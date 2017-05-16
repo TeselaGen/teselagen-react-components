@@ -9,7 +9,7 @@
 yarn add teselagen-react-components
 ```
 ```
-import {DataTable, routeDoubleClick} from "teselagen-react-components";
+import {DataTable, routeDoubleClick, queryParams} from "teselagen-react-components";
 ```
 
 [build-badge]: https://img.shields.io/travis/user/repo/master.png?style=flat-square

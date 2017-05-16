@@ -23,3 +23,9 @@
 - `npm run build` will build the component for publishing to npm and also bundle the demo app.
 
 - `npm run clean` will delete built resources.
+
+## Releasing
+
+- `npm whoami` you should be teselagen
+- `npm login` teselagen//ourMasterPass
+- `yarn release` will build the component, push to github, and releases to npm

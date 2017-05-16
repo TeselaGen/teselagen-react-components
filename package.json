@@ -1,6 +1,6 @@
 {
   "name": "teselagen-react-components",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Teselagen React Component Library",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -17,7 +17,7 @@
     "test": "nwb test-react",
     "test:coverage": "nwb test-react --coverage",
     "test:watch": "nwb test-react --server",
-    "release": "yarn build && release-it"
+    "release": "release-it"
   },
   "dependencies": {
     "redux": "^3.6.0"
