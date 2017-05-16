@@ -1,2 +1,3 @@
 export {default as DataTable} from './DataTable';
-export {routeDoubleClick} from './DataTable/dataTableUtils';
+export {default as routeDoubleClick} from './DataTable/utils/routeDoubleClick';
+export {default as queryParams} from './DataTable/utils/queryParams';

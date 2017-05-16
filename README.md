@@ -1,9 +1,16 @@
-# ve-editor
+# TeselaGen-React-Components
 
 [![Travis][build-badge]][build]
 [![npm package][npm-badge]][npm]
 [![Coveralls][coveralls-badge]][coveralls]
 
+# Using: 
+```
+yarn add teselagen-react-components
+```
+```
+import {DataTable, routeDoubleClick} from "teselagen-react-components";
+```
 
 [build-badge]: https://img.shields.io/travis/user/repo/master.png?style=flat-square
 [build]: https://travis-ci.org/user/repo
