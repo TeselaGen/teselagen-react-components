@@ -1,6 +1,6 @@
 {
   "name": "teselagen-react-components",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Teselagen React Component Library",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -18,7 +18,8 @@
     "test:coverage": "nwb test-react --coverage",
     "test:watch": "nwb test-react --server",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "release": "release-it"
   },
   "dependencies": {
     "redux": "^3.6.0"
@@ -43,7 +44,8 @@
     "react-dom": "^15.5.4",
     "react-measure": "^1.4.7",
     "react-redux": "^5.0.4",
-    "redux-form": "^6.7.0"
+    "redux-form": "^6.7.0",
+    "release-it": "^2.7.3"
   },
   "author": "",
   "homepage": "",
