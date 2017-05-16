@@ -5,6 +5,7 @@ import moment from "moment";
 import debounce from "lodash/debounce";
 import PagingToolbar from "./pagingToolbar";
 import lo_map from "lodash/map";
+
 import type {
   TableDataTypes,
   // SchemaForField,
@@ -41,7 +42,7 @@ import {
 } from "@blueprintjs/datetime";
 import "./style.css";
 import Measure from "react-measure";
-function noop () {}
+function noop() {}
 class DataTable extends React.Component {
   state = {
     dimensions: {
@@ -109,7 +110,7 @@ class DataTable extends React.Component {
     clearFilters: noop,
     setPageSize: noop,
     setOrderBy: noop,
-    setPage: noop,
+    setPage: noop
   };
 
   render() {

@@ -42,7 +42,7 @@ import {DataTable, routeDoubleClick, queryParams} from "teselagen-react-componen
 
 - `npm whoami` you should be teselagen
 - `npm login` teselagen//ourMasterPass
-- `yarn release` will build the component, push to github, and releases to npm
+- `yarn publish` bump version appropriately
 
 [build-badge]: https://img.shields.io/travis/user/repo/master.png?style=flat-square
 [build]: https://travis-ci.org/user/repo
