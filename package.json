@@ -1,6 +1,6 @@
 {
   "name": "teselagen-react-components",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "Teselagen React Component Library",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -45,8 +45,6 @@
     "redux-form": "^6.7.0",
     "release-it": "^2.7.3"
   },
-  "author": "teselagen",
-  "homepage": "https://github.com/TeselaGen/teselagen-react-components",
   "license": "MIT",
   "repository": "https://github.com/TeselaGen/teselagen-react-components",
   "keywords": [
