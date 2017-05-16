@@ -17,7 +17,7 @@
     "test": "nwb test-react",
     "test:coverage": "nwb test-react --coverage",
     "test:watch": "nwb test-react --server",
-    "release": "release-it"
+    "release": "npm version patch; npm publish"
   },
   "dependencies": {
     "redux": "^3.6.0"
