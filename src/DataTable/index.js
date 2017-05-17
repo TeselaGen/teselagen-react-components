@@ -83,14 +83,6 @@ class DataTable extends React.Component {
     onSingleRowSelect?: Function,
     onDeselect?: Function,
     onMultiRowSelect?: Function,
-    page: number,
-    pageSize: number,
-    order: string,
-    filter: Object,
-    selectedFilter: string,
-    filterValue: string,
-    fieldName: string,
-    searchTerm: string,
     cellRenderer: Object,
     customMenuItems: Object
   };
@@ -137,17 +129,16 @@ class DataTable extends React.Component {
       onMultiRowSelect,
       page,
       pageSize,
-      filter
+      selectedFilter
     } = this.props;
     const { dimensions } = this.state;
     const { width } = dimensions;
 
-    const setPaging = debounce(({ page, pageSize }) => {
+    const setPageSizeDebounced = debounce(pageSize => {
       setPageSize(pageSize);
-      setPage(page);
     }, 300);
 
-    const hasFilters = filter || searchTerm;
+    const hasFilters = selectedFilter || searchTerm;
     const numRows = isInfinite ? entities.length : pageSize;
     const maybeSpinner = isLoading
       ? <Spinner className={Classes.SMALL} />
@@ -175,24 +166,28 @@ class DataTable extends React.Component {
               <span className={"data-table-title"}>
                 {tableName}
               </span>}
-            {hasFilters
-              ? <Button
-                  onClick={function() {
-                    clearFilters();
-                  }}
-                  text={"Clear filters"}
-                />
-              : ""}
+
             {this.props.children}
           </div>
           {withSearch &&
-            <SearchBar
-              {...{
-                setSearchTerm,
-                maybeSpinner,
-                initialValues: { searchTerm }
-              }}
-            />}
+            <div className={"data-table-search-and-clear-filter-container"}>
+              {hasFilters
+                ? <Button
+                    className={"data-table-clear-filters"}
+                    onClick={function() {
+                      clearFilters();
+                    }}
+                    text={"Clear filters"}
+                  />
+                : ""}
+              <SearchBar
+                {...{
+                  setSearchTerm,
+                  maybeSpinner,
+                  initialValues: { searchTerm }
+                }}
+              />
+            </div>}
         </div>
         <div className={"data-table-body"}>
 
@@ -245,7 +240,8 @@ class DataTable extends React.Component {
                 page,
                 pageSize
               }}
-              setPaging={setPaging}
+              setPage={setPage}
+              setPageSize={setPageSizeDebounced}
             />
           </div>}
       </div>
@@ -543,7 +539,7 @@ class FilterAndSortMenu extends React.Component {
               className={"pt-popover-dismiss"}
               intent={Intent.SUCCESS}
               onClick={() => {
-                handleFilterSubmit;
+                handleFilterSubmit();
               }}
               text="Ok"
             />

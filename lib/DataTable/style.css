@@ -117,3 +117,10 @@
 	opacity: .7;
 }
 
+.data-table-search-and-clear-filter-container {
+	display: flex;
+}
+
+.data-table-clear-filters {
+	margin-right: 20px;
+}

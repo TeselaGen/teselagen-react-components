@@ -1,7 +1,7 @@
 //@flow
 import React from "react";
 import type { Paging } from "../flow_types";
-import { NumericInput, Intent } from "@blueprintjs/core";
+import { NumericInput } from "@blueprintjs/core";
 // queryParams: {
 //   filters: {},
 //   sorting: [],
@@ -13,11 +13,16 @@ import { NumericInput, Intent } from "@blueprintjs/core";
 class PagingToolbar extends React.Component {
   props: {
     paging: Paging,
-    setPaging: Function
+    setPageSize: Function,
+    setPage: Function
   };
 
   render() {
-    const { paging: { pageSize, page, total }, setPaging } = this.props;
+    const {
+      paging: { pageSize, page, total },
+      setPageSize,
+      setPage
+    } = this.props;
     const pageStart = (page - 1) * pageSize + 1;
     const pageEnd = (page - 1) * pageSize + pageSize < total
       ? (page - 1) * pageSize + pageSize
@@ -31,21 +36,15 @@ class PagingToolbar extends React.Component {
           className={"paging-row-input"}
           value={pageSize}
           onValueChange={value => {
-            setPaging({
-              page,
-              pageSize: value
-            });
+            setPageSize(value);
           }}
         />
         <span
           onClick={() => {
             if (backEnabled) {
-              setPaging({
-                pageSize,
-                page: page - 1
-              });
+              setPage(page - 1);
             } else {
-              toastr && toastr.warning('No more pages that way')
+              toastr && toastr.warning("No more pages that way");
             }
           }}
           className={
@@ -57,12 +56,9 @@ class PagingToolbar extends React.Component {
         <span
           onClick={() => {
             if (forwardEnabled) {
-              setPaging({
-                pageSize,
-                page: page + 1
-              });
+              setPage(page + 1);
             } else {
-              toastr && toastr.warning('No more pages that way')
+              toastr && toastr.warning("No more pages that way");
             }
           }}
           className={

@@ -8,25 +8,30 @@ export default function queryParams({ columns, schema, defaults = {} }) {
     order: "",
     where: {},
     include: [],
-    searchTerm: undefined, //undefined helps us compare when this has been changed to an empty string
+    searchTerm: "", //undefined helps us compare when this has been changed to an empty string
     page: 1,
     ...defaults
   };
 
+  // function getCurrentParams(location) {
+  //   let currentParams = {
+  //     ...defaultParams,
+  //     ...getParamsFromRoute(location)
+  //   };
+  //   return currentParams;
+  // }
+
   function getCurrentParams(location) {
     const { search } = location;
-    let currentParams = {
-      ...defaultParams,
-      ...jsonParseNested(queryString.parse(search))
-    };
-    return currentParams;
+    return jsonParseNested(queryString.parse(search));
   }
 
   return {
     getQueryParamsFromRouter: function({ location }) {
-      debugger;
-      location = location || window.location;
-      let graphqlQueryParams = getCurrentParams(location);
+      let graphqlQueryParams = {
+        ...defaultParams,
+        ...getCurrentParams(location)
+      };
       const { page, pageSize } = graphqlQueryParams;
       //convert params from user readable to what our api expects
       // aka page -> offset & pageSize -> limit
@@ -48,11 +53,12 @@ export default function queryParams({ columns, schema, defaults = {} }) {
       delete graphqlQueryParams.fieldName;
       if (selectedFilter) {
         const subFilter = getSubFilter(selectedFilter, filterValue, fieldName);
-        const { path, model } = schema[fieldName];
+        const { path, model } = schema.fields[fieldName];
+        const wherekey = model ? `$${path}$` : fieldName;
         graphqlQueryParams = {
           ...graphqlQueryParams,
           where: {
-            [model ? `$${path}$` : fieldName]: subFilter
+            [wherekey]: subFilter
           },
           include: model
             ? {
@@ -105,13 +111,14 @@ export default function queryParams({ columns, schema, defaults = {} }) {
       };
     },
     setQueryParamsOnRouter: function(dispatch, { history, location }) {
-      location = location || window.location;
-      const push = history ? history.push : window.history.pushState;
+      const { push } = history;
       function setSearchTerm(searchTerm) {
         const currentParams = getCurrentParams(location);
         let newParams = {
           ...currentParams,
-          searchTerm
+          searchTerm: searchTerm === defaultParams.searchTerm
+            ? undefined
+            : searchTerm
         };
         push({
           search: `?${queryString.stringify(jsonStringifyNested(newParams))}`
@@ -119,7 +126,6 @@ export default function queryParams({ columns, schema, defaults = {} }) {
       }
       function setFilter({ selectedFilter, filterValue, fieldName }) {
         const currentParams = getCurrentParams(location);
-
         let newParams = {
           ...currentParams,
           selectedFilter,
@@ -138,12 +144,15 @@ export default function queryParams({ columns, schema, defaults = {} }) {
         push({
           search: ""
         });
+        setTimeout(function() {
+          dispatch(reset("dataTableSearchInput"));
+        });
       }
       function setPageSize(pageSize) {
         const currentParams = getCurrentParams(location);
         let newParams = {
           ...currentParams,
-          pageSize
+          pageSize: pageSize === defaultParams.pageSize ? undefined : pageSize
         };
         push({
           search: `?${queryString.stringify(jsonStringifyNested(newParams))}`
@@ -153,7 +162,7 @@ export default function queryParams({ columns, schema, defaults = {} }) {
         const currentParams = getCurrentParams(location);
         let newParams = {
           ...currentParams,
-          order
+          order: order === defaultParams.order ? undefined : order
         };
         push({
           search: `?${queryString.stringify(jsonStringifyNested(newParams))}`
@@ -163,7 +172,7 @@ export default function queryParams({ columns, schema, defaults = {} }) {
         const currentParams = getCurrentParams(location);
         let newParams = {
           ...currentParams,
-          page
+          page: page === defaultParams.page ? undefined : page
         };
         push({
           search: `?${queryString.stringify(jsonStringifyNested(newParams))}`

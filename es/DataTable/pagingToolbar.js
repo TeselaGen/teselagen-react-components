@@ -6,7 +6,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 import React from "react";
 
-import { NumericInput, Intent } from "@blueprintjs/core";
+import { NumericInput } from "@blueprintjs/core";
 // queryParams: {
 //   filters: {},
 //   sorting: [],
@@ -40,7 +40,8 @@ var PagingToolbar = function (_React$Component) {
         pageSize = _props$paging.pageSize,
         page = _props$paging.page,
         total = _props$paging.total,
-        setPaging = _props.setPaging;
+        setPageSize = _props.setPageSize,
+        setPage = _props.setPage;
 
     var pageStart = (page - 1) * pageSize + 1;
     var pageEnd = (page - 1) * pageSize + pageSize < total ? (page - 1) * pageSize + pageSize : total;
@@ -58,19 +59,13 @@ var PagingToolbar = function (_React$Component) {
         className: "paging-row-input",
         value: pageSize,
         onValueChange: function onValueChange(value) {
-          setPaging({
-            page: page,
-            pageSize: value
-          });
+          setPageSize(value);
         }
       }),
       React.createElement("span", {
         onClick: function onClick() {
           if (backEnabled) {
-            setPaging({
-              pageSize: pageSize,
-              page: page - 1
-            });
+            setPage(page - 1);
           } else {
             toastr && toastr.warning('No more pages that way');
           }
@@ -91,10 +86,7 @@ var PagingToolbar = function (_React$Component) {
       React.createElement("span", {
         onClick: function onClick() {
           if (forwardEnabled) {
-            setPaging({
-              pageSize: pageSize,
-              page: page + 1
-            });
+            setPage(page + 1);
           } else {
             toastr && toastr.warning('No more pages that way');
           }

@@ -8,6 +8,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+import "../toastr";
 import React from "react";
 import times from "lodash/times";
 import moment from "moment";
@@ -159,7 +160,7 @@ var DataTable = (_temp2 = _class = function (_React$Component) {
           columns = _this$props4.columns,
           schema = _this$props4.schema,
           setFilter = _this$props4.setFilter,
-          setOrderBy = _this$props4.setOrderBy,
+          setOrder = _this$props4.setOrder,
           order = _this$props4.order;
 
 
@@ -190,7 +191,7 @@ var DataTable = (_temp2 = _class = function (_React$Component) {
         ),
         menu: React.createElement(FilterAndSortMenu, {
           setFilter: setFilter,
-          setOrderBy: setOrderBy,
+          setOrder: setOrder,
           fieldName: fieldName,
           dataType: columnDataType,
           schemaForField: schemaForField
@@ -229,20 +230,16 @@ var DataTable = (_temp2 = _class = function (_React$Component) {
         onMultiRowSelect = _props.onMultiRowSelect,
         page = _props.page,
         pageSize = _props.pageSize,
-        filter = _props.filter;
+        selectedFilter = _props.selectedFilter;
     var dimensions = this.state.dimensions;
     var width = dimensions.width;
 
 
-    var setPaging = debounce(function (_ref2) {
-      var page = _ref2.page,
-          pageSize = _ref2.pageSize;
-
+    var setPageSizeDebounced = debounce(function (pageSize) {
       setPageSize(pageSize);
-      setPage(page);
     }, 300);
 
-    var hasFilters = filter || searchTerm;
+    var hasFilters = selectedFilter || searchTerm;
     var numRows = isInfinite ? entities.length : pageSize;
     var maybeSpinner = isLoading ? React.createElement(Spinner, { className: Classes.SMALL }) : undefined;
     var numberOfColumns = columns ? columns.length : 0;
@@ -272,19 +269,24 @@ var DataTable = (_temp2 = _class = function (_React$Component) {
             { className: "data-table-title" },
             tableName
           ),
+          this.props.children
+        ),
+        withSearch && React.createElement(
+          "div",
+          { className: 'data-table-search-and-clear-filter-container' },
           hasFilters ? React.createElement(Button, {
+            className: 'data-table-clear-filters',
             onClick: function onClick() {
               clearFilters();
             },
             text: "Clear filters"
           }) : "",
-          this.props.children
-        ),
-        withSearch && React.createElement(SearchBar, {
-          setSearchTerm: setSearchTerm,
-          maybeSpinner: maybeSpinner,
-          initialValues: { searchTerm: searchTerm }
-        })
+          React.createElement(SearchBar, {
+            setSearchTerm: setSearchTerm,
+            maybeSpinner: maybeSpinner,
+            initialValues: { searchTerm: searchTerm }
+          })
+        )
       ),
       React.createElement(
         "div",
@@ -340,7 +342,8 @@ var DataTable = (_temp2 = _class = function (_React$Component) {
             page: page,
             pageSize: pageSize
           },
-          setPaging: setPaging
+          setPage: setPage,
+          setPageSize: setPageSizeDebounced
         })
       )
     );
@@ -357,6 +360,7 @@ var DataTable = (_temp2 = _class = function (_React$Component) {
   withSearch: true,
   withPaging: true,
   pageSize: 10,
+  extraClasses: "",
   page: 0,
   isLoading: false,
   isInfinite: false,
@@ -365,7 +369,7 @@ var DataTable = (_temp2 = _class = function (_React$Component) {
   setFilter: noop,
   clearFilters: noop,
   setPageSize: noop,
-  setOrderBy: noop,
+  setOrder: noop,
   setPage: noop
 }, _temp2);
 
@@ -405,7 +409,7 @@ var FilterAndSortMenu = (_temp3 = _class2 = function (_React$Component2) {
         dataType = _props2.dataType,
         model = _props2.schemaForField.model,
         fieldName = _props2.fieldName,
-        setOrderBy = _props2.setOrderBy;
+        setOrder = _props2.setOrder;
     var handleFilterChange = this.handleFilterChange,
         handleFilterValueChange = this.handleFilterValueChange,
         handleFilterSubmit = this.handleFilterSubmit;
@@ -434,14 +438,14 @@ var FilterAndSortMenu = (_temp3 = _class2 = function (_React$Component2) {
       React.createElement(MenuItem, {
         iconName: "sort-asc",
         onClick: function onClick() {
-          if (!model) setOrderBy(fieldName);
+          if (!model) setOrder(fieldName);
         },
         text: "Sort Asc"
       }),
       React.createElement(MenuItem, {
         iconName: "sort-desc",
         onClick: function onClick() {
-          if (!model) setOrderBy("reverse:" + fieldName);
+          if (!model) setOrder("reverse:" + fieldName);
         },
         text: "Sort Desc"
       }),
@@ -497,7 +501,7 @@ var FilterAndSortMenu = (_temp3 = _class2 = function (_React$Component2) {
           className: "pt-popover-dismiss",
           intent: Intent.SUCCESS,
           onClick: function onClick() {
-            handleFilterSubmit;
+            handleFilterSubmit();
           },
           text: "Ok"
         }),
@@ -673,10 +677,10 @@ function SearchBarInner(props) {
   );
 }
 
-function renderSearchBarInputGroup(_ref3) {
-  var input = _ref3.input,
-      setSearchTerm = _ref3.setSearchTerm,
-      maybeSpinner = _ref3.maybeSpinner;
+function renderSearchBarInputGroup(_ref2) {
+  var input = _ref2.input,
+      setSearchTerm = _ref2.setSearchTerm,
+      maybeSpinner = _ref2.maybeSpinner;
 
   return React.createElement(InputGroup, _extends({
     className: "pt-round datatable-search-input",

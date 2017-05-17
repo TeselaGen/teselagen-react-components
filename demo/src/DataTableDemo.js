@@ -3,6 +3,11 @@ import toArray from "lodash/toArray";
 import { FocusStyleManager } from "@blueprintjs/core";
 FocusStyleManager.onlyShowFocusOnTabs();
 
+import {
+  BrowserRouter as Router,
+  withRouter
+} from 'react-router-dom'
+
 const MOCK_MATERIALS = {
   "1": {
     name: "Material 1asdasdasdasdasdasdasdasdasdasdasdassa",
@@ -110,7 +115,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   };
 };
 
-var ReduxTable = connect (mapStateToProps, mapDispatchToProps)(DataTableWrapper)
+var ReduxTable = withRouter(connect (mapStateToProps, mapDispatchToProps)(DataTableWrapper))
 function DataTableWrapper (props) {
 	var {
 		page,
@@ -165,11 +170,11 @@ function DataTableWrapper (props) {
 
 function noop() {}
 
-
-
 export default function () {
 
 return <Provider store={store}>
-	<ReduxTable></ReduxTable>
+	<Router>
+		  <ReduxTable></ReduxTable>
+	</Router>
 </Provider>
 }
