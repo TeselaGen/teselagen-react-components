@@ -1,4 +1,5 @@
 //@flow
+import "../toastr";
 import React from "react";
 import times from "lodash/times";
 import moment from "moment";
