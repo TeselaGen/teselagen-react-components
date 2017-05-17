@@ -67,7 +67,7 @@ var PagingToolbar = function (_React$Component) {
           if (backEnabled) {
             setPage(page - 1);
           } else {
-            toastr && toastr.warning('No more pages that way');
+            toastr && toastr.warning("No more pages that way");
           }
         },
         className: "pt-icon-standard pt-icon-arrow-left paging-arrow-left " + (!backEnabled && " pt-disabled")
@@ -88,7 +88,7 @@ var PagingToolbar = function (_React$Component) {
           if (forwardEnabled) {
             setPage(page + 1);
           } else {
-            toastr && toastr.warning('No more pages that way');
+            toastr && toastr.warning("No more pages that way");
           }
         },
         className: "pt-icon-standard pt-icon-arrow-right paging-arrow-right " + (!forwardEnabled && " pt-disabled")

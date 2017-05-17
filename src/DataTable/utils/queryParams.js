@@ -77,7 +77,7 @@ export default function queryParams({ columns, schema, defaults = {} }) {
         columns.forEach(function(column) {
           const { model, type, path } = schema.fields[column];
           if (type === "string" || type === "lookup") {
-            var likeObj = { iLike: "%" + graphqlQueryParams.searchTerm + "%" };
+            var likeObj = { iLike: "%" + searchTerm + "%" };
             if (model) {
               const includeObj = include[model] || {
                 model,

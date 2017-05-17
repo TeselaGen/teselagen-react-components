@@ -273,9 +273,9 @@ var DataTable = (_temp2 = _class = function (_React$Component) {
         ),
         withSearch && React.createElement(
           "div",
-          { className: 'data-table-search-and-clear-filter-container' },
+          { className: "data-table-search-and-clear-filter-container" },
           hasFilters ? React.createElement(Button, {
-            className: 'data-table-clear-filters',
+            className: "data-table-clear-filters",
             onClick: function onClick() {
               clearFilters();
             },
