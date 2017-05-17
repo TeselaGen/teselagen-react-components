@@ -62,7 +62,6 @@ class DataTable extends React.Component {
     page: number,
     pageSize: number,
     order: string,
-    filter: Object,
     selectedFilter: string,
     filterValue: string,
     fieldName: string,
@@ -72,7 +71,7 @@ class DataTable extends React.Component {
     setFilter: Function,
     clearFilters: Function,
     setPageSize: Function,
-    setOrderBy: Function,
+    setOrder: Function,
     setPage: Function,
     onDoubleClick?: Function,
     children?: any,
@@ -102,6 +101,7 @@ class DataTable extends React.Component {
     withSearch: true,
     withPaging: true,
     pageSize: 10,
+    extraClasses: "",
     page: 0,
     isLoading: false,
     isInfinite: false,
@@ -110,7 +110,7 @@ class DataTable extends React.Component {
     setFilter: noop,
     clearFilters: noop,
     setPageSize: noop,
-    setOrderBy: noop,
+    setOrder: noop,
     setPage: noop
   };
 
@@ -358,7 +358,7 @@ class DataTable extends React.Component {
   };
 
   renderColumnHeader = (columnIndex: number) => {
-    const { columns, schema, setFilter, setOrderBy, order } = this.props;
+    const { columns, schema, setFilter, setOrder, order } = this.props;
 
     const fieldName = columns[columnIndex];
     const schemaForField = schema.fields[fieldName];
@@ -391,7 +391,7 @@ class DataTable extends React.Component {
         menu={
           <FilterAndSortMenu
             setFilter={setFilter}
-            setOrderBy={setOrderBy}
+            setOrder={setOrder}
             fieldName={fieldName}
             dataType={columnDataType}
             schemaForField={schemaForField}
@@ -431,7 +431,7 @@ class FilterAndSortMenu extends React.Component {
     dataType: TableDataTypes,
     schemaForField: Object,
     fieldName: string,
-    setOrderBy: Function,
+    setOrder: Function,
     setFilter: Function
   };
   handleFilterChange = (selectedFilter: string) => {
@@ -463,7 +463,7 @@ class FilterAndSortMenu extends React.Component {
       dataType,
       schemaForField: { model },
       fieldName,
-      setOrderBy
+      setOrder
     } = this.props;
     const {
       handleFilterChange,
@@ -493,14 +493,14 @@ class FilterAndSortMenu extends React.Component {
         <MenuItem
           iconName="sort-asc"
           onClick={() => {
-            if (!model) setOrderBy(fieldName);
+            if (!model) setOrder(fieldName);
           }}
           text="Sort Asc"
         />
         <MenuItem
           iconName="sort-desc"
           onClick={() => {
-            if (!model) setOrderBy("reverse:" + fieldName);
+            if (!model) setOrder("reverse:" + fieldName);
           }}
           text="Sort Desc"
         />

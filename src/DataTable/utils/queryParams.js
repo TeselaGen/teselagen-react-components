@@ -24,6 +24,8 @@ export default function queryParams({ columns, schema, defaults = {} }) {
 
   return {
     getQueryParamsFromRouter: function({ location }) {
+      debugger;
+      location = location || window.location;
       let graphqlQueryParams = getCurrentParams(location);
       const { page, pageSize } = graphqlQueryParams;
       //convert params from user readable to what our api expects
@@ -103,13 +105,15 @@ export default function queryParams({ columns, schema, defaults = {} }) {
       };
     },
     setQueryParamsOnRouter: function(dispatch, { history, location }) {
+      location = location || window.location;
+      const push = history ? history.push : window.history.pushState;
       function setSearchTerm(searchTerm) {
         const currentParams = getCurrentParams(location);
         let newParams = {
           ...currentParams,
           searchTerm
         };
-        history.push({
+        push({
           search: `?${queryString.stringify(jsonStringifyNested(newParams))}`
         });
       }
@@ -123,7 +127,7 @@ export default function queryParams({ columns, schema, defaults = {} }) {
           filterValue,
           searchTerm: undefined
         };
-        history.push({
+        push({
           search: `?${queryString.stringify(jsonStringifyNested(newParams))}`
         });
         setTimeout(function() {
@@ -131,7 +135,7 @@ export default function queryParams({ columns, schema, defaults = {} }) {
         });
       }
       function clearFilters() {
-        history.push({
+        push({
           search: ""
         });
       }
@@ -141,7 +145,7 @@ export default function queryParams({ columns, schema, defaults = {} }) {
           ...currentParams,
           pageSize
         };
-        history.push({
+        push({
           search: `?${queryString.stringify(jsonStringifyNested(newParams))}`
         });
       }
@@ -151,7 +155,7 @@ export default function queryParams({ columns, schema, defaults = {} }) {
           ...currentParams,
           order
         };
-        history.push({
+        push({
           search: `?${queryString.stringify(jsonStringifyNested(newParams))}`
         });
       }
@@ -161,7 +165,7 @@ export default function queryParams({ columns, schema, defaults = {} }) {
           ...currentParams,
           page
         };
-        history.push({
+        push({
           search: `?${queryString.stringify(jsonStringifyNested(newParams))}`
         });
       }

@@ -17,7 +17,8 @@
     "test": "nwb test-react",
     "precommit": "lint-staged",
     "test:coverage": "nwb test-react --coverage",
-    "test:watch": "nwb test-react --server"
+    "test:watch": "nwb test-react --server",
+    "bp": "npm run build; npm version patch; npm publish"
   },
   "dependencies": {
     "lint-staged": "^3.4.1",
