@@ -1,8 +1,9 @@
-export default function routeDoubleClick (row, rowIndex, history) {
+import pluralize from "pluralize";
+export default function routeDoubleClick(row, rowIndex, history) {
   const recordType = row["__typename"];
   const recordId = row["dbId"];
-  const route = "/" + recordType + "s" + "/" + recordId;
+  const route = "/" + pluralize(recordType) + "/" + recordId;
   history
     ? history.push(route)
-    : console.warn("router history not passed to datatable");
-};
+    : console.warn("react router history not passed to datatable");
+}
