@@ -376,7 +376,7 @@ class DataTable extends React.Component {
     return (
       <ColumnHeaderCell
         name={
-          <span>
+          <span title={displayName}>
             {displayName + "  "}
             {ordering &&
               (ordering === "asc"
