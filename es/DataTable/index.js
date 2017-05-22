@@ -185,7 +185,7 @@ var DataTable = (_temp2 = _class = function (_React$Component) {
       return React.createElement(ColumnHeaderCell, {
         name: React.createElement(
           "span",
-          null,
+          { title: displayName },
           displayName + "  ",
           ordering && (ordering === "asc" ? React.createElement("span", { className: "pt-icon-standard pt-icon-arrow-down" }) : React.createElement("span", { className: "pt-icon-standard pt-icon-arrow-up" }))
         ),
@@ -230,6 +230,7 @@ var DataTable = (_temp2 = _class = function (_React$Component) {
         onMultiRowSelect = _props.onMultiRowSelect,
         page = _props.page,
         pageSize = _props.pageSize,
+        reduxFormSearchInput = _props.reduxFormSearchInput,
         selectedFilter = _props.selectedFilter;
     var dimensions = this.state.dimensions;
     var width = dimensions.width;
@@ -238,7 +239,6 @@ var DataTable = (_temp2 = _class = function (_React$Component) {
     var setPageSizeDebounced = debounce(function (pageSize) {
       setPageSize(pageSize);
     }, 300);
-
     var hasFilters = selectedFilter || searchTerm;
     var numRows = isInfinite ? entities.length : pageSize;
     var maybeSpinner = isLoading ? React.createElement(Spinner, { className: Classes.SMALL }) : undefined;
@@ -282,9 +282,9 @@ var DataTable = (_temp2 = _class = function (_React$Component) {
             text: "Clear filters"
           }) : "",
           React.createElement(SearchBar, {
+            reduxFormSearchInput: reduxFormSearchInput,
             setSearchTerm: setSearchTerm,
-            maybeSpinner: maybeSpinner,
-            initialValues: { searchTerm: searchTerm }
+            maybeSpinner: maybeSpinner
           })
         )
       ),
@@ -373,6 +373,15 @@ var DataTable = (_temp2 = _class = function (_React$Component) {
   setPage: noop
 }, _temp2);
 
+// function QueryParams(props) {
+//   return (
+//       <Field
+//         name={fieldName}
+//         {...props}
+//         component={Component}
+//       />
+//   );
+// }
 
 export default DataTable;
 
@@ -660,39 +669,43 @@ var FilterInput = function (_React$Component3) {
   return FilterInput;
 }(React.Component);
 
-import { Field, reduxForm } from "redux-form";
-var SearchBar = reduxForm({
-  form: "dataTableSearchInput"
-})(SearchBarInner);
+// import { Field, reduxForm } from "redux-form";
+// const SearchBar = reduxForm({
+//   form: "dataTableSearchInput"
+// })(SearchBarInner);
 
-function SearchBarInner(props) {
-  return React.createElement(
-    "div",
-    { className: "data-table-search-and-filter" },
-    React.createElement(Field, _extends({
-      name: "searchTerm"
-    }, props, {
-      component: renderSearchBarInputGroup
-    }))
-  );
-}
+// function SearchBarInner(props) {
+//   return (
+//     <div className={"data-table-search-and-filter"}>
+//       <Field
+//         name="searchTerm"
+//         {...props}
+//         component={renderSearchBarInputGroup}
+//       />
 
-function renderSearchBarInputGroup(_ref2) {
-  var input = _ref2.input,
+//     </div>
+//   );
+// }
+
+// function renderSearchBarInputGroup({ reduxFormSearchInput, setSearchTerm, maybeSpinner }) {
+
+
+function SearchBar(_ref2) {
+  var reduxFormSearchInput = _ref2.reduxFormSearchInput,
       setSearchTerm = _ref2.setSearchTerm,
       maybeSpinner = _ref2.maybeSpinner;
 
   return React.createElement(InputGroup, _extends({
     className: "pt-round datatable-search-input",
     placeholder: "Search..."
-  }, input, onEnterHelper(function () {
-    setSearchTerm(input.value);
+  }, reduxFormSearchInput.input, onEnterHelper(function () {
+    setSearchTerm(reduxFormSearchInput.input.value);
   }), {
     rightElement: maybeSpinner || React.createElement(Button, {
       className: Classes.MINIMAL,
       iconName: "pt-icon-search",
       onClick: function onClick() {
-        setSearchTerm(input.value);
+        setSearchTerm(reduxFormSearchInput.input.value);
       }
     })
   }));

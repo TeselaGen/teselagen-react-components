@@ -10,7 +10,7 @@ import lo_map from "lodash/map";
 import type {
   TableDataTypes,
   // SchemaForField,
-  QueryParams,
+  // QueryParams,
   // Paging,
   IRegion
 } from "../flow_types";
@@ -55,6 +55,7 @@ class DataTable extends React.Component {
   props: {
     entities: Array<Object>,
     schema: Object,
+    reduxFormSearchInput: Object,
     extraClasses: string,
     tableName?: string,
     isLoading: boolean,
@@ -129,6 +130,7 @@ class DataTable extends React.Component {
       onMultiRowSelect,
       page,
       pageSize,
+      reduxFormSearchInput,
       selectedFilter
     } = this.props;
     const { dimensions } = this.state;
@@ -137,7 +139,6 @@ class DataTable extends React.Component {
     const setPageSizeDebounced = debounce(pageSize => {
       setPageSize(pageSize);
     }, 300);
-
     const hasFilters = selectedFilter || searchTerm;
     const numRows = isInfinite ? entities.length : pageSize;
     const maybeSpinner = isLoading
@@ -182,9 +183,9 @@ class DataTable extends React.Component {
                 : ""}
               <SearchBar
                 {...{
+                  reduxFormSearchInput,
                   setSearchTerm,
-                  maybeSpinner,
-                  initialValues: { searchTerm }
+                  maybeSpinner
                 }}
               />
             </div>}
@@ -410,6 +411,15 @@ class DataTable extends React.Component {
   };
 }
 
+// function QueryParams(props) {
+//   return (
+//       <Field
+//         name={fieldName}
+//         {...props}
+//         component={Component}
+//       />
+//   );
+// }
 export default DataTable;
 
 // type SelectedRegion = {rows?: Array<number>, cols?: Array<number>}
@@ -664,32 +674,33 @@ class FilterInput extends React.Component {
   }
 }
 
-import { Field, reduxForm } from "redux-form";
-const SearchBar = reduxForm({
-  form: "dataTableSearchInput"
-})(SearchBarInner);
+// import { Field, reduxForm } from "redux-form";
+// const SearchBar = reduxForm({
+//   form: "dataTableSearchInput"
+// })(SearchBarInner);
 
-function SearchBarInner(props) {
-  return (
-    <div className={"data-table-search-and-filter"}>
-      <Field
-        name="searchTerm"
-        {...props}
-        component={renderSearchBarInputGroup}
-      />
+// function SearchBarInner(props) {
+//   return (
+//     <div className={"data-table-search-and-filter"}>
+//       <Field
+//         name="searchTerm"
+//         {...props}
+//         component={renderSearchBarInputGroup}
+//       />
 
-    </div>
-  );
-}
+//     </div>
+//   );
+// }
 
-function renderSearchBarInputGroup({ input, setSearchTerm, maybeSpinner }) {
+// function renderSearchBarInputGroup({ reduxFormSearchInput, setSearchTerm, maybeSpinner }) {
+function SearchBar({ reduxFormSearchInput, setSearchTerm, maybeSpinner }) {
   return (
     <InputGroup
       className={"pt-round datatable-search-input"}
       placeholder="Search..."
-      {...input}
+      {...reduxFormSearchInput.input}
       {...onEnterHelper(function() {
-        setSearchTerm(input.value);
+        setSearchTerm(reduxFormSearchInput.input.value);
       })}
       rightElement={
         maybeSpinner ||
@@ -697,7 +708,7 @@ function renderSearchBarInputGroup({ input, setSearchTerm, maybeSpinner }) {
             className={Classes.MINIMAL}
             iconName={"pt-icon-search"}
             onClick={function() {
-              setSearchTerm(input.value);
+              setSearchTerm(reduxFormSearchInput.input.value);
             }}
           />
       }

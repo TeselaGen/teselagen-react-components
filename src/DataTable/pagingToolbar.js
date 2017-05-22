@@ -2,14 +2,7 @@
 import React from "react";
 import type { Paging } from "../flow_types";
 import { NumericInput } from "@blueprintjs/core";
-// queryParams: {
-//   filters: {},
-//   sorting: [],
-//   paging: {},
-//   columns: [],
-//   trackingInfo: {},
-//   responseId: {}
-// }
+
 class PagingToolbar extends React.Component {
   props: {
     paging: Paging,

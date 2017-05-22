@@ -1,5 +1,3 @@
-import { reset } from "redux-form";
-import isEqual from "lodash/isEqual";
 import queryString from "query-string";
 
 export default function queryParams({ columns, schema, defaults = {} }) {
@@ -10,183 +8,178 @@ export default function queryParams({ columns, schema, defaults = {} }) {
     include: [],
     searchTerm: "", //undefined helps us compare when this has been changed to an empty string
     page: 1,
+    selectedFilter: undefined,
+    fieldName: undefined,
+    filterValue: undefined,
     ...defaults
   };
 
-  // function getCurrentParams(location) {
-  //   let currentParams = {
-  //     ...defaultParams,
-  //     ...getParamsFromRoute(location)
-  //   };
-  //   return currentParams;
-  // }
-
-  function getCurrentParams(location) {
+  function getCurrentParamsFromUrl(location) {
     const { search } = location;
     return jsonParseNested(queryString.parse(search));
   }
+  function setCurrentParamsOnUrl(newParams, push) {
+    push({
+      search: `?${queryString.stringify(jsonStringifyNested(newParams))}`
+    });
+  }
 
-  return {
-    getQueryParamsFromRouter: function({ location }) {
-      let graphqlQueryParams = {
-        ...defaultParams,
-        ...getCurrentParams(location)
-      };
-      const { page, pageSize } = graphqlQueryParams;
-      //convert params from user readable to what our api expects
-      // aka page -> offset & pageSize -> limit
-      graphqlQueryParams.offset = (page - 1) * pageSize;
-      graphqlQueryParams.limit = pageSize;
+  function getQueryParams(currentParams) {
+    let graphqlQueryParams = {
+      ...defaultParams,
+      ...currentParams
+    };
+    const { page, pageSize } = graphqlQueryParams;
+    //convert params from user readable to what our api expects
+    // aka page -> offset & pageSize -> limit
+    graphqlQueryParams.offset = (page - 1) * pageSize;
+    graphqlQueryParams.limit = pageSize;
 
-      delete graphqlQueryParams.pageSize;
-      delete graphqlQueryParams.page;
+    delete graphqlQueryParams.pageSize;
+    delete graphqlQueryParams.page;
 
-      const {
-        searchTerm,
-        selectedFilter,
-        filterValue,
-        fieldName
-      } = graphqlQueryParams;
-      delete graphqlQueryParams.searchTerm;
-      delete graphqlQueryParams.selectedFilter;
-      delete graphqlQueryParams.filterValue;
-      delete graphqlQueryParams.fieldName;
-      if (selectedFilter) {
-        const subFilter = getSubFilter(selectedFilter, filterValue, fieldName);
-        const { path, model } = schema.fields[fieldName];
-        const wherekey = model ? `$${path}$` : fieldName;
-        graphqlQueryParams = {
-          ...graphqlQueryParams,
-          where: {
-            [wherekey]: subFilter
-          },
-          include: model
-            ? {
-                [model]: {
-                  model,
-                  required: false
-                }
-              }
-            : undefined
-        };
-      }
-      if (searchTerm) {
-        //custom logic based on the table schema to get the sequelize query
-        let include = {};
-        let or = {};
-        columns.forEach(function(column) {
-          const { model, type, path } = schema.fields[column];
-          if (type === "string" || type === "lookup") {
-            var likeObj = { iLike: "%" + searchTerm + "%" };
-            if (model) {
-              const includeObj = include[model] || {
+    const {
+      searchTerm,
+      selectedFilter,
+      filterValue,
+      fieldName
+    } = graphqlQueryParams;
+    delete graphqlQueryParams.searchTerm;
+    delete graphqlQueryParams.selectedFilter;
+    delete graphqlQueryParams.filterValue;
+    delete graphqlQueryParams.fieldName;
+    if (selectedFilter) {
+      const subFilter = getSubFilter(selectedFilter, filterValue, fieldName);
+      const { path, model } = schema.fields[fieldName];
+      const wherekey = model ? `$${path}$` : fieldName;
+      graphqlQueryParams = {
+        ...graphqlQueryParams,
+        where: {
+          [wherekey]: subFilter
+        },
+        include: model
+          ? {
+              [model]: {
                 model,
                 required: false
-              };
-              include[model] = includeObj;
-              or["$" + path + "$"] = likeObj;
-            } else {
-              or[column] = likeObj;
+              }
             }
-          }
-        }, {});
-        graphqlQueryParams = {
-          ...graphqlQueryParams,
-          offset: 0,
-          where: {
-            $or: or
-          },
-          include
-        };
-      }
-      return {
-        queryParams: graphqlQueryParams,
-        page,
-        pageSize,
-        order: graphqlQueryParams.order,
-        selectedFilter,
-        filterValue,
-        fieldName,
-        searchTerm
-      };
-    },
-    setQueryParamsOnRouter: function(dispatch, { history, location }) {
-      const { push } = history;
-      function setSearchTerm(searchTerm) {
-        const currentParams = getCurrentParams(location);
-        let newParams = {
-          ...currentParams,
-          searchTerm: searchTerm === defaultParams.searchTerm
-            ? undefined
-            : searchTerm
-        };
-        push({
-          search: `?${queryString.stringify(jsonStringifyNested(newParams))}`
-        });
-      }
-      function setFilter({ selectedFilter, filterValue, fieldName }) {
-        const currentParams = getCurrentParams(location);
-        let newParams = {
-          ...currentParams,
-          selectedFilter,
-          fieldName,
-          filterValue,
-          searchTerm: undefined
-        };
-        push({
-          search: `?${queryString.stringify(jsonStringifyNested(newParams))}`
-        });
-        setTimeout(function() {
-          dispatch(reset("dataTableSearchInput"));
-        });
-      }
-      function clearFilters() {
-        push({
-          search: ""
-        });
-        setTimeout(function() {
-          dispatch(reset("dataTableSearchInput"));
-        });
-      }
-      function setPageSize(pageSize) {
-        const currentParams = getCurrentParams(location);
-        let newParams = {
-          ...currentParams,
-          pageSize: pageSize === defaultParams.pageSize ? undefined : pageSize
-        };
-        push({
-          search: `?${queryString.stringify(jsonStringifyNested(newParams))}`
-        });
-      }
-      function setOrder(order) {
-        const currentParams = getCurrentParams(location);
-        let newParams = {
-          ...currentParams,
-          order: order === defaultParams.order ? undefined : order
-        };
-        push({
-          search: `?${queryString.stringify(jsonStringifyNested(newParams))}`
-        });
-      }
-      function setPage(page) {
-        const currentParams = getCurrentParams(location);
-        let newParams = {
-          ...currentParams,
-          page: page === defaultParams.page ? undefined : page
-        };
-        push({
-          search: `?${queryString.stringify(jsonStringifyNested(newParams))}`
-        });
-      }
-      return {
-        setSearchTerm,
-        setFilter,
-        clearFilters,
-        setPageSize,
-        setPage,
-        setOrder
+          : undefined
       };
     }
+    if (searchTerm) {
+      //custom logic based on the table schema to get the sequelize query
+      let include = {};
+      let or = {};
+      columns.forEach(function(column) {
+        const { model, type, path } = schema.fields[column];
+        if (type === "string" || type === "lookup") {
+          var likeObj = { iLike: "%" + searchTerm + "%" };
+          if (model) {
+            const includeObj = include[model] || {
+              model,
+              required: false
+            };
+            include[model] = includeObj;
+            or["$" + path + "$"] = likeObj;
+          } else {
+            or[column] = likeObj;
+          }
+        }
+      }, {});
+      graphqlQueryParams = {
+        ...graphqlQueryParams,
+        offset: 0,
+        where: {
+          $or: or
+        },
+        include
+      };
+    }
+    return {
+      queryParams: graphqlQueryParams,
+      page,
+      pageSize,
+      order: graphqlQueryParams.order,
+      selectedFilter,
+      filterValue,
+      fieldName,
+      searchTerm
+    };
+  }
+  function makeDataTableHandlers({ setNewParams, resetSearch }) {
+    function setSearchTerm(searchTerm, currentParams) {
+      let newParams = {
+        ...currentParams,
+        selectedFilter: undefined,
+        fieldName: undefined,
+        filterValue: undefined,
+        searchTerm: searchTerm === defaultParams.searchTerm
+          ? undefined
+          : searchTerm
+      };
+      setNewParams(newParams);
+    }
+    function setFilter(
+      { selectedFilter, filterValue, fieldName },
+      currentParams
+    ) {
+      let newParams = {
+        ...currentParams,
+        selectedFilter,
+        fieldName,
+        filterValue,
+        searchTerm: undefined
+      };
+      setNewParams(newParams);
+      resetSearch();
+    }
+    function clearFilters(currentParams) {
+      setNewParams({
+        ...currentParams,
+        selectedFilter: undefined,
+        fieldName: undefined,
+        filterValue: undefined,
+        searchTerm: undefined
+      });
+      resetSearch();
+    }
+    function setPageSize(pageSize, currentParams) {
+      let newParams = {
+        ...currentParams,
+        pageSize: pageSize === defaultParams.pageSize ? undefined : pageSize
+      };
+      setNewParams(newParams);
+    }
+    function setOrder(order, currentParams) {
+      let newParams = {
+        ...currentParams,
+        order: order === defaultParams.order ? undefined : order
+      };
+      setNewParams(newParams);
+    }
+    function setPage(page, currentParams) {
+      let newParams = {
+        ...currentParams,
+        page: page === defaultParams.page ? undefined : page
+      };
+      setNewParams(newParams);
+    }
+    return {
+      setSearchTerm,
+      setFilter,
+      clearFilters,
+      setPageSize,
+      setPage,
+      setOrder
+    };
+  }
+
+  return {
+    getQueryParams,
+    setCurrentParamsOnUrl,
+    getCurrentParamsFromUrl,
+    makeDataTableHandlers
   };
 }
 

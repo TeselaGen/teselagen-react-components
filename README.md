@@ -10,6 +10,7 @@ yarn add teselagen-react-components
 ```
 ```
 import {DataTable, routeDoubleClick, queryParams} from "teselagen-react-components";
+import {toastr} from 'teselagen-react-components';  // eslint-disable-line
 ```
 
 ## Prerequisites

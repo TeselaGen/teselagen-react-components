@@ -7,14 +7,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 import React from "react";
 
 import { NumericInput } from "@blueprintjs/core";
-// queryParams: {
-//   filters: {},
-//   sorting: [],
-//   paging: {},
-//   columns: [],
-//   trackingInfo: {},
-//   responseId: {}
-// }
 
 var PagingToolbar = function (_React$Component) {
   _inherits(PagingToolbar, _React$Component);
