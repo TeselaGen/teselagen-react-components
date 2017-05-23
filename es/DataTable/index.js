@@ -82,7 +82,7 @@ var DataTable = (_temp2 = _class = function (_React$Component) {
         cellData = row[columnName];
       }
       if (schemaForColumn.type === "timestamp") {
-        cellData = moment(cellData).format("MMM D, YYYY");
+        cellData = moment(new Date(cellData)).format("MMM D, YYYY");
       }
       if (cellRenderer && cellRenderer[columnName]) {
         cellData = cellRenderer[columnName](cellData);
