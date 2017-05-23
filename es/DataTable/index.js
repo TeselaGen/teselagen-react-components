@@ -1,6 +1,6 @@
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _class, _temp2, _class2, _temp3, _initialiseProps;
+var _class, _temp2;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -13,16 +13,16 @@ import React from "react";
 import times from "lodash/times";
 import moment from "moment";
 import debounce from "lodash/debounce";
-import PagingToolbar from "./pagingToolbar";
+import PagingToolbar from "./PagingToolbar";
 import lo_map from "lodash/map";
+import onEnterHelper from "./utils/onEnterHelper";
+import FilterAndSortMenu from "./FilterAndSortMenu";
 
 import get from "lodash/get";
 
-import { Button, Menu, Intent, MenuItem, MenuDivider, InputGroup, Spinner, Classes } from "@blueprintjs/core";
+import { Button, Menu, MenuItem, InputGroup, Spinner, Classes } from "@blueprintjs/core";
 import { Cell, Column, ColumnHeaderCell, ISelectedRegionTransform, RegionCardinality, Regions, Table, TableLoadingOption } from "@blueprintjs/table";
 
-import {
-/*DateInput, DateRangeInput, */DateInput, DateRangeInput } from "@blueprintjs/datetime";
 import "./style.css";
 import Measure from "react-measure";
 function noop() {}
@@ -362,6 +362,7 @@ var DataTable = (_temp2 = _class = function (_React$Component) {
   pageSize: 10,
   extraClasses: "",
   page: 0,
+  reduxFormSearchInput: {},
   isLoading: false,
   isInfinite: false,
   columns: [],
@@ -373,322 +374,8 @@ var DataTable = (_temp2 = _class = function (_React$Component) {
   setPage: noop
 }, _temp2);
 
-// function QueryParams(props) {
-//   return (
-//       <Field
-//         name={fieldName}
-//         {...props}
-//         component={Component}
-//       />
-//   );
-// }
 
 export default DataTable;
-
-// type SelectedRegion = {rows?: Array<number>, cols?: Array<number>}
-
-var FilterAndSortMenu = (_temp3 = _class2 = function (_React$Component2) {
-  _inherits(FilterAndSortMenu, _React$Component2);
-
-  function FilterAndSortMenu(props) {
-    _classCallCheck(this, FilterAndSortMenu);
-
-    var _this3 = _possibleConstructorReturn(this, _React$Component2.call(this, props));
-
-    _initialiseProps.call(_this3);
-
-    var selectedFilter = getFilterMenuItems(props.dataType)[0];
-    _this3.state = {
-      selectedFilter: selectedFilter,
-      filterValue: ""
-    };
-    return _this3;
-  }
-
-  // handleSubmit(event) {
-  //   alert('A name was submitted: ' + this.state.value);
-  //   event.preventDefault();
-  // }
-
-  FilterAndSortMenu.prototype.render = function render() {
-    var _state = this.state,
-        selectedFilter = _state.selectedFilter,
-        filterValue = _state.filterValue;
-    var _props2 = this.props,
-        dataType = _props2.dataType,
-        model = _props2.schemaForField.model,
-        fieldName = _props2.fieldName,
-        setOrder = _props2.setOrder;
-    var handleFilterChange = this.handleFilterChange,
-        handleFilterValueChange = this.handleFilterValueChange,
-        handleFilterSubmit = this.handleFilterSubmit;
-
-    var filterTypesDictionary = {
-      None: "",
-      "Text starts with": "text",
-      "Text ends with": "text",
-      "Text contains": "text",
-      "Text is exactly": "text",
-      // "Date is": "date",
-      "Date is between": "dateRange",
-      "Date is before": "date",
-      "Date is after": "date",
-      "Greater than": "number",
-      "Less than": "number",
-      "In range": "numberRange",
-      "Equal to": "number"
-    };
-    var filterMenuItems = getFilterMenuItems(dataType);
-    var requiresValue = selectedFilter && selectedFilter !== "None";
-
-    return React.createElement(
-      Menu,
-      { className: "data-table-header-menu" },
-      React.createElement(MenuItem, {
-        iconName: "sort-asc",
-        onClick: function onClick() {
-          if (!model) setOrder(fieldName);
-        },
-        text: "Sort Asc"
-      }),
-      React.createElement(MenuItem, {
-        iconName: "sort-desc",
-        onClick: function onClick() {
-          if (!model) setOrder("reverse:" + fieldName);
-        },
-        text: "Sort Desc"
-      }),
-      React.createElement(MenuDivider, null),
-      React.createElement(MenuItem
-      // iconName={showFilterBy ? "caret-down" : "caret-right"}
-      , { text: "Filter by condition...",
-        shouldDismissPopover: false
-      }),
-      React.createElement(
-        "div",
-        { className: "custom-menu-item" },
-        React.createElement(
-          "div",
-          { className: "pt-select pt-fill" },
-          React.createElement(
-            "select",
-            {
-              onChange: function onChange(e) {
-                var selectedFilter = e.target.value;
-                handleFilterChange(selectedFilter);
-              },
-              value: selectedFilter
-            },
-            filterMenuItems.map(function (menuItem, index) {
-              // console.log('menuItem:', menuItem)
-              return React.createElement(
-                "option",
-                { key: index, value: menuItem },
-                menuItem
-              );
-            })
-          )
-        )
-      ),
-      React.createElement(
-        "div",
-        { className: "custom-menu-item" },
-        React.createElement(FilterInput, {
-          dataType: dataType,
-          requiresValue: requiresValue,
-          handleFilterSubmit: handleFilterSubmit,
-          filterValue: filterValue,
-          handleFilterValueChange: handleFilterValueChange,
-          filterType: filterTypesDictionary[selectedFilter]
-        })
-      ),
-      React.createElement(MenuDivider, null),
-      React.createElement(
-        "div",
-        { className: "custom-menu-item menu-buttons" },
-        React.createElement(Button, {
-          className: "pt-popover-dismiss",
-          intent: Intent.SUCCESS,
-          onClick: function onClick() {
-            handleFilterSubmit();
-          },
-          text: "Ok"
-        }),
-        React.createElement(Button, { className: "pt-popover-dismiss", text: "Cancel" })
-      )
-    );
-  };
-
-  return FilterAndSortMenu;
-}(React.Component), _initialiseProps = function _initialiseProps() {
-  var _this4 = this;
-
-  this.handleFilterChange = function (selectedFilter) {
-    _this4.setState({ selectedFilter: selectedFilter });
-  };
-
-  this.handleFilterValueChange = function (filterValue) {
-    _this4.setState({ filterValue: filterValue });
-  };
-
-  this.handleFilterSubmit = function () {
-    var _state2 = _this4.state,
-        filterValue = _state2.filterValue,
-        selectedFilter = _state2.selectedFilter;
-    var _props3 = _this4.props,
-        fieldName = _props3.fieldName,
-        setFilter = _props3.setFilter,
-        schemaForField = _props3.schemaForField;
-
-
-    setFilter({
-      schemaForField: schemaForField,
-      fieldName: fieldName,
-      selectedFilter: selectedFilter,
-      filterValue: filterValue
-    });
-  };
-}, _temp3);
-
-var FilterInput = function (_React$Component3) {
-  _inherits(FilterInput, _React$Component3);
-
-  function FilterInput() {
-    _classCallCheck(this, FilterInput);
-
-    return _possibleConstructorReturn(this, _React$Component3.apply(this, arguments));
-  }
-
-  FilterInput.prototype.render = function render() {
-    var _props4 = this.props,
-        handleFilterValueChange = _props4.handleFilterValueChange,
-        handleFilterSubmit = _props4.handleFilterSubmit,
-        filterValue = _props4.filterValue,
-        filterType = _props4.filterType;
-    //Options: Text, Single number (before, after, equals), 2 numbers (range),
-    //Single Date (before, after, on), 2 dates (range)
-
-    var inputGroup = React.createElement("div", null);
-    switch (filterType) {
-      case "text":
-        inputGroup = React.createElement(
-          "div",
-          { className: "custom-menu-item" },
-          React.createElement(InputGroup, _extends({
-            placeholder: "Value",
-            onChange: function onChange(e) {
-              handleFilterValueChange(e.target.value);
-            }
-          }, onEnterHelper(handleFilterSubmit), {
-            value: filterValue
-          }))
-        );
-        break;
-      case "number":
-        inputGroup = React.createElement(
-          "div",
-          { className: "custom-menu-item" },
-          React.createElement(InputGroup, _extends({
-            placeholder: "Value",
-            onChange: function onChange(e) {
-              handleFilterValueChange(e.target.value);
-            }
-          }, onEnterHelper(handleFilterSubmit), {
-            value: filterValue,
-            type: "number"
-          }))
-        );
-        break;
-      case "numberRange":
-        inputGroup = React.createElement(
-          "div",
-          { className: "custom-menu-item" },
-          React.createElement(InputGroup, _extends({
-            placeholder: "Value",
-            onChange: function onChange(e) {
-              handleFilterValueChange([e.target.value, filterValue[1]]);
-            }
-          }, onEnterHelper(handleFilterSubmit), {
-            value: filterValue && filterValue[0],
-            type: "number"
-          })),
-          React.createElement(InputGroup, _extends({
-            placeholder: "Value",
-            onChange: function onChange(e) {
-              handleFilterValueChange([filterValue[0], e.target.value]);
-            }
-          }, onEnterHelper(handleFilterSubmit), {
-            value: filterValue && filterValue[1],
-            type: "number"
-          }))
-        );
-        break;
-      case "date":
-        inputGroup = React.createElement(
-          "div",
-          { className: "custom-menu-item" },
-          React.createElement(DateInput, _extends({
-            maxDate: new Date()
-          }, onEnterHelper(handleFilterSubmit), {
-            value: filterValue && filterValue[1],
-            onChange: function onChange(selectedDates) {
-              handleFilterValueChange(selectedDates);
-            }
-          })),
-          React.createElement("div", null)
-        );
-        break;
-      case "dateRange":
-        inputGroup = React.createElement(
-          "div",
-          { className: "custom-menu-item" },
-          React.createElement(DateRangeInput, _extends({}, onEnterHelper(handleFilterSubmit), {
-            popoverProps: {
-              inline: false,
-              tetherOptions: {
-                constraints: [{
-                  attachment: "together",
-                  to: "window",
-                  pin: true
-                }]
-              }
-            },
-            maxDate: new Date(),
-            onChange: function onChange(selectedDates) {
-              handleFilterValueChange(selectedDates);
-            }
-          }))
-        );
-        break;
-      default:
-      // to do
-    }
-    return inputGroup;
-  };
-
-  return FilterInput;
-}(React.Component);
-
-// import { Field, reduxForm } from "redux-form";
-// const SearchBar = reduxForm({
-//   form: "dataTableSearchInput"
-// })(SearchBarInner);
-
-// function SearchBarInner(props) {
-//   return (
-//     <div className={"data-table-search-and-filter"}>
-//       <Field
-//         name="searchTerm"
-//         {...props}
-//         component={renderSearchBarInputGroup}
-//       />
-
-//     </div>
-//   );
-// }
-
-// function renderSearchBarInputGroup({ reduxFormSearchInput, setSearchTerm, maybeSpinner }) {
-
 
 function SearchBar(_ref2) {
   var reduxFormSearchInput = _ref2.reduxFormSearchInput,
@@ -709,32 +396,4 @@ function SearchBar(_ref2) {
       }
     })
   }));
-}
-
-function getFilterMenuItems(dataType) {
-  var filterMenuItems = [];
-  if (dataType === "string") {
-    filterMenuItems = ["Text contains", "Text starts with", "Text ends with", "Text is exactly"];
-  } else if (dataType === "lookup") {
-    filterMenuItems = ["Text contains", "Text starts with", "Text ends with", "Text is exactly"];
-  } else if (dataType === "number") {
-    // else if (dataType === "lookup") {
-    //   filterMenuItems = ["None"];
-    // }
-    filterMenuItems = ["Greater than", "Less than", "In range", "Equal to"];
-  } else if (dataType === "timestamp") {
-    filterMenuItems = ["Date is between", "Date is before", "Date is after"];
-  }
-  return filterMenuItems;
-}
-
-function onEnterHelper(callback) {
-  //this is just
-  return {
-    onKeyDown: function onKeyDown(event) {
-      if (event.key === "Enter") {
-        callback(event);
-      }
-    }
-  };
 }
