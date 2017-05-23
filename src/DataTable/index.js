@@ -4,11 +4,11 @@ import React from "react";
 import times from "lodash/times";
 import moment from "moment";
 import debounce from "lodash/debounce";
-import PagingToolbar from "./pagingToolbar";
+import PagingToolbar from "./PagingToolbar";
 import lo_map from "lodash/map";
-
+import onEnterHelper from "./utils/onEnterHelper";
+import FilterAndSortMenu from "./FilterAndSortMenu";
 import type {
-  TableDataTypes,
   // SchemaForField,
   // QueryParams,
   // Paging,
@@ -19,9 +19,7 @@ import get from "lodash/get";
 import {
   Button,
   Menu,
-  Intent,
   MenuItem,
-  MenuDivider,
   InputGroup,
   Spinner,
   Classes
@@ -37,10 +35,6 @@ import {
   TableLoadingOption
 } from "@blueprintjs/table";
 
-import {
-  /*DateInput, DateRangeInput, */ DateInput,
-  DateRangeInput
-} from "@blueprintjs/datetime";
 import "./style.css";
 import Measure from "react-measure";
 function noop() {}
@@ -96,6 +90,7 @@ class DataTable extends React.Component {
     pageSize: 10,
     extraClasses: "",
     page: 0,
+    reduxFormSearchInput: {},
     isLoading: false,
     isInfinite: false,
     columns: [],
@@ -120,7 +115,6 @@ class DataTable extends React.Component {
       clearFilters,
       setPageSize,
       setPage,
-      // setSearchTerm,
       withTitle,
       withSearch,
       withPaging,
@@ -411,288 +405,8 @@ class DataTable extends React.Component {
   };
 }
 
-// function QueryParams(props) {
-//   return (
-//       <Field
-//         name={fieldName}
-//         {...props}
-//         component={Component}
-//       />
-//   );
-// }
 export default DataTable;
 
-// type SelectedRegion = {rows?: Array<number>, cols?: Array<number>}
-
-class FilterAndSortMenu extends React.Component {
-  constructor(props) {
-    super(props);
-    const selectedFilter = getFilterMenuItems(props.dataType)[0];
-    this.state = {
-      selectedFilter,
-      filterValue: ""
-    };
-  }
-  props: {
-    dataType: TableDataTypes,
-    schemaForField: Object,
-    fieldName: string,
-    setOrder: Function,
-    setFilter: Function
-  };
-  handleFilterChange = (selectedFilter: string) => {
-    this.setState({ selectedFilter: selectedFilter });
-  };
-  handleFilterValueChange = (filterValue: string): void => {
-    this.setState({ filterValue: filterValue });
-  };
-  handleFilterSubmit = () => {
-    const { filterValue, selectedFilter } = this.state;
-    const { fieldName, setFilter, schemaForField } = this.props;
-
-    setFilter({
-      schemaForField,
-      fieldName,
-      selectedFilter,
-      filterValue
-    });
-  };
-
-  // handleSubmit(event) {
-  //   alert('A name was submitted: ' + this.state.value);
-  //   event.preventDefault();
-  // }
-
-  render() {
-    const { selectedFilter, filterValue } = this.state;
-    const {
-      dataType,
-      schemaForField: { model },
-      fieldName,
-      setOrder
-    } = this.props;
-    const {
-      handleFilterChange,
-      handleFilterValueChange,
-      handleFilterSubmit
-    } = this;
-    const filterTypesDictionary = {
-      None: "",
-      "Text starts with": "text",
-      "Text ends with": "text",
-      "Text contains": "text",
-      "Text is exactly": "text",
-      // "Date is": "date",
-      "Date is between": "dateRange",
-      "Date is before": "date",
-      "Date is after": "date",
-      "Greater than": "number",
-      "Less than": "number",
-      "In range": "numberRange",
-      "Equal to": "number"
-    };
-    const filterMenuItems = getFilterMenuItems(dataType);
-    const requiresValue = selectedFilter && selectedFilter !== "None";
-
-    return (
-      <Menu className={"data-table-header-menu"}>
-        <MenuItem
-          iconName="sort-asc"
-          onClick={() => {
-            if (!model) setOrder(fieldName);
-          }}
-          text="Sort Asc"
-        />
-        <MenuItem
-          iconName="sort-desc"
-          onClick={() => {
-            if (!model) setOrder("reverse:" + fieldName);
-          }}
-          text="Sort Desc"
-        />
-        <MenuDivider />
-        <MenuItem
-          // iconName={showFilterBy ? "caret-down" : "caret-right"}
-          text="Filter by condition..."
-          shouldDismissPopover={false}
-        />
-        <div className={"custom-menu-item"}>
-          <div className="pt-select pt-fill">
-            <select
-              onChange={function(e) {
-                const selectedFilter = e.target.value;
-                handleFilterChange(selectedFilter);
-              }}
-              value={selectedFilter}
-            >
-              {filterMenuItems.map(function(menuItem, index) {
-                // console.log('menuItem:', menuItem)
-                return <option key={index} value={menuItem}>{menuItem}</option>;
-              })}
-            </select>
-          </div>
-        </div>
-        <div className={"custom-menu-item"}>
-          <FilterInput
-            dataType={dataType}
-            requiresValue={requiresValue}
-            handleFilterSubmit={handleFilterSubmit}
-            filterValue={filterValue}
-            handleFilterValueChange={handleFilterValueChange}
-            filterType={filterTypesDictionary[selectedFilter]}
-          />
-        </div>
-        <MenuDivider />
-        {
-          <div className={"custom-menu-item menu-buttons"}>
-            <Button
-              className={"pt-popover-dismiss"}
-              intent={Intent.SUCCESS}
-              onClick={() => {
-                handleFilterSubmit();
-              }}
-              text="Ok"
-            />
-            <Button className={"pt-popover-dismiss"} text="Cancel" />
-          </div>
-        }
-      </Menu>
-    );
-  }
-}
-
-class FilterInput extends React.Component {
-  render() {
-    const {
-      handleFilterValueChange,
-      handleFilterSubmit,
-      filterValue,
-      filterType
-    } = this.props;
-    //Options: Text, Single number (before, after, equals), 2 numbers (range),
-    //Single Date (before, after, on), 2 dates (range)
-    let inputGroup: JSX.Element = <div />;
-    switch (filterType) {
-      case "text":
-        inputGroup = (
-          <div className={"custom-menu-item"}>
-            <InputGroup
-              placeholder="Value"
-              onChange={function(e) {
-                handleFilterValueChange(e.target.value);
-              }}
-              {...onEnterHelper(handleFilterSubmit)}
-              value={filterValue}
-            />
-          </div>
-        );
-        break;
-      case "number":
-        inputGroup = (
-          <div className={"custom-menu-item"}>
-            <InputGroup
-              placeholder="Value"
-              onChange={function(e) {
-                handleFilterValueChange(e.target.value);
-              }}
-              {...onEnterHelper(handleFilterSubmit)}
-              value={filterValue}
-              type={"number"}
-            />
-          </div>
-        );
-        break;
-      case "numberRange":
-        inputGroup = (
-          <div className={"custom-menu-item"}>
-            <InputGroup
-              placeholder="Value"
-              onChange={function(e) {
-                handleFilterValueChange([e.target.value, filterValue[1]]);
-              }}
-              {...onEnterHelper(handleFilterSubmit)}
-              value={filterValue && filterValue[0]}
-              type={"number"}
-            />
-            <InputGroup
-              placeholder="Value"
-              onChange={function(e) {
-                handleFilterValueChange([filterValue[0], e.target.value]);
-              }}
-              {...onEnterHelper(handleFilterSubmit)}
-              value={filterValue && filterValue[1]}
-              type={"number"}
-            />
-          </div>
-        );
-        break;
-      case "date":
-        inputGroup = (
-          <div className={"custom-menu-item"}>
-            <DateInput
-              maxDate={new Date()}
-              {...onEnterHelper(handleFilterSubmit)}
-              value={filterValue && filterValue[1]}
-              onChange={selectedDates => {
-                handleFilterValueChange(selectedDates);
-              }}
-            />
-            <div />
-          </div>
-        );
-        break;
-      case "dateRange":
-        inputGroup = (
-          <div className={"custom-menu-item"}>
-
-            <DateRangeInput
-              {...onEnterHelper(handleFilterSubmit)}
-              popoverProps={{
-                inline: false,
-                tetherOptions: {
-                  constraints: [
-                    {
-                      attachment: "together",
-                      to: "window",
-                      pin: true
-                    }
-                  ]
-                }
-              }}
-              maxDate={new Date()}
-              onChange={selectedDates => {
-                handleFilterValueChange(selectedDates);
-              }}
-            />
-          </div>
-        );
-        break;
-      default:
-      // to do
-    }
-    return inputGroup;
-  }
-}
-
-// import { Field, reduxForm } from "redux-form";
-// const SearchBar = reduxForm({
-//   form: "dataTableSearchInput"
-// })(SearchBarInner);
-
-// function SearchBarInner(props) {
-//   return (
-//     <div className={"data-table-search-and-filter"}>
-//       <Field
-//         name="searchTerm"
-//         {...props}
-//         component={renderSearchBarInputGroup}
-//       />
-
-//     </div>
-//   );
-// }
-
-// function renderSearchBarInputGroup({ reduxFormSearchInput, setSearchTerm, maybeSpinner }) {
 function SearchBar({ reduxFormSearchInput, setSearchTerm, maybeSpinner }) {
   return (
     <InputGroup
@@ -714,42 +428,4 @@ function SearchBar({ reduxFormSearchInput, setSearchTerm, maybeSpinner }) {
       }
     />
   );
-}
-
-function getFilterMenuItems(dataType) {
-  let filterMenuItems = [];
-  if (dataType === "string") {
-    filterMenuItems = [
-      "Text contains",
-      "Text starts with",
-      "Text ends with",
-      "Text is exactly"
-    ];
-  } else if (dataType === "lookup") {
-    filterMenuItems = [
-      "Text contains",
-      "Text starts with",
-      "Text ends with",
-      "Text is exactly"
-    ];
-  } else if (dataType === "number") {
-    // else if (dataType === "lookup") {
-    //   filterMenuItems = ["None"];
-    // }
-    filterMenuItems = ["Greater than", "Less than", "In range", "Equal to"];
-  } else if (dataType === "timestamp") {
-    filterMenuItems = ["Date is between", "Date is before", "Date is after"];
-  }
-  return filterMenuItems;
-}
-
-function onEnterHelper(callback) {
-  //this is just
-  return {
-    onKeyDown: function(event) {
-      if (event.key === "Enter") {
-        callback(event);
-      }
-    }
-  };
 }

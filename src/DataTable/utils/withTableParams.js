@@ -85,22 +85,41 @@ export default function withQueryParams(
         action(...args, currentParams);
       };
     });
-    return Object.assign({}, stateProps, ownProps, boundDispatchProps);
+
+    return {
+      ...ownProps,
+      tableParams: {
+        ...stateProps,
+        ...dispatchProps
+      }
+    };
   }
+  const ConnectedComponent = connect(mapState)(Component);
   let QueryParams = function(props) {
     return (
       <Fields
         names={["reduxFormQueryParams", "reduxFormSearchInput"]}
         {...props}
-        component={Component}
+        component={ConnectedComponent}
       />
     );
   };
 
-  QueryParams = reduxForm({ form: formname })(QueryParams);
-  QueryParams = connect(mapStateToProps, mapDispatchToProps, mergeProps)(
-    QueryParams
+  return connect(mapStateToProps, mapDispatchToProps, mergeProps)(
+    reduxForm({ form: formname })(QueryParams)
   );
+}
 
-  return QueryParams;
+function mapState(state, ownProps) {
+  const { reduxFormQueryParams, reduxFormSearchInput } = ownProps;
+  return {
+    ...ownProps,
+    tableParams: {
+      ...ownProps.tableParams,
+      reduxFormQueryParams,
+      reduxFormSearchInput
+    },
+    reduxFormQueryParams: undefined,
+    reduxFormSearchInput: undefined
+  };
 }
