@@ -11,9 +11,10 @@ import FilterAndSortMenu from "./FilterAndSortMenu";
 import type {
   // SchemaForField,
   // QueryParams,
-  // Paging,
+  TableParams,
   IRegion
 } from "../flow_types";
+
 import get from "lodash/get";
 
 import {
@@ -49,37 +50,22 @@ class DataTable extends React.Component {
   props: {
     entities: Array<Object>,
     schema: Object,
-    reduxFormSearchInput: Object,
     extraClasses: string,
     tableName?: string,
     isLoading: boolean,
     entityCount: number,
-    page: number,
-    pageSize: number,
-    order: string,
-    selectedFilter: string,
-    filterValue: string,
-    fieldName: string,
-    searchTerm: string,
-    columns: Array<string>,
-    setSearchTerm: Function,
-    setFilter: Function,
-    clearFilters: Function,
-    setPageSize: Function,
-    setOrder: Function,
-    setPage: Function,
     onDoubleClick?: Function,
     children?: any,
     withTitle: boolean,
     withSearch: boolean,
     withPaging: boolean,
     isInfinite: boolean,
-    history: Object,
     onSingleRowSelect?: Function,
     onDeselect?: Function,
     onMultiRowSelect?: Function,
     cellRenderer: Object,
-    customMenuItems: Object
+    customMenuItems: Object,
+    ...TableParams
   };
 
   static defaultProps = {

@@ -1,14 +1,15 @@
+//@flow
 import React from "react";
 import {
 	DataTable,
 } from "../../../src";
 import {entities} from './mocks';
-
+import type {
+  TableParams,
+}  from '../../../src';
 
 export default function DataTableWrapper (props) {
-	var {
-		tableParams,
-	} = props
+	var tableParams: TableParams = props.tableParams
 	return <DataTable
 	    {...tableParams}
 	    entities={entities}

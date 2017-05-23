@@ -12,6 +12,25 @@ export type TableDataTypes = $Keys<typeof tableDataTypes>;
 
 export type SchemaForField = SchemaForFieldRelated | SchemaForFieldNonRelated;
 
+export type TableParams = {
+  reduxFormSearchInput: Object,
+  history: Object,
+  page: number,
+  pageSize: number,
+  order: string,
+  selectedFilter: string,
+  filterValue: string,
+  fieldName: string,
+  searchTerm: string,
+  columns: Array<string>,
+  setSearchTerm: Function,
+  setFilter: Function,
+  clearFilters: Function,
+  setPageSize: Function,
+  setOrder: Function,
+  setPage: Function
+};
+
 type SchemaForFieldNonRelated = {
   type: TableDataTypes,
   displayName: string
@@ -65,7 +84,6 @@ export type ColumnFilters = {
     filterOperation: FilterOperation
   }
 };
-
 
 export type SortingOptions = {
   [columnName: string]: "asc" | "desc"
