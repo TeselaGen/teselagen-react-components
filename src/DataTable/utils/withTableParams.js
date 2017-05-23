@@ -88,6 +88,7 @@ export default function withQueryParams(
 
     return {
       ...ownProps,
+      queryParams: stateProps.queryParams,
       tableParams: {
         ...stateProps,
         ...dispatchProps
