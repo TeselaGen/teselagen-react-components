@@ -72,7 +72,7 @@ exports[`(Component) renders without exploding 1`] = `
   <div
     className="data-table-footer"
   >
-    <PagingToolbar
+    <PagingTool
       paging={
         Object {
           "page": 0,

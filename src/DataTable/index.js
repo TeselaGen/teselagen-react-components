@@ -4,7 +4,7 @@ import React from "react";
 import times from "lodash/times";
 import moment from "moment";
 import debounce from "lodash/debounce";
-import PagingToolbar from "./PagingToolbar";
+import PagingTool from "./PagingTool";
 import lo_map from "lodash/map";
 import { onEnterHelper } from "./utils/onEnterOrBlurHelper";
 import FilterAndSortMenu from "./FilterAndSortMenu";
@@ -213,7 +213,7 @@ class DataTable extends React.Component {
         {!isInfinite &&
           withPaging &&
           <div className={"data-table-footer"}>
-            <PagingToolbar
+            <PagingTool
               paging={{
                 total: entityCount,
                 page,

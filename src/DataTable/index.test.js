@@ -1,7 +1,7 @@
 import React from "react";
 import { shallow, mount } from "enzyme";
 import Component from "./index";
-import PagingToolbar from "./PagingToolbar";
+import PagingTool from "./PagingTool";
 import DataTableDemo, {
   UrlConnected,
   ReduxConnected,
@@ -67,10 +67,10 @@ describe("DataTableDemo", () => {
     });
   });
 
-  describe("PagingToolbar", () => {
-    const pagingToolbarWrapper = reduxDataWrapper.find(PagingToolbar);
+  describe("PagingTool", () => {
+    const pagingToolbarWrapper = reduxDataWrapper.find(PagingTool);
 
-    it("renders a PagingToolbar", () => {
+    it("renders a PagingTool", () => {
       expect(pagingToolbarWrapper).toHaveLength(1);
     });
 
