@@ -25,6 +25,11 @@ export default function queryParams({ columns, schema, defaults = {} }) {
   }
 
   function getQueryParams(currentParams) {
+    Object.keys(currentParams).forEach(function(key) {
+      if (currentParams[key] === undefined) {
+        delete currentParams[key]; //we want to use the default value if any of these are undefined
+      }
+    });
     let graphqlQueryParams = {
       ...defaultParams,
       ...currentParams

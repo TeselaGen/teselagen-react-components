@@ -32,6 +32,7 @@ class PagingTool extends React.Component {
       setPage
     } = this.props;
     const pageStart = (page - 1) * pageSize + 1;
+    if (pageStart < 0) debugger;
     const pageEnd = (page - 1) * pageSize + pageSize < total
       ? (page - 1) * pageSize + pageSize
       : total;

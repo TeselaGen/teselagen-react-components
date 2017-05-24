@@ -86,17 +86,28 @@ describe("DataTableDemo", () => {
         }
       });
       expect(pagingInput.props().value).toBe("2");
+      console.log(
+        "reduxDataWrapper.props().queryParams1",
+        reduxDataWrapper.props().queryParams
+      );
+      expect(reduxDataWrapper.props().queryParams.offset).toBe(2);
       pagingInput.simulate("blur");
       expect(reduxDataWrapper.props().queryParams.limit).toBe(2);
+      pagingToolbarWrapper.find(".paging-arrow-right").simulate("click");
+      console.log(
+        "reduxDataWrapper.props().queryParams2",
+        reduxDataWrapper.props().queryParams
+      );
+      expect(reduxDataWrapper.props().queryParams.offset).toBe(2);
     });
 
     it("handles a page right", () => {
       pagingToolbarWrapper.find(".paging-arrow-right").simulate("click");
       expect(reduxDataWrapper.props().queryParams.offset).toBe(10);
-      console.log(
-        "reduxDataWrapper.props().queryParams",
-        reduxDataWrapper.props().queryParams
-      );
+      // console.log(
+      //   "reduxDataWrapper.props().queryParams",
+      //   reduxDataWrapper.props().queryParams
+      // );
     });
 
     it("handles a page left after a page right", () => {

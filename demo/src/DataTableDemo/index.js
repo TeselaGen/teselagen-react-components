@@ -43,7 +43,7 @@ export default function() {
 		<Provider store={store}>
 			<div>
 				<Router>
-					{/*<UrlConnected />*/}
+					<UrlConnected />
 				</Router>
 				<ReduxConnected />
 			</div>
