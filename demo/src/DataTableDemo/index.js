@@ -36,6 +36,8 @@ const ReduxConnected = withTableParams(DataTableWrapper,{
 	schema
 });
 
+export { UrlConnected, ReduxConnected, DataTableWrapper }
+
 export default function() {
 	return (
 		<Provider store={store}>

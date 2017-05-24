@@ -1,0 +1,88 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`(Component) renders without exploding 1`] = `
+<div
+  className="data-table-container "
+>
+  <div
+    className="data-table-header"
+  >
+    <div
+      className="data-table-title-and-buttons"
+    />
+    <div
+      className="data-table-search-and-clear-filter-container"
+    >
+      <SearchBar
+        reduxFormSearchInput={Object {}}
+        setSearchTerm={[Function]}
+      />
+    </div>
+  </div>
+  <div
+    className="data-table-body"
+  >
+    <Measure
+      blacklist={Array []}
+      cloneOptions={Object {}}
+      includeMargin={true}
+      onMeasure={[Function]}
+      shouldMeasure={true}
+      useClone={false}
+      whitelist={
+        Array [
+          "width",
+          "height",
+          "top",
+          "right",
+          "bottom",
+          "left",
+        ]
+      }
+    >
+      <Table
+        allowMultipleSelection={true}
+        columnWidths={Array []}
+        defaultColumnWidth={150}
+        defaultRowHeight={36}
+        enableFocus={false}
+        fillBodyWithGhostCells={true}
+        isColumnResizable={false}
+        isRowHeaderShown={false}
+        loadingOptions={Array []}
+        minColumnWidth={50}
+        minRowHeight={20}
+        numRows={10}
+        onSelection={[Function]}
+        renderBodyContextMenu={[Function]}
+        renderRowHeader={[Function]}
+        selectedRegionTransform={[Function]}
+        selectedRegions={Array []}
+        selectionModes={
+          Array [
+            3,
+            2,
+            1,
+            0,
+          ]
+        }
+      />
+    </Measure>
+  </div>
+  <div
+    className="data-table-footer"
+  >
+    <PagingTool
+      paging={
+        Object {
+          "page": 1,
+          "pageSize": 10,
+          "total": undefined,
+        }
+      }
+      setPage={[Function]}
+      setPageSize={[Function]}
+    />
+  </div>
+</div>
+`;

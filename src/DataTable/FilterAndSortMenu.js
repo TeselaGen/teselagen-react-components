@@ -1,6 +1,6 @@
 //@flow
 import "../toastr";
-import onEnterHelper from "./utils/onEnterHelper";
+import onEnterOrBlurHelper from "./utils/onEnterOrBlurHelper";
 import React from "react";
 import type {
   TableDataTypes
@@ -181,7 +181,7 @@ class FilterInput extends React.Component {
               onChange={function(e) {
                 handleFilterValueChange(e.target.value);
               }}
-              {...onEnterHelper(handleFilterSubmit)}
+              {...onEnterOrBlurHelper(handleFilterSubmit)}
               value={filterValue}
             />
           </div>
@@ -195,7 +195,7 @@ class FilterInput extends React.Component {
               onChange={function(e) {
                 handleFilterValueChange(e.target.value);
               }}
-              {...onEnterHelper(handleFilterSubmit)}
+              {...onEnterOrBlurHelper(handleFilterSubmit)}
               value={filterValue}
               type={"number"}
             />
@@ -210,7 +210,7 @@ class FilterInput extends React.Component {
               onChange={function(e) {
                 handleFilterValueChange([e.target.value, filterValue[1]]);
               }}
-              {...onEnterHelper(handleFilterSubmit)}
+              {...onEnterOrBlurHelper(handleFilterSubmit)}
               value={filterValue && filterValue[0]}
               type={"number"}
             />
@@ -219,7 +219,7 @@ class FilterInput extends React.Component {
               onChange={function(e) {
                 handleFilterValueChange([filterValue[0], e.target.value]);
               }}
-              {...onEnterHelper(handleFilterSubmit)}
+              {...onEnterOrBlurHelper(handleFilterSubmit)}
               value={filterValue && filterValue[1]}
               type={"number"}
             />
@@ -231,7 +231,7 @@ class FilterInput extends React.Component {
           <div className={"custom-menu-item"}>
             <DateInput
               maxDate={new Date()}
-              {...onEnterHelper(handleFilterSubmit)}
+              {...onEnterOrBlurHelper(handleFilterSubmit)}
               value={filterValue && filterValue[1]}
               onChange={selectedDates => {
                 handleFilterValueChange(selectedDates);
@@ -246,7 +246,7 @@ class FilterInput extends React.Component {
           <div className={"custom-menu-item"}>
 
             <DateRangeInput
-              {...onEnterHelper(handleFilterSubmit)}
+              {...onEnterOrBlurHelper(handleFilterSubmit)}
               popoverProps={{
                 inline: false,
                 tetherOptions: {

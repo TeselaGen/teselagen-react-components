@@ -4,9 +4,9 @@ import React from "react";
 import times from "lodash/times";
 import moment from "moment";
 import debounce from "lodash/debounce";
-import PagingToolbar from "./PagingToolbar";
+import PagingTool from "./PagingTool";
 import lo_map from "lodash/map";
-import onEnterHelper from "./utils/onEnterHelper";
+import { onEnterHelper } from "./utils/onEnterOrBlurHelper";
 import FilterAndSortMenu from "./FilterAndSortMenu";
 import type {
   // SchemaForField,
@@ -75,7 +75,7 @@ class DataTable extends React.Component {
     withPaging: true,
     pageSize: 10,
     extraClasses: "",
-    page: 0,
+    page: 1,
     reduxFormSearchInput: {},
     isLoading: false,
     isInfinite: false,
@@ -113,12 +113,10 @@ class DataTable extends React.Component {
       reduxFormSearchInput,
       selectedFilter
     } = this.props;
+
     const { dimensions } = this.state;
     const { width } = dimensions;
 
-    const setPageSizeDebounced = debounce(pageSize => {
-      setPageSize(pageSize);
-    }, 300);
     const hasFilters = selectedFilter || searchTerm;
     const numRows = isInfinite ? entities.length : pageSize;
     const maybeSpinner = isLoading
@@ -215,14 +213,14 @@ class DataTable extends React.Component {
         {!isInfinite &&
           withPaging &&
           <div className={"data-table-footer"}>
-            <PagingToolbar
+            <PagingTool
               paging={{
                 total: entityCount,
                 page,
                 pageSize
               }}
               setPage={setPage}
-              setPageSize={setPageSizeDebounced}
+              setPageSize={setPageSize}
             />
           </div>}
       </div>
