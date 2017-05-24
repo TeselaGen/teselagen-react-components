@@ -3,12 +3,22 @@ import { Fields, reduxForm } from "redux-form";
 import { connect } from "react-redux";
 import { formValueSelector } from "redux-form";
 import queryParams from "./queryParams";
-import { reset, change } from "redux-form";
+import { change } from "redux-form";
 
 export default function withQueryParams(
   Component,
-  { formname = "dataTableQueryParams", columns, schema, defaults, urlConnected }
+  { formname, columns, schema, defaults, urlConnected }
 ) {
+  if (!urlConnected && !formname) {
+    console.warning(
+      "Please pass a formname to the withTableParams if your table is not url connected"
+    );
+  }
+
+  if (!formname) {
+    formname = "dataTableQueryParams";
+  }
+
   const formSelector = formValueSelector(formname);
 
   const {

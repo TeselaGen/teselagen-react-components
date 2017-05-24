@@ -13,7 +13,7 @@
   "scripts": {
     "build": "nwb build-react-component --copy-files --no-demo",
     "clean": "nwb clean-module && npm clean-demo",
-    "start": "nwb serve-react-demo",
+    "start": "nwb serve-react-demo --port 3333",
     "test": "nwb test-react",
     "precommit": "lint-staged",
     "test:coverage": "nwb test-react --coverage",
