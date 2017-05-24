@@ -86,24 +86,15 @@ describe("DataTableDemo", () => {
         }
       });
       expect(pagingInput.props().value).toBe("2");
-      console.log(
-        "reduxDataWrapper.props().queryParams1",
-        reduxDataWrapper.props().queryParams
-      );
-      expect(reduxDataWrapper.props().queryParams.offset).toBe(2);
       pagingInput.simulate("blur");
       expect(reduxDataWrapper.props().queryParams.limit).toBe(2);
-      pagingToolbarWrapper.find(".paging-arrow-right").simulate("click");
-      console.log(
-        "reduxDataWrapper.props().queryParams2",
-        reduxDataWrapper.props().queryParams
-      );
-      expect(reduxDataWrapper.props().queryParams.offset).toBe(2);
     });
 
     it("handles a page right", () => {
+      expect(reduxDataWrapper.props().queryParams.limit).toBe(2);
       pagingToolbarWrapper.find(".paging-arrow-right").simulate("click");
-      expect(reduxDataWrapper.props().queryParams.offset).toBe(10);
+      expect(reduxDataWrapper.props().queryParams.offset).toBe(2);
+
       // console.log(
       //   "reduxDataWrapper.props().queryParams",
       //   reduxDataWrapper.props().queryParams
@@ -111,8 +102,24 @@ describe("DataTableDemo", () => {
     });
 
     it("handles a page left after a page right", () => {
-      expect(reduxDataWrapper.props().queryParams.offset).toBe(10);
+      expect(reduxDataWrapper.props().queryParams.offset).toBe(2);
       pagingToolbarWrapper.find(".paging-arrow-left").simulate("click");
+      expect(reduxDataWrapper.props().queryParams.offset).toBe(0);
+    });
+
+    it("searching brings us back to page 1", () => {
+      expect(reduxDataWrapper.props().queryParams.offset).toBe(0);
+      pagingToolbarWrapper.find(".paging-arrow-right").simulate("click");
+      expect(reduxDataWrapper.props().queryParams.offset).toBe(2);
+      const input = reduxDataWrapper.find(".datatable-search-input");
+      input
+        .find("input")
+        .simulate("change", { target: { value: "search string" } });
+      const button = input.find(".pt-icon-search");
+      button.simulate("click");
+      expect(reduxDataWrapper.props().tableParams.searchTerm).toEqual(
+        "search string"
+      );
       expect(reduxDataWrapper.props().queryParams.offset).toBe(0);
     });
   });

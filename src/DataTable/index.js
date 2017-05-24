@@ -75,7 +75,7 @@ class DataTable extends React.Component {
     withPaging: true,
     pageSize: 10,
     extraClasses: "",
-    page: 0,
+    page: 1,
     reduxFormSearchInput: {},
     isLoading: false,
     isInfinite: false,

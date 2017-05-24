@@ -35,6 +35,7 @@ export default function queryParams({ columns, schema, defaults = {} }) {
       ...currentParams
     };
     const { page, pageSize } = graphqlQueryParams;
+
     //convert params from user readable to what our api expects
     // aka page -> offset & pageSize -> limit
     graphqlQueryParams.offset = (page - 1) * pageSize;
@@ -72,7 +73,7 @@ export default function queryParams({ columns, schema, defaults = {} }) {
           : undefined
       };
     }
-    if (searchTerm) {
+    if (searchTerm && searchTerm !== "") {
       //custom logic based on the table schema to get the sequelize query
       let include = {};
       let or = {};
@@ -94,7 +95,6 @@ export default function queryParams({ columns, schema, defaults = {} }) {
       }, {});
       graphqlQueryParams = {
         ...graphqlQueryParams,
-        offset: 0,
         where: {
           $or: or
         },
@@ -117,6 +117,7 @@ export default function queryParams({ columns, schema, defaults = {} }) {
       let newParams = {
         ...currentParams,
         selectedFilter: undefined,
+        page: 1,
         fieldName: undefined,
         filterValue: undefined,
         searchTerm: searchTerm === defaultParams.searchTerm

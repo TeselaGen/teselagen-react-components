@@ -81,8 +81,8 @@ class PagingTool extends React.Component {
     );
   }
   handleValueChange = (valueAsNumber: number, valueAsString: string) => {
-    console.log("Value as number:", valueAsNumber);
-    console.log("Value as string:", valueAsString);
+    // console.log("Value as number:", valueAsNumber);
+    // console.log("Value as string:", valueAsString);
   };
 }
 
