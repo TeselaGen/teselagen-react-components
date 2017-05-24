@@ -47,6 +47,7 @@ export default function withQueryParams(
       fieldName,
       searchTerm
     } = getQueryParams(currentParams);
+    console.log("currentParams", currentParams);
     return {
       queryParams,
       page,
@@ -76,6 +77,7 @@ export default function withQueryParams(
       };
     } else {
       setNewParams = function(newParams) {
+        console.log("newParams", newParams);
         dispatch(change(formname, "reduxFormQueryParams", newParams));
       };
     }

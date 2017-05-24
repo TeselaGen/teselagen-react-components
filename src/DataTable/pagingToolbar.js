@@ -2,12 +2,27 @@
 import React from "react";
 import type { Paging } from "../flow_types";
 import { NumericInput } from "@blueprintjs/core";
+import onEnterOrBlurHelper from "./utils/onEnterOrBlurHelper";
 
 class PagingToolbar extends React.Component {
   props: {
     paging: Paging,
     setPageSize: Function,
     setPage: Function
+  };
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      value: props.paging.pageSize
+    };
+  }
+
+  onValueChange = value => {
+    this.setState({
+      value
+    });
   };
 
   render() {
@@ -27,10 +42,11 @@ class PagingToolbar extends React.Component {
         <span> Rows per page: </span>
         <NumericInput
           className={"paging-row-input"}
-          value={pageSize}
-          onValueChange={value => {
-            setPageSize(value);
-          }}
+          value={this.state.value}
+          onValueChange={this.onValueChange}
+          {...onEnterOrBlurHelper(() => {
+            setPageSize(this.state.value);
+          })}
         />
         <span
           onClick={() => {
