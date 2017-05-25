@@ -6,7 +6,7 @@ machine:
 
 dependencies:
   override:
-    - yarn install
+    - yarn install && yarn global add codecov
   cache_directories:
     - ~/.yarn-cache
 
