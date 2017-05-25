@@ -43,7 +43,7 @@ import {toastr} from 'teselagen-react-components';  // eslint-disable-line
 
 - `npm whoami` you should be teselagen
 - `npm login` teselagen//ourMasterPass
-- `yarn publish` bump version appropriately
+- `npm run release`
 
 [build-badge]: https://img.shields.io/travis/user/repo/master.png?style=flat-square
 [build]: https://travis-ci.org/user/repo
