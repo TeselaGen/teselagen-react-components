@@ -1,8 +1,8 @@
 # TeselaGen-React-Components
 
-[![Travis][build-badge]][build]
-[![npm package][npm-badge]][npm]
 [![CircleCI](https://circleci.com/gh/TeselaGen/teselagen-react-components/tree/master.svg?style=shield)](https://circleci.com/gh/TeselaGen/teselagen-react-components/tree/master)
+[![npm package][npm-badge]][npm]
+[![codecov](https://codecov.io/gh/TeselaGen/teselagen-react-components/branch/master/graph/badge.svg)](https://codecov.io/gh/TeselaGen/teselagen-react-components)
 
 # Using: 
 ```
