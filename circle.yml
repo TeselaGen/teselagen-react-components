@@ -1,26 +1,18 @@
 machine:
-  environment:
-    PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
+  pre:
+    - mkdir ~/.yarn-cache
+  node:
+    version: v7.10.0
 
 dependencies:
   override:
-    - yarn
+    - yarn install
   cache_directories:
-    - ~/.cache/yarn
+    - ~/.yarn-cache
 
 test:
   override:
     - yarn test
-
-sudo: false
-
-language: node_js
-
-node_js:
-  - 4
-
-before_install:
-  - yarn add codecov.io coveralls
 
 after_success:
   - cat ./coverage/lcov.info | ./node_modules/codecov.io/bin/codecov.io.js
