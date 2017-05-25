@@ -1,6 +1,6 @@
 {
   "name": "teselagen-react-components",
-  "version": "1.0.34",
+  "version": "1.0.35",
   "description": "Teselagen React Component Library",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -117,7 +117,11 @@
     "react-component",
     "teselagen"
   ],
-  "babel": {   
-    "presets": ["es2015", "stage-0", "react"]   
-  } 
+  "babel": {
+    "presets": [
+      "es2015",
+      "stage-0",
+      "react"
+    ]
+  }
 }
