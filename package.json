@@ -80,6 +80,7 @@
     "eslint-plugin-jsx-a11y": "4.0.0",
     "eslint-plugin-react": "6.4.1",
     "husky": "^0.13.3",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^20.0.4",
     "lint-staged": "^3.4.1",
     "nwb": "0.15.x",
@@ -103,9 +104,8 @@
     ]
   },
   "jest": {
-    "transform": {
-      "^.+\\.js$": "babel-jest",
-      "^.+\\.(css|scss)$": "<rootDir>/config/jest/cssTransform.js"
+    "moduleNameMapper": {
+      "\\.(css|scss)$": "identity-obj-proxy"
     },
     "snapshotSerializers": [
       "<rootDir>/node_modules/enzyme-to-json/serializer"
