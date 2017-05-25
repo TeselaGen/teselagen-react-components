@@ -4,4 +4,6 @@ export {
 } from "./DataTable/utils/routeDoubleClick";
 export { default as withTableParams } from "./DataTable/utils/withTableParams";
 export { default as toastr } from "./toastr";
+export * from "./VectorEditor";
+export * from "./toastr";
 export * from "./flow_types";
