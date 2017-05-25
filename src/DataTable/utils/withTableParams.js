@@ -10,7 +10,7 @@ export default function withQueryParams(
   { formname, columns, schema, defaults, urlConnected }
 ) {
   if (!urlConnected && !formname) {
-    console.warning(
+    console.warn(
       "Please pass a formname to the withTableParams if your table is not url connected"
     );
   }
