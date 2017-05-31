@@ -3,7 +3,6 @@ import "../toastr";
 import React from "react";
 import times from "lodash/times";
 import moment from "moment";
-import debounce from "lodash/debounce";
 import PagingTool from "./PagingTool";
 import lo_map from "lodash/map";
 import { onEnterHelper } from "./utils/onEnterOrBlurHelper";
@@ -125,7 +124,7 @@ class DataTable extends React.Component {
     const numberOfColumns = columns ? columns.length : 0;
     const columnWidths = [];
     times(numberOfColumns, () => {
-      columnWidths.push(width / numberOfColumns);
+      columnWidths.push((width - 15) / numberOfColumns);
     });
     const loadingOptions: TableLoadingOption[] = [];
     if (isLoading) {
@@ -169,45 +168,52 @@ class DataTable extends React.Component {
             </div>}
         </div>
         <div className={"data-table-body"}>
-
           <Measure
-            onMeasure={dimensions => {
-              this.setState({ dimensions });
+            bounds
+            onResize={contentRect => {
+              this.setState({ dimensions: contentRect.bounds });
             }}
           >
-            <Table
-              numRows={numRows}
-              columnWidths={columnWidths}
-              fillBodyWithGhostCells={true}
-              loadingOptions={loadingOptions}
-              isRowHeaderShown={false}
-              isColumnResizable={false}
-              renderBodyContextMenu={this.renderBodyContextMenu}
-              selectedRegions={this.state.selectedRegions}
-              selectedRegionTransform={this.selectedRegionTransform}
-              defaultRowHeight={36}
-              onSelection={selectedRegions => {
-                this.setState({ selectedRegions });
-                if (!selectedRegions.length && onDeselect) {
-                  onDeselect();
-                }
-                if (selectedRegions.length === 1 && onSingleRowSelect) {
-                  if (selectedRegions[0].rows) {
-                    if (
-                      selectedRegions[0].rows[0] === selectedRegions[0].rows[1]
-                    ) {
-                      const selectedRow = selectedRegions[0].rows[0];
-                      const record = entities[selectedRow];
-                      onSingleRowSelect(selectedRegions, record);
-                    }
-                  }
-                } else if (onMultiRowSelect) {
-                  onMultiRowSelect(selectedRegions);
-                }
-              }}
-            >
-              {entities && this.renderColumns()}
-            </Table>
+            {({ measureRef }) => {
+              return (
+                <div ref={measureRef}>
+                  <Table
+                    numRows={numRows}
+                    columnWidths={columnWidths}
+                    fillBodyWithGhostCells={true}
+                    loadingOptions={loadingOptions}
+                    isRowHeaderShown={false}
+                    isColumnResizable={false}
+                    renderBodyContextMenu={this.renderBodyContextMenu}
+                    selectedRegions={this.state.selectedRegions}
+                    selectedRegionTransform={this.selectedRegionTransform}
+                    defaultRowHeight={36}
+                    onSelection={selectedRegions => {
+                      this.setState({ selectedRegions });
+                      if (!selectedRegions.length && onDeselect) {
+                        onDeselect();
+                      }
+                      if (selectedRegions.length === 1 && onSingleRowSelect) {
+                        if (selectedRegions[0].rows) {
+                          if (
+                            selectedRegions[0].rows[0] ===
+                            selectedRegions[0].rows[1]
+                          ) {
+                            const selectedRow = selectedRegions[0].rows[0];
+                            const record = entities[selectedRow];
+                            onSingleRowSelect(selectedRegions, record);
+                          }
+                        }
+                      } else if (onMultiRowSelect) {
+                        onMultiRowSelect(selectedRegions);
+                      }
+                    }}
+                  >
+                    {entities && this.renderColumns()}
+                  </Table>
+                </div>
+              );
+            }}
           </Measure>
         </div>
         {!isInfinite &&
