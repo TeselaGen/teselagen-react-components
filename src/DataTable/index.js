@@ -301,6 +301,7 @@ class DataTable extends React.Component {
       selectedRows,
       regions
     });
+    if (!itemsToRender) return null;
     return (
       <Menu>
         {itemsToRender}
