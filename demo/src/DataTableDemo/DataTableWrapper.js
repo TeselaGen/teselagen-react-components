@@ -22,6 +22,7 @@ export default function DataTableWrapper (props) {
 	    withSearch={true}
 	    withPaging={true}
 	    isInfinite={false}
+			onRefresh={() => {alert("clicked refresh!")}}
 	    // history={history}
 	    onSingleRowSelect={noop}
 	    onDeselect={noop}

@@ -1,13 +1,14 @@
 //@flow
 import React from "react";
 import type { Paging } from "../flow_types";
-import { NumericInput } from "@blueprintjs/core";
+import { NumericInput, Button } from "@blueprintjs/core";
 import onEnterOrBlurHelper from "./utils/onEnterOrBlurHelper";
 
 export default class PagingTool extends React.Component {
   props: {
     paging: Paging,
     setPageSize: Function,
+    onRefresh?: Function,
     setPage: Function
   };
 
@@ -29,7 +30,8 @@ export default class PagingTool extends React.Component {
     const {
       paging: { pageSize, page, total },
       setPageSize,
-      setPage
+      setPage,
+      onRefresh
     } = this.props;
     const pageStart = (page - 1) * pageSize + 1;
     if (pageStart < 0) debugger;
@@ -55,6 +57,9 @@ export default class PagingTool extends React.Component {
             setPageSize(parseInt(e.target.value, 10));
           })}
         />
+        {onRefresh
+          ? <Button iconName="refresh" onClick={() => onRefresh()} />
+          : ""}
         <span
           onClick={() => {
             if (backEnabled) {
@@ -68,6 +73,7 @@ export default class PagingTool extends React.Component {
               (!backEnabled && " pt-disabled")
           }
         />
+
         <span> {pageStart}-{pageEnd} of {total} </span>
         <span
           onClick={() => {

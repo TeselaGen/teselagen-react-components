@@ -60,6 +60,7 @@ class DataTable extends React.Component {
     withSearch: boolean,
     withPaging: boolean,
     isInfinite: boolean,
+    onRefresh?: Function,
     onSingleRowSelect?: Function,
     onDeselect?: Function,
     onMultiRowSelect?: Function,
@@ -107,6 +108,7 @@ class DataTable extends React.Component {
       withPaging,
       isInfinite,
       onSingleRowSelect,
+      onRefresh,
       onDeselect,
       onMultiRowSelect,
       page,
@@ -219,6 +221,7 @@ class DataTable extends React.Component {
                 page,
                 pageSize
               }}
+              onRefresh={onRefresh}
               setPage={setPage}
               setPageSize={setPageSize}
             />
