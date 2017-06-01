@@ -7,9 +7,9 @@ import { formValueSelector } from "redux-form";
 import queryParams from "./queryParams";
 import { change } from "redux-form";
 
-export default function withQueryParams(
+export default function withTableParams(
   Component,
-  { formname, columns, schema, defaults, urlConnected }
+  { formname, columns, schema, defaults, urlConnected, isInfinite }
 ) {
   if (!urlConnected && !formname) {
     console.warn(
@@ -32,7 +32,8 @@ export default function withQueryParams(
     columns,
     schema,
     formname,
-    defaults
+    defaults,
+    isInfinite
   });
 
   const mapStateToProps = (state, { location }) => {

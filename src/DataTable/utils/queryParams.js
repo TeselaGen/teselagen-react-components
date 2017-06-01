@@ -1,6 +1,11 @@
 import queryString from "query-string";
 
-export default function queryParams({ columns, schema, defaults = {} }) {
+export default function queryParams({
+  columns,
+  schema,
+  defaults = {},
+  isInfinite
+}) {
   var defaultParams = {
     pageSize: 10,
     order: "",
@@ -34,7 +39,7 @@ export default function queryParams({ columns, schema, defaults = {} }) {
       ...defaultParams,
       ...currentParams
     };
-    const { page, pageSize } = graphqlQueryParams;
+    let { page, pageSize } = graphqlQueryParams;
 
     //convert params from user readable to what our api expects
     // aka page -> offset & pageSize -> limit
@@ -100,6 +105,12 @@ export default function queryParams({ columns, schema, defaults = {} }) {
         },
         include
       };
+    }
+    if (isInfinite) {
+      delete graphqlQueryParams.limit;
+      delete graphqlQueryParams.offset;
+      page = undefined;
+      pageSize = undefined;
     }
     return {
       queryParams: graphqlQueryParams,
