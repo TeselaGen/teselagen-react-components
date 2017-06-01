@@ -1,12 +1,13 @@
 //@flow
+
 import { withRouter } from "react-router-dom";
 import "../toastr";
 import React from "react";
 import times from "lodash/times";
 import moment from "moment";
 import PagingTool from "./PagingTool";
-import lo_map from "lodash/map";
 import { onEnterHelper } from "./utils/onEnterOrBlurHelper";
+import getSelectedRowsFromRegions from "./utils/getSelectedRowsFromRegions";
 import FilterAndSortMenu from "./FilterAndSortMenu";
 import type {
   // SchemaForField,
@@ -17,14 +18,7 @@ import type {
 
 import get from "lodash/get";
 
-import {
-  Button,
-  Menu,
-  MenuItem,
-  InputGroup,
-  Spinner,
-  Classes
-} from "@blueprintjs/core";
+import { Button, Menu, InputGroup, Spinner, Classes } from "@blueprintjs/core";
 import {
   Cell,
   Column,
@@ -65,7 +59,7 @@ class DataTable extends React.Component {
     onDeselect?: Function,
     onMultiRowSelect?: Function,
     cellRenderer: Object,
-    customMenuItems: Object,
+    menuItems: Object,
     ...TableParams
   };
 
@@ -290,27 +284,28 @@ class DataTable extends React.Component {
   };
 
   renderBodyContextMenu = ({ regions }: Array<IRegion>) => {
-    const { entities, history, customMenuItems } = this.props;
+    const { entities, history, menuItems } = this.props;
     //single selection
 
-    const menuItems = { ...(customMenuItems || {}) };
-
-    if (regions.length === 1) {
-      if (regions[0].rows) {
-        if (regions[0].rows[0] === regions[0].rows[1]) {
-          const selectedRow = regions[0].rows[0];
-          const recordData = entities[selectedRow];
-          return (
-            <Menu>
-              {lo_map(menuItems, menuItemGenerator =>
-                menuItemGenerator(recordData, history)
-              )}
-            </Menu>
-          );
-        }
-      }
+    // const menuItems = { ...(menuItems || {}) };
+    const selectedRows = getSelectedRowsFromRegions(regions);
+    const selectedRecords = selectedRows.map(row => {
+      return entities[row];
+    });
+    if (selectedRows.length < 1 || !menuItems || !menuItems.length) {
+      return null;
     }
-    return null;
+    const itemsToRender = menuItems({
+      selectedRecords,
+      history,
+      selectedRows,
+      regions
+    });
+    return (
+      <Menu>
+        {itemsToRender}
+      </Menu>
+    );
   };
 
   renderColumnHeader = (columnIndex: number) => {
