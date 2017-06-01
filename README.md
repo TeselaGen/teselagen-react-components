@@ -33,12 +33,6 @@ import {toastr} from 'teselagen-react-components';  // eslint-disable-line
 
 - `npm run test:watch` will run the tests on every change.
 
-## Building
-
-- `npm run build` will build the component for publishing to npm and also bundle the demo app.
-
-- `npm run clean` will delete built resources.
-
 ## Releasing
 
 - `npm whoami` you should be teselagen
