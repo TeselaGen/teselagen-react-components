@@ -21,7 +21,13 @@ export default function DataTableWrapper(props) {
 						onClick={function() {
 							console.log("I got clicked!");
 						}}
-						text={"menuText"}
+						text={"Menu text here"}
+					/>,
+					<MenuItem
+						onClick={function() {
+							console.log("I also got clicked!");
+						}}
+						text={"Some more"}
 					/>
 				];
 			}}
