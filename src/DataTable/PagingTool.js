@@ -4,7 +4,7 @@ import type { Paging } from "../flow_types";
 import { NumericInput } from "@blueprintjs/core";
 import onEnterOrBlurHelper from "./utils/onEnterOrBlurHelper";
 
-class PagingTool extends React.Component {
+export default class PagingTool extends React.Component {
   props: {
     paging: Paging,
     setPageSize: Function,
@@ -85,5 +85,3 @@ class PagingTool extends React.Component {
     // console.log("Value as string:", valueAsString);
   };
 }
-
-export default PagingTool;

@@ -1,4 +1,5 @@
 //@flow
+import { withRouter } from "react-router-dom";
 import "../toastr";
 import React from "react";
 import times from "lodash/times";
@@ -84,7 +85,8 @@ class DataTable extends React.Component {
     clearFilters: noop,
     setPageSize: noop,
     setOrder: noop,
-    setPage: noop
+    setPage: noop,
+    onDoubleClick: noop
   };
 
   render() {
@@ -169,51 +171,43 @@ class DataTable extends React.Component {
         </div>
         <div className={"data-table-body"}>
           <Measure
-            bounds
-            onResize={contentRect => {
-              this.setState({ dimensions: contentRect.bounds });
+            onMeasure={dimensions => {
+              this.setState({ dimensions });
             }}
           >
-            {({ measureRef }) => {
-              return (
-                <div ref={measureRef}>
-                  <Table
-                    numRows={numRows}
-                    columnWidths={columnWidths}
-                    fillBodyWithGhostCells={true}
-                    loadingOptions={loadingOptions}
-                    isRowHeaderShown={false}
-                    isColumnResizable={false}
-                    renderBodyContextMenu={this.renderBodyContextMenu}
-                    selectedRegions={this.state.selectedRegions}
-                    selectedRegionTransform={this.selectedRegionTransform}
-                    defaultRowHeight={36}
-                    onSelection={selectedRegions => {
-                      this.setState({ selectedRegions });
-                      if (!selectedRegions.length && onDeselect) {
-                        onDeselect();
-                      }
-                      if (selectedRegions.length === 1 && onSingleRowSelect) {
-                        if (selectedRegions[0].rows) {
-                          if (
-                            selectedRegions[0].rows[0] ===
-                            selectedRegions[0].rows[1]
-                          ) {
-                            const selectedRow = selectedRegions[0].rows[0];
-                            const record = entities[selectedRow];
-                            onSingleRowSelect(selectedRegions, record);
-                          }
-                        }
-                      } else if (onMultiRowSelect) {
-                        onMultiRowSelect(selectedRegions);
-                      }
-                    }}
-                  >
-                    {entities && this.renderColumns()}
-                  </Table>
-                </div>
-              );
-            }}
+            <Table
+              numRows={numRows}
+              columnWidths={columnWidths}
+              fillBodyWithGhostCells={true}
+              loadingOptions={loadingOptions}
+              isRowHeaderShown={false}
+              isColumnResizable={false}
+              renderBodyContextMenu={this.renderBodyContextMenu}
+              selectedRegions={this.state.selectedRegions}
+              selectedRegionTransform={this.selectedRegionTransform}
+              defaultRowHeight={36}
+              onSelection={selectedRegions => {
+                this.setState({ selectedRegions });
+                if (!selectedRegions.length && onDeselect) {
+                  onDeselect();
+                }
+                if (selectedRegions.length === 1 && onSingleRowSelect) {
+                  if (selectedRegions[0].rows) {
+                    if (
+                      selectedRegions[0].rows[0] === selectedRegions[0].rows[1]
+                    ) {
+                      const selectedRow = selectedRegions[0].rows[0];
+                      const record = entities[selectedRow];
+                      onSingleRowSelect(selectedRegions, record);
+                    }
+                  }
+                } else if (onMultiRowSelect) {
+                  onMultiRowSelect(selectedRegions);
+                }
+              }}
+            >
+              {entities && this.renderColumns()}
+            </Table>
           </Measure>
         </div>
         {!isInfinite &&
@@ -280,16 +274,14 @@ class DataTable extends React.Component {
     }
     return (
       <Cell>
-        {onDoubleClick
-          ? <div
-              className={"clickable-cell"}
-              onDoubleClick={() => {
-                onDoubleClick(row, rowIndex, history);
-              }}
-            >
-              {cellData}
-            </div>
-          : cellData}
+        <div
+          className={"clickable-cell"}
+          onDoubleClick={() => {
+            onDoubleClick(row, rowIndex, history);
+          }}
+        >
+          {cellData}
+        </div>
       </Cell>
     );
   };
@@ -395,7 +387,7 @@ class DataTable extends React.Component {
   };
 }
 
-export default DataTable;
+export default withRouter(DataTable);
 
 function SearchBar({ reduxFormSearchInput, setSearchTerm, maybeSpinner }) {
   return (

@@ -19,9 +19,9 @@
     "//test:coverage": "nwb test-react --coverage",
     "//test:watch": "nwb test-react --server",
     "release": "npm run build; release-it",
-    "test": "jest --coverage",
-    "test-watch": "jest --watch",
-    "test-debug": "node --inspect --debug-brk ./node_modules/.bin/jest --runInBand "
+    "test": "jest src --coverage",
+    "test-watch": "jest src --watch",
+    "test-debug": "node --inspect --debug-brk ./node_modules/.bin/jest src --runInBand "
   },
   "dependencies": {
     "basiccontext": "^3.5.1",
@@ -52,9 +52,9 @@
     "ve-sequence-utils": "^3.1.14"
   },
   "peerDependencies": {
-    "@blueprintjs/core": "^1.17.1",
-    "@blueprintjs/datetime": "^1.15.0",
-    "@blueprintjs/table": "^1.14.0",
+    "@blueprintjs/core": "^1.18.0",
+    "@blueprintjs/datetime": "^1.16.0",
+    "@blueprintjs/table": "^1.15.0",
     "react-addons-css-transition-group": "^15.5.2",
     "react-measure": "^1.4.7",
     "react-redux": "^5.0.4",
@@ -88,7 +88,7 @@
     "react": "^15.5.4",
     "react-addons-css-transition-group": "^15.5.2",
     "react-dom": "^15.5.4",
-    "react-measure": "^2.0.2",
+    "react-measure": "^1.4.7",
     "react-redux": "^5.0.5",
     "react-router-dom": "^4.1.1",
     "react-select": "^1.0.0-rc.5",

@@ -14,7 +14,9 @@ export default function DataTableWrapper (props) {
 	    {...tableParams}
 	    entities={entities}
 	    entityCount={entities.length}
-	    onDoubleClick={noop}
+	    onDoubleClick={function () {
+	    	console.log('double clicked')
+	    }}
 	    // children={children}
 	    withTitle={true}
 	    withSearch={true}

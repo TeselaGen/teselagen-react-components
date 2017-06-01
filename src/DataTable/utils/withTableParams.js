@@ -1,3 +1,5 @@
+//@flow
+import { withRouter } from "react-router-dom";
 import React from "react";
 import { Fields, reduxForm } from "redux-form";
 import { connect } from "react-redux";
@@ -33,7 +35,7 @@ export default function withQueryParams(
     defaults
   });
 
-  const mapStateToProps = (state, ownProps) => {
+  const mapStateToProps = (state, { location }) => {
     const currentParams = (urlConnected
       ? getCurrentParamsFromUrl(location)
       : formSelector(state, "reduxFormQueryParams")) || {};
@@ -117,8 +119,10 @@ export default function withQueryParams(
     );
   };
 
-  return connect(mapStateToProps, mapDispatchToProps, mergeProps)(
-    reduxForm({ form: formname })(QueryParams)
+  return withRouter(
+    connect(mapStateToProps, mapDispatchToProps, mergeProps)(
+      reduxForm({ form: formname })(QueryParams)
+    )
   );
 }
 

@@ -14,15 +14,6 @@ describe("(Component)", () => {
     expect(wrapper).toHaveLength(1);
     expect(wrapper).toMatchSnapshot();
   });
-
-  it("renders a search bar", () => {
-    const clearFilters = jest.fn();
-    const wrapper = shallow(
-      <Component searchTerm="woeif" withSearch clearFilters={clearFilters} />
-    );
-    const clearFilterBtn = wrapper.find(".data-table-clear-filters");
-    expect(clearFilterBtn).toHaveLength(1);
-  });
 });
 
 describe("DataTableDemo", () => {
