@@ -15,7 +15,7 @@ export default function DataTableWrapper(props) {
 			onDoubleClick={function() {
 				console.log("double clicked");
 			}}
-			menuItems={function({ selectedRecords, history, selectedRows, regions }) {
+			contextMenu={function({ selectedRecords, history, selectedRows, regions }) {
 				return [
 					<MenuItem
 						onClick={function() {

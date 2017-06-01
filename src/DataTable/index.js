@@ -59,7 +59,7 @@ class DataTable extends React.Component {
     onDeselect?: Function,
     onMultiRowSelect?: Function,
     cellRenderer: Object,
-    menuItems: Object,
+    contextMenu: Object,
     ...TableParams
   };
 
@@ -284,18 +284,18 @@ class DataTable extends React.Component {
   };
 
   renderBodyContextMenu = ({ regions }: Array<IRegion>) => {
-    const { entities, history, menuItems } = this.props;
+    const { entities, history, contextMenu } = this.props;
     //single selection
 
-    // const menuItems = { ...(menuItems || {}) };
+    // const contextMenu = { ...(contextMenu || {}) };
     const selectedRows = getSelectedRowsFromRegions(regions);
     const selectedRecords = selectedRows.map(row => {
       return entities[row];
     });
-    if (selectedRows.length < 1 || !menuItems || !menuItems.length) {
+    if (selectedRows.length < 1 || !contextMenu || !contextMenu.length) {
       return null;
     }
-    const itemsToRender = menuItems({
+    const itemsToRender = contextMenu({
       selectedRecords,
       history,
       selectedRows,
