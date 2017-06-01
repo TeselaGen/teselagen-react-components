@@ -44,9 +44,15 @@ export default class PagingTool extends React.Component {
         <NumericInput
           className={"paging-row-input"}
           value={this.state.value}
-          onValueChange={this.onValueChange}
-          {...onEnterOrBlurHelper(() => {
-            setPageSize(this.state.value);
+          onValueChange={value => {
+            this.onValueChange(value);
+            if (Math.abs(this.state.value - value) <= 1) {
+              setPageSize(parseInt(value, 10));
+            }
+          }}
+          {...onEnterOrBlurHelper(e => {
+            this.onValueChange(e.target.value);
+            setPageSize(parseInt(e.target.value, 10));
           })}
         />
         <span
