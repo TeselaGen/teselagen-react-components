@@ -293,27 +293,7 @@ class DataTable extends React.Component {
     const { entities, history, customMenuItems } = this.props;
     //single selection
 
-    const defaultMenuItems = {
-      view: (recordData, history) => {
-        const recordId = recordData.dbId;
-        const route = "/" + recordData["__typename"] + "s" + "/" + recordId;
-        return (
-          <MenuItem
-            key={recordId}
-            iconName="eye-open"
-            onClick={() => {
-              history.push(route);
-            }}
-            text="View"
-          />
-        );
-      },
-      delete: () => (
-        <MenuItem iconName="trash" onClick={() => {}} text="Delete" />
-      )
-    };
-
-    const menuItems = { ...defaultMenuItems, ...(customMenuItems || {}) };
+    const menuItems = { ...(customMenuItems || {}) };
 
     if (regions.length === 1) {
       if (regions[0].rows) {
