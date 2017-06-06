@@ -366,8 +366,6 @@ class DataTable extends React.Component {
   };
 }
 
-export default withRouter(DataTable);
-
 function SearchBar({ reduxFormSearchInput, setSearchTerm, maybeSpinner }) {
   return (
     <InputGroup
@@ -390,3 +388,5 @@ function SearchBar({ reduxFormSearchInput, setSearchTerm, maybeSpinner }) {
     />
   );
 }
+
+export default withRouter(DataTable);

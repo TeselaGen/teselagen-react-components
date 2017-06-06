@@ -113,5 +113,20 @@ describe("DataTableDemo", () => {
       );
       expect(reduxDataWrapper.props().queryParams.offset).toBe(0);
     });
+    it("changing page size brings us back to page 1", () => {
+      expect(reduxDataWrapper.props().queryParams.offset).toBe(0);
+      pagingToolbarWrapper.find(".paging-arrow-right").simulate("click");
+      expect(reduxDataWrapper.props().queryParams.offset).toBe(2);
+      expect(reduxDataWrapper.props().queryParams.limit).toBe(2);
+      pagingInput.simulate("change", {
+        target: {
+          value: 3
+        }
+      });
+      expect(pagingInput.props().value).toBe("3");
+      pagingInput.simulate("blur");
+      expect(reduxDataWrapper.props().queryParams.limit).toBe(3);
+      expect(reduxDataWrapper.props().queryParams.offset).toBe(0);
+    });
   });
 });

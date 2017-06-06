@@ -12,6 +12,6 @@ export default function getSelectedRowsFromRegions(regions) {
 
 function sort_unique(arr) {
   return arr.sort().filter(function(el, i, a) {
-    return i == a.indexOf(el);
+    return i === a.indexOf(el);
   });
 }

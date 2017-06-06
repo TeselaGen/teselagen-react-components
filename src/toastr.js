@@ -11,7 +11,7 @@ const BottomToaster = Toaster.create({
 });
 
 if (!window.toastr) window.toastr = {};
-if (!window.toastr.success)
+if (!window.toastr.success) {
   window.toastr.success = function(message, options) {
     options = options || {};
     var toastToUse = options.bottom ? BottomToaster : TopToaster;
@@ -20,8 +20,9 @@ if (!window.toastr.success)
       message
     });
   };
+}
 
-if (!window.toastr.error)
+if (!window.toastr.error) {
   window.toastr.error = function(message, options) {
     options = options || {};
     var toastToUse = options.bottom ? BottomToaster : TopToaster;
@@ -30,8 +31,9 @@ if (!window.toastr.error)
       message
     });
   };
+}
 
-if (!window.toastr.warning)
+if (!window.toastr.warning) {
   window.toastr.warning = function(message, options) {
     options = options || {};
     var toastToUse = options.bottom ? BottomToaster : TopToaster;
@@ -40,8 +42,9 @@ if (!window.toastr.warning)
       message
     });
   };
+}
 
-if (!window.toastr.info)
+if (!window.toastr.info) {
   window.toastr.info = function(message, options) {
     options = options || {};
     var toastToUse = options.bottom ? BottomToaster : TopToaster;
@@ -49,5 +52,4 @@ if (!window.toastr.info)
       message
     });
   };
-
-export default TopToaster;
+}

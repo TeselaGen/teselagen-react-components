@@ -164,7 +164,8 @@ export default function queryParams({
     function setPageSize(pageSize, currentParams) {
       let newParams = {
         ...currentParams,
-        pageSize: pageSize === defaultParams.pageSize ? undefined : pageSize
+        pageSize: pageSize === defaultParams.pageSize ? undefined : pageSize,
+        page: 1
       };
       setNewParams(newParams);
     }
