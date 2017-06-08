@@ -25,12 +25,13 @@ function getIntentClass({ meta: { touched, error } }) {
 
 function removeUnwantedProps(props) {
   const cleanedProps = { ...props };
-  delete props.intent;
-  delete props.intentClass;
-  delete props.meta;
-  delete props.className;
-  delete props.tooltipError;
-  delete props.tooltipProps;
+  delete cleanedProps.intent;
+  delete cleanedProps.intentClass;
+  delete cleanedProps.meta;
+  delete cleanedProps.className;
+  delete cleanedProps.tooltipError;
+  delete cleanedProps.tooltipProps;
+  delete cleanedProps.tabIndex;
   return cleanedProps;
 }
 
