@@ -4,6 +4,7 @@ export {
   default as routeDoubleClick
 } from "./DataTable/utils/routeDoubleClick";
 export { default as withTableParams } from "./DataTable/utils/withTableParams";
+export * from "./FormComponents";
 export * from "./toastr";
 export * from "./VectorEditor";
 export * from "./toastr";
