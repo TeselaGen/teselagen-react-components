@@ -99,7 +99,15 @@ export const renderBlueprintTextarea = props => {
 
 export const renderBlueprintEditableText = props => {
   const { input, ...rest } = props;
-  return <EditableText {...input} {...removeUnwantedProps(rest)} />;
+  return (
+    <EditableText
+      {...input}
+      onConfirm={function(...args) {
+        input.onBlur && input.onBlur(...args);
+      }}
+      {...removeUnwantedProps(rest)}
+    />
+  );
 };
 
 export const renderBlueprintSelector = props => {

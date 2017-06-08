@@ -1,5 +1,6 @@
 import React from 'react'
 import { reduxForm } from 'redux-form'
+
 import {
   InputField,
   SelectField,
@@ -8,8 +9,9 @@ import {
   TextareaField,
   EditableTextField,
   NumericInputField,
-  ReactSelectField
-  // RadioField
+  ReactSelectField,
+  // RadioField,
+  onEnterOrBlurHelper
 } from '../../../src'
 import './style.css'
 import { Provider } from 'react-redux'
@@ -35,6 +37,9 @@ class FormComponentsDemo extends React.Component {
             name={'inputField'}
             label="Input"
             placeholder="Enter input..."
+            {...onEnterOrBlurHelper(function (argument) {
+              console.log('onEnter/Blur hit')
+            })}
           />
           <InputField
             name={'inputFieldWithTooltipError'}
@@ -65,6 +70,9 @@ class FormComponentsDemo extends React.Component {
           />
           <EditableTextField
             name={'fieldnumber8'}
+            {...onEnterOrBlurHelper(function (argument) {
+              console.log('onEnter/Blur hit')
+            })}
             label="Editable Text"
             placeholder="Enter new text..."
           />
