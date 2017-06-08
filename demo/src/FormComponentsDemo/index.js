@@ -24,20 +24,19 @@ class FormComponentsDemo extends React.Component {
             Blueprint Redux Form Components
           </h3>
           <div className="form-component">
-            <NumericInputField label="Numeric Input" placeholder="0" />
+            <NumericInputField name={'fieldnumber1'} label="Numeric Input" placeholder="0" />
           </div>
           <div className="form-component">
-            <InputField label="Input" placeholder="Enter input..." />
+            <InputField name={'fieldnumber2'} label="Input" placeholder="Enter input..." />
           </div>
           <div className="form-component">
-            <SelectField label="Select" name="source" disabled={false}>
+            <SelectField name={'fieldnumber3'} label="Select"  disabled={false}>
               <option value="1">Option One</option>
               <option value="2">Option Two</option>
             </SelectField>
             <div className="form-component">
-              <DateInputField
+              <DateInputField name={'fieldnumber5'}
                 label="Date Input"
-                name="dueDate"
                 minDate={new Date()}
                 maxDate={
                   new Date(
@@ -47,13 +46,13 @@ class FormComponentsDemo extends React.Component {
               />
             </div>
             <div className="form-component">
-              <CheckboxField label="Checkbox" checked={true} />
+              <CheckboxField name={'fieldnumber6'} label="Checkbox" checked={true} />
             </div>
             <div className="form-component">
-              <TextareaField label="Textarea" placeholder="Enter notes..." />
+              <TextareaField name={'fieldnumber7'} label="Textarea" placeholder="Enter notes..." />
             </div>
             <div className="form-component">
-              <EditableTextField
+              <EditableTextField name={'fieldnumber8'}
                 label="Editable Text"
                 placeholder="Enter new text..."
               />

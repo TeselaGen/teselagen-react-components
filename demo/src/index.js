@@ -6,10 +6,14 @@ import VectorEditorDemo from './VectorEditorDemo/index.js'
 import LoadingDemo from './LoadingDemo/index.js'
 import FormComponentsDemo from './FormComponentsDemo'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+import { Provider } from 'react-redux'
+import store from './store';
+
 
 const Demo = () => {
   return (
     <div>
+      <Provider store={store}>
         <Router>
           <div>
             <Route path="/" component={HomePage} />
@@ -19,6 +23,7 @@ const Demo = () => {
             <Route path="/formcomponents" component={FormComponentsDemo} />
           </div>
         </Router>
+      </Provider>
     </div>
   )
 }
