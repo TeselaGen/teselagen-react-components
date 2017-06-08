@@ -10,118 +10,142 @@ import {
   RadioGroup,
   Checkbox,
   EditableText,
-  Popover,
-  PopoverInteractionKind,
+  Tooltip,
   Position
 } from "@blueprintjs/core";
 
 import { DateInput } from "@blueprintjs/datetime";
-function getIntentClass({ meta: { touched, error } }) {
+function getIntent({ meta: { touched, error } }) {
   return touched && error ? Intent.DANGER : "";
 }
 
+function getIntentClass({ meta: { touched, error } }) {
+  return touched && error ? "pt-intent-danger" : "";
+}
+
+function removeUnwantedProps(props) {
+  const cleanedProps = { ...props };
+  delete props.intent;
+  delete props.intentClass;
+  delete props.meta;
+  delete props.className;
+  delete props.tooltipError;
+  delete props.tooltipProps;
+  return cleanedProps;
+}
+
 function AbstractInput(props) {
-  const { className, children, label, meta: { touched, error } } = props;
+  const {
+    children,
+    tooltipProps,
+    tooltipError,
+    label,
+    meta: { touched, error }
+  } = props;
   const showError = touched && error;
 
-  const target = (
+  return (
     <div className={`pt-form-group ${getIntentClass(props)}`}>
       {label &&
         <label className="pt-label">
           {label}
         </label>}
-      {children}
-    </div>
-  );
-  const content = (
-    <div className={"error-popover pt-form-helper-text " + Intent.DANGER}>
-      {" "}{error}
-    </div>
-  );
-  return (
-    <div className={className}>
-
-      <Popover
-        isDisabled={!showError}
-        defaultIsOpen
-        enforceFocus={false}
+      <Tooltip
+        isDisabled={!tooltipError || !showError}
+        intent={Intent.DANGER}
+        content={error}
         position={Position.TOP}
-        interactionKind={PopoverInteractionKind.HOVER}
-        content={content}
-        target={target}
-      />
+        {...tooltipProps}
+      >
+        {children}
+      </Tooltip>
+      {!tooltipError &&
+        showError &&
+        <div className={"pt-form-helper-text"}>{error}</div>}
     </div>
   );
 }
 
 export const renderBlueprintDateInput = props => {
-  const { input, ...rest } = props;
-  return <DateInput intent={getIntentClass(props)} {...input} {...rest} />;
+  const { input, intent, ...rest } = props;
+  return (
+    <DateInput intent={intent} {...input} {...removeUnwantedProps(rest)} />
+  );
 };
 
 export const renderBlueprintInput = props => {
-  const { input, ...rest } = props;
-  return <InputGroup intent={getIntentClass(props)} {...input} {...rest} />;
+  const { input, intent, ...rest } = props;
+  return (
+    <InputGroup intent={intent} {...input} {...removeUnwantedProps(rest)} />
+  );
 };
 
 export const renderBlueprintCheckbox = props => {
   const { input, label, ...rest } = props;
-  return <Checkbox {...input} {...rest} label={label} />;
+  return <Checkbox {...input} {...removeUnwantedProps(rest)} label={label} />;
 };
 
 export const renderBlueprintTextarea = props => {
-  const { input, className, ...rest } = props;
+  const { input, intentClass, ...rest } = props;
   return (
     <textarea
-      className={`${className} ${getIntentClass(props)} pt-input`}
+      {...removeUnwantedProps(rest)}
+      className={`${intentClass} pt-input pt-fill`}
       {...input}
-      {...rest}
     />
   );
 };
 
 export const renderBlueprintEditableText = props => {
   const { input, ...rest } = props;
-  return <EditableText intent={getIntentClass(props)} {...input} {...rest} />;
+  return <EditableText {...input} {...removeUnwantedProps(rest)} />;
 };
 
 export const renderBlueprintSelector = props => {
   const { input, hideValue, ...rest } = props;
   return (
-    <div className={`pt-select ${getIntentClass(props)}`}>
+    <div className={"pt-select pt-fill"}>
       <select
-        className={`pt-select ${getIntentClass(props)}`}
         {...(hideValue ? { value: "" } : {})}
         {...input}
-        {...rest}
+        {...removeUnwantedProps(rest)}
       />
     </div>
   );
 };
 
 export const renderMultiSelect = props => {
-  const { input, hideValue, options, ...rest } = props;
-  return <Select options={options} {...input} {...rest} />;
+  // spreading input not working, grab the values needed instead
+  const { input: { value, onChange }, hideValue, options, ...rest } = props;
+  return (
+    <Select
+      options={options}
+      value={value}
+      onChange={onChange}
+      {...removeUnwantedProps(rest)}
+    />
+  );
 };
 
 export const renderBlueprintNumericInput = props => {
-  const { input, hideValue, ...rest } = props;
+  const { input, hideValue, intent, ...rest } = props;
   return (
     <NumericInput
       onValueChange={value => {
         // needed for redux form to change value
         rest.onChange ? rest.onChange(value) : input.onChange(value);
       }}
-      intent={getIntentClass(props)}
+      intent={intent}
       {...(hideValue ? { value: "" } : {})}
       {...input}
-      {...rest}
+      {...removeUnwantedProps(rest)}
+      className={"pt-fill"}
     />
   );
 };
 
 export const renderBlueprintRadio = ({ input, label, ...rest }) => {
-  return <Radio {...input} label={label} {...rest} />;
+  return <Radio {...input} label={label} {...removeUnwantedProps(rest)} />;
 };
 
 export const BlueprintRadioGroup = ({ name, labelsAndValues, ...rest }) => {
@@ -136,7 +160,7 @@ export const BlueprintRadioGroup = ({ name, labelsAndValues, ...rest }) => {
             type={"radio"}
             value={value}
             component={renderBlueprintRadio}
-            {...rest}
+            {...removeUnwantedProps(rest)}
           />
         );
       })}
@@ -153,9 +177,10 @@ function generateField(component) {
 
 export const withDefaultValue = WrappedComponent => {
   return props => {
-    const defaultProps = {
+    let defaultProps = {
       ...props,
-      className: undefined,
+      intent: getIntent(props),
+      intentClass: getIntentClass(props),
       input: {
         ...props.input,
         value: props.input.value === ""
