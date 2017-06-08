@@ -1,5 +1,5 @@
 import React from "react";
-import Loading from '../../../src';
+import {Loading} from '../../../src';
 
 export default class LoadingComponentDemo extends React.Component {
 	render() {

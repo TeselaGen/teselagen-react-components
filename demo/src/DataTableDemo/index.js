@@ -8,15 +8,9 @@ import { onEnterOrBlurHelper } from "../../../src";
 
 import { columns, schema } from "./mocks";
 import { BrowserRouter as Router, withRouter } from "react-router-dom";
-
+import { Provider } from "react-redux";
+import store from "../store";
 FocusStyleManager.onlyShowFocusOnTabs();
-
-// const store = createStore(
-// 	combineReducers({
-// 		form
-// 	}),
-// 	window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-// );
 
 let UrlConnected = withTableParams(DataTableWrapper, {
 	urlConnected: true,
@@ -43,33 +37,41 @@ const ReduxConnected2 = withTableParams(DataTableWrapper, {
 export { UrlConnected, ReduxConnected, DataTableWrapper };
 export default class TableDemo extends React.Component {
 	render() {
-		var {open} = this.state || {}
+		var { open } = this.state || {};
 		return (
+			<Provider store={store}>
 				<div
-				{...onEnterOrBlurHelper(function () {
-					console.log('blurred or entered')
-				})}
+					{...onEnterOrBlurHelper(function() {
+						console.log("blurred or entered");
+					})}
 				>
 					<Router>
 						<div>
-							<button onClick={()=>{
-								this.setState({
-									open: true
-								})
-							}}> open table in dialog</button>
+							<button
+								onClick={() => {
+									this.setState({
+										open: true
+									});
+								}}
+							>
+								{" "}open table in dialog
+							</button>
 							<UrlConnected />
 							<ReduxConnected />
-							<Dialog isOpen={open} onClose={()=>{
-								this.setState({
-									open: false
-								})
-							}}>
-								<ReduxConnected2/>
+							<Dialog
+								isOpen={open}
+								onClose={() => {
+									this.setState({
+										open: false
+									});
+								}}
+							>
+								<ReduxConnected2 />
 							</Dialog>
 						</div>
 					</Router>
 				</div>
+			</Provider>
 		);
-
 	}
 }

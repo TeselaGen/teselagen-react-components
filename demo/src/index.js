@@ -1,21 +1,14 @@
 import './style.css'
 import React from 'react'
 import { render } from 'react-dom'
-import { Provider } from 'react-redux'
-import { createStore, combineReducers } from 'redux'
-import { reducer as formReducer } from 'redux-form'
 import DataTableDemo from './DataTableDemo/index.js'
 import VectorEditorDemo from './VectorEditorDemo/index.js'
 import LoadingDemo from './LoadingDemo/index.js'
 import FormComponentsDemo from './FormComponentsDemo'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+import { Provider } from 'react-redux'
+import store from './store';
 
-const store = createStore(
-  combineReducers({
-    formReducer
-  }),
-  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-)
 
 const Demo = () => {
   return (
