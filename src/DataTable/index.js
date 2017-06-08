@@ -6,7 +6,7 @@ import React from "react";
 import times from "lodash/times";
 import moment from "moment";
 import PagingTool from "./PagingTool";
-import { onEnterHelper } from "./utils/onEnterOrBlurHelper";
+import { onEnterHelper } from "../utils/handlerHelpers";
 import getSelectedRowsFromRegions from "./utils/getSelectedRowsFromRegions";
 import FilterAndSortMenu from "./FilterAndSortMenu";
 import type {

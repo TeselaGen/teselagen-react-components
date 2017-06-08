@@ -16,7 +16,7 @@ export function onBlurHelper(callback) {
   };
 }
 
-export default function onEnterOrBlurHelper(callback) {
+export function onEnterOrBlurHelper(callback) {
   return {
     onKeyDown: function(event) {
       if (event.key === "Enter") {

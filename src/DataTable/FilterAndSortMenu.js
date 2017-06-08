@@ -1,6 +1,6 @@
 //@flow
 import "../toastr";
-import onEnterOrBlurHelper from "./utils/onEnterOrBlurHelper";
+import { onEnterOrBlurHelper } from "../utils/handlerHelpers";
 import React from "react";
 import type {
   TableDataTypes

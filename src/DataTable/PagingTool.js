@@ -2,7 +2,7 @@
 import React from "react";
 import type { Paging } from "../flow_types";
 import { NumericInput, Button } from "@blueprintjs/core";
-import onEnterOrBlurHelper from "./utils/onEnterOrBlurHelper";
+import { onEnterOrBlurHelper } from "../utils/handlerHelpers";
 
 export default class PagingTool extends React.Component {
   props: {
