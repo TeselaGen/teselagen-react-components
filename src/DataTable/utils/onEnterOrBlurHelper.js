@@ -1,5 +1,4 @@
 export function onEnterHelper(callback) {
-  //this is just
   return {
     onKeyDown: function(event) {
       if (event.key === "Enter") {
@@ -10,7 +9,6 @@ export function onEnterHelper(callback) {
 }
 
 export function onBlurHelper(callback) {
-  //this is just
   return {
     onBlur: function(event) {
       callback(event);
