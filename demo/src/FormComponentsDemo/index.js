@@ -7,9 +7,9 @@ import {
   CheckboxField,
   TextareaField,
   EditableTextField,
-  ReactSelectField,
-  NumericInputField,
-  RadioField
+  NumericInputField
+  // ReactSelectField,
+  // RadioField
 } from '../../../src/FormComponents'
 
 import './style.css'
@@ -22,19 +22,19 @@ class FormComponentsDemo extends React.Component {
           Blueprint Redux Form Components
         </h3>
         <div className="form-component">
-          <NumericInputField label="Volume" name="volume" />
+          <NumericInputField label="Numeric Input" placeholder="0" />
         </div>
         <div className="form-component">
-          <InputField label="Type" name="aliquotType" />
+          <InputField label="Input" placeholder="Enter input..." />
         </div>
         <div className="form-component">
-          <SelectField label="select" name="source" disabled={false}>
-            <option value="1">One</option>
-            <option value="2">Two</option>
+          <SelectField label="Select" name="source" disabled={false}>
+            <option value="1">Option One</option>
+            <option value="2">Option Two</option>
           </SelectField>
           <div className="form-component">
             <DateInputField
-              label="Due Date"
+              label="Date Input"
               name="dueDate"
               minDate={new Date()}
               maxDate={
@@ -43,13 +43,13 @@ class FormComponentsDemo extends React.Component {
             />
           </div>
           <div className="form-component">
-            <CheckboxField label="Valid Aliquot" checked={false} />
+            <CheckboxField label="Checkbox" checked={true} />
           </div>
           <div className="form-component">
-            <TextareaField label="notes" placeholder="Enter notes..." />
+            <TextareaField label="Textarea" placeholder="Enter notes..." />
           </div>
           <div className="form-component">
-            <EditableTextField name="name" placeholder="Workflow name..." />
+            <EditableTextField label="Editable Text" placeholder="Enter new text..." />
           </div>
           <div className="form-component" />
         </div>
