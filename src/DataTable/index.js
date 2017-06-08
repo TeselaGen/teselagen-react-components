@@ -6,7 +6,7 @@ import React from "react";
 import times from "lodash/times";
 import moment from "moment";
 import PagingTool from "./PagingTool";
-import { onEnterHelper } from "../utils/handlerHelpers";
+
 import getSelectedRowsFromRegions from "./utils/getSelectedRowsFromRegions";
 import FilterAndSortMenu from "./FilterAndSortMenu";
 import type {
@@ -32,6 +32,17 @@ import {
 
 import "./style.css";
 import Measure from "react-measure";
+
+export function onEnterHelper(callback) {
+  return {
+    onKeyDown: function(event) {
+      if (event.key === "Enter") {
+        callback(event);
+      }
+    }
+  };
+}
+
 function noop() {}
 class DataTable extends React.Component {
   state = {

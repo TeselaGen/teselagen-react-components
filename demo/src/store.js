@@ -3,7 +3,7 @@ import { reducer as formReducer } from 'redux-form'
 
 const store = createStore(
   combineReducers({
-    formReducer
+    form: formReducer
   }),
   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 )

@@ -4,7 +4,7 @@ import { FocusStyleManager, Dialog } from "@blueprintjs/core";
 // import { reducer as form } from "redux-form";
 import DataTableWrapper from "./DataTableWrapper";
 import { withTableParams } from "../../../src";
-import { onEnterOrBlurHelper } from "../../../src";
+// import { onEnterOrBlurHelper } from "../../../src";
 
 import { columns, schema } from "./mocks";
 import { BrowserRouter as Router, withRouter } from "react-router-dom";
@@ -41,9 +41,6 @@ export default class TableDemo extends React.Component {
 		return (
 			<Provider store={store}>
 				<div
-					{...onEnterOrBlurHelper(function() {
-						console.log("blurred or entered");
-					})}
 				>
 					<Router>
 						<div>

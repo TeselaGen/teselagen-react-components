@@ -1,6 +1,6 @@
 //@flow
 import "../toastr";
-import { onEnterOrBlurHelper } from "../utils/handlerHelpers";
+
 import React from "react";
 import type {
   TableDataTypes
@@ -23,6 +23,19 @@ import {
   DateRangeInput
 } from "@blueprintjs/datetime";
 import "./style.css";
+
+function onEnterOrBlurHelper(callback) {
+  return {
+    onKeyDown: function(event) {
+      if (event.key === "Enter") {
+        callback(event);
+      }
+    },
+    onBlur: function(event) {
+      callback(event);
+    }
+  };
+}
 
 export default class FilterAndSortMenu extends React.Component {
   constructor(props) {

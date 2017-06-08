@@ -10,7 +10,7 @@ import {
   NumericInputField
   // ReactSelectField,
   // RadioField
-} from "../../../src/FormComponents";
+} from "../../../src";
 import "./style.css";
 import { Provider } from "react-redux";
 import store from "../store";

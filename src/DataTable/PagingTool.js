@@ -2,7 +2,19 @@
 import React from "react";
 import type { Paging } from "../flow_types";
 import { NumericInput, Button } from "@blueprintjs/core";
-import { onEnterOrBlurHelper } from "../utils/handlerHelpers";
+
+function onEnterOrBlurHelper(callback) {
+  return {
+    onKeyDown: function(event) {
+      if (event.key === "Enter") {
+        callback(event);
+      }
+    },
+    onBlur: function(event) {
+      callback(event);
+    }
+  };
+}
 
 export default class PagingTool extends React.Component {
   props: {
