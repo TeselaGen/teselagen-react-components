@@ -1,28 +1,36 @@
 import './style.css'
 import React from 'react'
 import { render } from 'react-dom'
+import { Provider } from 'react-redux'
+import { createStore, combineReducers } from "redux";
+import { reducer as form } from "redux-form";
 import DataTableDemo from './DataTableDemo/index.js'
 import VectorEditorDemo from './VectorEditorDemo/index.js'
 import LoadingDemo from './LoadingDemo/index.js'
-import BlueprintReduxFormComponentsDemo
-  from './BlueprintReduxFormComponentsDemo'
+import FormComponentsDemo from './FormComponentsDemo'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+
+const store = createStore(
+  combineReducers({
+    form
+  }),
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+)
 
 let Demo = function() {
   return (
     <div>
-      <Router>
-        <div>
-          <Route path="/" component={HomePage} />
-          <Route path="/vectoreditor" component={VectorEditorDemo} />
-          <Route path="/datatable" component={DataTableDemo} />
-          <Route path="/loading" component={LoadingDemo} />
-          <Route
-            path="/blueprintreduxformcomponents"
-            component={BlueprintReduxFormComponentsDemo}
-          />
-        </div>
-      </Router>
+      <Provider store={store}>
+        <Router>
+          <div>
+            <Route path="/" component={HomePage} />
+            <Route path="/vectoreditor" component={VectorEditorDemo} />
+            <Route path="/datatable" component={DataTableDemo} />
+            <Route path="/loading" component={LoadingDemo} />
+            <Route path="/formcomponents" component={FormComponentsDemo} />
+          </div>
+        </Router>
+      </Provider>
     </div>
   )
 }
@@ -58,7 +66,7 @@ function HomePage() {
         style={{ color: 'inherit', textDecoration: 'none' }}
       >
         <div className={'pt-popover-dismiss pt-menu-item'}>
-          BlueprintReduxFormComponentsDemo
+          FormComponentsDemo
         </div>
       </Link>
     </div>

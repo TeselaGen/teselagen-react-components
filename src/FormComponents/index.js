@@ -168,13 +168,9 @@ export const BlueprintRadioGroup = ({ name, labelsAndValues, ...rest }) => {
 };
 
 function generateField(component) {
-  const compWithDefaultVal = withDefaultValue(component)
+  const compWithDefaultVal = withDefaultValue(component);
   return function FieldMaker({ name, ...rest }) {
-    return (
-      <Field name={name} 
-      component={compWithDefaultVal}
-       {...rest} />
-    );
+    return <Field name={name} component={compWithDefaultVal} {...rest} />;
   };
 }
 

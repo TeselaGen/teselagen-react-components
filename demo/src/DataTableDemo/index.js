@@ -1,8 +1,7 @@
 import React from "react";
 import { FocusStyleManager, Dialog } from "@blueprintjs/core";
-import { Provider } from "react-redux";
-import { createStore, combineReducers } from "redux";
-import { reducer as form } from "redux-form";
+// import { createStore, combineReducers } from "redux";
+// import { reducer as form } from "redux-form";
 import DataTableWrapper from "./DataTableWrapper";
 import { withTableParams } from "../../../src";
 
@@ -11,12 +10,12 @@ import { BrowserRouter as Router, withRouter } from "react-router-dom";
 
 FocusStyleManager.onlyShowFocusOnTabs();
 
-const store = createStore(
-	combineReducers({
-		form
-	}),
-	window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-);
+// const store = createStore(
+// 	combineReducers({
+// 		form
+// 	}),
+// 	window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+// );
 
 let UrlConnected = withTableParams(DataTableWrapper, {
 	urlConnected: true,
@@ -45,7 +44,6 @@ export default class TableDemo extends React.Component {
 	render() {
 		var {open} = this.state || {}
 		return (
-			<Provider store={store}>
 				<div>
 					<Router>
 						<div>
@@ -66,7 +64,6 @@ export default class TableDemo extends React.Component {
 						</div>
 					</Router>
 				</div>
-			</Provider>
 		);
 
 	}
