@@ -102,8 +102,8 @@ export const renderBlueprintEditableText = props => {
   return (
     <EditableText
       {...input}
-      onConfirm={function(...args) {
-        input.onBlur && input.onBlur(...args);
+      onConfirm={function(value) {
+        input.onBlur && input.onBlur(value);
       }}
       {...removeUnwantedProps(rest)}
     />
