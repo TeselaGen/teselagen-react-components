@@ -36,9 +36,10 @@ import {toastr} from 'teselagen-react-components';  // eslint-disable-line
 ## Releasing
 
 - `npm whoami` you should be teselagen
-- `npm login` teselagen//ourMasterPass
+- `npm login` 
+teselagen//ourMasterPass//team@teselagen.com
 - for patch: `npm run release`
-- for minor/major: `npm run release --minor/major`
+- for minor/major: `npm run release minor/major`
 
 [build-badge]: https://img.shields.io/travis/user/repo/master.png?style=flat-square
 [build]: https://travis-ci.org/user/repo
