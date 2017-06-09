@@ -25,13 +25,17 @@ function getIntentClass({ meta: { touched, error } }) {
 
 function removeUnwantedProps(props) {
   const cleanedProps = { ...props };
+  delete cleanedProps.className;
   delete cleanedProps.intent;
   delete cleanedProps.intentClass;
   delete cleanedProps.meta;
-  delete cleanedProps.className;
+  delete cleanedProps.tabIndex;
   delete cleanedProps.tooltipError;
   delete cleanedProps.tooltipProps;
-  delete cleanedProps.tabIndex;
+  if (cleanedProps.inputClassName) {
+    cleanedProps.className = cleanedProps.inputClassName;
+    delete cleanedProps.inputClassName;
+  }
   return cleanedProps;
 }
 
@@ -87,11 +91,11 @@ export const renderBlueprintCheckbox = props => {
 };
 
 export const renderBlueprintTextarea = props => {
-  const { input, intentClass, ...rest } = props;
+  const { input, intentClass, inputClassName, ...rest } = props;
   return (
     <textarea
       {...removeUnwantedProps(rest)}
-      className={`${intentClass} pt-input pt-fill`}
+      className={`${intentClass} ${inputClassName} pt-input pt-fill`}
       {...input}
     />
   );
@@ -137,7 +141,7 @@ export const renderMultiSelect = props => {
 };
 
 export const renderBlueprintNumericInput = props => {
-  const { input, hideValue, intent, ...rest } = props;
+  const { input, hideValue, intent, inputClassName, ...rest } = props;
   return (
     <NumericInput
       onValueChange={value => {
@@ -148,18 +152,14 @@ export const renderBlueprintNumericInput = props => {
       {...(hideValue ? { value: "" } : {})}
       {...input}
       {...removeUnwantedProps(rest)}
-      className={"pt-fill"}
+      className={`pt-fill ${inputClassName}`}
     />
   );
 };
 
 export const renderBlueprintRadioGroup = ({ input, options, ...rest }) => {
   return (
-    <RadioGroup
-      selectedValue={input.value}
-      {...input}
-      className={"parameter-settings-radio-group"}
-    >
+    <RadioGroup selectedValue={input.value} {...input}>
       {options.map(function({ label, value }, index) {
         return (
           <Radio

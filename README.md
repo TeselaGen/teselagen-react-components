@@ -10,7 +10,26 @@ yarn add teselagen-react-components
 ```
 ```
 import {DataTable, routeDoubleClick, queryParams} from "teselagen-react-components";
-import {toastr} from 'teselagen-react-components';  // eslint-disable-line
+import {toastr} from 'teselagen-react-components';
+import {
+	InputField,
+	SelectField,
+	DateInputField,
+	CheckboxField,
+	TextareaField,
+	EditableTextField,
+	ReactSelectField,
+	NumericInputField,
+	RadioGroupField
+} from 'teselagen-react-components'
+
+<InputField
+  name={"fieldName"}
+  label="fieldLabel"
+  placeholder="Enter text..."
+  inputClassName="className(s) for input"
+/>
+
 ```
 
 ## Prerequisites
