@@ -153,23 +153,20 @@ export const renderBlueprintNumericInput = props => {
   );
 };
 
-export const renderBlueprintRadio = ({ input, label, ...rest }) => {
-  return <Radio {...input} label={label} {...removeUnwantedProps(rest)} />;
-};
-
-export const BlueprintRadioGroup = ({ name, labelsAndValues, ...rest }) => {
+export const renderBlueprintRadioGroup = ({ input, options, ...rest }) => {
   return (
-    <RadioGroup className={"parameter-settings-radio-group"}>
-      {labelsAndValues.map(function({ label, value }, index) {
+    <RadioGroup
+      selectedValue={input.value}
+      {...input}
+      className={"parameter-settings-radio-group"}
+    >
+      {options.map(function({ label, value }, index) {
         return (
-          <Field
-            key={index}
-            label={label}
-            name={name}
-            type={"radio"}
-            value={value}
-            component={renderBlueprintRadio}
+          <Radio
             {...removeUnwantedProps(rest)}
+            key={index}
+            value={value}
+            label={label}
           />
         );
       })}
@@ -214,4 +211,4 @@ export const TextareaField = generateField(renderBlueprintTextarea);
 export const EditableTextField = generateField(renderBlueprintEditableText);
 export const ReactSelectField = generateField(renderMultiSelect);
 export const NumericInputField = generateField(renderBlueprintNumericInput);
-export const RadioField = generateField(renderBlueprintRadio);
+export const RadioGroupField = generateField(renderBlueprintRadioGroup);
