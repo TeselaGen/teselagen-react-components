@@ -24,11 +24,12 @@ function getIntentClass({ meta: { touched, error } }) {
 }
 
 function removeUnwantedProps(props) {
-  const cleanedProps = { ...props };
+  let cleanedProps = { ...props };
   delete cleanedProps.className;
   delete cleanedProps.intent;
   delete cleanedProps.intentClass;
   delete cleanedProps.meta;
+  delete cleanedProps.defaultValue;
   delete cleanedProps.tabIndex;
   delete cleanedProps.tooltipError;
   delete cleanedProps.tooltipProps;
