@@ -46,12 +46,13 @@ function AbstractInput(props) {
     tooltipProps,
     tooltipError,
     label,
+    className,
     meta: { touched, error }
   } = props;
   const showError = touched && error;
 
   return (
-    <div className={`pt-form-group ${getIntentClass(props)}`}>
+    <div className={`pt-form-group ${getIntentClass(props)} ${className}`}>
       {label &&
         <label className="pt-label">
           {label}
