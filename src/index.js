@@ -1,3 +1,4 @@
+import "./fontello/css/fontello.css";
 export { default as DataTable } from "./DataTable";
 export { default as Loading } from "./Loading";
 export {

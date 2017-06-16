@@ -61,11 +61,9 @@ teselagen//ourMasterPass//team@teselagen.com
 - for patch: `npm run release`
 - for minor/major: `npm run release minor/major`
 
-[build-badge]: https://img.shields.io/travis/user/repo/master.png?style=flat-square
-[build]: https://travis-ci.org/user/repo
 
-[npm-badge]: https://img.shields.io/npm/v/npm-package.png?style=flat-square
-[npm]: https://www.npmjs.org/package/npm-package
-
-[coveralls-badge]: https://img.shields.io/coveralls/user/repo/master.png?style=flat-square
-[coveralls]: https://coveralls.io/github/user/repo
+## Adding custom svg icons
+ - `yarn fontopen` this opens up our custom font file in the fontello webtool
+ - add the svg icons you want, hit **Save Session** to commit your changes
+ - then run `yarn fontsave`
+ - commit the changes :)
