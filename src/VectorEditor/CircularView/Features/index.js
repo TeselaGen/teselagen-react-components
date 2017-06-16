@@ -3,7 +3,7 @@ import getAnnotationNameAndStartStopString
 import "./style.css";
 import Feature from "./Feature";
 import drawCircularLabel2 from "../drawCircularLabel2";
-import intervalTree2 from "interval-tree2";
+import intervalTree2 from "teselagen-interval-tree";
 import getRangeAngles from "../getRangeAnglesSpecial";
 import featureColorMap from "../../constants/featureColorMap.json";
 import getYOffset from "../getYOffset";

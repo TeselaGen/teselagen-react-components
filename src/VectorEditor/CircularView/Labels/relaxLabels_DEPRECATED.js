@@ -1,4 +1,4 @@
-import intervalTree2 from "interval-tree2";
+import intervalTree2 from "teselagen-interval-tree";
 // var xRanges = new intervalTree2(0)
 // var yRanges = new intervalTree2(0)
 // iTree.search(start, end)

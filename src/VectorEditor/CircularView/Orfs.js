@@ -2,7 +2,7 @@ import getAnnotationNameAndStartStopString
   from "../utils/getAnnotationNameAndStartStopString";
 import orfFrameToColorMap from "../constants/orfFrameToColorMap";
 import drawDirectedPiePiece from "./drawDirectedPiePiece";
-import intervalTree2 from "interval-tree2";
+import intervalTree2 from "teselagen-interval-tree";
 import getRangeAngles from "./getRangeAnglesSpecial";
 import getAngleForPositionMidpoint from "./getAngleForPositionMidpoint";
 import getYOffset from "./getYOffset";

@@ -2,3 +2,7 @@
   margin: 5px;
   color: red;
 }
+
+.te-file-upload-input{
+	min-width: 140px;
+}

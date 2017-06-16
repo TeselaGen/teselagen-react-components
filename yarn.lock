@@ -309,6 +309,10 @@ asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
 
+attr-accept@^1.0.3:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/attr-accept/-/attr-accept-1.1.0.tgz#b5cd35227f163935a8f1de10ed3eba16941f6be6"
+
 autoprefixer@6.7.0, autoprefixer@^6.3.1:
   version "6.7.0"
   resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-6.7.0.tgz#88992cf04df141e7b8293550f2ee716c565d1cae"
@@ -3778,10 +3782,6 @@ interpret@^1.0.0:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/interpret/-/interpret-1.0.3.tgz#cbc35c62eeee73f19ab7b10a801511401afc0f90"
 
-interval-tree2@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/interval-tree2/-/interval-tree2-1.1.0.tgz#210f402906185331872de8440b7c24c6ea2800c4"
-
 invariant@^2.0.0, invariant@^2.2.0, invariant@^2.2.1, invariant@^2.2.2:
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/invariant/-/invariant-2.2.2.tgz#9e1f56ac0acdb6bf303306f338be3b204ae60360"
@@ -6386,6 +6386,13 @@ react-draggable@^2.2.3:
   dependencies:
     classnames "^2.2.5"
 
+react-dropzone@^3.13.2:
+  version "3.13.2"
+  resolved "https://registry.yarnpkg.com/react-dropzone/-/react-dropzone-3.13.2.tgz#318745c03007ca6b948cdd4431abc009b16a6588"
+  dependencies:
+    attr-accept "^1.0.3"
+    prop-types "^15.5.7"
+
 react-icon-base@2.0.7:
   version "2.0.7"
   resolved "https://registry.yarnpkg.com/react-icon-base/-/react-icon-base-2.0.7.tgz#0bd18736bd6ce79ca6d69ce8387a07fb8d4ceffe"
@@ -7408,6 +7415,10 @@ tar@^2.2.1:
     fstream "^1.0.2"
     inherits "2"
 
+teselagen-interval-tree@1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/teselagen-interval-tree/-/teselagen-interval-tree-1.1.1.tgz#941785eec6dd382a1e39d1c9908988264f36ef57"
+
 test-exclude@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/test-exclude/-/test-exclude-3.3.0.tgz#7a17ca1239988c98367b0621456dbb7d4bc38977"
@@ -7725,16 +7736,23 @@ vary@~1.1.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.1.tgz#67535ebb694c1d52257457984665323f587e8d37"
 
-ve-range-utils@^2.0.34, ve-range-utils@^2.0.35:
+ve-range-utils@^2.0.34:
   version "2.0.36"
   resolved "https://registry.yarnpkg.com/ve-range-utils/-/ve-range-utils-2.0.36.tgz#15e9d8e13aaeda06f86b401134509c6e2cc64d9e"
   dependencies:
     lodash "^3.10.1"
     validate.io-nonnegative-integer-array "^1.0.1"
 
-ve-sequence-utils@*, ve-sequence-utils@^3.1.14:
-  version "3.1.14"
-  resolved "https://registry.yarnpkg.com/ve-sequence-utils/-/ve-sequence-utils-3.1.14.tgz#62ac0a286aac369051cff5a9ad56c79c1b7ba44e"
+ve-range-utils@^2.0.37:
+  version "2.0.37"
+  resolved "https://registry.yarnpkg.com/ve-range-utils/-/ve-range-utils-2.0.37.tgz#ecc086d9eaae4fde4327331ef39ef50de8e32ad5"
+  dependencies:
+    lodash "^3.10.1"
+    validate.io-nonnegative-integer-array "^1.0.1"
+
+ve-sequence-utils@*, ve-sequence-utils@3.1.17:
+  version "3.1.17"
+  resolved "https://registry.yarnpkg.com/ve-sequence-utils/-/ve-sequence-utils-3.1.17.tgz#bcf585243f3d36051ca8577e346820a82abf32fe"
   dependencies:
     bson-objectid "^1.1.1"
     lodash "^4.10.0"

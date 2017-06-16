@@ -15,6 +15,9 @@ export default function drawDirectedPiePiece({
   annotationHeight,
   totalAngle
 }) {
+  if (isNaN(totalAngle)) {
+    debugger;
+  }
   var tailHeight = annotationHeight * tailThickness;
 
   var arrowheadOuterRadius = radius + annotationHeight / 2;

@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import getXStartAndWidthOfRowAnnotation
   from "./getXStartAndWidthOfRowAnnotation";
-import intervalTree2 from "interval-tree2";
+import intervalTree2 from "teselagen-interval-tree";
 import getYOffset from "../CircularView/getYOffset";
 import forEach from "lodash/forEach";
 

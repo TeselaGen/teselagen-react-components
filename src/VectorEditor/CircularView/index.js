@@ -22,15 +22,14 @@ import React from "react";
 import Draggable from "react-draggable";
 import "./style.css";
 import draggableClassnames from "../constants/draggableClassnames";
-
 function noop() {}
 
 var defaultSequenceData = {
-  features: {},
-  primers: {},
-  orfs: {},
+  features: [],
+  primers: [],
+  orfs: [],
   sequence: "",
-  cutsites: {},
+  cutsites: [],
   name: ""
 };
 
@@ -122,7 +121,7 @@ export default class CircularView extends React.Component {
       ...sequenceData
     };
     var { sequence = "atgc" } = sequenceDataToUse;
-    var sequenceLength = sequence;
+    var sequenceLength = sequence.length;
     var sequenceName = hideName ? "" : sequenceDataToUse.name || "";
     circularAndLinearTickSpacing =
       circularAndLinearTickSpacing ||

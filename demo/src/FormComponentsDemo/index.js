@@ -11,6 +11,7 @@ import {
   NumericInputField,
   ReactSelectField,
   RadioGroupField,
+  FileUploadField,
   onEnterOrBlurHelper
 } from "../../../src";
 import "./style.css";
@@ -44,6 +45,10 @@ class FormComponentsDemo extends React.Component {
             name={"fieldnumber1"}
             label="Numeric Input"
             placeholder="0"
+          />
+          <FileUploadField
+            name={"fieldnumber1a"}
+            label="File Input"
           />
           <InputField
             name={"inputField"}

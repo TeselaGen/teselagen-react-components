@@ -15,6 +15,10 @@ import {
 } from "@blueprintjs/core";
 
 import { DateInput } from "@blueprintjs/datetime";
+import Dropzone from "react-dropzone";
+
+function noop() {}
+
 function getIntent({ meta: { touched, error } }) {
   return touched && error ? Intent.DANGER : "";
 }
@@ -90,6 +94,56 @@ export const renderBlueprintInput = props => {
 export const renderBlueprintCheckbox = props => {
   const { input, label, ...rest } = props;
   return <Checkbox {...input} {...removeUnwantedProps(rest)} label={label} />;
+};
+
+const handleFileUpload = e => {
+  if (!e.target.files.length) return;
+  const file = e.target.files[0];
+  return new Promise(resolve => {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      // get file content
+      var fileString = e.target.result;
+      resolve(fileString);
+    };
+    reader.readAsText(file, "UTF-8");
+    reader.onError = function(err) {
+      resolve(err);
+    };
+  });
+};
+
+export const renderBlueprintFileUpload = props => {
+  // const { input: { onChange }, cbFunction=noop } = props
+  const {
+    input: { onChange, value: files },
+    dropzoneOptions = {},
+    name,
+    cbFunction = noop
+  } = props;
+  // return <label className="pt-file-upload ">
+  //         <input onChange={function (e) {
+  //           return onChange(e.target.files);
+  //         }} type="file" />
+  //         <span className="pt-file-upload-input">Choose file...</span>
+  //       </label>
+  return (
+    <Dropzone
+      onDrop={onChange}
+      className="pt-file-upload"
+      name={name}
+      {...dropzoneOptions}
+    >
+      <span className="te-file-upload-input pt-file-upload-input">
+        {files
+          ? Array.isArray(files) &&
+              files.map((file, i) => {
+                return file.name + (i !== files.length - 1 ? "," : "");
+              })
+          : "Choose file..."}
+      </span>
+    </Dropzone>
+  );
 };
 
 export const renderBlueprintTextarea = props => {
@@ -206,6 +260,7 @@ export const withDefaultValue = WrappedComponent => {
 };
 
 export const InputField = generateField(renderBlueprintInput);
+export const FileUploadField = generateField(renderBlueprintFileUpload);
 export const SelectField = generateField(renderBlueprintSelector);
 export const DateInputField = generateField(renderBlueprintDateInput);
 export const CheckboxField = generateField(renderBlueprintCheckbox);

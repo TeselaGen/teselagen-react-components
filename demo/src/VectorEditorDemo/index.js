@@ -1,8 +1,8 @@
 import React from "react";
 import { Provider } from "react-redux";
 import store from "../store";
-
-import exampleSequenceData from '../../../src/VectorEditor/exampleData/exampleSequenceData';
+import tidyUpSequenceData from 've-sequence-utils/tidyUpSequenceData';
+import exampleSequenceData from './exampleSequenceData';
 import {
 	CircularView,
 	RowView,
@@ -11,14 +11,16 @@ import {
 	CutsiteFilter
 } from "../../../src";
 
+const data = tidyUpSequenceData(exampleSequenceData, {annotationsAsObjects: true})
+console.log('data:', data)
 
 export default function() {
 	return (
 		<Provider store={store}>
 			<div>
 				<h1>ve-editor Demo</h1>
-				<CircularView sequenceData={exampleSequenceData}/>
-				<RowView sequenceData={exampleSequenceData}/>
+				<CircularView sequenceData={data}/>
+				<RowView sequenceData={data}/>
 			</div>
 		</Provider>
 	);
