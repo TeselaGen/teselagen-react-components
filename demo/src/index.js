@@ -5,10 +5,18 @@ import DataTableDemo from './DataTableDemo/index.js'
 import VectorEditorDemo from './VectorEditorDemo/index.js'
 import LoadingDemo from './LoadingDemo/index.js'
 import FormComponentsDemo from './FormComponentsDemo'
+import FontIconsDemo from './FontIconsDemo'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import store from './store';
 
+var demos = {
+  vectoreditor: VectorEditorDemo,
+  datatable: DataTableDemo,
+  loading: LoadingDemo,
+  formcomponents: FormComponentsDemo,
+  fonticons: FontIconsDemo,
+}
 
 const Demo = () => {
   return (
@@ -17,10 +25,11 @@ const Demo = () => {
         <Router>
           <div>
             <Route path="/" component={HomePage} />
-            <Route path="/vectoreditor" component={VectorEditorDemo} />
-            <Route path="/datatable" component={DataTableDemo} />
-            <Route path="/loading" component={LoadingDemo} />
-            <Route path="/formcomponents" component={FormComponentsDemo} />
+            {
+              Object.keys(demos).map(function (key) {
+                return <Route path={`/${key}`} component={demos[key]} />
+              })
+            }
           </div>
         </Router>
       </Provider>
@@ -33,35 +42,18 @@ render(<Demo />, document.querySelector('#demo'))
 function HomePage() {
   return (
     <div>
-      <Link
-        to="/vectoreditor"
-        style={{ color: 'inherit', textDecoration: 'none' }}
-      >
-        <div className={'pt-popover-dismiss pt-menu-item'}>
-          Vector Editor Demo
-        </div>
-      </Link>
-      <Link
-        to="/datatable"
-        style={{ color: 'inherit', textDecoration: 'none' }}
-      >
-        <div className={'pt-popover-dismiss pt-menu-item'}>
-          Data Table Demo
-        </div>
-      </Link>
-      <Link to="/loading" style={{ color: 'inherit', textDecoration: 'none' }}>
-        <div className={'pt-popover-dismiss pt-menu-item'}>
-          Loading Demo
-        </div>
-      </Link>
-      <Link
-        to="/formcomponents"
-        style={{ color: 'inherit', textDecoration: 'none' }}
-      >
-        <div className={'pt-popover-dismiss pt-menu-item'}>
-          Form Components Demo
-        </div>
-      </Link>
+      {
+        Object.keys(demos).map(function (key) {
+          return <Link
+              to={`/${key}`}
+              style={{ color: 'inherit', textDecoration: 'none' }}
+            >
+              <div className={'pt-popover-dismiss pt-menu-item'}>
+                {key} demo
+              </div>
+            </Link>
+        })
+      }
     </div>
   )
 }
