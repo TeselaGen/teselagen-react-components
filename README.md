@@ -20,7 +20,8 @@ import {
 	EditableTextField,
 	ReactSelectField,
 	NumericInputField,
-	RadioGroupField
+	RadioGroupField,
+	FileUploadField
 } from 'teselagen-react-components'
 
 <InputField
