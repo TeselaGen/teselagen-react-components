@@ -170,25 +170,16 @@ export const renderBlueprintEditableText = props => {
   );
 };
 
-export const renderBlueprintSelector = props => {
-  const { input, hideValue, ...rest } = props;
-  return (
-    <div className={"pt-select pt-fill"}>
-      <select
-        {...(hideValue ? { value: "" } : {})}
-        {...input}
-        {...removeUnwantedProps(rest)}
-      />
-    </div>
-  );
-};
-
-export const renderMultiSelect = props => {
+export const renderSelect = props => {
   // spreading input not working, grab the values needed instead
   const { input: { value, onChange }, hideValue, options, ...rest } = props;
+
   return (
     <Select
-      options={options}
+      options={options.map(function(opt) {
+        if (!opt.value) return { label: opt, value: opt };
+        return opt;
+      })}
       value={value}
       onChange={onChange}
       {...removeUnwantedProps(rest)}
@@ -261,11 +252,10 @@ export const withDefaultValue = WrappedComponent => {
 
 export const InputField = generateField(renderBlueprintInput);
 export const FileUploadField = generateField(renderBlueprintFileUpload);
-export const SelectField = generateField(renderBlueprintSelector);
 export const DateInputField = generateField(renderBlueprintDateInput);
 export const CheckboxField = generateField(renderBlueprintCheckbox);
 export const TextareaField = generateField(renderBlueprintTextarea);
 export const EditableTextField = generateField(renderBlueprintEditableText);
-export const ReactSelectField = generateField(renderMultiSelect);
 export const NumericInputField = generateField(renderBlueprintNumericInput);
 export const RadioGroupField = generateField(renderBlueprintRadioGroup);
+export const SelectField = generateField(renderSelect);

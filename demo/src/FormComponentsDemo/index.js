@@ -9,7 +9,6 @@ import {
   TextareaField,
   EditableTextField,
   NumericInputField,
-  ReactSelectField,
   RadioGroupField,
   FileUploadField,
   onEnterOrBlurHelper
@@ -46,10 +45,7 @@ class FormComponentsDemo extends React.Component {
             label="Numeric Input"
             placeholder="0"
           />
-          <FileUploadField
-            name={"fieldnumber1a"}
-            label="File Input"
-          />
+          <FileUploadField name={"fieldnumber1a"} label="File Input" />
           <InputField
             name={"inputField"}
             label="Input"
@@ -67,10 +63,26 @@ class FormComponentsDemo extends React.Component {
             label="Input"
             placeholder="Enter input..."
           />
-          <SelectField name={"fieldnumber3"} label="Select" disabled={false}>
-            <option value="1">Option One</option>
-            <option value="2">Option Two</option>
-          </SelectField>
+          <SelectField
+            options={["hey", "you", "guys"]}
+            name={"fieldnumber3"}
+            label="Select Simple"
+            disabled={false}
+          />
+
+          <SelectField
+            options={[
+              {
+                label: "hey",
+                value: { tree: "trunk" }
+              },
+              { label: "you", value: { tree: "graph" } },
+              { label: "guys", value: { tree: "chart" } }
+            ]}
+            name={"fieldnumber3a"}
+            label="Select with name and value"
+            disabled={false}
+          />
           <DateInputField
             name={"fieldnumber5"}
             label="Date Input"
@@ -93,7 +105,7 @@ class FormComponentsDemo extends React.Component {
             label="Editable Text"
             placeholder="Enter new text..."
           />
-          <ReactSelectField
+          <SelectField
             name="collaborators"
             label="Collaborators"
             multi
