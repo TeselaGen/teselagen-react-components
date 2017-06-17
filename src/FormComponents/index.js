@@ -177,7 +177,7 @@ export const renderSelect = props => {
   return (
     <Select
       options={options.map(function(opt) {
-        if (!opt.value) return { label: opt, value: opt };
+        if (typeof opt === "string") return { label: opt, value: opt };
         return opt;
       })}
       value={value}

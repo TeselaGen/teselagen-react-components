@@ -69,6 +69,12 @@ class FormComponentsDemo extends React.Component {
             label="Select Simple"
             disabled={false}
           />
+          <SelectField
+            options={["", "you", "guys"]}
+            name={"fieldnumber3a"}
+            label="Select Simple With Blank Value"
+            disabled={false}
+          />
 
           <SelectField
             options={[
@@ -79,7 +85,7 @@ class FormComponentsDemo extends React.Component {
               { label: "you", value: { tree: "graph" } },
               { label: "guys", value: { tree: "chart" } }
             ]}
-            name={"fieldnumber3a"}
+            name={"fieldnumber3b"}
             label="Select with name and value"
             disabled={false}
           />
