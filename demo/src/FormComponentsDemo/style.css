@@ -6,3 +6,7 @@
   /*margin: 20px;*/
   /*width: 100%;*/
 }
+
+.Select {
+	min-width: 150px;
+}
