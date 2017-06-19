@@ -19,6 +19,7 @@ export default function() {
 		<Provider store={store}>
 			<div>
 				<h1>ve-editor Demo</h1>
+				<VeToolBar></VeToolBar>
 				<CircularView sequenceData={data}/>
 				<RowView sequenceData={data}/>
 			</div>

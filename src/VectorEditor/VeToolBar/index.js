@@ -9,6 +9,14 @@ import "./style.css";
 import CutsiteFilter from "../CutsiteFilter";
 import FileSaver from "file-saver";
 import Radio from "../Radio";
+import save_img from "./veToolbarIcons/save.png";
+// import print_img from './veToolbarIcons/print.png';
+import show_cut_sites_img from "./veToolbarIcons/show_cut_sites.png";
+import show_features_img from "./veToolbarIcons/show_features.png";
+import show_primers_img from "./veToolbarIcons/show_primers.png";
+import show_orfs_img from "./veToolbarIcons/show_orfs.png";
+import fullscreen_img from "./veToolbarIcons/fullscreen.png";
+// import toggle_views_img from './veToolbarIcons/toggle_views.svg';
 
 export default class VeToolBar extends React.Component {
   state = {
@@ -75,7 +83,7 @@ export default class VeToolBar extends React.Component {
               // downloadSequenceData(sequenceData || )
             }}
           >
-            <img src="svgs/veToolbarIcons/save.png" alt="Download .gb file" />
+            <img src={save_img} alt="Download .gb file" />
           </div>
         ),
         tooltip: "Download .gb file",
@@ -105,7 +113,7 @@ export default class VeToolBar extends React.Component {
       //       // downloadSequenceData(sequenceData || )
       //     }}
       //     >
-      //     <img src="svgs/veToolbarIcons/print.png" alt="Print Vector"/>
+      //     <img src={print_img} alt="Print Vector"/>
       //   </div>,
       //   tooltip: 'Print Vector',
       //   id: 'print'
@@ -117,10 +125,7 @@ export default class VeToolBar extends React.Component {
               annotationVisibilityToggle("cutsites");
             }}
           >
-            <img
-              src="svgs/veToolbarIcons/show_cut_sites.png"
-              alt="Show cut sites"
-            />
+            <img src={show_cut_sites_img} alt="Show cut sites" />
           </div>
         ),
         toggled: annotationVisibility.cutsites,
@@ -148,10 +153,7 @@ export default class VeToolBar extends React.Component {
               annotationVisibilityToggle("features");
             }}
           >
-            <img
-              src="svgs/veToolbarIcons/show_features.png"
-              alt="Show features"
-            />
+            <img src={show_features_img} alt="Show features" />
           </div>
         ),
         toggled: annotationVisibility.features,
@@ -166,7 +168,7 @@ export default class VeToolBar extends React.Component {
               annotationVisibilityToggle("primers");
             }}
           >
-            <img src="svgs/veToolbarIcons/show_primers.png" alt="Show oligos" />
+            <img src={show_primers_img} alt="Show oligos" />
           </div>
         ),
         toggled: annotationVisibility.primers,
@@ -187,10 +189,7 @@ export default class VeToolBar extends React.Component {
               }
             }}
           >
-            <img
-              src="svgs/veToolbarIcons/show_orfs.png"
-              alt="Show Open Reading Frames"
-            />
+            <img src={show_orfs_img} alt="Show Open Reading Frames" />
           </div>
         ),
         toggled: annotationVisibility.orfs,
@@ -271,9 +270,7 @@ export default class VeToolBar extends React.Component {
             />
           </div>
         ),
-        dropdownicon: (
-          <img src="svgs/veToolbarIcons/fullscreen.png" alt="Toggle Views" />
-        ),
+        dropdownicon: <img src={fullscreen_img} alt="Toggle Views" />,
         dropdowntooltip: "Toggle Views",
         id: "toggleViews"
       },
