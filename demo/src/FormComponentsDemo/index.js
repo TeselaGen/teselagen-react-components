@@ -4,6 +4,7 @@ import { reduxForm } from "redux-form";
 import {
   InputField,
   SelectField,
+  ReactSelectField,
   DateInputField,
   CheckboxField,
   TextareaField,
@@ -75,12 +76,18 @@ class FormComponentsDemo extends React.Component {
             label="Select Simple With Blank Value"
             disabled={false}
           />
-
           <SelectField
+            onChange={function () {
+              console.log('arguments:', arguments)
+            }}
             options={[
               {
                 label: "hey",
                 value: { tree: "trunk" }
+              },
+              {
+                label: "there",
+                value: "12312asd"
               },
               { label: "you", value: { tree: "graph" } },
               { label: "guys", value: { tree: "chart" } }
@@ -111,7 +118,7 @@ class FormComponentsDemo extends React.Component {
             label="Editable Text"
             placeholder="Enter new text..."
           />
-          <SelectField
+          <ReactSelectField
             name="collaborators"
             label="Collaborators"
             multi

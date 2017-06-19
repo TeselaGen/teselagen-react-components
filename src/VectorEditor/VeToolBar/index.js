@@ -1,7 +1,9 @@
 // import download from 'in-browser-download'
 import DropDown from "react-icons/lib/md/arrow-drop-down";
 import InfoCircle from "react-icons/lib/fa/info-circle";
-import Popover from "react-popover2";
+// import Popover from "react-popover2";
+// import {Popover} from '@blueprintjs/core';
+import Popover from "react-popover";
 import jsonToGenbank from "bio-parsers/parsers/jsonToGenbank";
 import React from "react";
 // import get from 'lodash/get'
@@ -203,7 +205,7 @@ export default class VeToolBar extends React.Component {
                 type="number"
                 className="minOrfSizeInput"
                 onChange={function(event) {
-                  var minimumOrfSize = parseInt(event.target.value);
+                  var minimumOrfSize = parseInt(event.target.value, 10);
                   if (!(minimumOrfSize > -1)) return;
                   if (minimumOrfSize > sequenceLength) return;
                   minimumOrfSizeUpdate(minimumOrfSize);

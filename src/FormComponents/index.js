@@ -17,8 +17,6 @@ import {
 import { DateInput } from "@blueprintjs/datetime";
 import Dropzone from "react-dropzone";
 
-function noop() {}
-
 function getIntent({ meta: { touched, error } }) {
   return touched && error ? Intent.DANGER : "";
 }
@@ -96,30 +94,29 @@ export const renderBlueprintCheckbox = props => {
   return <Checkbox {...input} {...removeUnwantedProps(rest)} label={label} />;
 };
 
-const handleFileUpload = e => {
-  if (!e.target.files.length) return;
-  const file = e.target.files[0];
-  return new Promise(resolve => {
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      // get file content
-      var fileString = e.target.result;
-      resolve(fileString);
-    };
-    reader.readAsText(file, "UTF-8");
-    reader.onError = function(err) {
-      resolve(err);
-    };
-  });
-};
+// const handleFileUpload = e => {
+//   if (!e.target.files.length) return;
+//   const file = e.target.files[0];
+//   return new Promise(resolve => {
+//     var reader = new FileReader();
+//     reader.onload = function(e) {
+//       // get file content
+//       var fileString = e.target.result;
+//       resolve(fileString);
+//     };
+//     reader.readAsText(file, "UTF-8");
+//     reader.onError = function(err) {
+//       resolve(err);
+//     };
+//   });
+// };
 
 export const renderBlueprintFileUpload = props => {
   // const { input: { onChange }, cbFunction=noop } = props
   const {
     input: { onChange, value: files },
     dropzoneOptions = {},
-    name,
-    cbFunction = noop
+    name
   } = props;
   // return <label className="pt-file-upload ">
   //         <input onChange={function (e) {
@@ -170,7 +167,7 @@ export const renderBlueprintEditableText = props => {
   );
 };
 
-export const renderSelect = props => {
+export const renderReactSelect = props => {
   // spreading input not working, grab the values needed instead
   const { input: { value, onChange }, hideValue, options, ...rest } = props;
 
@@ -184,6 +181,39 @@ export const renderSelect = props => {
       onChange={onChange}
       {...removeUnwantedProps(rest)}
     />
+  );
+};
+
+export const renderSelect = props => {
+  // spreading input not working, grab the values needed instead
+  const { input: { value, onChange }, hideValue, options, ...rest } = props;
+  return (
+    <div className={"pt-select pt-fill"}>
+      <select
+        {...(hideValue ? { value: "" } : {})}
+        value={JSON.stringify(value)}
+        onChange={function(e) {
+          onChange(JSON.parse(e.target.value));
+        }}
+        {...removeUnwantedProps(rest)}
+      >
+        {options.map(function(opt, index) {
+          let label, value;
+          if (typeof opt === "string") {
+            label = opt;
+            value = opt;
+          } else {
+            label = opt.label;
+            value = opt.value;
+          }
+          return (
+            <option key={index} value={JSON.stringify(value)}>
+              {label}
+            </option>
+          );
+        })}
+      </select>
+    </div>
   );
 };
 
@@ -258,4 +288,5 @@ export const TextareaField = generateField(renderBlueprintTextarea);
 export const EditableTextField = generateField(renderBlueprintEditableText);
 export const NumericInputField = generateField(renderBlueprintNumericInput);
 export const RadioGroupField = generateField(renderBlueprintRadioGroup);
+export const ReactSelectField = generateField(renderReactSelect);
 export const SelectField = generateField(renderSelect);
