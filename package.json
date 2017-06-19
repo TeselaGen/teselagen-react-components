@@ -1,6 +1,6 @@
 {
   "name": "teselagen-react-components",
-  "version": "4.0.4",
+  "version": "4.0.5",
   "description": "Teselagen React Component Library",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -116,7 +116,11 @@
     "snapshotSerializers": [
       "<rootDir>/node_modules/enzyme-to-json/serializer"
     ],
-    "testPathIgnorePatterns": ["/node_modules/", "/lib/", "/es/"]
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/lib/",
+      "/es/"
+    ]
   },
   "license": "MIT",
   "repository": "https://github.com/TeselaGen/teselagen-react-components",
