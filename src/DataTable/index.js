@@ -340,15 +340,17 @@ class DataTable extends React.Component {
                 : <span className={"pt-icon-standard pt-icon-arrow-up"} />)}
           </span>
         }
-        menu={
-          <FilterAndSortMenu
-            setFilter={setFilter}
-            setOrder={setOrder}
-            fieldName={fieldName}
-            dataType={columnDataType}
-            schemaForField={schemaForField}
-          />
-        }
+        renderMenu={function() {
+          return (
+            <FilterAndSortMenu
+              setFilter={setFilter}
+              setOrder={setOrder}
+              fieldName={fieldName}
+              dataType={columnDataType}
+              schemaForField={schemaForField}
+            />
+          );
+        }}
       />
     );
   };
