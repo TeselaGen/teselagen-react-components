@@ -17,10 +17,11 @@ import {
 import "./style.css";
 import { Provider } from "react-redux";
 import store from "../store";
-import { Position } from "@blueprintjs/core";
+import { Position, Button, Intent } from "@blueprintjs/core";
 
 class FormComponentsDemo extends React.Component {
   render() {
+    const {handleSubmit} = this.props
     return (
       <Provider store={store}>
         <div>
@@ -51,6 +52,15 @@ class FormComponentsDemo extends React.Component {
           <InputField
             name={"inputField"}
             label="Input"
+            placeholder="Enter input..."
+            {...onEnterOrBlurHelper(function(argument) {
+              console.log("onEnter/Blur hit");
+            })}
+          />
+          <InputField
+            name={"inputField2"}
+            label="Input With Default"
+            defaultValue={'Default Value Here!'}
             placeholder="Enter input..."
             {...onEnterOrBlurHelper(function(argument) {
               console.log("onEnter/Blur hit");
@@ -131,6 +141,19 @@ class FormComponentsDemo extends React.Component {
               { label: "Tom Ogasawara", value: "Tom Ogasawara" }
             ]}
           />
+          <Button intent={Intent.SUCCESS} text="Submit Form" onClick={handleSubmit(function (formData) {
+            console.log('formData:', formData)
+          })}>
+          </Button>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
         </div>
       </Provider>
     );
