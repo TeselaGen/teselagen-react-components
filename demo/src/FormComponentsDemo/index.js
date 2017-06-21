@@ -20,7 +20,9 @@ import store from "../store";
 import { Position, Button, Intent } from "@blueprintjs/core";
 
 class FormComponentsDemo extends React.Component {
+  
   render() {
+    const {defaultSelectValue} = this.state || {}
     const {handleSubmit} = this.props
     return (
       <Provider store={store}>
@@ -77,15 +79,32 @@ class FormComponentsDemo extends React.Component {
           />
           <SelectField
             options={["hey", "you", "guys"]}
-            name={"fieldnumber3"}
+            name={"fieldnumber3.1"}
             label="Select Simple"
-            disabled={false}
           />
           <SelectField
-            options={["", "you", "guys"]}
-            name={"fieldnumber3a"}
-            label="Select Simple With Blank Value"
-            disabled={false}
+            options={["hey", "you", "guys"]}
+            name={"fieldnumber3.2"}
+            defaultValue={"you"}
+            label="Select Simple with defaultValue"
+          />
+
+          <SelectField
+            options={["hey", "you", "guys"]}
+            name={"fieldnumber3.3"}
+            defaultValue={defaultSelectValue}
+            label="Select Simple with defaultValue"
+          />
+          <Button text="Set default" onClick={()=>{
+            this.setState({defaultSelectValue: "you"})
+          }}>
+
+          </Button>
+          <SelectField
+            options={["hey", "you", "guys"]}
+            name={"fieldnumber3"}
+            placeholder={"Please choose..."}
+            label="Select Simple With Placeholder"
           />
           <SelectField
             onChange={function () {
@@ -105,7 +124,6 @@ class FormComponentsDemo extends React.Component {
             ]}
             name={"fieldnumber3b"}
             label="Select with name and value"
-            disabled={false}
           />
           <DateInputField
             name={"fieldnumber5"}

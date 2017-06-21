@@ -265,6 +265,8 @@ class DataTable extends React.Component {
     }
     if (schemaForColumn.type === "timestamp") {
       cellData = moment(new Date(cellData)).format("MMM D, YYYY");
+    } else if (schemaForColumn.type === "boolean") {
+      cellData = cellData ? "True" : "False";
     }
     if (cellRenderer && cellRenderer[columnName]) {
       cellData = cellRenderer[columnName](cellData);

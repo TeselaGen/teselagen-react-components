@@ -1,3 +1,4 @@
+import deepEqual from "deep-equal";
 import React from "react";
 import { Field } from "redux-form";
 import Select from "react-select";
@@ -58,6 +59,24 @@ class AbstractInput extends React.Component {
         },
         payload: defaultValue
       });
+  }
+
+  componentWillUpdate({
+    meta: { dispatch, form },
+    defaultValue,
+    input: { name }
+  }) {
+    const { defaultValue: oldDefaultValue } = this.props;
+    if (!deepEqual(defaultValue, oldDefaultValue)) {
+      dispatch({
+        type: "@@redux-form/CHANGE",
+        meta: {
+          form,
+          field: name
+        },
+        payload: defaultValue
+      });
+    }
   }
 
   render() {
@@ -170,10 +189,13 @@ export const renderReactSelect = props => {
 
   return (
     <Select
-      options={options.map(function(opt) {
-        if (typeof opt === "string") return { label: opt, value: opt };
-        return opt;
-      })}
+      options={
+        options &&
+          options.map(function(opt) {
+            if (typeof opt === "string") return { label: opt, value: opt };
+            return opt;
+          })
+      }
       value={value}
       onChange={onChange}
       {...removeUnwantedProps(rest)}
@@ -183,7 +205,13 @@ export const renderReactSelect = props => {
 
 export const renderSelect = props => {
   // spreading input not working, grab the values needed instead
-  const { input: { value, onChange }, hideValue, options, ...rest } = props;
+  const {
+    input: { value, onChange },
+    hideValue,
+    placeholder,
+    options,
+    ...rest
+  } = props;
   return (
     <div className={"pt-select pt-fill"}>
       <select
@@ -194,11 +222,19 @@ export const renderSelect = props => {
         }}
         {...removeUnwantedProps(rest)}
       >
+        {placeholder &&
+          <option value="" disabled selected hidden>
+            {placeholder}
+          </option>}
         {options.map(function(opt, index) {
           let label, value;
           if (typeof opt === "string") {
             label = opt;
             value = opt;
+          } else if (Array.isArray(opt)) {
+            throw new Error(
+              "the option coming in should be an object, not an array!"
+            );
           } else {
             label = opt.label;
             value = opt.value;
