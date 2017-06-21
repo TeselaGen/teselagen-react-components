@@ -185,22 +185,24 @@ export const renderBlueprintEditableText = props => {
 
 export const renderReactSelect = props => {
   // spreading input not working, grab the values needed instead
-  const { input: { value, onChange }, hideValue, options, ...rest } = props;
-
-  return (
-    <Select
-      options={
-        options &&
-          options.map(function(opt) {
-            if (typeof opt === "string") return { label: opt, value: opt };
-            return opt;
-          })
-      }
-      value={value}
-      onChange={onChange}
-      {...removeUnwantedProps(rest)}
-    />
-  );
+  const {
+    async,
+    input: { value, onChange },
+    hideValue,
+    options,
+    ...rest
+  } = props;
+  const propsToUse = {
+    options: options &&
+      options.map(function(opt) {
+        if (typeof opt === "string") return { label: opt, value: opt };
+        return opt;
+      }),
+    value,
+    onChange,
+    ...removeUnwantedProps(rest)
+  };
+  return async ? <Select.Async {...propsToUse} /> : <Select {...propsToUse} />;
 };
 
 export const renderSelect = props => {

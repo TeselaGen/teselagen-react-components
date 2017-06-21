@@ -18,6 +18,21 @@ import "./style.css";
 import { Provider } from "react-redux";
 import store from "../store";
 import { Position, Button, Intent } from "@blueprintjs/core";
+var getOptions = function(input, callback) {
+  setTimeout(function() {
+    callback(null, {
+      options: [
+        { value: 'one', label: 'One' },
+        { value: 'two', label: 'Two' }
+      ],
+      // CAREFUL! Only set this to true when there are no more options,
+      // or more specific queries will not be sent to the server.
+      complete: true
+    });
+  }, 500);
+};
+
+
 
 class FormComponentsDemo extends React.Component {
   
@@ -158,6 +173,13 @@ class FormComponentsDemo extends React.Component {
               { label: "Sam Denicola", value: "Sam Denicola" },
               { label: "Tom Ogasawara", value: "Tom Ogasawara" }
             ]}
+          />
+          <ReactSelectField
+            async
+            name="collaborators2"
+            label="React Select AsyncCollaborators"
+            multi
+            loadOptions={getOptions}
           />
           <Button intent={Intent.SUCCESS} text="Submit Form" onClick={handleSubmit(function (formData) {
             console.log('formData:', formData)
