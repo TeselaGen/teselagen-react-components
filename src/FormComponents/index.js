@@ -249,29 +249,22 @@ export const renderBlueprintRadioGroup = ({ input, options, ...rest }) => {
 };
 
 function generateField(component) {
-  const compWithDefaultVal = withDefaultValue(component);
+  const compWithDefaultVal = withAbstractWrapper(component);
   return function FieldMaker({ name, ...rest }) {
     return <Field name={name} component={compWithDefaultVal} {...rest} />;
   };
 }
 
-export const withDefaultValue = WrappedComponent => {
+export const withAbstractWrapper = ComponentToWrap => {
   return props => {
     let defaultProps = {
       ...props,
       intent: getIntent(props),
-      intentClass: getIntentClass(props),
-      input: {
-        ...props.input,
-        value: props.input.value === ""
-          ? props.defaultValue || props.input.value
-          : props.input.value
-      }
+      intentClass: getIntentClass(props)
     };
-
     return (
       <AbstractInput {...props}>
-        <WrappedComponent {...defaultProps} />
+        <ComponentToWrap {...defaultProps} />
       </AbstractInput>
     );
   };
