@@ -42,37 +42,58 @@ function removeUnwantedProps(props) {
   return cleanedProps;
 }
 
-function AbstractInput(props) {
-  const {
-    children,
-    tooltipProps,
-    tooltipError,
-    label,
-    className,
-    meta: { touched, error }
-  } = props;
-  const showError = touched && error;
+class AbstractInput extends React.Component {
+  componentWillMount() {
+    const {
+      meta: { dispatch, form },
+      defaultValue,
+      input: { name }
+    } = this.props;
+    defaultValue !== undefined &&
+      dispatch({
+        type: "@@redux-form/CHANGE",
+        meta: {
+          form,
+          field: name
+        },
+        payload: defaultValue
+      });
+  }
 
-  return (
-    <div className={`pt-form-group ${getIntentClass(props)} ${className}`}>
-      {label &&
-        <label className="pt-label">
-          {label}
-        </label>}
-      <Tooltip
-        isDisabled={!tooltipError || !showError}
-        intent={Intent.DANGER}
-        content={error}
-        position={Position.TOP}
-        {...tooltipProps}
+  render() {
+    const {
+      children,
+      tooltipProps,
+      tooltipError,
+      label,
+      className,
+      meta: { touched, error }
+    } = this.props;
+    const showError = touched && error;
+
+    return (
+      <div
+        className={`pt-form-group ${getIntentClass(this.props)} ${className}`}
       >
-        {children}
-      </Tooltip>
-      {!tooltipError &&
-        showError &&
-        <div className={"pt-form-helper-text"}>{error}</div>}
-    </div>
-  );
+        {label &&
+          <label className="pt-label">
+            {label}
+          </label>}
+        <Tooltip
+          isDisabled={!tooltipError || !showError}
+          intent={Intent.DANGER}
+          content={error}
+          position={Position.TOP}
+          {...tooltipProps}
+        >
+          {children}
+        </Tooltip>
+        {!tooltipError &&
+          showError &&
+          <div className={"pt-form-helper-text"}>{error}</div>}
+      </div>
+    );
+  }
 }
 
 export const renderBlueprintDateInput = props => {
@@ -94,36 +115,12 @@ export const renderBlueprintCheckbox = props => {
   return <Checkbox {...input} {...removeUnwantedProps(rest)} label={label} />;
 };
 
-// const handleFileUpload = e => {
-//   if (!e.target.files.length) return;
-//   const file = e.target.files[0];
-//   return new Promise(resolve => {
-//     var reader = new FileReader();
-//     reader.onload = function(e) {
-//       // get file content
-//       var fileString = e.target.result;
-//       resolve(fileString);
-//     };
-//     reader.readAsText(file, "UTF-8");
-//     reader.onError = function(err) {
-//       resolve(err);
-//     };
-//   });
-// };
-
 export const renderBlueprintFileUpload = props => {
-  // const { input: { onChange }, cbFunction=noop } = props
   const {
     input: { onChange, value: files },
     dropzoneOptions = {},
     name
   } = props;
-  // return <label className="pt-file-upload ">
-  //         <input onChange={function (e) {
-  //           return onChange(e.target.files);
-  //         }} type="file" />
-  //         <span className="pt-file-upload-input">Choose file...</span>
-  //       </label>
   return (
     <Dropzone
       onDrop={onChange}

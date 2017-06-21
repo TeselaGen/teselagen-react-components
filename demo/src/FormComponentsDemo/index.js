@@ -30,6 +30,7 @@ class FormComponentsDemo extends React.Component {
           <RadioGroupField
             name={"fieldnumber0"}
             label={"Radio Group Input"}
+            defaultValue={"false"}
             options={[
               {
                 label: "Option 1",
