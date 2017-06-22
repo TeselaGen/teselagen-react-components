@@ -7,9 +7,9 @@ import exampleSequenceData from "./exampleSequenceData";
 import {
 	CircularView,
 	RowView,
-	RowItem,
+	// RowItem,
 	VeToolBar,
-	CutsiteFilter,
+	// CutsiteFilter,
 	createVectorEditor
 } from "../../../src";
 const data = tidyUpSequenceData(exampleSequenceData, {
@@ -18,10 +18,6 @@ const data = tidyUpSequenceData(exampleSequenceData, {
 
 const { withEditorInteractions, withEditorProps } = createVectorEditor({
 	namespace: "DemoEditor",
-	store,
-	initialValues: {
-		sequenceData: data
-	}
 });
 
 const CircularViewConnected = withEditorInteractions(CircularView);
@@ -29,9 +25,6 @@ const RowViewConnected = withEditorInteractions(RowView);
 // const RowItemConnected = withEditorProps(RowItem);
 const VeToolBarConnected = withEditorProps(VeToolBar);
 // const CutsiteFilterConnected = withEditorProps(CutsiteFilter);
-
-
-console.log("data:", data);
 
 export default function() {
 	return (

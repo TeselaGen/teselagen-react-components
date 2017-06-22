@@ -1,3 +1,4 @@
+import exampleSequenceData from './VectorEditorDemo/exampleSequenceData';
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import { reducer as formReducer } from 'redux-form'
 import {vectorEditorReducer as VectorEditor} from '../../src'
@@ -10,7 +11,7 @@ const composeEnhancer = (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ && window._
 const store = createStore(
   combineReducers({
     form: formReducer,
-    VectorEditor
+    VectorEditor: VectorEditor({DemoEditor: {sequenceData: exampleSequenceData}})
   }),
   undefined,
   composeEnhancer(

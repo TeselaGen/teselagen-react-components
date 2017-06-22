@@ -60,40 +60,50 @@ var reducers = {
   replacementLayers
 };
 
-export default function(state = {}, action) {
-  var namespaces;
-  var newState = {};
-  if (action.meta && action.meta.EditorNamespace) {
-    namespaces = Array.isArray(action.meta.EditorNamespace)
-      ? action.meta.EditorNamespace
-      : [action.meta.EditorNamespace];
+export default function reducerFactory(initialState) {
+  if (!initialState || !Object.keys(initialState).length) {
+    throw new Error(
+      "Please pass an initial state to the vector editor reducer like: {DemoEditor: {}}!"
+    );
   }
-  var stateToReturn;
-  if (namespaces) {
-    //we're dealing with an action specific to a given editor
-    namespaces.forEach(function(namespace) {
-      var currentState = state[namespace];
-      if (action.type === "VECTOR_EDITOR_INITIALIZE") {
-        //merge the exisiting state with the new payload of props (if you want to do a clean wipe, use VECTOR_EDITOR_CLEAR)
-        currentState = { ...state[namespace], ...(action.payload || {}) };
-      }
-      if (action.type === "VECTOR_EDITOR_CLEAR") {
-        currentState = undefined;
-      }
-      newState[namespace] = combineReducers(reducers)(currentState, action);
-    });
-    stateToReturn = {
-      ...state,
-      ...newState
-    };
-  } else {
-    //just a normal action
-    Object.keys(state).forEach(function(namespace) {
-      newState[namespace] = combineReducers(reducers)(state[namespace], action);
-    });
-    stateToReturn = newState;
-  }
-  return stateToReturn;
+  return function(state = initialState, action) {
+    var namespaces;
+    var newState = {};
+    if (action.meta && action.meta.EditorNamespace) {
+      namespaces = Array.isArray(action.meta.EditorNamespace)
+        ? action.meta.EditorNamespace
+        : [action.meta.EditorNamespace];
+    }
+    var stateToReturn;
+    if (namespaces) {
+      //we're dealing with an action specific to a given editor
+      namespaces.forEach(function(namespace) {
+        var currentState = state[namespace];
+        if (action.type === "VECTOR_EDITOR_INITIALIZE") {
+          //merge the exisiting state with the new payload of props (if you want to do a clean wipe, use VECTOR_EDITOR_CLEAR)
+          currentState = { ...state[namespace], ...(action.payload || {}) };
+        }
+        if (action.type === "VECTOR_EDITOR_CLEAR") {
+          currentState = undefined;
+        }
+        newState[namespace] = combineReducers(reducers)(currentState, action);
+      });
+      stateToReturn = {
+        ...state,
+        ...newState
+      };
+    } else {
+      //just a normal action
+      Object.keys(state).forEach(function(namespace) {
+        newState[namespace] = combineReducers(reducers)(
+          state[namespace],
+          action
+        );
+      });
+      stateToReturn = newState;
+    }
+    return stateToReturn;
+  };
 }
 
 // export const getBlankEditor = (state) => (state.blankEditor)

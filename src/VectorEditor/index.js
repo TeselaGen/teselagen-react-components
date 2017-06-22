@@ -26,8 +26,6 @@ export {
 
 function createVectorEditor({
   namespace,
-  store,
-  initialValues,
   actionOverrides = fakeActionOverrides
 }) {
   var meta = { namespace };
@@ -48,14 +46,6 @@ function createVectorEditor({
     ...metaActions,
     ...overrides
   };
-
-  store.dispatch({
-    type: "VECTOR_EDITOR_INITIALIZE",
-    meta: {
-      EditorNamespace: namespace
-    },
-    payload: initialValues
-  });
 
   function mapDispatchToActions(dispatch, props) {
     var { actionOverrides = fakeActionOverrides } = props;
