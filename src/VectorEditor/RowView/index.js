@@ -16,9 +16,25 @@ var defaultMarginWidth = 50;
 
 function noop() {}
 
+const defaultProps = {
+  sequenceData: { sequence: "" },
+  selectionLayer: {},
+  // bpToJumpTo:0,
+  editorDragged: noop,
+  editorDragStarted: noop,
+  editorClicked: noop,
+  editorDragStopped: noop,
+  onScroll: noop,
+  width: defaultContainerWidth,
+  marginWidth: defaultMarginWidth,
+  height: 400,
+  veWrapperProvidedProps: {}
+};
+
 class RowView extends React.Component {
   getNearestCursorPositionToMouseEvent(rowData, event, callback) {
     var { charWidth = defaultCharWidth } = {
+      ...defaultProps,
       ...this.props.veWrapperProvidedProps,
       ...this.props
     };
@@ -105,7 +121,11 @@ class RowView extends React.Component {
       selectAll = noop,
       selectInverse = noop,
       readOnly
-    } = { ...self.props.veWrapperProvidedProps, ...self.props };
+    } = {
+      ...defaultProps,
+      ...self.props.veWrapperProvidedProps,
+      ...self.props
+    };
 
     // combokeys.stop();
     // combokeys.watch(self.rowViewComp)
@@ -170,6 +190,7 @@ class RowView extends React.Component {
       self.combokeys.bind(keyCombo, function(event) {
         var shiftHeld = event.shiftKey;
         var bpsPerRow = getBpsPerRow({
+          ...defaultProps,
           ...self.props.veWrapperProvidedProps,
           ...self.props
         });
@@ -180,7 +201,11 @@ class RowView extends React.Component {
           circular,
           caretPositionUpdate,
           selectionLayerUpdate
-        } = { ...self.props.veWrapperProvidedProps, ...self.props };
+        } = {
+          ...defaultProps,
+          ...self.props.veWrapperProvidedProps,
+          ...self.props
+        };
         var moveBy = moveCaret({
           sequenceLength,
           bpsPerRow,
@@ -231,10 +256,15 @@ class RowView extends React.Component {
     //   debugger
     // }
     var thisPropsToUse = {
+      ...defaultProps,
       ...this.props.veWrapperProvidedProps,
       ...this.props
     };
-    var propsToUse = { ...props.veWrapperProvidedProps, ...props };
+    var propsToUse = {
+      ...defaultProps,
+      ...props.veWrapperProvidedProps,
+      ...props
+    };
 
     var { caretPosition, selectionLayer } = propsToUse;
     var bpsPerRow = getBpsPerRow(propsToUse);
@@ -268,23 +298,12 @@ class RowView extends React.Component {
     }
   }
 
-  static defaultProps = {
-    sequenceData: { sequence: "" },
-    selectionLayer: {},
-    // bpToJumpTo:0,
-    editorDragged: noop,
-    editorDragStarted: noop,
-    editorClicked: noop,
-    editorDragStopped: noop,
-    onScroll: noop,
-    width: defaultContainerWidth,
-    marginWidth: defaultMarginWidth,
-    height: 400,
-    veWrapperProvidedProps: {}
-  };
-
   render() {
-    var propsToUse = { ...this.props.veWrapperProvidedProps, ...this.props };
+    var propsToUse = {
+      ...defaultProps,
+      ...this.props.veWrapperProvidedProps,
+      ...this.props
+    };
     var {
       //currently found in props
       sequenceData,

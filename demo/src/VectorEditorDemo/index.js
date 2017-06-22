@@ -1,42 +1,50 @@
 import React from "react";
 import { Provider } from "react-redux";
 import store from "../store";
-import tidyUpSequenceData from 've-sequence-utils/tidyUpSequenceData';
-import exampleSequenceData from './exampleSequenceData';
+import tidyUpSequenceData from "ve-sequence-utils/tidyUpSequenceData";
+import exampleSequenceData from "./exampleSequenceData";
 
 import {
-	CircularView as _CircularView,
-	RowView as _RowView,
-	RowItem as _RowItem,
-	VeToolBar as _VeToolBar,
-	CutsiteFilter as _CutsiteFilter,
+	CircularView,
+	RowView,
+	RowItem,
+	VeToolBar,
+	CutsiteFilter,
 	createVectorEditor
 } from "../../../src";
+const data = tidyUpSequenceData(exampleSequenceData, {
+	annotationsAsObjects: true
+});
 
-const {withEditorInteractions, withEditorProps} = createVectorEditor({
-  namespace: 'DemoEditor', 
-  store
-})
+const { withEditorInteractions, withEditorProps } = createVectorEditor({
+	namespace: "DemoEditor",
+	store,
+	initialValues: {
+		sequenceData: data
+	}
+});
 
-const CircularView = withEditorInteractions(_CircularView)
-const RowView = withEditorInteractions(_RowView)
-const RowItem = withEditorProps(_RowItem)
-const VeToolBar = withEditorProps(_VeToolBar)
-const CutsiteFilter = withEditorProps(_CutsiteFilter)
+const CircularViewConnected = withEditorInteractions(CircularView);
+const RowViewConnected = withEditorInteractions(RowView);
+// const RowItemConnected = withEditorProps(RowItem);
+const VeToolBarConnected = withEditorProps(VeToolBar);
+// const CutsiteFilterConnected = withEditorProps(CutsiteFilter);
 
 
-
-const data = tidyUpSequenceData(exampleSequenceData, {annotationsAsObjects: true})
-console.log('data:', data)
+console.log("data:", data);
 
 export default function() {
 	return (
 		<Provider store={store}>
 			<div>
 				<h1>ve-editor Demo</h1>
-				<VeToolBar></VeToolBar>
-				<CircularView sequenceData={data}/>
-				<RowView sequenceData={data}/>
+				<VeToolBarConnected />
+				<h2>Redux Connected (aka interactive!) </h2>
+				<CircularViewConnected/>
+				<RowViewConnected/>
+				<h2>Not Redux Connected (aka non interactive) </h2>
+				<CircularView sequenceData={data} />
+				<RowView sequenceData={data} />
 			</div>
 		</Provider>
 	);

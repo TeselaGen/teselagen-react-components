@@ -217,15 +217,19 @@ export const renderSelect = props => {
   return (
     <div className={"pt-select pt-fill"}>
       <select
+        value={
+          placeholder && value === ""
+            ? "__placeholder__"
+            : JSON.stringify(value)
+        }
         {...(hideValue ? { value: "" } : {})}
-        value={JSON.stringify(value)}
         onChange={function(e) {
           onChange(JSON.parse(e.target.value));
         }}
         {...removeUnwantedProps(rest)}
       >
         {placeholder &&
-          <option value="" disabled selected hidden>
+          <option value="__placeholder__" disabled hidden>
             {placeholder}
           </option>}
         {options.map(function(opt, index) {

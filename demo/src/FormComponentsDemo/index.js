@@ -108,7 +108,8 @@ class FormComponentsDemo extends React.Component {
             options={["hey", "you", "guys"]}
             name={"fieldnumber3.3"}
             defaultValue={defaultSelectValue}
-            label="Select Simple with defaultValue"
+            placeholder="I'm just hanging out"
+            label="Select Simple with initially unset defaultValue and a placeholder"
           />
           <Button text="Set default" onClick={()=>{
             this.setState({defaultSelectValue: "you"})

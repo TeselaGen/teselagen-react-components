@@ -75,7 +75,6 @@ export default class CircularView extends React.Component {
       width = 400,
       height = 400,
       scale = 1,
-      centerText,
       sequenceData = {},
       hideName = false,
       HoverHelper = PassThrough,
@@ -453,6 +452,8 @@ export default class CircularView extends React.Component {
             radius: radius,
             innerRadius
           });
+        } else {
+          return <div />;
         }
       });
     }

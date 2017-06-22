@@ -27,6 +27,7 @@ export {
 function createVectorEditor({
   namespace,
   store,
+  initialValues,
   actionOverrides = fakeActionOverrides
 }) {
   var meta = { namespace };
@@ -52,7 +53,8 @@ function createVectorEditor({
     type: "VECTOR_EDITOR_INITIALIZE",
     meta: {
       EditorNamespace: namespace
-    }
+    },
+    payload: initialValues
   });
 
   function mapDispatchToActions(dispatch, props) {
@@ -103,7 +105,9 @@ function createVectorEditor({
     };
   }, mapDispatchToActions);
 
-  const withEditorInteractions = withEditorProps(_withEditorInteractions);
+  const withEditorInteractions = function(Comp) {
+    return withEditorProps(_withEditorInteractions(Comp));
+  };
   return {
     veActions: metaActions,
     veSelectors: s,

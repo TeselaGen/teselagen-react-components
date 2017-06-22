@@ -26,8 +26,8 @@ const Demo = () => {
           <div>
             <Route path="/" component={HomePage} />
             {
-              Object.keys(demos).map(function (key) {
-                return <Route path={`/${key}`} component={demos[key]} />
+              Object.keys(demos).map(function (key, index) {
+                return <Route key={index} path={`/${key}`} component={demos[key]} />
               })
             }
           </div>
