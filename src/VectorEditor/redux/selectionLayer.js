@@ -5,16 +5,15 @@ import createAction from "./utils/createMetaAction";
 // ------------------------------------
 // Actions
 // ------------------------------------
-export const selectionLayerClear = createAction("selectionLayerClear");
-export const selectionLayerUpdate = createAction("selectionLayerUpdate");
+export const selectionLayerClear = createAction("SELECTION_LAYER_CLEAR");
+export const selectionLayerUpdate = createAction("SELECTION_LAYER_UPDATE");
 
-import { caretPositionUpdate } from "./caretPosition"; //important, keep this here in the order of the file and let it use the commonjs syntax!
 // ------------------------------------
 // Reducer
 // ------------------------------------
 export default createReducer(
   {
-    [caretPositionUpdate]: () => {
+    CARET_POSITION_UPDATE: () => {
       //clear the selection layer if the caret is updated!
       return {
         start: -1,

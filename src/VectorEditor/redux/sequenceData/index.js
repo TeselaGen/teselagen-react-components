@@ -5,13 +5,13 @@ import sequence from "./sequence";
 import translations from "./translations";
 import { combineReducers } from "redux";
 import cleanSequenceData from "../../utils/cleanSequenceData";
+import { createReducer } from "redux-act";
 // export * from './sharedActionCreators';
 export * from "./primers";
 // export * from './features';
 // export * from './sequence';
 // export * from './circular';
 export * from "./translations";
-import { createReducer } from "redux-act";
 
 // ------------------------------------
 // Actions
@@ -34,6 +34,8 @@ export default function(state, action) {
     primers,
     features,
     sequence,
+    parts: (state = {}) => state,
+    size: (state = {}) => state,
     circular: createReducer({}, true),
     translations,
     name: createReducer({}, ""),

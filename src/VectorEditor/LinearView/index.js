@@ -1,7 +1,5 @@
 import draggableClassnames from "../constants/draggableClassnames";
-import some from "lodash/some";
-import moveCaret from "../VectorInteractionWrapper/moveCaret";
-import handleCaretMoved from "../VectorInteractionWrapper/handleCaretMoved";
+// import some from "lodash/some";
 import prepareRowData from "../utils/prepareRowData";
 import React from "react";
 import Draggable from "react-draggable";
@@ -10,8 +8,8 @@ import "./style.css";
 
 var defaultCharWidth = 12;
 var defaultMarginWidth = 10;
-import Combokeys from "combokeys";
-var combokeys;
+// import Combokeys from "combokeys";
+// var combokeys;
 
 function noop() {}
 
@@ -50,17 +48,17 @@ export default class LinearView extends React.Component {
     }
 
     if (rowNotFound) {
-      var { top, bottom } = rowDomNode.getBoundingClientRect();
-      var numbers = [top, bottom];
-      var target = event.clientY;
-      var topOrBottom = numbers
-        .map(function(value, index) {
-          return [Math.abs(value - target), index];
-        })
-        .sort()
-        .map(function(value) {
-          return numbers[value[1]];
-        })[0];
+      // var { top, bottom } = rowDomNode.getBoundingClientRect();
+      // var numbers = [top, bottom];
+      // var target = event.clientY;
+      // var topOrBottom = numbers
+      //   .map(function(value, index) {
+      //     return [Math.abs(value - target), index];
+      //   })
+      //   .sort()
+      //   .map(function(value) {
+      //     return numbers[value[1]];
+      //   })[0];
 
       nearestCaretPos = 0;
     }

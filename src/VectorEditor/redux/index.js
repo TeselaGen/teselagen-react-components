@@ -75,7 +75,7 @@ export default function(state = {}, action) {
       var currentState = state[namespace];
       if (action.type === "VECTOR_EDITOR_INITIALIZE") {
         //merge the exisiting state with the new payload of props (if you want to do a clean wipe, use VECTOR_EDITOR_CLEAR)
-        currentState = { ...state[namespace], ...action.payload };
+        currentState = { ...state[namespace], ...(action.payload || {}) };
       }
       if (action.type === "VECTOR_EDITOR_CLEAR") {
         currentState = undefined;
@@ -88,7 +88,7 @@ export default function(state = {}, action) {
     };
   } else {
     //just a normal action
-    Object.keys(state).map(function(namespace) {
+    Object.keys(state).forEach(function(namespace) {
       newState[namespace] = combineReducers(reducers)(state[namespace], action);
     });
     stateToReturn = newState;

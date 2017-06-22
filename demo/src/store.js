@@ -1,11 +1,22 @@
-import { createStore, combineReducers } from 'redux'
+import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import { reducer as formReducer } from 'redux-form'
+import {vectorEditorReducer as VectorEditor} from '../../src'
+import thunk from 'redux-thunk';
+
+const composeEnhancer = (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
+	actionsBlacklist: ['HOVEREDANNOTATIONUPDATE', 'HOVEREDANNOTATIONCLEAR']
+})) || compose;
 
 const store = createStore(
   combineReducers({
-    form: formReducer
+    form: formReducer,
+    VectorEditor
   }),
-  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+  undefined,
+  composeEnhancer(
+  	  applyMiddleware(thunk)
+  	)
+  
 )
 
 export default store

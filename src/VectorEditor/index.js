@@ -1,14 +1,14 @@
 // import cleanSequenceData from './utils/cleanSequenceData';
 // import deepEqual from 'deep-equal';
 import "./coreStyle.css";
-import reducer, { actions } from "./redux";
+import vectorEditorReducer, { actions } from "./redux";
 import s from "./selectors";
 import { connect } from "react-redux";
 import React from "react";
 import addMetaToActionCreators from "./redux/utils/addMetaToActionCreators";
 import { bindActionCreators } from "redux";
-import VectorInteractionWrapper from "./VectorInteractionWrapper";
-import _HoverHelper from "./HoverHelper";
+import _withEditorInteractions from "./withEditorInteractions";
+import HoverHelperComp from "./HoverHelper";
 export { default as CircularView } from "./CircularView";
 export { default as RowView } from "./RowView";
 export { default as RowItem } from "./RowItem";
@@ -26,12 +26,13 @@ export {
 
 function createVectorEditor({
   namespace,
+  store,
   actionOverrides = fakeActionOverrides
 }) {
   var meta = { namespace };
   var HoverHelper = function(props) {
     return (
-      <_HoverHelper
+      <HoverHelperComp
         {...{
           ...props,
           meta
@@ -46,6 +47,13 @@ function createVectorEditor({
     ...metaActions,
     ...overrides
   };
+
+  store.dispatch({
+    type: "VECTOR_EDITOR_INITIALIZE",
+    meta: {
+      EditorNamespace: namespace
+    }
+  });
 
   function mapDispatchToActions(dispatch, props) {
     var { actionOverrides = fakeActionOverrides } = props;
@@ -63,7 +71,7 @@ function createVectorEditor({
     return { ...bindActionCreators(actionsToPass, dispatch), dispatch };
   }
 
-  var VectorEditorContainer = connect(function(state, props) {
+  var withEditorProps = connect(function(state, props) {
     var { VectorEditor } = state;
     //then use the fake blankEditor data as a substitute
     var editorState = VectorEditor[meta.namespace];
@@ -94,17 +102,18 @@ function createVectorEditor({
       ...props
     };
   }, mapDispatchToActions);
-  var VectorEditor = VectorEditorContainer(VectorInteractionWrapper);
 
+  const withEditorInteractions = withEditorProps(_withEditorInteractions);
   return {
     veActions: metaActions,
     veSelectors: s,
-    VectorEditor,
-    VectorEditorContainer,
+    withEditorInteractions,
+    withEditorProps,
     HoverHelper
   };
 }
-export { reducer };
+
+export { vectorEditorReducer };
 export { createVectorEditor };
 
 function fakeActionOverrides() {

@@ -41,16 +41,18 @@ render(<Demo />, document.querySelector('#demo'))
 
 function HomePage() {
   return (
-    <div>
+    <div style={{display: 'flex'}}>
       {
-        Object.keys(demos).map(function (key) {
+        Object.keys(demos).map(function (name, index) {
           return <Link
-              to={`/${key}`}
+            key={index}
+              to={`/${name}`}
               style={{ color: 'inherit', textDecoration: 'none' }}
             >
-              <div className={'pt-popover-dismiss pt-menu-item'}>
-                {key} demo
+              <div style={  {borderLeft: index !== 0 && '2px solid grey'}} className={'pt-popover-dismiss pt-menu-item'}>
+                {name} demo
               </div>
+
             </Link>
         })
       }
