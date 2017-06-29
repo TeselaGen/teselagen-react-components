@@ -59,6 +59,7 @@
     "ve-sequence-utils": "3.1.17"
   },
   "peerDependencies": {
+    "antd": "^2.11.2",
     "@blueprintjs/core": "^1.18.0",
     "@blueprintjs/datetime": "^1.16.0",
     "@blueprintjs/table": "^1.15.0",
@@ -69,6 +70,7 @@
     "redux-thunk": "*"
   },
   "devDependencies": {
+    "antd": "^2.11.2",
     "@blueprintjs/core": "^1.18.0",
     "@blueprintjs/datetime": "^1.16.0",
     "@blueprintjs/table": "^1.15.0",

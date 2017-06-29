@@ -1,3 +1,5 @@
+import Dragger from "antd/lib/upload/Dragger";
+import cloneDeep from "lodash/cloneDeep";
 import deepEqual from "deep-equal";
 import React from "react";
 import { Field } from "redux-form";
@@ -159,6 +161,51 @@ export const renderBlueprintFileUpload = props => {
   );
 };
 
+export const renderAntFileUpload = ({
+  innerText,
+  innerIcon,
+  contentOverride,
+  hideDropAfterUpload,
+  onUploadFinished,
+  fileLimit,
+  input: { onChange, value = [] },
+  ...rest
+}) => {
+  console.log("value:", JSON.stringify(value, false, 4));
+  return (
+    <Dragger
+      className={
+        "tg-file-upload " +
+          (hideDropAfterUpload && value.length && " tg-hide-drop-target")
+      }
+      fileList={value}
+      onChange={function(info) {
+        let fileList = info.fileList;
+        // 1. Limit the number of uploaded files to the fileLimit if it exists
+        if (fileLimit) {
+          fileList = fileList.slice(-fileLimit);
+        }
+        if (
+          !fileList.some(file => {
+            console.log("file.status:", file.status);
+            return file.status === "uploading";
+          })
+        ) {
+          onUploadFinished(fileList);
+        }
+        onChange(cloneDeep(fileList));
+      }}
+      {...rest}
+    >
+      {contentOverride ||
+        <div className={"tg-upload-inner"}>
+          {innerIcon || <span className={"pt-icon-upload pt-icon-large"} />}
+          {innerText || "Click or drag to upload"}
+        </div>}
+    </Dragger>
+  );
+};
+
 export const renderBlueprintTextarea = props => {
   const { input, intentClass, inputClassName, ...rest } = props;
   return (
@@ -199,7 +246,15 @@ export const renderReactSelect = props => {
         return opt;
       }),
     value,
-    onChange,
+    onChange: function(valOrVals) {
+      onChange(
+        Array.isArray(valOrVals)
+          ? valOrVals.map(function(val) {
+              return val.value;
+            })
+          : valOrVals.value
+      );
+    },
     ...removeUnwantedProps(rest)
   };
   return async ? <Select.Async {...propsToUse} /> : <Select {...propsToUse} />;
@@ -224,7 +279,7 @@ export const renderSelect = props => {
         }
         {...(hideValue ? { value: "" } : {})}
         onChange={function(e) {
-          onChange(JSON.parse(e.target.value));
+          onChange(e, JSON.parse(e.target.value));
         }}
         {...removeUnwantedProps(rest)}
       >
@@ -262,7 +317,7 @@ export const renderBlueprintNumericInput = props => {
     <NumericInput
       onValueChange={value => {
         // needed for redux form to change value
-        rest.onChange ? rest.onChange(value) : input.onChange(value);
+        input.onChange({}, value);
       }}
       intent={intent}
       {...(hideValue ? { value: "" } : {})}
@@ -314,6 +369,7 @@ export const withAbstractWrapper = ComponentToWrap => {
 
 export const InputField = generateField(renderBlueprintInput);
 export const FileUploadField = generateField(renderBlueprintFileUpload);
+export const AntFileUploadField = generateField(renderAntFileUpload);
 export const DateInputField = generateField(renderBlueprintDateInput);
 export const CheckboxField = generateField(renderBlueprintCheckbox);
 export const TextareaField = generateField(renderBlueprintTextarea);

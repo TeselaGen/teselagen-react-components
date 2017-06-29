@@ -1,3 +1,5 @@
+import enUS from 'antd/lib/locale-provider/en_US';
+import LocaleProvider from 'antd/lib/locale-provider';
 import React from "react";
 import { reduxForm } from "redux-form";
 
@@ -12,9 +14,16 @@ import {
   NumericInputField,
   RadioGroupField,
   FileUploadField,
+  AntFileUploadField,
   onEnterOrBlurHelper
 } from "../../../src";
 import "./style.css";
+import "antd/lib/upload/style/index.css";
+import "antd/lib/transfer/style/css";
+import "antd/lib/transfer/style/css";
+import 'antd/lib/tooltip/style/css';
+
+
 import { Provider } from "react-redux";
 import store from "../store";
 import { Position, Button, Intent } from "@blueprintjs/core";
@@ -39,7 +48,8 @@ class FormComponentsDemo extends React.Component {
   render() {
     const {defaultSelectValue} = this.state || {}
     const {handleSubmit} = this.props
-    return (
+    return (<LocaleProvider locale={enUS}>
+      
       <Provider store={store}>
         <div>
           <h3 className="form-component-title">
@@ -65,7 +75,53 @@ class FormComponentsDemo extends React.Component {
             label="Numeric Input"
             placeholder="0"
           />
-          <FileUploadField name={"fieldnumber1a"} label="File Input" />
+          <FileUploadField 
+
+            name={"fieldnumber1a"} 
+            label="File Input" 
+          />
+          
+          <AntFileUploadField 
+          label='AntD upload component'
+          onUploadFinished={function (fileList) {
+              console.log('do something with the finished file list:', fileList)
+            }} 
+          multiple
+          // accept={[".json"]} 
+          // innerIcon={<span></span>} //icon override
+          // innerText='some text override'
+          action={"//jsonplaceholder.typicode.com/posts/"} 
+          name={"uploadfield"}  />
+
+          <AntFileUploadField 
+          label='AntD upload component with hidden drop target after upload'
+          onUploadFinished={function (fileList) {
+              console.log('do something with the finished file list:', fileList)
+            }} 
+          multiple
+          hideDropAfterUpload
+          // accept={[".json"]} 
+          // innerIcon={<span></span>} //icon override
+          // innerText='some text override'
+          action={"//jsonplaceholder.typicode.com/posts/"} 
+          name={"uploadfieldwithhiddendroptargetafterupload"}  />
+
+          <AntFileUploadField 
+          label='AntD upload component with default value set!'
+          onUploadFinished={function (fileList) {
+              console.log('do something with the finished file list:', fileList)
+            }}
+          multiple
+          defaultValue={[{
+            uid: 1, //you must set a unique id for this to work properly
+            name: "yarn.lock",
+            status: "error",
+          }]}
+          // accept={[".json"]} 
+          // innerIcon={<span></span>} //icon override
+          // innerText='some text override'
+          action={"//jsonplaceholder.typicode.com/posts/"} 
+          name={"uploadfieldwithdefault"}  />
           <InputField
             name={"inputField"}
             label="Input"
@@ -166,7 +222,9 @@ class FormComponentsDemo extends React.Component {
           <ReactSelectField
             name="collaborators"
             label="Collaborators"
-            multi
+            onChange={function (val) {
+              console.log('val:', val)
+            }}
             options={[
               { label: "Rodrigo Pavez", value: "Rodrigo Pavez" },
               { label: "Ximena Morales", value: "Ximena Morales" },
@@ -180,6 +238,9 @@ class FormComponentsDemo extends React.Component {
             name="collaborators2"
             label="React Select AsyncCollaborators"
             multi
+            onChange={function (val) {
+              console.log('val:', val)
+            }}
             loadOptions={getOptions}
           />
           <Button intent={Intent.SUCCESS} text="Submit Form" onClick={handleSubmit(function (formData) {
@@ -197,7 +258,8 @@ class FormComponentsDemo extends React.Component {
           <br/>
         </div>
       </Provider>
-    );
+      
+    </LocaleProvider>);
   }
 }
 

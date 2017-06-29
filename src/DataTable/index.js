@@ -335,11 +335,13 @@ class DataTable extends React.Component {
       <ColumnHeaderCell
         name={
           <span title={displayName}>
-            {displayName + "  "}
-            {ordering &&
-              (ordering === "asc"
-                ? <span className={"pt-icon-standard pt-icon-arrow-down"} />
-                : <span className={"pt-icon-standard pt-icon-arrow-up"} />)}
+            <span>
+              {displayName + "  "}
+              {ordering &&
+                (ordering === "asc"
+                  ? <span className={"pt-icon-standard pt-icon-arrow-down"} />
+                  : <span className={"pt-icon-standard pt-icon-arrow-up"} />)}
+            </span>
           </span>
         }
         renderMenu={function() {
