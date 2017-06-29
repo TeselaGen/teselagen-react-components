@@ -155,14 +155,14 @@ class FormComponentsDemo extends React.Component {
           />
           <SelectField
             options={["hey", "you", "guys"]}
-            name={"fieldnumber3.2"}
+            name={"fieldnumber3agag.2"}
             defaultValue={"you"}
             label="Select Simple with defaultValue"
           />
 
           <SelectField
             options={["hey", "you", "guys"]}
-            name={"fieldnumber3.3"}
+            name={"fieldnumber3aa.3"}
             defaultValue={defaultSelectValue}
             placeholder="I'm just hanging out"
             label="Select Simple with initially unset defaultValue and a placeholder"
@@ -174,7 +174,7 @@ class FormComponentsDemo extends React.Component {
           </Button>
           <SelectField
             options={["hey", "you", "guys"]}
-            name={"fieldnumber3"}
+            name={"fieldnumber3asdfg"}
             placeholder={"Please choose..."}
             label="Select Simple With Placeholder"
           />
@@ -194,7 +194,7 @@ class FormComponentsDemo extends React.Component {
               { label: "you", value: { tree: "graph" } },
               { label: "guys", value: { tree: "chart" } }
             ]}
-            name={"fieldnumber3b"}
+            name={"fieldnumber3baa"}
             label="Select with name and value"
           />
           <DateInputField

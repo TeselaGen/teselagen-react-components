@@ -279,7 +279,7 @@ export const renderSelect = props => {
         }
         {...(hideValue ? { value: "" } : {})}
         onChange={function(e) {
-          onChange(e, JSON.parse(e.target.value));
+          onChange(JSON.parse(e.target.value));
         }}
         {...removeUnwantedProps(rest)}
       >
