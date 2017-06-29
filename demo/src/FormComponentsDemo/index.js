@@ -82,6 +82,7 @@ class FormComponentsDemo extends React.Component {
           />
           
           <AntFileUploadField 
+
           label='AntD upload component'
           onUploadFinished={function (fileList) {
               console.log('do something with the finished file list:', fileList)
@@ -94,6 +95,7 @@ class FormComponentsDemo extends React.Component {
           name={"uploadfield"}  />
 
           <AntFileUploadField 
+          className={'myspecialclassname'}
           label='AntD upload component with hidden drop target after upload'
           onUploadFinished={function (fileList) {
               console.log('do something with the finished file list:', fileList)

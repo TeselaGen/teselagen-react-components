@@ -165,17 +165,18 @@ export const renderAntFileUpload = ({
   innerText,
   innerIcon,
   contentOverride,
+  className = " ",
   hideDropAfterUpload,
   onUploadFinished,
   fileLimit,
   input: { onChange, value = [] },
   ...rest
 }) => {
-  console.log("value:", JSON.stringify(value, false, 4));
   return (
     <Dragger
       className={
-        "tg-file-upload " +
+        className +
+          " tg-file-upload " +
           (hideDropAfterUpload && value.length && " tg-hide-drop-target")
       }
       fileList={value}
@@ -187,7 +188,6 @@ export const renderAntFileUpload = ({
         }
         if (
           !fileList.some(file => {
-            console.log("file.status:", file.status);
             return file.status === "uploading";
           })
         ) {
