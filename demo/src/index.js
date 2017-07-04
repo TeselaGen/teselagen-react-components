@@ -23,7 +23,7 @@ const Demo = () => {
     <div>
       <Provider store={store}>
         <Router>
-          <div>
+          <div style={{margin: 15}}>
             <Route path="/" component={HomePage} />
             {
               Object.keys(demos).map(function (key, index) {
