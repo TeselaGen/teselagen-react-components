@@ -197,7 +197,7 @@ class FormComponentsDemo extends React.Component {
               { label: "guys", value: { tree: "chart" } }
             ]}
             name={"fieldnumber3baa"}
-            label="Select with name and value"
+            label="Select with name and value, supporting json values"
           />
           <DateInputField
             name={"fieldnumber5"}

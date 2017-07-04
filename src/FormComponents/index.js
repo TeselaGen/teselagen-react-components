@@ -111,7 +111,9 @@ class AbstractInput extends React.Component {
         </Tooltip>
         {!tooltipError &&
           showError &&
-          <div className={"pt-form-helper-text"}>{error}</div>}
+          <div className={"tg-field-error-holder pt-form-helper-text"}>
+            {error}
+          </div>}
       </div>
     );
   }
@@ -275,11 +277,15 @@ export const renderSelect = props => {
         value={
           placeholder && value === ""
             ? "__placeholder__"
-            : JSON.stringify(value)
+            : typeof value !== "string" ? JSON.stringify(value) : value
         }
         {...(hideValue ? { value: "" } : {})}
         onChange={function(e) {
-          onChange(JSON.parse(e.target.value));
+          let val = e.target.value;
+          try {
+            val = JSON.parse(e.target.value);
+          } catch (e) {}
+          onChange(val);
         }}
         {...removeUnwantedProps(rest)}
       >
@@ -301,7 +307,10 @@ export const renderSelect = props => {
             value = opt.value;
           }
           return (
-            <option key={index} value={JSON.stringify(value)}>
+            <option
+              key={index}
+              value={typeof value !== "string" ? JSON.stringify(value) : value}
+            >
               {label}
             </option>
           );

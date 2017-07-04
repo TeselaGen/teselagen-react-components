@@ -14,17 +14,16 @@
     "build": "nwb build-react-component --copy-files --no-demo",
     "clean": "nwb clean-module && npm clean-demo",
     "start": "nwb serve-react-demo --port 3333",
-    "//test": "nwb test-react",
     "precommit": "lint-staged",
     "prepublish": "npm run build",
     "fontopen": "make fontopen",
     "fontsave": "make fontsave",
-    "//test:coverage": "nwb test-react --coverage",
-    "//test:watch": "nwb test-react --server",
     "release": "release-it",
-    "test": "jest src --coverage",
-    "test:staged": "cross-env CI=true jest --env=jsdom --findRelatedTests",
-    "test-watch": "jest src --watch",
+    "test": "jest --env=jsdom --maxWorkers 2",
+    "test-coverage": "yarn test -- --coverage",
+    "test:staged": "cross-env CI=true yarn test -- --findRelatedTests",
+    "test-fix": "git reset . && cross-env CI=true yarn test --onlyChanged --updateSnapshot",
+    "test-watch": "yarn test -- --watch",
     "test-debug": "node --inspect --debug-brk ./node_modules/.bin/jest src --runInBand "
   },
   "dependencies": {
@@ -109,7 +108,9 @@
     "redux": "^3.6.0",
     "redux-form": "^6.7.0",
     "redux-thunk": "*",
-    "release-it": "^2.7.3"
+    "release-it": "^2.7.3",
+    "sinon": "^2.3.6",
+    "tap": "^10.7.0"
   },
   "lint-staged": {
     "src/**/*.js ": [
