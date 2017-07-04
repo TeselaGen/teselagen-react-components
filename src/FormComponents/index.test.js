@@ -1,14 +1,14 @@
 // import each from 'lodash/each';
 import {
   InputField,
-  SelectField
+  SelectField,
   // FileUploadField,
   // AntFileUploadField,
   // DateInputField,
   // CheckboxField,
   // TextareaField,
   // EditableTextField,
-  // NumericInputField,
+  NumericInputField
   // RadioGroupField,
   // ReactSelectField,
 } from "./index";
@@ -64,6 +64,55 @@ describe("form components", function() {
     expect(value).toEqual("testValue");
   });
   const nestedJson = { my: "nestedJson" };
+
+  it("NumericInputField functions as expected", function() {
+    const FormContainer = reduxForm({
+      form: "testForm",
+      validate: function(values) {
+        const errors = {};
+        if (!values.testField) {
+          errors.testField = "Required";
+        }
+        return errors;
+      }
+    })(function(argument) {
+      return (
+        <div>
+          <NumericInputField name="testField" /> // defaultValue={1}
+        </div>
+      );
+    });
+    const store = createStore(combineReducers({ form: formReducer }));
+    const mountedForm = mount(
+      <Provider store={store}>
+        <FormContainer />
+      </Provider>
+    );
+
+    const input = mountedForm.find("input").first();
+    expect(input).toHaveLength(1);
+    // Our form component only shows error messages (help text) if the
+    // field has been touched. To mimic touching the field, we simulate a
+    // blur event, which means the input's onBlur method will run, which
+    // will call the onBlur method supplied by Redux-Form.
+    input.simulate("blur");
+    const errorTextContainer = mountedForm.find(".tg-field-error-holder");
+    expect(errorTextContainer).toHaveLength(1);
+
+    expect(input).toHaveLength(1);
+    input.simulate("change", { target: { value: "2" } });
+    expect(store.getState().form.testForm.values.testField).toEqual("2");
+
+    input.simulate("change", { target: { value: "-2" } });
+    expect(store.getState().form.testForm.values.testField).toEqual("-2");
+
+    input.simulate("change", { target: { value: "ab" } });
+    expect(store.getState().form.testForm.values.testField).toEqual("ab");
+    input.simulate("blur", { target: { value: "ab" } });
+    mountedForm.find(".tg-field-error-holder");
+    expect(errorTextContainer).toHaveLength(1);
+  });
+
   it("SelectField functions as expected", function() {
     const FormContainer = reduxForm({
       form: "testForm",

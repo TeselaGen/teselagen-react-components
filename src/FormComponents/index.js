@@ -1,3 +1,4 @@
+import mathExpressionEvaluator from "math-expression-evaluator";
 import Dragger from "antd/lib/upload/Dragger";
 import cloneDeep from "lodash/cloneDeep";
 import deepEqual from "deep-equal";
@@ -31,6 +32,9 @@ function getIntentClass({ meta: { touched, error } }) {
 function removeUnwantedProps(props) {
   let cleanedProps = { ...props };
   delete cleanedProps.className;
+  delete cleanedProps.units;
+  delete cleanedProps.onChange;
+  delete cleanedProps.onBlur;
   delete cleanedProps.intent;
   delete cleanedProps.intentClass;
   delete cleanedProps.meta;
@@ -122,20 +126,20 @@ class AbstractInput extends React.Component {
 export const renderBlueprintDateInput = props => {
   const { input, intent, ...rest } = props;
   return (
-    <DateInput intent={intent} {...input} {...removeUnwantedProps(rest)} />
+    <DateInput {...removeUnwantedProps(rest)} intent={intent} {...input} />
   );
 };
 
 export const renderBlueprintInput = props => {
   const { input, intent, ...rest } = props;
   return (
-    <InputGroup intent={intent} {...input} {...removeUnwantedProps(rest)} />
+    <InputGroup {...removeUnwantedProps(rest)} intent={intent} {...input} />
   );
 };
 
 export const renderBlueprintCheckbox = props => {
   const { input, label, ...rest } = props;
-  return <Checkbox {...input} {...removeUnwantedProps(rest)} label={label} />;
+  return <Checkbox {...removeUnwantedProps(rest)} {...input} label={label} />;
 };
 
 export const renderBlueprintFileUpload = props => {
@@ -154,9 +158,9 @@ export const renderBlueprintFileUpload = props => {
       <span className="te-file-upload-input pt-file-upload-input">
         {files
           ? Array.isArray(files) &&
-              files.map((file, i) => {
-                return file.name + (i !== files.length - 1 ? "," : "");
-              })
+            files.map((file, i) => {
+              return file.name + (i !== files.length - 1 ? "," : "");
+            })
           : "Choose file..."}
       </span>
     </Dropzone>
@@ -178,8 +182,8 @@ export const renderAntFileUpload = ({
     <Dragger
       className={
         className +
-          " tg-file-upload " +
-          (hideDropAfterUpload && value.length && " tg-hide-drop-target")
+        " tg-file-upload " +
+        (hideDropAfterUpload && value.length && " tg-hide-drop-target")
       }
       fileList={value}
       onChange={function(info) {
@@ -223,11 +227,11 @@ export const renderBlueprintEditableText = props => {
   const { input, ...rest } = props;
   return (
     <EditableText
+      {...removeUnwantedProps(rest)}
       {...input}
       onConfirm={function(value) {
         input.onBlur && input.onBlur(value);
       }}
-      {...removeUnwantedProps(rest)}
     />
   );
 };
@@ -242,7 +246,9 @@ export const renderReactSelect = props => {
     ...rest
   } = props;
   const propsToUse = {
-    options: options &&
+    ...removeUnwantedProps(rest),
+    options:
+      options &&
       options.map(function(opt) {
         if (typeof opt === "string") return { label: opt, value: opt };
         return opt;
@@ -256,8 +262,7 @@ export const renderReactSelect = props => {
             })
           : valOrVals.value
       );
-    },
-    ...removeUnwantedProps(rest)
+    }
   };
   return async ? <Select.Async {...propsToUse} /> : <Select {...propsToUse} />;
 };
@@ -274,6 +279,7 @@ export const renderSelect = props => {
   return (
     <div className={"pt-select pt-fill"}>
       <select
+        {...removeUnwantedProps(rest)}
         value={
           placeholder && value === ""
             ? "__placeholder__"
@@ -287,7 +293,6 @@ export const renderSelect = props => {
           } catch (e) {}
           onChange(val);
         }}
-        {...removeUnwantedProps(rest)}
       >
         {placeholder &&
           <option value="__placeholder__" disabled hidden>
@@ -324,15 +329,23 @@ export const renderBlueprintNumericInput = props => {
   const { input, hideValue, intent, inputClassName, ...rest } = props;
   return (
     <NumericInput
-      onValueChange={value => {
-        // needed for redux form to change value
-        input.onChange({}, value);
-      }}
+      value={input.value}
       intent={intent}
-      {...(hideValue ? { value: "" } : {})}
-      {...input}
       {...removeUnwantedProps(rest)}
+      {...(hideValue ? { value: "" } : {})}
       className={`pt-fill ${inputClassName}`}
+      onValueChange={(numericVal, stringVal) => {
+        // needed for redux form to change value
+        input.onChange(stringVal);
+      }}
+      onBlur={function(e) {
+        try {
+          const num = mathExpressionEvaluator.eval(e.target.value);
+          input.onBlur(num);
+        } catch (e) {
+          input.onBlur("");
+        }
+      }}
     />
   );
 };

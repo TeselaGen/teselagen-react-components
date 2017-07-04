@@ -74,6 +74,9 @@ class FormComponentsDemo extends React.Component {
             name={"fieldnumber1"}
             label="Numeric Input"
             placeholder="0"
+            onChange={function (e,val) {
+              console.log('e, val:', e, val)
+            }}
           />
           <FileUploadField 
 
