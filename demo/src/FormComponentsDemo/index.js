@@ -13,9 +13,7 @@ import {
   EditableTextField,
   NumericInputField,
   RadioGroupField,
-  FileUploadField,
   AntFileUploadField,
-  onEnterOrBlurHelper
 } from "../../../src";
 import "./style.css";
 import "antd/lib/upload/style/index.css";
@@ -59,6 +57,9 @@ class FormComponentsDemo extends React.Component {
             name={"fieldnumber0"}
             label={"Radio Group Input"}
             defaultValue={"false"}
+            onFieldSubmit={function (val) {
+              console.log('on field submit!:', val)
+            }}
             options={[
               {
                 label: "Option 1",
@@ -72,22 +73,17 @@ class FormComponentsDemo extends React.Component {
           />
           <NumericInputField
             name={"fieldnumber1"}
-            label="Numeric Input"
+            label="Numeric Input with added onFieldSubmit"
             placeholder="0"
-            onChange={function (e,val) {
-              console.log('e, val:', e, val)
+            onFieldSubmit={function (val) {
+              console.log('on field submit!:', val)
             }}
-          />
-          <FileUploadField 
-
-            name={"fieldnumber1a"} 
-            label="File Input" 
           />
           
           <AntFileUploadField 
 
           label='AntD upload component'
-          onUploadFinished={function (fileList) {
+          onFieldSubmit={function (fileList) {
               console.log('do something with the finished file list:', fileList)
             }} 
           multiple
@@ -131,18 +127,18 @@ class FormComponentsDemo extends React.Component {
             name={"inputField"}
             label="Input"
             placeholder="Enter input..."
-            {...onEnterOrBlurHelper(function(argument) {
-              console.log("onEnter/Blur hit");
-            })}
+            onFieldSubmit={function (val) {
+              console.log('on field submit!:', val)
+            }}
           />
           <InputField
             name={"inputField2"}
             label="Input With Default"
             defaultValue={'Default Value Here!'}
             placeholder="Enter input..."
-            {...onEnterOrBlurHelper(function(argument) {
-              console.log("onEnter/Blur hit");
-            })}
+            onFieldSubmit={function (val) {
+              console.log('on field submit!:', val)
+            }}
           />
           <InputField
             name={"inputFieldWithTooltipError"}
@@ -150,15 +146,24 @@ class FormComponentsDemo extends React.Component {
             tooltipProps={{
               position: Position.TOP
             }}
+            onFieldSubmit={function (val) {
+              console.log('on field submit!:', val)
+            }}
             label="Input"
             placeholder="Enter input..."
           />
           <SelectField
+            onFieldSubmit={function (val) {
+              console.log('on field submit!:', val)
+            }}
             options={["hey", "you", "guys"]}
             name={"fieldnumber3.1"}
             label="Select Simple"
           />
           <SelectField
+            onFieldSubmit={function (val) {
+              console.log('on field submit!:', val)
+            }}
             options={["hey", "you", "guys"]}
             name={"fieldnumber3agag.2"}
             defaultValue={"you"}
@@ -166,6 +171,9 @@ class FormComponentsDemo extends React.Component {
           />
 
           <SelectField
+            onFieldSubmit={function (val) {
+              console.log('on field submit!:', val)
+            }}
             options={["hey", "you", "guys"]}
             name={"fieldnumber3aa.3"}
             defaultValue={defaultSelectValue}
@@ -180,12 +188,15 @@ class FormComponentsDemo extends React.Component {
           <SelectField
             options={["hey", "you", "guys"]}
             name={"fieldnumber3asdfg"}
+            onFieldSubmit={function (val) {
+              console.log('on field submit!:', val)
+            }}
             placeholder={"Please choose..."}
             label="Select Simple With Placeholder"
           />
           <SelectField
-            onChange={function () {
-              console.log('arguments:', arguments)
+            onFieldSubmit={function (val) {
+              console.log('on field submit!:', val)
             }}
             options={[
               {
@@ -205,30 +216,38 @@ class FormComponentsDemo extends React.Component {
           <DateInputField
             name={"fieldnumber5"}
             label="Date Input"
+            onFieldSubmit={function (val) {
+              console.log('on field submit!:', val)
+            }}
             minDate={new Date()}
             maxDate={
               new Date(new Date().setFullYear(new Date().getFullYear() + 10))
             }
           />
-          <CheckboxField name={"fieldnumber6"} label="Checkbox" />
+          <CheckboxField onFieldSubmit={function (val) {
+              console.log('on field submit!:', val)
+            }} name={"fieldnumber6"} label="Checkbox" />
           <TextareaField
             name={"fieldnumber7"}
+            onFieldSubmit={function (val) {
+              console.log('on field submit!:', val)
+            }}
             label="Textarea"
             placeholder="Enter notes..."
           />
           <EditableTextField
             name={"fieldnumber8"}
-            {...onEnterOrBlurHelper(function(argument) {
-              console.log("onEnter/Blur hit");
-            })}
+            onFieldSubmit={function (val) {
+              console.log('on field submit!:', val)
+            }}
             label="Editable Text"
             placeholder="Enter new text..."
           />
           <ReactSelectField
             name="collaborators"
             label="Collaborators"
-            onChange={function (val) {
-              console.log('val:', val)
+            onFieldSubmit={function (val) {
+              console.log('on field submit!:', val)
             }}
             options={[
               { label: "Rodrigo Pavez", value: "Rodrigo Pavez" },
@@ -243,8 +262,8 @@ class FormComponentsDemo extends React.Component {
             name="collaborators2"
             label="React Select AsyncCollaborators"
             multi
-            onChange={function (val) {
-              console.log('val:', val)
+            onFieldSubmit={function (val) {
+              console.log('on field submit!:', val)
             }}
             loadOptions={getOptions}
           />

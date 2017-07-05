@@ -19,7 +19,6 @@ import {
 } from "@blueprintjs/core";
 
 import { DateInput } from "@blueprintjs/datetime";
-import Dropzone from "react-dropzone";
 
 function getIntent({ meta: { touched, error } }) {
   return touched && error ? Intent.DANGER : "";
@@ -34,6 +33,7 @@ function removeUnwantedProps(props) {
   delete cleanedProps.className;
   delete cleanedProps.units;
   delete cleanedProps.onChange;
+  delete cleanedProps.onFieldSubmit;
   delete cleanedProps.onBlur;
   delete cleanedProps.intent;
   delete cleanedProps.intentClass;
@@ -124,46 +124,52 @@ class AbstractInput extends React.Component {
 }
 
 export const renderBlueprintDateInput = props => {
-  const { input, intent, ...rest } = props;
+  const { input, intent, onFieldSubmit, ...rest } = props;
   return (
-    <DateInput {...removeUnwantedProps(rest)} intent={intent} {...input} />
+    <DateInput
+      {...removeUnwantedProps(rest)}
+      intent={intent}
+      {...input}
+      onChange={function(selectedDate) {
+        input.onChange(selectedDate);
+        onFieldSubmit(selectedDate);
+      }}
+    />
   );
 };
 
 export const renderBlueprintInput = props => {
-  const { input, intent, ...rest } = props;
+  const { input, intent, onFieldSubmit, ...rest } = props;
   return (
-    <InputGroup {...removeUnwantedProps(rest)} intent={intent} {...input} />
+    <InputGroup
+      {...removeUnwantedProps(rest)}
+      intent={intent}
+      {...input}
+      onKeyDown={function(e, ...args) {
+        if (e.key === "Enter") {
+          onFieldSubmit(e.target.value);
+        }
+      }}
+      onBlur={function(e, val) {
+        input.onBlur(e, val);
+        onFieldSubmit(e.target ? e.target.value : val);
+      }}
+    />
   );
 };
 
 export const renderBlueprintCheckbox = props => {
-  const { input, label, ...rest } = props;
-  return <Checkbox {...removeUnwantedProps(rest)} {...input} label={label} />;
-};
-
-export const renderBlueprintFileUpload = props => {
-  const {
-    input: { onChange, value: files },
-    dropzoneOptions = {},
-    name
-  } = props;
+  const { input, label, onFieldSubmit, ...rest } = props;
   return (
-    <Dropzone
-      onDrop={onChange}
-      className="pt-file-upload"
-      name={name}
-      {...dropzoneOptions}
-    >
-      <span className="te-file-upload-input pt-file-upload-input">
-        {files
-          ? Array.isArray(files) &&
-            files.map((file, i) => {
-              return file.name + (i !== files.length - 1 ? "," : "");
-            })
-          : "Choose file..."}
-      </span>
-    </Dropzone>
+    <Checkbox
+      {...removeUnwantedProps(rest)}
+      {...input}
+      label={label}
+      onChange={function(e, val) {
+        input.onChange(e, val);
+        onFieldSubmit(e.target ? e.target.value : val);
+      }}
+    />
   );
 };
 
@@ -173,8 +179,8 @@ export const renderAntFileUpload = ({
   contentOverride,
   className = " ",
   hideDropAfterUpload,
-  onUploadFinished,
   fileLimit,
+  onFieldSubmit,
   input: { onChange, value = [] },
   ...rest
 }) => {
@@ -197,7 +203,7 @@ export const renderAntFileUpload = ({
             return file.status === "uploading";
           })
         ) {
-          onUploadFinished(fileList);
+          onFieldSubmit(fileList);
         }
         onChange(cloneDeep(fileList));
       }}
@@ -213,24 +219,29 @@ export const renderAntFileUpload = ({
 };
 
 export const renderBlueprintTextarea = props => {
-  const { input, intentClass, inputClassName, ...rest } = props;
+  const { input, intentClass, inputClassName, onFieldSubmit, ...rest } = props;
   return (
     <textarea
       {...removeUnwantedProps(rest)}
       className={`${intentClass} ${inputClassName} pt-input pt-fill`}
       {...input}
+      onBlur={function(e, val) {
+        input.onBlur(e, val);
+        onFieldSubmit(e.target ? e.target.value : val);
+      }}
     />
   );
 };
 
 export const renderBlueprintEditableText = props => {
-  const { input, ...rest } = props;
+  const { input, onFieldSubmit, ...rest } = props;
   return (
     <EditableText
       {...removeUnwantedProps(rest)}
       {...input}
       onConfirm={function(value) {
         input.onBlur && input.onBlur(value);
+        onFieldSubmit(value);
       }}
     />
   );
@@ -243,6 +254,7 @@ export const renderReactSelect = props => {
     input: { value, onChange },
     hideValue,
     options,
+    onFieldSubmit,
     ...rest
   } = props;
   const propsToUse = {
@@ -255,13 +267,13 @@ export const renderReactSelect = props => {
       }),
     value,
     onChange: function(valOrVals) {
-      onChange(
-        Array.isArray(valOrVals)
-          ? valOrVals.map(function(val) {
-              return val.value;
-            })
-          : valOrVals.value
-      );
+      const valToPass = Array.isArray(valOrVals)
+        ? valOrVals.map(function(val) {
+            return val.value;
+          })
+        : valOrVals.value;
+      onChange(valToPass);
+      onFieldSubmit(valToPass);
     }
   };
   return async ? <Select.Async {...propsToUse} /> : <Select {...propsToUse} />;
@@ -273,6 +285,7 @@ export const renderSelect = props => {
     input: { value, onChange },
     hideValue,
     placeholder,
+    onFieldSubmit,
     options,
     ...rest
   } = props;
@@ -292,6 +305,7 @@ export const renderSelect = props => {
             val = JSON.parse(e.target.value);
           } catch (e) {}
           onChange(val);
+          onFieldSubmit(val);
         }}
       >
         {placeholder &&
@@ -326,7 +340,24 @@ export const renderSelect = props => {
 };
 
 export const renderBlueprintNumericInput = props => {
-  const { input, hideValue, intent, inputClassName, ...rest } = props;
+  const {
+    input,
+    hideValue,
+    intent,
+    inputClassName,
+    onFieldSubmit,
+    ...rest
+  } = props;
+  function handleBlurOrButtonClick(stringVal) {
+    try {
+      const num = mathExpressionEvaluator.eval(stringVal);
+      input.onBlur(num);
+      onFieldSubmit(num);
+    } catch (e) {
+      input.onBlur("");
+      onFieldSubmit("");
+    }
+  }
   return (
     <NumericInput
       value={input.value}
@@ -338,21 +369,31 @@ export const renderBlueprintNumericInput = props => {
         // needed for redux form to change value
         input.onChange(stringVal);
       }}
+      onButtonClick={function(numericVal, stringVal) {
+        handleBlurOrButtonClick(stringVal);
+      }}
       onBlur={function(e) {
-        try {
-          const num = mathExpressionEvaluator.eval(e.target.value);
-          input.onBlur(num);
-        } catch (e) {
-          input.onBlur("");
-        }
+        handleBlurOrButtonClick(e.target.value);
       }}
     />
   );
 };
 
-export const renderBlueprintRadioGroup = ({ input, options, ...rest }) => {
+export const renderBlueprintRadioGroup = ({
+  input,
+  options,
+  onFieldSubmit,
+  ...rest
+}) => {
   return (
-    <RadioGroup selectedValue={input.value} {...input}>
+    <RadioGroup
+      selectedValue={input.value}
+      {...input}
+      onChange={function(...args) {
+        input.onChange(...args);
+        onFieldSubmit(...args);
+      }}
+    >
       {options.map(function({ label, value }, index) {
         return (
           <Radio
@@ -369,8 +410,18 @@ export const renderBlueprintRadioGroup = ({ input, options, ...rest }) => {
 
 function generateField(component) {
   const compWithDefaultVal = withAbstractWrapper(component);
-  return function FieldMaker({ name, ...rest }) {
-    return <Field name={name} component={compWithDefaultVal} {...rest} />;
+  return function FieldMaker({ name, onFieldSubmit = () => {}, ...rest }) {
+    // function onFieldSubmit(e,val) {
+    //   _onFieldSubmit && _onFieldSubmit(e.target ? e.target.value : val)
+    // }
+    return (
+      <Field
+        onFieldSubmit={onFieldSubmit}
+        name={name}
+        component={compWithDefaultVal}
+        {...rest}
+      />
+    );
   };
 }
 
@@ -390,7 +441,6 @@ export const withAbstractWrapper = ComponentToWrap => {
 };
 
 export const InputField = generateField(renderBlueprintInput);
-export const FileUploadField = generateField(renderBlueprintFileUpload);
 export const AntFileUploadField = generateField(renderAntFileUpload);
 export const DateInputField = generateField(renderBlueprintDateInput);
 export const CheckboxField = generateField(renderBlueprintCheckbox);
