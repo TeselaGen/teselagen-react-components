@@ -73,7 +73,7 @@ class FormComponentsDemo extends React.Component {
           />
           <NumericInputField
             name={"fieldnumber1"}
-            label="Numeric Input with added onFieldSubmit"
+            label="Numeric Input"
             placeholder="0"
             onFieldSubmit={function (val) {
               console.log('on field submit!:', val)
@@ -96,7 +96,7 @@ class FormComponentsDemo extends React.Component {
           <AntFileUploadField 
           className={'myspecialclassname'}
           label='AntD upload component with hidden drop target after upload'
-          onUploadFinished={function (fileList) {
+          onFieldSubmit={function (fileList) {
               console.log('do something with the finished file list:', fileList)
             }} 
           multiple
@@ -109,7 +109,7 @@ class FormComponentsDemo extends React.Component {
 
           <AntFileUploadField 
           label='AntD upload component with default value set!'
-          onUploadFinished={function (fileList) {
+          onFieldSubmit={function (fileList) {
               console.log('do something with the finished file list:', fileList)
             }}
           multiple
@@ -159,6 +159,14 @@ class FormComponentsDemo extends React.Component {
             options={["hey", "you", "guys"]}
             name={"fieldnumber3.1"}
             label="Select Simple"
+          />
+          <SelectField
+            onFieldSubmit={function (val) {
+              console.log('on field submit!:', val)
+            }}
+            options={[1, 2, 4]}
+            name={"fieldnumber3.1"}
+            label="Select Simple with number values passed in simplified options obj"
           />
           <SelectField
             onFieldSubmit={function (val) {

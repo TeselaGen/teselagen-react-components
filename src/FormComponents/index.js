@@ -1,3 +1,4 @@
+import isNumber from "lodash/isNumber";
 import mathExpressionEvaluator from "math-expression-evaluator";
 import Dragger from "antd/lib/upload/Dragger";
 import cloneDeep from "lodash/cloneDeep";
@@ -262,7 +263,9 @@ export const renderReactSelect = props => {
     options:
       options &&
       options.map(function(opt) {
-        if (typeof opt === "string") return { label: opt, value: opt };
+        if (typeof opt === "string") {
+          return { label: opt, value: opt };
+        } else if (isNumber(opt)) return { label: opt.toString(), value: opt };
         return opt;
       }),
     value,
@@ -316,6 +319,9 @@ export const renderSelect = props => {
           let label, value;
           if (typeof opt === "string") {
             label = opt;
+            value = opt;
+          } else if (isNumber(opt)) {
+            label = opt.toString();
             value = opt;
           } else if (Array.isArray(opt)) {
             throw new Error(
