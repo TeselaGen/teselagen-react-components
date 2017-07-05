@@ -389,9 +389,9 @@ export const renderBlueprintRadioGroup = ({
     <RadioGroup
       selectedValue={input.value}
       {...input}
-      onChange={function(...args) {
-        input.onChange(...args);
-        onFieldSubmit(...args);
+      onChange={function(e, val, ...args) {
+        input.onChange(e, val, ...args);
+        onFieldSubmit(e.target ? e.target.value : val);
       }}
     >
       {options.map(function({ label, value }, index) {
