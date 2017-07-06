@@ -54,6 +54,7 @@ class DataTable extends React.Component {
     withSearch: boolean,
     withPaging: boolean,
     isInfinite: boolean,
+    containerWidth: number,
     onRefresh?: Function,
     onSingleRowSelect?: Function,
     onDeselect?: Function,
@@ -102,6 +103,7 @@ class DataTable extends React.Component {
       withPaging,
       isInfinite,
       onSingleRowSelect,
+      containerWidth,
       onRefresh,
       onDeselect,
       onMultiRowSelect,
@@ -112,7 +114,8 @@ class DataTable extends React.Component {
     } = this.props;
 
     const { dimensions } = this.state;
-    const { width } = dimensions;
+    let { width } = dimensions;
+    if (containerWidth) width = containerWidth;
 
     const hasFilters = selectedFilter || searchTerm;
     const numRows = isInfinite ? entities.length : pageSize;
@@ -122,7 +125,7 @@ class DataTable extends React.Component {
     const numberOfColumns = columns ? columns.length : 0;
     const columnWidths = [];
     times(numberOfColumns, () => {
-      columnWidths.push((width - 15) / numberOfColumns);
+      columnWidths.push(width / numberOfColumns); //SD why did we have the width - X ? removing for now...
     });
     const loadingOptions: TableLoadingOption[] = [];
     if (isLoading) {
@@ -136,7 +139,6 @@ class DataTable extends React.Component {
       <div className={"data-table-container " + extraClasses}>
         <div className={"data-table-header"}>
           <div className={"data-table-title-and-buttons"}>
-
             {tableName &&
               withTitle &&
               <span className={"data-table-title"}>
@@ -383,13 +385,13 @@ function SearchBar({ reduxFormSearchInput, setSearchTerm, maybeSpinner }) {
       })}
       rightElement={
         maybeSpinner ||
-          <Button
-            className={Classes.MINIMAL}
-            iconName={"pt-icon-search"}
-            onClick={function() {
-              setSearchTerm(reduxFormSearchInput.input.value);
-            }}
-          />
+        <Button
+          className={Classes.MINIMAL}
+          iconName={"pt-icon-search"}
+          onClick={function() {
+            setSearchTerm(reduxFormSearchInput.input.value);
+          }}
+        />
       }
     />
   );

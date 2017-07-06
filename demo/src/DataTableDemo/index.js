@@ -56,6 +56,7 @@ export default class TableDemo extends React.Component {
 							<UrlConnected />
 							<ReduxConnected />
 							<Dialog
+								style={{width: "640px"}}
 								isOpen={open}
 								onClose={() => {
 									this.setState({
