@@ -27,7 +27,8 @@ import {
   RegionCardinality,
   Regions,
   Table,
-  TableLoadingOption
+  TableLoadingOption,
+  SelectionModes
 } from "@blueprintjs/table";
 
 import "./style.css";
@@ -110,9 +111,9 @@ class DataTable extends React.Component {
       page,
       pageSize,
       reduxFormSearchInput,
-      selectedFilter
+      selectedFilter,
+      bpTableProps = {}
     } = this.props;
-
     const { dimensions } = this.state;
     let { width } = dimensions;
     if (containerWidth) width = containerWidth;
@@ -184,7 +185,17 @@ class DataTable extends React.Component {
               selectedRegions={this.state.selectedRegions}
               selectedRegionTransform={this.selectedRegionTransform}
               defaultRowHeight={36}
+              selectionModes={SelectionModes.ROWS_AND_CELLS}
               onSelection={selectedRegions => {
+                //tnr: we might need to come back here and manually add in logic to stop multiple rows from being selected when
+                // allowMultipleSelection is false
+                // const selectedRows = getSelectedRowsFromRegions(selectedRegions)
+                // const {selectedRegions: oldSelectedRegions} = this.state
+
+                // const {allowMultipleSelection} = bpTableProps
+                // if (allowMultipleSelection === false) {
+
+                // }
                 this.setState({ selectedRegions });
                 if (!selectedRegions.length && onDeselect) {
                   onDeselect();
@@ -203,6 +214,7 @@ class DataTable extends React.Component {
                   onMultiRowSelect(selectedRegions);
                 }
               }}
+              {...bpTableProps}
             >
               {entities && this.renderColumns()}
             </Table>

@@ -82,12 +82,12 @@ class FormComponentsDemo extends React.Component {
           
           <AntFileUploadField 
 
-          label='AntD upload component'
+          label='AntD upload component with only json files accepted'
           onFieldSubmit={function (fileList) {
               console.log('do something with the finished file list:', fileList)
             }} 
           multiple
-          // accept={[".json"]} 
+          accept={".json"} 
           // innerIcon={<span></span>} //icon override
           // innerText='some text override'
           action={"//jsonplaceholder.typicode.com/posts/"} 
@@ -203,6 +203,16 @@ class FormComponentsDemo extends React.Component {
             label="Select Simple With Placeholder"
           />
           <SelectField
+            options={["hey", "you", "guys"]}
+            name={"untouchedSelect"}
+            onFieldSubmit={function (val) {
+              console.log('on field submit!:', val)
+            }}
+            showErrorIfUntouched
+            placeholder={"Please choose..."}
+            label="Select With Untouched Errors"
+          />
+          <SelectField
             onFieldSubmit={function (val) {
               console.log('on field submit!:', val)
             }}
@@ -299,6 +309,9 @@ const validate = values => {
   const errors = {};
   if (!values.inputField) {
     errors.inputField = "required";
+  }
+  if (!values.untouchedSelect) {
+    errors.untouchedSelect = "required";
   }
   if (!values.inputFieldWithTooltipError) {
     errors.inputFieldWithTooltipError = "required";

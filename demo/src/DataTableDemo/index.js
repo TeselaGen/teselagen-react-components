@@ -37,7 +37,12 @@ const ReduxConnected2 = withTableParams(DataTableWrapper, {
 export { UrlConnected, ReduxConnected, DataTableWrapper };
 export default class TableDemo extends React.Component {
 	render() {
-		var { open } = this.state || {};
+		var { open, allowMultipleSelection=false } = this.state || {};
+		const tableParams = {
+									bpTableProps: {
+										allowMultipleSelection
+									}
+								}
 		return (
 			<Provider store={store}>
 				<div
@@ -53,8 +58,19 @@ export default class TableDemo extends React.Component {
 							>
 								{" "}open table in dialog
 							</button>
+							<button
+								onClick={() => {
+									this.setState({
+										allowMultipleSelection: !allowMultipleSelection
+									});
+								}}
+							>
+								{" "}{allowMultipleSelection ? 'disable ' : 'enable '} multiple row selection
+							</button>
 							<UrlConnected />
-							<ReduxConnected />
+							<ReduxConnected 
+								tableParams={tableParams}
+							/>
 							<Dialog
 								style={{width: "640px"}}
 								isOpen={open}
@@ -64,7 +80,7 @@ export default class TableDemo extends React.Component {
 									});
 								}}
 							>
-								<ReduxConnected2 />
+								<ReduxConnected2 tableParams={tableParams} />
 							</Dialog>
 						</div>
 					</Router>

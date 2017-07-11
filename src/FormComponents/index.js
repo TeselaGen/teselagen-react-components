@@ -21,18 +21,19 @@ import {
 
 import { DateInput } from "@blueprintjs/datetime";
 
-function getIntent({ meta: { touched, error } }) {
-  return touched && error ? Intent.DANGER : "";
+function getIntent({ showErrorIfUntouched, meta: { touched, error } }) {
+  return (touched || showErrorIfUntouched) && error ? Intent.DANGER : "";
 }
 
-function getIntentClass({ meta: { touched, error } }) {
-  return touched && error ? "pt-intent-danger" : "";
+function getIntentClass({ showErrorIfUntouched, meta: { touched, error } }) {
+  return (touched || showErrorIfUntouched) && error ? "pt-intent-danger" : "";
 }
 
 function removeUnwantedProps(props) {
   let cleanedProps = { ...props };
   delete cleanedProps.className;
   delete cleanedProps.units;
+  delete cleanedProps.showErrorIfUntouched;
   delete cleanedProps.onChange;
   delete cleanedProps.onFieldSubmit;
   delete cleanedProps.onBlur;
@@ -93,9 +94,11 @@ class AbstractInput extends React.Component {
       tooltipError,
       label,
       className,
-      meta: { touched, error }
+      showErrorIfUntouched,
+      meta
     } = this.props;
-    const showError = touched && error;
+    const { touched, error } = meta;
+    const showError = (touched || showErrorIfUntouched) && error;
 
     return (
       <div
@@ -182,40 +185,57 @@ export const renderAntFileUpload = ({
   hideDropAfterUpload,
   fileLimit,
   onFieldSubmit,
+  accept,
   input: { onChange, value = [] },
   ...rest
 }) => {
+  let acceptToUse = accept;
+  if (Array.isArray(accept)) {
+    acceptToUse = accept.reduce((acc, name) => {
+      acc += ", " + name;
+      return acc;
+    });
+  }
   return (
-    <Dragger
-      className={
-        className +
-        " tg-file-upload " +
-        (hideDropAfterUpload && value.length && " tg-hide-drop-target")
+    <div
+      title={
+        acceptToUse
+          ? "Accepts only " + acceptToUse + " files"
+          : "Accepts any file input"
       }
-      fileList={value}
-      onChange={function(info) {
-        let fileList = info.fileList;
-        // 1. Limit the number of uploaded files to the fileLimit if it exists
-        if (fileLimit) {
-          fileList = fileList.slice(-fileLimit);
-        }
-        if (
-          !fileList.some(file => {
-            return file.status === "uploading";
-          })
-        ) {
-          onFieldSubmit(fileList);
-        }
-        onChange(cloneDeep(fileList));
-      }}
-      {...rest}
     >
-      {contentOverride ||
-        <div className={"tg-upload-inner"}>
-          {innerIcon || <span className={"pt-icon-upload pt-icon-large"} />}
-          {innerText || "Click or drag to upload"}
-        </div>}
-    </Dragger>
+      <Dragger
+        className={
+          className +
+          " tg-file-upload " +
+          (hideDropAfterUpload && value.length && " tg-hide-drop-target")
+        }
+        fileList={value}
+        accept={acceptToUse}
+        onChange={function(info) {
+          let fileList = info.fileList;
+          // 1. Limit the number of uploaded files to the fileLimit if it exists
+          if (fileLimit) {
+            fileList = fileList.slice(-fileLimit);
+          }
+          if (
+            !fileList.some(file => {
+              return file.status === "uploading";
+            })
+          ) {
+            onFieldSubmit(fileList);
+          }
+          onChange(cloneDeep(fileList));
+        }}
+        {...rest}
+      >
+        {contentOverride ||
+          <div className={"tg-upload-inner"}>
+            {innerIcon || <span className={"pt-icon-upload pt-icon-large"} />}
+            {innerText || "Click or drag to upload"}
+          </div>}
+      </Dragger>
+    </div>
   );
 };
 

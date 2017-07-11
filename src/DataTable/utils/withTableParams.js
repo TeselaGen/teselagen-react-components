@@ -37,9 +37,10 @@ export default function withTableParams(
   });
 
   const mapStateToProps = (state, { location }) => {
-    const currentParams = (urlConnected
-      ? getCurrentParamsFromUrl(location)
-      : formSelector(state, "reduxFormQueryParams")) || {};
+    const currentParams =
+      (urlConnected
+        ? getCurrentParamsFromUrl(location)
+        : formSelector(state, "reduxFormQueryParams")) || {};
     const {
       queryParams,
       page,
@@ -103,6 +104,7 @@ export default function withTableParams(
       ...ownProps,
       queryParams: stateProps.queryParams,
       tableParams: {
+        ...ownProps.tableParams,
         ...stateProps,
         ...dispatchProps,
         ...boundDispatchProps

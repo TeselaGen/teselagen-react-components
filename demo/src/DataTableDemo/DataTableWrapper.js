@@ -2,11 +2,10 @@
 import React from "react";
 import { DataTable } from "../../../src";
 import { entities } from "./mocks";
-import type { TableParams } from "../../../src";
 import { MenuItem } from "@blueprintjs/core";
 
 export default function DataTableWrapper(props) {
-	var tableParams: TableParams = props.tableParams;
+	const {tableParams} = props;
 	return (
 		<DataTable
 			{...tableParams}
