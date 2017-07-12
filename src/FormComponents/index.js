@@ -200,7 +200,7 @@ export const renderAntFileUpload = ({
     <div
       title={
         acceptToUse
-          ? "Accepts only " + acceptToUse + " files"
+          ? "Accepts only the following file types: " + acceptToUse
           : "Accepts any file input"
       }
     >
