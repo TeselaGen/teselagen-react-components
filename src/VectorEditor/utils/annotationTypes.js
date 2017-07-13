@@ -26,6 +26,7 @@ export const derivedDataTypesMap = derivedDataTypes.reduce(function(
   key
 ) {
   nextVal[key] = key;
+  return nextVal;
 }, {});
 export function getSingular(type) {
   return type.slice(0, -1);

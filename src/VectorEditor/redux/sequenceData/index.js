@@ -3,7 +3,7 @@ import features from "./features";
 import primers from "./primers";
 import sequence from "./sequence";
 import translations from "./translations";
-import { combineReducers } from "redux";
+import combineReducersDontIgnoreKeys from "../../utils/combineReducersDontIgnoreKeys";
 import cleanSequenceData from "../../utils/cleanSequenceData";
 import { createReducer } from "redux-act";
 // export * from './sharedActionCreators';
@@ -30,7 +30,8 @@ export default function(state, action) {
   if (action.type === "SEQUENCE_DATA_UPDATE") {
     stateToPass = action.payload;
   }
-  return combineReducers({
+
+  return combineReducersDontIgnoreKeys({
     primers,
     features,
     sequence,
