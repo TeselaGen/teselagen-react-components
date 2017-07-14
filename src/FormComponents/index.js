@@ -95,16 +95,19 @@ class AbstractInput extends React.Component {
       label,
       className,
       showErrorIfUntouched,
-      meta
+      meta,
+      noOuterLabel
     } = this.props;
     const { touched, error } = meta;
     const showError = (touched || showErrorIfUntouched) && error;
 
     return (
       <div
-        className={`pt-form-group ${getIntentClass(this.props)} ${className}`}
+        className={`pt-form-group ${getIntentClass(this.props) ||
+          ""} ${className || ""}`}
       >
         {label &&
+          !noOuterLabel &&
           <label className="pt-label">
             {label}
           </label>}
@@ -208,7 +211,7 @@ export const renderAntFileUpload = ({
         className={
           className +
           " tg-file-upload " +
-          (hideDropAfterUpload && value.length && " tg-hide-drop-target")
+          (hideDropAfterUpload && value.length ? " tg-hide-drop-target" : "")
         }
         fileList={value}
         accept={acceptToUse}
@@ -434,8 +437,8 @@ export const renderBlueprintRadioGroup = ({
   );
 };
 
-function generateField(component) {
-  const compWithDefaultVal = withAbstractWrapper(component);
+function generateField(component, opts) {
+  const compWithDefaultVal = withAbstractWrapper(component, opts);
   return function FieldMaker({ name, onFieldSubmit = () => {}, ...rest }) {
     // function onFieldSubmit(e,val) {
     //   _onFieldSubmit && _onFieldSubmit(e.target ? e.target.value : val)
@@ -451,7 +454,7 @@ function generateField(component) {
   };
 }
 
-export const withAbstractWrapper = ComponentToWrap => {
+export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
   return props => {
     let defaultProps = {
       ...props,
@@ -459,7 +462,7 @@ export const withAbstractWrapper = ComponentToWrap => {
       intentClass: getIntentClass(props)
     };
     return (
-      <AbstractInput {...props}>
+      <AbstractInput {...{ ...opts, ...props }}>
         <ComponentToWrap {...defaultProps} />
       </AbstractInput>
     );
@@ -469,7 +472,9 @@ export const withAbstractWrapper = ComponentToWrap => {
 export const InputField = generateField(renderBlueprintInput);
 export const AntFileUploadField = generateField(renderAntFileUpload);
 export const DateInputField = generateField(renderBlueprintDateInput);
-export const CheckboxField = generateField(renderBlueprintCheckbox);
+export const CheckboxField = generateField(renderBlueprintCheckbox, {
+  noOuterLabel: true
+});
 export const TextareaField = generateField(renderBlueprintTextarea);
 export const EditableTextField = generateField(renderBlueprintEditableText);
 export const NumericInputField = generateField(renderBlueprintNumericInput);
