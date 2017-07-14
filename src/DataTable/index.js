@@ -330,11 +330,11 @@ class DataTable extends React.Component {
 
     const fieldName = columns[columnIndex];
     const schemaForField = schema.fields[fieldName];
-    const { displayName } = schemaForField;
+    const { displayName, sortDisabled } = schemaForField;
     const columnDataType = schema.fields[fieldName].type;
 
     let ordering;
-    if (order) {
+    if (order && typeof order === "string") {
       var orderField = order.replace("reverse:", "");
       if (orderField === fieldName) {
         if (orderField === order) {
@@ -361,6 +361,7 @@ class DataTable extends React.Component {
         renderMenu={function() {
           return (
             <FilterAndSortMenu
+              sortDisabled={sortDisabled}
               setFilter={setFilter}
               setOrder={setOrder}
               fieldName={fieldName}

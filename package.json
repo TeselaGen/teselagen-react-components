@@ -65,6 +65,7 @@
     "@blueprintjs/core": "^1.18.0",
     "@blueprintjs/datetime": "^1.16.0",
     "@blueprintjs/table": "^1.15.0",
+    "tg-client-query-builder": "^2.6.0",
     "antd": "^2.11.2",
     "react-addons-css-transition-group": "^15.5.2",
     "react-redux": "^5.0.4",
@@ -76,6 +77,7 @@
   },
   "devDependencies": {
     "@blueprintjs/core": "^1.21.0",
+    "tg-client-query-builder": "^2.6.0",
     "@blueprintjs/datetime": "^1.17.0",
     "@blueprintjs/table": "^1.18.0",
     "antd": "^2.11.2",

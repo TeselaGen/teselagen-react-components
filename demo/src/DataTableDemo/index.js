@@ -4,13 +4,22 @@ import { FocusStyleManager, Dialog } from "@blueprintjs/core";
 // import { reducer as form } from "redux-form";
 import DataTableWrapper from "./DataTableWrapper";
 import { withTableParams } from "../../../src";
+import { withTableParams_new } from "../../../src";
 // import { onEnterOrBlurHelper } from "../../../src";
 
-import { columns, schema } from "./mocks";
+import { columns, schema } from "./new_mocks";
 import { BrowserRouter as Router, withRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "../store";
 FocusStyleManager.onlyShowFocusOnTabs();
+
+let UrlConnectedNew = withTableParams_new(DataTableWrapper, {
+	urlConnected: true,
+	formname: "example 1", //this should be a unique name
+	columns,
+	schema
+});
+UrlConnectedNew = withRouter(UrlConnectedNew);
 
 let UrlConnected = withTableParams(DataTableWrapper, {
 	urlConnected: true,
@@ -67,6 +76,9 @@ export default class TableDemo extends React.Component {
 							>
 								{" "}{allowMultipleSelection ? 'disable ' : 'enable '} multiple row selection
 							</button>
+							<h3>New Table</h3>
+							<UrlConnectedNew />
+							<h3>Old Table</h3>
 							<UrlConnected />
 							<ReduxConnected 
 								tableParams={tableParams}

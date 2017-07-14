@@ -65,12 +65,7 @@ export default class FilterAndSortMenu extends React.Component {
 
   render() {
     const { selectedFilter, filterValue } = this.state;
-    const {
-      dataType,
-      schemaForField: { model },
-      fieldName,
-      setOrder
-    } = this.props;
+    const { dataType, fieldName, setOrder, sortDisabled } = this.props;
     const {
       handleFilterChange,
       handleFilterValueChange,
@@ -96,21 +91,24 @@ export default class FilterAndSortMenu extends React.Component {
 
     return (
       <Menu className={"data-table-header-menu"}>
-        <MenuItem
-          iconName="sort-asc"
-          onClick={() => {
-            if (!model) setOrder(fieldName);
-          }}
-          text="Sort Asc"
-        />
-        <MenuItem
-          iconName="sort-desc"
-          onClick={() => {
-            if (!model) setOrder("reverse:" + fieldName);
-          }}
-          text="Sort Desc"
-        />
-        <MenuDivider />
+        {!sortDisabled &&
+          <div>
+            <MenuItem
+              iconName="sort-asc"
+              onClick={() => {
+                setOrder(fieldName);
+              }}
+              text="Sort Asc"
+            />
+            <MenuItem
+              iconName="sort-desc"
+              onClick={() => {
+                setOrder("reverse:" + fieldName);
+              }}
+              text="Sort Desc"
+            />
+            <MenuDivider />
+          </div>}
         <MenuItem
           // iconName={showFilterBy ? "caret-down" : "caret-right"}
           text="Filter by condition..."
@@ -127,7 +125,11 @@ export default class FilterAndSortMenu extends React.Component {
             >
               {filterMenuItems.map(function(menuItem, index) {
                 // console.log('menuItem:', menuItem)
-                return <option key={index} value={menuItem}>{menuItem}</option>;
+                return (
+                  <option key={index} value={menuItem}>
+                    {menuItem}
+                  </option>
+                );
               })}
             </select>
           </div>
@@ -244,7 +246,6 @@ class FilterInput extends React.Component {
       case "dateRange":
         inputGroup = (
           <div className={"custom-menu-item"}>
-
             <DateRangeInput
               {...onEnterOrBlurHelper(handleFilterSubmit)}
               popoverProps={{
