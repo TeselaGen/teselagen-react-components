@@ -247,7 +247,8 @@ export const renderBlueprintTextarea = props => {
   return (
     <textarea
       {...removeUnwantedProps(rest)}
-      className={`${intentClass} ${inputClassName} pt-input pt-fill`}
+      className={`${intentClass || ""} ${inputClassName ||
+        ""} pt-input pt-fill`}
       {...input}
       onBlur={function(e, val) {
         input.onBlur(e, val);
@@ -393,7 +394,7 @@ export const renderBlueprintNumericInput = props => {
       intent={intent}
       {...removeUnwantedProps(rest)}
       {...(hideValue ? { value: "" } : {})}
-      className={`pt-fill ${inputClassName}`}
+      className={`pt-fill ${inputClassName || ""}`}
       onValueChange={(numericVal, stringVal) => {
         // needed for redux form to change value
         input.onChange(stringVal);
