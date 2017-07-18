@@ -1,3 +1,4 @@
+import sortify from "json.sortify";
 import isNumber from "lodash/isNumber";
 import mathExpressionEvaluator from "math-expression-evaluator";
 import Dragger from "antd/lib/upload/Dragger";
@@ -324,7 +325,7 @@ export const renderSelect = props => {
         value={
           placeholder && value === ""
             ? "__placeholder__"
-            : typeof value !== "string" ? JSON.stringify(value) : value
+            : typeof value !== "string" ? sortify(value) : value
         }
         {...(hideValue ? { value: "" } : {})}
         onChange={function(e) {
@@ -359,7 +360,7 @@ export const renderSelect = props => {
           return (
             <option
               key={index}
-              value={typeof value !== "string" ? JSON.stringify(value) : value}
+              value={typeof value !== "string" ? sortify(value) : value}
             >
               {label}
             </option>
