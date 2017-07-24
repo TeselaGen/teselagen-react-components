@@ -300,7 +300,7 @@ export const renderReactSelect = props => {
         ? valOrVals.map(function(val) {
             return val.value;
           })
-        : valOrVals.value;
+        : valOrVals ? valOrVals.value : "";
       onChange(valToPass);
       onFieldSubmit(valToPass);
     }
