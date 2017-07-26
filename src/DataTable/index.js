@@ -6,6 +6,7 @@ import React from "react";
 import times from "lodash/times";
 import moment from "moment";
 import PagingTool from "./PagingTool";
+import camelCase from "lodash/camelCase";
 import { onEnterHelper } from "../utils/handlerHelpers";
 import getSelectedRowsFromRegions from "./utils/getSelectedRowsFromRegions";
 import FilterAndSortMenu from "./FilterAndSortMenu";
@@ -39,7 +40,8 @@ class DataTable extends React.Component {
     dimensions: {
       width: -1
     },
-    selectedRegions: []
+    selectedRegions: [],
+    columns: []
   };
 
   props: {
@@ -76,7 +78,6 @@ class DataTable extends React.Component {
     reduxFormSearchInput: {},
     isLoading: false,
     isInfinite: false,
-    columns: [],
     setSearchTerm: noop,
     setFilter: noop,
     clearFilters: noop,
@@ -86,13 +87,24 @@ class DataTable extends React.Component {
     onDoubleClick: noop
   };
 
+  componentWillMount() {
+    const { schema } = this.props;
+    const columns = schema.fields.reduce(function(columns, field, i) {
+      if (field.isHidden) {
+        return columns;
+      } else {
+        columns.push({ displayName: field.displayName, schemaIndex: i });
+        return columns;
+      }
+    }, []);
+    this.setState({ columns: columns });
+  }
   render() {
     const {
       entities,
       extraClasses,
       tableName,
       isLoading,
-      columns,
       searchTerm,
       entityCount,
       setSearchTerm,
@@ -114,7 +126,7 @@ class DataTable extends React.Component {
       selectedFilter,
       bpTableProps = {}
     } = this.props;
-    const { dimensions } = this.state;
+    const { dimensions, columns } = this.state;
     let { width } = dimensions;
     if (containerWidth) width = containerWidth;
 
@@ -239,17 +251,16 @@ class DataTable extends React.Component {
   }
 
   renderColumns = () => {
-    const { columns, schema } = this.props;
+    const { columns } = this.state;
     if (!columns.length) {
       return;
     }
     let columnsToRender = [];
     columns.forEach((column, index) => {
-      let name = schema.fields[column].displayName;
       columnsToRender.push(
         <Column
           key={index}
-          name={name}
+          name={column.displayName}
           renderCell={this.renderCell}
           renderColumnHeader={this.renderColumnHeader}
         />
@@ -262,28 +273,24 @@ class DataTable extends React.Component {
     const {
       entities,
       schema,
-      columns,
       history,
       onDoubleClick,
       cellRenderer
     } = this.props;
-    const columnName = columns[columnIndex];
+    const { columns } = this.state;
+    const column = columns[columnIndex];
     const row = entities[rowIndex];
     if (!row) return <Cell />;
-    const schemaForColumn = schema.fields[columnName];
+    const schemaForColumn = schema.fields[column.schemaIndex];
     let cellData;
-    if (schemaForColumn.path) {
-      cellData = get(row, schemaForColumn.path);
-    } else {
-      cellData = row[columnName];
-    }
+    cellData = get(row, schemaForColumn.path);
     if (schemaForColumn.type === "timestamp") {
       cellData = moment(new Date(cellData)).format("MMM D, YYYY");
     } else if (schemaForColumn.type === "boolean") {
       cellData = cellData ? "True" : "False";
     }
-    if (cellRenderer && cellRenderer[columnName]) {
-      cellData = cellRenderer[columnName](cellData);
+    if (cellRenderer && cellRenderer[schemaForColumn.path]) {
+      cellData = cellRenderer[schemaForColumn.path](cellData);
     }
     return (
       <Cell>
@@ -302,7 +309,6 @@ class DataTable extends React.Component {
   renderBodyContextMenu = ({ regions }: Array<IRegion>) => {
     const { entities, history, contextMenu } = this.props;
     //single selection
-
     // const contextMenu = { ...(contextMenu || {}) };
     const selectedRows = getSelectedRowsFromRegions(regions);
     const selectedRecords = selectedRows.map(row => {
@@ -326,17 +332,17 @@ class DataTable extends React.Component {
   };
 
   renderColumnHeader = (columnIndex: number) => {
-    const { columns, schema, setFilter, setOrder, order } = this.props;
-
-    const fieldName = columns[columnIndex];
-    const schemaForField = schema.fields[fieldName];
+    const { schema, setFilter, setOrder, order } = this.props;
+    const { columns } = this.state;
+    const schemaIndex = columns[columnIndex]["schemaIndex"];
+    const schemaForField = schema.fields[schemaIndex];
     const { displayName, sortDisabled } = schemaForField;
-    const columnDataType = schema.fields[fieldName].type;
+    const columnDataType = schemaForField.type;
 
     let ordering;
     if (order && typeof order === "string") {
       var orderField = order.replace("reverse:", "");
-      if (orderField === fieldName) {
+      if (orderField === camelCase(displayName)) {
         if (orderField === order) {
           ordering = "asc";
         } else {
@@ -364,7 +370,7 @@ class DataTable extends React.Component {
               sortDisabled={sortDisabled}
               setFilter={setFilter}
               setOrder={setOrder}
-              fieldName={fieldName}
+              camelCaseDisplayName={camelCase(displayName)}
               dataType={columnDataType}
               schemaForField={schemaForField}
             />

@@ -1,20 +1,16 @@
 import queryString from "query-string";
 import QueryBuilder from "tg-client-query-builder";
-import _ from "lodash";
+import last from "lodash/last";
+import camelCase from "lodash/camelCase";
 
-export default function queryParams({
-  columns,
-  schema,
-  defaults = {},
-  isInfinite
-}) {
+export default function queryParams({ schema, defaults = {}, isInfinite }) {
   var defaultParams = {
     pageSize: 10,
     order: "",
     searchTerm: "", //undefined helps us compare when this has been changed to an empty string
     page: 1,
     selectedFilter: undefined,
-    fieldName: undefined,
+    camelCaseDisplayName: undefined,
     filterValue: undefined,
     ...defaults
   };
@@ -75,15 +71,24 @@ export default function queryParams({
     let graphqlQueryParams = {};
     let { page, pageSize } = tableQueryParams;
     if (tableQueryParams.order) {
-      const fieldName = tableQueryParams.order.replace(/^reverse:/gi, "");
-      const schemaForField = schema.fields[fieldName];
+      const camelCaseDisplayName = tableQueryParams.order.replace(
+        /^reverse:/gi,
+        ""
+      );
+      const schemaForField = schema.fields.find(function(field) {
+        return camelCase(field.displayName) === camelCaseDisplayName;
+      });
       if (schemaForField) {
         const { path } = schemaForField;
-        let reversed = fieldName !== tableQueryParams.order;
+        let reversed = camelCaseDisplayName !== tableQueryParams.order;
         const prefix = reversed ? "-" : "";
-        graphqlQueryParams.sort = [prefix + (path || fieldName)];
+        graphqlQueryParams.sort = [prefix + (path || camelCaseDisplayName)];
       } else {
-        console.error("No schema for field found!", fieldName, schema.fields);
+        console.error(
+          "No schema for field found!",
+          camelCaseDisplayName,
+          schema.fields
+        );
       }
     }
     // let graphqlQueryParams =
@@ -96,29 +101,31 @@ export default function queryParams({
       searchTerm,
       selectedFilter,
       filterValue,
-      fieldName
+      camelCaseDisplayName
     } = tableQueryParams;
 
     // delete graphqlQueryParams.searchTerm;
     // delete graphqlQueryParams.selectedFilter;
     // delete graphqlQueryParams.filterValue;
-    // delete graphqlQueryParams.fieldName;
+    // delete graphqlQueryParams.camelCaseDisplayName;
 
     if (selectedFilter) {
       const subFilter = getSubFilter(qb, selectedFilter, filterValue);
-      const { path, reference } = schema.fields[fieldName];
+      const { path, reference } = schema.fields.find(function(field) {
+        return camelCase(field.displayName) === camelCaseDisplayName;
+      });
       if (reference) {
         qb.whereAny({
           [reference.sourceField]: buildRef(
             qb,
             reference,
-            _.last(path.split(".")),
+            last(path.split(".")),
             subFilter
           )
         });
       } else {
         qb.whereAny({
-          [fieldName]: subFilter
+          [path]: subFilter
         });
       }
     }
@@ -126,21 +133,21 @@ export default function queryParams({
     if (searchTerm && searchTerm !== "") {
       //custom logic based on the table schema to get the sequelize query
       let searchTermFilters = [];
-      columns.forEach(function(column) {
-        const { reference, type, path } = schema.fields[column];
+      schema.fields.forEach(function(schemaField) {
+        const { reference, type, path } = schemaField;
         if (type === "string" || type === "lookup") {
           if (reference) {
             searchTermFilters.push({
               [reference.sourceField]: buildRef(
                 qb,
                 reference,
-                _.last(path.split(".")),
+                last(path.split(".")),
                 qb.contains(searchTerm)
               )
             });
           } else {
             searchTermFilters.push({
-              [column]: qb.contains(searchTerm)
+              [path]: qb.contains(searchTerm)
             });
           }
         }
@@ -165,7 +172,7 @@ export default function queryParams({
       order: graphqlQueryParams.sort,
       selectedFilter,
       filterValue,
-      fieldName,
+      camelCaseDisplayName,
       searchTerm
     };
   }
@@ -175,7 +182,7 @@ export default function queryParams({
         ...currentParams,
         selectedFilter: undefined,
         page: 1,
-        fieldName: undefined,
+        camelCaseDisplayName: undefined,
         filterValue: undefined,
         searchTerm:
           searchTerm === defaultParams.searchTerm ? undefined : searchTerm
@@ -183,13 +190,13 @@ export default function queryParams({
       setNewParams(newParams);
     }
     function setFilter(
-      { selectedFilter, filterValue, fieldName },
+      { selectedFilter, filterValue, camelCaseDisplayName },
       currentParams
     ) {
       let newParams = {
         ...currentParams,
         selectedFilter,
-        fieldName,
+        camelCaseDisplayName,
         filterValue,
         searchTerm: undefined
       };
@@ -200,7 +207,7 @@ export default function queryParams({
       setNewParams({
         ...currentParams,
         selectedFilter: undefined,
-        fieldName: undefined,
+        camelCaseDisplayName: undefined,
         filterValue: undefined,
         searchTerm: undefined
       });

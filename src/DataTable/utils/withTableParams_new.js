@@ -9,7 +9,7 @@ import { change } from "redux-form";
 
 export default function withTableParams(
   Component,
-  { formname, columns, schema, defaults, urlConnected, isInfinite }
+  { formname, schema, defaults, urlConnected, isInfinite }
 ) {
   if (!urlConnected && !formname) {
     console.warn(
@@ -29,7 +29,6 @@ export default function withTableParams(
     setCurrentParamsOnUrl,
     getCurrentParamsFromUrl
   } = queryParams({
-    columns,
     schema,
     formname,
     defaults,
@@ -61,7 +60,6 @@ export default function withTableParams(
       fieldName,
       searchTerm,
       schema: schema,
-      columns,
       currentParams,
       initialValues: { reduxFormSearchInput: currentParams.searchTerm }
     };

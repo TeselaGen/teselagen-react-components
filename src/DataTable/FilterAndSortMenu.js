@@ -36,7 +36,7 @@ export default class FilterAndSortMenu extends React.Component {
   props: {
     dataType: TableDataTypes,
     schemaForField: Object,
-    fieldName: string,
+    camelCaseDisplayName: string,
     setOrder: Function,
     setFilter: Function
   };
@@ -48,11 +48,11 @@ export default class FilterAndSortMenu extends React.Component {
   };
   handleFilterSubmit = () => {
     const { filterValue, selectedFilter } = this.state;
-    const { fieldName, setFilter, schemaForField } = this.props;
+    const { camelCaseDisplayName, setFilter, schemaForField } = this.props;
 
     setFilter({
       schemaForField,
-      fieldName,
+      camelCaseDisplayName,
       selectedFilter,
       filterValue
     });
@@ -65,7 +65,12 @@ export default class FilterAndSortMenu extends React.Component {
 
   render() {
     const { selectedFilter, filterValue } = this.state;
-    const { dataType, fieldName, setOrder, sortDisabled } = this.props;
+    const {
+      dataType,
+      camelCaseDisplayName,
+      setOrder,
+      sortDisabled
+    } = this.props;
     const {
       handleFilterChange,
       handleFilterValueChange,
@@ -96,14 +101,14 @@ export default class FilterAndSortMenu extends React.Component {
             <MenuItem
               iconName="sort-asc"
               onClick={() => {
-                setOrder(fieldName);
+                setOrder(camelCaseDisplayName);
               }}
               text="Sort Asc"
             />
             <MenuItem
               iconName="sort-desc"
               onClick={() => {
-                setOrder("reverse:" + fieldName);
+                setOrder("reverse:" + camelCaseDisplayName);
               }}
               text="Sort Desc"
             />
