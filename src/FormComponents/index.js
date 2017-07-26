@@ -284,24 +284,25 @@ export const renderReactSelect = props => {
     onFieldSubmit,
     ...rest
   } = props;
+  const optsToUse =
+    options &&
+    options.map(function(opt) {
+      if (typeof opt === "string") {
+        return { label: opt, value: opt };
+      } else if (isNumber(opt)) return { label: opt.toString(), value: opt };
+      return opt;
+    });
   const propsToUse = {
     ...removeUnwantedProps(rest),
-    options:
-      options &&
-      options.map(function(opt) {
-        if (typeof opt === "string") {
-          return { label: opt, value: opt };
-        } else if (isNumber(opt)) return { label: opt.toString(), value: opt };
-        return opt;
-      }),
+    options: optsToUse,
     value,
-    onChange: function(valOrVals) {
+    onChange: function(valOrVals, ...rest) {
       const valToPass = Array.isArray(valOrVals)
         ? valOrVals.map(function(val) {
             return val.value;
           })
         : valOrVals ? valOrVals.value : "";
-      onChange(valToPass);
+      onChange(valOrVals, ...rest);
       onFieldSubmit(valToPass);
     }
   };
