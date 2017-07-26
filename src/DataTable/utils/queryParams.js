@@ -1,11 +1,6 @@
 import queryString from "query-string";
 
-export default function queryParams({
-  columns,
-  schema,
-  defaults = {},
-  isInfinite
-}) {
+export default function queryParams({ schema, defaults = {}, isInfinite }) {
   var defaultParams = {
     pageSize: 10,
     order: "",
@@ -82,20 +77,21 @@ export default function queryParams({
       //custom logic based on the table schema to get the sequelize query
       let include = {};
       let or = {};
-      columns.forEach(function(column) {
-        const { model, type, path } = schema.fields[column];
+      schema.fields.forEach(function(schemaField) {
+        const { type /*path*/ } = schemaField;
         if (type === "string" || type === "lookup") {
-          var likeObj = { iLike: "%" + searchTerm + "%" };
-          if (model) {
-            const includeObj = include[model] || {
-              model,
-              required: false
-            };
-            include[model] = includeObj;
-            or["$" + path + "$"] = likeObj;
-          } else {
-            or[column] = likeObj;
-          }
+          // var likeObj = { iLike: "%" + searchTerm + "%" };
+          //SD: avoiding this problem as we will solve in the new queryParams
+          // if (model) {
+          //   const includeObj = include[model] || {
+          //     model,
+          //     required: false
+          //   };
+          //   include[model] = includeObj;
+          //   or["$" + path + "$"] = likeObj;
+          // } else {
+          //   or[column] = likeObj;
+          // }
         }
       }, {});
       graphqlQueryParams = {
@@ -131,9 +127,8 @@ export default function queryParams({
         page: 1,
         fieldName: undefined,
         filterValue: undefined,
-        searchTerm: searchTerm === defaultParams.searchTerm
-          ? undefined
-          : searchTerm
+        searchTerm:
+          searchTerm === defaultParams.searchTerm ? undefined : searchTerm
       };
       setNewParams(newParams);
     }

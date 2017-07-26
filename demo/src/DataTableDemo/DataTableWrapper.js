@@ -1,7 +1,7 @@
 //@flow
 import React from "react";
 import { DataTable } from "../../../src";
-import { entities } from "./mocks";
+import { entities } from "./new_schema_mocks";
 import { MenuItem } from "@blueprintjs/core";
 
 export default function DataTableWrapper(props) {
