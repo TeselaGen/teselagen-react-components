@@ -88,15 +88,17 @@ class DataTable extends React.Component {
   };
 
   componentWillMount() {
-    const { schema } = this.props;
-    const columns = schema.fields.reduce(function(columns, field, i) {
-      if (field.isHidden) {
-        return columns;
-      } else {
-        columns.push({ displayName: field.displayName, schemaIndex: i });
-        return columns;
-      }
-    }, []);
+    const { schema = {} } = this.props;
+    const columns = schema.fields
+      ? schema.fields.reduce(function(columns, field, i) {
+          if (field.isHidden) {
+            return columns;
+          } else {
+            columns.push({ displayName: field.displayName, schemaIndex: i });
+            return columns;
+          }
+        }, [])
+      : [];
     this.setState({ columns: columns });
   }
   render() {
