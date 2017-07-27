@@ -156,12 +156,12 @@ export const renderBlueprintInput = props => {
       {...input}
       onKeyDown={function(e, ...args) {
         if (e.key === "Enter") {
-          onFieldSubmit(e.target.value);
+          onFieldSubmit(e.target.value, { enter: true }, e);
         }
       }}
       onBlur={function(e, val) {
         input.onBlur(e, val);
-        onFieldSubmit(e.target ? e.target.value : val);
+        onFieldSubmit(e.target ? e.target.value : val, { blur: true }, e);
       }}
     />
   );
@@ -254,7 +254,12 @@ export const renderBlueprintTextarea = props => {
       {...input}
       onBlur={function(e, val) {
         input.onBlur(e, val);
-        onFieldSubmit(e.target ? e.target.value : val);
+        onFieldSubmit(e.target ? e.target.value : val, { blur: true }, e);
+      }}
+      onKeyDown={function(e, ...args) {
+        if (e.keyCode === 13 && (e.metaKey || e.ctrlKey)) {
+          onFieldSubmit(e.target.value, { cmdEnter: true }, e);
+        }
       }}
     />
   );
