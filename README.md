@@ -63,8 +63,10 @@ import {
 - `npm whoami` you should be teselagen
 - `npm login` 
 teselagen//ourMasterPass//team@teselagen.com
-- for patch: `npm run release`
-- for minor/major: `npm run release minor/major`
+- git pull
+- npm version patch|minor|major
+- npm publish
+- git push
 
 
 ## Adding custom svg icons
