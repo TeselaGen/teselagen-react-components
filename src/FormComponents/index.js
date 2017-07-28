@@ -102,6 +102,18 @@ class AbstractInput extends React.Component {
     const { touched, error } = meta;
     const showError = (touched || showErrorIfUntouched) && error;
 
+    const componentToWrap = tooltipError
+      ? <Tooltip
+          isDisabled={!tooltipError || !showError}
+          intent={Intent.DANGER}
+          content={error}
+          position={Position.TOP}
+          {...tooltipProps}
+        >
+          {children}
+        </Tooltip>
+      : children;
+
     return (
       <div
         className={`pt-form-group tg-form-component ${getIntentClass(
@@ -113,15 +125,7 @@ class AbstractInput extends React.Component {
           <label className="pt-label">
             {label}
           </label>}
-        <Tooltip
-          isDisabled={!tooltipError || !showError}
-          intent={Intent.DANGER}
-          content={error}
-          position={Position.TOP}
-          {...tooltipProps}
-        >
-          {children}
-        </Tooltip>
+        {componentToWrap}
         {!tooltipError &&
           showError &&
           <div className={"tg-field-error-holder pt-form-helper-text"}>
