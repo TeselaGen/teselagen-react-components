@@ -297,17 +297,25 @@ export const renderReactSelect = props => {
       } else if (isNumber(opt)) return { label: opt.toString(), value: opt };
       return opt;
     });
+  const valueToUse = //here we're coercing json values into an object with {label,value} because react-select does not seem to recognize the json value directly
+    !Array.isArray(value) && typeof value === "object"
+      ? optsToUse.find(obj => {
+          return deepEqual(obj.value, value);
+        })
+      : value;
+
   const propsToUse = {
     ...removeUnwantedProps(rest),
     options: optsToUse,
-    value,
+    value: valueToUse,
+
     onChange: function(valOrVals, ...rest) {
       const valToPass = Array.isArray(valOrVals)
         ? valOrVals.map(function(val) {
             return val.value;
           })
         : valOrVals ? valOrVals.value : "";
-      onChange(valOrVals, ...rest);
+      onChange(valToPass, ...rest);
       onFieldSubmit(valToPass);
     }
   };
@@ -331,13 +339,15 @@ export const renderSelect = props => {
         value={
           placeholder && value === ""
             ? "__placeholder__"
-            : typeof value !== "string" ? sortify(value) : value
+            : typeof value !== "string"
+              ? sortify(value) //deterministically sort and stringify the object/number coming in because select fields only support string values
+              : value
         }
         {...(hideValue ? { value: "" } : {})}
         onChange={function(e) {
           let val = e.target.value;
           try {
-            val = JSON.parse(e.target.value);
+            val = JSON.parse(e.target.value); //try to json parse the string coming in
           } catch (e) {}
           onChange(val);
           onFieldSubmit(val);
@@ -350,9 +360,11 @@ export const renderSelect = props => {
         {options.map(function(opt, index) {
           let label, value;
           if (typeof opt === "string") {
+            //support passing opts like: ['asdf','awfw']
             label = opt;
             value = opt;
           } else if (isNumber(opt)) {
+            //support passing opts like: [1,2,3,4]
             label = opt.toString();
             value = opt;
           } else if (Array.isArray(opt)) {
@@ -360,13 +372,18 @@ export const renderSelect = props => {
               "the option coming in should be an object, not an array!"
             );
           } else {
+            //support passing opts the normal way [{label: 'opt1', value: 'hey'}]
             label = opt.label;
             value = opt.value;
           }
           return (
             <option
               key={index}
-              value={typeof value !== "string" ? sortify(value) : value}
+              value={
+                typeof value !== "string"
+                  ? sortify(value) //deterministically sort and stringify the object/number coming in because select fields only support string values
+                  : value
+              }
             >
               {label}
             </option>

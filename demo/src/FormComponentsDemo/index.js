@@ -288,6 +288,9 @@ class FormComponentsDemo extends React.Component {
                 { label: "Sam Denicola", value: "Sam Denicola" },
                 { label: "Tom Ogasawara", value: "Tom Ogasawara" }
               ]}
+              onChange={function(val) {
+                console.log("val:", val);
+              }}
             />
             <ReactSelectField
               async
