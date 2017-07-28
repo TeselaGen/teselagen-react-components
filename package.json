@@ -4,12 +4,7 @@
   "description": "Teselagen React Component Library",
   "main": "lib/index.js",
   "module": "es/index.js",
-  "files": [
-    "css",
-    "es",
-    "lib",
-    "umd"
-  ],
+  "files": ["css", "es", "lib", "umd"],
   "scripts": {
     "build": "nwb build-react-component --copy-files --no-demo",
     "clean": "nwb clean-module && npm clean-demo",
@@ -127,26 +122,13 @@
     "moduleNameMapper": {
       "\\.(css|scss|png)$": "identity-obj-proxy"
     },
-    "snapshotSerializers": [
-      "<rootDir>/node_modules/enzyme-to-json/serializer"
-    ],
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/lib/",
-      "/es/"
-    ]
+    "snapshotSerializers": ["<rootDir>/node_modules/enzyme-to-json/serializer"],
+    "testPathIgnorePatterns": ["/node_modules/", "/lib/", "/es/"]
   },
   "license": "MIT",
   "repository": "https://github.com/TeselaGen/teselagen-react-components",
-  "keywords": [
-    "react-component",
-    "teselagen"
-  ],
+  "keywords": ["react-component", "teselagen"],
   "babel": {
-    "presets": [
-      "es2015",
-      "stage-0",
-      "react"
-    ]
+    "presets": ["es2015", "stage-0", "react"]
   }
 }
