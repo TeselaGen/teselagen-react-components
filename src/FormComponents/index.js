@@ -306,7 +306,13 @@ export const renderReactSelect = props => {
       ? optsToUse.find(obj => {
           return deepEqual(obj.value, value);
         })
-      : value;
+      : Array.isArray(value)
+        ? value.map(val => {
+            return optsToUse.find(obj => {
+              return deepEqual(obj.value, val);
+            });
+          })
+        : value;
 
   const propsToUse = {
     ...removeUnwantedProps(rest),

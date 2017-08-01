@@ -293,6 +293,27 @@ class FormComponentsDemo extends React.Component {
               }}
             />
             <ReactSelectField
+              name="collaboratorsMulti"
+              label="Collaborators Multi"
+              onFieldSubmit={function(val) {
+                console.log("on field submit!:", val);
+              }}
+              multi
+              options={[
+                {
+                  label: "Rodrigo Pavez",
+                  value: { name: "Rodrigo Pavez", id: "123" }
+                },
+                { label: "Ximena Morales", value: "Ximena Morales" },
+                { label: "Kyle Craft", value: "Kyle Craft" },
+                { label: "Sam Denicola", value: "Sam Denicola" },
+                { label: "Tom Ogasawara", value: "Tom Ogasawara" }
+              ]}
+              onChange={function(val) {
+                console.log("val:", val);
+              }}
+            />
+            <ReactSelectField
               async
               name="collaborators2"
               label="React Select AsyncCollaborators"
