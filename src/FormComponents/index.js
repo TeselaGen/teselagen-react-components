@@ -308,9 +308,11 @@ export const renderReactSelect = props => {
         })
       : Array.isArray(value)
         ? value.map(val => {
-            return optsToUse.find(obj => {
-              return deepEqual(obj.value, val);
-            });
+            return optsToUse
+              ? optsToUse.find(obj => {
+                  return deepEqual(obj.value, val);
+                })
+              : val;
           })
         : value;
 
