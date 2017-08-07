@@ -7,10 +7,10 @@ export default function queryParams({ schema, defaults = {}, isInfinite }) {
   var defaultParams = {
     pageSize: 10,
     order: "",
-    searchTerm: "", //undefined helps us compare when this has been changed to an empty string
+    searchTerm: "",
     page: 1,
     selectedFilter: undefined,
-    camelCaseDisplayName: undefined,
+    filterOn: undefined,
     filterValue: undefined,
     ...defaults
   };
@@ -43,7 +43,7 @@ export default function queryParams({ schema, defaults = {}, isInfinite }) {
     }
   }
 
-  function getQueryParams(currentParams) {
+  function getQueryParams(currentParams, urlConnected) {
     const { model } = schema;
     let qb = new QueryBuilder(model);
     // qb = qb.filter('user')
@@ -71,24 +71,17 @@ export default function queryParams({ schema, defaults = {}, isInfinite }) {
     let graphqlQueryParams = {};
     let { page, pageSize } = tableQueryParams;
     if (tableQueryParams.order) {
-      const camelCaseDisplayName = tableQueryParams.order.replace(
-        /^reverse:/gi,
-        ""
-      );
+      const filterOn = tableQueryParams.order.replace(/^reverse:/gi, "");
       const schemaForField = schema.fields.find(function(field) {
-        return camelCase(field.displayName) === camelCaseDisplayName;
+        return camelCase(field.displayName) === filterOn;
       });
       if (schemaForField) {
         const { path } = schemaForField;
-        let reversed = camelCaseDisplayName !== tableQueryParams.order;
+        let reversed = filterOn !== tableQueryParams.order;
         const prefix = reversed ? "-" : "";
-        graphqlQueryParams.sort = [prefix + (path || camelCaseDisplayName)];
+        graphqlQueryParams.sort = [prefix + (path || filterOn)];
       } else {
-        console.error(
-          "No schema for field found!",
-          camelCaseDisplayName,
-          schema.fields
-        );
+        console.error("No schema for field found!", filterOn, schema.fields);
       }
     }
     // let graphqlQueryParams =
@@ -101,32 +94,44 @@ export default function queryParams({ schema, defaults = {}, isInfinite }) {
       searchTerm,
       selectedFilter,
       filterValue,
-      camelCaseDisplayName
+      filterOn
     } = tableQueryParams;
 
     // delete graphqlQueryParams.searchTerm;
     // delete graphqlQueryParams.selectedFilter;
     // delete graphqlQueryParams.filterValue;
-    // delete graphqlQueryParams.camelCaseDisplayName;
+    // delete graphqlQueryParams.filterOn;
 
     if (selectedFilter) {
-      const subFilter = getSubFilter(qb, selectedFilter, filterValue);
-      const { path, reference } = schema.fields.find(function(field) {
-        return camelCase(field.displayName) === camelCaseDisplayName;
-      });
-      if (reference) {
-        qb.whereAny({
-          [reference.sourceField]: buildRef(
-            qb,
-            reference,
-            last(path.split(".")),
-            subFilter
-          )
+      try {
+        const subFilter = getSubFilter(qb, selectedFilter, filterValue);
+        const { path, reference } = schema.fields.find(function(field) {
+          return camelCase(field.displayName) === filterOn;
         });
-      } else {
-        qb.whereAny({
-          [path]: subFilter
-        });
+        if (reference) {
+          qb.whereAny({
+            [reference.sourceField]: buildRef(
+              qb,
+              reference,
+              last(path.split(".")),
+              subFilter
+            )
+          });
+        } else {
+          qb.whereAny({
+            [path]: subFilter
+          });
+        }
+      } catch (e) {
+        if (urlConnected) {
+          console.error(
+            "The following error occurred when trying to build the query params. This is probably due to a malformed URL:",
+            e
+          );
+        } else {
+          console.error("Error building query params from filter:");
+          throw e;
+        }
       }
     }
 
@@ -162,7 +167,6 @@ export default function queryParams({ schema, defaults = {}, isInfinite }) {
       page = undefined;
       pageSize = undefined;
     }
-
     return {
       //the query params get passed directly to graphql
       queryParams: graphqlQueryParams,
@@ -172,7 +176,7 @@ export default function queryParams({ schema, defaults = {}, isInfinite }) {
       order: graphqlQueryParams.sort,
       selectedFilter,
       filterValue,
-      camelCaseDisplayName,
+      filterOn,
       searchTerm
     };
   }
@@ -182,7 +186,7 @@ export default function queryParams({ schema, defaults = {}, isInfinite }) {
         ...currentParams,
         selectedFilter: undefined,
         page: 1,
-        camelCaseDisplayName: undefined,
+        filterOn: undefined,
         filterValue: undefined,
         searchTerm:
           searchTerm === defaultParams.searchTerm ? undefined : searchTerm
@@ -190,13 +194,13 @@ export default function queryParams({ schema, defaults = {}, isInfinite }) {
       setNewParams(newParams);
     }
     function setFilter(
-      { selectedFilter, filterValue, camelCaseDisplayName },
+      { selectedFilter, filterValue, filterOn },
       currentParams
     ) {
       let newParams = {
         ...currentParams,
         selectedFilter,
-        camelCaseDisplayName,
+        filterOn,
         filterValue,
         searchTerm: undefined
       };
@@ -207,7 +211,7 @@ export default function queryParams({ schema, defaults = {}, isInfinite }) {
       setNewParams({
         ...currentParams,
         selectedFilter: undefined,
-        camelCaseDisplayName: undefined,
+        filterOn: undefined,
         filterValue: undefined,
         searchTerm: undefined
       });

@@ -79,30 +79,29 @@ describe("DataTableDemo", () => {
       });
       expect(pagingInput.props().value).toBe("2");
       pagingInput.simulate("blur");
-      expect(reduxDataWrapper.props().queryParams.limit).toBe(2);
+      expect(reduxDataWrapper.props().queryParams.pageSize).toBe(2);
     });
 
     it("handles a page right", () => {
-      expect(reduxDataWrapper.props().queryParams.limit).toBe(2);
+      expect(reduxDataWrapper.props().queryParams.pageSize).toBe(2);
       pagingToolbarWrapper.find(".paging-arrow-right").simulate("click");
-      expect(reduxDataWrapper.props().queryParams.offset).toBe(2);
+      expect(reduxDataWrapper.props().queryParams.pageNumber).toBe(2);
 
-      // console.log(
       //   "reduxDataWrapper.props().queryParams",
       //   reduxDataWrapper.props().queryParams
       // );
     });
 
     it("handles a page left after a page right", () => {
-      expect(reduxDataWrapper.props().queryParams.offset).toBe(2);
+      expect(reduxDataWrapper.props().queryParams.pageNumber).toBe(2);
       pagingToolbarWrapper.find(".paging-arrow-left").simulate("click");
-      expect(reduxDataWrapper.props().queryParams.offset).toBe(0);
+      expect(reduxDataWrapper.props().queryParams.pageNumber).toBe(1);
     });
 
     it("searching brings us back to page 1", () => {
-      expect(reduxDataWrapper.props().queryParams.offset).toBe(0);
+      expect(reduxDataWrapper.props().queryParams.pageNumber).toBe(1);
       pagingToolbarWrapper.find(".paging-arrow-right").simulate("click");
-      expect(reduxDataWrapper.props().queryParams.offset).toBe(2);
+      expect(reduxDataWrapper.props().queryParams.pageNumber).toBe(2);
       const input = reduxDataWrapper.find(".datatable-search-input");
       input
         .find("input")
@@ -112,13 +111,13 @@ describe("DataTableDemo", () => {
       expect(reduxDataWrapper.props().tableParams.searchTerm).toEqual(
         "search string"
       );
-      expect(reduxDataWrapper.props().queryParams.offset).toBe(0);
+      expect(reduxDataWrapper.props().queryParams.pageNumber).toBe(1);
     });
     it("changing page size brings us back to page 1", () => {
-      expect(reduxDataWrapper.props().queryParams.offset).toBe(0);
+      expect(reduxDataWrapper.props().queryParams.pageNumber).toBe(1);
       pagingToolbarWrapper.find(".paging-arrow-right").simulate("click");
-      expect(reduxDataWrapper.props().queryParams.offset).toBe(2);
-      expect(reduxDataWrapper.props().queryParams.limit).toBe(2);
+      expect(reduxDataWrapper.props().queryParams.pageNumber).toBe(2);
+      expect(reduxDataWrapper.props().queryParams.pageSize).toBe(2);
       pagingInput.simulate("change", {
         target: {
           value: 3
@@ -126,8 +125,8 @@ describe("DataTableDemo", () => {
       });
       expect(pagingInput.props().value).toBe("3");
       pagingInput.simulate("blur");
-      expect(reduxDataWrapper.props().queryParams.limit).toBe(3);
-      expect(reduxDataWrapper.props().queryParams.offset).toBe(0);
+      expect(reduxDataWrapper.props().queryParams.pageSize).toBe(3);
+      expect(reduxDataWrapper.props().queryParams.pageNumber).toBe(1);
     });
   });
 });

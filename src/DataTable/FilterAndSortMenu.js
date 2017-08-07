@@ -36,7 +36,7 @@ export default class FilterAndSortMenu extends React.Component {
   props: {
     dataType: TableDataTypes,
     schemaForField: Object,
-    camelCaseDisplayName: string,
+    filterOn: string,
     setOrder: Function,
     setFilter: Function
   };
@@ -48,11 +48,11 @@ export default class FilterAndSortMenu extends React.Component {
   };
   handleFilterSubmit = () => {
     const { filterValue, selectedFilter } = this.state;
-    const { camelCaseDisplayName, setFilter, schemaForField } = this.props;
+    const { filterOn, setFilter, schemaForField } = this.props;
 
     setFilter({
       schemaForField,
-      camelCaseDisplayName,
+      filterOn,
       selectedFilter,
       filterValue
     });
@@ -65,12 +65,7 @@ export default class FilterAndSortMenu extends React.Component {
 
   render() {
     const { selectedFilter, filterValue } = this.state;
-    const {
-      dataType,
-      camelCaseDisplayName,
-      setOrder,
-      sortDisabled
-    } = this.props;
+    const { dataType } = this.props;
     const {
       handleFilterChange,
       handleFilterValueChange,
@@ -96,24 +91,6 @@ export default class FilterAndSortMenu extends React.Component {
 
     return (
       <Menu className={"data-table-header-menu"}>
-        {!sortDisabled &&
-          <div>
-            <MenuItem
-              iconName="sort-asc"
-              onClick={() => {
-                setOrder(camelCaseDisplayName);
-              }}
-              text="Sort Asc"
-            />
-            <MenuItem
-              iconName="sort-desc"
-              onClick={() => {
-                setOrder("reverse:" + camelCaseDisplayName);
-              }}
-              text="Sort Desc"
-            />
-            <MenuDivider />
-          </div>}
         <MenuItem
           // iconName={showFilterBy ? "caret-down" : "caret-right"}
           text="Filter by condition..."

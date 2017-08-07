@@ -113,7 +113,11 @@ export default function withTableParams(
   let QueryParams = function(props) {
     return (
       <Fields
-        names={["reduxFormQueryParams", "reduxFormSearchInput"]}
+        names={[
+          "reduxFormQueryParams",
+          "reduxFormSearchInput",
+          "reduxFormSelectedEntityIdMap"
+        ]}
         {...props}
         component={ConnectedComponent}
       />
@@ -128,15 +132,21 @@ export default function withTableParams(
 }
 
 function mapState(state, ownProps) {
-  const { reduxFormQueryParams, reduxFormSearchInput } = ownProps;
+  const {
+    reduxFormQueryParams,
+    reduxFormSearchInput,
+    reduxFormSelectedEntityIdMap
+  } = ownProps;
   return {
     ...ownProps,
     tableParams: {
       ...ownProps.tableParams,
       reduxFormQueryParams,
-      reduxFormSearchInput
+      reduxFormSearchInput,
+      reduxFormSelectedEntityIdMap
     },
     reduxFormQueryParams: undefined,
-    reduxFormSearchInput: undefined
+    reduxFormSearchInput: undefined,
+    reduxFormSelectedEntityIdMap: undefined
   };
 }

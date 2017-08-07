@@ -3,7 +3,7 @@ import { FocusStyleManager, Dialog } from "@blueprintjs/core";
 // import { createStore, combineReducers } from "redux";
 // import { reducer as form } from "redux-form";
 import DataTableWrapper from "./DataTableWrapper";
-import { withTableParams } from "../../../src";
+// import { withTableParams } from "../../../src";
 import { withTableParams_new } from "../../../src";
 // import { onEnterOrBlurHelper } from "../../../src";
 
@@ -14,41 +14,23 @@ import { Provider } from "react-redux";
 import store from "../store";
 FocusStyleManager.onlyShowFocusOnTabs();
 
-let UrlConnectedNew = withTableParams_new(DataTableWrapper, {
-	urlConnected: true,
-	formname: "example 1", //this should be a unique name
-	schema
-});
-UrlConnectedNew = withRouter(UrlConnectedNew);
-
-let UrlConnected = withTableParams(DataTableWrapper, {
+let UrlConnected = withTableParams_new(DataTableWrapper, {
 	urlConnected: true,
 	formname: "example 1", //this should be a unique name
 	schema
 });
 UrlConnected = withRouter(UrlConnected);
 
-const ReduxConnected = withTableParams(DataTableWrapper, {
+let ReduxConnected = withTableParams_new(DataTableWrapper, {
 	urlConnected: false,
-	formname: "example 2",
+	formname: "example 2", //this should be a unique name
 	schema
 });
+ReduxConnected = withRouter(ReduxConnected);
 
-const ReduxConnected2 = withTableParams(DataTableWrapper, {
-	urlConnected: false,
-	formname: "example 3",
-	schema
-});
-
-export { UrlConnected, ReduxConnected, DataTableWrapper };
+export { DataTableWrapper, UrlConnected, ReduxConnected };
 export default class TableDemo extends React.Component {
 	render() {
-		var { open, allowMultipleSelection=false } = this.state || {};
-		const tableParams = {
-									bpTableProps: {
-										allowMultipleSelection
-									}
-								}
 		return (
 			<Provider store={store}>
 				<div
@@ -64,33 +46,14 @@ export default class TableDemo extends React.Component {
 							>
 								{" "}open table in dialog
 							</button>
-							<button
-								onClick={() => {
-									this.setState({
-										allowMultipleSelection: !allowMultipleSelection
-									});
-								}}
-							>
-								{" "}{allowMultipleSelection ? 'disable ' : 'enable '} multiple row selection
-							</button>
-							<h3>New Table</h3>
-							<UrlConnectedNew />
-							<h3>Old Table</h3>
+							<h3>URL Connected</h3>
+							<br/>
 							<UrlConnected />
-							<ReduxConnected 
-								tableParams={tableParams}
-							/>
-							<Dialog
-								style={{width: "640px"}}
-								isOpen={open}
-								onClose={() => {
-									this.setState({
-										open: false
-									});
-								}}
-							>
-								<ReduxConnected2 tableParams={tableParams} />
-							</Dialog>
+							<br/>
+							<h3>Redux Connected</h3>
+							<br/>
+							<ReduxConnected />
+							<br/>
 						</div>
 					</Router>
 				</div>
