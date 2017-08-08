@@ -4,7 +4,6 @@ import { withRouter } from "react-router-dom";
 import "../toastr";
 import React from "react";
 import times from "lodash/times";
-import uniqBy from "lodash/uniqBy";
 import moment from "moment";
 import PagingTool from "./PagingTool";
 import camelCase from "lodash/camelCase";
@@ -349,56 +348,41 @@ class DataTable extends React.Component {
     if (rowIndex >= entities.length) {
       return <Cell />;
     }
+    const entity = entities[rowIndex];
     return (
       <Cell className={"tg-checkbox-cell"} style={{ width: 40 }}>
         <Checkbox
           onClick={e => {
-            let newRows = [];
+            let newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
             const isRowCurrentlyChecked = checkedRows.indexOf(rowIndex) > -1;
 
             if (e.shiftKey && rowIndex !== lastCheckedRow) {
               var start = rowIndex;
               var end = lastCheckedRow;
-
-              const rowsToCheckOrUncheck = [];
               for (
                 var i = Math.min(start, end);
                 i < Math.max(start, end) + 1;
                 i++
               ) {
-                rowsToCheckOrUncheck.push(i);
-              }
-              const isLastCheckedRowCurrentlyChecked =
-                checkedRows.indexOf(lastCheckedRow) > -1;
-
-              if (!isLastCheckedRowCurrentlyChecked) {
-                //remove all rowsToCheckOrUncheck
-                newRows = checkedRows.filter(i => {
-                  return !(rowsToCheckOrUncheck.indexOf(i) > -1);
-                });
-              } else {
-                //add the rowsToCheckOrUncheck and remove duplicates
-                newRows = uniqBy(
-                  [...checkedRows, ...rowsToCheckOrUncheck],
-                  i => i
-                );
+                const isLastCheckedRowCurrentlyChecked =
+                  checkedRows.indexOf(lastCheckedRow) > -1;
+                let tempEntity = entities[i];
+                if (isLastCheckedRowCurrentlyChecked) {
+                  newIdMap[tempEntity.id] = true;
+                } else {
+                  delete newIdMap[tempEntity.id];
+                }
               }
             } else {
               //no shift key
               if (isRowCurrentlyChecked) {
-                //remove all rowsToCheckOrUncheck
-                newRows = checkedRows.filter(i => {
-                  return i !== rowIndex;
-                });
+                delete newIdMap[entity.id];
               } else {
-                //add the rowsToCheckOrUncheck and remove duplicates
-                newRows = [...checkedRows, rowIndex];
+                newIdMap[entity.id] = true;
               }
             }
 
-            reduxFormSelectedEntityIdMap.input.onChange(
-              getIdMapFromSelectedRows(entities, newRows)
-            );
+            reduxFormSelectedEntityIdMap.input.onChange(newIdMap);
             this.setState({ lastCheckedRow: rowIndex });
           }}
           className={"tg-checkbox-cell-inner"}
@@ -494,15 +478,16 @@ class DataTable extends React.Component {
       <ColumnHeaderCell className={"tg-checkbox-header-cell"}>
         <Checkbox
           onChange={e => {
-            let newRows = [];
-            if (checkboxProps.checked) {
-              newRows = [];
-            } else {
-              newRows = Array.from(Array(entities.length).keys());
-            }
-            reduxFormSelectedEntityIdMap.input.onChange(
-              getIdMapFromSelectedRows(entities, newRows)
-            );
+            let newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
+            Array.from(Array(entities.length).keys()).forEach(function(i) {
+              if (checkboxProps.checked) {
+                delete newIdMap[entities[i].id];
+              } else {
+                newIdMap[entities[i].id] = true;
+              }
+            });
+
+            reduxFormSelectedEntityIdMap.input.onChange(newIdMap);
             this.setState({ lastCheckedRow: undefined });
             // this.setState({selectedRegions: getSelectedRegionsFromRowsArray(newRows)})
           }}
