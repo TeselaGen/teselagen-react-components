@@ -660,17 +660,28 @@ function getSelectedRegionsFromRowsArray(rowsArray) {
   //         ]
   //     }
   // ]
-  const selectedRegions = [];
-  rowsArray.sort().forEach(function(rowNum) {
-    const currentRegion = selectedRegions[selectedRegions.length - 1];
-    if (!currentRegion) {
-      selectedRegions.push({
-        rows: [rowNum, rowNum]
-      });
-    } else {
-      currentRegion.rows[1] = rowNum;
-    }
-  });
+  const selectedRegions = rowsArray
+    .sort()
+    .reduce((acc, rowNum, i) => {
+      const rowNumBefore = rowsArray[i - 1];
+      const rowNumAfter = rowsArray[i + 1];
+      if (rowNumBefore && rowNumBefore === rowNum - 1) {
+        const arrayToAddTo = acc.find(o => o.rows.indexOf(rowNumBefore) > -1)
+          .rows;
+        arrayToAddTo.push(rowNum);
+      } else {
+        const rows = [rowNum];
+        if (!rowNumAfter || (rowNumAfter && rowNumAfter > rowNum + 1))
+          rows.push(rowNum);
+        acc.push({
+          rows
+        });
+      }
+      return acc;
+    }, [])
+    .forEach(o => {
+      if (o.rows.length > 2) o.rows = [o.rows[0], o.rows[o.rows.length - 1]];
+    });
   return selectedRegions;
 }
 // <ColumnHeaderCell
