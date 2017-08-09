@@ -220,7 +220,6 @@ class DataTable extends React.Component {
             <Table
               numRows={numRows}
               columnWidths={columnWidths}
-              fillBodyWithGhostCells={true}
               loadingOptions={loadingOptions}
               isRowHeaderShown={false}
               isColumnResizable={false}
@@ -282,9 +281,11 @@ class DataTable extends React.Component {
         </div>
         <div className={"data-table-footer"}>
           <div className={"tg-datatable-selected-count"}>
-            {" "}{`${selectedRowCount} Record${selectedRowCount === 1
-              ? ""
-              : "s"} Selected`}{" "}
+            {selectedRowCount > 0
+              ? ` ${selectedRowCount} Record${selectedRowCount === 1
+                  ? ""
+                  : "s"} Selected `
+              : ""}
           </div>
           {!isInfinite && withPaging
             ? <PagingTool
