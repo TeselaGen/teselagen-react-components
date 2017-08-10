@@ -81,6 +81,7 @@ export default class CircularView extends React.Component {
       annotationHeight = 15,
       spaceBetweenAnnotations = 2,
       annotationVisibility = {},
+      annotationLabelVisibility = {},
       caretPosition = -1,
       circularAndLinearTickSpacing,
       editorDragged = noop,
@@ -142,6 +143,7 @@ export default class CircularView extends React.Component {
       // sequence: showSequence = true,
       // reverseSequence: showReverseSequence = true,
     } = annotationVisibility;
+    var { featureLabels: showFeatureLabels = true } = annotationLabelVisibility;
     var {
       features: maxFeaturesToDisplay = 50,
       primers: maxPrimersToDisplay = 50,
@@ -261,7 +263,9 @@ export default class CircularView extends React.Component {
         });
         //update the radius, labels, and svg
         radius += results.height;
-        labels = { ...labels, ...results.labels };
+        if (showFeatureLabels) {
+          labels = { ...labels, ...results.labels };
+        }
         return results.component;
       }
     }

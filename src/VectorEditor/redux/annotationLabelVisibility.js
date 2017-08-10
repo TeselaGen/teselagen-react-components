@@ -7,8 +7,8 @@ import createAction from "./utils/createMetaAction";
 // ------------------------------------
 // Actions
 // ------------------------------------
-export const toggleAnnotationLabelVisibility = createAction(
-  "toggleAnnotationLabelVisibility"
+export const annotationLabelVisibilityToggle = createAction(
+  "annotationLabelVisibilityToggle"
 );
 
 // ------------------------------------
@@ -16,10 +16,12 @@ export const toggleAnnotationLabelVisibility = createAction(
 // ------------------------------------
 export default createReducer(
   {
-    [toggleAnnotationLabelVisibility]: (state, payload) => {
+    [annotationLabelVisibilityToggle]: (state, payload) => {
+      // remove plural 's' and add Labels (sequences => sequenceLabels)
+      const namedLabel = payload.slice(0, -1) + "Labels";
       return {
         ...state,
-        [payload]: !state[payload]
+        [namedLabel]: !state[namedLabel]
       };
     }
   },
