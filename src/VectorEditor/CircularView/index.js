@@ -15,8 +15,7 @@ import _Cutsites from "./Cutsites";
 import sortBy from "lodash/sortBy";
 import PositionAnnotationOnCircle from "./PositionAnnotationOnCircle";
 import getAngleForPositionMidpoint from "./getAngleForPositionMidpoint";
-import normalizePositionByRangeLength
-  from "ve-range-utils/normalizePositionByRangeLength";
+import normalizePositionByRangeLength from "ve-range-utils/normalizePositionByRangeLength";
 import getPositionFromAngle from "ve-range-utils/getPositionFromAngle";
 import React from "react";
 import Draggable from "react-draggable";
@@ -127,8 +126,8 @@ export default class CircularView extends React.Component {
       (sequenceLength < 10
         ? 1
         : sequenceLength < 50
-            ? Math.ceil(sequenceLength / 5)
-            : Math.ceil(sequenceLength / 100) * 10);
+          ? Math.ceil(sequenceLength / 5)
+          : Math.ceil(sequenceLength / 100) * 10);
     var {
       features: showFeatures = true,
       primers: showPrimers = true,
@@ -453,7 +452,7 @@ export default class CircularView extends React.Component {
             innerRadius
           });
         } else {
-          return <div />;
+          return <div key={index} />;
         }
       });
     }
@@ -511,9 +510,13 @@ export default class CircularView extends React.Component {
               className={"veCircularViewMiddleOfVectorText"}
               style={{ width: innerRadius, textAlign: "center" }}
             >
-              <span>{sequenceName} </span>
+              <span>
+                {sequenceName}{" "}
+              </span>
               <br />
-              <span>{sequenceLength + " bps"}</span>
+              <span>
+                {sequenceLength + " bps"}
+              </span>
             </div>
             <svg
               key="circViewSvg"
@@ -529,7 +532,9 @@ export default class CircularView extends React.Component {
               height={height}
               ref="circularView"
               className={"circularViewSvg"}
-              viewBox={`-${radius * scale} -${radius * scale} ${radius * 2 * scale} ${radius * 2 * scale}`}
+              viewBox={`-${radius * scale} -${radius * scale} ${radius *
+                2 *
+                scale} ${radius * 2 * scale}`}
             >
               {annotationsSvgs}
             </svg>
