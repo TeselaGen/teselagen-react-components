@@ -1,15 +1,16 @@
 import queryString from "query-string";
+import QueryBuilder from "tg-client-query-builder";
+import last from "lodash/last";
+import camelCase from "lodash/camelCase";
 
 export default function queryParams({ schema, defaults = {}, isInfinite }) {
   var defaultParams = {
     pageSize: 10,
     order: "",
-    where: {},
-    include: [],
-    searchTerm: "", //undefined helps us compare when this has been changed to an empty string
+    searchTerm: "",
     page: 1,
     selectedFilter: undefined,
-    fieldName: undefined,
+    filterOn: undefined,
     filterValue: undefined,
     ...defaults
   };
@@ -24,98 +25,158 @@ export default function queryParams({ schema, defaults = {}, isInfinite }) {
     });
   }
 
-  function getQueryParams(currentParams) {
+  function buildRef(qb, reference, searchField, expression) {
+    if (reference.reference) {
+      // qb[reference.target] = {}
+      return qb.related(reference.target).whereAny({
+        [reference.sourceField]: buildRef(
+          qb,
+          reference.reference,
+          searchField,
+          expression
+        )
+      });
+    } else {
+      return qb.related(reference.target).whereAny({
+        [searchField]: expression
+      });
+    }
+  }
+
+  function getQueryParams(currentParams, urlConnected) {
+    const { model } = schema;
+    let qb = new QueryBuilder(model);
+    // qb = qb.filter('user')
+    // qb = qb.whereAny({
+    //   userStatus: qb.related('userStatus').whereAny({
+    //     code: qb.contains('pending')
+    //   })
+    // })
+    // qb = qb.andWhere({
+    //   age: qb.lessThan(12)
+    // })
+    // qb.toJSON()
+    // let filterBuilder = qb.filter(model); //start filter on model
+
     Object.keys(currentParams).forEach(function(key) {
       if (currentParams[key] === undefined) {
         delete currentParams[key]; //we want to use the default value if any of these are undefined
       }
     });
-    let graphqlQueryParams = {
+    let tableQueryParams = {
       ...defaultParams,
       ...currentParams
     };
-    let { page, pageSize } = graphqlQueryParams;
 
+    let graphqlQueryParams = {};
+    let { page, pageSize } = tableQueryParams;
+    if (tableQueryParams.order) {
+      const filterOn = tableQueryParams.order.replace(/^reverse:/gi, "");
+      const schemaForField = schema.fields.find(function(field) {
+        return camelCase(field.displayName) === filterOn;
+      });
+      if (schemaForField) {
+        const { path } = schemaForField;
+        let reversed = filterOn !== tableQueryParams.order;
+        const prefix = reversed ? "-" : "";
+        graphqlQueryParams.sort = [prefix + (path || filterOn)];
+      } else {
+        console.error("No schema for field found!", filterOn, schema.fields);
+      }
+    }
+    // let graphqlQueryParams =
     //convert params from user readable to what our api expects
-    // aka page -> offset & pageSize -> limit
-    graphqlQueryParams.offset = (page - 1) * pageSize;
-    graphqlQueryParams.limit = pageSize;
-
-    delete graphqlQueryParams.pageSize;
-    delete graphqlQueryParams.page;
+    // aka page -> pageNumber & pageSize -> pageSize
+    graphqlQueryParams.pageNumber = page;
+    graphqlQueryParams.pageSize = pageSize;
 
     const {
       searchTerm,
       selectedFilter,
       filterValue,
-      fieldName
-    } = graphqlQueryParams;
-    delete graphqlQueryParams.searchTerm;
-    delete graphqlQueryParams.selectedFilter;
-    delete graphqlQueryParams.filterValue;
-    delete graphqlQueryParams.fieldName;
+      filterOn
+    } = tableQueryParams;
+
+    // delete graphqlQueryParams.searchTerm;
+    // delete graphqlQueryParams.selectedFilter;
+    // delete graphqlQueryParams.filterValue;
+    // delete graphqlQueryParams.filterOn;
+
     if (selectedFilter) {
-      const subFilter = getSubFilter(selectedFilter, filterValue, fieldName);
-      const { path, model } = schema.fields[fieldName];
-      const wherekey = model ? `$${path}$` : fieldName;
-      graphqlQueryParams = {
-        ...graphqlQueryParams,
-        where: {
-          [wherekey]: subFilter
-        },
-        include: model
-          ? {
-              [model]: {
-                model,
-                required: false
-              }
-            }
-          : undefined
-      };
+      try {
+        const subFilter = getSubFilter(qb, selectedFilter, filterValue);
+        const { path, reference } = schema.fields.find(function(field) {
+          return camelCase(field.displayName) === filterOn;
+        });
+        if (reference) {
+          qb.whereAny({
+            [reference.sourceField]: buildRef(
+              qb,
+              reference,
+              last(path.split(".")),
+              subFilter
+            )
+          });
+        } else {
+          qb.whereAny({
+            [path]: subFilter
+          });
+        }
+      } catch (e) {
+        if (urlConnected) {
+          console.error(
+            "The following error occurred when trying to build the query params. This is probably due to a malformed URL:",
+            e
+          );
+        } else {
+          console.error("Error building query params from filter:");
+          throw e;
+        }
+      }
     }
+
     if (searchTerm && searchTerm !== "") {
       //custom logic based on the table schema to get the sequelize query
-      let include = {};
-      let or = {};
+      let searchTermFilters = [];
       schema.fields.forEach(function(schemaField) {
-        const { type /*path*/ } = schemaField;
+        const { reference, type, path } = schemaField;
         if (type === "string" || type === "lookup") {
-          // var likeObj = { iLike: "%" + searchTerm + "%" };
-          //SD: avoiding this problem as we will solve in the new queryParams
-          // if (model) {
-          //   const includeObj = include[model] || {
-          //     model,
-          //     required: false
-          //   };
-          //   include[model] = includeObj;
-          //   or["$" + path + "$"] = likeObj;
-          // } else {
-          //   or[column] = likeObj;
-          // }
+          if (reference) {
+            searchTermFilters.push({
+              [reference.sourceField]: buildRef(
+                qb,
+                reference,
+                last(path.split(".")),
+                qb.contains(searchTerm)
+              )
+            });
+          } else {
+            searchTermFilters.push({
+              [path]: qb.contains(searchTerm)
+            });
+          }
         }
-      }, {});
-      graphqlQueryParams = {
-        ...graphqlQueryParams,
-        where: {
-          $or: or
-        },
-        include
-      };
+      });
+      qb.orWhereAny(...searchTermFilters);
     }
+    graphqlQueryParams.filter = qb.toJSON();
+
     if (isInfinite) {
-      delete graphqlQueryParams.limit;
-      delete graphqlQueryParams.offset;
+      graphqlQueryParams.pageSize = 999;
+      graphqlQueryParams.pageNumber = 1;
       page = undefined;
       pageSize = undefined;
     }
     return {
+      //the query params get passed directly to graphql
       queryParams: graphqlQueryParams,
+      //these are values that might be generally useful for the wrapped component
       page,
       pageSize,
-      order: graphqlQueryParams.order,
+      order: graphqlQueryParams.sort,
       selectedFilter,
       filterValue,
-      fieldName,
+      filterOn,
       searchTerm
     };
   }
@@ -125,7 +186,7 @@ export default function queryParams({ schema, defaults = {}, isInfinite }) {
         ...currentParams,
         selectedFilter: undefined,
         page: 1,
-        fieldName: undefined,
+        filterOn: undefined,
         filterValue: undefined,
         searchTerm:
           searchTerm === defaultParams.searchTerm ? undefined : searchTerm
@@ -133,13 +194,13 @@ export default function queryParams({ schema, defaults = {}, isInfinite }) {
       setNewParams(newParams);
     }
     function setFilter(
-      { selectedFilter, filterValue, fieldName },
+      { selectedFilter, filterValue, filterOn },
       currentParams
     ) {
       let newParams = {
         ...currentParams,
         selectedFilter,
-        fieldName,
+        filterOn,
         filterValue,
         searchTerm: undefined
       };
@@ -150,7 +211,7 @@ export default function queryParams({ schema, defaults = {}, isInfinite }) {
       setNewParams({
         ...currentParams,
         selectedFilter: undefined,
-        fieldName: undefined,
+        filterOn: undefined,
         filterValue: undefined,
         searchTerm: undefined
       });
@@ -222,33 +283,26 @@ function jsonParseNested(obj) {
   return newObj;
 }
 
-function getSubFilter(selectedFilter, filterValue, fieldName) {
-  if (selectedFilter === "Text starts with")
-    return { $iLike: `${filterValue}%` };
-  else if (selectedFilter === "Text ends with")
-    return { $iLike: `%${filterValue}` };
-  else if (selectedFilter === "Text contains")
-    return { $iLike: `%${filterValue}%` };
-  else if (selectedFilter === "Text is exactly")
-    return { $iLike: `${filterValue}` };
+function getSubFilter(qb, selectedFilter, filterValue) {
+  if (selectedFilter === "Text starts with") return qb.startsWith(filterValue);
+  else if (selectedFilter === "Text ends with") return qb.endsWith(filterValue);
+  else if (selectedFilter === "Text contains") return qb.contains(filterValue);
+  else if (selectedFilter === "Text is exactly") return filterValue;
   else if (selectedFilter === "Date is between")
-    // else if (selectedFilter === "Date is")
-    //   return {
-    //     $between: [
-    //       filterValue.getTime(),
-    //       filterValue.getTime() + 4320000
-    //     ]
-    //   };
-    return {
-      $between: [filterValue[0].getTime(), filterValue[1].getTime()]
-    };
+    return qb.between([filterValue[0].getTime(), filterValue[1].getTime()]);
   else if (selectedFilter === "Date is before")
-    return { $lt: filterValue.getTime() };
+    return qb.lessThan(filterValue.getTime());
   else if (selectedFilter === "Date is after")
-    return { $gt: filterValue.getTime() };
-  else if (selectedFilter === "Greater than") return { $gt: filterValue };
-  else if (selectedFilter === "Less than") return { $lt: filterValue };
+    return qb.greaterThan(filterValue.getTime());
+  else if (selectedFilter === "Greater than")
+    return qb.greaterThan(filterValue);
+  else if (selectedFilter === "Less than") return qb.lessThan(filterValue);
   else if (selectedFilter === "In range")
-    return { $between: [filterValue[0], filterValue[1]] };
+    return qb.between([filterValue[0], filterValue[1]]);
   else if (selectedFilter === "Equal to") return filterValue;
+  else {
+    throw new Error(
+      `Unsupported filter ${selectedFilter}. Please make a new filter if you need one`
+    );
+  }
 }

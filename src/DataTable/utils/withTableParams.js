@@ -1,11 +1,9 @@
 //@flow
 import { withRouter } from "react-router-dom";
 import React from "react";
-import { Fields, reduxForm } from "redux-form";
+import { Fields, change, formValueSelector, reduxForm } from "redux-form";
 import { connect } from "react-redux";
-import { formValueSelector } from "redux-form";
-import queryParams from "./queryParams";
-import { change } from "redux-form";
+import queryParams from "./queryParams_new";
 
 export default function withTableParams(
   Component,
@@ -47,9 +45,9 @@ export default function withTableParams(
       order,
       selectedFilter,
       filterValue,
-      fieldName,
+      filterOn,
       searchTerm
-    } = getQueryParams(currentParams);
+    } = getQueryParams(currentParams, urlConnected);
     return {
       queryParams,
       page,
@@ -57,7 +55,7 @@ export default function withTableParams(
       order,
       selectedFilter,
       filterValue,
-      fieldName,
+      filterOn,
       searchTerm,
       schema: schema,
       currentParams,

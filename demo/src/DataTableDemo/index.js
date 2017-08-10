@@ -3,8 +3,7 @@ import { FocusStyleManager, Dialog } from "@blueprintjs/core";
 // import { createStore, combineReducers } from "redux";
 // import { reducer as form } from "redux-form";
 import DataTableWrapper from "./DataTableWrapper";
-// import { withTableParams } from "../../../src";
-import { withTableParams_new } from "../../../src";
+import { withTableParams } from "../../../src";
 // import { onEnterOrBlurHelper } from "../../../src";
 
 // import { columns, schema } from "./new_mocks";
@@ -14,14 +13,14 @@ import { Provider } from "react-redux";
 import store from "../store";
 FocusStyleManager.onlyShowFocusOnTabs();
 
-let UrlConnected = withTableParams_new(DataTableWrapper, {
+let UrlConnected = withTableParams(DataTableWrapper, {
 	urlConnected: true,
 	formname: "example 1", //this should be a unique name
 	schema
 });
 UrlConnected = withRouter(UrlConnected);
 
-let ReduxConnected = withTableParams_new(DataTableWrapper, {
+let ReduxConnected = withTableParams(DataTableWrapper, {
 	urlConnected: false,
 	formname: "example 2", //this should be a unique name
 	schema
