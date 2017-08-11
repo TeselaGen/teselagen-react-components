@@ -3,4 +3,5 @@
 /lib
 /node_modules
 /umd
+/demo/dist/
 npm-debug.log*

@@ -1,0 +1,13 @@
+{
+  "apps" : [{
+    "name": "teselagen-components",
+    "script": "serve-react-demo --port 3333",
+    "cwd": "/app",
+    "exec_interpreter": "nwb"
+  },{
+    "name": "webhook",
+    "cwd": "/app",
+    "script": "github-webhook",
+    "args": "--config /app/.github-webhook"
+  }]
+}
