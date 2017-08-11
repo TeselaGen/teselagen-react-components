@@ -173,7 +173,7 @@ export default class VeToolBar extends React.Component {
                 annotationLabelVisibilityToggle("features");
                 /* labelVisibilityToggle("features"); */
               }}
-              checked={annotationLabelVisibility.featureLabels}
+              checked={annotationLabelVisibility.features}
               id="showFeatureLabels"
               type="checkbox"
             />

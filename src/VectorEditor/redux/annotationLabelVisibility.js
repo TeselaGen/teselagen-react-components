@@ -1,8 +1,11 @@
-import { visibilityInitialValues } from "./annotationVisibility";
-
 //./caretPosition.js
 import { createReducer } from "redux-act";
 import createAction from "./utils/createMetaAction";
+const visibilityInitialValues = {
+  features: true,
+  parts: true,
+  cutsites: true
+};
 
 // ------------------------------------
 // Actions
@@ -17,11 +20,9 @@ export const annotationLabelVisibilityToggle = createAction(
 export default createReducer(
   {
     [annotationLabelVisibilityToggle]: (state, payload) => {
-      // remove plural 's' and add Labels (sequences => sequenceLabels)
-      const namedLabel = payload.slice(0, -1) + "Labels";
       return {
         ...state,
-        [namedLabel]: !state[namedLabel]
+        [payload]: !state[payload]
       };
     }
   },

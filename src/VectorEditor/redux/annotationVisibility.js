@@ -2,11 +2,9 @@
 import { createReducer } from "redux-act";
 import createAction from "./utils/createMetaAction";
 
-export const visibilityInitialValues = {
+const visibilityInitialValues = {
   features: true,
   translations: true,
-  featureLabels: true,
-  partLabels: true,
   parts: true,
   orfs: true,
   orfTranslations: true,
