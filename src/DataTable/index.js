@@ -519,18 +519,6 @@ class DataTable extends React.Component {
       filterOn === ccDisplayName ? " tg-active-filter" : "";
     let ordering;
 
-    //TODO: remove this once we remove queryParams_new!
-    if (order && typeof order === "string") {
-      var orderField = order.replace("reverse:", "");
-      if (orderField === ccDisplayName) {
-        if (orderField === order) {
-          ordering = "asc";
-        } else {
-          ordering = "desc";
-        }
-      }
-    }
-
     if (order && order.length) {
       order.forEach(function(order) {
         var orderField = order.replace("-", "");
