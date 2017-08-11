@@ -3,7 +3,7 @@ import { withRouter } from "react-router-dom";
 import React from "react";
 import { Fields, change, formValueSelector, reduxForm } from "redux-form";
 import { connect } from "react-redux";
-import queryParams from "./queryParams_new";
+import queryParams from "./queryParams";
 
 export default function withTableParams(
   Component,
