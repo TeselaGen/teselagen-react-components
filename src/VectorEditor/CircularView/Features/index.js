@@ -1,5 +1,4 @@
-import getAnnotationNameAndStartStopString
-  from "../../utils/getAnnotationNameAndStartStopString";
+import getAnnotationNameAndStartStopString from "../../utils/getAnnotationNameAndStartStopString";
 import "./style.css";
 import Feature from "./Feature";
 import drawCircularLabel2 from "../drawCircularLabel2";
@@ -14,11 +13,11 @@ import noop from "lodash/noop";
 
 function Features({
   radius,
+  showFeatureLabels = true,
   //configurable
   forceInlineFeatureLabels = true,
   forceOuterFeatureLabels = true,
   spaceBetweenAnnotations = 2,
-  noFeatureLabels = false,
   featureHeight = 10,
   featureClicked = noop,
   //non-configurable
@@ -71,7 +70,7 @@ function Features({
     annotationRadius = radius + annotationCopy.yOffset * totalAnnotationHeight;
     //check if annotation name will fit
     var labelAngle = annotation.name.length * 9 / annotationRadius;
-    if (!forceOuterFeatureLabels && !noFeatureLabels) {
+    if (!forceOuterFeatureLabels && showFeatureLabels) {
       labelFits = labelAngle < totalAngle;
       if (!labelFits || forceInlineFeatureLabels) {
         //if the label doesn't fit within the annotation, draw it to the side
@@ -100,7 +99,7 @@ function Features({
     //     return
     // }
 
-    if (!labelFits && !noFeatureLabels) {
+    if (!labelFits && showFeatureLabels) {
       //add labels to the exported label array (to be drawn by the label component)
       labels[annotation.id] = {
         annotationCenterAngle: centerAngle,
@@ -148,7 +147,9 @@ function Features({
         passJustOnMouseOverAndClassname
       >
         <g onClick={onClick} className="Features clickable">
-          <title>{getAnnotationNameAndStartStopString(annotation)}</title>
+          <title>
+            {getAnnotationNameAndStartStopString(annotation)}
+          </title>
           <PositionAnnotationOnCircle
             key={"feature" + index}
             sAngle={startAngle}
@@ -164,7 +165,7 @@ function Features({
             />
           </PositionAnnotationOnCircle>
           {labelFits &&
-            !noFeatureLabels &&
+            showFeatureLabels &&
             <PositionAnnotationOnCircle
               key={"inlineLabel" + index}
               sAngle={labelCenter + Math.PI} //add PI because drawCircularLabel is drawing 180

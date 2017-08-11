@@ -10,7 +10,8 @@ import {
 	// RowItem,
 	VeToolBar,
 	// CutsiteFilter,
-	createVectorEditor
+	createVectorEditor,
+	LinearView
 } from "../../../src";
 const data = tidyUpSequenceData(exampleSequenceData, {
 	annotationsAsObjects: true
@@ -38,6 +39,7 @@ export default function() {
 				<h2>Not Redux Connected (aka non interactive) </h2>
 				<CircularView sequenceData={data} />
 				<RowView sequenceData={data} />
+				<LinearView sequenceData={data} />
 			</div>
 		</Provider>
 	);

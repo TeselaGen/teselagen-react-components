@@ -1,14 +1,17 @@
-import { visibilityInitialValues } from "./annotationVisibility";
-
 //./caretPosition.js
 import { createReducer } from "redux-act";
 import createAction from "./utils/createMetaAction";
+const visibilityInitialValues = {
+  features: true,
+  parts: true,
+  cutsites: true
+};
 
 // ------------------------------------
 // Actions
 // ------------------------------------
-export const toggleAnnotationLabelVisibility = createAction(
-  "toggleAnnotationLabelVisibility"
+export const annotationLabelVisibilityToggle = createAction(
+  "annotationLabelVisibilityToggle"
 );
 
 // ------------------------------------
@@ -16,7 +19,7 @@ export const toggleAnnotationLabelVisibility = createAction(
 // ------------------------------------
 export default createReducer(
   {
-    [toggleAnnotationLabelVisibility]: (state, payload) => {
+    [annotationLabelVisibilityToggle]: (state, payload) => {
       return {
         ...state,
         [payload]: !state[payload]

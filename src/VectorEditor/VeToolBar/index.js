@@ -48,6 +48,8 @@ export default class VeToolBar extends React.Component {
     annotationVisibilityShow: () => {},
     annotationVisibilityHide: () => {},
     annotationVisibility: {},
+    annotationLabelVisibilityToggle: () => {},
+    labelVisibility: {},
     AdditionalTools: [],
     minimumOrfSizeUpdate: () => {},
     minimumOrfSize: 300,
@@ -62,9 +64,11 @@ export default class VeToolBar extends React.Component {
     var {
       sequenceData,
       annotationVisibilityToggle,
+      annotationLabelVisibilityToggle,
       annotationVisibilityShow,
       annotationVisibilityHide,
       annotationVisibility,
+      annotationLabelVisibility,
       AdditionalTools = [],
       minimumOrfSizeUpdate,
       minimumOrfSize,
@@ -73,6 +77,7 @@ export default class VeToolBar extends React.Component {
       sequenceLength,
       excludeObj = {}
     } = this.props;
+
     var items = [
       {
         component: (
@@ -161,6 +166,23 @@ export default class VeToolBar extends React.Component {
         toggled: annotationVisibility.features,
         tooltip: "Show features",
         tooltipToggled: "Hide features",
+        dropdown: (
+          <div>
+            <input
+              onChange={function() {
+                annotationLabelVisibilityToggle("features");
+                /* labelVisibilityToggle("features"); */
+              }}
+              checked={annotationLabelVisibility.features}
+              id="showFeatureLabels"
+              type="checkbox"
+            />
+            <span>
+              {"  "} Show feature labels
+            </span>
+          </div>
+        ),
+        dropdowntooltip: "Feature options",
         id: "features"
       },
       {
@@ -230,7 +252,6 @@ export default class VeToolBar extends React.Component {
             <span className={"translateInfoSpan"}>
               To translate an arbitrary area, right click a selection.
             </span>
-
           </div>
         ),
         dropdowntooltip: "Open Reading Frame options",
@@ -332,7 +353,7 @@ export default class VeToolBar extends React.Component {
                 onClick={self.handleOpen(index)}
                 className={
                   " hint--bottom-left " +
-                    (dropdownicon ? "" : " veToolbarDropdown")
+                  (dropdownicon ? "" : " veToolbarDropdown")
                 }
               >
                 {dropdownicon

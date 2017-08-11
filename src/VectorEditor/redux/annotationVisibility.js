@@ -1,4 +1,8 @@
-export const visibilityInitialValues = {
+//./caretPosition.js
+import { createReducer } from "redux-act";
+import createAction from "./utils/createMetaAction";
+
+const visibilityInitialValues = {
   features: true,
   translations: true,
   parts: true,
@@ -8,10 +12,6 @@ export const visibilityInitialValues = {
   cutsites: true,
   reverseSequence: true
 };
-
-//./caretPosition.js
-import { createReducer } from "redux-act";
-import createAction from "./utils/createMetaAction";
 
 // ------------------------------------
 // Actions
