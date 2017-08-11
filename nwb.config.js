@@ -5,6 +5,7 @@ module.exports = {
     umd: false
   },
   webpack: {
+    uglify: false,
     extra: {
       devtool: 'source-map'
     },
