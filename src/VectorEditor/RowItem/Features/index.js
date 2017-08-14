@@ -5,8 +5,7 @@ import React from "react";
 import featureColorMap from "../../constants/featureColorMap.json";
 
 // import './style.css'
-import getXStartAndWidthOfRowAnnotation
-  from "../getXStartAndWidthOfRowAnnotation";
+import getXStartAndWidthOfRowAnnotation from "../getXStartAndWidthOfRowAnnotation";
 
 import getAnnotationRangeType from "ve-range-utils/getAnnotationRangeType";
 import Feature from "./Feature";
@@ -61,7 +60,7 @@ function Features(props) {
             key={index}
             top={
               annotationRange.yOffset *
-                (annotationHeight + spaceBetweenAnnotations)
+              (annotationHeight + spaceBetweenAnnotations)
             }
             left={result.xStart}
           >
@@ -109,7 +108,7 @@ Features.propTypes = {
         start: PropTypes.number.isRequired,
         end: PropTypes.number.isRequired,
         forward: PropTypes.bool.isRequired,
-        id: PropTypes.string.isRequired
+        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
       })
     })
   ),
