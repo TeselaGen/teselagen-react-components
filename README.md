@@ -16,6 +16,50 @@ Add peer-dependencies:
 yarn add @blueprintjs/core @blueprintjs/datetime @blueprintjs/table antd react-addons-css-transition-group react-redux react-select redux 
 ```
 
+##Vector Editor: 
+Redux connected: 
+
+//store.js
+import {vectorEditorReducer as VectorEditor} from 'teselagen-react-components'
+const store = createStore(
+  combineReducers({
+    form: formReducer, 
+    VectorEditor: VectorEditor({
+		DemoEditor: {
+			sequenceData: exampleSequenceData
+		}
+	})
+  }),
+  //otherArgsHere
+)
+
+//DemoEditor.js
+import {createVectorEditor} from 'teselagen-react-components'
+import store from '../store';
+
+export default createVectorEditor({
+  namespace: 'DemoEditor', 
+  store,
+  // actionOverrides(actions) {
+  //   return {
+  //     featureClicked: function ({annotation}) {
+  //       return actions.caretPositionUpdate(annotation.start)
+  //     },
+  //     selectionLayerUpdate: function (selectionLayer) {
+  //       return actions.caretPositionUpdate(selectionLayer.start)
+  //     }
+  //   }
+  // }
+})
+
+
+//some file where you want to do things to the demo editor
+var {veActions: {updateSequenceData, selectionLayerClear, caretPositionClear, updateLineageLines, filteredRestrictionEnzymesUpdate, filteredRestrictionEnzymesReset, annotationVisibilityHide, annotationVisibilityShow}} = DemoEditor
+
+dispatch(updateSequenceData(sequenceData)) //update the sequence data for the demo editor
+
+
+
 ```
 import {DataTable, routeDoubleClick, queryParams} from "teselagen-react-components";
 import {toastr} from 'teselagen-react-components';
