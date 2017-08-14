@@ -89,6 +89,7 @@ export default class CircularView extends React.Component {
       editorClicked = noop,
       editorDragStopped = noop,
       featureClicked = noop,
+      selectionLayerRightClicked = noop,
       primerClicked = noop,
       deletionLayerClicked = noop,
       replacementLayerClicked = noop,
@@ -449,6 +450,7 @@ export default class CircularView extends React.Component {
           return SelectionLayer({
             index,
             selectionLayer,
+            selectionLayerRightClicked,
             sequenceLength,
             baseRadius: baseRadius,
             radius: radius,

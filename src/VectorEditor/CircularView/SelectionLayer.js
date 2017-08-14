@@ -3,7 +3,7 @@ import sector from "paths-js/sector";
 import getRangeAngles from "./getRangeAnglesSpecial";
 import lruMemoize from "lru-memoize";
 import PositionAnnotationOnCircle from "./PositionAnnotationOnCircle";
-import PropTypes from "prop-types";
+// import PropTypes from "prop-types";
 import React from "react";
 import draggableClassnames from "../constants/draggableClassnames";
 
@@ -12,6 +12,7 @@ function SelectionLayer({
   sequenceLength,
   radius,
   innerRadius,
+  selectionLayerRightClicked,
   index
 }) {
   var { color, start, end, showCaret = false } = selectionLayer;
@@ -37,14 +38,22 @@ function SelectionLayer({
   });
 
   return (
-    <g key={"veSelectionLayer" + index} className="veSelectionLayer">
+    <g
+      onContextMenu={event => {
+        selectionLayerRightClicked({
+          annotation: selectionLayer,
+          event
+        });
+      }}
+      key={"veSelectionLayer" + index}
+      className="veSelectionLayer"
+    >
       <PositionAnnotationOnCircle
         className="selectionLayerWrapper"
         sAngle={startAngle}
         eAngle={endAngle}
         height={0}
       >
-
         <path
           className="selectionLayer"
           style={{ opacity: 0.3 }}

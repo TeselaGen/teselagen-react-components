@@ -15,7 +15,7 @@ const store = createStore(
   }),
   undefined,
   composeEnhancer(
-  	  applyMiddleware(thunk)
+  	  applyMiddleware(thunk) //your store should be redux-thunk connected for the VectorEditor component to work
   	)
   
 )

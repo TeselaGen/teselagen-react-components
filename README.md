@@ -31,16 +31,18 @@ const store = createStore(
 		}
 	})
   }),
-  //otherArgsHere
+  undefined,
+  composeEnhancer(
+  	  applyMiddleware(thunk) //your store should be redux-thunk enabled!
+  	)
 )
 
 //DemoEditor.js
 import {createVectorEditor} from 'teselagen-react-components'
-import store from '../store';
 
 export default createVectorEditor({
   namespace: 'DemoEditor', 
-  store,
+  //you can pass editor specific action overrides at this level or at render time
   // actionOverrides(actions) {
   //   return {
   //     featureClicked: function ({annotation}) {
@@ -61,6 +63,69 @@ import {CircularView, LinearView, CutsiteFilter} from 'teselagen-react-component
 var CutsiteFilterConnected = withEditorProps(CutsiteFilter)
 var CircularViewConnected = withEditorInteractions(CircularView)
 var LinearViewConnected = withEditorInteractions(LinearView)
+
+
+function actionOverrides(actions) {
+	return {
+		selectionLayerRightClicked(firstArg, ...otherArgs) {
+			return actions.selectionLayerRightClicked(
+				{
+					...firstArg,
+					extraItems: [
+						{
+							title: "Delete Selection",
+							fn: onDeleteClick,
+							disabled: deletionButtonDisabled
+						},
+						{
+							title: "Replace Selection",
+							fn: onReplaceClick,
+							disabled: replaceDisabled
+						}
+					]
+				},
+				...otherArgs
+			);
+		}
+	};
+}
+
+function MyReactComp () {
+	var editorProps = { //
+		actionOverrides: (restrictionDigest || alreadyLinearized) ? actionOverrides : undefined,
+		disableEditorClickAndDrag: restrictionDigest || alreadyLinearized,
+		annotationVisibility: { 
+			//only show custites if the user is doing a restriction digest
+			cutsites: restrictionDigest,
+			orfs: false
+		}
+	}
+	return <div>
+		<LinearViewConnected 
+		    //props passed here will take precedence over redux provided props
+			{...editorProps}/>
+		<CircularViewConnected
+                {... {
+                  ...editorProps,
+                  scale: .8,
+                  width: Math.max(containerWidth - 100, 200),
+                  height: Math.max(containerWidth - 300, 200),
+                  featureOptions: {
+                    showFeatureLabels: restrictionDigest
+                  },
+                  // selectionLayer: [],
+                  lineageLines
+                    // componentOverrides: restrictionDigest
+                    //   ? {
+                    //     SelectionLayer: SelectionLayerOverride,
+                    //     Caret: CaretOverride,
+                    //   }
+                    //  : undefined
+                  }
+                }
+                />
+	</div>
+}
 
 //some file where you want to do things to the demo editor
 import DemoEditor from '../DemoEditor';
