@@ -1,4 +1,4 @@
-import sortify from "json.sortify";
+import sortify from "./sortify"; //tnr TODO: export this from json.sortify when https://github.com/ThomasR/JSON.sortify/issues/11 is resolved
 import isNumber from "lodash/isNumber";
 import mathExpressionEvaluator from "math-expression-evaluator";
 import Dragger from "antd/lib/upload/Dragger";
