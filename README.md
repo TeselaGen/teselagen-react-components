@@ -19,6 +19,7 @@ yarn add @blueprintjs/core @blueprintjs/datetime @blueprintjs/table antd react-a
 ##Vector Editor: 
 Redux connected: 
 
+```js
 //store.js
 import {vectorEditorReducer as VectorEditor} from 'teselagen-react-components'
 const store = createStore(
@@ -52,15 +53,25 @@ export default createVectorEditor({
   // }
 })
 
+//file where you want to display the editor: 
+import DemoEditor from '../DemoEditor';
+var {withEditorInteractions, withEditorProps, veSelectors, HoverHelper} = SelectInsertEditor
+import {CircularView, LinearView, CutsiteFilter} from 'teselagen-react-components';
+
+var CutsiteFilterConnected = withEditorProps(CutsiteFilter)
+var CircularViewConnected = withEditorInteractions(CircularView)
+var LinearViewConnected = withEditorInteractions(LinearView)
 
 //some file where you want to do things to the demo editor
-var {veActions: {updateSequenceData, selectionLayerClear, caretPositionClear, updateLineageLines, filteredRestrictionEnzymesUpdate, filteredRestrictionEnzymesReset, annotationVisibilityHide, annotationVisibilityShow}} = DemoEditor
+import DemoEditor from '../DemoEditor';
+var {veActions} = DemoEditor
+//see all actions by console logging veActions
 
-dispatch(updateSequenceData(sequenceData)) //update the sequence data for the demo editor
-
-
-
+dispatch(veActions.updateSequenceData(sequenceData)) //dispatch an update action the sequence data for the demo editor
 ```
+
+##Data Table
+```js
 import {DataTable, routeDoubleClick, queryParams} from "teselagen-react-components";
 import {toastr} from 'teselagen-react-components';
 import {
