@@ -2,6 +2,8 @@
 import { change, formValueSelector } from "redux-form";
 import { connect } from "react-redux";
 import queryParams from "./queryParams";
+import compose from "lodash/fp/compose";
+import { withRouter } from "react-router-dom";
 
 export default function withTableParams(
   Component,
@@ -107,5 +109,8 @@ export default function withTableParams(
     };
   }
 
-  return connect(mapStateToProps, mapDispatchToProps, mergeProps)(Component);
+  return compose(
+    withRouter,
+    connect(mapStateToProps, mapDispatchToProps, mergeProps)
+  )(Component);
 }
