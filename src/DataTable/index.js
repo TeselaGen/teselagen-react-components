@@ -718,9 +718,7 @@ function getSelectedRegionsFromRowsArray(rowsArray) {
 
 function getIdMapFromSelectedRows(entities, selectedRows) {
   return selectedRows.reduce(function(acc, rowNum) {
-    const entity = entities[rowNum];
-    if (!entity) return false;
-    acc[entity.id] = true;
+    if (entities[rowNum]) acc[entities[rowNum].id] = true;
     return acc;
   }, {});
 }
