@@ -53,6 +53,11 @@ export default class TableDemo extends React.Component {
 							<br/>
 							<ReduxConnected />
 							<br/>
+							<h3>Unconnected - Not connected to params (aka you'll need to handle paging/sort/filter yourself) </h3>
+							<DataTableWrapper {...{tableParams: {
+								schema,
+							}}} />
+							<br/>
 						</div>
 					</Router>
 				</div>

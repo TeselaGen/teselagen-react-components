@@ -1,7 +1,5 @@
 //@flow
-import { withRouter } from "react-router-dom";
-import React from "react";
-import { Fields, change, formValueSelector, reduxForm } from "redux-form";
+import { change, formValueSelector } from "redux-form";
 import { connect } from "react-redux";
 import queryParams from "./queryParams";
 
@@ -16,7 +14,7 @@ export default function withTableParams(
   }
 
   if (!formname) {
-    formname = "dataTableQueryParams";
+    formname = "tgDataTable";
   }
 
   const formSelector = formValueSelector(formname);
@@ -103,48 +101,11 @@ export default function withTableParams(
         ...ownProps.tableParams,
         ...stateProps,
         ...dispatchProps,
-        ...boundDispatchProps
+        ...boundDispatchProps,
+        form: formname //this will override the default redux form name
       }
     };
   }
-  const ConnectedComponent = connect(mapState)(Component);
-  let QueryParams = function(props) {
-    return (
-      <Fields
-        names={[
-          "reduxFormQueryParams",
-          "reduxFormSearchInput",
-          "reduxFormSelectedEntityIdMap"
-        ]}
-        {...props}
-        component={ConnectedComponent}
-      />
-    );
-  };
 
-  return withRouter(
-    connect(mapStateToProps, mapDispatchToProps, mergeProps)(
-      reduxForm({ form: formname })(QueryParams)
-    )
-  );
-}
-
-function mapState(state, ownProps) {
-  const {
-    reduxFormQueryParams,
-    reduxFormSearchInput,
-    reduxFormSelectedEntityIdMap
-  } = ownProps;
-  return {
-    ...ownProps,
-    tableParams: {
-      ...ownProps.tableParams,
-      reduxFormQueryParams,
-      reduxFormSearchInput,
-      reduxFormSelectedEntityIdMap
-    },
-    reduxFormQueryParams: undefined,
-    reduxFormSearchInput: undefined,
-    reduxFormSelectedEntityIdMap: undefined
-  };
+  return connect(mapStateToProps, mapDispatchToProps, mergeProps)(Component);
 }

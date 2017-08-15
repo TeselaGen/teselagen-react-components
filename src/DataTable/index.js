@@ -1,6 +1,9 @@
 //@flow
-
 import { withRouter } from "react-router-dom";
+import { Fields, reduxForm } from "redux-form";
+// import { connect } from "react-redux";
+import compose from "lodash/fp/compose";
+
 import "../toastr";
 import React from "react";
 import times from "lodash/times";
@@ -619,7 +622,22 @@ function SearchBar({ reduxFormSearchInput, setSearchTerm, maybeSpinner }) {
   );
 }
 
-export default withRouter(DataTable);
+export default compose(
+  withRouter,
+  reduxForm({ form: "tgDataTable" })
+)(function ReduxFormWrapper(props) {
+  return (
+    <Fields
+      names={[
+        "reduxFormQueryParams",
+        "reduxFormSearchInput",
+        "reduxFormSelectedEntityIdMap"
+      ]}
+      {...props}
+      component={DataTable}
+    />
+  );
+});
 
 function getSelectedRowsFromEntities(entities, idMap) {
   if (!idMap) return [];
