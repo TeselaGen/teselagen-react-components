@@ -149,37 +149,36 @@
 .tg-datatable-column-header {
 	display: flex;
 	align-items: center;
-	justify-content: space-around;
+	justify-content: flex-start;
 }
 
-/*.tg-datatable-column-header > * {
-	we set opacity to be 1 here
-	opacity: 0; 
-}*/
 
 .tg-datatable-column-header:hover * {
-	/*we set opacity to be 1 here*/
 	transition: 0.2s;
-	opacity: 1 !important; 
+	display: inherit !important; 
+}
+.tg-datatable-column-header:hover .tg-filter-menu-button {
+	transition: 0.2s;
+	display: block !important; 
 }
 
 .tg-datatable-name {
 	white-space: nowrap;
 	overflow: hidden;
 	min-width: 0px;
+	padding-left: 10px;
 	text-overflow: ellipsis;
 }
 
 
 .tg-sort-arrow-container {
 	margin-left: 4px;
-
 	display: flex;
 	flex-direction: column;
 }
 
 .tg-sort-arrow-container > * {
-	opacity: 0; 
+	display: none; 
 	font-size: 10px !important;
 }
 .tg-sort-arrow-container > *:hover {
@@ -187,17 +186,17 @@
 }
 .tg-active-sort {
 	color: blue;
-	opacity: 1;
+	display: inherit;
 }
 
 
 .tg-filter-menu-button {
-	opacity: 0; 
+	display: none; 
 }
 
 .tg-active-filter {
 	color: blue;
-	opacity: 1; 
+	display: block; 
 }
 .data-table-footer {
 	display: flex;
