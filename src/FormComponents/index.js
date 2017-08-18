@@ -463,7 +463,7 @@ export const renderBlueprintRadioGroup = ({
         onFieldSubmit(e.target ? e.target.value : val);
       }}
     >
-      {options.map(function({ label, value, checked }, index) {
+      {options.map(function({ label, value }, index) {
         return (
           <Radio
             {...removeUnwantedProps(rest)}
