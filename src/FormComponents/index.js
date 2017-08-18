@@ -179,6 +179,7 @@ export const renderBlueprintCheckbox = props => {
     <Checkbox
       {...removeUnwantedProps(rest)}
       {...input}
+      checked={input.value}
       label={label}
       onChange={function(e, val) {
         input.onChange(e, val);

@@ -253,7 +253,8 @@ class FormComponentsDemo extends React.Component {
               onFieldSubmit={function(val) {
                 console.log("on field submit!:", val);
               }}
-              name={"fieldnumber6"}
+              defaultValue
+              name={"checkboxField"}
               label="Checkbox"
             />
             <TextareaField
