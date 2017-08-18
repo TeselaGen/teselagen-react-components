@@ -57,9 +57,10 @@ class AbstractInput extends React.Component {
     const {
       meta: { dispatch, form },
       defaultValue,
-      input: { name }
+      input: { name, value }
     } = this.props;
-    defaultValue !== undefined &&
+    !value &&
+      defaultValue !== undefined &&
       dispatch({
         type: "@@redux-form/CHANGE",
         meta: {
@@ -73,10 +74,10 @@ class AbstractInput extends React.Component {
   componentWillUpdate({
     meta: { dispatch, form },
     defaultValue,
-    input: { name }
+    input: { name, value }
   }) {
     const { defaultValue: oldDefaultValue } = this.props;
-    if (!deepEqual(defaultValue, oldDefaultValue)) {
+    if (!value && !deepEqual(defaultValue, oldDefaultValue)) {
       dispatch({
         type: "@@redux-form/CHANGE",
         meta: {
