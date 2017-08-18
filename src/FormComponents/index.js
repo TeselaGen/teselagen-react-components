@@ -452,12 +452,13 @@ export const renderBlueprintRadioGroup = ({
   input,
   options,
   onFieldSubmit,
+  selectedValue,
   ...rest
 }) => {
   return (
     <RadioGroup
-      selectedValue={input.value}
       {...input}
+      selectedValue={selectedValue}
       onChange={function(e, val, ...args) {
         input.onChange(e, val, ...args);
         onFieldSubmit(e.target ? e.target.value : val);
