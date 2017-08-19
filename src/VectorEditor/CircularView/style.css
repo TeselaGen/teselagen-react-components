@@ -18,5 +18,9 @@
 
 .selectionLayerInverseWrapper {
   fill: none !important; }
+  
+.rowViewTextContainer {
+  user-select: none;
+}
 
 /*# sourceMappingURL=style.css.map */
