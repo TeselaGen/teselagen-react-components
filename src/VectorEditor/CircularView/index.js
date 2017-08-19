@@ -511,17 +511,25 @@ export default class CircularView extends React.Component {
         >
           <div>
             <div
-              key="circViewSvgCenterText"
-              className={"veCircularViewMiddleOfVectorText"}
-              style={{ width: innerRadius, textAlign: "center" }}
+              style={{
+                position: "absolute",
+                width,
+                height
+              }}
             >
-              <span>
-                {sequenceName}{" "}
-              </span>
-              <br />
-              <span>
-                {sequenceLength + " bps"}
-              </span>
+              <div
+                key="circViewSvgCenterText"
+                className={"veCircularViewMiddleOfVectorText"}
+                style={{ width: innerRadius, textAlign: "center" }}
+              >
+                <span>
+                  {sequenceName}{" "}
+                </span>
+                <br />
+                <span>
+                  {sequenceLength + " bps"}
+                </span>
+              </div>
             </div>
             <svg
               key="circViewSvg"
