@@ -514,7 +514,8 @@ export default class CircularView extends React.Component {
               style={{
                 position: "absolute",
                 width,
-                height
+                height,
+                pointerEvents: "none"
               }}
             >
               <div
