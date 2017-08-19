@@ -23,7 +23,7 @@ const { withEditorInteractions, withEditorProps } = createVectorEditor({
 
 const CircularViewConnected = withEditorInteractions(CircularView);
 const RowViewConnected = withEditorInteractions(RowView);
-const LinearViewConnected = withEditorInteractions(LinearView);
+// const LinearViewConnected = withEditorInteractions(LinearView);
 // const RowItemConnected = withEditorProps(RowItem);
 const VeToolBarConnected = withEditorProps(VeToolBar);
 // const CutsiteFilterConnected = withEditorProps(CutsiteFilter);
@@ -35,7 +35,6 @@ export default function() {
 				<h1>ve-editor Demo</h1>
 				<VeToolBarConnected />
 				<h2>Redux Connected (aka interactive!) </h2>
-				<LinearViewConnected/>
 				<CircularViewConnected/>
 				<RowViewConnected/>
 				<h2>Not Redux Connected (aka non interactive) </h2>
