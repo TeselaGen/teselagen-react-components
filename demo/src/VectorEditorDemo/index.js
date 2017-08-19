@@ -23,6 +23,7 @@ const { withEditorInteractions, withEditorProps } = createVectorEditor({
 
 const CircularViewConnected = withEditorInteractions(CircularView);
 const RowViewConnected = withEditorInteractions(RowView);
+// const LinearViewConnected = withEditorInteractions(LinearView);
 // const RowItemConnected = withEditorProps(RowItem);
 const VeToolBarConnected = withEditorProps(VeToolBar);
 // const CutsiteFilterConnected = withEditorProps(CutsiteFilter);
