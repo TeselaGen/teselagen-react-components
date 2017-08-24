@@ -91,7 +91,7 @@
     "enzyme-to-json": "^1.5.1",
     "eslint": "^3.19.0",
     "eslint-config-react-app": "^1.0.4",
-    "eslint-config-teselagen": "^1.0.1",
+    "eslint-config-teselagen": "^1.0.4",
     "eslint-loader": "^1.7.1",
     "eslint-plugin-flowtype": "^2.34.0",
     "eslint-plugin-import": "^2.3.0",
