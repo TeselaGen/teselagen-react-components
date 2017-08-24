@@ -266,6 +266,8 @@ class RowView extends React.Component {
       ...props
     };
 
+    const { isDragInProgress } = propsToUse;
+
     var { caretPosition, selectionLayer } = propsToUse;
     var bpsPerRow = getBpsPerRow(propsToUse);
     //UPDATE THE ROW VIEW'S POSITION BASED ON CARET OR SELECTION CHANGES
@@ -291,9 +293,11 @@ class RowView extends React.Component {
       var rowToScrollTo = Math.floor(scrollToBp / bpsPerRow);
       var [start, end] = this.InfiniteScroller.getVisibleRange();
       if (rowToScrollTo < start || rowToScrollTo > end) {
-        this.InfiniteScroller.scrollTo(rowToScrollTo, {
-          jumpToBottomOfRow: scrollToBp > previousBp
-        });
+        if (!isDragInProgress()) {
+          this.InfiniteScroller.scrollTo(rowToScrollTo, {
+            jumpToBottomOfRow: scrollToBp > previousBp
+          });
+        }
       }
     }
   }
