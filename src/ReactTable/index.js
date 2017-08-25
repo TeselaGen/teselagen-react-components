@@ -3,14 +3,13 @@ import { withRouter } from "react-router-dom";
 import { Fields, reduxForm } from "redux-form";
 // import { connect } from "react-redux";
 import compose from "lodash/fp/compose";
-
+import { isEmpty, min, max, range } from "lodash";
 import "../toastr";
 import React from "react";
 import moment from "moment";
 import PagingTool from "./PagingTool";
 import camelCase from "lodash/camelCase";
 import { onEnterHelper } from "../utils/handlerHelpers";
-import getSelectedRowsFromRegions from "./utils/getSelectedRowsFromRegions";
 import FilterAndSortMenu from "./FilterAndSortMenu";
 
 import {
@@ -20,7 +19,8 @@ import {
   Spinner,
   Popover,
   Classes,
-  Position
+  Position,
+  ContextMenu
 } from "@blueprintjs/core";
 import ReactTable from "react-table";
 import { RegionCardinality, Regions } from "@blueprintjs/table";
@@ -149,19 +149,26 @@ class ReactDataTable extends React.Component {
             columns={this.getColumns()}
             defaultPageSize={numRows}
             showPagination={false}
-            sorting={false}
+            sortable={false}
             getTrProps={(state, rowInfo) => {
               if (!rowInfo) return {};
+              const rowId = rowInfo.original.id;
               const rowSelected =
-                reduxFormSelectedEntityIdMap.input.value[rowInfo.original.id];
+                reduxFormSelectedEntityIdMap.input.value[rowId];
               return {
-                onClick: () => {
-                  reduxFormSelectedEntityIdMap.input.onChange({
-                    [rowInfo.original.id]: true
-                  });
+                onClick: e => {
+                  this.handleRowClick(e, rowInfo);
                 },
-                onContextMenu: () => {
-                  //console.log('row context menu')
+                onContextMenu: e => {
+                  e.preventDefault();
+                  if (rowId === undefined) return;
+                  const oldIdMap =
+                    reduxFormSelectedEntityIdMap.input.value || {};
+                  const newIdMap = oldIdMap[rowId]
+                    ? oldIdMap
+                    : { [rowId]: true };
+                  reduxFormSelectedEntityIdMap.input.onChange(newIdMap);
+                  this.showContextMenu(newIdMap, e);
                 },
                 className: rowSelected ? "selected" : "",
                 onDoubleClick: () => {
@@ -229,29 +236,72 @@ class ReactDataTable extends React.Component {
     });
   };
 
-  renderBodyContextMenu = ({ regions }) => {
-    const { entities, history, contextMenu } = this.props;
-    //single selection
-    // const contextMenu = { ...(contextMenu || {}) };
-    const selectedRows = getSelectedRowsFromRegions(regions);
-    const selectedRecords = selectedRows.map(row => {
-      return entities[row];
-    });
-    if (selectedRows.length < 1 || !contextMenu || !contextMenu.length) {
-      return null;
+  handleRowClick = (e, rowInfo) => {
+    const rowId = rowInfo.original.id;
+    const { reduxFormSelectedEntityIdMap, entities } = this.props;
+    if (rowId === undefined) return;
+    const ctrl = e.metaKey || e.ctrlKey;
+    const oldIdMap = reduxFormSelectedEntityIdMap.input.value || {};
+    let newIdMap = {
+      [rowId]: true
+    };
+    if (ctrl) {
+      newIdMap = {
+        ...oldIdMap,
+        ...newIdMap
+      };
+    } else if (e.shiftKey && !isEmpty(oldIdMap)) {
+      const currentlySelectedRowIndices = entities.reduce((acc, entity, i) => {
+        return oldIdMap[entity.id] ? acc.concat(i) : acc;
+      }, []);
+      if (currentlySelectedRowIndices.length) {
+        const minIndex = min(currentlySelectedRowIndices);
+        const maxIndex = max(currentlySelectedRowIndices);
+        if (rowInfo.index < minIndex || rowInfo.index > maxIndex) {
+          if (
+            rowInfo.index === minIndex - 1 ||
+            rowInfo.index === maxIndex + 1
+          ) {
+            newIdMap = {
+              ...oldIdMap,
+              ...newIdMap
+            };
+          } else {
+            const highRange =
+              rowInfo.index < minIndex ? minIndex : rowInfo.index;
+            const lowRange =
+              rowInfo.index < minIndex ? rowInfo.index : maxIndex;
+            range(lowRange, highRange).forEach(index => {
+              const recordId = entities[index] && entities[index].id;
+              if (recordId || recordId === 0) newIdMap[recordId] = true;
+            });
+            newIdMap = {
+              ...oldIdMap,
+              ...newIdMap
+            };
+          }
+        }
+      }
     }
+    reduxFormSelectedEntityIdMap.input.onChange(newIdMap);
+  };
+
+  showContextMenu = (idMap, e) => {
+    const { entities, history, contextMenu } = this.props;
+    const selectedRecords = entities.reduce((acc, entity) => {
+      return idMap[entity.id] ? acc.concat(entity) : acc;
+    }, []);
     const itemsToRender = contextMenu({
       selectedRecords,
-      history,
-      selectedRows,
-      regions
+      history
     });
     if (!itemsToRender) return null;
-    return (
+    const menu = (
       <Menu>
         {itemsToRender}
       </Menu>
     );
+    ContextMenu.show(menu, { left: e.clientX, top: e.clientY });
   };
 
   renderColumnHeader = columnIndex => {
@@ -384,87 +434,3 @@ export default compose(
     />
   );
 });
-
-// function getSelectedRowsFromEntities(entities, idMap) {
-//   if (!idMap) return []
-//   return entities.reduce((acc, entity, i) => {
-//     if (idMap[entity.id]) {
-//       acc.push(i)
-//     }
-//     return acc
-//   }, [])
-// }
-
-// function getSelectedRegionsFromRowsArray(rowsArray) {
-//   //tnr note: selected regions are structured as blocks of regions
-//   // use getSelectedRowsFromRegions() to get the rows!
-//   // selectedRegions: [
-//   //     {
-//   //         "rows": [
-//   //             0, //selection block 1 going from row 0 to 1
-//   //             1
-//   //         ]
-//   //     },
-//   //     {
-//   //         "rows": [
-//   //             3, //selection block 2 going from row 3 to 3
-//   //             3
-//   //         ]
-//   //     }
-//   // ]
-//   const selectedRegions = rowsArray
-//     .sort()
-//     .reduce((acc, rowNum, i) => {
-//       const rowNumBefore = rowsArray[i - 1]
-//       const rowNumAfter = rowsArray[i + 1]
-//       if (rowNumBefore && rowNumBefore === rowNum - 1) {
-//         const arrayToAddTo = acc.find(o => o.rows.indexOf(rowNumBefore) > -1)
-//           .rows
-//         arrayToAddTo.push(rowNum)
-//       } else {
-//         const rows = [rowNum]
-//         if (!rowNumAfter || (rowNumAfter && rowNumAfter > rowNum + 1))
-//           rows.push(rowNum)
-//         acc.push({
-//           rows
-//         })
-//       }
-//       return acc
-//     }, [])
-//     .forEach(o => {
-//       if (o.rows.length > 2) o.rows = [o.rows[0], o.rows[o.rows.length - 1]]
-//     })
-//   return selectedRegions
-// }
-// // <ColumnHeaderCell
-// //   name={
-// //     <span title={displayName}>
-// //       <span>
-// //         {displayName + "  "}
-// //         {ordering &&
-// //           (ordering === "asc"
-// //             ? <span className={"pt-icon-standard pt-icon-arrow-down"} />
-// //             : <span className={"pt-icon-standard pt-icon-arrow-up"} />)}
-// //       </span>
-// //     </span>
-// //   }
-// //   renderMenu={function() {
-// //     return (
-// //       <FilterAndSortMenu
-// //         sortDisabled={sortDisabled}
-// //         setFilter={setFilter}
-// //         setOrder={setOrder}
-// //         filterOn={camelCase(displayName)}
-// //         dataType={columnDataType}
-// //         schemaForField={schemaForField}
-// //       />
-// //     );
-// //   }}
-// // />
-
-// function getIdMapFromSelectedRows(entities, selectedRows) {
-//   return selectedRows.reduce(function(acc, rowNum) {
-//     if (entities[rowNum]) acc[entities[rowNum].id] = true
-//     return acc
-//   }, {})
-// }

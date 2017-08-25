@@ -60,12 +60,14 @@ export default class DataTableWrapper extends React.Component {
 					}) {
 						return [
 							<MenuItem
+								key={1}
 								onClick={function() {
 									console.log("I got clicked!");
 								}}
 								text={"Menu text here"}
 							/>,
 							<MenuItem
+								key={2}
 								onClick={function() {
 									console.log("I also got clicked!");
 								}}

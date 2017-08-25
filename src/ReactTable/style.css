@@ -203,6 +203,10 @@
 	cursor: pointer;
 }
 
+.ReactTable .rt-tr.-odd {
+	background: #f4f4f4;
+}
+
 .ReactTable .rt-tr.selected {
 	background: lightblue;
 }
