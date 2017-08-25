@@ -2,6 +2,7 @@
 @import url(~@blueprintjs/table/dist/table.css);
 @import url(~@blueprintjs/datetime/dist/blueprint-datetime.css);
 @import url(~react-select/dist/react-select.css);
+@import url(~react-table/react-table.css);
 
 body {
 	margin: 10px;
