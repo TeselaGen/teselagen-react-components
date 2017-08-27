@@ -53,10 +53,10 @@ export default class DataTableWrapper extends React.Component {
 					}}
 					title={'Demo table'}
 					contextMenu={function({
-						selectedRecords,
-						history,
-						selectedRows,
-						regions
+						// selectedRecords,
+						// history,
+						// selectedRows,
+						// regions
 					}) {
 						return [
 							<MenuItem

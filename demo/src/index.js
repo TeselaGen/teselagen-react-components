@@ -12,7 +12,7 @@ import store from './store';
 import Perf from 'react-addons-perf'
 import ReactTableDemo from './ReactTableDemo'
 
-var demos = {
+const demos = {
   vectoreditor: VectorEditorDemo,
   datatable: DataTableDemo,
   'react-table': ReactTableDemo,

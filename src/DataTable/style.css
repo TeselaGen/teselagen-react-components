@@ -1,139 +1,139 @@
 .custom-menu-item {
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	word-wrap: normal;
-	display: block;
-	border-radius: 2px;
-	padding: 7px;
-	line-height: 16px;
-	color: inherit;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-wrap: normal;
+  display: block;
+  border-radius: 2px;
+  padding: 7px;
+  line-height: 16px;
+  color: inherit;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .menu-buttons {
-	display: flex;
-	justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .data-table-header-menu {
-	min-width: 210px;
+  min-width: 210px;
 }
 
 .bp-table-cell {
-	display: flex !important;
+  display: flex !important;
 }
 
 .bp-table-selection-enabled .bp-table-cell {
-	cursor: pointer !important;
+  cursor: pointer !important;
 }
 
 .data-table-search-and-filter {
-	display: flex;
+  display: flex;
 }
 
 .data-table-header {
-	display: flex;
-	justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .data-table-title {
-	font-size: 1.6em;
-	margin-right: 10px;
+  font-size: 1.6em;
+  margin-right: 10px;
 }
 
 .data-table-body {
-	margin-top: 20px;
-	height: 100%;
+  margin-top: 20px;
+  height: 100%;
 }
 
 .data-table-container {
-	padding: 20px;
-	height: 100%;
+  padding: 20px;
+  height: 100%;
 }
 
 .data-table-title-and-buttons {
-	display: flex;
+  display: flex;
 }
 
 .bp-table-selection-region {
-	border: 1px solid rgba(93, 10, 222, 0.42) !important;
-	background-color: rgba(0, 108, 171, .2) !important;
+  border: 1px solid rgba(93, 10, 222, 0.42) !important;
+  background-color: rgba(0, 108, 171, .2) !important;
 }
 
 .bp-table-cell-ledger-odd {
-	background-color: #f0f0f0;
+  background-color: #f0f0f0;
 }
 
 .bp-table-no-wrap-text {
-	display: flex !important;
-	align-items: center !important;
-	width: 100%;
+  display: flex !important;
+  align-items: center !important;
+  width: 100%;
 }
 .datatable-search-input {
-	width: 200px;
+  width: 200px;
 }
 
 .clickable-cell {
-	height: 100%;
-	width: 100%;
-	display: flex;
-	align-items: center;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .paging-toolbar-container {
-	margin-left: 5px;
-	display: flex;
-	justify-content: flex-end;
-	align-items: center;
+  margin-left: 5px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .paging-row-input {
-	margin-left: 10px;
+  margin-left: 10px;
 }
 .paging-row-input .pt-input-group .pt-input {
-	width: 40px;
+  width: 40px;
 }
 
 .paging-arrow-left {
-	cursor: pointer;
-	width: 20px;
-	margin-left: 20px;
-	margin-right: 20px;
+  cursor: pointer;
+  width: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 .paging-arrow-right {
-	cursor: pointer;
-	width: 20px;
-	margin-left: 20px;
+  cursor: pointer;
+  width: 20px;
+  margin-left: 20px;
 }
 :not(.pt-disabled).paging-arrow-right:hover {
-	font-size: 20px;
+  font-size: 20px;
 }
 :not(.pt-disabled).paging-arrow-left:hover {
-	font-size: 20px;
+  font-size: 20px;
 }
 .pt-icon-standard.pt-disabled {
-	cursor: not-allowed;
-	opacity: .7;
+  cursor: not-allowed;
+  opacity: .7;
 }
 
 .data-table-search-and-clear-filter-container {
-	display: flex;
+  display: flex;
 }
 
 .data-table-clear-filters {
-	margin-right: 20px;
+  margin-right: 20px;
 }
 
 .tg-checkbox-cell {
-	padding: 0px;
-	padding-top: 3px;
+  padding: 0px;
+  padding-top: 3px;
 }
 .tg-checkbox-header-cell {
-	padding: 0px;
-	padding-top: 3px;
+  padding: 0px;
+  padding-top: 3px;
 }
 /*.tg-checkbox-cell > div {
 	display: flex;
@@ -142,65 +142,63 @@
 	ali
 }*/
 .tg-checkbox-cell-inner {
-	margin-top: 4px;
-	margin-left: 9px;
+  margin-top: 4px;
+  margin-left: 9px;
 }
 
 .tg-datatable-column-header {
-	display: flex;
-	align-items: center;
-	justify-content: flex-start;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }
-
 
 .tg-datatable-column-header:hover * {
-	transition: 0.2s;
-	display: inherit !important; 
+  transition: 0.2s;
+  display: inherit !important;
 }
-/* .tg-datatable-column-header:hover .tg-filter-menu-button {
-	transition: 0.2s;
-	display: block !important; 
-} */
+
+.tg-datatable-column-header:hover .tg-filter-menu-button {
+  transition: 0.2s;
+  display: block !important;
+}
 
 .tg-datatable-name {
-	white-space: nowrap;
-	overflow: hidden;
-	min-width: 0px;
-	padding-left: 10px;
-	text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  min-width: 0px;
+  padding-left: 10px;
+  text-overflow: ellipsis;
 }
 
-
 .tg-sort-arrow-container {
-	margin-left: 4px;
-	display: flex;
-	flex-direction: column;
+  margin-left: 4px;
+  display: flex;
+  flex-direction: column;
 }
 
 .tg-sort-arrow-container > * {
-	display: none; 
-	font-size: 10px !important;
+  display: none;
+  font-size: 10px !important;
 }
 .tg-sort-arrow-container > *:hover {
-	background: rgba(167, 182, 194, 0.3)	
+  background: rgba(167, 182, 194, 0.3);
 }
 .tg-active-sort {
-	color: blue;
-	display: inherit;
+  color: blue;
+  display: inherit;
 }
 
-
 .tg-filter-menu-button {
-	display: none; 
+  display: none;
 }
 
 .tg-active-filter {
-	color: blue;
-	display: block; 
+  color: blue;
+  display: block;
 }
 .data-table-footer {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	justify-content: space-between;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
 }
