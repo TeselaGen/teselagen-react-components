@@ -2976,9 +2976,9 @@ eslint-config-react-app@^1.0.4:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/eslint-config-react-app/-/eslint-config-react-app-1.0.5.tgz#98337597bc01cc22991fcbdda07451f3b4511718"
 
-eslint-config-teselagen@^1.0.1:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/eslint-config-teselagen/-/eslint-config-teselagen-1.0.2.tgz#9d32089639298c42b69b46e22efcce84247fceeb"
+eslint-config-teselagen@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/eslint-config-teselagen/-/eslint-config-teselagen-1.0.4.tgz#e135f7c77cde7ad6265d113783d1f392e593d125"
 
 eslint-import-resolver-node@^0.3.1:
   version "0.3.1"

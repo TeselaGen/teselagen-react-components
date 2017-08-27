@@ -105,7 +105,7 @@ class AbstractInput extends React.Component {
 
     const componentToWrap = tooltipError
       ? <Tooltip
-          isDisabled={!tooltipError || !showError}
+          isDisabled={!showError}
           intent={Intent.DANGER}
           content={error}
           position={Position.TOP}
@@ -160,7 +160,7 @@ export const renderBlueprintInput = props => {
       {...removeUnwantedProps(rest)}
       intent={intent}
       {...input}
-      onKeyDown={function(e, ...args) {
+      onKeyDown={function(e) {
         if (e.key === "Enter") {
           onFieldSubmit(e.target.value, { enter: true }, e);
         }
@@ -201,13 +201,8 @@ export const renderAntFileUpload = ({
   input: { onChange, value = [] },
   ...rest
 }) => {
-  let acceptToUse = accept;
-  if (Array.isArray(accept)) {
-    acceptToUse = accept.reduce((acc, name) => {
-      acc += ", " + name;
-      return acc;
-    });
-  }
+  let acceptToUse = Array.isArray(accept) ? accept.join(", ") : accept;
+
   return (
     <div
       title={
@@ -263,7 +258,7 @@ export const renderBlueprintTextarea = props => {
         input.onBlur(e, val);
         onFieldSubmit(e.target ? e.target.value : val, { blur: true }, e);
       }}
-      onKeyDown={function(e, ...args) {
+      onKeyDown={function(e) {
         if (e.keyCode === 13 && (e.metaKey || e.ctrlKey)) {
           onFieldSubmit(e.target.value, { cmdEnter: true }, e);
         }
@@ -324,7 +319,7 @@ export const renderReactSelect = props => {
     options: optsToUse,
     value: valueToUse,
 
-    onChange: function(valOrVals, ...rest) {
+    onChange(valOrVals, ...rest) {
       const valToPass = Array.isArray(valOrVals)
         ? valOrVals.map(function(val) {
             return val.value;
@@ -453,13 +448,12 @@ export const renderBlueprintRadioGroup = ({
   input,
   options,
   onFieldSubmit,
-  selectedValue,
   ...rest
 }) => {
   return (
     <RadioGroup
       {...input}
-      selectedValue={selectedValue}
+      selectedValue={input.value}
       onChange={function(e, val, ...args) {
         input.onChange(e, val, ...args);
         onFieldSubmit(e.target ? e.target.value : val);
