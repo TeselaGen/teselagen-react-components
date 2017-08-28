@@ -35,9 +35,8 @@
   margin-right: 10px;
 }
 
-.data-table-body {
+.react-table-body {
   margin: 20px 0;
-  height: 100%;
 }
 
 .data-table-container {
@@ -181,6 +180,7 @@
 
 .ReactTable {
   user-select: none;
+  background: white;
 }
 
 .ReactTable .rt-thead.-header {

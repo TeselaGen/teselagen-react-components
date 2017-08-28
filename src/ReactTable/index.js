@@ -140,7 +140,7 @@ class ReactDataTable extends React.Component {
               />
             </div>}
         </div>
-        <div className={"data-table-body"}>
+        <div className={"react-table-body"}>
           <ReactTable
             data={entities}
             columns={this.renderColumns()}
