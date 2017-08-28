@@ -1,75 +1,28 @@
-//@flow
 import queryString from "query-string";
 import QueryBuilder from "tg-client-query-builder";
 import last from "lodash/last";
-import uniqBy from "lodash/uniqBy";
 import camelCase from "lodash/camelCase";
 
-export default function queryParams({
-  schema,
-  defaults = {},
-  isInfinite,
-  onlyOneFilter
-}) {
+export default function queryParams({ schema, defaults = {}, isInfinite }) {
   let defaultParams = {
     pageSize: 10,
     order: "",
     searchTerm: "",
     page: 1,
-    filters: [
-      //filters look like this:
-      // {
-      //   selectedFilter: undefined,
-      //   filterOn: undefined,
-      //   filterValue: undefined,
-      // }
-    ],
+    selectedFilter: undefined,
+    filterOn: undefined,
+    filterValue: undefined,
     ...defaults
   };
 
   function getCurrentParamsFromUrl(location) {
     const { search } = location;
-    return parseFilters(queryString.parse(search));
+    return jsonParseNested(queryString.parse(search));
   }
   function setCurrentParamsOnUrl(newParams, push) {
-    const stringifiedFilters = stringifyFilters(newParams);
     push({
-      search: `?${queryString.stringify(stringifiedFilters)}`
+      search: `?${queryString.stringify(jsonStringifyNested(newParams))}`
     });
-  }
-
-  function stringifyFilters(newParams) {
-    let filters = [];
-    if (newParams.filters && newParams.filters.length) {
-      filters = newParams.filters.reduce(
-        (acc, { filterOn, selectedFilter, filterValue }, index) => {
-          acc +=
-            (index > 0 ? "&&" : "") +
-            `${filterOn}__${selectedFilter}__${safeStringify(filterValue)}`;
-          return acc;
-        },
-        ""
-      );
-    }
-    return {
-      ...newParams,
-      filters
-    };
-  }
-  function parseFilters(newParams) {
-    return {
-      ...newParams,
-      filters:
-        newParams.filters &&
-        newParams.filters.split("&&").map(filter => {
-          const splitFilter = filter.split("__");
-          return {
-            filterOn: splitFilter[0],
-            selectedFilter: splitFilter[1],
-            filterValue: safeParse(splitFilter[2])
-          };
-        })
-    };
   }
 
   function buildRef(qb, reference, searchField, expression) {
@@ -117,17 +70,17 @@ export default function queryParams({
     let graphqlQueryParams = {};
     let { page, pageSize } = tableQueryParams;
     if (tableQueryParams.order) {
-      const orderOn = tableQueryParams.order.replace(/^reverse:/gi, "");
+      const filterOn = tableQueryParams.order.replace(/^reverse:/gi, "");
       const schemaForField = schema.fields.find(function(field) {
-        return camelCase(field.displayName) === orderOn;
+        return camelCase(field.displayName) === filterOn;
       });
       if (schemaForField) {
         const { path } = schemaForField;
-        let reversed = orderOn !== tableQueryParams.order;
+        let reversed = filterOn !== tableQueryParams.order;
         const prefix = reversed ? "-" : "";
-        graphqlQueryParams.sort = [prefix + (path || orderOn)];
+        graphqlQueryParams.sort = [prefix + (path || filterOn)];
       } else {
-        console.error("No schema for field found!", orderOn, schema.fields);
+        console.error("No schema for field found!", filterOn, schema.fields);
       }
     }
     // let graphqlQueryParams =
@@ -136,48 +89,49 @@ export default function queryParams({
     graphqlQueryParams.pageNumber = page;
     graphqlQueryParams.pageSize = pageSize;
 
-    const { searchTerm, filters } = tableQueryParams;
-    let errorParsingUrlString;
+    const {
+      searchTerm,
+      selectedFilter,
+      filterValue,
+      filterOn
+    } = tableQueryParams;
 
-    if (filters.length) {
-      filters.forEach(filter => {
-        if (!filter) {
-          console.warn("We should always have a filter object!");
-          return;
-        }
-        const { selectedFilter, filterValue, filterOn } = filter;
-        try {
-          const subFilter = getSubFilter(qb, selectedFilter, filterValue);
-          const { path, reference } = schema.fields.find(function(field) {
-            return camelCase(field.displayName) === filterOn;
+    // delete graphqlQueryParams.searchTerm;
+    // delete graphqlQueryParams.selectedFilter;
+    // delete graphqlQueryParams.filterValue;
+    // delete graphqlQueryParams.filterOn;
+
+    if (selectedFilter) {
+      try {
+        const subFilter = getSubFilter(qb, selectedFilter, filterValue);
+        const { path, reference } = schema.fields.find(function(field) {
+          return camelCase(field.displayName) === filterOn;
+        });
+        if (reference) {
+          qb.whereAny({
+            [reference.sourceField]: buildRef(
+              qb,
+              reference,
+              last(path.split(".")),
+              subFilter
+            )
           });
-          if (reference) {
-            qb.whereAny({
-              [reference.sourceField]: buildRef(
-                qb,
-                reference,
-                last(path.split(".")),
-                subFilter
-              )
-            });
-          } else {
-            qb.whereAny({
-              [path]: subFilter
-            });
-          }
-        } catch (e) {
-          if (urlConnected) {
-            errorParsingUrlString = e;
-            console.error(
-              "The following error occurred when trying to build the query params. This is probably due to a malformed URL:",
-              e
-            );
-          } else {
-            console.error("Error building query params from filter:");
-            throw e;
-          }
+        } else {
+          qb.whereAny({
+            [path]: subFilter
+          });
         }
-      });
+      } catch (e) {
+        if (urlConnected) {
+          console.error(
+            "The following error occurred when trying to build the query params. This is probably due to a malformed URL:",
+            e
+          );
+        } else {
+          console.error("Error building query params from filter:");
+          throw e;
+        }
+      }
     }
 
     if (searchTerm && searchTerm !== "") {
@@ -205,6 +159,7 @@ export default function queryParams({
       qb.orWhereAny(...searchTermFilters);
     }
     graphqlQueryParams.filter = qb.toJSON();
+
     if (isInfinite) {
       graphqlQueryParams.pageSize = 999;
       graphqlQueryParams.pageNumber = 1;
@@ -218,53 +173,45 @@ export default function queryParams({
       page,
       pageSize,
       order: graphqlQueryParams.sort,
-      filters,
-      errorParsingUrlString,
+      selectedFilter,
+      filterValue,
+      filterOn,
       searchTerm
     };
   }
   function makeDataTableHandlers({ setNewParams, resetSearch }) {
-    //all of these actions have currentParams bound to them as their last arg in withTableParams
     function setSearchTerm(searchTerm, currentParams) {
       let newParams = {
         ...currentParams,
+        selectedFilter: undefined,
         page: 1,
+        filterOn: undefined,
+        filterValue: undefined,
         searchTerm:
           searchTerm === defaultParams.searchTerm ? undefined : searchTerm
       };
       setNewParams(newParams);
-      onlyOneFilter && clearFilters();
     }
-    function addFilters(newFilters, currentParams) {
-      if (!newFilters) return;
-      const filters = uniqBy(
-        [...newFilters, ...(onlyOneFilter ? [] : currentParams.filters || [])],
-        "filterOn"
-      );
-
+    function setFilter(
+      { selectedFilter, filterValue, filterOn },
+      currentParams
+    ) {
       let newParams = {
         ...currentParams,
-        filters
+        selectedFilter,
+        filterOn,
+        filterValue,
+        searchTerm: undefined
       };
       setNewParams(newParams);
-      onlyOneFilter && resetSearch();
-    }
-    function removeSingleFilter(filterOn, currentParams) {
-      const filters = currentParams.filters
-        ? currentParams.filters.filter(filter => {
-            return filter.filterOn !== filterOn;
-          })
-        : undefined;
-      let newParams = {
-        ...currentParams,
-        filters
-      };
-      setNewParams(newParams);
+      resetSearch();
     }
     function clearFilters(currentParams) {
       setNewParams({
         ...currentParams,
-        filters: undefined,
+        selectedFilter: undefined,
+        filterOn: undefined,
+        filterValue: undefined,
         searchTerm: undefined
       });
       resetSearch();
@@ -293,9 +240,8 @@ export default function queryParams({
     }
     return {
       setSearchTerm,
-      addFilters,
+      setFilter,
       clearFilters,
-      removeSingleFilter,
       setPageSize,
       setPage,
       setOrder
@@ -310,31 +256,42 @@ export default function queryParams({
   };
 }
 
-function safeStringify(val) {
-  if (val !== null && typeof val === "object") {
-    return JSON.stringify(val);
-  }
-  return val;
+function jsonStringifyNested(obj) {
+  let newObj = {};
+  Object.keys(obj).forEach(function(key) {
+    let val = obj[key];
+    if (val !== null && typeof val === "object") {
+      newObj[key] = JSON.stringify(val);
+    } else {
+      newObj[key] = val;
+    }
+  });
+  return newObj;
 }
 
-function safeParse(val) {
-  try {
-    return JSON.parse(val);
-  } catch (e) {
-    return val;
-  }
+function jsonParseNested(obj) {
+  let newObj = {};
+  Object.keys(obj).forEach(function(key) {
+    let val = obj[key];
+    try {
+      newObj[key] = JSON.parse(val);
+    } catch (e) {
+      newObj[key] = val;
+    }
+  });
+  return newObj;
 }
 
 function getSubFilter(qb, selectedFilter, filterValue) {
-  if (selectedFilter === "Starts with") return qb.startsWith(filterValue);
-  else if (selectedFilter === "Ends with") return qb.endsWith(filterValue);
-  else if (selectedFilter === "Contains") return qb.contains(filterValue);
-  else if (selectedFilter === "Is exactly") return filterValue;
-  else if (selectedFilter === "Is between")
+  if (selectedFilter === "Text starts with") return qb.startsWith(filterValue);
+  else if (selectedFilter === "Text ends with") return qb.endsWith(filterValue);
+  else if (selectedFilter === "Text contains") return qb.contains(filterValue);
+  else if (selectedFilter === "Text is exactly") return filterValue;
+  else if (selectedFilter === "Date is between")
     return qb.between([filterValue[0].getTime(), filterValue[1].getTime()]);
-  else if (selectedFilter === "Is before")
+  else if (selectedFilter === "Date is before")
     return qb.lessThan(filterValue.getTime());
-  else if (selectedFilter === "Is after")
+  else if (selectedFilter === "Date is after")
     return qb.greaterThan(filterValue.getTime());
   else if (selectedFilter === "Greater than")
     return qb.greaterThan(filterValue);

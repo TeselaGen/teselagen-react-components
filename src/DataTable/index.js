@@ -119,13 +119,12 @@ class DataTable extends React.Component {
       ? schema.fields.reduce(function(columns, field, i) {
           if (field.isHidden) {
             return columns;
-          } else {
-            columns.push({ displayName: field.displayName, schemaIndex: i });
-            return columns;
           }
+          columns.push({ displayName: field.displayName, schemaIndex: i });
+          return columns;
         }, [])
       : [];
-    this.setState({ columns: columns });
+    this.setState({ columns });
   }
   render() {
     const {
@@ -289,7 +288,7 @@ class DataTable extends React.Component {
                   ? SelectionModes.NONE
                   : SelectionModes.ROWS_AND_CELLS
               }
-              onSelection={(selectedRegions, ...args) => {
+              onSelection={selectedRegions => {
                 //tnr: we might need to come back here and manually add in logic to stop multiple rows from being selected when
                 // allowMultipleSelection is false
                 // const selectedRows = getSelectedRowsFromRegions(selectedRegions)
@@ -383,7 +382,7 @@ class DataTable extends React.Component {
     return columnsToRender;
   };
 
-  renderCheckboxCell = (rowIndex: number, columnIndex: number) => {
+  renderCheckboxCell = (rowIndex: number /*, columnIndex: number*/) => {
     const { entities, reduxFormSelectedEntityIdMap } = this.props;
 
     const checkedRows = getSelectedRowsFromEntities(
@@ -408,10 +407,10 @@ class DataTable extends React.Component {
             const isRowCurrentlyChecked = checkedRows.indexOf(rowIndex) > -1;
 
             if (e.shiftKey && rowIndex !== lastCheckedRow) {
-              var start = rowIndex;
-              var end = lastCheckedRow;
+              let start = rowIndex;
+              let end = lastCheckedRow;
               for (
-                var i = Math.min(start, end);
+                let i = Math.min(start, end);
                 i < Math.max(start, end) + 1;
                 i++
               ) {
@@ -506,7 +505,7 @@ class DataTable extends React.Component {
     );
   };
 
-  renderCheckboxHeader = (columnIndex: number) => {
+  renderCheckboxHeader = (/*columnIndex: number*/) => {
     const { entities, reduxFormSelectedEntityIdMap } = this.props;
     const checkedRows = getSelectedRowsFromEntities(
       entities,
@@ -528,7 +527,7 @@ class DataTable extends React.Component {
     return (
       <ColumnHeaderCell className={"tg-checkbox-header-cell"}>
         <Checkbox
-          onChange={e => {
+          onChange={() => {
             let newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
             Array.from(Array(entities.length).keys()).forEach(function(i) {
               if (checkboxProps.checked) {
@@ -575,7 +574,7 @@ class DataTable extends React.Component {
 
     if (order && order.length) {
       order.forEach(function(order) {
-        var orderField = order.replace("-", "");
+        let orderField = order.replace("-", "");
         if (orderField === ccDisplayName) {
           if (orderField === order) {
             ordering = "asc";
