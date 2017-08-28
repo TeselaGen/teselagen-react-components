@@ -34,12 +34,17 @@ const renderToggle = (that, type, description) => {
   );
 };
 
-export default class TableDemo extends React.Component {
+export default class DataTableDemo extends React.Component {
   state = {
+    renderUnconnectedTable: false,
     urlConnected: true,
     onlyOneFilter: false,
     inDialog: false
   };
+  componentWillMount() {
+    //tnr: the following code allows the DataTable test to set defaults on the demo (which is used in the testing)
+    this.setState(this.props);
+  }
 
   render() {
     let ConnectedTable = withTableParams(DataTableInstance, {
@@ -58,6 +63,11 @@ export default class TableDemo extends React.Component {
             <div>
               <h3>Demo specific options:</h3>
               <br />
+              {renderToggle(
+                this,
+                "renderUnconnectedTable",
+                "Render the table without the withTableParams wrapper. It's just a simple disconnected react component. You'll need to handle paging/sort/filters yourself. Try hitting isInfinite to see something actually show up with it"
+              )}
               {renderToggle(this, "inDialog", "Render the table in a dialog")}
               <h3>withTableParams options:</h3>
               <br />
@@ -83,19 +93,15 @@ export default class TableDemo extends React.Component {
                   >
                     <ConnectedTable />
                   </Dialog>
-                : <ConnectedTable />}
-              <br />
-              <h3>
-                Unconnected - Not connected to params (aka you'll need to handle
-                paging/sort/filters yourself){" "}
-              </h3>
-              <DataTableInstance
-                {...{
-                  tableParams: {
-                    schema
-                  }
-                }}
-              />
+                : this.state.renderUnconnectedTable
+                  ? <DataTableInstance
+                      {...{
+                        tableParams: {
+                          schema
+                        }
+                      }}
+                    />
+                  : <ConnectedTable />}
               <br />
             </div>
           </Router>
@@ -105,7 +111,7 @@ export default class TableDemo extends React.Component {
   }
 }
 
-class DataTableInstance extends React.Component {
+export class DataTableInstance extends React.Component {
   state = {
     additionalFilters: false,
     withTitle: true,
@@ -132,7 +138,7 @@ class DataTableInstance extends React.Component {
         selectedFilter: "Contains",
         filterValue: "aj"
       }
-		];
+    ];
     return (
       <div>
         <h3>Table Level Options</h3>
