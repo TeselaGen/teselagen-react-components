@@ -64,6 +64,7 @@ class ReactDataTable extends React.Component {
             ? columns
             : columns.concat({
                 displayName: field.displayName,
+                width: field.width,
                 schemaIndex
               });
         }, [])
@@ -139,7 +140,7 @@ class ReactDataTable extends React.Component {
         <div className={"data-table-body"}>
           <ReactTable
             data={entities}
-            columns={this.getColumns()}
+            columns={this.renderColumns()}
             defaultPageSize={numRows}
             pageSize={numRows}
             showPagination={false}
@@ -331,7 +332,7 @@ class ReactDataTable extends React.Component {
     );
   };
 
-  getColumns = () => {
+  renderColumns = () => {
     const { schema, cellRenderer, withCheckboxes } = this.props;
     const { columns } = this.state;
     if (!columns.length) {
@@ -363,6 +364,9 @@ class ReactDataTable extends React.Component {
         Header: this.renderColumnHeader(column.schemaIndex),
         accessor: schemaForColumn.path
       };
+      if (column.width) {
+        tableColumn.width = column.width;
+      }
       if (schemaForColumn.type === "timestamp") {
         tableColumn.Cell = props =>
           <span>
