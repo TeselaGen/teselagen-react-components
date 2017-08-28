@@ -53,7 +53,10 @@ class ReactDataTable extends React.Component {
     setPageSize: noop,
     setOrder: noop,
     setPage: noop,
-    onDoubleClick: noop
+    onDoubleClick: noop,
+    onMultiRowSelect: noop,
+    onSingleRowSelect: noop,
+    onDeselect: noop
   };
 
   componentWillMount() {

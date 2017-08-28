@@ -91,7 +91,7 @@ export default (e, rowInfo, props) => {
   reduxFormSelectedEntityIdMap.input.onChange(newIdMap);
   const selectedRecords = getSelectedRecordsFromEntities(entities, newIdMap);
   selectedRecords.length === 0
-    ? onDeselect && onDeselect()
+    ? onDeselect()
     : selectedRecords.length > 1
       ? onMultiRowSelect(selectedRecords)
       : onSingleRowSelect(selectedRecords[0]);
