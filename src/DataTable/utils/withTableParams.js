@@ -57,7 +57,7 @@ export default function withTableParams(
       filterValue,
       filterOn,
       searchTerm,
-      schema: schema,
+      schema,
       currentParams,
       initialValues: { reduxFormSearchInput: currentParams.searchTerm }
     };
