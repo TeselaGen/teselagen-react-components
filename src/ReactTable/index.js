@@ -93,6 +93,7 @@ class ReactDataTable extends React.Component {
       isInfinite,
       onRefresh,
       page,
+      height,
       pageSize,
       reduxFormSearchInput,
       reduxFormSelectedEntityIdMap,
@@ -151,7 +152,9 @@ class ReactDataTable extends React.Component {
             className={"-striped"}
             loading={isLoading}
             getTrGroupProps={this.getTableRowProps}
-            getTbodyProps={this.getTableBodyProps}
+            style={{
+              height
+            }}
           />
         </div>
         <div className={"data-table-footer"}>
@@ -178,24 +181,6 @@ class ReactDataTable extends React.Component {
       </div>
     );
   }
-
-  getTableBodyProps = () => {
-    // set the table body height to the target height minus the height of the header
-    const { height: targetHeight } = this.props;
-    const headerHeight = 45;
-    const isPercent = targetHeight.indexOf && targetHeight.indexOf("%") > -1;
-    let height = parseInt(targetHeight, 10);
-    if (isPercent) {
-      height = `calc(${height}% - ${headerHeight}px)`;
-    } else {
-      height = height - headerHeight;
-    }
-    return {
-      style: {
-        height
-      }
-    };
-  };
 
   getTableRowProps = (state, rowInfo) => {
     const {

@@ -37,6 +37,7 @@
 
 .react-table-body {
   margin: 20px 0;
+  height: 100%;
 }
 
 .data-table-container {
@@ -190,6 +191,11 @@
 
 .ReactTable .rt-td {
   cursor: pointer;
+  height: 40px;
+}
+
+.ReactTable .rt-tr-group {
+  flex: initial;
 }
 
 .ReactTable .rt-tr-group.selected {
