@@ -361,7 +361,7 @@ class ReactDataTable extends React.Component {
     columns.forEach(column => {
       const schemaForColumn = schema.fields[column.schemaIndex];
       const tableColumn = {
-        Header: this.renderColumnHeader(column.schemaIndex),
+        Header: this.renderColumnHeader(column),
         accessor: schemaForColumn.path
       };
       if (column.width) {
@@ -407,10 +407,8 @@ class ReactDataTable extends React.Component {
     ContextMenu.show(menu, { left: e.clientX, top: e.clientY });
   };
 
-  renderColumnHeader = columnIndex => {
+  renderColumnHeader = column => {
     const { schema, setFilter, setOrder, order, filterOn } = this.props;
-    const { columns } = this.state;
-    const column = columns[columnIndex];
     const schemaIndex = column["schemaIndex"];
     const schemaForField = schema.fields[schemaIndex];
     const { displayName, sortDisabled } = schemaForField;

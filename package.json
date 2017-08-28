@@ -121,7 +121,7 @@
   },
   "lint-staged": {
     "src/**/*.js ": [
-      "eslint --fix --max-warnings=0",
+      "eslint --fix",
       "prettier --write",
       "yarn test:staged",
       "git add"
