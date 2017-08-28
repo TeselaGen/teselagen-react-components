@@ -89,7 +89,6 @@ class ReactDataTable extends React.Component {
       isInfinite,
       onRefresh,
       page,
-      height,
       pageSize,
       reduxFormSearchInput,
       reduxFormSelectedEntityIdMap,
@@ -105,12 +104,8 @@ class ReactDataTable extends React.Component {
     const selectedRowCount = Object.keys(
       reduxFormSelectedEntityIdMap.input.value || {}
     ).length;
-
     return (
-      <div
-        style={{ height }}
-        className={"data-table-container " + extraClasses}
-      >
+      <div className={"data-table-container " + extraClasses}>
         <div className={"data-table-header"}>
           <div className={"data-table-title-and-buttons"}>
             {tableName &&
@@ -146,10 +141,13 @@ class ReactDataTable extends React.Component {
             data={entities}
             columns={this.getColumns()}
             defaultPageSize={numRows}
+            pageSize={numRows}
             showPagination={false}
             sortable={false}
             className={"-striped"}
+            loading={isLoading}
             getTrGroupProps={this.getTableRowProps}
+            getTbodyProps={this.getTableBodyProps}
           />
         </div>
         <div className={"data-table-footer"}>
@@ -176,6 +174,24 @@ class ReactDataTable extends React.Component {
       </div>
     );
   }
+
+  getTableBodyProps = () => {
+    // set the table body height to the target height minus the height of the header
+    const { height: targetHeight } = this.props;
+    const headerHeight = 45;
+    const isPercent = targetHeight.indexOf && targetHeight.indexOf("%") > -1;
+    let height = parseInt(targetHeight, 10);
+    if (isPercent) {
+      height = `calc(${height}% - ${headerHeight}px)`;
+    } else {
+      height = height - headerHeight;
+    }
+    return {
+      style: {
+        height
+      }
+    };
+  };
 
   getTableRowProps = (state, rowInfo) => {
     const {

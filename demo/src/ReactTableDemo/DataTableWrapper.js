@@ -10,6 +10,7 @@ export default class DataTableWrapper extends React.Component {
 		withSearch: true,
 		withPaging: true,
 		isInfinite: false,
+		isLoading: false,
 		withCheckboxes: true,
 	}
 	render() {
@@ -33,7 +34,7 @@ export default class DataTableWrapper extends React.Component {
 		if (this.state.isInfinite) {
 			entitiesToPass = entities
 		} else {
-			for (var i = (page - 1) * pageSize; i < page*pageSize; i++) {
+			for (let i = (page - 1) * pageSize; i < page*pageSize; i++) {
 				entities[i] && entitiesToPass.push(entities[i])
 			}
 		}
@@ -43,6 +44,7 @@ export default class DataTableWrapper extends React.Component {
 				{renderToggle('withSearch')}
 				{renderToggle('withPaging')}
 				{renderToggle('isInfinite')}
+				{renderToggle('isLoading')}
 				{renderToggle('withCheckboxes')}
 				<ReactTable
 					{...tableParams}
@@ -51,13 +53,14 @@ export default class DataTableWrapper extends React.Component {
 					onDoubleClick={function() {
 						console.log("double clicked");
 					}}
+					height={'20%'}
 					title={'Demo table'}
-					contextMenu={function({
-						// selectedRecords,
-						// history,
-						// selectedRows,
-						// regions
-					}) {
+					contextMenu={function(/*{
+						selectedRecords,
+						history,
+						selectedRows,
+						regions
+					}*/) {
 						return [
 							<MenuItem
 								key={1}
@@ -79,6 +82,7 @@ export default class DataTableWrapper extends React.Component {
 					withSearch={this.state.withSearch}
 					withPaging={this.state.withPaging}
 					isInfinite={this.state.isInfinite}
+					isLoading={this.state.isLoading}
 					withCheckboxes={this.state.withCheckboxes}
 					onRefresh={() => {
 						alert("clicked refresh!");
