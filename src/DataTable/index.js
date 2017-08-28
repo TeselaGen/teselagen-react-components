@@ -8,6 +8,7 @@ import "../toastr";
 import React from "react";
 import times from "lodash/times";
 import moment from "moment";
+import deepEqual from "deep-equal";
 import PagingTool from "./PagingTool";
 import camelCase from "lodash/camelCase";
 import { onEnterHelper } from "../utils/handlerHelpers";
@@ -95,27 +96,35 @@ class DataTable extends React.Component {
     isInfinite: false,
     withCheckboxes: false,
     setSearchTerm: noop,
-    setFilter: noop,
+    addFilters: noop,
     clearFilters: noop,
+    removeSingleFilter: noop,
     setPageSize: noop,
+    filters: [],
     setOrder: noop,
     setPage: noop,
     onDoubleClick: noop
   };
 
+  componentWillUpdate(newProps) {
+    if (!deepEqual(newProps.additionalFilters, this.props.additionalFilters)) {
+      newProps.addFilters(newProps.additionalFilters);
+    }
+  }
+
   componentWillMount() {
+    this.props.addFilters(this.props.additionalFilters);
     const { schema = {} } = this.props;
     const columns = schema.fields
       ? schema.fields.reduce(function(columns, field, i) {
           if (field.isHidden) {
             return columns;
-          } else {
-            columns.push({ displayName: field.displayName, schemaIndex: i });
-            return columns;
           }
+          columns.push({ displayName: field.displayName, schemaIndex: i });
+          return columns;
         }, [])
       : [];
-    this.setState({ columns: columns });
+    this.setState({ columns });
   }
   render() {
     const {
@@ -142,16 +151,33 @@ class DataTable extends React.Component {
       page,
       height,
       pageSize,
+      schema,
       reduxFormSearchInput,
       reduxFormSelectedEntityIdMap,
-      selectedFilter,
+      filters,
+      errorParsingUrlString,
       bpTableProps = {}
     } = this.props;
     const { dimensions, columns } = this.state;
     let { width } = dimensions;
     if (containerWidth) width = containerWidth;
 
-    const hasFilters = selectedFilter || searchTerm;
+    const hasFilters = filters.length || searchTerm;
+    const filtersOnNonDisplayedFields = [];
+    schema.fields.forEach(({ isHidden, displayName }) => {
+      const ccDisplayName = camelCase(displayName);
+      if (isHidden) {
+        filters.forEach(filter => {
+          if (filter.filterOn === ccDisplayName) {
+            filtersOnNonDisplayedFields.push({
+              ...filter,
+              displayName
+            });
+          }
+        });
+      }
+    });
+
     const numRows = isInfinite ? entities.length : pageSize;
     const maybeSpinner = isLoading
       ? <Spinner className={Classes.SMALL} />
@@ -191,9 +217,29 @@ class DataTable extends React.Component {
               <span className={"data-table-title"}>
                 {tableName}
               </span>}
-
             {this.props.children}
           </div>
+          {errorParsingUrlString &&
+            <span className={"pt-icon-error pt-intent-warning"}>
+              Error parsing URL
+            </span>}
+          {filtersOnNonDisplayedFields.length
+            ? filtersOnNonDisplayedFields.map(
+                ({ displayName, selectedFilter, filterValue }) => {
+                  return (
+                    <div
+                      key={displayName}
+                      className={"tg-filter-on-non-displayed-field"}
+                    >
+                      <span className={"pt-icon-filter"} />
+                      <span>
+                        {" "}{displayName} {selectedFilter} {filterValue}{" "}
+                      </span>
+                    </div>
+                  );
+                }
+              )
+            : ""}
           {withSearch &&
             <div className={"data-table-search-and-clear-filter-container"}>
               {hasFilters
@@ -242,7 +288,7 @@ class DataTable extends React.Component {
                   ? SelectionModes.NONE
                   : SelectionModes.ROWS_AND_CELLS
               }
-              onSelection={(selectedRegions, ...args) => {
+              onSelection={selectedRegions => {
                 //tnr: we might need to come back here and manually add in logic to stop multiple rows from being selected when
                 // allowMultipleSelection is false
                 // const selectedRows = getSelectedRowsFromRegions(selectedRegions)
@@ -336,7 +382,7 @@ class DataTable extends React.Component {
     return columnsToRender;
   };
 
-  renderCheckboxCell = (rowIndex: number, columnIndex: number) => {
+  renderCheckboxCell = (rowIndex: number /*, columnIndex: number*/) => {
     const { entities, reduxFormSelectedEntityIdMap } = this.props;
 
     const checkedRows = getSelectedRowsFromEntities(
@@ -361,10 +407,10 @@ class DataTable extends React.Component {
             const isRowCurrentlyChecked = checkedRows.indexOf(rowIndex) > -1;
 
             if (e.shiftKey && rowIndex !== lastCheckedRow) {
-              var start = rowIndex;
-              var end = lastCheckedRow;
+              let start = rowIndex;
+              let end = lastCheckedRow;
               for (
-                var i = Math.min(start, end);
+                let i = Math.min(start, end);
                 i < Math.max(start, end) + 1;
                 i++
               ) {
@@ -459,7 +505,7 @@ class DataTable extends React.Component {
     );
   };
 
-  renderCheckboxHeader = (columnIndex: number) => {
+  renderCheckboxHeader = (/*columnIndex: number*/) => {
     const { entities, reduxFormSelectedEntityIdMap } = this.props;
     const checkedRows = getSelectedRowsFromEntities(
       entities,
@@ -481,7 +527,7 @@ class DataTable extends React.Component {
     return (
       <ColumnHeaderCell className={"tg-checkbox-header-cell"}>
         <Checkbox
-          onChange={e => {
+          onChange={() => {
             let newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
             Array.from(Array(entities.length).keys()).forEach(function(i) {
               if (checkboxProps.checked) {
@@ -505,10 +551,11 @@ class DataTable extends React.Component {
   renderColumnHeader = (columnIndex: number) => {
     const {
       schema,
-      setFilter,
+      addFilters,
       setOrder,
       order,
-      filterOn,
+      filters,
+      removeSingleFilter,
       withCheckboxes
     } = this.props;
     const { columns } = this.state;
@@ -518,13 +565,16 @@ class DataTable extends React.Component {
     const { displayName, sortDisabled } = schemaForField;
     const columnDataType = schemaForField.type;
     const ccDisplayName = camelCase(displayName);
-    const activeFilterClass =
-      filterOn === ccDisplayName ? " tg-active-filter" : "";
+    const activeFilterClass = filters.some(({ filterOn }) => {
+      return filterOn === ccDisplayName;
+    })
+      ? " tg-active-filter"
+      : "";
     let ordering;
 
     if (order && order.length) {
       order.forEach(function(order) {
-        var orderField = order.replace("-", "");
+        let orderField = order.replace("-", "");
         if (orderField === ccDisplayName) {
           if (orderField === order) {
             ordering = "asc";
@@ -575,7 +625,13 @@ class DataTable extends React.Component {
               iconName="filter"
             />
             <FilterAndSortMenu
-              setFilter={setFilter}
+              addFilters={addFilters}
+              removeSingleFilter={removeSingleFilter}
+              currentFilter={
+                filters.filter(({ filterOn }) => {
+                  return filterOn === ccDisplayName;
+                })[0]
+              }
               filterOn={ccDisplayName}
               dataType={columnDataType}
               schemaForField={schemaForField}
@@ -706,7 +762,7 @@ function getSelectedRegionsFromRowsArray(rowsArray) {
 //     return (
 //       <FilterAndSortMenu
 //         sortDisabled={sortDisabled}
-//         setFilter={setFilter}
+//         addFilters={addFilters}
 //         setOrder={setOrder}
 //         filterOn={camelCase(displayName)}
 //         dataType={columnDataType}

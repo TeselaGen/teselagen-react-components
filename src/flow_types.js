@@ -10,8 +10,6 @@ const tableDataTypes = {
 };
 export type TableDataTypes = $Keys<typeof tableDataTypes>;
 
-export type SchemaForField = SchemaForFieldRelated | SchemaForFieldNonRelated;
-
 export type TableParams = {
   reduxFormSearchInput: Object,
   history: Object,
@@ -24,7 +22,7 @@ export type TableParams = {
   searchTerm: string,
   columns: Array<string>,
   setSearchTerm: Function,
-  setFilter: Function,
+  addFilters: Function,
   clearFilters: Function,
   setPageSize: Function,
   setOrder: Function,
@@ -33,16 +31,26 @@ export type TableParams = {
 
 type SchemaForFieldNonRelated = {
   type: TableDataTypes,
-  displayName: string
+  displayName: string,
+  isHidden: boolean,
+  path: string
+};
+
+type FieldReference = {
+  sourceField: "string",
+  target: "string",
+  reference: FieldReference
 };
 
 type SchemaForFieldRelated = {
   type: TableDataTypes,
   displayName: string,
-  model: string,
+  isHidden: boolean,
   path: string,
-  field: string
+  reference: FieldReference
 };
+
+export type SchemaForField = SchemaForFieldRelated | SchemaForFieldNonRelated;
 
 export type DataTableSchema = {
   fields: {
@@ -51,23 +59,23 @@ export type DataTableSchema = {
   customFields?: Object
 };
 
-const stringOperationTypes = {
-  startsWith: "startsWith",
-  endsWith: "endsWith",
-  contains: "contains",
-  exactlyMatches: "exactlyMatches"
-};
+// const stringOperationTypes = {
+//   startsWith: "startsWith",
+//   endsWith: "endsWith",
+//   contains: "contains",
+//   exactlyMatches: "exactlyMatches"
+// };
 
-type StringOperationTypes = $Keys<typeof stringOperationTypes>;
+// type StringOperationTypes = $Keys<typeof stringOperationTypes>;
 
-const numberAndTimestampOperationTypes = {
-  greaterThan: "greaterThan",
-  lessThan: "lessThan",
-  rangeOf: "rangeOf",
-  equalTo: "equalTo",
-  greaterThanEqualTo: "greaterThanEqualTo",
-  lessThanEqualTo: "lessThanEqualTo"
-};
+// const numberAndTimestampOperationTypes = {
+//   greaterThan: "greaterThan",
+//   lessThan: "lessThan",
+//   rangeOf: "rangeOf",
+//   equalTo: "equalTo",
+//   greaterThanEqualTo: "greaterThanEqualTo",
+//   lessThanEqualTo: "lessThanEqualTo"
+// };
 
 // type NumberAndTimestampOperationTypes = $Keys<
 //   typeof numberAndTimestampOperationTypes

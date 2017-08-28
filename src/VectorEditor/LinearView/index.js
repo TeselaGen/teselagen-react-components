@@ -6,8 +6,7 @@ import Draggable from "react-draggable";
 import RowItem from "../RowItem";
 import "./style.css";
 
-var defaultCharWidth = 12;
-var defaultMarginWidth = 10;
+let defaultMarginWidth = 10;
 // import Combokeys from "combokeys";
 // var combokeys;
 
@@ -15,36 +14,32 @@ function noop() {}
 
 export default class LinearView extends React.Component {
   getNearestCursorPositionToMouseEvent(rowData, event, callback) {
-    var { charWidth = defaultCharWidth } = {
-      ...this.props.veWrapperProvidedProps,
-      ...this.props
-    };
-    var rowNotFound = true;
+    let rowNotFound = true;
     //loop through all the rendered rows to see if the click event lands in one of them
-    var nearestCaretPos = 0;
-    var rowDomNode = this.linearView;
-    var boundingRowRect = rowDomNode.getBoundingClientRect();
+    let nearestCaretPos = 0;
+    let rowDomNode = this.linearView;
+    let boundingRowRect = rowDomNode.getBoundingClientRect();
     if (
       event.clientY > boundingRowRect.top &&
       event.clientY < boundingRowRect.top + boundingRowRect.height
     ) {
       //then the click is falls within this row
       rowNotFound = false;
-      var row = rowData[0];
+      let row = rowData[0];
       if (event.clientX - boundingRowRect.left < 0) {
         nearestCaretPos = row.start;
       } else {
-        var clickXPositionRelativeToRowContainer =
+        let clickXPositionRelativeToRowContainer =
           event.clientX - boundingRowRect.left;
-        var numberOfBPsInFromRowStart = Math.floor(
-          (clickXPositionRelativeToRowContainer + charWidth / 2) / charWidth
+        let numberOfBPsInFromRowStart = Math.floor(
+          (clickXPositionRelativeToRowContainer + this.charWidth / 2) /
+            this.charWidth
         );
         nearestCaretPos = numberOfBPsInFromRowStart + row.start;
         if (nearestCaretPos > row.end + 1) {
           nearestCaretPos = row.end + 1;
         }
       }
-      return true; //break the loop early because we found the row the click event landed in
     }
 
     if (rowNotFound) {
@@ -62,8 +57,7 @@ export default class LinearView extends React.Component {
 
       nearestCaretPos = 0;
     }
-
-    callback({
+    const callbackVals = {
       shiftHeld: event.shiftKey,
       nearestCaretPos,
       caretGrabbed: event.target.className === "cursor",
@@ -73,7 +67,8 @@ export default class LinearView extends React.Component {
       selectionEndGrabbed: event.target.classList.contains(
         draggableClassnames.selectionEnd
       )
-    });
+    };
+    callback(callbackVals);
   }
 
   // componentDidMount() {
@@ -148,8 +143,8 @@ export default class LinearView extends React.Component {
   // }
 
   render() {
-    var propsToUse = { ...this.props.veWrapperProvidedProps, ...this.props };
-    var {
+    let propsToUse = { ...this.props.veWrapperProvidedProps, ...this.props };
+    let {
       //currently found in props
       sequenceData = {},
       // bpToJumpTo=0,
@@ -163,11 +158,13 @@ export default class LinearView extends React.Component {
       height,
       ...rest
     } = propsToUse;
+    let innerWidth = width - marginWidth;
+    this.charWidth = innerWidth / sequenceData.sequence.length;
     // var containerWidthMinusMargin = width - marginWidth
-    var bpsPerRow = sequenceData.sequence.length;
-    var sequenceLength = sequenceData.sequence.length;
-    var sequenceName = hideName ? "" : sequenceData.name || "";
-    var rowData = prepareRowData(sequenceData, bpsPerRow);
+    let bpsPerRow = sequenceData.sequence.length;
+    let sequenceLength = sequenceData.sequence.length;
+    let sequenceName = hideName ? "" : sequenceData.name || "";
+    let rowData = prepareRowData(sequenceData, bpsPerRow);
     return (
       <Draggable
         bounds={{ top: 0, left: 0, right: 0, bottom: 0 }}
@@ -191,10 +188,8 @@ export default class LinearView extends React.Component {
           ref={ref => (this.linearView = ref)}
           className="veLinearView"
           style={{
-            overflowY: "auto",
-            overflowX: "visible",
             height,
-            // width: '100%',
+            width,
             marginLeft: marginWidth / 2
             // marginRight: marginWidth/2
           }}
@@ -206,11 +201,12 @@ export default class LinearView extends React.Component {
             );
           }}
         >
+          <SequenceName {...{ sequenceName, sequenceLength }} />
           <RowItem
             {...{
               ...rest,
               sequenceLength: sequenceData.sequence.length,
-              width: width - marginWidth,
+              width: innerWidth,
               bpsPerRow,
               tickSpacing: Math.floor(bpsPerRow / 10),
               annotationVisibility: {
@@ -222,17 +218,26 @@ export default class LinearView extends React.Component {
             }}
             row={rowData[0]}
           />
-          <div
-            key="circViewSvgCenterText"
-            className={"veCircularViewMiddleOfVectorText"}
-            style={{ textAlign: "center" }}
-          >
-            <span>{sequenceName} </span>
-            <br />
-            <span>{sequenceLength + " bps"}</span>
-          </div>
         </div>
       </Draggable>
     );
   }
+}
+
+function SequenceName({ sequenceName, sequenceLength }) {
+  return (
+    <div
+      key="circViewSvgCenterText"
+      //className={"veCircularViewMiddleOfVectorText"}
+      style={{ textAlign: "center" }}
+    >
+      <span>
+        {sequenceName}{" "}
+      </span>
+      <br />
+      <span>
+        {sequenceLength + " bps"}
+      </span>
+    </div>
+  );
 }

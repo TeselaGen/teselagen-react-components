@@ -7,7 +7,7 @@ import { withRouter } from "react-router-dom";
 
 export default function withTableParams(
   Component,
-  { formname, schema, defaults, urlConnected, isInfinite }
+  { formname, schema, defaults, urlConnected, isInfinite, onlyOneFilter }
 ) {
   if (!urlConnected && !formname) {
     console.warn(
@@ -20,7 +20,6 @@ export default function withTableParams(
   }
 
   const formSelector = formValueSelector(formname);
-
   const {
     makeDataTableHandlers,
     getQueryParams,
@@ -30,6 +29,7 @@ export default function withTableParams(
     schema,
     formname,
     defaults,
+    onlyOneFilter,
     isInfinite
   });
 
@@ -38,25 +38,8 @@ export default function withTableParams(
       (urlConnected
         ? getCurrentParamsFromUrl(location)
         : formSelector(state, "reduxFormQueryParams")) || {};
-    const {
-      queryParams,
-      page,
-      pageSize,
-      order,
-      selectedFilter,
-      filterValue,
-      filterOn,
-      searchTerm
-    } = getQueryParams(currentParams, urlConnected);
     return {
-      queryParams,
-      page,
-      pageSize,
-      order,
-      selectedFilter,
-      filterValue,
-      filterOn,
-      searchTerm,
+      ...getQueryParams(currentParams, urlConnected),
       schema,
       currentParams,
       initialValues: { reduxFormSearchInput: currentParams.searchTerm }
