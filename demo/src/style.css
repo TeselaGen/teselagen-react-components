@@ -6,3 +6,9 @@
 body {
 	margin: 10px;
 }
+
+/* fixes issue with pt icons not showing up */
+[class^="pt-icon-"]:before,
+[class*=" pt-icon-"]:before {
+  font-family: Icons16 !important;
+}

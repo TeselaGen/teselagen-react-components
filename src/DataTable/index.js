@@ -8,6 +8,7 @@ import "../toastr";
 import React from "react";
 import times from "lodash/times";
 import moment from "moment";
+import deepEqual from "deep-equal";
 import PagingTool from "./PagingTool";
 import camelCase from "lodash/camelCase";
 import { onEnterHelper } from "../utils/handlerHelpers";
@@ -95,15 +96,24 @@ class DataTable extends React.Component {
     isInfinite: false,
     withCheckboxes: false,
     setSearchTerm: noop,
-    setFilter: noop,
+    addFilters: noop,
     clearFilters: noop,
+    removeSingleFilter: noop,
     setPageSize: noop,
+    filters: [],
     setOrder: noop,
     setPage: noop,
     onDoubleClick: noop
   };
 
+  componentWillUpdate(newProps) {
+    if (!deepEqual(newProps.additionalFilters, this.props.additionalFilters)) {
+      newProps.addFilters(newProps.additionalFilters);
+    }
+  }
+
   componentWillMount() {
+    this.props.addFilters(this.props.additionalFilters);
     const { schema = {} } = this.props;
     const columns = schema.fields
       ? schema.fields.reduce(function(columns, field, i) {
@@ -142,16 +152,33 @@ class DataTable extends React.Component {
       page,
       height,
       pageSize,
+      schema,
       reduxFormSearchInput,
       reduxFormSelectedEntityIdMap,
-      selectedFilter,
+      filters,
+      errorParsingUrlString,
       bpTableProps = {}
     } = this.props;
     const { dimensions, columns } = this.state;
     let { width } = dimensions;
     if (containerWidth) width = containerWidth;
 
-    const hasFilters = selectedFilter || searchTerm;
+    const hasFilters = filters.length || searchTerm;
+    const filtersOnNonDisplayedFields = [];
+    schema.fields.forEach(({ isHidden, displayName }) => {
+      const ccDisplayName = camelCase(displayName);
+      if (isHidden) {
+        filters.forEach(filter => {
+          if (filter.filterOn === ccDisplayName) {
+            filtersOnNonDisplayedFields.push({
+              ...filter,
+              displayName
+            });
+          }
+        });
+      }
+    });
+
     const numRows = isInfinite ? entities.length : pageSize;
     const maybeSpinner = isLoading
       ? <Spinner className={Classes.SMALL} />
@@ -191,9 +218,29 @@ class DataTable extends React.Component {
               <span className={"data-table-title"}>
                 {tableName}
               </span>}
-
             {this.props.children}
           </div>
+          {errorParsingUrlString &&
+            <span className={"pt-icon-error pt-intent-warning"}>
+              Error parsing URL
+            </span>}
+          {filtersOnNonDisplayedFields.length
+            ? filtersOnNonDisplayedFields.map(
+                ({ displayName, selectedFilter, filterValue }) => {
+                  return (
+                    <div
+                      key={displayName}
+                      className={"tg-filter-on-non-displayed-field"}
+                    >
+                      <span className={"pt-icon-filter"} />
+                      <span>
+                        {" "}{displayName} {selectedFilter} {filterValue}{" "}
+                      </span>
+                    </div>
+                  );
+                }
+              )
+            : ""}
           {withSearch &&
             <div className={"data-table-search-and-clear-filter-container"}>
               {hasFilters
@@ -505,10 +552,11 @@ class DataTable extends React.Component {
   renderColumnHeader = (columnIndex: number) => {
     const {
       schema,
-      setFilter,
+      addFilters,
       setOrder,
       order,
-      filterOn,
+      filters,
+      removeSingleFilter,
       withCheckboxes
     } = this.props;
     const { columns } = this.state;
@@ -518,8 +566,11 @@ class DataTable extends React.Component {
     const { displayName, sortDisabled } = schemaForField;
     const columnDataType = schemaForField.type;
     const ccDisplayName = camelCase(displayName);
-    const activeFilterClass =
-      filterOn === ccDisplayName ? " tg-active-filter" : "";
+    const activeFilterClass = filters.some(({ filterOn }) => {
+      return filterOn === ccDisplayName;
+    })
+      ? " tg-active-filter"
+      : "";
     let ordering;
 
     if (order && order.length) {
@@ -575,7 +626,13 @@ class DataTable extends React.Component {
               iconName="filter"
             />
             <FilterAndSortMenu
-              setFilter={setFilter}
+              addFilters={addFilters}
+              removeSingleFilter={removeSingleFilter}
+              currentFilter={
+                filters.filter(({ filterOn }) => {
+                  return filterOn === ccDisplayName;
+                })[0]
+              }
               filterOn={ccDisplayName}
               dataType={columnDataType}
               schemaForField={schemaForField}
@@ -706,7 +763,7 @@ function getSelectedRegionsFromRowsArray(rowsArray) {
 //     return (
 //       <FilterAndSortMenu
 //         sortDisabled={sortDisabled}
-//         setFilter={setFilter}
+//         addFilters={addFilters}
 //         setOrder={setOrder}
 //         filterOn={camelCase(displayName)}
 //         dataType={columnDataType}

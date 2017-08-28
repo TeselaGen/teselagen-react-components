@@ -13,7 +13,6 @@ import {
   Button,
   Menu,
   Intent,
-  MenuItem,
   MenuDivider,
   InputGroup
 } from "@blueprintjs/core";
@@ -38,7 +37,8 @@ export default class FilterAndSortMenu extends React.Component {
     schemaForField: Object,
     filterOn: string,
     setOrder: Function,
-    setFilter: Function
+    addFilters: Function,
+    removeSingleFilter: Function
   };
   handleFilterChange = (selectedFilter: string) => {
     this.setState({ selectedFilter: selectedFilter });
@@ -48,16 +48,25 @@ export default class FilterAndSortMenu extends React.Component {
   };
   handleFilterSubmit = () => {
     const { filterValue, selectedFilter } = this.state;
-    const { filterOn, setFilter, schemaForField } = this.props;
-
-    setFilter({
-      schemaForField,
-      filterOn,
-      selectedFilter,
-      filterValue
-    });
+    const { filterOn, addFilters, removeSingleFilter } = this.props;
+    if (!filterValue) {
+      return removeSingleFilter(filterOn);
+    }
+    addFilters([
+      {
+        filterOn,
+        selectedFilter,
+        filterValue
+      }
+    ]);
   };
-
+  componentWillMount() {
+    if (this.props.currentFilter) {
+      this.setState({
+        ...this.props.currentFilter
+      });
+    }
+  }
   // handleSubmit(event) {
   //   alert('A name was submitted: ' + this.state.value);
   //   event.preventDefault();
@@ -65,7 +74,7 @@ export default class FilterAndSortMenu extends React.Component {
 
   render() {
     const { selectedFilter, filterValue } = this.state;
-    const { dataType } = this.props;
+    const { dataType, currentFilter, removeSingleFilter } = this.props;
     const {
       handleFilterChange,
       handleFilterValueChange,
@@ -73,14 +82,14 @@ export default class FilterAndSortMenu extends React.Component {
     } = this;
     const filterTypesDictionary = {
       None: "",
-      "Text starts with": "text",
-      "Text ends with": "text",
-      "Text contains": "text",
-      "Text is exactly": "text",
+      "Starts with": "text",
+      "Ends with": "text",
+      Contains: "text",
+      "Is exactly": "text",
       // "Date is": "date",
-      "Date is between": "dateRange",
-      "Date is before": "date",
-      "Date is after": "date",
+      "Is between": "dateRange",
+      "Is before": "date",
+      "Is after": "date",
       "Greater than": "number",
       "Less than": "number",
       "In range": "numberRange",
@@ -91,11 +100,21 @@ export default class FilterAndSortMenu extends React.Component {
 
     return (
       <Menu className={"data-table-header-menu"}>
-        <MenuItem
-          // iconName={showFilterBy ? "caret-down" : "caret-right"}
-          text="Filter by condition..."
-          shouldDismissPopover={false}
-        />
+        {/*         
+        <div className={"custom-menu-item"}>
+          <span>Filter by condition. {schemaForField.displayName}</span>
+        </div> */}
+        {currentFilter &&
+          <div
+            onClick={() => {
+              removeSingleFilter(currentFilter.filterOn);
+            }}
+            className="pt-popover-dismiss custom-menu-item"
+          >
+            <Button className={"pt-intent-danger pt-icon-remove"}>
+              Clear Filter
+            </Button>
+          </div>}
         <div className={"custom-menu-item"}>
           <div className="pt-select pt-fill">
             <select
@@ -260,26 +279,16 @@ class FilterInput extends React.Component {
 function getFilterMenuItems(dataType) {
   let filterMenuItems = [];
   if (dataType === "string") {
-    filterMenuItems = [
-      "Text contains",
-      "Text starts with",
-      "Text ends with",
-      "Text is exactly"
-    ];
+    filterMenuItems = ["Contains", "Starts with", "Ends with", "Is exactly"];
   } else if (dataType === "lookup") {
-    filterMenuItems = [
-      "Text contains",
-      "Text starts with",
-      "Text ends with",
-      "Text is exactly"
-    ];
+    filterMenuItems = ["Contains", "Starts with", "Ends with", "Is exactly"];
   } else if (dataType === "number") {
     // else if (dataType === "lookup") {
     //   filterMenuItems = ["None"];
     // }
     filterMenuItems = ["Greater than", "Less than", "In range", "Equal to"];
   } else if (dataType === "timestamp") {
-    filterMenuItems = ["Date is between", "Date is before", "Date is after"];
+    filterMenuItems = ["Is between", "Is before", "Is after"];
   }
   return filterMenuItems;
 }

@@ -1,0 +1,7 @@
+.toggle-button-holder {
+	display: flex;
+	flex-wrap: row;
+}
+.toggle-button-holder span{
+	margin-left: 30px;
+}
