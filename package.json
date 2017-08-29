@@ -1,6 +1,6 @@
 {
   "name": "teselagen-react-components",
-  "version": "9.2.1",
+  "version": "9.2.5",
   "description": "Teselagen React Component Library",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -67,6 +67,7 @@
     "@blueprintjs/core": "^1.18.0",
     "@blueprintjs/datetime": "^1.16.0",
     "@blueprintjs/table": "^1.15.0",
+    "react-table": "^6.5.3",
     "antd": "^2.11.2",
     "react-addons-css-transition-group": "^15.5.2",
     "react-redux": "^5.0.4",
@@ -90,7 +91,7 @@
     "enzyme-to-json": "^1.5.1",
     "eslint": "^3.19.0",
     "eslint-config-react-app": "^1.0.4",
-    "eslint-config-teselagen": "^1.0.4",
+    "eslint-config-teselagen": "^1.0.6",
     "eslint-loader": "^1.7.1",
     "eslint-plugin-flowtype": "^2.34.0",
     "eslint-plugin-import": "^2.3.0",
@@ -109,6 +110,7 @@
     "react-redux": "^5.0.6",
     "react-router-dom": "^4.1.2",
     "react-select": "^1.0.0-rc.5",
+    "react-table": "^6.5.3",
     "react-test-renderer": "^15.6.1",
     "redux": "^3.6.0",
     "redux-form": "^7.0.3",
@@ -120,9 +122,13 @@
   },
   "lint-staged": {
     "src/**/*.js ": [
-      "eslint --fix --max-warnings=0",
+      "eslint --fix",
       "prettier --write",
       "yarn test:staged",
+      "git add"
+    ],
+    "*.css": [
+      "prettier --write",
       "git add"
     ]
   },

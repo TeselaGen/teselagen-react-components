@@ -1,3 +1,5 @@
+@import url(~react-table/react-table.css);
+
 .custom-menu-item {
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -7,9 +9,6 @@
   padding: 7px;
   line-height: 16px;
   color: inherit;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
 }
 
@@ -20,14 +19,6 @@
 
 .data-table-header-menu {
   min-width: 210px;
-}
-
-.bp-table-cell {
-  display: flex !important;
-}
-
-.bp-table-selection-enabled .bp-table-cell {
-  cursor: pointer !important;
 }
 
 .data-table-search-and-filter {
@@ -44,8 +35,8 @@
   margin-right: 10px;
 }
 
-.data-table-body {
-  margin-top: 20px;
+.react-table-body {
+  margin: 20px 0;
   height: 100%;
 }
 
@@ -58,20 +49,6 @@
   display: flex;
 }
 
-.bp-table-selection-region {
-  border: 1px solid rgba(93, 10, 222, 0.42) !important;
-  background-color: rgba(0, 108, 171, .2) !important;
-}
-
-.bp-table-cell-ledger-odd {
-  background-color: #f0f0f0;
-}
-
-.bp-table-no-wrap-text {
-  display: flex !important;
-  align-items: center !important;
-  width: 100%;
-}
 .datatable-search-input {
   width: 200px;
 }
@@ -127,47 +104,43 @@
   margin-right: 20px;
 }
 
-.tg-checkbox-cell {
-  padding: 0px;
-  padding-top: 3px;
-}
-.tg-checkbox-header-cell {
-  padding: 0px;
-  padding-top: 3px;
-}
-/*.tg-checkbox-cell > div {
-	display: flex;
-	justify-content: center;
-	align-self: center;
-	ali
-}*/
-.tg-checkbox-cell-inner {
-  margin-top: 4px;
-  margin-left: 9px;
+.tg-react-table-checkbox-cell {
+  padding-top: 0;
 }
 
-.tg-datatable-column-header {
+.tg-react-table-checkbox-header-cell {
+  padding-top: 0;
+}
+
+.tg-react-table-checkbox-cell-inner {
+  margin-top: 0;
+  margin-left: 0;
+  margin-bottom: 0;
+}
+
+.tg-react-table-column-header {
   display: flex;
   align-items: center;
   justify-content: flex-start;
 }
 
-.tg-datatable-column-header:hover * {
+.tg-react-table-column-header:hover * {
   transition: 0.2s;
   display: inherit !important;
 }
 
-.tg-datatable-column-header:hover .tg-filter-menu-button {
+.tg-react-table-column-header:hover .tg-filter-menu-button {
   transition: 0.2s;
   display: block !important;
 }
 
-.tg-datatable-name {
+.tg-react-table-name {
   white-space: nowrap;
   overflow: hidden;
   min-width: 0px;
-  padding-left: 10px;
+  padding: 8px 0 8px;
   text-overflow: ellipsis;
+  font-size: 13px;
 }
 
 .tg-sort-arrow-container {
@@ -180,9 +153,11 @@
   display: none;
   font-size: 10px !important;
 }
+
 .tg-sort-arrow-container > *:hover {
   background: rgba(167, 182, 194, 0.3);
 }
+
 .tg-active-sort {
   color: blue;
   display: inherit;
@@ -196,9 +171,41 @@
   color: blue;
   display: block;
 }
+
 .data-table-footer {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
+}
+
+.ReactTable {
+  user-select: none;
+  background: white;
+}
+
+.ReactTable .rt-thead.-header {
+  box-shadow: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.ReactTable .rt-td {
+  cursor: pointer;
+  height: 40px;
+}
+
+.ReactTable .rt-tr-group {
+  flex: initial;
+}
+
+.ReactTable .rt-tr-group.selected {
+  background: lightblue !important;
+}
+
+.tg-react-table-checkbox-header-container {
+  padding: 12px 0 0 8px !important;
+}
+
+.tg-react-table-checkbox-cell-container {
+  padding: 8px 0 0 8px !important;
 }

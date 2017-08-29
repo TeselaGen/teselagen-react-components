@@ -16,7 +16,7 @@ export default function withTableParams(
   }
 
   if (!formname) {
-    formname = "tgDataTable";
+    formname = "tgReactTable";
   }
 
   const formSelector = formValueSelector(formname);

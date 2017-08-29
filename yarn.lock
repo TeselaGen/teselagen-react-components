@@ -2976,9 +2976,9 @@ eslint-config-react-app@^1.0.4:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/eslint-config-react-app/-/eslint-config-react-app-1.0.5.tgz#98337597bc01cc22991fcbdda07451f3b4511718"
 
-eslint-config-teselagen@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/eslint-config-teselagen/-/eslint-config-teselagen-1.0.4.tgz#e135f7c77cde7ad6265d113783d1f392e593d125"
+eslint-config-teselagen@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/eslint-config-teselagen/-/eslint-config-teselagen-1.0.6.tgz#e243a565e3b0864bdef04355a42bc897d6a2490e"
 
 eslint-import-resolver-node@^0.3.1:
   version "0.3.1"
@@ -7437,6 +7437,12 @@ react-slick@~0.14.2:
     json2mq "^0.2.0"
     object-assign "^4.1.0"
     slick-carousel "^1.6.0"
+
+react-table@^6.5.3:
+  version "6.5.3"
+  resolved "https://registry.yarnpkg.com/react-table/-/react-table-6.5.3.tgz#fd84371b97bcabed8308b766faeeaf4264b155c8"
+  dependencies:
+    classnames "^2.2.5"
 
 react-test-renderer@^15.6.1:
   version "15.6.1"

@@ -6,7 +6,7 @@ import Draggable from "react-draggable";
 import RowItem from "../RowItem";
 import "./style.css";
 
-var defaultMarginWidth = 10;
+let defaultMarginWidth = 10;
 // import Combokeys from "combokeys";
 // var combokeys;
 
@@ -14,24 +14,24 @@ function noop() {}
 
 export default class LinearView extends React.Component {
   getNearestCursorPositionToMouseEvent(rowData, event, callback) {
-    var rowNotFound = true;
+    let rowNotFound = true;
     //loop through all the rendered rows to see if the click event lands in one of them
-    var nearestCaretPos = 0;
-    var rowDomNode = this.linearView;
-    var boundingRowRect = rowDomNode.getBoundingClientRect();
+    let nearestCaretPos = 0;
+    let rowDomNode = this.linearView;
+    let boundingRowRect = rowDomNode.getBoundingClientRect();
     if (
       event.clientY > boundingRowRect.top &&
       event.clientY < boundingRowRect.top + boundingRowRect.height
     ) {
       //then the click is falls within this row
       rowNotFound = false;
-      var row = rowData[0];
+      let row = rowData[0];
       if (event.clientX - boundingRowRect.left < 0) {
         nearestCaretPos = row.start;
       } else {
-        var clickXPositionRelativeToRowContainer =
+        let clickXPositionRelativeToRowContainer =
           event.clientX - boundingRowRect.left;
-        var numberOfBPsInFromRowStart = Math.floor(
+        let numberOfBPsInFromRowStart = Math.floor(
           (clickXPositionRelativeToRowContainer + this.charWidth / 2) /
             this.charWidth
         );
@@ -143,8 +143,8 @@ export default class LinearView extends React.Component {
   // }
 
   render() {
-    var propsToUse = { ...this.props.veWrapperProvidedProps, ...this.props };
-    var {
+    let propsToUse = { ...this.props.veWrapperProvidedProps, ...this.props };
+    let {
       //currently found in props
       sequenceData = {},
       // bpToJumpTo=0,
@@ -158,13 +158,13 @@ export default class LinearView extends React.Component {
       height,
       ...rest
     } = propsToUse;
-    var innerWidth = width - marginWidth;
+    let innerWidth = width - marginWidth;
     this.charWidth = innerWidth / sequenceData.sequence.length;
     // var containerWidthMinusMargin = width - marginWidth
-    var bpsPerRow = sequenceData.sequence.length;
-    var sequenceLength = sequenceData.sequence.length;
-    var sequenceName = hideName ? "" : sequenceData.name || "";
-    var rowData = prepareRowData(sequenceData, bpsPerRow);
+    let bpsPerRow = sequenceData.sequence.length;
+    let sequenceLength = sequenceData.sequence.length;
+    let sequenceName = hideName ? "" : sequenceData.name || "";
+    let rowData = prepareRowData(sequenceData, bpsPerRow);
     return (
       <Draggable
         bounds={{ top: 0, left: 0, right: 0, bottom: 0 }}
