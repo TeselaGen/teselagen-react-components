@@ -35,11 +35,6 @@
   margin-right: 10px;
 }
 
-.react-table-body {
-  margin: 20px 0;
-  height: 100%;
-}
-
 .data-table-container {
   padding: 20px;
   height: 100%;
@@ -141,6 +136,8 @@
   padding: 8px 0 8px;
   text-overflow: ellipsis;
   font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.65);
 }
 
 .tg-sort-arrow-container {
@@ -150,7 +147,7 @@
 }
 
 .tg-sort-arrow-container > * {
-  display: none;
+  display: none !important;
   font-size: 10px !important;
 }
 
@@ -164,7 +161,7 @@
 }
 
 .tg-filter-menu-button {
-  display: none;
+  display: none !important;
 }
 
 .tg-active-filter {
@@ -184,18 +181,32 @@
   background: white;
 }
 
+.ReactTable .rt-thead .rt-th {
+  border-right: none;
+}
+
 .ReactTable .rt-thead.-header {
   box-shadow: none;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: #f7f7f7;
 }
 
-.ReactTable .rt-td {
+.ReactTable .rt-tbody .rt-td {
   cursor: pointer;
-  height: 40px;
+  border-right: none;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
 }
 
 .ReactTable .rt-tr-group {
   flex: initial;
+  min-height: 35px !important;
+}
+
+.ReactTable .rt-tbody .rt-tr-group {
+  border-bottom-color: rgb(233, 233, 233);
 }
 
 .ReactTable .rt-tr-group.selected {

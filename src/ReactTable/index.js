@@ -141,22 +141,20 @@ class ReactDataTable extends React.Component {
               />
             </div>}
         </div>
-        <div className={"react-table-body"}>
-          <ReactTable
-            data={entities}
-            columns={this.renderColumns()}
-            defaultPageSize={numRows}
-            pageSize={numRows}
-            showPagination={false}
-            sortable={false}
-            className={"-striped"}
-            loading={isLoading}
-            getTrGroupProps={this.getTableRowProps}
-            style={{
-              height
-            }}
-          />
-        </div>
+        <ReactTable
+          data={entities}
+          columns={this.renderColumns()}
+          defaultPageSize={numRows}
+          pageSize={numRows}
+          showPagination={false}
+          sortable={false}
+          loading={isLoading}
+          getTrGroupProps={this.getTableRowProps}
+          style={{
+            height,
+            margin: "20px 0"
+          }}
+        />
         <div className={"data-table-footer"}>
           <div className={"tg-react-table-selected-count"}>
             {selectedRowCount > 0
