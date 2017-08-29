@@ -37,22 +37,10 @@ export const schema: DataTableSchema = {
       displayName: "User Status",
       sortDisabled: true,
       path: "user.status.name",
-      reference: {
-        sourceField: "userId",
-        target: "user.id",
-        reference: {
-          sourceField: "statusId",
-          target: "status.id"
-        }
-      },
     },
     {
       sortDisabled: true,
       path: "user.lastName",
-      reference: {
-        sourceField: "userId",
-        target: "user.id"
-      },
       type: "string",
       displayName: "Added By"
     }
