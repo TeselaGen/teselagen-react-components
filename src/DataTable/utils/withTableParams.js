@@ -33,10 +33,10 @@ export default function withTableParams(
     isInfinite
   });
 
-  const mapStateToProps = (state, { location }) => {
+  const mapStateToProps = (state, { history }) => {
     const currentParams =
       (urlConnected
-        ? getCurrentParamsFromUrl(location)
+        ? getCurrentParamsFromUrl(history.location) //important to use history location and not ownProps.location because for some reason the location path lags one render behind!!
         : formSelector(state, "reduxFormQueryParams")) || {};
     return {
       ...getQueryParams(currentParams, urlConnected),
@@ -56,6 +56,7 @@ export default function withTableParams(
     if (urlConnected) {
       setNewParams = function(newParams) {
         setCurrentParamsOnUrl(newParams, ownProps.history.push);
+        dispatch(change(formname, "reduxFormQueryParams", newParams)); //we always will update the redux params as a workaround for withRouter not always working if inside a redux-connected container https://github.com/ReactTraining/react-router/issues/5037
       };
     } else {
       setNewParams = function(newParams) {
@@ -93,6 +94,11 @@ export default function withTableParams(
   }
 
   return compose(
+    connect(state => {
+      return {
+        unusedProp: formSelector(state, "reduxFormQueryParams") || {} //tnr: we need this to trigger withRouter and force it to update if it is nested in a redux-connected container.. very ugly but necessary
+      };
+    }),
     withRouter,
     connect(mapStateToProps, mapDispatchToProps, mergeProps)
   )(Component);
