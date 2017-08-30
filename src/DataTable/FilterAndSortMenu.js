@@ -48,15 +48,20 @@ export default class FilterAndSortMenu extends React.Component {
   };
   handleFilterSubmit = () => {
     const { filterValue, selectedFilter } = this.state;
+    let filterValToUse = filterValue;
+    if (selectedFilter === "True" || selectedFilter === "False") {
+      //manually set the filterValue because none is set when type=boolean
+      filterValToUse = selectedFilter;
+    }
     const { filterOn, addFilters, removeSingleFilter } = this.props;
-    if (!filterValue) {
+    if (!filterValToUse) {
       return removeSingleFilter(filterOn);
     }
     addFilters([
       {
         filterOn,
         selectedFilter,
-        filterValue
+        filterValue: filterValToUse
       }
     ]);
   };
@@ -86,6 +91,8 @@ export default class FilterAndSortMenu extends React.Component {
       "Ends with": "text",
       Contains: "text",
       "Is exactly": "text",
+      True: "boolean",
+      False: "boolean",
       // "Date is": "date",
       "Is between": "dateRange",
       "Is before": "date",
@@ -282,6 +289,8 @@ function getFilterMenuItems(dataType) {
     filterMenuItems = ["Contains", "Starts with", "Ends with", "Is exactly"];
   } else if (dataType === "lookup") {
     filterMenuItems = ["Contains", "Starts with", "Ends with", "Is exactly"];
+  } else if (dataType === "boolean") {
+    filterMenuItems = ["True", "False"];
   } else if (dataType === "number") {
     // else if (dataType === "lookup") {
     //   filterMenuItems = ["None"];

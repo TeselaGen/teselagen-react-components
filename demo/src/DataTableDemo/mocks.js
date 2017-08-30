@@ -10,6 +10,7 @@ const MOCK_MATERIALS = times(60).map(function (a,index) {
     id: index,
     notDisplayedField: chance.name(),
     name: chance.name(),
+    isShared: chance.pickone([true, false]),
     user: {
       lastName: chance.name(),
       status: {
@@ -29,6 +30,7 @@ export const schema: DataTableSchema = {
   fields: [
     {path: "notDisplayedField", isHidden: true, type: "string", displayName: "Not Displayed" },
     {path: "type", type: "lookup", displayName: "Type" },
+    {path: "isShared", type: "boolean", displayName: "Is Shared?" },
     {path: "name", type: "string", displayName: "Name" },
     {path: "createdAt", type: "timestamp", displayName: "Date Created" },
     {path: "updatedAt", type: "timestamp", displayName: "Last Edited" },

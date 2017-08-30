@@ -331,6 +331,8 @@ function getSubFilter(qb, selectedFilter, filterValue) {
   else if (selectedFilter === "Ends with") return qb.endsWith(filterValue);
   else if (selectedFilter === "Contains") return qb.contains(filterValue);
   else if (selectedFilter === "Is exactly") return filterValue;
+  else if (selectedFilter === "True") return qb.equals(true);
+  else if (selectedFilter === "False") return qb.equals(false);
   else if (selectedFilter === "Is between")
     return qb.between([filterValue[0].getTime(), filterValue[1].getTime()]);
   else if (selectedFilter === "Is before")
