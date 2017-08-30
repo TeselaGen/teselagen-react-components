@@ -228,7 +228,7 @@ export default function queryParams({
     function setSearchTerm(searchTerm, currentParams) {
       let newParams = {
         ...currentParams,
-        page: 1,
+        page: undefined, //set page undefined to return the table to page 1
         searchTerm:
           searchTerm === defaultParams.searchTerm ? undefined : searchTerm
       };
@@ -244,6 +244,7 @@ export default function queryParams({
 
       let newParams = {
         ...currentParams,
+        page: undefined, //set page undefined to return the table to page 1
         filters
       };
       setNewParams(newParams);
@@ -273,7 +274,7 @@ export default function queryParams({
       let newParams = {
         ...currentParams,
         pageSize: pageSize === defaultParams.pageSize ? undefined : pageSize,
-        page: 1
+        page: undefined //set page undefined to return the table to page 1
       };
       setNewParams(newParams);
     }
