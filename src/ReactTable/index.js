@@ -1,18 +1,10 @@
-//@flow
 import { withRouter } from "react-router-dom";
 import { Fields, reduxForm } from "redux-form";
 import { compose } from "redux";
 import { range } from "lodash";
-import "../toastr";
 import React from "react";
 import moment from "moment";
-import PagingTool from "./PagingTool";
 import camelCase from "lodash/camelCase";
-import { onEnterHelper } from "../utils/handlerHelpers";
-import FilterAndSortMenu from "./FilterAndSortMenu";
-import { getSelectedRowsFromEntities } from "./utils/selection";
-import rowClick from "./utils/rowClick";
-
 import {
   Button,
   Menu,
@@ -24,9 +16,16 @@ import {
   ContextMenu,
   Checkbox
 } from "@blueprintjs/core";
-import ReactTable from "react-table";
 
+import "../toastr";
+import { onEnterHelper } from "../utils/handlerHelpers";
+import { getSelectedRowsFromEntities } from "./utils/selection";
+import rowClick from "./utils/rowClick";
+import ReactTable from "react-table";
+import FilterAndSortMenu from "../DataTable/FilterAndSortMenu";
+import PagingTool from "../DataTable/PagingTool";
 import "./style.css";
+
 const noop = () => {};
 class ReactDataTable extends React.Component {
   state = {
@@ -367,7 +366,7 @@ class ReactDataTable extends React.Component {
       if (cellRenderer && cellRenderer[schemaForColumn.path]) {
         tableColumn.Cell = props =>
           <span>
-            {cellRenderer[schemaForColumn.path](props)}
+            {cellRenderer[schemaForColumn.path](props.value, props.original)}
           </span>;
       }
       columnsToRender.push(tableColumn);

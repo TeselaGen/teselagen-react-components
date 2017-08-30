@@ -464,7 +464,7 @@ class DataTable extends React.Component {
       cellData = cellData ? "True" : "False";
     }
     if (cellRenderer && cellRenderer[schemaForColumn.path]) {
-      cellData = cellRenderer[schemaForColumn.path](cellData);
+      cellData = cellRenderer[schemaForColumn.path](cellData, row);
     }
     return (
       <Cell>
