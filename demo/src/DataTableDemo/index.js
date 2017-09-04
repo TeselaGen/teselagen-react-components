@@ -47,13 +47,12 @@ export default class DataTableDemo extends React.Component {
   }
 
   render() {
-    let ConnectedTable = withTableParams(DataTableInstance, {
-      ConnectedTable: true,
+    let ConnectedTable = withTableParams({
       formname: "example 1", //this should be a unique name
       schema,
       urlConnected: this.state.urlConnected,
       onlyOneFilter: this.state.onlyOneFilter
-    });
+    })(DataTableInstance)
     ConnectedTable = withRouter(ConnectedTable);
 
     return (

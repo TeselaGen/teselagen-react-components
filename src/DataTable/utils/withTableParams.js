@@ -5,10 +5,23 @@ import queryParams from "./queryParams";
 import compose from "lodash/fp/compose";
 import { withRouter } from "react-router-dom";
 
-export default function withTableParams(
-  Component,
-  { formname, schema, defaults, urlConnected, isInfinite, onlyOneFilter }
-) {
+export default function withTableParams(compOrOpts, pOptions) {
+  let options;
+  let Component;
+  if (!pOptions) {
+    options = compOrOpts;
+  } else {
+    options = pOptions;
+    Component = compOrOpts;
+  }
+  let {
+    formname,
+    schema,
+    defaults,
+    urlConnected,
+    isInfinite,
+    onlyOneFilter
+  } = options;
   if (!urlConnected && !formname) {
     console.warn(
       "Please pass a formname to the withTableParams if your table is not url connected"
@@ -93,7 +106,7 @@ export default function withTableParams(
     };
   }
 
-  return compose(
+  const toReturn = compose(
     connect(state => {
       return {
         unusedProp: formSelector(state, "reduxFormQueryParams") || {} //tnr: we need this to trigger withRouter and force it to update if it is nested in a redux-connected container.. very ugly but necessary
@@ -101,5 +114,9 @@ export default function withTableParams(
     }),
     withRouter,
     connect(mapStateToProps, mapDispatchToProps, mergeProps)
-  )(Component);
+  );
+  if (Component) {
+    return toReturn(Component);
+  }
+  return toReturn;
 }
