@@ -507,7 +507,7 @@ function SearchBar({ reduxFormSearchInput, setSearchTerm, maybeSpinner }) {
 
 export default compose(
   withRouter,
-  reduxForm({ form: "tgReactTable" })
+  reduxForm({ form: "tgReactTable" }) //this can be and often is overridden at runtime (by passing a form prop)
 )(props => {
   return (
     <Fields

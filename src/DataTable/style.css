@@ -38,6 +38,7 @@
 .data-table-container {
   padding: 20px;
   height: 100%;
+  width: 100%;
 }
 
 .data-table-title-and-buttons {
