@@ -1,84 +1,35 @@
-//@flow
 import { withRouter } from "react-router-dom";
 import { Fields, reduxForm } from "redux-form";
-// import { connect } from "react-redux";
-import compose from "lodash/fp/compose";
-
-import "../toastr";
+import { compose } from "redux";
+import { range } from "lodash";
 import React from "react";
-import times from "lodash/times";
 import moment from "moment";
-import deepEqual from "deep-equal";
-import PagingTool from "./PagingTool";
 import camelCase from "lodash/camelCase";
-import { onEnterHelper } from "../utils/handlerHelpers";
-import getSelectedRowsFromRegions from "./utils/getSelectedRowsFromRegions";
-import FilterAndSortMenu from "./FilterAndSortMenu";
-import type {
-  // SchemaForField,
-  // QueryParams,
-  TableParams,
-  IRegion
-} from "../flow_types";
-
-import get from "lodash/get";
-
 import {
   Button,
   Menu,
   InputGroup,
-  Checkbox,
   Spinner,
   Popover,
   Classes,
-  Position
+  Position,
+  ContextMenu,
+  Checkbox
 } from "@blueprintjs/core";
-import {
-  Cell,
-  Column,
-  ColumnHeaderCell,
-  ISelectedRegionTransform,
-  RegionCardinality,
-  Regions,
-  Table,
-  TableLoadingOption,
-  SelectionModes
-} from "@blueprintjs/table";
 
+import { onEnterHelper } from "../utils/handlerHelpers";
+import { getSelectedRowsFromEntities } from "./utils/selection";
+import rowClick from "./utils/rowClick";
+import ReactTable from "react-table";
+import PagingTool from "./PagingTool";
+import FilterAndSortMenu from "./FilterAndSortMenu";
+import "../toastr";
 import "./style.css";
-import Measure from "react-measure";
-function noop() {}
-class DataTable extends React.Component {
-  state = {
-    dimensions: {
-      width: -1
-    },
-    columns: []
-  };
 
-  props: {
-    entities: Array<Object>,
-    schema: Object,
-    extraClasses: string,
-    tableName?: string,
-    isLoading: boolean,
-    entityCount: number,
-    onDoubleClick?: Function,
-    children?: any,
-    withTitle: boolean,
-    withSearch: boolean,
-    withPaging: boolean,
-    isInfinite: boolean,
-    containerWidth: number,
-    height?: number | string,
-    onRefresh?: Function,
-    onSingleRowSelect?: Function,
-    onDeselect?: Function,
-    onMultiRowSelect?: Function,
-    cellRenderer: Object,
-    contextMenu: Object,
-    withCheckboxes: Object,
-    ...TableParams
+const noop = () => {};
+class ReactDataTable extends React.Component {
+  state = {
+    columns: []
   };
 
   static defaultProps = {
@@ -96,36 +47,33 @@ class DataTable extends React.Component {
     isInfinite: false,
     withCheckboxes: false,
     setSearchTerm: noop,
-    addFilters: noop,
+    setFilter: noop,
     clearFilters: noop,
-    removeSingleFilter: noop,
     setPageSize: noop,
-    filters: [],
     setOrder: noop,
     setPage: noop,
-    onDoubleClick: noop
+    onDoubleClick: noop,
+    onMultiRowSelect: noop,
+    onSingleRowSelect: noop,
+    onDeselect: noop
   };
 
-  componentWillUpdate(newProps) {
-    if (!deepEqual(newProps.additionalFilters, this.props.additionalFilters)) {
-      newProps.addFilters(newProps.additionalFilters);
-    }
-  }
-
   componentWillMount() {
-    this.props.addFilters(this.props.additionalFilters);
     const { schema = {} } = this.props;
     const columns = schema.fields
-      ? schema.fields.reduce(function(columns, field, i) {
-          if (field.isHidden) {
-            return columns;
-          }
-          columns.push({ displayName: field.displayName, schemaIndex: i });
-          return columns;
+      ? schema.fields.reduce((columns, field, schemaIndex) => {
+          return field.isHidden
+            ? columns
+            : columns.concat({
+                displayName: field.displayName,
+                width: field.width,
+                schemaIndex
+              });
         }, [])
       : [];
     this.setState({ columns });
   }
+
   render() {
     const {
       entities,
@@ -141,75 +89,27 @@ class DataTable extends React.Component {
       withTitle,
       withSearch,
       withPaging,
-      withCheckboxes,
       isInfinite,
-      onSingleRowSelect,
-      containerWidth,
       onRefresh,
-      onDeselect,
-      onMultiRowSelect,
       page,
       height,
       pageSize,
-      schema,
       reduxFormSearchInput,
       reduxFormSelectedEntityIdMap,
-      filters,
-      errorParsingUrlString,
-      bpTableProps = {}
+      selectedFilter
     } = this.props;
-    const { dimensions, columns } = this.state;
-    let { width } = dimensions;
-    if (containerWidth) width = containerWidth;
 
-    const hasFilters = filters.length || searchTerm;
-    const filtersOnNonDisplayedFields = [];
-    schema.fields.forEach(({ isHidden, displayName }) => {
-      const ccDisplayName = camelCase(displayName);
-      if (isHidden) {
-        filters.forEach(filter => {
-          if (filter.filterOn === ccDisplayName) {
-            filtersOnNonDisplayedFields.push({
-              ...filter,
-              displayName
-            });
-          }
-        });
-      }
-    });
-
+    const hasFilters = selectedFilter || searchTerm;
     const numRows = isInfinite ? entities.length : pageSize;
     const maybeSpinner = isLoading
       ? <Spinner className={Classes.SMALL} />
       : undefined;
-    const numberOfColumns = columns ? columns.length : 0;
-    const columnWidths = [];
-    const CHECKBOX_COLUMN_WIDTH = 35;
-    times(numberOfColumns, () => {
-      columnWidths.push(
-        (width - (withCheckboxes ? CHECKBOX_COLUMN_WIDTH : 0)) / numberOfColumns
-      ); //SD why did we have the width - X ? removing for now...
-    });
-    if (withCheckboxes) {
-      columnWidths.unshift(CHECKBOX_COLUMN_WIDTH);
-    }
-    const loadingOptions: TableLoadingOption[] = [];
-    if (isLoading) {
-      loadingOptions.push(TableLoadingOption.CELLS);
-      loadingOptions.push(TableLoadingOption.ROW_HEADERS);
-    }
 
     const selectedRowCount = Object.keys(
       reduxFormSelectedEntityIdMap.input.value || {}
     ).length;
-    // const selectRow = rowIndex => {
-    //   this.setState({ selectedRegions: [{ rows: [rowIndex, rowIndex] }] });
-    // };
     return (
-      <div
-        style={{ height }}
-        className={"data-table-container " + extraClasses}
-      >
+      <div className={"data-table-container " + extraClasses}>
         <div className={"data-table-header"}>
           <div className={"data-table-title-and-buttons"}>
             {tableName &&
@@ -217,35 +117,15 @@ class DataTable extends React.Component {
               <span className={"data-table-title"}>
                 {tableName}
               </span>}
+
             {this.props.children}
           </div>
-          {errorParsingUrlString &&
-            <span className={"pt-icon-error pt-intent-warning"}>
-              Error parsing URL
-            </span>}
-          {filtersOnNonDisplayedFields.length
-            ? filtersOnNonDisplayedFields.map(
-                ({ displayName, selectedFilter, filterValue }) => {
-                  return (
-                    <div
-                      key={displayName}
-                      className={"tg-filter-on-non-displayed-field"}
-                    >
-                      <span className={"pt-icon-filter"} />
-                      <span>
-                        {" "}{displayName} {selectedFilter} {filterValue}{" "}
-                      </span>
-                    </div>
-                  );
-                }
-              )
-            : ""}
           {withSearch &&
             <div className={"data-table-search-and-clear-filter-container"}>
               {hasFilters
                 ? <Button
                     className={"data-table-clear-filters"}
-                    onClick={function() {
+                    onClick={() => {
                       clearFilters();
                     }}
                     text={"Clear filters"}
@@ -260,76 +140,22 @@ class DataTable extends React.Component {
               />
             </div>}
         </div>
-        <div className={"data-table-body"}>
-          <Measure
-            onMeasure={dimensions => {
-              this.setState({ dimensions });
-            }}
-          >
-            <Table
-              numRows={numRows}
-              columnWidths={columnWidths}
-              loadingOptions={loadingOptions}
-              isRowHeaderShown={false}
-              isColumnResizable={false}
-              renderBodyContextMenu={this.renderBodyContextMenu}
-              selectedRegions={getSelectedRegionsFromRowsArray(
-                withCheckboxes
-                  ? []
-                  : getSelectedRowsFromEntities(
-                      entities,
-                      reduxFormSelectedEntityIdMap.input.value
-                    )
-              )}
-              selectedRegionTransform={this.selectedRegionTransform}
-              defaultRowHeight={36}
-              selectionModes={
-                withCheckboxes
-                  ? SelectionModes.NONE
-                  : SelectionModes.ROWS_AND_CELLS
-              }
-              onSelection={selectedRegions => {
-                //tnr: we might need to come back here and manually add in logic to stop multiple rows from being selected when
-                // allowMultipleSelection is false
-                // const selectedRows = getSelectedRowsFromRegions(selectedRegions)
-                // const {selectedRegions: oldSelectedRegions} = this.state
-
-                // const {allowMultipleSelection} = bpTableProps
-                // if (allowMultipleSelection === false) {
-
-                // }
-                if (withCheckboxes) return;
-                reduxFormSelectedEntityIdMap.input.onChange(
-                  getIdMapFromSelectedRows(
-                    entities,
-                    getSelectedRowsFromRegions(selectedRegions)
-                  )
-                );
-                if (!selectedRegions.length && onDeselect) {
-                  onDeselect();
-                }
-                if (selectedRegions.length === 1 && onSingleRowSelect) {
-                  if (selectedRegions[0].rows) {
-                    if (
-                      selectedRegions[0].rows[0] === selectedRegions[0].rows[1]
-                    ) {
-                      const selectedRow = selectedRegions[0].rows[0];
-                      const record = entities[selectedRow];
-                      onSingleRowSelect(selectedRegions, record);
-                    }
-                  }
-                } else if (onMultiRowSelect) {
-                  onMultiRowSelect(selectedRegions);
-                }
-              }}
-              {...bpTableProps}
-            >
-              {entities && this.renderColumns()}
-            </Table>
-          </Measure>
-        </div>
+        <ReactTable
+          data={entities}
+          columns={this.renderColumns()}
+          defaultPageSize={numRows}
+          pageSize={numRows}
+          showPagination={false}
+          sortable={false}
+          loading={isLoading}
+          getTrGroupProps={this.getTableRowProps}
+          style={{
+            height,
+            margin: "20px 0"
+          }}
+        />
         <div className={"data-table-footer"}>
-          <div className={"tg-datatable-selected-count"}>
+          <div className={"tg-react-table-selected-count"}>
             {selectedRowCount > 0
               ? ` ${selectedRowCount} Record${selectedRowCount === 1
                   ? ""
@@ -353,62 +179,111 @@ class DataTable extends React.Component {
     );
   }
 
-  renderColumns = () => {
-    const { columns } = this.state;
-    const { withCheckboxes } = this.props;
-    if (!columns.length) {
-      return;
-    }
-    let columnsToRender = withCheckboxes
-      ? [
-          <Column
-            key={"checkboxes"}
-            name={"checkboxes"}
-            renderCell={this.renderCheckboxCell}
-            renderColumnHeader={this.renderCheckboxHeader}
-          />
-        ]
-      : [];
-    columns.forEach((column, index) => {
-      columnsToRender.push(
-        <Column
-          key={index}
-          name={column.displayName}
-          renderCell={this.renderCell}
-          renderColumnHeader={this.renderColumnHeader}
-        />
-      );
-    });
-    return columnsToRender;
+  getTableRowProps = (state, rowInfo) => {
+    const {
+      reduxFormSelectedEntityIdMap,
+      withCheckboxes,
+      onDoubleClick,
+      history
+    } = this.props;
+    if (!rowInfo) return {};
+    const rowId = rowInfo.original.id;
+    const rowSelected = reduxFormSelectedEntityIdMap.input.value[rowId];
+    return {
+      onClick: e => {
+        if (withCheckboxes) return;
+        rowClick(e, rowInfo, this.props);
+      },
+      onContextMenu: e => {
+        e.preventDefault();
+        if (rowId === undefined) return;
+        const oldIdMap = reduxFormSelectedEntityIdMap.input.value || {};
+        let newIdMap;
+        if (withCheckboxes) {
+          newIdMap = oldIdMap;
+        } else {
+          // if we are not using checkboxes we need to make sure
+          // that the id of the record gets added to the id map
+          newIdMap = oldIdMap[rowId] ? oldIdMap : { [rowId]: true };
+          reduxFormSelectedEntityIdMap.input.onChange(newIdMap);
+        }
+        this.showContextMenu(newIdMap, e);
+      },
+      className: rowSelected && !withCheckboxes ? "selected" : "",
+      onDoubleClick: () => {
+        onDoubleClick(rowInfo.original, rowInfo.index, history);
+      }
+    };
   };
 
-  renderCheckboxCell = (rowIndex: number /*, columnIndex: number*/) => {
+  renderCheckboxHeader = () => {
     const { entities, reduxFormSelectedEntityIdMap } = this.props;
-
     const checkedRows = getSelectedRowsFromEntities(
       entities,
       reduxFormSelectedEntityIdMap.input.value
     );
+    const checkboxProps = {
+      checked: false,
+      indeterminate: false
+    };
+    if (checkedRows.length === entities.length) {
+      //tnr: maybe this will need to change if we want enable select all across pages
+      checkboxProps.checked = true;
+    } else {
+      if (checkedRows.length) {
+        checkboxProps.indeterminate = true;
+      }
+    }
 
+    return (
+      <div>
+        <Checkbox
+          onChange={() => {
+            const newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
+            range(entities.length).forEach(i => {
+              if (checkboxProps.checked) {
+                delete newIdMap[entities[i].id];
+              } else {
+                newIdMap[entities[i].id] = true;
+              }
+            });
+
+            reduxFormSelectedEntityIdMap.input.onChange(newIdMap);
+            this.setState({ lastCheckedRow: undefined });
+          }}
+          {...checkboxProps}
+          className={"tg-react-table-checkbox-cell-inner"}
+        />
+      </div>
+    );
+  };
+
+  renderCheckboxCell = row => {
+    const rowIndex = row.index;
+    const { entities, reduxFormSelectedEntityIdMap } = this.props;
+    const checkedRows = getSelectedRowsFromEntities(
+      entities,
+      reduxFormSelectedEntityIdMap.input.value
+    );
     const { lastCheckedRow } = this.state;
-    // const selectedRows = getSelectedRowsFromRegions(selectedRegions);
+
     const isSelected = checkedRows.some(rowNum => {
       return rowNum === rowIndex;
     });
     if (rowIndex >= entities.length) {
-      return <Cell />;
+      return <div />;
     }
     const entity = entities[rowIndex];
     return (
-      <Cell className={"tg-checkbox-cell"} style={{ width: 40 }}>
+      <div className={"tg-react-table-checkbox-cell"} style={{ width: 40 }}>
         <Checkbox
           onClick={e => {
             let newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
             const isRowCurrentlyChecked = checkedRows.indexOf(rowIndex) > -1;
 
             if (e.shiftKey && rowIndex !== lastCheckedRow) {
-              let start = rowIndex;
-              let end = lastCheckedRow;
+              const start = rowIndex;
+              const end = lastCheckedRow;
               for (
                 let i = Math.min(start, end);
                 i < Math.max(start, end) + 1;
@@ -435,146 +310,102 @@ class DataTable extends React.Component {
             reduxFormSelectedEntityIdMap.input.onChange(newIdMap);
             this.setState({ lastCheckedRow: rowIndex });
           }}
-          className={"tg-checkbox-cell-inner"}
+          className={"tg-react-table-checkbox-cell-inner"}
           checked={isSelected}
         />
-      </Cell>
+      </div>
     );
   };
 
-  renderCell = (rowIndex: number, columnIndex: number) => {
-    const {
-      entities,
-      schema,
-      history,
-      onDoubleClick,
-      cellRenderer,
-      withCheckboxes
-    } = this.props;
+  renderColumns = () => {
+    const { schema, cellRenderer, withCheckboxes } = this.props;
     const { columns } = this.state;
-    const column = columns[columnIndex + (withCheckboxes ? -1 : 0)];
-    const row = entities[rowIndex];
-    if (!row) return <Cell />;
-    const schemaForColumn = schema.fields[column.schemaIndex];
-    let cellData;
-    cellData = get(row, schemaForColumn.path);
-    if (schemaForColumn.type === "timestamp") {
-      cellData = moment(new Date(cellData)).format("MMM D, YYYY");
-    } else if (schemaForColumn.type === "boolean") {
-      cellData = cellData ? "True" : "False";
+    if (!columns.length) {
+      return;
     }
-    if (cellRenderer && cellRenderer[schemaForColumn.path]) {
-      cellData = cellRenderer[schemaForColumn.path](cellData, row, rowIndex);
-    }
-    return (
-      <Cell>
-        <div
-          className={"clickable-cell"}
-          onDoubleClick={() => {
-            onDoubleClick(row, rowIndex, history);
-          }}
-        >
-          {cellData}
-        </div>
-      </Cell>
-    );
+    let columnsToRender = withCheckboxes
+      ? [
+          {
+            Header: this.renderCheckboxHeader,
+            Cell: this.renderCheckboxCell,
+            width: 35,
+            resizable: false,
+            getHeaderProps: () => {
+              return {
+                className: "tg-react-table-checkbox-header-container"
+              };
+            },
+            getProps: () => {
+              return {
+                className: "tg-react-table-checkbox-cell-container"
+              };
+            }
+          }
+        ]
+      : [];
+    columns.forEach(column => {
+      const schemaForColumn = schema.fields[column.schemaIndex];
+      const tableColumn = {
+        Header: this.renderColumnHeader(column),
+        accessor: schemaForColumn.path
+      };
+      if (column.width) {
+        tableColumn.width = column.width;
+      }
+      if (schemaForColumn.type === "timestamp") {
+        tableColumn.Cell = props =>
+          <span>
+            {moment(new Date(props.value)).format("MMM D, YYYY")}
+          </span>;
+      } else if (schemaForColumn.type === "boolean") {
+        tableColumn.Cell = props =>
+          <span>
+            {props.value ? "True" : "False"}
+          </span>;
+      }
+      if (cellRenderer && cellRenderer[schemaForColumn.path]) {
+        tableColumn.Cell = props => {
+          const { value, original: record, index } = props;
+          return cellRenderer[schemaForColumn.path](value, record, index);
+        };
+      }
+      columnsToRender.push(tableColumn);
+    });
+    return columnsToRender;
   };
 
-  renderBodyContextMenu = ({ regions }: Array<IRegion>) => {
+  showContextMenu = (idMap, e) => {
     const { entities, history, contextMenu } = this.props;
-    //single selection
-    // const contextMenu = { ...(contextMenu || {}) };
-    const selectedRows = getSelectedRowsFromRegions(regions);
-    const selectedRecords = selectedRows.map(row => {
-      return entities[row];
-    });
-    if (selectedRows.length < 1 || !contextMenu || !contextMenu.length) {
-      return null;
-    }
+    const selectedRecords = entities.reduce((acc, entity) => {
+      return idMap[entity.id] ? acc.concat(entity) : acc;
+    }, []);
     const itemsToRender = contextMenu({
       selectedRecords,
-      history,
-      selectedRows,
-      regions
+      history
     });
     if (!itemsToRender) return null;
-    return (
+    const menu = (
       <Menu>
         {itemsToRender}
       </Menu>
     );
+    ContextMenu.show(menu, { left: e.clientX, top: e.clientY });
   };
 
-  renderCheckboxHeader = (/*columnIndex: number*/) => {
-    const { entities, reduxFormSelectedEntityIdMap } = this.props;
-    const checkedRows = getSelectedRowsFromEntities(
-      entities,
-      reduxFormSelectedEntityIdMap.input.value
-    );
-    const checkboxProps = {
-      checked: false,
-      indeterminate: false
-    };
-    if (checkedRows.length === entities.length) {
-      //tnr: maybe this will need to change if we want enable select all across pages
-      checkboxProps.checked = true;
-    } else {
-      if (checkedRows.length) {
-        checkboxProps.indeterminate = true;
-      }
-    }
-
-    return (
-      <ColumnHeaderCell className={"tg-checkbox-header-cell"}>
-        <Checkbox
-          onChange={() => {
-            let newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
-            Array.from(Array(entities.length).keys()).forEach(function(i) {
-              if (checkboxProps.checked) {
-                delete newIdMap[entities[i].id];
-              } else {
-                newIdMap[entities[i].id] = true;
-              }
-            });
-
-            reduxFormSelectedEntityIdMap.input.onChange(newIdMap);
-            this.setState({ lastCheckedRow: undefined });
-            // this.setState({selectedRegions: getSelectedRegionsFromRowsArray(newRows)})
-          }}
-          {...checkboxProps}
-          className={"tg-checkbox-cell-inner"}
-        />
-      </ColumnHeaderCell>
-    );
-  };
-
-  renderColumnHeader = (columnIndex: number) => {
-    const {
-      schema,
-      addFilters,
-      setOrder,
-      order,
-      filters,
-      removeSingleFilter,
-      withCheckboxes
-    } = this.props;
-    const { columns } = this.state;
-    const schemaIndex =
-      columns[columnIndex + (withCheckboxes ? -1 : 0)]["schemaIndex"];
+  renderColumnHeader = column => {
+    const { schema, setFilter, setOrder, order, filterOn } = this.props;
+    const schemaIndex = column["schemaIndex"];
     const schemaForField = schema.fields[schemaIndex];
     const { displayName, sortDisabled } = schemaForField;
     const columnDataType = schemaForField.type;
     const ccDisplayName = camelCase(displayName);
-    const activeFilterClass = filters.some(({ filterOn }) => {
-      return filterOn === ccDisplayName;
-    })
-      ? " tg-active-filter"
-      : "";
+    const activeFilterClass =
+      filterOn === ccDisplayName ? " tg-active-filter" : "";
     let ordering;
 
     if (order && order.length) {
-      order.forEach(function(order) {
-        let orderField = order.replace("-", "");
+      order.forEach(order => {
+        const orderField = order.replace("-", "");
         if (orderField === ccDisplayName) {
           if (orderField === order) {
             ordering = "asc";
@@ -586,72 +417,51 @@ class DataTable extends React.Component {
     }
 
     const isOrderedDown = ordering && ordering === "asc";
-    // const menu = this.renderMenu(columnDataType, schemaForField);
     return (
-      <ColumnHeaderCell>
-        <div className={"tg-datatable-column-header"}>
-          <span title={displayName} className={"tg-datatable-name"}>
-            {displayName + "  "}
-          </span>
-          {!sortDisabled &&
-            <div className={"tg-sort-arrow-container"}>
-              <span
-                title={"Sort Z-A"}
-                onClick={() => {
-                  setOrder("reverse:" + ccDisplayName);
-                }}
-                className={
-                  "pt-icon-standard pt-icon-chevron-up " +
-                  (ordering && !isOrderedDown ? "tg-active-sort" : "")
-                }
-              />
-              <span
-                title={"Sort A-Z"}
-                onClick={() => {
-                  setOrder(ccDisplayName);
-                }}
-                className={
-                  "pt-icon-standard pt-icon-chevron-down " +
-                  (ordering && isOrderedDown ? "tg-active-sort" : "")
-                }
-              />
-            </div>}
-          <Popover position={Position.BOTTOM_RIGHT}>
-            <Button
-              title={"Filter"}
+      <div className={"tg-react-table-column-header"}>
+        <span title={displayName} className={"tg-react-table-name"}>
+          {displayName + "  "}
+        </span>
+        {!sortDisabled &&
+          <div className={"tg-sort-arrow-container"}>
+            <span
+              title={"Sort Z-A"}
+              onClick={() => {
+                setOrder("reverse:" + ccDisplayName);
+              }}
               className={
-                "tg-filter-menu-button " + Classes.MINIMAL + activeFilterClass
+                "pt-icon-standard pt-icon-chevron-up " +
+                (ordering && !isOrderedDown ? "tg-active-sort" : "")
               }
-              iconName="filter"
             />
-            <FilterAndSortMenu
-              addFilters={addFilters}
-              removeSingleFilter={removeSingleFilter}
-              currentFilter={
-                filters.filter(({ filterOn }) => {
-                  return filterOn === ccDisplayName;
-                })[0]
+            <span
+              title={"Sort A-Z"}
+              onClick={() => {
+                setOrder(ccDisplayName);
+              }}
+              className={
+                "pt-icon-standard pt-icon-chevron-down " +
+                (ordering && isOrderedDown ? "tg-active-sort" : "")
               }
-              filterOn={ccDisplayName}
-              dataType={columnDataType}
-              schemaForField={schemaForField}
             />
-          </Popover>
-        </div>
-      </ColumnHeaderCell>
+          </div>}
+        <Popover position={Position.BOTTOM_RIGHT}>
+          <Button
+            title={"Filter"}
+            className={
+              "tg-filter-menu-button " + Classes.MINIMAL + activeFilterClass
+            }
+            iconName="filter"
+          />
+          <FilterAndSortMenu
+            setFilter={setFilter}
+            filterOn={ccDisplayName}
+            dataType={columnDataType}
+            schemaForField={schemaForField}
+          />
+        </Popover>
+      </div>
     );
-  };
-
-  // renderMenu = (dataType: TableDataTypes, schemaForField: SchemaForField) => {
-  //   return <FilterAndSortMenu  dataType={dataType} schemaForField={schemaForField}/>;
-  // };
-
-  selectedRegionTransform = (region: ISelectedRegionTransform) => {
-    // convert cell selection to row selection
-    if (Regions.getRegionCardinality(region) === RegionCardinality.CELLS) {
-      return Regions.row(region.rows[0], region.rows[1]);
-    }
-    return region;
   };
 }
 
@@ -661,7 +471,7 @@ function SearchBar({ reduxFormSearchInput, setSearchTerm, maybeSpinner }) {
       className={"pt-round datatable-search-input"}
       placeholder="Search..."
       {...reduxFormSearchInput.input}
-      {...onEnterHelper(function() {
+      {...onEnterHelper(() => {
         setSearchTerm(reduxFormSearchInput.input.value);
       })}
       rightElement={
@@ -669,7 +479,7 @@ function SearchBar({ reduxFormSearchInput, setSearchTerm, maybeSpinner }) {
         <Button
           className={Classes.MINIMAL}
           iconName={"pt-icon-search"}
-          onClick={function() {
+          onClick={() => {
             setSearchTerm(reduxFormSearchInput.input.value);
           }}
         />
@@ -680,8 +490,8 @@ function SearchBar({ reduxFormSearchInput, setSearchTerm, maybeSpinner }) {
 
 export default compose(
   withRouter,
-  reduxForm({ form: "tgDataTable" })
-)(function ReduxFormWrapper(props) {
+  reduxForm({ form: "tgReactTable" })
+)(props => {
   return (
     <Fields
       names={[
@@ -690,91 +500,7 @@ export default compose(
         "reduxFormSelectedEntityIdMap"
       ]}
       {...props}
-      component={DataTable}
+      component={ReactDataTable}
     />
   );
 });
-
-function getSelectedRowsFromEntities(entities, idMap) {
-  if (!idMap) return [];
-  return entities.reduce((acc, entity, i) => {
-    if (idMap[entity.id]) {
-      acc.push(i);
-    }
-    return acc;
-  }, []);
-}
-
-function getSelectedRegionsFromRowsArray(rowsArray) {
-  //tnr note: selected regions are structured as blocks of regions
-  // use getSelectedRowsFromRegions() to get the rows!
-  // selectedRegions: [
-  //     {
-  //         "rows": [
-  //             0, //selection block 1 going from row 0 to 1
-  //             1
-  //         ]
-  //     },
-  //     {
-  //         "rows": [
-  //             3, //selection block 2 going from row 3 to 3
-  //             3
-  //         ]
-  //     }
-  // ]
-  const selectedRegions = rowsArray
-    .sort()
-    .reduce((acc, rowNum, i) => {
-      const rowNumBefore = rowsArray[i - 1];
-      const rowNumAfter = rowsArray[i + 1];
-      if (rowNumBefore && rowNumBefore === rowNum - 1) {
-        const arrayToAddTo = acc.find(o => o.rows.indexOf(rowNumBefore) > -1)
-          .rows;
-        arrayToAddTo.push(rowNum);
-      } else {
-        const rows = [rowNum];
-        if (!rowNumAfter || (rowNumAfter && rowNumAfter > rowNum + 1))
-          rows.push(rowNum);
-        acc.push({
-          rows
-        });
-      }
-      return acc;
-    }, [])
-    .forEach(o => {
-      if (o.rows.length > 2) o.rows = [o.rows[0], o.rows[o.rows.length - 1]];
-    });
-  return selectedRegions;
-}
-// <ColumnHeaderCell
-//   name={
-//     <span title={displayName}>
-//       <span>
-//         {displayName + "  "}
-//         {ordering &&
-//           (ordering === "asc"
-//             ? <span className={"pt-icon-standard pt-icon-arrow-down"} />
-//             : <span className={"pt-icon-standard pt-icon-arrow-up"} />)}
-//       </span>
-//     </span>
-//   }
-//   renderMenu={function() {
-//     return (
-//       <FilterAndSortMenu
-//         sortDisabled={sortDisabled}
-//         addFilters={addFilters}
-//         setOrder={setOrder}
-//         filterOn={camelCase(displayName)}
-//         dataType={columnDataType}
-//         schemaForField={schemaForField}
-//       />
-//     );
-//   }}
-// />
-
-function getIdMapFromSelectedRows(entities, selectedRows) {
-  return selectedRows.reduce(function(acc, rowNum) {
-    if (entities[rowNum]) acc[entities[rowNum].id] = true;
-    return acc;
-  }, {});
-}

@@ -1,3 +1,7 @@
+.form-components {
+  margin: 40px;
+}
+
 .form-component-title {
   margin: 20px;
 }
@@ -8,5 +12,5 @@
 }
 
 .Select {
-	min-width: 150px;
+  min-width: 150px;
 }

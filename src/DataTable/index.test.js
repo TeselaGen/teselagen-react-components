@@ -8,7 +8,6 @@ describe("(Component)", () => {
   it("renders without exploding", () => {
     const wrapper = shallow(<Component />);
     expect(wrapper).toHaveLength(1);
-    expect(wrapper).toMatchSnapshot();
   });
 });
 

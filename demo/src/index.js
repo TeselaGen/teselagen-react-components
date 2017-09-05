@@ -10,12 +10,10 @@ import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import store from './store';
 import Perf from 'react-addons-perf'
-import ReactTableDemo from './ReactTableDemo'
 
 const demos = {
   vectoreditor: VectorEditorDemo,
   datatable: DataTableDemo,
-  'react-table': ReactTableDemo,
   loading: LoadingDemo,
   formcomponents: FormComponentsDemo,
   fonticons: FontIconsDemo,

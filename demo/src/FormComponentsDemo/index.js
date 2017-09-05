@@ -42,7 +42,7 @@ class FormComponentsDemo extends React.Component {
     return (
       <LocaleProvider locale={enUS}>
         <Provider store={store}>
-          <div>
+          <div className='pt-card pt-elevation-2 form-components'>
             <h3 className="form-component-title">
               Blueprint Redux Form Components
             </h3>
@@ -331,15 +331,6 @@ class FormComponentsDemo extends React.Component {
                 console.info("formData:", formData);
               })}
             />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
           </div>
         </Provider>
       </LocaleProvider>

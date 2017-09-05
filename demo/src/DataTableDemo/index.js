@@ -163,9 +163,7 @@ export class DataTableInstance extends React.Component {
           title={"Demo table"}
           contextMenu={function({
             selectedRecords,
-            history,
-            selectedRows,
-            regions
+            history
           }) {
             return [
               <MenuItem

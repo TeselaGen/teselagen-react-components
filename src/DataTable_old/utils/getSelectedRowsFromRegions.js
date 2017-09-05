@@ -1,9 +1,9 @@
 export default function getSelectedRowsFromRegions(regions) {
   let selectedRows = [];
   regions.forEach(function(region) {
-    var lowEnd = region.rows[0];
-    var highEnd = region.rows[1];
-    for (var i = lowEnd; i <= highEnd; i++) {
+    let lowEnd = region.rows[0];
+    let highEnd = region.rows[1];
+    for (let i = lowEnd; i <= highEnd; i++) {
       selectedRows.push(i);
     }
   });
