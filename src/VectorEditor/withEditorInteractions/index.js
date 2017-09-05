@@ -1,9 +1,7 @@
 import getSequenceWithinRange from "ve-range-utils/getSequenceWithinRange";
 import Clipboard from "./Clipboard";
-import updateSelectionOrCaret
-  from "../utils/selectionAndCaretUtils/updateSelectionOrCaret";
-import normalizePositionByRangeLength
-  from "ve-range-utils/normalizePositionByRangeLength";
+import updateSelectionOrCaret from "../utils/selectionAndCaretUtils/updateSelectionOrCaret";
+import normalizePositionByRangeLength from "ve-range-utils/normalizePositionByRangeLength";
 import getRangeLength from "ve-range-utils/getRangeLength";
 import React from "react";
 // import draggableClassnames from "../constants/draggableClassnames";
@@ -134,6 +132,7 @@ function VectorInteractionHOC(Component) {
               });
             }
           },
+          isDragInProgress: () => dragInProgress,
           editorDragStopped: function() {
             setTimeout(function() {
               dragInProgress = false;
