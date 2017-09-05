@@ -162,7 +162,7 @@ export class DataTableInstance extends React.Component {
             console.log("double clicked");
           }}
           cellRenderer={{
-            isShared: (value) => {
+            isShared: (value, record, row) => {
               return <span
                 style={{
                   color:

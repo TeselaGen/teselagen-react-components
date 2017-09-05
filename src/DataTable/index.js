@@ -378,8 +378,11 @@ class ReactDataTable extends React.Component {
       if (cellRenderer && cellRenderer[schemaForColumn.path]) {
         tableColumn.Cell = cellRenderer[schemaForColumn.path];
         tableColumn.Cell = row => {
-          const val = cellRenderer[schemaForColumn.path](row.value, row);
-          console.log("val:", val);
+          const val = cellRenderer[schemaForColumn.path](
+            row.value,
+            row.original,
+            row
+          );
           return val;
         };
       }
