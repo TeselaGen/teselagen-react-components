@@ -45,6 +45,7 @@ class ReactDataTable extends React.Component {
     reduxFormSelectedEntityIdMap: {},
     isLoading: false,
     isInfinite: false,
+    isSingleSelect: false,
     withCheckboxes: false,
     setSearchTerm: noop,
     setFilter: noop,
