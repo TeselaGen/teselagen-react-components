@@ -118,6 +118,7 @@ export class DataTableInstance extends React.Component {
     withPaging: true,
     isInfinite: false,
     isSingleSelect: false,
+    maxHeight: false,
     withCheckboxes: true
   };
 
@@ -154,6 +155,7 @@ export class DataTableInstance extends React.Component {
         {renderToggle(this, "isInfinite")}
         {renderToggle(this, "withCheckboxes")}
         {renderToggle(this, "isSingleSelect")}
+        {renderToggle(this, "maxHeight")}
         <DataTable
           {...tableParams}
           entities={entitiesToPass}
@@ -203,6 +205,7 @@ export class DataTableInstance extends React.Component {
           isInfinite={this.state.isInfinite}
           withCheckboxes={this.state.withCheckboxes}
           isSingleSelect={this.state.isSingleSelect}
+          maxHeight={this.state.maxHeight && '200px' }
           onRefresh={() => {
             alert("clicked refresh!");
           }}

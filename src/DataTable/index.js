@@ -40,7 +40,7 @@ class ReactDataTable extends React.Component {
     pageSize: 10,
     extraClasses: "",
     page: 1,
-    height: "100%",
+    style: {},
     reduxFormSearchInput: {},
     reduxFormSelectedEntityIdMap: {},
     isLoading: false,
@@ -93,7 +93,8 @@ class ReactDataTable extends React.Component {
       isInfinite,
       onRefresh,
       page,
-      height,
+      maxHeight,
+      style,
       pageSize,
       reduxFormSearchInput,
       reduxFormSelectedEntityIdMap,
@@ -151,8 +152,9 @@ class ReactDataTable extends React.Component {
           loading={isLoading}
           getTrGroupProps={this.getTableRowProps}
           style={{
-            height,
-            margin: "20px 0"
+            maxHeight,
+            margin: "20px 0",
+            ...style
           }}
         />
         <div className={"data-table-footer"}>
