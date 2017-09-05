@@ -376,9 +376,11 @@ class ReactDataTable extends React.Component {
           </span>;
       }
       if (cellRenderer && cellRenderer[schemaForColumn.path]) {
-        tableColumn.Cell = props => {
-          const { value, original: record, index } = props;
-          return cellRenderer[schemaForColumn.path](value, record, index);
+        tableColumn.Cell = cellRenderer[schemaForColumn.path];
+        tableColumn.Cell = row => {
+          const val = cellRenderer[schemaForColumn.path](row.value, row);
+          console.log("val:", val);
+          return val;
         };
       }
       columnsToRender.push(tableColumn);

@@ -161,6 +161,21 @@ export class DataTableInstance extends React.Component {
           onDoubleClick={function() {
             console.log("double clicked");
           }}
+          cellRenderer={{
+            isShared: (value) => {
+              return <span
+                style={{
+                  color:
+                    value
+                      ? 'green'
+                      : 'red'
+                }}
+              >
+                {value ? 'True' : 'False'} { " "}
+                <button>click me</button>
+              </span>
+            }
+          }}
           additionalFilters={additionalFilters}
           title={"Demo table"}
           contextMenu={function({
