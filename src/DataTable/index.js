@@ -94,6 +94,7 @@ class DataTable extends React.Component {
     reduxFormSelectedEntityIdMap: {},
     isLoading: false,
     isInfinite: false,
+    isSingleSelect: false,
     withCheckboxes: false,
     setSearchTerm: noop,
     addFilters: noop,
@@ -143,6 +144,7 @@ class DataTable extends React.Component {
       withPaging,
       withCheckboxes,
       isInfinite,
+      isSingleSelect,
       onSingleRowSelect,
       containerWidth,
       onRefresh,
@@ -383,7 +385,11 @@ class DataTable extends React.Component {
   };
 
   renderCheckboxCell = (rowIndex: number /*, columnIndex: number*/) => {
-    const { entities, reduxFormSelectedEntityIdMap } = this.props;
+    const {
+      entities,
+      reduxFormSelectedEntityIdMap,
+      isSingleSelect
+    } = this.props;
 
     const checkedRows = getSelectedRowsFromEntities(
       entities,
@@ -405,8 +411,9 @@ class DataTable extends React.Component {
           onClick={e => {
             let newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
             const isRowCurrentlyChecked = checkedRows.indexOf(rowIndex) > -1;
-
-            if (e.shiftKey && rowIndex !== lastCheckedRow) {
+            if (isSingleSelect) {
+              newIdMap = { [entity.id]: true };
+            } else if (e.shiftKey && rowIndex !== lastCheckedRow) {
               let start = rowIndex;
               let end = lastCheckedRow;
               for (
@@ -506,7 +513,11 @@ class DataTable extends React.Component {
   };
 
   renderCheckboxHeader = (/*columnIndex: number*/) => {
-    const { entities, reduxFormSelectedEntityIdMap } = this.props;
+    const {
+      entities,
+      reduxFormSelectedEntityIdMap,
+      isSingleSelect
+    } = this.props;
     const checkedRows = getSelectedRowsFromEntities(
       entities,
       reduxFormSelectedEntityIdMap.input.value
@@ -526,24 +537,26 @@ class DataTable extends React.Component {
 
     return (
       <ColumnHeaderCell className={"tg-checkbox-header-cell"}>
-        <Checkbox
-          onChange={() => {
-            let newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
-            Array.from(Array(entities.length).keys()).forEach(function(i) {
-              if (checkboxProps.checked) {
-                delete newIdMap[entities[i].id];
-              } else {
-                newIdMap[entities[i].id] = true;
-              }
-            });
+        {isSingleSelect
+          ? ""
+          : <Checkbox
+              onChange={() => {
+                let newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
+                Array.from(Array(entities.length).keys()).forEach(function(i) {
+                  if (checkboxProps.checked) {
+                    delete newIdMap[entities[i].id];
+                  } else {
+                    newIdMap[entities[i].id] = true;
+                  }
+                });
 
-            reduxFormSelectedEntityIdMap.input.onChange(newIdMap);
-            this.setState({ lastCheckedRow: undefined });
-            // this.setState({selectedRegions: getSelectedRegionsFromRowsArray(newRows)})
-          }}
-          {...checkboxProps}
-          className={"tg-checkbox-cell-inner"}
-        />
+                reduxFormSelectedEntityIdMap.input.onChange(newIdMap);
+                this.setState({ lastCheckedRow: undefined });
+                // this.setState({selectedRegions: getSelectedRegionsFromRowsArray(newRows)})
+              }}
+              {...checkboxProps}
+              className={"tg-checkbox-cell-inner"}
+            />}
       </ColumnHeaderCell>
     );
   };
