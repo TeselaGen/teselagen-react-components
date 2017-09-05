@@ -1,9 +1,10 @@
 import { withRouter } from "react-router-dom";
 import { Fields, reduxForm } from "redux-form";
 import { compose } from "redux";
-import { range } from "lodash";
+import { range, isNumber } from "lodash";
 import React from "react";
 import moment from "moment";
+
 import camelCase from "lodash/camelCase";
 import {
   Button,
@@ -37,6 +38,7 @@ class ReactDataTable extends React.Component {
     withTitle: true,
     withSearch: true,
     withPaging: true,
+    hidePageSizeWhenPossible: false,
     pageSize: 10,
     extraClasses: "",
     page: 1,
@@ -86,6 +88,8 @@ class ReactDataTable extends React.Component {
       setSearchTerm,
       clearFilters,
       setPageSize,
+      hidePageSizeWhenPossible,
+      doNotShowEmptyRows,
       setPage,
       withTitle,
       withSearch,
@@ -100,7 +104,9 @@ class ReactDataTable extends React.Component {
       reduxFormSelectedEntityIdMap,
       selectedFilter
     } = this.props;
-
+    let entityCountToUse = !isNumber(entityCount)
+      ? entities.length
+      : entityCount;
     const hasFilters = selectedFilter || searchTerm;
     const numRows = isInfinite ? entities.length : pageSize;
     const maybeSpinner = isLoading
@@ -146,7 +152,9 @@ class ReactDataTable extends React.Component {
           data={entities}
           columns={this.renderColumns()}
           defaultPageSize={numRows}
-          pageSize={numRows}
+          pageSize={
+            doNotShowEmptyRows ? Math.min(numRows, entities.length) : numRows
+          }
           showPagination={false}
           sortable={false}
           loading={isLoading}
@@ -165,7 +173,9 @@ class ReactDataTable extends React.Component {
                   : "s"} Selected `
               : ""}
           </div>
-          {!isInfinite && withPaging
+          {!isInfinite &&
+          withPaging &&
+          (hidePageSizeWhenPossible ? entityCount > pageSize : true)
             ? <PagingTool
                 paging={{
                   total: entityCount,

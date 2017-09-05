@@ -1,6 +1,5 @@
 //@flow
 import React from "react";
-import { entities, schema } from "./mocks";
 import { MenuItem, Switch } from "@blueprintjs/core";
 import { FocusStyleManager, Dialog } from "@blueprintjs/core";
 // import { createStore, combineReducers } from "redux";
@@ -12,7 +11,40 @@ import "./style.css";
 import { BrowserRouter as Router, withRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "../store";
+import Chance from 'chance';
+import times from "lodash/times";
+import {DataTableSchema} from '../../../src/flow_types';
 FocusStyleManager.onlyShowFocusOnTabs();
+
+//@flow
+
+const chance = new Chance()
+
+
+const schema: DataTableSchema = {
+  model: "material",
+  fields: [
+    {path: "notDisplayedField", isHidden: true, type: "string", displayName: "Not Displayed" },
+    {path: "type", type: "lookup", displayName: "Type" },
+    {path: "isShared", type: "boolean", displayName: "Is Shared?" },
+    {path: "name", type: "string", displayName: "Name" },
+    {path: "createdAt", type: "timestamp", displayName: "Date Created" },
+    {path: "updatedAt", type: "timestamp", displayName: "Last Edited" },
+    {
+      type: 'lookup',
+      displayName: "User Status",
+      sortDisabled: true,
+      path: "user.status.name",
+    },
+    {
+      sortDisabled: true,
+      path: "user.lastName",
+      type: "string",
+      displayName: "Added By"
+    }
+  ]
+};
+
 
 const renderToggle = (that, type, description) => {
   return (
@@ -119,11 +151,35 @@ export class DataTableInstance extends React.Component {
     isInfinite: false,
     isSingleSelect: false,
     maxHeight: false,
-    withCheckboxes: true
+    hidePageSizeWhenPossible: false,
+    doNotShowEmptyRows: false,
+    withCheckboxes: true,
+    numOfEntities: 60
   };
 
   render() {
+    const { numOfEntities } = this.state;
+    const entities = times(numOfEntities).map(function (a,index) {
+      
+      return {
+        id: index,
+        notDisplayedField: chance.name(),
+        name: chance.name(),
+        isShared: chance.pickone([true, false]),
+        user: {
+          lastName: chance.name(),
+          status: {
+            name: chance.pickone(['pending', 'added'])
+          }
+        },
+        type: 'denicolaType',
+        addedBy: chance.name(),
+        updatedAt: new Date().toLocaleString(),
+        createdAt: new Date().toLocaleString()
+      }
+    });
     const { tableParams } = this.props;
+    
     const { page, pageSize } = tableParams;
     let entitiesToPass = [];
     if (this.state.isInfinite) {
@@ -149,10 +205,15 @@ export class DataTableInstance extends React.Component {
           "additionalFilters",
           "Filters can be added by passing an additionalFilters prop. You can even filter on non-displayed fields"
         )}
+        Set numer of entities: <input type="number" value={numOfEntities} onChange={(e) => {
+          this.setState({numOfEntities: parseInt(e.target.value, 10)})
+        }}/>
         {renderToggle(this, "withTitle")}
         {renderToggle(this, "withSearch")}
         {renderToggle(this, "withPaging")}
         {renderToggle(this, "isInfinite")}
+        {renderToggle(this, "hidePageSizeWhenPossible")}
+        {renderToggle(this, "doNotShowEmptyRows")}
         {renderToggle(this, "withCheckboxes")}
         {renderToggle(this, "isSingleSelect")}
         {renderToggle(this, "maxHeight")}
@@ -203,6 +264,8 @@ export class DataTableInstance extends React.Component {
           withSearch={this.state.withSearch}
           withPaging={this.state.withPaging}
           isInfinite={this.state.isInfinite}
+          hidePageSizeWhenPossible={this.state.hidePageSizeWhenPossible}
+          doNotShowEmptyRows={this.state.doNotShowEmptyRows}
           withCheckboxes={this.state.withCheckboxes}
           isSingleSelect={this.state.isSingleSelect}
           maxHeight={this.state.maxHeight && '200px' }
