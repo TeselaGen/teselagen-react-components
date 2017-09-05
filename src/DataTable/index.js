@@ -218,7 +218,11 @@ class ReactDataTable extends React.Component {
   };
 
   renderCheckboxHeader = () => {
-    const { entities, reduxFormSelectedEntityIdMap } = this.props;
+    const {
+      entities,
+      reduxFormSelectedEntityIdMap,
+      isSingleSelect
+    } = this.props;
     const checkedRows = getSelectedRowsFromEntities(
       entities,
       reduxFormSelectedEntityIdMap.input.value
@@ -238,30 +242,35 @@ class ReactDataTable extends React.Component {
 
     return (
       <div>
-        <Checkbox
-          onChange={() => {
-            const newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
-            range(entities.length).forEach(i => {
-              if (checkboxProps.checked) {
-                delete newIdMap[entities[i].id];
-              } else {
-                newIdMap[entities[i].id] = true;
-              }
-            });
+        {!isSingleSelect &&
+          <Checkbox
+            onChange={() => {
+              const newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
+              range(entities.length).forEach(i => {
+                if (checkboxProps.checked) {
+                  delete newIdMap[entities[i].id];
+                } else {
+                  newIdMap[entities[i].id] = true;
+                }
+              });
 
-            reduxFormSelectedEntityIdMap.input.onChange(newIdMap);
-            this.setState({ lastCheckedRow: undefined });
-          }}
-          {...checkboxProps}
-          className={"tg-react-table-checkbox-cell-inner"}
-        />
+              reduxFormSelectedEntityIdMap.input.onChange(newIdMap);
+              this.setState({ lastCheckedRow: undefined });
+            }}
+            {...checkboxProps}
+            className={"tg-react-table-checkbox-cell-inner"}
+          />}
       </div>
     );
   };
 
   renderCheckboxCell = row => {
     const rowIndex = row.index;
-    const { entities, reduxFormSelectedEntityIdMap } = this.props;
+    const {
+      entities,
+      reduxFormSelectedEntityIdMap,
+      isSingleSelect
+    } = this.props;
     const checkedRows = getSelectedRowsFromEntities(
       entities,
       reduxFormSelectedEntityIdMap.input.value
@@ -282,7 +291,9 @@ class ReactDataTable extends React.Component {
             let newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
             const isRowCurrentlyChecked = checkedRows.indexOf(rowIndex) > -1;
 
-            if (e.shiftKey && rowIndex !== lastCheckedRow) {
+            if (isSingleSelect) {
+              newIdMap = { [entity.id]: true };
+            } else if (e.shiftKey && rowIndex !== lastCheckedRow) {
               const start = rowIndex;
               const end = lastCheckedRow;
               for (

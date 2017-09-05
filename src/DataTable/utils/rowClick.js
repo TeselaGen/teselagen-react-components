@@ -9,6 +9,7 @@ export default (e, rowInfo, props) => {
   const {
     reduxFormSelectedEntityIdMap,
     entities,
+    isSingleSelect,
     onDeselect,
     onSingleRowSelect,
     onMultiRowSelect
@@ -20,7 +21,10 @@ export default (e, rowInfo, props) => {
   let newIdMap = {
     [rowId]: new Date()
   };
-  if (rowSelected && e.shiftKey) return;
+
+  if (isSingleSelect) {
+    if (rowSelected) newIdMap = {};
+  } else if (rowSelected && e.shiftKey) return;
   else if (rowSelected && ctrl) {
     newIdMap = {
       ...oldIdMap
