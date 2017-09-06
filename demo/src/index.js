@@ -2,6 +2,8 @@ import './style.css'
 import React from 'react'
 import { render } from 'react-dom'
 import DataTableDemo from './DataTableDemo/index.js'
+import InfoPopoverDemo from './InfoPopoverDemo/index.js'
+
 import VectorEditorDemo from './VectorEditorDemo/index.js'
 import LoadingDemo from './LoadingDemo/index.js'
 import FormComponentsDemo from './FormComponentsDemo'
@@ -14,6 +16,7 @@ import Perf from 'react-addons-perf'
 const demos = {
   vectoreditor: VectorEditorDemo,
   datatable: DataTableDemo,
+  infopopover: InfoPopoverDemo,
   loading: LoadingDemo,
   formcomponents: FormComponentsDemo,
   fonticons: FontIconsDemo,
