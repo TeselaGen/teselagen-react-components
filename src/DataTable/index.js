@@ -24,6 +24,7 @@ import rowClick from "./utils/rowClick";
 import ReactTable from "react-table";
 import PagingTool from "./PagingTool";
 import FilterAndSortMenu from "./FilterAndSortMenu";
+import getIdOrCode from "./utils/getIdOrCode";
 import "../toastr";
 import "./style.css";
 
@@ -175,10 +176,10 @@ class ReactDataTable extends React.Component {
           </div>
           {!isInfinite &&
           withPaging &&
-          (hidePageSizeWhenPossible ? entityCount > pageSize : true)
+          (hidePageSizeWhenPossible ? entityCountToUse > pageSize : true)
             ? <PagingTool
                 paging={{
-                  total: entityCount,
+                  total: entityCountToUse,
                   page,
                   pageSize
                 }}
@@ -200,7 +201,7 @@ class ReactDataTable extends React.Component {
       history
     } = this.props;
     if (!rowInfo) return {};
-    const rowId = rowInfo.original.id;
+    const rowId = getIdOrCode(rowInfo.original);
     const rowSelected = reduxFormSelectedEntityIdMap.input.value[rowId];
     return {
       onClick: e => {
@@ -259,10 +260,11 @@ class ReactDataTable extends React.Component {
             onChange={() => {
               const newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
               range(entities.length).forEach(i => {
+                const entityId = getIdOrCode(entities[i]);
                 if (checkboxProps.checked) {
-                  delete newIdMap[entities[i].id];
+                  delete newIdMap[entityId];
                 } else {
-                  newIdMap[entities[i].id] = true;
+                  newIdMap[entityId] = true;
                 }
               });
 
@@ -302,9 +304,9 @@ class ReactDataTable extends React.Component {
           onClick={e => {
             let newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
             const isRowCurrentlyChecked = checkedRows.indexOf(rowIndex) > -1;
-
+            const entityId = getIdOrCode(entity);
             if (isSingleSelect) {
-              newIdMap = { [entity.id]: true };
+              newIdMap = { [entityId]: true };
             } else if (e.shiftKey && rowIndex !== lastCheckedRow) {
               const start = rowIndex;
               const end = lastCheckedRow;
@@ -315,19 +317,20 @@ class ReactDataTable extends React.Component {
               ) {
                 const isLastCheckedRowCurrentlyChecked =
                   checkedRows.indexOf(lastCheckedRow) > -1;
-                let tempEntity = entities[i];
+                const tempEntity = entities[i];
+                const tempEntityId = getIdOrCode(tempEntity);
                 if (isLastCheckedRowCurrentlyChecked) {
-                  newIdMap[tempEntity.id] = true;
+                  newIdMap[tempEntityId] = true;
                 } else {
-                  delete newIdMap[tempEntity.id];
+                  delete newIdMap[tempEntityId];
                 }
               }
             } else {
               //no shift key
               if (isRowCurrentlyChecked) {
-                delete newIdMap[entity.id];
+                delete newIdMap[entityId];
               } else {
-                newIdMap[entity.id] = true;
+                newIdMap[entityId] = true;
               }
             }
 
@@ -406,7 +409,7 @@ class ReactDataTable extends React.Component {
   showContextMenu = (idMap, e) => {
     const { entities, history, contextMenu } = this.props;
     const selectedRecords = entities.reduce((acc, entity) => {
-      return idMap[entity.id] ? acc.concat(entity) : acc;
+      return idMap[getIdOrCode(entity)] ? acc.concat(entity) : acc;
     }, []);
     const itemsToRender = contextMenu({
       selectedRecords,

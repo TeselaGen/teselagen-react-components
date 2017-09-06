@@ -3,9 +3,12 @@ import {
   getSelectedRowsFromEntities,
   getSelectedRecordsFromEntities
 } from "./selection";
+import getIdOrCode from "./getIdOrCode";
 
 export default (e, rowInfo, props) => {
-  const rowId = rowInfo.original.id;
+  const rowId = getIdOrCode(rowInfo.original);
+  if (rowId === undefined) return;
+
   const {
     reduxFormSelectedEntityIdMap,
     entities,
@@ -14,7 +17,6 @@ export default (e, rowInfo, props) => {
     onSingleRowSelect,
     onMultiRowSelect
   } = props;
-  if (rowId === undefined) return;
   const ctrl = e.metaKey || e.ctrlKey;
   const oldIdMap = reduxFormSelectedEntityIdMap.input.value || {};
   const rowSelected = oldIdMap[rowId];
@@ -63,13 +65,15 @@ export default (e, rowInfo, props) => {
       if (mostRecentlySelectedIndex !== -1) {
         // clear out other selections in current group
         for (let i = mostRecentlySelectedIndex + 1; i < entities.length; i++) {
-          if (!oldIdMap[entities[i].id]) break;
-          delete oldIdMap[entities[i].id];
+          const entityId = getIdOrCode(entities[i]);
+          if (!oldIdMap[entityId]) break;
+          delete oldIdMap[entityId];
         }
 
         for (let i = mostRecentlySelectedIndex - 1; i >= 0; i--) {
-          if (!oldIdMap[entities[i].id]) break;
-          delete oldIdMap[entities[i].id];
+          const entityId = getIdOrCode(entities[i]);
+          if (!oldIdMap[entityId]) break;
+          delete oldIdMap[entityId];
         }
 
         const highRange =
@@ -80,8 +84,8 @@ export default (e, rowInfo, props) => {
           rowInfo.index > mostRecentlySelectedIndex
             ? mostRecentlySelectedIndex + 1
             : rowInfo.index;
-        range(lowRange, highRange + 1).forEach(index => {
-          const recordId = entities[index] && entities[index].id;
+        range(lowRange, highRange + 1).forEach(i => {
+          const recordId = entities[i] && getIdOrCode(entities[i]);
           if (recordId || recordId === 0) newIdMap[recordId] = true;
         });
         newIdMap = {
