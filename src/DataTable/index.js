@@ -117,6 +117,13 @@ class ReactDataTable extends React.Component {
     const selectedRowCount = Object.keys(
       reduxFormSelectedEntityIdMap.input.value || {}
     ).length;
+
+    let rowsToShow = doNotShowEmptyRows
+      ? Math.min(numRows, entities.length)
+      : numRows;
+    // if there are no entities then provide enough space to show
+    // no rows found message
+    if (entities.length === 0 && rowsToShow < 3) rowsToShow = 3;
     return (
       <div className={"data-table-container " + extraClasses}>
         <div className={"data-table-header"}>
@@ -152,10 +159,7 @@ class ReactDataTable extends React.Component {
         <ReactTable
           data={entities}
           columns={this.renderColumns()}
-          defaultPageSize={numRows}
-          pageSize={
-            doNotShowEmptyRows ? Math.min(numRows, entities.length) : numRows
-          }
+          pageSize={rowsToShow}
           showPagination={false}
           sortable={false}
           loading={isLoading}

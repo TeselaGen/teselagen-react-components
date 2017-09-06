@@ -11,30 +11,34 @@ import "./style.css";
 import { BrowserRouter as Router, withRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "../store";
-import Chance from 'chance';
+import Chance from "chance";
 import times from "lodash/times";
-import {DataTableSchema} from '../../../src/flow_types';
+import { DataTableSchema } from "../../../src/flow_types";
 FocusStyleManager.onlyShowFocusOnTabs();
 
 //@flow
 
-const chance = new Chance()
-
+const chance = new Chance();
 
 const schema: DataTableSchema = {
   model: "material",
   fields: [
-    {path: "notDisplayedField", isHidden: true, type: "string", displayName: "Not Displayed" },
-    {path: "type", type: "lookup", displayName: "Type" },
-    {path: "isShared", type: "boolean", displayName: "Is Shared?" },
-    {path: "name", type: "string", displayName: "Name" },
-    {path: "createdAt", type: "timestamp", displayName: "Date Created" },
-    {path: "updatedAt", type: "timestamp", displayName: "Last Edited" },
     {
-      type: 'lookup',
+      path: "notDisplayedField",
+      isHidden: true,
+      type: "string",
+      displayName: "Not Displayed"
+    },
+    { path: "type", type: "lookup", displayName: "Type" },
+    { path: "isShared", type: "boolean", displayName: "Is Shared?" },
+    { path: "name", type: "string", displayName: "Name" },
+    { path: "createdAt", type: "timestamp", displayName: "Date Created" },
+    { path: "updatedAt", type: "timestamp", displayName: "Last Edited" },
+    {
+      type: "lookup",
       displayName: "User Status",
       sortDisabled: true,
-      path: "user.status.name",
+      path: "user.status.name"
     },
     {
       sortDisabled: true,
@@ -44,7 +48,6 @@ const schema: DataTableSchema = {
     }
   ]
 };
-
 
 const renderToggle = (that, type, description) => {
   return (
@@ -84,7 +87,7 @@ export default class DataTableDemo extends React.Component {
       schema,
       urlConnected: this.state.urlConnected,
       onlyOneFilter: this.state.onlyOneFilter
-    })(DataTableInstance)
+    })(DataTableInstance);
     ConnectedTable = withRouter(ConnectedTable);
 
     return (
@@ -142,6 +145,29 @@ export default class DataTableDemo extends React.Component {
   }
 }
 
+const generateFakeRows = num => {
+  return times(num).map(function(a, index) {
+    return {
+      id: index,
+      notDisplayedField: chance.name(),
+      name: chance.name(),
+      isShared: chance.pickone([true, false]),
+      user: {
+        lastName: chance.name(),
+        status: {
+          name: chance.pickone(["pending", "added"])
+        }
+      },
+      type: "denicolaType",
+      addedBy: chance.name(),
+      updatedAt: new Date().toLocaleString(),
+      createdAt: new Date().toLocaleString()
+    };
+  });
+};
+
+const defaultNumOfEntities = 60;
+
 export class DataTableInstance extends React.Component {
   state = {
     additionalFilters: false,
@@ -154,38 +180,20 @@ export class DataTableInstance extends React.Component {
     hidePageSizeWhenPossible: false,
     doNotShowEmptyRows: false,
     withCheckboxes: true,
-    numOfEntities: 60
+    numOfEntities: 60,
+    entities: generateFakeRows(defaultNumOfEntities)
   };
 
   render() {
-    const { numOfEntities } = this.state;
-    const entities = times(numOfEntities).map(function (a,index) {
-      
-      return {
-        id: index,
-        notDisplayedField: chance.name(),
-        name: chance.name(),
-        isShared: chance.pickone([true, false]),
-        user: {
-          lastName: chance.name(),
-          status: {
-            name: chance.pickone(['pending', 'added'])
-          }
-        },
-        type: 'denicolaType',
-        addedBy: chance.name(),
-        updatedAt: new Date().toLocaleString(),
-        createdAt: new Date().toLocaleString()
-      }
-    });
+    const { numOfEntities, entities } = this.state;
     const { tableParams } = this.props;
-    
     const { page, pageSize } = tableParams;
     let entitiesToPass = [];
+
     if (this.state.isInfinite) {
       entitiesToPass = entities;
     } else {
-      for (var i = (page - 1) * pageSize; i < page * pageSize; i++) {
+      for (let i = (page - 1) * pageSize; i < page * pageSize; i++) {
         entities[i] && entitiesToPass.push(entities[i]);
       }
     }
@@ -205,9 +213,18 @@ export class DataTableInstance extends React.Component {
           "additionalFilters",
           "Filters can be added by passing an additionalFilters prop. You can even filter on non-displayed fields"
         )}
-        Set numer of entities: <input type="number" value={numOfEntities} onChange={(e) => {
-          this.setState({numOfEntities: parseInt(e.target.value, 10)})
-        }}/>
+        Set number of entities:{" "}
+        <input
+          type="number"
+          value={numOfEntities}
+          onChange={e => {
+            const numOfEntities = parseInt(e.target.value, 10);
+            this.setState({
+              numOfEntities,
+              entities: generateFakeRows(numOfEntities)
+            });
+          }}
+        />
         {renderToggle(this, "withTitle")}
         {renderToggle(this, "withSearch")}
         {renderToggle(this, "withPaging")}
@@ -226,25 +243,20 @@ export class DataTableInstance extends React.Component {
           }}
           cellRenderer={{
             isShared: (value, record, row) => {
-              return <span
-                style={{
-                  color:
-                    value
-                      ? 'green'
-                      : 'red'
-                }}
-              >
-                {value ? 'True' : 'False'} { " "}
-                <button>click me</button>
-              </span>
+              return (
+                <span
+                  style={{
+                    color: value ? "green" : "red"
+                  }}
+                >
+                  {value ? "True" : "False"} <button>click me</button>
+                </span>
+              );
             }
           }}
           additionalFilters={additionalFilters}
           title={"Demo table"}
-          contextMenu={function({
-            selectedRecords,
-            history
-          }) {
+          contextMenu={function({ selectedRecords, history }) {
             return [
               <MenuItem
                 onClick={function() {
@@ -268,7 +280,7 @@ export class DataTableInstance extends React.Component {
           doNotShowEmptyRows={this.state.doNotShowEmptyRows}
           withCheckboxes={this.state.withCheckboxes}
           isSingleSelect={this.state.isSingleSelect}
-          maxHeight={this.state.maxHeight && '200px' }
+          maxHeight={this.state.maxHeight && "200px"}
           onRefresh={() => {
             alert("clicked refresh!");
           }}
