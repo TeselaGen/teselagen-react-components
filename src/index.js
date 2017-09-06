@@ -5,6 +5,7 @@ export {
   default as routeDoubleClick
 } from "./DataTable/utils/routeDoubleClick";
 export { default as withTableParams } from "./DataTable/utils/withTableParams";
+export { default as InfoPopover } from "./InfoPopover.js";
 export * from "./FormComponents";
 export * from "./toastr";
 export * from "./VectorEditor";
