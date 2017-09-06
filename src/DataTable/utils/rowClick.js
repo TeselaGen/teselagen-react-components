@@ -55,13 +55,16 @@ export default (e, rowInfo, props) => {
       forEach(oldIdMap, (value, key) => {
         if (typeof value !== "boolean" && value > timeToBeat.time)
           timeToBeat = {
-            id: parseInt(key, 10),
+            id: key,
             time: value
           };
       });
-      const mostRecentlySelectedIndex = entities.findIndex(
-        e => e.id === timeToBeat.id
-      );
+      const mostRecentlySelectedIndex = entities.findIndex(e => {
+        let id = getIdOrCode(e);
+        if (!id && id !== 0) id = "";
+        return id.toString() === timeToBeat.id;
+      });
+
       if (mostRecentlySelectedIndex !== -1) {
         // clear out other selections in current group
         for (let i = mostRecentlySelectedIndex + 1; i < entities.length; i++) {
