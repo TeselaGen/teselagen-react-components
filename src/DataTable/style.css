@@ -182,10 +182,6 @@
   background: white;
 }
 
-.ReactTable .rt-thead .rt-th {
-  border-right: none;
-}
-
 .ReactTable .rt-thead.-header {
   box-shadow: none;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
@@ -197,8 +193,6 @@
   border-right: none;
   color: rgba(0, 0, 0, 0.65);
   font-size: 12px;
-  display: flex;
-  align-items: center;
 }
 
 .ReactTable .rt-tr-group {
