@@ -29,7 +29,7 @@ const schema: DataTableSchema = {
       type: "string",
       displayName: "Not Displayed"
     },
-    { path: "type", type: "lookup", displayName: "Type" },
+    { path: "type", type: "lookup", displayName: "Special Type" },
     { path: "isShared", type: "boolean", displayName: "Is Shared?" },
     { path: "name", type: "string", displayName: "Name" },
     { path: "createdAt", type: "timestamp", displayName: "Date Created" },
@@ -37,7 +37,6 @@ const schema: DataTableSchema = {
     {
       type: "lookup",
       displayName: "User Status",
-      sortDisabled: true,
       path: "user.status.name"
     },
     {

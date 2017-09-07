@@ -2,9 +2,8 @@
 import queryString from "query-string";
 import QueryBuilder from "tg-client-query-builder";
 import last from "lodash/last";
-import uniqBy from "lodash/uniqBy";
-import clone from "lodash/clone";
-import camelCase from "lodash/camelCase";
+
+import { uniqBy, get, clone, camelCase, startsWith, endsWith } from "lodash";
 
 const pageSizes = [5, 10, 15, 25, 50, 100, 200];
 
@@ -23,9 +22,9 @@ export function getMergedOpts(topLevel = {}, instanceLevel = {}) {
       filters: [
         //filters look like this:
         // {
-        //   selectedFilter: undefined,
-        //   filterOn: undefined,
-        //   filterValue: undefined,
+        //   selectedFilter: 'Text Contains',
+        //   filterOn: ccDisplayName,
+        //   filterValue: 'thomas',
         // }
       ],
       ...(topLevel.defaults || {}),
@@ -48,26 +47,116 @@ function safeParse(val) {
     return val;
   }
 }
+function getFieldsMappedByCCDisplayName(schema) {
+  return schema.fields.reduce((acc, field) => {
+    acc[camelCase(field.displayName)] = field;
+    return acc;
+  }, {});
+}
 
-function getSubFilter(qb, selectedFilter, filterValue) {
-  if (selectedFilter === "Starts with") return qb.startsWith(filterValue);
-  else if (selectedFilter === "Ends with") return qb.endsWith(filterValue);
-  else if (selectedFilter === "Contains") return qb.contains(filterValue);
-  else if (selectedFilter === "Is exactly") return filterValue;
-  else if (selectedFilter === "True") return qb.equals(true);
-  else if (selectedFilter === "False") return qb.equals(false);
-  else if (selectedFilter === "Is between")
-    return qb.between([filterValue[0].getTime(), filterValue[1].getTime()]);
-  else if (selectedFilter === "Is before")
-    return qb.lessThan(filterValue.getTime());
-  else if (selectedFilter === "Is after")
-    return qb.greaterThan(filterValue.getTime());
-  else if (selectedFilter === "Greater than")
-    return qb.greaterThan(filterValue);
-  else if (selectedFilter === "Less than") return qb.lessThan(filterValue);
-  else if (selectedFilter === "In range")
-    return qb.between([filterValue[0], filterValue[1]]);
-  else if (selectedFilter === "Equal to") return filterValue;
+export function filterEntitiesLocal(filters, entities, schema) {
+  const ccFields = getFieldsMappedByCCDisplayName(schema);
+  filters.forEach(filter => {
+    const { filterOn, filterValue, selectedFilter } = filter;
+    console.log("filterValue:", filterValue);
+    const field = ccFields[filterOn];
+    const { path } = field;
+    const subFilter = getSubFilter(false, selectedFilter, filterValue);
+    entities = entities.filter(entity => {
+      const fieldVal = get(entity, path);
+      console.log("fieldVal:", fieldVal);
+      const shouldKeep = subFilter(fieldVal);
+      console.log("shouldKeep:", shouldKeep);
+      return shouldKeep;
+    });
+  });
+  return entities;
+}
+
+function getSubFilter(
+  qb, //if no qb is passed, it means we are filtering locally and want to get a function back that can be used in an array filter
+  selectedFilter,
+  filterValue
+) {
+  if (selectedFilter === "Starts with") {
+    return qb
+      ? qb.startsWith(filterValue)
+      : fieldVal => {
+          return startsWith(fieldVal, filterValue);
+        };
+  } else if (selectedFilter === "Ends with") {
+    return qb
+      ? qb.endsWith(filterValue)
+      : fieldVal => {
+          return endsWith(fieldVal, filterValue);
+        };
+  } else if (selectedFilter === "Contains") {
+    return qb
+      ? qb.contains(filterValue)
+      : fieldVal => {
+          return fieldVal.replace(filterValue, "") !== fieldVal;
+        };
+  } else if (selectedFilter === "Is exactly") {
+    return qb
+      ? filterValue
+      : fieldVal => {
+          return fieldVal === filterValue;
+        };
+  } else if (selectedFilter === "True") {
+    return qb
+      ? qb.equals(true)
+      : fieldVal => {
+          return !!fieldVal;
+        };
+  } else if (selectedFilter === "False") {
+    return qb
+      ? qb.equals(false)
+      : fieldVal => {
+          return !fieldVal;
+        };
+  } else if (selectedFilter === "Is between") {
+    return qb
+      ? qb.between([filterValue[0].getTime(), filterValue[1].getTime()])
+      : fieldVal => {
+          return filterValue[0] <= fieldVal && fieldVal <= filterValue[1];
+        };
+  } else if (selectedFilter === "Is before") {
+    return qb
+      ? qb.lessThan(filterValue.getTime())
+      : fieldVal => {
+          return fieldVal <= filterValue;
+        };
+  } else if (selectedFilter === "Is after") {
+    return qb
+      ? qb.greaterThan(filterValue.getTime())
+      : fieldVal => {
+          return fieldVal >= filterValue;
+        };
+  } else if (selectedFilter === "Greater than") {
+    return qb
+      ? qb.greaterThan(filterValue)
+      : fieldVal => {
+          return fieldVal >= filterValue;
+        };
+  } else if (selectedFilter === "Less than") {
+    return qb
+      ? qb.lessThan(filterValue)
+      : fieldVal => {
+          return fieldVal <= filterValue;
+        };
+  } else if (selectedFilter === "In range") {
+    return qb
+      ? qb.between([filterValue[0], filterValue[1]])
+      : fieldVal => {
+          return filterValue[0] <= fieldVal && fieldVal <= filterValue[1];
+        };
+  } else if (selectedFilter === "Equal to") {
+    return qb
+      ? filterValue
+      : fieldVal => {
+          return fieldVal == filterValue;
+        };
+  }
 
   throw new Error(
     `Unsupported filter ${selectedFilter}. Please make a new filter if you need one`

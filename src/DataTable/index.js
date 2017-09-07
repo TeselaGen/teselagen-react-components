@@ -26,6 +26,7 @@ import ReactTable from "react-table";
 import PagingTool from "./PagingTool";
 import FilterAndSortMenu from "./FilterAndSortMenu";
 import getIdOrCode from "./utils/getIdOrCode";
+import { filterEntitiesLocal } from "./utils/queryParams";
 import "../toastr";
 import "./style.css";
 import withTableParams from "./utils/withTableParams";
@@ -72,6 +73,7 @@ class ReactDataTable extends React.Component {
   };
 
   componentWillMountOrReceiveProps = (oldProps, newProps) => {
+    //handle programatic filter adding
     if (!deepEqual(newProps.additionalFilters, oldProps.additionalFilters)) {
       newProps.addFilters(newProps.additionalFilters);
     }
@@ -88,6 +90,7 @@ class ReactDataTable extends React.Component {
         : [];
       this.setState({ columns });
     }
+    //handle local sorting!
     let newEntities;
     if (
       !deepEqual(
@@ -123,7 +126,7 @@ class ReactDataTable extends React.Component {
       newEntities = entities;
       if (newProps.localConnected) {
         if (filters && filters.length) {
-          // debugger;
+          newEntities = filterEntitiesLocal(filters, newEntities, schema);
         }
         //calculate the sorted, filtered, paged entities for the local table
         if (order && order.length) {
@@ -136,9 +139,6 @@ class ReactDataTable extends React.Component {
                 ascOrDescArray.push(orderField === order ? "asc" : "desc");
                 //push the actual sorting function
                 orderFuncs.push(o => {
-                  console.log("o:", o);
-                  console.log("path:", path);
-                  console.log("get(o, path):", get(o, path));
                   return get(o, path);
                 });
                 return true;
@@ -604,11 +604,10 @@ class ReactDataTable extends React.Component {
     const { displayName, sortDisabled, path } = schemaForField;
     const columnDataType = schemaForField.type;
     const ccDisplayName = camelCase(displayName);
-    const activeFilterClass = filters.some(({ filterOn }) => {
+    const currentFilter = filters.filter(({ filterOn }) => {
       return filterOn === ccDisplayName;
-    })
-      ? " tg-active-filter"
-      : "";
+    })[0];
+    const activeFilterClass = currentFilter ? " tg-active-filter" : "";
     let ordering;
     if (order && order.length) {
       order.forEach(order => {
@@ -664,11 +663,7 @@ class ReactDataTable extends React.Component {
           <FilterAndSortMenu
             addFilters={addFilters}
             removeSingleFilter={removeSingleFilter}
-            currentFilter={
-              filters.filter(({ filterOn }) => {
-                return filterOn === ccDisplayName;
-              })[0]
-            }
+            currentFilter={currentFilter}
             filterOn={ccDisplayName}
             dataType={columnDataType}
             schemaForField={schemaForField}

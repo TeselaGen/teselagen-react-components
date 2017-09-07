@@ -20,7 +20,7 @@ import {
   Position
 } from "@blueprintjs/core";
 
-import { DateInput } from "@blueprintjs/datetime";
+import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
 
 function getIntent({ showErrorIfUntouched, meta: { touched, error } }) {
   return (touched || showErrorIfUntouched) && error ? Intent.DANGER : "";
@@ -140,6 +140,22 @@ export const renderBlueprintDateInput = props => {
   const { input, intent, onFieldSubmit, ...rest } = props;
   return (
     <DateInput
+      {...removeUnwantedProps(rest)}
+      intent={intent}
+      format="MM/DD/YYYY"
+      {...input}
+      onChange={function(selectedDate) {
+        input.onChange(selectedDate);
+        onFieldSubmit(selectedDate);
+      }}
+    />
+  );
+};
+
+export const renderBlueprintDateRangeInput = props => {
+  const { input, intent, onFieldSubmit, ...rest } = props;
+  return (
+    <DateRangeInput
       {...removeUnwantedProps(rest)}
       intent={intent}
       format="MM/DD/YYYY"
@@ -515,6 +531,7 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
 export const InputField = generateField(renderBlueprintInput);
 export const AntFileUploadField = generateField(renderAntFileUpload);
 export const DateInputField = generateField(renderBlueprintDateInput);
+export const DateRangeInputField = generateField(renderBlueprintDateRangeInput);
 export const CheckboxField = generateField(renderBlueprintCheckbox, {
   noOuterLabel: true
 });

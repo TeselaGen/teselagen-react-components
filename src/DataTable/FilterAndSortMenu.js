@@ -1,3 +1,7 @@
+import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
+
+// import {DateRangeInputField, DateInputField} from '../FormComponents';
+
 //@flow
 import "../toastr";
 import { onEnterOrBlurHelper } from "../utils/handlerHelpers";
@@ -17,10 +21,6 @@ import {
   InputGroup
 } from "@blueprintjs/core";
 
-import {
-  /*DateInput, DateRangeInput, */ DateInput,
-  DateRangeInput
-} from "@blueprintjs/datetime";
 import "./style.css";
 
 export default class FilterAndSortMenu extends React.Component {
@@ -111,7 +111,7 @@ export default class FilterAndSortMenu extends React.Component {
         <div className={"custom-menu-item"}>
           <span>Filter by condition. {schemaForField.displayName}</span>
         </div> */}
-        {currentFilter &&
+        {currentFilter && (
           <div
             onClick={() => {
               removeSingleFilter(currentFilter.filterOn);
@@ -121,7 +121,8 @@ export default class FilterAndSortMenu extends React.Component {
             <Button className={"pt-intent-danger pt-icon-remove"}>
               Clear Filter
             </Button>
-          </div>}
+          </div>
+        )}
         <div className={"custom-menu-item"}>
           <div className="pt-select pt-fill">
             <select
@@ -241,7 +242,6 @@ class FilterInput extends React.Component {
           <div className={"custom-menu-item"}>
             <DateInput
               maxDate={new Date()}
-              {...onEnterOrBlurHelper(handleFilterSubmit)}
               value={filterValue && filterValue[1]}
               onChange={selectedDates => {
                 handleFilterValueChange(selectedDates);
@@ -255,22 +255,11 @@ class FilterInput extends React.Component {
         inputGroup = (
           <div className={"custom-menu-item"}>
             <DateRangeInput
-              {...onEnterOrBlurHelper(handleFilterSubmit)}
-              popoverProps={{
-                inline: false,
-                tetherOptions: {
-                  constraints: [
-                    {
-                      attachment: "together",
-                      to: "window",
-                      pin: true
-                    }
-                  ]
-                }
-              }}
               maxDate={new Date()}
               onChange={selectedDates => {
-                handleFilterValueChange(selectedDates);
+                if (selectedDates[0] && selectedDates[1]) {
+                  handleFilterValueChange(selectedDates);
+                }
               }}
             />
           </div>

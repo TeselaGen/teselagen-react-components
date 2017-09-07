@@ -162,7 +162,7 @@
 
 .tg-active-filter {
   color: blue;
-  display: block;
+  display: block !important;
 }
 
 .data-table-footer {
