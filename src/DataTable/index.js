@@ -1,4 +1,5 @@
-import { withRouter } from "react-router-dom";
+import deepEqual from "deep-equal";
+import { connect } from "react-redux";
 import { Fields, reduxForm } from "redux-form";
 import { compose } from "redux";
 import { range, isNumber } from "lodash";
@@ -17,6 +18,7 @@ import {
   ContextMenu,
   Checkbox
 } from "@blueprintjs/core";
+import { some, get, orderBy } from "lodash";
 
 import { onEnterHelper } from "../utils/handlerHelpers";
 import { getSelectedRowsFromEntities } from "./utils/selection";
@@ -27,6 +29,7 @@ import FilterAndSortMenu from "./FilterAndSortMenu";
 import getIdOrCode from "./utils/getIdOrCode";
 import "../toastr";
 import "./style.css";
+import withTableParams from "./utils/withTableParams";
 
 const noop = () => {};
 class ReactDataTable extends React.Component {
@@ -44,6 +47,7 @@ class ReactDataTable extends React.Component {
     extraClasses: "",
     page: 1,
     style: {},
+    localConnected: false, //we aren't connected to an external db for our sorting/filtering/paging
     reduxFormSearchInput: {},
     reduxFormSelectedEntityIdMap: {},
     isLoading: false,
@@ -59,28 +63,91 @@ class ReactDataTable extends React.Component {
     onDoubleClick: noop,
     onMultiRowSelect: noop,
     onSingleRowSelect: noop,
-    onDeselect: noop
+    onDeselect: noop,
+    addFilters: noop,
+    removeSingleFilter: noop,
+    filters: []
   };
 
+  componentWillMountOrReceiveProps = (oldProps, newProps) => {
+    if (!deepEqual(newProps.additionalFilters, oldProps.additionalFilters)) {
+      newProps.addFilters(newProps.additionalFilters);
+    }
+    if (!deepEqual(newProps.schema, oldProps.schema)) {
+      const { schema = {} } = newProps;
+      const columns = schema.fields
+        ? schema.fields.reduce(function(columns, field, i) {
+            if (field.isHidden) {
+              return columns;
+            }
+            columns.push({ displayName: field.displayName, schemaIndex: i });
+            return columns;
+          }, [])
+        : [];
+      this.setState({ columns });
+    }
+    if (
+      !deepEqual(
+        {
+          entities: newProps.entities,
+          schema: newProps.schema,
+          order: newProps.order
+        },
+        {
+          entities: oldProps.entities,
+          schema: oldProps.schema,
+          order: oldProps.order
+        }
+      )
+    ) {
+      const { schema = {}, order, entities } = newProps;
+      let newEntities = entities;
+
+      if (newProps.localConnected) {
+        //calculate the sorted, filtered, paged entities for the local table
+        if (order && order.length) {
+          let orderFuncs = [];
+          let ascOrDescArray = [];
+          order.forEach(order => {
+            const orderField = order.replace("-", "");
+            const foundColumn = some(schema.fields, ({ path }) => {
+              if (path === orderField) {
+                ascOrDescArray.push(orderField === order ? "asc" : "desc");
+                //push the actual sorting function
+                orderFuncs.push(o => {
+                  console.log("o:", o);
+                  console.log("path:", path);
+                  console.log("get(o, path):", get(o, path));
+                  return get(o, path);
+                });
+                return true;
+              }
+            });
+            if (!foundColumn) {
+              console.error(
+                "Ruh roh, there should have been a column to sort on for ",
+                order,
+                "but none was found in ",
+                schema.fields
+              );
+            }
+          });
+          newEntities = orderBy(newEntities, orderFuncs, ascOrDescArray);
+        }
+      }
+      this.setState({ entities: newEntities });
+    }
+  };
+
+  componentWillReceiveProps(newProps) {
+    this.componentWillMountOrReceiveProps(this.props, newProps);
+  }
   componentWillMount() {
-    const { schema = {} } = this.props;
-    const columns = schema.fields
-      ? schema.fields.reduce((columns, field, schemaIndex) => {
-          return field.isHidden
-            ? columns
-            : columns.concat({
-                displayName: field.displayName,
-                width: field.width,
-                schemaIndex
-              });
-        }, [])
-      : [];
-    this.setState({ columns });
+    this.componentWillMountOrReceiveProps({}, this.props);
   }
 
   render() {
     const {
-      entities,
       extraClasses,
       tableName,
       isLoading,
@@ -103,16 +170,35 @@ class ReactDataTable extends React.Component {
       pageSize,
       reduxFormSearchInput,
       reduxFormSelectedEntityIdMap,
-      selectedFilter
+      schema,
+      filters,
+      errorParsingUrlString
     } = this.props;
+    const { entities } = this.state;
     let entityCountToUse = !isNumber(entityCount)
       ? entities.length
       : entityCount;
-    const hasFilters = selectedFilter || searchTerm;
+    const hasFilters = filters.length || searchTerm;
+    const filtersOnNonDisplayedFields = [];
+    schema.fields.forEach(({ isHidden, displayName }) => {
+      const ccDisplayName = camelCase(displayName);
+      if (isHidden) {
+        filters.forEach(filter => {
+          if (filter.filterOn === ccDisplayName) {
+            filtersOnNonDisplayedFields.push({
+              ...filter,
+              displayName
+            });
+          }
+        });
+      }
+    });
     const numRows = isInfinite ? entities.length : pageSize;
-    const maybeSpinner = isLoading
-      ? <Spinner className={Classes.SMALL} />
-      : undefined;
+    const maybeSpinner = isLoading ? (
+      <Spinner className={Classes.SMALL} />
+    ) : (
+      undefined
+    );
 
     const selectedRowCount = Object.keys(
       reduxFormSelectedEntityIdMap.input.value || {}
@@ -124,29 +210,55 @@ class ReactDataTable extends React.Component {
     // if there are no entities then provide enough space to show
     // no rows found message
     if (entities.length === 0 && rowsToShow < 3) rowsToShow = 3;
+
     return (
       <div className={"data-table-container " + extraClasses}>
         <div className={"data-table-header"}>
           <div className={"data-table-title-and-buttons"}>
             {tableName &&
-              withTitle &&
-              <span className={"data-table-title"}>
-                {tableName}
-              </span>}
-
+            withTitle && (
+              <span className={"data-table-title"}>{tableName}</span>
+            )}
             {this.props.children}
           </div>
-          {withSearch &&
+          {errorParsingUrlString && (
+            <span className={"pt-icon-error pt-intent-warning"}>
+              Error parsing URL
+            </span>
+          )}
+          {filtersOnNonDisplayedFields.length ? (
+            filtersOnNonDisplayedFields.map(
+              ({ displayName, selectedFilter, filterValue }) => {
+                return (
+                  <div
+                    key={displayName}
+                    className={"tg-filter-on-non-displayed-field"}
+                  >
+                    <span className={"pt-icon-filter"} />
+                    <span>
+                      {" "}
+                      {displayName} {selectedFilter} {filterValue}{" "}
+                    </span>
+                  </div>
+                );
+              }
+            )
+          ) : (
+            ""
+          )}
+          {withSearch && (
             <div className={"data-table-search-and-clear-filter-container"}>
-              {hasFilters
-                ? <Button
-                    className={"data-table-clear-filters"}
-                    onClick={() => {
-                      clearFilters();
-                    }}
-                    text={"Clear filters"}
-                  />
-                : ""}
+              {hasFilters ? (
+                <Button
+                  className={"data-table-clear-filters"}
+                  onClick={() => {
+                    clearFilters();
+                  }}
+                  text={"Clear filters"}
+                />
+              ) : (
+                ""
+              )}
               <SearchBar
                 {...{
                   reduxFormSearchInput,
@@ -154,7 +266,8 @@ class ReactDataTable extends React.Component {
                   maybeSpinner
                 }}
               />
-            </div>}
+            </div>
+          )}
         </div>
         <ReactTable
           data={entities}
@@ -172,26 +285,30 @@ class ReactDataTable extends React.Component {
         />
         <div className={"data-table-footer"}>
           <div className={"tg-react-table-selected-count"}>
-            {selectedRowCount > 0
-              ? ` ${selectedRowCount} Record${selectedRowCount === 1
-                  ? ""
-                  : "s"} Selected `
-              : ""}
+            {selectedRowCount > 0 ? (
+              ` ${selectedRowCount} Record${selectedRowCount === 1
+                ? ""
+                : "s"} Selected `
+            ) : (
+              ""
+            )}
           </div>
           {!isInfinite &&
           withPaging &&
-          (hidePageSizeWhenPossible ? entityCountToUse > pageSize : true)
-            ? <PagingTool
-                paging={{
-                  total: entityCountToUse,
-                  page,
-                  pageSize
-                }}
-                onRefresh={onRefresh}
-                setPage={setPage}
-                setPageSize={setPageSize}
-              />
-            : <div className={"tg-placeholder"} />}
+          (hidePageSizeWhenPossible ? entityCountToUse > pageSize : true) ? (
+            <PagingTool
+              paging={{
+                total: entityCountToUse,
+                page,
+                pageSize
+              }}
+              onRefresh={onRefresh}
+              setPage={setPage}
+              setPageSize={setPageSize}
+            />
+          ) : (
+            <div className={"tg-placeholder"} />
+          )}
         </div>
       </div>
     );
@@ -235,11 +352,8 @@ class ReactDataTable extends React.Component {
   };
 
   renderCheckboxHeader = () => {
-    const {
-      entities,
-      reduxFormSelectedEntityIdMap,
-      isSingleSelect
-    } = this.props;
+    const { reduxFormSelectedEntityIdMap, isSingleSelect } = this.props;
+    const { entities } = this.state;
     const checkedRows = getSelectedRowsFromEntities(
       entities,
       reduxFormSelectedEntityIdMap.input.value
@@ -259,7 +373,7 @@ class ReactDataTable extends React.Component {
 
     return (
       <div>
-        {!isSingleSelect &&
+        {!isSingleSelect && (
           <Checkbox
             onChange={() => {
               const newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
@@ -277,18 +391,16 @@ class ReactDataTable extends React.Component {
             }}
             {...checkboxProps}
             className={"tg-react-table-checkbox-cell-inner"}
-          />}
+          />
+        )}
       </div>
     );
   };
 
   renderCheckboxCell = row => {
     const rowIndex = row.index;
-    const {
-      entities,
-      reduxFormSelectedEntityIdMap,
-      isSingleSelect
-    } = this.props;
+    const { reduxFormSelectedEntityIdMap, isSingleSelect } = this.props;
+    const { entities } = this.state;
     const checkedRows = getSelectedRowsFromEntities(
       entities,
       reduxFormSelectedEntityIdMap.input.value
@@ -384,15 +496,13 @@ class ReactDataTable extends React.Component {
         tableColumn.width = column.width;
       }
       if (schemaForColumn.type === "timestamp") {
-        tableColumn.Cell = props =>
-          <span>
-            {moment(new Date(props.value)).format("MMM D, YYYY")}
-          </span>;
+        tableColumn.Cell = props => (
+          <span>{moment(new Date(props.value)).format("MMM D, YYYY")}</span>
+        );
       } else if (schemaForColumn.type === "boolean") {
-        tableColumn.Cell = props =>
-          <span>
-            {props.value ? "True" : "False"}
-          </span>;
+        tableColumn.Cell = props => (
+          <span>{props.value ? "True" : "False"}</span>
+        );
       }
       if (cellRenderer && cellRenderer[schemaForColumn.path]) {
         tableColumn.Cell = cellRenderer[schemaForColumn.path];
@@ -411,7 +521,8 @@ class ReactDataTable extends React.Component {
   };
 
   showContextMenu = (idMap, e) => {
-    const { entities, history, contextMenu } = this.props;
+    const { history, contextMenu } = this.props;
+    const { entities } = this.state;
     const selectedRecords = entities.reduce((acc, entity) => {
       return idMap[getIdOrCode(entity)] ? acc.concat(entity) : acc;
     }, []);
@@ -420,29 +531,34 @@ class ReactDataTable extends React.Component {
       history
     });
     if (!itemsToRender) return null;
-    const menu = (
-      <Menu>
-        {itemsToRender}
-      </Menu>
-    );
+    const menu = <Menu>{itemsToRender}</Menu>;
     ContextMenu.show(menu, { left: e.clientX, top: e.clientY });
   };
 
   renderColumnHeader = column => {
-    const { schema, setFilter, setOrder, order, filterOn } = this.props;
+    const {
+      schema,
+      addFilters,
+      setOrder,
+      order,
+      filters,
+      removeSingleFilter
+    } = this.props;
     const schemaIndex = column["schemaIndex"];
     const schemaForField = schema.fields[schemaIndex];
-    const { displayName, sortDisabled } = schemaForField;
+    const { displayName, sortDisabled, path } = schemaForField;
     const columnDataType = schemaForField.type;
     const ccDisplayName = camelCase(displayName);
-    const activeFilterClass =
-      filterOn === ccDisplayName ? " tg-active-filter" : "";
+    const activeFilterClass = filters.some(({ filterOn }) => {
+      return filterOn === ccDisplayName;
+    })
+      ? " tg-active-filter"
+      : "";
     let ordering;
-
     if (order && order.length) {
       order.forEach(order => {
         const orderField = order.replace("-", "");
-        if (orderField === ccDisplayName) {
+        if (orderField === path) {
           if (orderField === order) {
             ordering = "asc";
           } else {
@@ -458,7 +574,7 @@ class ReactDataTable extends React.Component {
         <span title={displayName} className={"tg-react-table-name"}>
           {displayName + "  "}
         </span>
-        {!sortDisabled &&
+        {!sortDisabled && (
           <div className={"tg-sort-arrow-container"}>
             <span
               title={"Sort Z-A"}
@@ -480,7 +596,8 @@ class ReactDataTable extends React.Component {
                 (ordering && isOrderedDown ? "tg-active-sort" : "")
               }
             />
-          </div>}
+          </div>
+        )}
         <Popover position={Position.BOTTOM_RIGHT}>
           <Button
             title={"Filter"}
@@ -490,7 +607,13 @@ class ReactDataTable extends React.Component {
             iconName="filter"
           />
           <FilterAndSortMenu
-            setFilter={setFilter}
+            addFilters={addFilters}
+            removeSingleFilter={removeSingleFilter}
+            currentFilter={
+              filters.filter(({ filterOn }) => {
+                return filterOn === ccDisplayName;
+              })[0]
+            }
             filterOn={ccDisplayName}
             dataType={columnDataType}
             schemaForField={schemaForField}
@@ -511,21 +634,34 @@ function SearchBar({ reduxFormSearchInput, setSearchTerm, maybeSpinner }) {
         setSearchTerm(reduxFormSearchInput.input.value);
       })}
       rightElement={
-        maybeSpinner ||
-        <Button
-          className={Classes.MINIMAL}
-          iconName={"pt-icon-search"}
-          onClick={() => {
-            setSearchTerm(reduxFormSearchInput.input.value);
-          }}
-        />
+        maybeSpinner || (
+          <Button
+            className={Classes.MINIMAL}
+            iconName={"pt-icon-search"}
+            onClick={() => {
+              setSearchTerm(reduxFormSearchInput.input.value);
+            }}
+          />
+        )
       }
     />
   );
 }
 
 export default compose(
-  withRouter,
+  withTableParams(), //connect to withTableParams here in the dataTable component so that, in the case that the table is not manually connected,
+  connect((state, ownProps) => {
+    if (!ownProps.isTableParamsConnected) {
+      //this is the case where we're hooking up to withTableParams locally, so we need to take the tableParams off the props
+      //and set localConnected: true
+      return {
+        localConnected: true, //we aren't connected to an external db for our sorting/filtering/paging
+        ...ownProps.tableParams
+      };
+    } else {
+      return {};
+    }
+  }),
   reduxForm({ form: "tgReactTable" }) //this can be and often is overridden at runtime (by passing a form prop)
 )(props => {
   return (

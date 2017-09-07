@@ -71,7 +71,7 @@ class AbstractInput extends React.Component {
       });
   }
 
-  componentWillUpdate({
+  componentWillReceiveProps({
     meta: { dispatch, form },
     defaultValue,
     input: { name, value }
@@ -103,17 +103,19 @@ class AbstractInput extends React.Component {
     const { touched, error } = meta;
     const showError = (touched || showErrorIfUntouched) && error;
 
-    const componentToWrap = tooltipError
-      ? <Tooltip
-          isDisabled={!showError}
-          intent={Intent.DANGER}
-          content={error}
-          position={Position.TOP}
-          {...tooltipProps}
-        >
-          {children}
-        </Tooltip>
-      : children;
+    const componentToWrap = tooltipError ? (
+      <Tooltip
+        isDisabled={!showError}
+        intent={Intent.DANGER}
+        content={error}
+        position={Position.TOP}
+        {...tooltipProps}
+      >
+        {children}
+      </Tooltip>
+    ) : (
+      children
+    );
 
     return (
       <div
@@ -121,17 +123,14 @@ class AbstractInput extends React.Component {
           this.props
         ) || ""} ${className || ""}`}
       >
-        {label &&
-          !noOuterLabel &&
-          <label className="pt-label">
-            {label}
-          </label>}
+        {label && !noOuterLabel && <label className="pt-label">{label}</label>}
         {componentToWrap}
         {!tooltipError &&
-          showError &&
+        showError && (
           <div className={"tg-field-error-holder pt-form-helper-text"}>
             {error}
-          </div>}
+          </div>
+        )}
       </div>
     );
   }
@@ -206,9 +205,11 @@ export const renderAntFileUpload = ({
   return (
     <div
       title={
-        acceptToUse
-          ? "Accepts only the following file types: " + acceptToUse
-          : "Accepts any file input"
+        acceptToUse ? (
+          "Accepts only the following file types: " + acceptToUse
+        ) : (
+          "Accepts any file input"
+        )
       }
     >
       <Dragger
@@ -236,11 +237,12 @@ export const renderAntFileUpload = ({
         }}
         {...rest}
       >
-        {contentOverride ||
+        {contentOverride || (
           <div className={"tg-upload-inner"}>
             {innerIcon || <span className={"pt-icon-upload pt-icon-large"} />}
             {innerText || "Click or drag to upload"}
-          </div>}
+          </div>
+        )}
       </Dragger>
     </div>
   );
@@ -347,11 +349,13 @@ export const renderSelect = props => {
       <select
         {...removeUnwantedProps(rest)}
         value={
-          placeholder && value === ""
-            ? "__placeholder__"
-            : typeof value !== "string"
-              ? sortify(value) //deterministically sort and stringify the object/number coming in because select fields only support string values
-              : value
+          placeholder && value === "" ? (
+            "__placeholder__"
+          ) : typeof value !== "string" ? (
+            sortify(value) //deterministically sort and stringify the object/number coming in because select fields only support string values
+          ) : (
+            value
+          )
         }
         {...(hideValue ? { value: "" } : {})}
         onChange={function(e) {
@@ -363,10 +367,11 @@ export const renderSelect = props => {
           onFieldSubmit(val);
         }}
       >
-        {placeholder &&
+        {placeholder && (
           <option value="__placeholder__" disabled hidden>
             {placeholder}
-          </option>}
+          </option>
+        )}
         {options.map(function(opt, index) {
           let label, value;
           if (typeof opt === "string") {
@@ -390,9 +395,11 @@ export const renderSelect = props => {
             <option
               key={index}
               value={
-                typeof value !== "string"
-                  ? sortify(value) //deterministically sort and stringify the object/number coming in because select fields only support string values
-                  : value
+                typeof value !== "string" ? (
+                  sortify(value) //deterministically sort and stringify the object/number coming in because select fields only support string values
+                ) : (
+                  value
+                )
               }
             >
               {label}

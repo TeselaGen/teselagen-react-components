@@ -1,12 +1,17 @@
 import React from "react";
 import { shallow, mount } from "enzyme";
-import Component from "./index";
+import DataTable from "./index";
 import PagingTool from "./PagingTool";
 import DataTableDemo, { DataTableInstance } from "../../demo/src/DataTableDemo";
+import { Provider } from "react-redux";
 
-describe("(Component)", () => {
+describe("(DataTable)", () => {
   it("renders without exploding", () => {
-    const wrapper = shallow(<Component />);
+    const wrapper = shallow(
+      <Provider>
+        <DataTable />
+      </Provider>
+    );
     expect(wrapper).toHaveLength(1);
   });
 });

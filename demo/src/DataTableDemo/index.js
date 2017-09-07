@@ -82,7 +82,8 @@ export default class DataTableDemo extends React.Component {
   }
 
   render() {
-    let ConnectedTable = withTableParams({
+
+    let ConnectedTable = withTableParams({ //tnrtodo: this should be set up as an enhancer instead
       formname: "example 1", //this should be a unique name
       schema,
       urlConnected: this.state.urlConnected,
@@ -131,7 +132,10 @@ export default class DataTableDemo extends React.Component {
                   ? <DataTableInstance
                       {...{
                         tableParams: {
-                          schema
+                          formname: "example 1", //this should be a unique name
+                          schema,
+                          urlConnected: this.state.urlConnected,
+                          onlyOneFilter: this.state.onlyOneFilter
                         }
                       }}
                     />
@@ -160,8 +164,8 @@ const generateFakeRows = num => {
       },
       type: "denicolaType",
       addedBy: chance.name(),
-      updatedAt: new Date().toLocaleString(),
-      createdAt: new Date().toLocaleString()
+      updatedAt: chance.date(),
+      createdAt: chance.date(),
     };
   });
 };
@@ -189,7 +193,6 @@ export class DataTableInstance extends React.Component {
     const { tableParams } = this.props;
     const { page, pageSize } = tableParams;
     let entitiesToPass = [];
-
     if (this.state.isInfinite) {
       entitiesToPass = entities;
     } else {
