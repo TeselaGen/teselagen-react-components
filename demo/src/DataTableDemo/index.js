@@ -177,6 +177,7 @@ export class DataTableInstance extends React.Component {
     isInfinite: false,
     isSingleSelect: false,
     maxHeight: false,
+    isLoading: false,
     hidePageSizeWhenPossible: false,
     doNotShowEmptyRows: false,
     withCheckboxes: true,
@@ -229,6 +230,7 @@ export class DataTableInstance extends React.Component {
         {renderToggle(this, "withSearch")}
         {renderToggle(this, "withPaging")}
         {renderToggle(this, "isInfinite")}
+        {renderToggle(this, "isLoading")}
         {renderToggle(this, "hidePageSizeWhenPossible")}
         {renderToggle(this, "doNotShowEmptyRows")}
         {renderToggle(this, "withCheckboxes")}
@@ -276,6 +278,7 @@ export class DataTableInstance extends React.Component {
           withSearch={this.state.withSearch}
           withPaging={this.state.withPaging}
           isInfinite={this.state.isInfinite}
+          isLoading={this.state.isLoading}
           hidePageSizeWhenPossible={this.state.hidePageSizeWhenPossible}
           doNotShowEmptyRows={this.state.doNotShowEmptyRows}
           withCheckboxes={this.state.withCheckboxes}
