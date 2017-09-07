@@ -2,7 +2,7 @@ import deepEqual from "deep-equal";
 import { connect } from "react-redux";
 import { Fields, reduxForm } from "redux-form";
 import { compose } from "redux";
-import { range, isNumber } from "lodash";
+import { range, isNumber, take, drop, get, some, orderBy } from "lodash";
 import React from "react";
 import moment from "moment";
 
@@ -18,8 +18,6 @@ import {
   ContextMenu,
   Checkbox
 } from "@blueprintjs/core";
-import { some, get, orderBy } from "lodash";
-
 import { onEnterHelper } from "../utils/handlerHelpers";
 import { getSelectedRowsFromEntities } from "./utils/selection";
 import rowClick from "./utils/rowClick";
@@ -91,19 +89,37 @@ class ReactDataTable extends React.Component {
         {
           entities: newProps.entities,
           schema: newProps.schema,
-          order: newProps.order
+          order: newProps.order,
+          filters: newProps.filters,
+          pageSize: newProps.pageSize,
+          page: newProps.page,
+          isInfinite: newProps.isInfinite
         },
         {
           entities: oldProps.entities,
           schema: oldProps.schema,
-          order: oldProps.order
+          order: oldProps.order,
+          filters: oldProps.filters,
+          pageSize: oldProps.pageSize,
+          page: oldProps.page,
+          isInfinite: oldProps.isInfinite
         }
       )
     ) {
-      const { schema = {}, order, entities } = newProps;
+      const {
+        schema = {},
+        order,
+        entities,
+        filters,
+        pageSize,
+        page,
+        isInfinite
+      } = newProps;
       let newEntities = entities;
-
       if (newProps.localConnected) {
+        if (filters && filters.length) {
+          // debugger;
+        }
         //calculate the sorted, filtered, paged entities for the local table
         if (order && order.length) {
           let orderFuncs = [];
@@ -133,6 +149,10 @@ class ReactDataTable extends React.Component {
             }
           });
           newEntities = orderBy(newEntities, orderFuncs, ascOrDescArray);
+        }
+        if (!isInfinite) {
+          const offset = (page - 1) * pageSize;
+          newEntities = take(drop(newEntities, offset), pageSize);
         }
       }
       this.setState({ entities: newEntities });
@@ -278,11 +298,7 @@ class ReactDataTable extends React.Component {
           loading={isLoading}
           getTrGroupProps={this.getTableRowProps}
           NoDataComponent={({ children }) =>
-            isLoading
-              ? null
-              : <div className="rt-noData">
-                  {children}
-                </div>}
+            isLoading ? null : <div className="rt-noData">{children}</div>}
           style={{
             maxHeight,
             margin: "20px 0",

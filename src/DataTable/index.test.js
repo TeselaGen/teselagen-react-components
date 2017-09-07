@@ -8,7 +8,7 @@ import { Provider } from "react-redux";
 describe("(DataTable)", () => {
   it("renders without exploding", () => {
     const wrapper = shallow(
-      <Provider>
+      <Provider store={{}}>
         <DataTable />
       </Provider>
     );
@@ -57,24 +57,24 @@ describe("DataTableDemo", () => {
       expect(pagingToolbarWrapper).toHaveLength(1);
     });
 
-    const pagingInput = pagingToolbarWrapper.find("input");
+    const pagingInput = pagingToolbarWrapper.find("select");
     it("pagesize is initialized with a value of 10", () => {
-      expect(pagingInput.props().value).toBe("10");
+      expect(pagingInput.props().value).toBe(10);
     });
 
     it("handles a page size change", () => {
       pagingInput.simulate("change", {
         target: {
-          value: 2
+          value: 2 //setting a value of 2 should bring us to the nearest allowed paging increment of 5
         }
       });
-      expect(pagingInput.props().value).toBe("2");
+      expect(pagingInput.props().value).toBe(5);
       pagingInput.simulate("blur");
-      expect(dataTableInstance.props().queryParams.pageSize).toBe(2);
+      expect(dataTableInstance.props().queryParams.pageSize).toBe(5);
     });
 
     it("handles a page right", () => {
-      expect(dataTableInstance.props().queryParams.pageSize).toBe(2);
+      expect(dataTableInstance.props().queryParams.pageSize).toBe(5);
       pagingToolbarWrapper.find(".paging-arrow-right").simulate("click");
       expect(dataTableInstance.props().queryParams.pageNumber).toBe(2);
 
@@ -108,15 +108,15 @@ describe("DataTableDemo", () => {
       expect(dataTableInstance.props().queryParams.pageNumber).toBe(1);
       pagingToolbarWrapper.find(".paging-arrow-right").simulate("click");
       expect(dataTableInstance.props().queryParams.pageNumber).toBe(2);
-      expect(dataTableInstance.props().queryParams.pageSize).toBe(2);
+      expect(dataTableInstance.props().queryParams.pageSize).toBe(5);
       pagingInput.simulate("change", {
         target: {
-          value: 3
+          value: 10
         }
       });
-      expect(pagingInput.props().value).toBe("3");
+      expect(pagingInput.props().value).toBe(10);
       pagingInput.simulate("blur");
-      expect(dataTableInstance.props().queryParams.pageSize).toBe(3);
+      expect(dataTableInstance.props().queryParams.pageSize).toBe(10);
       expect(dataTableInstance.props().queryParams.pageNumber).toBe(1);
     });
   });

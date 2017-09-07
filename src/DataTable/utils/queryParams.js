@@ -3,7 +3,12 @@ import queryString from "query-string";
 import QueryBuilder from "tg-client-query-builder";
 import last from "lodash/last";
 import uniqBy from "lodash/uniqBy";
+import clone from "lodash/clone";
 import camelCase from "lodash/camelCase";
+
+const pageSizes = [5, 10, 15, 25, 50, 100, 200];
+
+export { pageSizes };
 
 export function getMergedOpts(topLevel = {}, instanceLevel = {}) {
   return {
@@ -262,11 +267,6 @@ export function getQueryParams({
       console.error("No schema for field found!", orderOn, schema.fields);
     }
   }
-  // let graphqlQueryParams =
-  //convert params from user readable to what our api expects
-  // aka page -> pageNumber & pageSize -> pageSize
-  graphqlQueryParams.pageNumber = page;
-  graphqlQueryParams.pageSize = pageSize;
 
   const { searchTerm, filters } = tableQueryParams;
   let errorParsingUrlString;
@@ -337,12 +337,29 @@ export function getQueryParams({
     qb.orWhereAny(...searchTermFilters);
   }
   graphqlQueryParams.filter = qb.toJSON();
+  if (page <= 0 || isNaN(page)) {
+    page = undefined;
+  }
   if (isInfinite) {
     graphqlQueryParams.pageSize = 999;
     graphqlQueryParams.pageNumber = 1;
     page = undefined;
     pageSize = undefined;
   }
+
+  if (pageSize !== undefined) {
+    //pageSize might come in as an unexpected number so we coerce it to be one of the nums in our pageSizes array
+    let closest = clone(pageSizes).sort(
+      (a, b) => Math.abs(pageSize - a) - Math.abs(pageSize - b)
+    )[0];
+    pageSize = closest;
+  }
+
+  // let graphqlQueryParams =
+  //convert params from user readable to what our api expects
+  // aka page -> pageNumber & pageSize -> pageSize
+  graphqlQueryParams.pageNumber = page;
+  graphqlQueryParams.pageSize = pageSize;
   return {
     //the query params get passed directly to graphql
     queryParams: graphqlQueryParams,

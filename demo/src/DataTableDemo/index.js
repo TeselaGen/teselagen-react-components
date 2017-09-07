@@ -192,9 +192,9 @@ export class DataTableInstance extends React.Component {
   render() {
     const { numOfEntities, entities } = this.state;
     const { tableParams } = this.props;
-    const { page, pageSize } = tableParams;
+    const { page, pageSize, isTableParamsConnected } = tableParams;
     let entitiesToPass = [];
-    if (this.state.isInfinite) {
+    if (this.state.isInfinite || !isTableParamsConnected) {
       entitiesToPass = entities;
     } else {
       for (let i = (page - 1) * pageSize; i < page * pageSize; i++) {
