@@ -45,6 +45,7 @@ class ReactDataTable extends React.Component {
     extraClasses: "",
     page: 1,
     style: {},
+    maxHeight: 800,
     localConnected: false, //we aren't connected to an external db for our sorting/filtering/paging
     reduxFormSearchInput: {},
     reduxFormSelectedEntityIdMap: {},

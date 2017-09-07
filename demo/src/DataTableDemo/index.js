@@ -238,7 +238,7 @@ export class DataTableInstance extends React.Component {
         {renderToggle(this, "doNotShowEmptyRows")}
         {renderToggle(this, "withCheckboxes")}
         {renderToggle(this, "isSingleSelect")}
-        {renderToggle(this, "maxHeight")}
+        {renderToggle(this, "maxHeight", "By default every table has a max height of 800px. Setting this true changes it to 200px")}
         <DataTable
           {...tableParams}
           entities={entitiesToPass}
@@ -286,7 +286,12 @@ export class DataTableInstance extends React.Component {
           doNotShowEmptyRows={this.state.doNotShowEmptyRows}
           withCheckboxes={this.state.withCheckboxes}
           isSingleSelect={this.state.isSingleSelect}
-          maxHeight={this.state.maxHeight && "200px"}
+          {
+            ...this.state.maxHeight ? {
+              maxHeight:"200px"
+            } : {}
+          }
+          
           onRefresh={() => {
             alert("clicked refresh!");
           }}
