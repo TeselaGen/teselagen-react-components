@@ -9,14 +9,7 @@ export default (e, rowInfo, props) => {
   const rowId = getIdOrCode(rowInfo.original);
   if (rowId === undefined) return;
 
-  const {
-    reduxFormSelectedEntityIdMap,
-    entities,
-    isSingleSelect,
-    onDeselect,
-    onSingleRowSelect,
-    onMultiRowSelect
-  } = props;
+  const { reduxFormSelectedEntityIdMap, entities, isSingleSelect } = props;
   const ctrl = e.metaKey || e.ctrlKey;
   const oldIdMap = reduxFormSelectedEntityIdMap.input.value || {};
   const rowSelected = oldIdMap[rowId];
@@ -99,11 +92,22 @@ export default (e, rowInfo, props) => {
     }
   }
 
-  reduxFormSelectedEntityIdMap.input.onChange(newIdMap);
-  const selectedRecords = getSelectedRecordsFromEntities(entities, newIdMap);
+  finalizeSelection({ idMap: newIdMap, props });
+};
+
+export function finalizeSelection({ idMap, props }) {
+  const {
+    reduxFormSelectedEntityIdMap,
+    entities,
+    onDeselect,
+    onSingleRowSelect,
+    onMultiRowSelect
+  } = props;
+  reduxFormSelectedEntityIdMap.input.onChange(idMap);
+  const selectedRecords = getSelectedRecordsFromEntities(entities, idMap);
   selectedRecords.length === 0
     ? onDeselect()
     : selectedRecords.length > 1
       ? onMultiRowSelect(selectedRecords)
       : onSingleRowSelect(selectedRecords[0]);
-};
+}

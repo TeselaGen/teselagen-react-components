@@ -5,6 +5,7 @@ import { compose } from "redux";
 import { range, isNumber, take, drop, get, some, orderBy } from "lodash";
 import React from "react";
 import moment from "moment";
+import uniqid from "uniqid";
 
 import camelCase from "lodash/camelCase";
 import {
@@ -20,7 +21,7 @@ import {
 } from "@blueprintjs/core";
 import { onEnterHelper } from "../utils/handlerHelpers";
 import { getSelectedRowsFromEntities } from "./utils/selection";
-import rowClick from "./utils/rowClick";
+import rowClick, { finalizeSelection } from "./utils/rowClick";
 import ReactTable from "react-table";
 import PagingTool from "./PagingTool";
 import FilterAndSortMenu from "./FilterAndSortMenu";
@@ -28,6 +29,8 @@ import getIdOrCode from "./utils/getIdOrCode";
 import "../toastr";
 import "./style.css";
 import withTableParams from "./utils/withTableParams";
+
+const ROW_HEIGHT = 35;
 
 const noop = () => {};
 class ReactDataTable extends React.Component {
@@ -85,6 +88,7 @@ class ReactDataTable extends React.Component {
         : [];
       this.setState({ columns });
     }
+    let newEntities;
     if (
       !deepEqual(
         {
@@ -116,7 +120,7 @@ class ReactDataTable extends React.Component {
         page,
         isInfinite
       } = newProps;
-      let newEntities = entities;
+      newEntities = entities;
       if (newProps.localConnected) {
         if (filters && filters.length) {
           // debugger;
@@ -158,12 +162,37 @@ class ReactDataTable extends React.Component {
       }
       this.setState({ entities: newEntities });
     }
+
+    // handle programmatic selection and scrolling
+    const { tableId } = this.state;
+    const { selectedIds } = newProps;
+    const { selectedIds: oldSelectedIds, entities: oldEntities } = oldProps;
+    newEntities = newEntities || oldEntities;
+    if (selectedIds === oldSelectedIds) return;
+    const idArray = Array.isArray(selectedIds) ? selectedIds : [selectedIds];
+    const newIdMap = idArray.reduce((acc, idOrCode) => {
+      acc[idOrCode] = true;
+      return acc;
+    }, {});
+    finalizeSelection({ idMap: newIdMap, props: newProps });
+    const idToScrollTo = idArray[0];
+    if (!idToScrollTo && idToScrollTo !== 0) return;
+    const entityIndexToScrollTo = newEntities.findIndex(
+      e => e.id === idToScrollTo || e.code === idToScrollTo
+    );
+    if (entityIndexToScrollTo === -1) return;
+    const scrollHeight = ROW_HEIGHT * entityIndexToScrollTo;
+    const tableBody = document.getElementById(tableId);
+    if (tableBody) tableBody.scrollTop = scrollHeight;
   };
 
   componentWillReceiveProps(newProps) {
     this.componentWillMountOrReceiveProps(this.props, newProps);
   }
   componentWillMount() {
+    // table id is used for programmatic scroll
+    const tableId = uniqid();
+    this.setState({ tableId });
     this.componentWillMountOrReceiveProps({}, this.props);
   }
 
@@ -195,7 +224,7 @@ class ReactDataTable extends React.Component {
       filters,
       errorParsingUrlString
     } = this.props;
-    const { entities } = this.state;
+    const { entities, tableId } = this.state;
     let entityCountToUse = !isNumber(entityCount)
       ? entities.length
       : entityCount;
@@ -297,6 +326,9 @@ class ReactDataTable extends React.Component {
           showPagination={false}
           sortable={false}
           loading={isLoading}
+          getTbodyProps={() => ({
+            id: tableId
+          })}
           getTrGroupProps={this.getTableRowProps}
           NoDataComponent={({ children }) =>
             isLoading ? null : <div className="rt-noData">{children}</div>}
