@@ -277,6 +277,12 @@ class ReactDataTable extends React.Component {
           sortable={false}
           loading={isLoading}
           getTrGroupProps={this.getTableRowProps}
+          NoDataComponent={({ children }) =>
+            isLoading
+              ? null
+              : <div className="rt-noData">
+                  {children}
+                </div>}
           style={{
             maxHeight,
             margin: "20px 0",
