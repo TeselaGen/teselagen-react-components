@@ -211,22 +211,22 @@
   padding: 8px 0 0 8px !important;
 }
 
-.ReactTable.compact .rt-tbody .rt-td {
+.tg-compact-table .rt-tbody .rt-td {
   padding: 4px 7px;
 }
 
-.ReactTable.compact .rt-tr-group {
+.tg-compact-table .rt-tr-group {
   min-height: 20px !important;
 }
 
-.ReactTable.compact .tg-react-table-checkbox-header-container {
+.tg-compact-table .tg-react-table-checkbox-header-container {
   padding-top: 8px !important;
 }
 
-.ReactTable.compact .tg-react-table-checkbox-cell-container {
+.tg-compact-table .tg-react-table-checkbox-cell-container {
   padding-top: 5px !important;
 }
 
-.ReactTable.compact .tg-react-table-name {
+.tg-compact-table .tg-react-table-name {
   padding: 4px 0 4px;
 }
