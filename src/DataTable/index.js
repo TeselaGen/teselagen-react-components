@@ -667,7 +667,10 @@ class ReactDataTable extends React.Component {
 }
 
 export default compose(
-  withTableParams(), //connect to withTableParams here in the dataTable component so that, in the case that the table is not manually connected,
+  //connect to withTableParams here in the dataTable component so that, in the case that the table is not manually connected,
+  withTableParams({
+    isLocalCall: true
+  }),
   connect((state, ownProps) => {
     if (!ownProps.isTableParamsConnected) {
       //this is the case where we're hooking up to withTableParams locally, so we need to take the tableParams off the props

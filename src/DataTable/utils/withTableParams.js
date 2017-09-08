@@ -20,6 +20,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
     topLevelOptions = pTopLevelOpts;
     Component = compOrOpts;
   }
+  const { isLocalCall } = topLevelOptions;
 
   const mapStateToProps = (state, ownProps) => {
     if (ownProps.isTableParamsConnected) {
@@ -45,7 +46,8 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         urlConnected,
         defaults,
         schema,
-        isInfinite
+        isInfinite,
+        isLocalCall
       }),
       currentParams,
       initialValues: { reduxFormSearchInput: currentParams.searchTerm }

@@ -469,8 +469,56 @@ export function getQueryParams({
   urlConnected,
   defaults,
   schema,
-  isInfinite
+  isInfinite,
+  isLocalCall
 }) {
+  Object.keys(currentParams).forEach(function(key) {
+    if (currentParams[key] === undefined) {
+      delete currentParams[key]; //we want to use the default value if any of these are undefined
+    }
+  });
+  let tableQueryParams = {
+    ...defaults,
+    ...currentParams
+  };
+  let { page, pageSize, searchTerm, filters, order } = tableQueryParams;
+  if (page <= 0 || isNaN(page)) {
+    page = undefined;
+  }
+  if (isInfinite) {
+    page = undefined;
+    pageSize = undefined;
+  }
+  if (pageSize !== undefined) {
+    //pageSize might come in as an unexpected number so we coerce it to be one of the nums in our pageSizes array
+    let closest = clone(pageSizes).sort(
+      (a, b) => Math.abs(pageSize - a) - Math.abs(pageSize - b)
+    )[0];
+    pageSize = closest;
+  }
+  const toReturn = {
+    //these are values that might be generally useful for the wrapped component
+    page,
+    pageSize,
+    order,
+    filters,
+    searchTerm
+  };
+  if (isLocalCall) {
+    //if this call is being made by a local-data only connected datatable component,
+    //we don't want to do the following gql stuff
+    return toReturn;
+  }
+
+  let graphqlQueryParams = {};
+  if (isInfinite) {
+    graphqlQueryParams.pageSize = 999;
+    graphqlQueryParams.pageNumber = 1;
+  } else {
+    graphqlQueryParams.pageNumber = page;
+    graphqlQueryParams.pageSize = pageSize;
+  }
+
   const { model } = schema;
   let qb = new QueryBuilder(model);
   // qb = qb.filter('user')
@@ -485,18 +533,8 @@ export function getQueryParams({
   // qb.toJSON()
   // let filterBuilder = qb.filter(model); //start filter on model
 
-  Object.keys(currentParams).forEach(function(key) {
-    if (currentParams[key] === undefined) {
-      delete currentParams[key]; //we want to use the default value if any of these are undefined
-    }
-  });
-  let tableQueryParams = {
-    ...defaults,
-    ...currentParams
-  };
   const ccFields = getFieldsMappedByCCDisplayName(schema);
-  let graphqlQueryParams = {};
-  let { page, pageSize } = tableQueryParams;
+
   if (tableQueryParams.order && tableQueryParams.order.length) {
     tableQueryParams.order.forEach(orderVal => {
       const ccDisplayName = orderVal.replace(/^-/gi, "");
@@ -519,7 +557,6 @@ export function getQueryParams({
     });
   }
 
-  const { searchTerm, filters } = tableQueryParams;
   let errorParsingUrlString;
   let allFilters = [
     ...filters,
@@ -570,38 +607,11 @@ export function getQueryParams({
   }
 
   graphqlQueryParams.filter = qb.toJSON();
-  if (page <= 0 || isNaN(page)) {
-    page = undefined;
-  }
-  if (isInfinite) {
-    graphqlQueryParams.pageSize = 999;
-    graphqlQueryParams.pageNumber = 1;
-    page = undefined;
-    pageSize = undefined;
-  }
 
-  if (pageSize !== undefined) {
-    //pageSize might come in as an unexpected number so we coerce it to be one of the nums in our pageSizes array
-    let closest = clone(pageSizes).sort(
-      (a, b) => Math.abs(pageSize - a) - Math.abs(pageSize - b)
-    )[0];
-    pageSize = closest;
-  }
-
-  // let graphqlQueryParams =
-  //convert params from user readable to what our api expects
-  // aka page -> pageNumber & pageSize -> pageSize
-  graphqlQueryParams.pageNumber = page;
-  graphqlQueryParams.pageSize = pageSize;
   return {
+    ...toReturn,
     //the query params get passed directly to graphql
     queryParams: graphqlQueryParams,
-    //these are values that might be generally useful for the wrapped component
-    page,
-    pageSize,
-    order: tableQueryParams.order,
-    filters,
-    errorParsingUrlString,
-    searchTerm
+    errorParsingUrlString
   };
 }
