@@ -5,11 +5,11 @@ import {
 } from "./selection";
 import getIdOrCode from "./getIdOrCode";
 
-export default (e, rowInfo, props) => {
+export default (e, rowInfo, entities, props) => {
   const rowId = getIdOrCode(rowInfo.original);
   if (rowId === undefined) return;
 
-  const { reduxFormSelectedEntityIdMap, entities, isSingleSelect } = props;
+  const { reduxFormSelectedEntityIdMap, isSingleSelect } = props;
   const ctrl = e.metaKey || e.ctrlKey;
   const oldIdMap = reduxFormSelectedEntityIdMap.input.value || {};
   const rowSelected = oldIdMap[rowId];

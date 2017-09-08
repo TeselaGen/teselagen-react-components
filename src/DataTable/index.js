@@ -6,12 +6,10 @@ import { range, take, drop } from "lodash";
 import React from "react";
 import moment from "moment";
 import uniqid from "uniqid";
-
 import camelCase from "lodash/camelCase";
 import {
   Button,
   Menu,
-  InputGroup,
   Spinner,
   Popover,
   Classes,
@@ -19,7 +17,6 @@ import {
   ContextMenu,
   Checkbox
 } from "@blueprintjs/core";
-import { onEnterHelper } from "../utils/handlerHelpers";
 import { getSelectedRowsFromEntities } from "./utils/selection";
 import rowClick, { finalizeSelection } from "./utils/rowClick";
 import ReactTable from "react-table";
@@ -27,6 +24,7 @@ import PagingTool from "./PagingTool";
 import FilterAndSortMenu from "./FilterAndSortMenu";
 import getIdOrCode from "./utils/getIdOrCode";
 import { filterEntitiesLocal, orderEntitiesLocal } from "./utils/queryParams";
+import SearchBar from "./SearchBar";
 import "../toastr";
 import "./style.css";
 import withTableParams from "./utils/withTableParams";
@@ -371,7 +369,7 @@ class ReactDataTable extends React.Component {
     return {
       onClick: e => {
         if (withCheckboxes) return;
-        rowClick(e, rowInfo, this.props);
+        rowClick(e, rowInfo, this.state.entities, this.props);
       },
       onContextMenu: e => {
         e.preventDefault();
@@ -666,30 +664,6 @@ class ReactDataTable extends React.Component {
       </div>
     );
   };
-}
-
-function SearchBar({ reduxFormSearchInput, setSearchTerm, maybeSpinner }) {
-  return (
-    <InputGroup
-      className={"pt-round datatable-search-input"}
-      placeholder="Search..."
-      {...reduxFormSearchInput.input}
-      {...onEnterHelper(() => {
-        setSearchTerm(reduxFormSearchInput.input.value);
-      })}
-      rightElement={
-        maybeSpinner || (
-          <Button
-            className={Classes.MINIMAL}
-            iconName={"pt-icon-search"}
-            onClick={() => {
-              setSearchTerm(reduxFormSearchInput.input.value);
-            }}
-          />
-        )
-      }
-    />
-  );
 }
 
 export default compose(

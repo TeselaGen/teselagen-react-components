@@ -191,23 +191,28 @@ function getSubFilter(
   filterValue
 ) {
   const ccSelectedFilter = camelCase(selectedFilter);
+  const filterValLower = filterValue.toLowerCase();
+
   if (ccSelectedFilter === "startsWith") {
     return qb
       ? qb.startsWith(filterValue)
       : fieldVal => {
-          return startsWith(fieldVal, filterValue);
+          return startsWith(fieldVal.toLowerCase(), filterValLower);
         };
   } else if (ccSelectedFilter === "endsWith") {
     return qb
       ? qb.endsWith(filterValue)
       : fieldVal => {
-          return endsWith(fieldVal, filterValue);
+          return endsWith(fieldVal.toLowerCase(), filterValLower);
         };
   } else if (ccSelectedFilter === "contains") {
     return qb
       ? qb.contains(filterValue)
       : fieldVal => {
-          return fieldVal.replace(filterValue, "") !== fieldVal;
+          return (
+            fieldVal.toLowerCase().replace(filterValLower, "") !==
+            fieldVal.toLowerCase()
+          );
         };
   } else if (ccSelectedFilter === "isExactly") {
     return qb
