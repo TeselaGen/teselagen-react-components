@@ -191,7 +191,8 @@ function getSubFilter(
   filterValue
 ) {
   const ccSelectedFilter = camelCase(selectedFilter);
-  const filterValLower = filterValue.toLowerCase();
+  const filterValLower =
+    filterValue && filterValue.toLowerCase && filterValue.toLowerCase();
 
   if (ccSelectedFilter === "startsWith") {
     return qb
