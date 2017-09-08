@@ -1,7 +1,8 @@
 //@flow
 import React from "react";
+import classNames from "classnames";
 import type { Paging } from "../flow_types";
-import { Button } from "@blueprintjs/core";
+import { Button, Classes } from "@blueprintjs/core";
 import { pageSizes } from "./utils/queryParams";
 
 export default class PagingTool extends React.Component {
@@ -37,6 +38,16 @@ export default class PagingTool extends React.Component {
     const forwardEnabled = page * pageSize + 1 < total;
     return (
       <div className={"paging-toolbar-container"}>
+        {onRefresh && (
+          <Button
+            iconName="refresh"
+            style={{
+              marginRight: 10
+            }}
+            className={classNames(Classes.SMALL, Classes.MINIMAL)}
+            onClick={() => onRefresh()}
+          />
+        )}
         <div className="pt-select">
           <select
             style={{ width: 55 }}
@@ -59,23 +70,17 @@ export default class PagingTool extends React.Component {
             ]}
           </select>
         </div>
-        {onRefresh ? (
-          <Button iconName="refresh" onClick={() => onRefresh()} />
-        ) : (
-          ""
-        )}
         <Button
           onClick={() => {
-            if (backEnabled) {
-              setPage(parseInt(page, 10) - 1);
-            } else {
-              toastr && toastr.warning("No more pages that way");
-            }
+            setPage(parseInt(page, 10) - 1);
           }}
-          className={
-            "pt-icon-standard pt-icon-arrow-left paging-arrow-left " +
-            (!backEnabled && " pt-disabled")
-          }
+          disabled={!backEnabled}
+          iconName="arrow-left"
+          className={classNames(
+            Classes.SMALL,
+            Classes.MINIMAL,
+            "paging-arrow-left"
+          )}
         />
 
         <span>
@@ -87,17 +92,16 @@ export default class PagingTool extends React.Component {
           )}{" "}
         </span>
         <Button
+          disabled={!forwardEnabled}
+          iconName="arrow-right"
           onClick={() => {
-            if (forwardEnabled) {
-              setPage(parseInt(page, 10) + 1);
-            } else {
-              toastr && toastr.warning("No more pages that way");
-            }
+            setPage(parseInt(page, 10) + 1);
           }}
-          className={
-            "pt-icon-arrow-right paging-arrow-right " +
-            (!forwardEnabled && " pt-disabled")
-          }
+          className={classNames(
+            Classes.SMALL,
+            Classes.MINIMAL,
+            "paging-arrow-right"
+          )}
         />
       </div>
     );
