@@ -17,6 +17,7 @@ import {
   ContextMenu,
   Checkbox
 } from "@blueprintjs/core";
+import classNames from "classnames";
 import { getSelectedRowsFromEntities } from "./utils/selection";
 import rowClick, { finalizeSelection } from "./utils/rowClick";
 import ReactTable from "react-table";
@@ -210,7 +211,8 @@ class ReactDataTable extends React.Component {
       reduxFormSelectedEntityIdMap,
       schema,
       filters,
-      errorParsingUrlString
+      errorParsingUrlString,
+      compact
     } = this.props;
     const { entities, tableId, entityCount } = this.state;
     const hasFilters = filters.length || searchTerm;
@@ -324,6 +326,7 @@ class ReactDataTable extends React.Component {
             margin: "20px 0",
             ...style
           }}
+          className={classNames({ compact })}
         />
         <div className={"data-table-footer"}>
           <div className={"tg-react-table-selected-count"}>
@@ -597,7 +600,7 @@ class ReactDataTable extends React.Component {
       filters.filter(({ filterOn }) => {
         return filterOn === ccDisplayName;
       })[0];
-    const activeFilterClass = currentFilter ? " tg-active-filter" : "";
+    const activeFilterClass = currentFilter ? "tg-active-filter" : "";
     let ordering;
     if (order && order.length) {
       order.forEach(order => {
@@ -647,9 +650,12 @@ class ReactDataTable extends React.Component {
         <Popover position={Position.BOTTOM_RIGHT}>
           <Button
             title={"Filter"}
-            className={
-              "tg-filter-menu-button " + Classes.MINIMAL + activeFilterClass
-            }
+            className={classNames(
+              "tg-filter-menu-button",
+              Classes.MINIMAL,
+              activeFilterClass,
+              Classes.SMALL
+            )}
             iconName="filter"
           />
           <FilterAndSortMenu

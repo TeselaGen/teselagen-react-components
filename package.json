@@ -30,6 +30,7 @@
   "dependencies": {
     "basiccontext": "^3.5.1",
     "bio-parsers": "^4.2.0",
+    "classnames": "^2.2.5",
     "clipboard": "^1.7.1",
     "clone": "^2.1.1",
     "color": "^2.0.0",

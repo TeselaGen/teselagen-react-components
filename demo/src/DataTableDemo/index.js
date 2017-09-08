@@ -73,7 +73,8 @@ export default class DataTableDemo extends React.Component {
     renderUnconnectedTable: false,
     urlConnected: true,
     onlyOneFilter: false,
-    inDialog: false
+    inDialog: false,
+    compact: false
   };
   componentWillMount() {
     //tnr: the following code allows the DataTable test to set defaults on the demo (which is used in the testing)
@@ -251,6 +252,7 @@ export class DataTableInstance extends React.Component {
         {renderToggle(this, "doNotShowEmptyRows")}
         {renderToggle(this, "withCheckboxes")}
         {renderToggle(this, "isSingleSelect")}
+        {renderToggle(this, "compact")}
         {renderToggle(this, "maxHeight", "By default every table has a max height of 800px. Setting this true changes it to 200px")}
         <DataTable
           {...tableParams}
@@ -295,6 +297,7 @@ export class DataTableInstance extends React.Component {
           withPaging={this.state.withPaging}
           isInfinite={this.state.isInfinite}
           isLoading={this.state.isLoading}
+          compact={this.state.compact}
           hidePageSizeWhenPossible={this.state.hidePageSizeWhenPossible}
           doNotShowEmptyRows={this.state.doNotShowEmptyRows}
           withCheckboxes={this.state.withCheckboxes}
