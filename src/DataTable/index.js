@@ -2,7 +2,7 @@ import deepEqual from "deep-equal";
 import { connect } from "react-redux";
 import { Fields, reduxForm } from "redux-form";
 import { compose } from "redux";
-import { range, isNumber, take, drop, get, some, orderBy } from "lodash";
+import { range, take, drop } from "lodash";
 import React from "react";
 import moment from "moment";
 import uniqid from "uniqid";
@@ -26,7 +26,7 @@ import ReactTable from "react-table";
 import PagingTool from "./PagingTool";
 import FilterAndSortMenu from "./FilterAndSortMenu";
 import getIdOrCode from "./utils/getIdOrCode";
-import { filterEntitiesLocal } from "./utils/queryParams";
+import { filterEntitiesLocal, orderEntitiesLocal } from "./utils/queryParams";
 import "../toastr";
 import "./style.css";
 import withTableParams from "./utils/withTableParams";
@@ -92,6 +92,7 @@ class ReactDataTable extends React.Component {
     }
     //handle local sorting!
     let newEntities;
+    let newEntityCount;
     if (
       !deepEqual(
         {
@@ -101,7 +102,9 @@ class ReactDataTable extends React.Component {
           filters: newProps.filters,
           pageSize: newProps.pageSize,
           page: newProps.page,
-          isInfinite: newProps.isInfinite
+          isInfinite: newProps.isInfinite,
+          entityCount: newProps.entityCount,
+          searchTerm: newProps.searchTerm
         },
         {
           entities: oldProps.entities,
@@ -110,7 +113,9 @@ class ReactDataTable extends React.Component {
           filters: oldProps.filters,
           pageSize: oldProps.pageSize,
           page: oldProps.page,
-          isInfinite: oldProps.isInfinite
+          isInfinite: oldProps.isInfinite,
+          entityCount: oldProps.entityCount,
+          searchTerm: oldProps.searchTerm
         }
       )
     ) {
@@ -121,46 +126,32 @@ class ReactDataTable extends React.Component {
         filters,
         pageSize,
         page,
-        isInfinite
+        isInfinite,
+        entityCount,
+        searchTerm
       } = newProps;
       newEntities = entities;
+      newEntityCount = entityCount;
       if (newProps.localConnected) {
-        if (filters && filters.length) {
-          newEntities = filterEntitiesLocal(filters, newEntities, schema);
-        }
+        //if the table is local (aka not directly connected to a db) then we need to
+        //handle filtering/paging/sorting all on the front end
+        newEntities = filterEntitiesLocal(
+          filters,
+          searchTerm,
+          newEntities,
+          schema
+        );
+        newEntities = orderEntitiesLocal(order, newEntities, schema);
+
+        newEntityCount = newEntities.length;
         //calculate the sorted, filtered, paged entities for the local table
-        if (order && order.length) {
-          let orderFuncs = [];
-          let ascOrDescArray = [];
-          order.forEach(order => {
-            const orderField = order.replace("-", "");
-            const foundColumn = some(schema.fields, ({ path }) => {
-              if (path === orderField) {
-                ascOrDescArray.push(orderField === order ? "asc" : "desc");
-                //push the actual sorting function
-                orderFuncs.push(o => {
-                  return get(o, path);
-                });
-                return true;
-              }
-            });
-            if (!foundColumn) {
-              console.error(
-                "Ruh roh, there should have been a column to sort on for ",
-                order,
-                "but none was found in ",
-                schema.fields
-              );
-            }
-          });
-          newEntities = orderBy(newEntities, orderFuncs, ascOrDescArray);
-        }
+
         if (!isInfinite) {
           const offset = (page - 1) * pageSize;
           newEntities = take(drop(newEntities, offset), pageSize);
         }
       }
-      this.setState({ entities: newEntities });
+      this.setState({ entities: newEntities, entityCount: newEntityCount });
     }
 
     // handle programmatic selection and scrolling
@@ -202,7 +193,6 @@ class ReactDataTable extends React.Component {
       tableName,
       isLoading,
       searchTerm,
-      entityCount,
       setSearchTerm,
       clearFilters,
       setPageSize,
@@ -224,25 +214,24 @@ class ReactDataTable extends React.Component {
       filters,
       errorParsingUrlString
     } = this.props;
-    const { entities, tableId } = this.state;
-    let entityCountToUse = !isNumber(entityCount)
-      ? entities.length
-      : entityCount;
+    const { entities, tableId, entityCount } = this.state;
     const hasFilters = filters.length || searchTerm;
     const filtersOnNonDisplayedFields = [];
-    schema.fields.forEach(({ isHidden, displayName }) => {
-      const ccDisplayName = camelCase(displayName);
-      if (isHidden) {
-        filters.forEach(filter => {
-          if (filter.filterOn === ccDisplayName) {
-            filtersOnNonDisplayedFields.push({
-              ...filter,
-              displayName
-            });
-          }
-        });
-      }
-    });
+    if (filters && filters.length) {
+      schema.fields.forEach(({ isHidden, displayName }) => {
+        const ccDisplayName = camelCase(displayName);
+        if (isHidden) {
+          filters.forEach(filter => {
+            if (filter.filterOn === ccDisplayName) {
+              filtersOnNonDisplayedFields.push({
+                ...filter,
+                displayName
+              });
+            }
+          });
+        }
+      });
+    }
     const numRows = isInfinite ? entities.length : pageSize;
     const maybeSpinner = isLoading ? (
       <Spinner className={Classes.SMALL} />
@@ -350,10 +339,10 @@ class ReactDataTable extends React.Component {
           </div>
           {!isInfinite &&
           withPaging &&
-          (hidePageSizeWhenPossible ? entityCountToUse > pageSize : true) ? (
+          (hidePageSizeWhenPossible ? entityCount > pageSize : true) ? (
             <PagingTool
               paging={{
-                total: entityCountToUse,
+                total: entityCount,
                 page,
                 pageSize
               }}
@@ -604,15 +593,18 @@ class ReactDataTable extends React.Component {
     const { displayName, sortDisabled, path } = schemaForField;
     const columnDataType = schemaForField.type;
     const ccDisplayName = camelCase(displayName);
-    const currentFilter = filters.filter(({ filterOn }) => {
-      return filterOn === ccDisplayName;
-    })[0];
+    const currentFilter =
+      filters &&
+      filters.length &&
+      filters.filter(({ filterOn }) => {
+        return filterOn === ccDisplayName;
+      })[0];
     const activeFilterClass = currentFilter ? " tg-active-filter" : "";
     let ordering;
     if (order && order.length) {
       order.forEach(order => {
         const orderField = order.replace("-", "");
-        if (orderField === path) {
+        if (orderField === ccDisplayName) {
           if (orderField === order) {
             ordering = "asc";
           } else {
@@ -622,7 +614,9 @@ class ReactDataTable extends React.Component {
       });
     }
 
-    const isOrderedDown = ordering && ordering === "asc";
+    const sortDown = ordering && ordering === "asc";
+    const sortUp = ordering && !sortDown;
+
     return (
       <div className={"tg-react-table-column-header"}>
         <span title={displayName} className={"tg-react-table-name"}>
@@ -631,23 +625,23 @@ class ReactDataTable extends React.Component {
         {!sortDisabled && (
           <div className={"tg-sort-arrow-container"}>
             <span
-              title={"Sort Z-A"}
-              onClick={() => {
-                setOrder("reverse:" + ccDisplayName);
+              title={"Sort Z-A (Hold shift to sort multiple columns)"}
+              onClick={e => {
+                setOrder("-" + ccDisplayName, sortUp, e.shiftKey);
               }}
               className={
                 "pt-icon-standard pt-icon-chevron-up " +
-                (ordering && !isOrderedDown ? "tg-active-sort" : "")
+                (sortUp ? "tg-active-sort" : "")
               }
             />
             <span
-              title={"Sort A-Z"}
-              onClick={() => {
-                setOrder(ccDisplayName);
+              title={"Sort A-Z (Hold shift to sort multiple columns)"}
+              onClick={e => {
+                setOrder(ccDisplayName, sortDown, e.shiftKey);
               }}
               className={
                 "pt-icon-standard pt-icon-chevron-down " +
-                (ordering && isOrderedDown ? "tg-active-sort" : "")
+                (sortDown ? "tg-active-sort" : "")
               }
             />
           </div>

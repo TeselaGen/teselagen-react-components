@@ -1,9 +1,20 @@
 //@flow
 import queryString from "query-string";
 import QueryBuilder from "tg-client-query-builder";
-import last from "lodash/last";
+import moment from "moment";
 
-import { uniqBy, get, clone, camelCase, startsWith, endsWith } from "lodash";
+import {
+  uniqBy,
+  uniq,
+  get,
+  clone,
+  camelCase,
+  startsWith,
+  endsWith,
+  last,
+  remove,
+  orderBy
+} from "lodash";
 
 const pageSizes = [5, 10, 15, 25, 50, 100, 200];
 
@@ -16,14 +27,14 @@ export function getMergedOpts(topLevel = {}, instanceLevel = {}) {
     ...instanceLevel,
     defaults: {
       pageSize: 10,
-      order: "",
+      order: [], //[-name, statusCode] //an array of camelCase display names with - sign to denote reverse
       searchTerm: "",
       page: 1,
       filters: [
         //filters look like this:
         // {
-        //   selectedFilter: 'Text Contains',
-        //   filterOn: ccDisplayName,
+        //   selectedFilter: 'textContains', //camel case
+        //   filterOn: ccDisplayName, //camel case display name
         //   filterValue: 'thomas',
         // }
       ],
@@ -54,23 +65,124 @@ function getFieldsMappedByCCDisplayName(schema) {
   }, {});
 }
 
-export function filterEntitiesLocal(filters, entities, schema) {
-  const ccFields = getFieldsMappedByCCDisplayName(schema);
-  filters.forEach(filter => {
-    const { filterOn, filterValue, selectedFilter } = filter;
-    console.log("filterValue:", filterValue);
-    const field = ccFields[filterOn];
-    const { path } = field;
-    const subFilter = getSubFilter(false, selectedFilter, filterValue);
-    entities = entities.filter(entity => {
-      const fieldVal = get(entity, path);
-      console.log("fieldVal:", fieldVal);
-      const shouldKeep = subFilter(fieldVal);
-      console.log("shouldKeep:", shouldKeep);
-      return shouldKeep;
+export function orderEntitiesLocal(orderArray, entities, schema) {
+  if (orderArray && orderArray.length) {
+    let orderFuncs = [];
+    let ascOrDescArray = [];
+    orderArray.forEach(order => {
+      const ccDisplayName = order.replace(/^-/gi, "");
+      const ccFields = getFieldsMappedByCCDisplayName(schema);
+      const field = ccFields[ccDisplayName];
+      if (!field) {
+        throw new Error(
+          "Ruh roh, there should have been a column to sort on for ",
+          order,
+          "but none was found in ",
+          schema.fields
+        );
+      }
+      const { path } = field;
+      ascOrDescArray.push(ccDisplayName === order ? "asc" : "desc");
+      //push the actual sorting function
+      orderFuncs.push(o => {
+        return get(o, path);
+      });
+      return true;
     });
+    entities = orderBy(entities, orderFuncs, ascOrDescArray);
+  }
+  return entities;
+}
+
+export function filterEntitiesLocal(
+  filters = [],
+  searchTerm,
+  entities,
+  schema
+) {
+  let allFilters = [
+    ...filters,
+    ...getFiltersFromSearchTerm(searchTerm, schema)
+  ];
+  allFilters = allFilters.filter(val => {
+    return val !== "";
+  });
+  if (allFilters.length) {
+    const ccFields = getFieldsMappedByCCDisplayName(schema);
+    const orFilters = [];
+    const andFilters = [];
+    allFilters.forEach(filter => {
+      if (filter.isOrFilter) {
+        orFilters.push(filter);
+      } else {
+        andFilters.push(filter);
+      }
+    });
+    //filter ands first
+    andFilters.forEach(filter => {
+      entities = getEntitiesForGivenFilter(entities, filter, ccFields);
+    });
+    //then filter ors
+    if (orFilters.length) {
+      let orEntities = [];
+      orFilters.forEach(filter => {
+        orEntities = orEntities.concat(
+          getEntitiesForGivenFilter(entities, filter, ccFields)
+        );
+      });
+      entities = uniq(orEntities);
+    }
+  }
+  return entities;
+}
+
+function getEntitiesForGivenFilter(entities, filter, ccFields) {
+  const { filterOn, filterValue, selectedFilter } = filter;
+  const field = ccFields[filterOn];
+  const { path } = field;
+  const subFilter = getSubFilter(false, selectedFilter, filterValue);
+  entities = entities.filter(entity => {
+    const fieldVal = get(entity, path);
+    const shouldKeep = subFilter(fieldVal);
+    return shouldKeep;
   });
   return entities;
+}
+
+function getFiltersFromSearchTerm(searchTerm, schema) {
+  const searchTermFilters = [];
+  if (searchTerm) {
+    schema.fields.forEach(field => {
+      const { type, displayName } = field;
+      if (type === "string" || type === "lookup") {
+        searchTermFilters.push({
+          filterOn: camelCase(displayName),
+          filterValue: searchTerm,
+          selectedFilter: "contains",
+          isOrFilter: true
+        });
+      } else if (type === "boolean") {
+        if ("true".replace(new RegExp("^" + searchTerm, "ig"), "") !== "true") {
+          searchTermFilters.push({
+            filterOn: camelCase(displayName),
+            filterValue: true,
+            selectedFilter: "true",
+            isOrFilter: true
+          });
+        } else if (
+          "false".replace(new RegExp("^" + searchTerm, "ig"), "") !== "false"
+        ) {
+          searchTermFilters.push({
+            filterOn: camelCase(displayName),
+            filterValue: false,
+            selectedFilter: "false",
+            isOrFilter: true
+          });
+        }
+      }
+    });
+  }
+  return searchTermFilters;
 }
 
 function getSubFilter(
@@ -78,83 +190,90 @@ function getSubFilter(
   selectedFilter,
   filterValue
 ) {
-  if (selectedFilter === "Starts with") {
+  const ccSelectedFilter = camelCase(selectedFilter);
+  if (ccSelectedFilter === "startsWith") {
     return qb
       ? qb.startsWith(filterValue)
       : fieldVal => {
           return startsWith(fieldVal, filterValue);
         };
-  } else if (selectedFilter === "Ends with") {
+  } else if (ccSelectedFilter === "endsWith") {
     return qb
       ? qb.endsWith(filterValue)
       : fieldVal => {
           return endsWith(fieldVal, filterValue);
         };
-  } else if (selectedFilter === "Contains") {
+  } else if (ccSelectedFilter === "contains") {
     return qb
       ? qb.contains(filterValue)
       : fieldVal => {
           return fieldVal.replace(filterValue, "") !== fieldVal;
         };
-  } else if (selectedFilter === "Is exactly") {
+  } else if (ccSelectedFilter === "isExactly") {
     return qb
       ? filterValue
       : fieldVal => {
           return fieldVal === filterValue;
         };
-  } else if (selectedFilter === "True") {
+  } else if (ccSelectedFilter === "true") {
     return qb
       ? qb.equals(true)
       : fieldVal => {
           return !!fieldVal;
         };
-  } else if (selectedFilter === "False") {
+  } else if (ccSelectedFilter === "false") {
     return qb
       ? qb.equals(false)
       : fieldVal => {
           return !fieldVal;
         };
-  } else if (selectedFilter === "Is between") {
+  } else if (ccSelectedFilter === "isBetween") {
     return qb
-      ? qb.between([filterValue[0].getTime(), filterValue[1].getTime()])
+      ? qb.between([
+          moment(filterValue[0]).valueOf(),
+          moment(filterValue[1]).valueOf()
+        ])
       : fieldVal => {
-          return filterValue[0] <= fieldVal && fieldVal <= filterValue[1];
+          return (
+            moment(filterValue[0]).valueOf() <= moment(fieldVal).valueOf() &&
+            moment(fieldVal).valueOf() <= moment(filterValue[1]).valueOf()
+          );
         };
-  } else if (selectedFilter === "Is before") {
+  } else if (ccSelectedFilter === "isBefore") {
     return qb
-      ? qb.lessThan(filterValue.getTime())
+      ? qb.lessThan(moment(filterValue).valueOf())
       : fieldVal => {
-          return fieldVal <= filterValue;
+          return moment(fieldVal).valueOf() <= moment(filterValue).valueOf();
         };
-  } else if (selectedFilter === "Is after") {
+  } else if (ccSelectedFilter === "isAfter") {
     return qb
-      ? qb.greaterThan(filterValue.getTime())
+      ? qb.greaterThan(moment(filterValue).valueOf())
       : fieldVal => {
-          return fieldVal >= filterValue;
+          return moment(fieldVal).valueOf() >= moment(filterValue).valueOf();
         };
-  } else if (selectedFilter === "Greater than") {
+  } else if (ccSelectedFilter === "greaterThan") {
     return qb
       ? qb.greaterThan(filterValue)
       : fieldVal => {
           return fieldVal >= filterValue;
         };
-  } else if (selectedFilter === "Less than") {
+  } else if (ccSelectedFilter === "lessThan") {
     return qb
       ? qb.lessThan(filterValue)
       : fieldVal => {
           return fieldVal <= filterValue;
         };
-  } else if (selectedFilter === "In range") {
+  } else if (ccSelectedFilter === "inRange") {
     return qb
       ? qb.between([filterValue[0], filterValue[1]])
       : fieldVal => {
           return filterValue[0] <= fieldVal && fieldVal <= filterValue[1];
         };
-  } else if (selectedFilter === "Equal to") {
+  } else if (ccSelectedFilter === "equalTo") {
     return qb
       ? filterValue
       : fieldVal => {
-          return fieldVal == filterValue;
+          return fieldVal === filterValue;
         };
   }
 
@@ -175,29 +294,40 @@ export function setCurrentParamsOnUrl(newParams, push) {
 }
 
 function stringifyFilters(newParams) {
-  let filters = [];
+  let filters;
   if (newParams.filters && newParams.filters.length) {
     filters = newParams.filters.reduce(
       (acc, { filterOn, selectedFilter, filterValue }, index) => {
         acc +=
-          (index > 0 ? "&&" : "") +
-          `${filterOn}__${selectedFilter}__${safeStringify(filterValue)}`;
+          (index > 0 ? "___" : "") +
+          `${filterOn}__${camelCase(selectedFilter)}__${safeStringify(
+            filterValue
+          )}`;
         return acc;
       },
       ""
     );
   }
+  let order;
+  if (newParams.order && newParams.order.length) {
+    order = newParams.order.reduce((acc, order, index) => {
+      acc += (index > 0 ? "___" : "") + order;
+      return acc;
+    }, "");
+  }
   return {
     ...newParams,
-    filters
+    filters,
+    order
   };
 }
 function parseFilters(newParams) {
   return {
     ...newParams,
+    order: newParams.order && newParams.order.split("___"),
     filters:
       newParams.filters &&
-      newParams.filters.split("&&").map(filter => {
+      newParams.filters.split("___").map(filter => {
         const splitFilter = filter.split("__");
         return {
           filterOn: splitFilter[0],
@@ -284,10 +414,29 @@ export function makeDataTableHandlers({
     };
     setNewParams(newParams);
   }
-  function setOrder(order, currentParams) {
+  function setOrder(order, isRemove, shiftHeld, currentParams) {
+    let newOrder = [];
+    if (shiftHeld) {
+      //first remove the old order
+      newOrder = [...(currentParams.order || [])].filter(value => {
+        const shouldRemove =
+          value.replace(/^-/, "") === order.replace(/^-/, "");
+        return !shouldRemove;
+      });
+      //then, if we are adding, pop the order onto the array
+      if (!isRemove) {
+        newOrder.push(order);
+      }
+    } else {
+      if (isRemove) {
+        newOrder = [];
+      } else {
+        newOrder = [order];
+      }
+    }
     let newParams = {
       ...currentParams,
-      order: order === defaults.order ? undefined : order
+      order: newOrder
     };
     setNewParams(newParams);
   }
@@ -339,41 +488,54 @@ export function getQueryParams({
     ...defaults,
     ...currentParams
   };
-
+  const ccFields = getFieldsMappedByCCDisplayName(schema);
   let graphqlQueryParams = {};
   let { page, pageSize } = tableQueryParams;
-  if (tableQueryParams.order) {
-    const orderOn = tableQueryParams.order.replace(/^reverse:/gi, "");
-    const schemaForField = schema.fields.find(function(field) {
-      return camelCase(field.displayName) === orderOn;
+  if (tableQueryParams.order && tableQueryParams.order.length) {
+    tableQueryParams.order.forEach(orderVal => {
+      const ccDisplayName = orderVal.replace(/^-/gi, "");
+      const schemaForField = ccFields[ccDisplayName];
+      if (schemaForField) {
+        const { path } = schemaForField;
+        let reversed = ccDisplayName !== tableQueryParams.order;
+        const prefix = reversed ? "-" : "";
+        graphqlQueryParams.sort = [
+          ...(graphqlQueryParams.sort || []),
+          prefix + path
+        ];
+      } else {
+        console.error(
+          "No schema for field found!",
+          ccDisplayName,
+          schema.fields
+        );
+      }
     });
-    if (schemaForField) {
-      const { path } = schemaForField;
-      let reversed = orderOn !== tableQueryParams.order;
-      const prefix = reversed ? "-" : "";
-      graphqlQueryParams.sort = [prefix + (path || orderOn)];
-    } else {
-      console.error("No schema for field found!", orderOn, schema.fields);
-    }
   }
 
   const { searchTerm, filters } = tableQueryParams;
   let errorParsingUrlString;
-
-  if (filters.length) {
-    filters.forEach(filter => {
+  let allFilters = [
+    ...filters,
+    ...getFiltersFromSearchTerm(searchTerm, schema)
+  ];
+  allFilters = allFilters.filter(val => {
+    return val !== "";
+  }); //get rid of erroneous filters
+  if (allFilters.length) {
+    allFilters.forEach(filter => {
       if (!filter) {
         console.warn("We should always have a filter object!");
         return;
       }
-      const { selectedFilter, filterValue, filterOn } = filter;
+      const { selectedFilter, filterValue, filterOn, isOrFilter } = filter;
       try {
         const subFilter = getSubFilter(qb, selectedFilter, filterValue);
         const { path, reference } = schema.fields.find(function(field) {
           return camelCase(field.displayName) === filterOn;
         });
         if (reference) {
-          qb.whereAny({
+          qb[isOrFilter ? "orWhereAny" : "whereAny"]({
             [reference.sourceField]: buildRef(
               qb,
               reference,
@@ -382,7 +544,7 @@ export function getQueryParams({
             )
           });
         } else {
-          qb.whereAny({
+          qb[isOrFilter ? "orWhereAny" : "whereAny"]({
             [path]: subFilter
           });
         }
@@ -401,30 +563,6 @@ export function getQueryParams({
     });
   }
 
-  if (searchTerm && searchTerm !== "") {
-    //custom logic based on the table schema to get the sequelize query
-    let searchTermFilters = [];
-    schema.fields.forEach(function(schemaField) {
-      const { reference, type, path } = schemaField;
-      if (type === "string" || type === "lookup") {
-        if (reference) {
-          searchTermFilters.push({
-            [reference.sourceField]: buildRef(
-              qb,
-              reference,
-              last(path.split(".")),
-              qb.contains(searchTerm)
-            )
-          });
-        } else {
-          searchTermFilters.push({
-            [path]: qb.contains(searchTerm)
-          });
-        }
-      }
-    });
-    qb.orWhereAny(...searchTermFilters);
-  }
   graphqlQueryParams.filter = qb.toJSON();
   if (page <= 0 || isNaN(page)) {
     page = undefined;
@@ -455,7 +593,7 @@ export function getQueryParams({
     //these are values that might be generally useful for the wrapped component
     page,
     pageSize,
-    order: graphqlQueryParams.sort,
+    order: tableQueryParams.order,
     filters,
     errorParsingUrlString,
     searchTerm
