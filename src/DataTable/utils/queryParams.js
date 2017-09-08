@@ -75,10 +75,10 @@ export function orderEntitiesLocal(orderArray, entities, schema) {
       const field = ccFields[ccDisplayName];
       if (!field) {
         throw new Error(
-          "Ruh roh, there should have been a column to sort on for ",
-          order,
-          "but none was found in ",
-          schema.fields
+          "Ruh roh, there should have been a column to sort on for " +
+            order +
+            "but none was found in " +
+            schema.fields
         );
       }
       const { path } = field;
