@@ -83,7 +83,7 @@ export default class PagingTool extends React.Component {
           {total ? (
             `${parseInt(pageStart, 10)}-${parseInt(pageEnd, 10)} of ${total}`
           ) : (
-            "No Records"
+            "No Rows"
           )}{" "}
         </span>
         <Button

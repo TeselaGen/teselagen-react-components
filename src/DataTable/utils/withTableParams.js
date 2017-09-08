@@ -36,7 +36,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       schema,
       isInfinite
     } = mergedOpts;
-    if (isLocalCall && !ownProps.isTableParamsConnected) {
+    if (isLocalCall && !ownProps.isTableParamsConnected && !formname) {
       console.error(
         "Please pass a unique 'formname' prop to the locally connected table with schema: ",
         schema
