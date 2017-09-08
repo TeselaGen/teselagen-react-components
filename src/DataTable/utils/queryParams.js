@@ -249,25 +249,25 @@ function getSubFilter(
     return qb
       ? qb.lessThan(moment(filterValue).valueOf())
       : fieldVal => {
-          return moment(fieldVal).valueOf() <= moment(filterValue).valueOf();
+          return moment(fieldVal).valueOf() < moment(filterValue).valueOf();
         };
   } else if (ccSelectedFilter === "isAfter") {
     return qb
       ? qb.greaterThan(moment(filterValue).valueOf())
       : fieldVal => {
-          return moment(fieldVal).valueOf() >= moment(filterValue).valueOf();
+          return moment(fieldVal).valueOf() > moment(filterValue).valueOf();
         };
   } else if (ccSelectedFilter === "greaterThan") {
     return qb
       ? qb.greaterThan(filterValue)
       : fieldVal => {
-          return fieldVal >= filterValue;
+          return fieldVal > filterValue;
         };
   } else if (ccSelectedFilter === "lessThan") {
     return qb
       ? qb.lessThan(filterValue)
       : fieldVal => {
-          return fieldVal <= filterValue;
+          return fieldVal < filterValue;
         };
   } else if (ccSelectedFilter === "inRange") {
     return qb
