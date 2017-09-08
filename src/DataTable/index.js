@@ -591,7 +591,7 @@ class ReactDataTable extends React.Component {
     } = this.props;
     const schemaIndex = column["schemaIndex"];
     const schemaForField = schema.fields[schemaIndex];
-    const { displayName, sortDisabled, path } = schemaForField;
+    const { displayName, sortDisabled } = schemaForField;
     const columnDataType = schemaForField.type;
     const ccDisplayName = camelCase(displayName);
     const currentFilter =
@@ -689,7 +689,7 @@ export default compose(
       return {};
     }
   }),
-  reduxForm({ form: "tgReactTable" }) //this can be and often is overridden at runtime (by passing a form prop)
+  reduxForm() //the formname is passed via withTableParams and is often user overridden
 )(props => {
   return (
     <Fields

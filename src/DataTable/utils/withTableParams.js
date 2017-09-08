@@ -35,6 +35,12 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       schema,
       isInfinite
     } = mergedOpts;
+    if (isLocalCall && !ownProps.isTableParamsConnected) {
+      console.error(
+        "Please pass a unique 'formname' prop to the locally connected table with schema: ",
+        schema
+      );
+    }
     const currentParams =
       (urlConnected
         ? getCurrentParamsFromUrl(history.location) //important to use history location and not ownProps.location because for some reason the location path lags one render behind!!
