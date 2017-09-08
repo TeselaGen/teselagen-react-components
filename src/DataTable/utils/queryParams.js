@@ -12,8 +12,9 @@ import {
   startsWith,
   endsWith,
   last,
-  remove,
-  orderBy
+  orderBy,
+  take,
+  drop
 } from "lodash";
 
 const pageSizes = [5, 10, 15, 25, 50, 100, 200];
@@ -65,7 +66,7 @@ function getFieldsMappedByCCDisplayName(schema) {
   }, {});
 }
 
-export function orderEntitiesLocal(orderArray, entities, schema) {
+function orderEntitiesLocal(orderArray, entities, schema) {
   if (orderArray && orderArray.length) {
     let orderFuncs = [];
     let ascOrDescArray = [];
@@ -94,12 +95,7 @@ export function orderEntitiesLocal(orderArray, entities, schema) {
   return entities;
 }
 
-export function filterEntitiesLocal(
-  filters = [],
-  searchTerm,
-  entities,
-  schema
-) {
+function filterEntitiesLocal(filters = [], searchTerm, entities, schema) {
   let allFilters = [
     ...filters,
     ...getFiltersFromSearchTerm(searchTerm, schema)
@@ -470,6 +466,7 @@ export function getQueryParams({
   defaults,
   schema,
   isInfinite,
+  entities,
   isLocalCall
 }) {
   Object.keys(currentParams).forEach(function(key) {
@@ -504,114 +501,130 @@ export function getQueryParams({
     filters,
     searchTerm
   };
+
   if (isLocalCall) {
+    let newEntities = entities;
+    //if the table is local (aka not directly connected to a db) then we need to
+    //handle filtering/paging/sorting all on the front end
+    newEntities = filterEntitiesLocal(filters, searchTerm, newEntities, schema);
+    newEntities = orderEntitiesLocal(order, newEntities, schema);
+
+    let newEntityCount = newEntities.length;
+    //calculate the sorted, filtered, paged entities for the local table
+
+    if (!isInfinite) {
+      const offset = (page - 1) * pageSize;
+      newEntities = take(drop(newEntities, offset), pageSize);
+    }
+    toReturn.entities = newEntities;
+    toReturn.entityCount = newEntityCount;
     //if this call is being made by a local-data only connected datatable component,
     //we don't want to do the following gql stuff
     return toReturn;
-  }
-
-  let graphqlQueryParams = {};
-  if (isInfinite) {
-    graphqlQueryParams.pageSize = 999;
-    graphqlQueryParams.pageNumber = 1;
   } else {
-    graphqlQueryParams.pageNumber = page;
-    graphqlQueryParams.pageSize = pageSize;
-  }
+    let graphqlQueryParams = {};
+    if (isInfinite) {
+      graphqlQueryParams.pageSize = 999;
+      graphqlQueryParams.pageNumber = 1;
+    } else {
+      graphqlQueryParams.pageNumber = page;
+      graphqlQueryParams.pageSize = pageSize;
+    }
 
-  const { model } = schema;
-  let qb = new QueryBuilder(model);
-  // qb = qb.filter('user')
-  // qb = qb.whereAny({
-  //   userStatus: qb.related('userStatus').whereAny({
-  //     code: qb.contains('pending')
-  //   })
-  // })
-  // qb = qb.andWhere({
-  //   age: qb.lessThan(12)
-  // })
-  // qb.toJSON()
-  // let filterBuilder = qb.filter(model); //start filter on model
+    const { model } = schema;
+    let qb = new QueryBuilder(model);
+    // qb = qb.filter('user')
+    // qb = qb.whereAny({
+    //   userStatus: qb.related('userStatus').whereAny({
+    //     code: qb.contains('pending')
+    //   })
+    // })
+    // qb = qb.andWhere({
+    //   age: qb.lessThan(12)
+    // })
+    // qb.toJSON()
+    // let filterBuilder = qb.filter(model); //start filter on model
 
-  const ccFields = getFieldsMappedByCCDisplayName(schema);
+    const ccFields = getFieldsMappedByCCDisplayName(schema);
 
-  if (tableQueryParams.order && tableQueryParams.order.length) {
-    tableQueryParams.order.forEach(orderVal => {
-      const ccDisplayName = orderVal.replace(/^-/gi, "");
-      const schemaForField = ccFields[ccDisplayName];
-      if (schemaForField) {
-        const { path } = schemaForField;
-        let reversed = ccDisplayName !== tableQueryParams.order;
-        const prefix = reversed ? "-" : "";
-        graphqlQueryParams.sort = [
-          ...(graphqlQueryParams.sort || []),
-          prefix + path
-        ];
-      } else {
-        console.error(
-          "No schema for field found!",
-          ccDisplayName,
-          schema.fields
-        );
-      }
-    });
-  }
-
-  let errorParsingUrlString;
-  let allFilters = [
-    ...filters,
-    ...getFiltersFromSearchTerm(searchTerm, schema)
-  ];
-  allFilters = allFilters.filter(val => {
-    return val !== "";
-  }); //get rid of erroneous filters
-  if (allFilters.length) {
-    allFilters.forEach(filter => {
-      if (!filter) {
-        console.warn("We should always have a filter object!");
-        return;
-      }
-      const { selectedFilter, filterValue, filterOn, isOrFilter } = filter;
-      try {
-        const subFilter = getSubFilter(qb, selectedFilter, filterValue);
-        const { path, reference } = schema.fields.find(function(field) {
-          return camelCase(field.displayName) === filterOn;
-        });
-        if (reference) {
-          qb[isOrFilter ? "orWhereAny" : "whereAny"]({
-            [reference.sourceField]: buildRef(
-              qb,
-              reference,
-              last(path.split(".")),
-              subFilter
-            )
-          });
+    if (tableQueryParams.order && tableQueryParams.order.length) {
+      tableQueryParams.order.forEach(orderVal => {
+        const ccDisplayName = orderVal.replace(/^-/gi, "");
+        const schemaForField = ccFields[ccDisplayName];
+        if (schemaForField) {
+          const { path } = schemaForField;
+          let reversed = ccDisplayName !== tableQueryParams.order;
+          const prefix = reversed ? "-" : "";
+          graphqlQueryParams.sort = [
+            ...(graphqlQueryParams.sort || []),
+            prefix + path
+          ];
         } else {
-          qb[isOrFilter ? "orWhereAny" : "whereAny"]({
-            [path]: subFilter
-          });
-        }
-      } catch (e) {
-        if (urlConnected) {
-          errorParsingUrlString = e;
           console.error(
-            "The following error occurred when trying to build the query params. This is probably due to a malformed URL:",
-            e
+            "No schema for field found!",
+            ccDisplayName,
+            schema.fields
           );
-        } else {
-          console.error("Error building query params from filter:");
-          throw e;
         }
-      }
-    });
+      });
+    }
+
+    let errorParsingUrlString;
+    let allFilters = [
+      ...filters,
+      ...getFiltersFromSearchTerm(searchTerm, schema)
+    ];
+    allFilters = allFilters.filter(val => {
+      return val !== "";
+    }); //get rid of erroneous filters
+    if (allFilters.length) {
+      allFilters.forEach(filter => {
+        if (!filter) {
+          console.warn("We should always have a filter object!");
+          return;
+        }
+        const { selectedFilter, filterValue, filterOn, isOrFilter } = filter;
+        try {
+          const subFilter = getSubFilter(qb, selectedFilter, filterValue);
+          const { path, reference } = schema.fields.find(function(field) {
+            return camelCase(field.displayName) === filterOn;
+          });
+          if (reference) {
+            qb[isOrFilter ? "orWhereAny" : "whereAny"]({
+              [reference.sourceField]: buildRef(
+                qb,
+                reference,
+                last(path.split(".")),
+                subFilter
+              )
+            });
+          } else {
+            qb[isOrFilter ? "orWhereAny" : "whereAny"]({
+              [path]: subFilter
+            });
+          }
+        } catch (e) {
+          if (urlConnected) {
+            errorParsingUrlString = e;
+            console.error(
+              "The following error occurred when trying to build the query params. This is probably due to a malformed URL:",
+              e
+            );
+          } else {
+            console.error("Error building query params from filter:");
+            throw e;
+          }
+        }
+      });
+    }
+
+    graphqlQueryParams.filter = qb.toJSON();
+
+    return {
+      ...toReturn,
+      //the query params get passed directly to graphql
+      queryParams: graphqlQueryParams,
+      errorParsingUrlString
+    };
   }
-
-  graphqlQueryParams.filter = qb.toJSON();
-
-  return {
-    ...toReturn,
-    //the query params get passed directly to graphql
-    queryParams: graphqlQueryParams,
-    errorParsingUrlString
-  };
 }

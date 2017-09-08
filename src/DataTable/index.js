@@ -24,7 +24,6 @@ import ReactTable from "react-table";
 import PagingTool from "./PagingTool";
 import FilterAndSortMenu from "./FilterAndSortMenu";
 import getIdOrCode from "./utils/getIdOrCode";
-import { filterEntitiesLocal, orderEntitiesLocal } from "./utils/queryParams";
 import SearchBar from "./SearchBar";
 import "../toastr";
 import "./style.css";
@@ -49,7 +48,6 @@ class ReactDataTable extends React.Component {
     page: 1,
     style: {},
     maxHeight: 800,
-    localConnected: false, //we aren't connected to an external db for our sorting/filtering/paging
     reduxFormSearchInput: {},
     reduxFormSelectedEntityIdMap: {},
     isLoading: false,
@@ -89,75 +87,11 @@ class ReactDataTable extends React.Component {
         : [];
       this.setState({ columns });
     }
-    //handle local sorting!
-    let newEntities;
-    let newEntityCount;
-    if (
-      !deepEqual(
-        {
-          entities: newProps.entities,
-          schema: newProps.schema,
-          order: newProps.order,
-          filters: newProps.filters,
-          pageSize: newProps.pageSize,
-          page: newProps.page,
-          isInfinite: newProps.isInfinite,
-          entityCount: newProps.entityCount,
-          searchTerm: newProps.searchTerm
-        },
-        {
-          entities: oldProps.entities,
-          schema: oldProps.schema,
-          order: oldProps.order,
-          filters: oldProps.filters,
-          pageSize: oldProps.pageSize,
-          page: oldProps.page,
-          isInfinite: oldProps.isInfinite,
-          entityCount: oldProps.entityCount,
-          searchTerm: oldProps.searchTerm
-        }
-      )
-    ) {
-      const {
-        schema = {},
-        order,
-        entities,
-        filters,
-        pageSize,
-        page,
-        isInfinite,
-        entityCount,
-        searchTerm
-      } = newProps;
-      newEntities = entities;
-      newEntityCount = entityCount;
-      if (newProps.localConnected) {
-        //if the table is local (aka not directly connected to a db) then we need to
-        //handle filtering/paging/sorting all on the front end
-        newEntities = filterEntitiesLocal(
-          filters,
-          searchTerm,
-          newEntities,
-          schema
-        );
-        newEntities = orderEntitiesLocal(order, newEntities, schema);
-
-        newEntityCount = newEntities.length;
-        //calculate the sorted, filtered, paged entities for the local table
-
-        if (!isInfinite) {
-          const offset = (page - 1) * pageSize;
-          newEntities = take(drop(newEntities, offset), pageSize);
-        }
-      }
-      this.setState({ entities: newEntities, entityCount: newEntityCount });
-    }
 
     // handle programmatic selection and scrolling
     const { tableId } = this.state;
-    const { selectedIds } = newProps;
-    const { selectedIds: oldSelectedIds, entities: oldEntities } = oldProps;
-    newEntities = newEntities || oldEntities;
+    const { selectedIds, entities } = newProps;
+    const { selectedIds: oldSelectedIds } = oldProps;
     if (selectedIds === oldSelectedIds) return;
     const idArray = Array.isArray(selectedIds) ? selectedIds : [selectedIds];
     const newIdMap = idArray.reduce((acc, idOrCode) => {
@@ -167,7 +101,7 @@ class ReactDataTable extends React.Component {
     finalizeSelection({ idMap: newIdMap, props: newProps });
     const idToScrollTo = idArray[0];
     if (!idToScrollTo && idToScrollTo !== 0) return;
-    const entityIndexToScrollTo = newEntities.findIndex(
+    const entityIndexToScrollTo = entities.findIndex(
       e => e.id === idToScrollTo || e.code === idToScrollTo
     );
     if (entityIndexToScrollTo === -1) return;
@@ -212,9 +146,19 @@ class ReactDataTable extends React.Component {
       schema,
       filters,
       errorParsingUrlString,
-      compact
+      compact,
+      compactPaging,
+      entityCount,
+      entities
     } = this.props;
-    const { entities, tableId, entityCount } = this.state;
+    let compactClassName = "";
+    if (compactPaging) {
+      compactClassName += " tg-compact-paging";
+    }
+    if (compact) {
+      compactClassName += "tg-compact-table";
+    }
+    const { tableId } = this.state;
     const hasFilters = filters.length || searchTerm;
     const filtersOnNonDisplayedFields = [];
     if (filters && filters.length) {
@@ -251,7 +195,13 @@ class ReactDataTable extends React.Component {
     if (entities.length === 0 && rowsToShow < 3) rowsToShow = 3;
 
     return (
-      <div className={"data-table-container " + extraClasses}>
+      <div
+        className={classNames(
+          "data-table-container",
+          extraClasses,
+          compactClassName
+        )}
+      >
         <div className={"data-table-header"}>
           <div className={"data-table-title-and-buttons"}>
             {tableName &&
@@ -326,7 +276,6 @@ class ReactDataTable extends React.Component {
             margin: "20px 0",
             ...style
           }}
-          className={classNames({ compact })}
         />
         <div className={"data-table-footer"}>
           <div className={"tg-react-table-selected-count"}>
@@ -364,7 +313,8 @@ class ReactDataTable extends React.Component {
       reduxFormSelectedEntityIdMap,
       withCheckboxes,
       onDoubleClick,
-      history
+      history,
+      entities
     } = this.props;
     if (!rowInfo) return {};
     const rowId = getIdOrCode(rowInfo.original);
@@ -372,7 +322,7 @@ class ReactDataTable extends React.Component {
     return {
       onClick: e => {
         if (withCheckboxes) return;
-        rowClick(e, rowInfo, this.state.entities, this.props);
+        rowClick(e, rowInfo, entities, this.props);
       },
       onContextMenu: e => {
         e.preventDefault();
@@ -397,8 +347,11 @@ class ReactDataTable extends React.Component {
   };
 
   renderCheckboxHeader = () => {
-    const { reduxFormSelectedEntityIdMap, isSingleSelect } = this.props;
-    const { entities } = this.state;
+    const {
+      reduxFormSelectedEntityIdMap,
+      isSingleSelect,
+      entities
+    } = this.props;
     const checkedRows = getSelectedRowsFromEntities(
       entities,
       reduxFormSelectedEntityIdMap.input.value
@@ -444,8 +397,11 @@ class ReactDataTable extends React.Component {
 
   renderCheckboxCell = row => {
     const rowIndex = row.index;
-    const { reduxFormSelectedEntityIdMap, isSingleSelect } = this.props;
-    const { entities } = this.state;
+    const {
+      reduxFormSelectedEntityIdMap,
+      isSingleSelect,
+      entities
+    } = this.props;
     const checkedRows = getSelectedRowsFromEntities(
       entities,
       reduxFormSelectedEntityIdMap.input.value
@@ -566,8 +522,7 @@ class ReactDataTable extends React.Component {
   };
 
   showContextMenu = (idMap, e) => {
-    const { history, contextMenu } = this.props;
-    const { entities } = this.state;
+    const { history, contextMenu, entities } = this.props;
     const selectedRecords = entities.reduce((acc, entity) => {
       return idMap[getIdOrCode(entity)] ? acc.concat(entity) : acc;
     }, []);
@@ -680,9 +635,7 @@ export default compose(
   connect((state, ownProps) => {
     if (!ownProps.isTableParamsConnected) {
       //this is the case where we're hooking up to withTableParams locally, so we need to take the tableParams off the props
-      //and set localConnected: true
       return {
-        localConnected: true, //we aren't connected to an external db for our sorting/filtering/paging
         ...ownProps.tableParams
       };
     } else {

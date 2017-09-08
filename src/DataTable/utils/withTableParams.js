@@ -24,6 +24,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
 
   const mapStateToProps = (state, ownProps) => {
     if (ownProps.isTableParamsConnected) {
+      //short circuit because we've already run this logic
       return {};
     }
     const mergedOpts = getMergedOpts(topLevelOptions, ownProps);
@@ -49,6 +50,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       ...mergedOpts,
       ...getQueryParams({
         currentParams,
+        entities: ownProps.entities,
         urlConnected,
         defaults,
         schema,
