@@ -506,7 +506,6 @@ class ReactDataTable extends React.Component {
         );
       }
       if (cellRenderer && cellRenderer[schemaForColumn.path]) {
-        tableColumn.Cell = cellRenderer[schemaForColumn.path];
         tableColumn.Cell = row => {
           const val = cellRenderer[schemaForColumn.path](
             row.value,
