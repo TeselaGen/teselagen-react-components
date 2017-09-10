@@ -106,8 +106,4 @@ export default class PagingTool extends React.Component {
       </div>
     );
   }
-  handleValueChange = (valueAsNumber: number, valueAsString: string) => {
-    // console.log("Value as number:", valueAsNumber);
-    // console.log("Value as string:", valueAsString);
-  };
 }

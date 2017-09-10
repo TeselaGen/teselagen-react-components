@@ -25,6 +25,7 @@ import PagingTool from "./PagingTool";
 import FilterAndSortMenu from "./FilterAndSortMenu";
 import getIdOrCode from "./utils/getIdOrCode";
 import SearchBar from "./SearchBar";
+import { getSelectedRecordsFromEntities } from "./utils/selection";
 import "../toastr";
 import "./style.css";
 import withTableParams from "./utils/withTableParams";
@@ -149,6 +150,7 @@ class ReactDataTable extends React.Component {
       compact,
       compactPaging,
       entityCount,
+      isSingleSelect,
       entities
     } = this.props;
     let compactClassName = "";
@@ -277,16 +279,23 @@ class ReactDataTable extends React.Component {
             ...style
           }}
         />
-        <div className={"data-table-footer"}>
-          <div className={"tg-react-table-selected-count"}>
-            {selectedRowCount > 0 ? (
-              ` ${selectedRowCount} Record${selectedRowCount === 1
-                ? ""
-                : "s"} Selected `
-            ) : (
-              ""
-            )}
-          </div>
+        <div
+          className={"data-table-footer"}
+          style={{
+            justifyContent: isSingleSelect ? "flex-end" : "space-between"
+          }}
+        >
+          {!isSingleSelect && (
+            <div className={"tg-react-table-selected-count"}>
+              {selectedRowCount > 0 ? (
+                ` ${selectedRowCount} Record${selectedRowCount === 1
+                  ? ""
+                  : "s"} Selected `
+              ) : (
+                ""
+              )}
+            </div>
+          )}
           {!isInfinite &&
           withPaging &&
           (hidePageSizeWhenPossible ? entityCount > pageSize : true) ? (
@@ -300,9 +309,7 @@ class ReactDataTable extends React.Component {
               setPage={setPage}
               setPageSize={setPageSize}
             />
-          ) : (
-            <div className={"tg-placeholder"} />
-          )}
+          ) : null}
         </div>
       </div>
     );
@@ -497,13 +504,10 @@ class ReactDataTable extends React.Component {
         tableColumn.width = column.width;
       }
       if (schemaForColumn.type === "timestamp") {
-        tableColumn.Cell = props => (
-          <span>{moment(new Date(props.value)).format("MMM D, YYYY")}</span>
-        );
+        tableColumn.Cell = props =>
+          moment(new Date(props.value)).format("MMM D, YYYY");
       } else if (schemaForColumn.type === "boolean") {
-        tableColumn.Cell = props => (
-          <span>{props.value ? "True" : "False"}</span>
-        );
+        tableColumn.Cell = props => (props.value ? "True" : "False");
       }
       if (cellRenderer && cellRenderer[schemaForColumn.path]) {
         tableColumn.Cell = row => {
@@ -522,9 +526,7 @@ class ReactDataTable extends React.Component {
 
   showContextMenu = (idMap, e) => {
     const { history, contextMenu, entities } = this.props;
-    const selectedRecords = entities.reduce((acc, entity) => {
-      return idMap[getIdOrCode(entity)] ? acc.concat(entity) : acc;
-    }, []);
+    const selectedRecords = getSelectedRecordsFromEntities(entities, idMap);
     const itemsToRender = contextMenu({
       selectedRecords,
       history
@@ -584,20 +586,22 @@ class ReactDataTable extends React.Component {
               onClick={e => {
                 setOrder("-" + ccDisplayName, sortUp, e.shiftKey);
               }}
-              className={
-                "pt-icon-standard pt-icon-chevron-up " +
-                (sortUp ? "tg-active-sort" : "")
-              }
+              className={classNames("pt-icon-standard", "pt-icon-chevron-up", {
+                "tg-active-sort": sortUp
+              })}
             />
             <span
               title={"Sort A-Z (Hold shift to sort multiple columns)"}
               onClick={e => {
                 setOrder(ccDisplayName, sortDown, e.shiftKey);
               }}
-              className={
-                "pt-icon-standard pt-icon-chevron-down " +
-                (sortDown ? "tg-active-sort" : "")
-              }
+              className={classNames(
+                "pt-icon-standard",
+                "pt-icon-chevron-down",
+                {
+                  "tg-active-sort": sortDown
+                }
+              )}
             />
           </div>
         )}
