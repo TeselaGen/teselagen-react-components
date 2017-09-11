@@ -2,7 +2,7 @@ import deepEqual from "deep-equal";
 import { connect } from "react-redux";
 import { Fields, reduxForm } from "redux-form";
 import { compose } from "redux";
-import { range, take, drop } from "lodash";
+import { range } from "lodash";
 import React from "react";
 import moment from "moment";
 import uniqid from "uniqid";
@@ -96,7 +96,7 @@ class ReactDataTable extends React.Component {
     if (selectedIds === oldSelectedIds) return;
     const idArray = Array.isArray(selectedIds) ? selectedIds : [selectedIds];
     const newIdMap = idArray.reduce((acc, idOrCode) => {
-      acc[idOrCode] = true;
+      if (idOrCode || idOrCode === 0) acc[idOrCode] = true;
       return acc;
     }, {});
     finalizeSelection({ idMap: newIdMap, props: newProps });

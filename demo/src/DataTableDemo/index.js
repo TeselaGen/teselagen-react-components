@@ -73,8 +73,7 @@ export default class DataTableDemo extends React.Component {
     renderUnconnectedTable: false,
     urlConnected: true,
     onlyOneFilter: false,
-    inDialog: false,
-    compact: false
+    inDialog: false
   };
   componentWillMount() {
     //tnr: the following code allows the DataTable test to set defaults on the demo (which is used in the testing)
@@ -182,11 +181,12 @@ export class DataTableInstance extends React.Component {
     isSingleSelect: false,
     maxHeight: false,
     isLoading: false,
+    compact: false,
     hidePageSizeWhenPossible: false,
     doNotShowEmptyRows: false,
     withCheckboxes: true,
     numOfEntities: 60,
-    selectedIds: null,
+    selectedIds: undefined,
     entities: generateFakeRows(defaultNumOfEntities)
   };
 
