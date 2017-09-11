@@ -169,7 +169,6 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
 }
 
 .ReactTable {
@@ -216,7 +215,7 @@
 }
 
 .tg-compact-table .rt-tr-group {
-  min-height: 20px !important;
+  min-height: 25px !important;
 }
 
 .tg-compact-table .tg-react-table-checkbox-header-container {

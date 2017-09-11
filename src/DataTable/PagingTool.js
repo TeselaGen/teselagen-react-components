@@ -35,7 +35,7 @@ export default class PagingTool extends React.Component {
         ? (page - 1) * pageSize + pageSize
         : total;
     const backEnabled = page - 1 > 0;
-    const forwardEnabled = page * pageSize + 1 < total;
+    const forwardEnabled = page * pageSize < total;
     return (
       <div className={"paging-toolbar-container"}>
         {onRefresh && (
@@ -106,8 +106,4 @@ export default class PagingTool extends React.Component {
       </div>
     );
   }
-  handleValueChange = (valueAsNumber: number, valueAsString: string) => {
-    // console.log("Value as number:", valueAsNumber);
-    // console.log("Value as string:", valueAsString);
-  };
 }
