@@ -35,7 +35,7 @@ export default class PagingTool extends React.Component {
         ? (page - 1) * pageSize + pageSize
         : total;
     const backEnabled = page - 1 > 0;
-    const forwardEnabled = page * pageSize + 1 < total;
+    const forwardEnabled = page * pageSize < total;
     return (
       <div className={"paging-toolbar-container"}>
         {onRefresh && (
