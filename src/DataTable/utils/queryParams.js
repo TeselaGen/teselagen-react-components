@@ -95,6 +95,22 @@ function orderEntitiesLocal(orderArray, entities, schema) {
   return entities;
 }
 
+function getAndAndOrFilters(allFilters) {
+  const orFilters = [];
+  const andFilters = [];
+  allFilters.forEach(filter => {
+    if (filter.isOrFilter) {
+      orFilters.push(filter);
+    } else {
+      andFilters.push(filter);
+    }
+  });
+  return {
+    orFilters,
+    andFilters
+  };
+}
+
 function filterEntitiesLocal(filters = [], searchTerm, entities, schema) {
   let allFilters = [
     ...filters,
@@ -105,15 +121,7 @@ function filterEntitiesLocal(filters = [], searchTerm, entities, schema) {
   });
   if (allFilters.length) {
     const ccFields = getFieldsMappedByCCDisplayName(schema);
-    const orFilters = [];
-    const andFilters = [];
-    allFilters.forEach(filter => {
-      if (filter.isOrFilter) {
-        orFilters.push(filter);
-      } else {
-        andFilters.push(filter);
-      }
-    });
+    const { andFilters, orFilters } = getAndAndOrFilters(filters);
     //filter ands first
     andFilters.forEach(filter => {
       entities = getEntitiesForGivenFilter(entities, filter, ccFields);
@@ -574,51 +582,31 @@ export function getQueryParams({
       ...filters,
       ...getFiltersFromSearchTerm(searchTerm, schema)
     ];
+
     allFilters = allFilters.filter(val => {
       return val !== "";
     }); //get rid of erroneous filters
-    if (allFilters.length) {
-      allFilters.forEach(filter => {
-        if (!filter) {
-          console.warn("We should always have a filter object!");
-          return;
-        }
-        const { selectedFilter, filterValue, filterOn, isOrFilter } = filter;
-        try {
-          const subFilter = getSubFilter(qb, selectedFilter, filterValue);
-          const { path, reference } = schema.fields.find(function(field) {
-            return camelCase(field.displayName) === filterOn;
-          });
-          if (reference) {
-            qb[isOrFilter ? "orWhereAny" : "whereAny"]({
-              [reference.sourceField]: buildRef(
-                qb,
-                reference,
-                last(path.split(".")),
-                subFilter
-              )
-            });
-          } else {
-            qb[isOrFilter ? "orWhereAny" : "whereAny"]({
-              [path]: subFilter
-            });
-          }
-        } catch (e) {
-          if (urlConnected) {
-            errorParsingUrlString = e;
-            console.error(
-              "The following error occurred when trying to build the query params. This is probably due to a malformed URL:",
-              e
-            );
-          } else {
-            console.error("Error building query params from filter:");
-            throw e;
-          }
-        }
-      });
+    const { andFilters, orFilters } = getAndAndOrFilters(allFilters);
+    try {
+      qb
+        .whereAll(getQueries(andFilters, qb, ccFields))
+        .andWhereAny(getQueries(orFilters, qb, ccFields));
+    } catch (e) {
+      if (urlConnected) {
+        errorParsingUrlString = e;
+        console.error(
+          "The following error occurred when trying to build the query params. This is probably due to a malformed URL:",
+          e
+        );
+      } else {
+        console.error("Error building query params from filter:");
+        throw e;
+      }
     }
 
     graphqlQueryParams.filter = qb.toJSON();
+
+    console.log("graphqlQueryParams:", graphqlQueryParams);
 
     return {
       ...toReturn,
@@ -627,4 +615,30 @@ export function getQueryParams({
       errorParsingUrlString
     };
   }
+}
+
+function getQueries(filters, qb, ccFields) {
+  const subQueries = filters.reduce((acc, filter) => {
+    if (!filter) {
+      console.warn("We should always have a filter object!");
+      return acc;
+    }
+    const { selectedFilter, filterValue, filterOn } = filter;
+    const subFilter = getSubFilter(qb, selectedFilter, filterValue);
+    const { path, reference } = ccFields[filterOn];
+
+    if (reference) {
+      acc[reference.sourceField] = buildRef(
+        qb,
+        reference,
+        last(path.split(".")),
+        subFilter
+      );
+    } else {
+      acc[path] = subFilter;
+    }
+    return acc;
+  }, {});
+  console.log("subQueries:", subQueries);
+  return subQueries;
 }

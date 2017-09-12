@@ -2982,8 +2982,8 @@ eslint-config-react-app@^1.0.4:
   resolved "https://registry.yarnpkg.com/eslint-config-react-app/-/eslint-config-react-app-1.0.5.tgz#98337597bc01cc22991fcbdda07451f3b4511718"
 
 eslint-config-teselagen@^1.0.7:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/eslint-config-teselagen/-/eslint-config-teselagen-1.0.7.tgz#9eb9948c17722bf67393dd2d7893130ef405eebb"
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/eslint-config-teselagen/-/eslint-config-teselagen-1.0.10.tgz#0fcfaf8d5df08dd234dfc6113ddbefc7236c7627"
 
 eslint-import-resolver-node@^0.3.1:
   version "0.3.1"
@@ -8706,8 +8706,8 @@ text-table@~0.2.0:
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
 
 tg-client-query-builder@^2.6.0:
-  version "2.8.0"
-  resolved "https://registry.yarnpkg.com/tg-client-query-builder/-/tg-client-query-builder-2.8.0.tgz#365f8a3569f6f415cae90f9a5d0bd60f6b0fe1a9"
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/tg-client-query-builder/-/tg-client-query-builder-2.10.0.tgz#25840987f8eb0dabf748ffd6d443d9fe8392f317"
   dependencies:
     json-beautify "^1.0.1"
     json-format "^1.0.1"
