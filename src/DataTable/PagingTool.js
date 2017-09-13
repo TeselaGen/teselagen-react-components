@@ -113,7 +113,7 @@ export default class PagingTool extends React.Component {
                   const selectedPage =
                     pageValue > lastPage
                       ? lastPage
-                      : pageValue < 1 ? 1 : pageValue;
+                      : pageValue < 1 || isNaN(pageValue) ? 1 : pageValue;
                   this.setState({
                     selectedPage
                   });
