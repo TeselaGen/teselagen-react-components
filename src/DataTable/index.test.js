@@ -77,10 +77,6 @@ describe("DataTableDemo", () => {
       expect(dataTableInstance.props().queryParams.pageSize).toBe(5);
       pagingToolbarWrapper.find(".paging-arrow-right").simulate("click");
       expect(dataTableInstance.props().queryParams.pageNumber).toBe(2);
-
-      //   "dataTableInstance.props().queryParams",
-      //   dataTableInstance.props().queryParams
-      // );
     });
 
     it("handles a page left after a page right", () => {

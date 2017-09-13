@@ -63,23 +63,9 @@
   align-items: center;
 }
 
-.paging-row-input {
-  margin-left: 10px;
-}
-.paging-row-input .pt-input-group .pt-input {
-  width: 40px;
-}
-
-.paging-arrow-left {
-  cursor: pointer;
-  width: 20px;
-  margin-left: 10px;
-  margin-right: 10px;
-}
-.paging-arrow-right {
-  cursor: pointer;
-  width: 20px;
-  margin-left: 10px;
+.paging-toolbar-container button,
+.paging-toolbar-container .pt-select select {
+  /* border-radius: 0; */
 }
 
 .pt-icon-standard.pt-disabled {
