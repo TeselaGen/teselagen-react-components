@@ -59,8 +59,9 @@ export default compose(
     }
   }),
 )(AddToWorkQueueDialog);
-
 ```
+
+Any of the withQuery/withDelete/withUpsert enhancers can be passed an `{asFunction: true}` option which will make them return a function that can then be invoked. 
 
 ##Vector Editor: 
 Redux connected: 

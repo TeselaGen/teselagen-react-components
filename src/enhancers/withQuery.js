@@ -10,14 +10,13 @@ import compose from "lodash/fp/compose";
  * withQuery 
  * @param {gql fragment} fragment supply a fragment as the first argument
  * @param options 
- *    @param {boolean} isPlural - are we searching for 1 thing or many?
- *    @param {string} queryName - what the props come back on ( by default = modelName + 'Query')
- *    @param {boolean} asFunction - if true, this gives you back a function you can call directly instead of a HOC
- *    @param {boolean} asQueryObj - if true, this gives you back the gql query object aka gql`query myQuery () {}`
- *    @param {string} idAs - by default single record queries occur on an id. But, if the record doesn't have an id field, and instead has a 'code', you can set idAs: 'code'
- *    @param {boolean} getIdFromParams - grab the id variable off the match.params object being passed in!
- *    @param {boolean} showLoading - show a loading spinner over the whole component
- 
+ * @param {boolean} options.isPlural - are we searching for 1 thing or many?
+ * @param {string} options.queryName - what the props come back on ( by default = modelName + 'Query')
+ * @param {boolean} options.asFunction - if true, this gives you back a function you can call directly instead of a HOC
+ * @param {boolean} options.asQueryObj - if true, this gives you back the gql query object aka gql`query myQuery () {}`
+ * @param {string} options.idAs - by default single record queries occur on an id. But, if the record doesn't have an id field, and instead has a 'code', you can set idAs: 'code'
+ * @param {boolean} options.getIdFromParams - grab the id variable off the match.params object being passed in!
+ * @param {boolean} options.showLoading - show a loading spinner over the whole component
  * @return props: {xxxxQuery, data }
  */
 export default function withQuery(fragment, options = {}) {
@@ -88,7 +87,11 @@ export default function withQuery(fragment, options = {}) {
           variables: localVars || variables || rest.options.variables
         })
         .then(function(res) {
-          return Promise.resolve(res.data[nameToUse].results);
+          return Promise.resolve(
+            isPlural ? res.data[nameToUse].results : res.data[nameToUse],
+            res.data,
+            res
+          );
         });
     };
   }
