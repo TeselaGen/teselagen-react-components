@@ -34,7 +34,7 @@ export default function withQuery(nameOrFragment, options = {}) {
     : nameOrFragment;
   // const {fragment, extraMutateArgs} = options
   const fragName = fragment && fragment.definitions[0].name.value;
-  const nameToUse = queryName || isPlural ? pluralize(name) : name;
+  const nameToUse = queryName || (isPlural ? pluralize(name) : name);
   const queryNameToUse = nameToUse + "Query";
   // const pascalNameToUse = pascalCase(nameToUse)
   const queryInner = `${fragName ? `...${fragName}` : idAs || "id"}`;
