@@ -8,7 +8,7 @@ import compose from "lodash/fp/compose";
 
 /**
  * withQuery 
- * @param {string | gql fragment} nameOrFragment supply either a name or a top-level fragment
+ * @param {gql fragment} fragment supply a fragment as the first argument
  * @param options 
  *    @param {boolean} isPlural - are we searching for 1 thing or many?
  *    @param {string} queryName - what the props come back on ( by default = modelName + 'Query')
@@ -20,7 +20,7 @@ import compose from "lodash/fp/compose";
  
  * @return props: {xxxxQuery, data }
  */
-export default function withQuery(nameOrFragment, options = {}) {
+export default function withQuery(fragment, options = {}) {
   const {
     isPlural,
     queryName,
@@ -33,10 +33,17 @@ export default function withQuery(nameOrFragment, options = {}) {
     showLoading,
     ...rest
   } = options;
-  const fragment = typeof nameOrFragment === "string" ? null : nameOrFragment;
-  const name = fragment
-    ? fragment.definitions[0].typeCondition.name.value
-    : nameOrFragment;
+  if (typeof fragment === "string" || typeof fragment !== "object") {
+    throw new Error("");
+  }
+  const name = get(fragment, "definitions[0].typeCondition.name.value");
+  if (!name) {
+    console.error("Bad fragment passed to withQuery!!");
+    console.error(fragment, options);
+    throw new Error(
+      "No fragment name found in withQuery() call. This is due to passing in a string or something other than a gql fragment to withQuery"
+    );
+  }
   // const {fragment, extraMutateArgs} = options
   const fragName = fragment && fragment.definitions[0].name.value;
   const nameToUse = queryName || (isPlural ? pluralize(name) : name);
