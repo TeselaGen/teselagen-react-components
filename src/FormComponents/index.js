@@ -1,12 +1,13 @@
 import sortify from "./sortify"; //tnr TODO: export this from json.sortify when https://github.com/ThomasR/JSON.sortify/issues/11 is resolved
 import isNumber from "lodash/isNumber";
 import mathExpressionEvaluator from "math-expression-evaluator";
-import Dragger from "antd/lib/upload/Dragger";
 import cloneDeep from "lodash/cloneDeep";
 import deepEqual from "deep-equal";
 import React from "react";
 import { Field } from "redux-form";
 import Select from "react-select";
+import Uploader from "./Uploader";
+
 import "./style.css";
 import {
   InputGroup,
@@ -204,63 +205,15 @@ export const renderBlueprintCheckbox = props => {
   );
 };
 
-export const renderAntFileUpload = ({
-  innerText,
-  innerIcon,
-  contentOverride,
-  className = " ",
-  hideDropAfterUpload,
-  fileLimit,
-  onFieldSubmit,
-  accept,
-  input: { onChange, value = [] },
-  ...rest
-}) => {
-  let acceptToUse = Array.isArray(accept) ? accept.join(", ") : accept;
-
+export const renderFileUpload = props => {
+  const { input, onFieldSubmit, ...rest } = props;
   return (
-    <div
-      title={
-        acceptToUse ? (
-          "Accepts only the following file types: " + acceptToUse
-        ) : (
-          "Accepts any file input"
-        )
-      }
-    >
-      <Dragger
-        className={
-          className +
-          " tg-file-upload " +
-          (hideDropAfterUpload && value.length ? " tg-hide-drop-target" : "")
-        }
-        fileList={value}
-        accept={acceptToUse}
-        onChange={function(info) {
-          let fileList = info.fileList;
-          // 1. Limit the number of uploaded files to the fileLimit if it exists
-          if (fileLimit) {
-            fileList = fileList.slice(-fileLimit);
-          }
-          if (
-            !fileList.some(file => {
-              return file.status === "uploading";
-            })
-          ) {
-            onFieldSubmit(fileList);
-          }
-          onChange(cloneDeep(fileList));
-        }}
-        {...rest}
-      >
-        {contentOverride || (
-          <div className={"tg-upload-inner"}>
-            {innerIcon || <span className={"pt-icon-upload pt-icon-large"} />}
-            {innerText || "Click or drag to upload"}
-          </div>
-        )}
-      </Dragger>
-    </div>
+    <Uploader
+      fileList={input.value}
+      onSuccess={onFieldSubmit}
+      {...rest}
+      onChange={input.onChange}
+    />
   );
 };
 
@@ -529,7 +482,7 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
 };
 
 export const InputField = generateField(renderBlueprintInput);
-export const AntFileUploadField = generateField(renderAntFileUpload);
+export const FileUploadField = generateField(renderFileUpload);
 export const DateInputField = generateField(renderBlueprintDateInput);
 export const DateRangeInputField = generateField(renderBlueprintDateRangeInput);
 export const CheckboxField = generateField(renderBlueprintCheckbox, {
