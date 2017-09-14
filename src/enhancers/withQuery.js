@@ -149,7 +149,7 @@ export default function withQuery(fragment, options = {}) {
           [nameToUse + "Error"]: data.error,
           [nameToUse + "Loading"]: data.loading,
           [nameToUse + "Count"]: results && results.length,
-          [camelCase("refetch_" ) + "Refetch"]: data.refetch
+          [camelCase("refetch_" + nameToUse)]: data.refetch
         };
       },
       ...rest //overwrite defaults here
