@@ -47,7 +47,7 @@ export default function withQuery(nameOrFragment, options = {}) {
   let gqlQuery;
   if (isPlural) {
     gqlQuery = gql`
-      query ${queryNameToUse} ($pageSize: Int $sort: [String] $filter: JSON $pageNumber: Int {
+      query ${queryNameToUse} ($pageSize: Int $sort: [String] $filter: JSON $pageNumber: Int) {
         ${nameToUse}(pageSize: $pageSize, sort: $sort, filter: $filter, pageNumber: $pageNumber) {
           results {
             ${queryInner}
