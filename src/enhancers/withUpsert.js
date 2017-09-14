@@ -4,6 +4,7 @@ import compose from "lodash/fp/compose";
 import { gql } from "react-apollo";
 import pascalCase from "pascal-case";
 import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
+import refetchMap from "./refetchMap";
 
 /**
  * withUpsert 
@@ -191,7 +192,11 @@ export default function withUpsert(nameOrFragment, options = {}) {
           ).then(function(res) {
             if (refetch) {
               refetch.forEach(name => {
-                window[name]().then(() => {});
+                if (refetchMap[name]) {
+                  refetchMap[name]();
+                } else {
+                  console.log("No query matching", name, "found in refetchMap");
+                }
               });
             }
             return Promise.resolve(

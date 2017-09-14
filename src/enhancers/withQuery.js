@@ -6,6 +6,7 @@ import React from "react";
 import deepEqual from "deep-equal";
 import Loading from "../Loading";
 import compose from "lodash/fp/compose";
+import refetchMap from "./refetchMap";
 
 /**
  * withQuery 
@@ -21,6 +22,7 @@ import compose from "lodash/fp/compose";
  * @param {boolean} options.showError - default=true show an error message toastr if the an error occurs while loading the data
  * @return props: {xxxxQuery, data }
  */
+
 export default function withQuery(fragment, options = {}) {
   const {
     isPlural,
@@ -129,6 +131,7 @@ export default function withQuery(fragment, options = {}) {
         };
       },
       props: ({ data }) => {
+        refetchMap[nameToUse] = data.refetch;
         const results = get(data, nameToUse + (isPlural ? ".results" : ""));
         const totalResults = isPlural
           ? get(data, nameToUse + ".totalResults", 0)
