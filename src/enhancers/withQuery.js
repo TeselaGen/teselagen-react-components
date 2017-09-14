@@ -31,8 +31,8 @@ export default function withQuery(fragment, options = {}) {
     client,
     variables,
     getIdFromParams,
-    showLoading,
-    showError,
+    showLoading = true,
+    showError = true,
     ...rest
   } = options;
   if (typeof fragment === "string" || typeof fragment !== "object") {
