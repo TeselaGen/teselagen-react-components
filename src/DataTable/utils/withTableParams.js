@@ -124,7 +124,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
 
     return {
       ...ownProps,
-      queryParams: stateProps.queryParams,
+      variables: stateProps.variables,
       tableParams: {
         ...ownProps.tableParams,
         ...stateProps,
