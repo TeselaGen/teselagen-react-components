@@ -158,6 +158,8 @@ export default function withQuery(fragment, options = {}) {
         componentWillReceiveProps(nextProps) {
           if (
             showError &&
+            nextProps.data &&
+            this.props.data &&
             !deepEqual(nextProps.data.error, this.props.data.error)
           ) {
             const error = nextProps.data.error;
