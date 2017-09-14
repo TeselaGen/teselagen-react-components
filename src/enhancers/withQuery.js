@@ -32,6 +32,7 @@ export default function withQuery(fragment, options = {}) {
     idAs,
     client,
     variables,
+    props,
     getIdFromParams,
     showLoading = true,
     showError = true,
@@ -130,7 +131,8 @@ export default function withQuery(fragment, options = {}) {
           ...rest
         };
       },
-      props: ({ data }) => {
+      props: (...args) => {
+        const { data } = args[0];
         refetchMap[nameToUse] = data.refetch;
         const results = get(data, nameToUse + (isPlural ? ".results" : ""));
         const totalResults = isPlural
@@ -146,6 +148,7 @@ export default function withQuery(fragment, options = {}) {
           ["loading" + upperFirst(nameToUse)]: data.loading
         };
         return {
+          ...(props ? props(...args) : {}),
           data: newData,
           [queryNameToUse]: newData,
           [nameToUse]: results,
