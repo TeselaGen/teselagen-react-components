@@ -195,7 +195,12 @@ export default function withUpsert(nameOrFragment, options = {}) {
                 if (refetchMap[name]) {
                   refetchMap[name]();
                 } else {
-                  console.log("No query matching", name, "found in refetchMap");
+                  console.log(
+                    "No query matching:",
+                    name,
+                    "found in refetchMap: ",
+                    refetchMap
+                  );
                 }
               });
             }
