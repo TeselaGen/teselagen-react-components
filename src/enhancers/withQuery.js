@@ -84,7 +84,7 @@ export default function withQuery(nameOrFragment, options = {}) {
       };
       return {
         data: newData,
-        [queryNameToUse]: data,
+        [queryNameToUse]: newData,
         [nameToUse]: results,
         [nameToUse + "Count"]: results
       };

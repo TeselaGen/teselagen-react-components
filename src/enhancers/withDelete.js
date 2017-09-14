@@ -4,9 +4,13 @@ import { gql } from "react-apollo";
 import { graphql } from "react-apollo";
 import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
 
-export default function(_recordType, options = {}) {
-  const { mutationName, extraMutateArgs } = options;
-  const recordType = pascalCase(_recordType);
+export default function(nameOrFragment, options = {}) {
+  const { mutationName, extraMutateArgs, ...rest } = options;
+  const fragment = typeof nameOrFragment === "string" ? null : nameOrFragment;
+  const name = fragment
+    ? fragment.definitions[0].typeCondition.name.value
+    : nameOrFragment;
+  const recordType = pascalCase(name);
   const pluralRecordType = pluralize(recordType);
   /*eslint-disable*/
   var deleteByIdsMutation = gql`
@@ -69,11 +73,12 @@ export default function(_recordType, options = {}) {
             console.error("idArray.length:", idArray.length);
             console.error("deletedCount:", deletedCount);
             console.error(
-              `make sure you passed in the correct type ${_recordType} for the item you want to be deleting and that the item still exists! `
+              `make sure you passed in the correct type ${name} for the item you want to be deleting and that the item still exists! `
             );
           }
         });
       }
-    })
+    }),
+    ...rest
   });
 }

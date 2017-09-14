@@ -31,7 +31,8 @@ export default function withUpsert(nameOrFragment, options = {}) {
     idAs,
     forceCreate,
     forceUpdate,
-    client
+    client,
+    ...rest
   } = options;
   const fragment = typeof nameOrFragment === "string" ? null : nameOrFragment;
   const name = fragment
@@ -137,7 +138,8 @@ export default function withUpsert(nameOrFragment, options = {}) {
             });
           }
         };
-      }
+      },
+      ...rest
     }),
     graphql(updateMutation, {
       name: "updateItem",
@@ -156,7 +158,8 @@ export default function withUpsert(nameOrFragment, options = {}) {
             });
           }
         };
-      }
+      },
+      ...rest
     }),
     connect((state, ownProps) => {
       const { createItem, updateItem } = ownProps;
