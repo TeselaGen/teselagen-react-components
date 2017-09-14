@@ -6,7 +6,6 @@ import React from "react";
 import deepEqual from "deep-equal";
 import Loading from "../Loading";
 import compose from "lodash/fp/compose";
-import refetchMap from "./refetchMap";
 
 /**
  * withQuery 
@@ -133,7 +132,6 @@ export default function withQuery(fragment, options = {}) {
       },
       props: (...args) => {
         const { data } = args[0];
-        refetchMap[nameToUse] = data.refetch;
         const results = get(data, nameToUse + (isPlural ? ".results" : ""));
         const totalResults = isPlural
           ? get(data, nameToUse + ".totalResults", 0)
@@ -173,9 +171,6 @@ export default function withQuery(fragment, options = {}) {
             console.error("error:", error);
             window.toastr.error(`Error loading ${queryNameToUse}`);
           }
-        }
-        componentWillUnmount() {
-          delete refetchMap[nameToUse];
         }
         render() {
           const { data = {} } = this.props;

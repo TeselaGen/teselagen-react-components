@@ -4,18 +4,17 @@ import compose from "lodash/fp/compose";
 import { gql } from "react-apollo";
 import pascalCase from "pascal-case";
 import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
-import refetchMap from "./refetchMap";
 
 /**
  * withUpsert 
  * @param {string | gql fragment} nameOrFragment supply either a name or a top-level fragment
  * @param options 
  *    @param mutationName {string} optional rename of the default upsert function withXXXX to whatever you want
+ *    @param refetchQueries {[queryNameStrings]} 
  *    @param extraMutateArgs {obj | function} obj or function that returns obj to get passed to the actual mutation call
  *    @param invalidate {[string]} array of model types to invalidate after the mutate
  *    @param asFunction {boolean} if true, this gives you back a function you can call directly instead of a HOC
  *    @param idAs {string} if not using a fragment, you get an id field back as default. But, if the record doesn't have an id field, and instead has a 'code', you can set idAs: 'code'
- *    @param refetch (not yet implemented!) {[string]} supply array of strings of the names of queries that you'd like to refetch after the create/update
  *    @param forceCreate {boolean} sometimes the thing you're creating won't have an id field (it might have a code or something else as its primary key). This lets you override the default behavior of updating if no id is found
  *    @param forceUpdate {boolean} sometimes the thing you're updating might have an id field. This lets you override that. This lets you override the default behavior of creating if an id is found
  
@@ -28,11 +27,11 @@ export default function withUpsert(nameOrFragment, options = {}) {
     extraMutateArgs = {},
     invalidate,
     asFunction,
-    refetch,
     idAs,
     forceCreate,
     forceUpdate,
     client,
+    refetchQueries,
     ...rest
   } = options;
   const fragment = typeof nameOrFragment === "string" ? null : nameOrFragment;
@@ -135,6 +134,7 @@ export default function withUpsert(nameOrFragment, options = {}) {
               variables: {
                 input
               },
+              refetchQueries,
               ...getExtraMutateArgs(...args)
             });
           }
@@ -190,20 +190,6 @@ export default function withUpsert(nameOrFragment, options = {}) {
             values,
             ...rest
           ).then(function(res) {
-            if (refetch) {
-              refetch.forEach(name => {
-                if (refetchMap[name]) {
-                  refetchMap[name]();
-                } else {
-                  console.log(
-                    "No query matching:",
-                    name,
-                    "found in refetchMap: ",
-                    refetchMap
-                  );
-                }
-              });
-            }
             return Promise.resolve(
               res.data[isUpdate ? updateName : createName][
                 isUpdate ? "updatedItemsCursor" : "createdItemsCursor"
