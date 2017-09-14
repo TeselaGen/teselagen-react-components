@@ -174,6 +174,9 @@ export default function withQuery(fragment, options = {}) {
             window.toastr.error(`Error loading ${queryNameToUse}`);
           }
         }
+        componentWillUnmount() {
+          delete refetchMap[nameToUse];
+        }
         render() {
           const { data = {} } = this.props;
           const { loading } = data;
