@@ -11,19 +11,28 @@ import { get, upperFirst } from "lodash";
  *    @param {string} queryName - what the props come back on ( by default = modelName + 'Query')
  *    @param {boolean} asFunction - if true, this gives you back a function you can call directly instead of a HOC
  *    @param {string} idAs - by default single record queries occur on an id. But, if the record doesn't have an id field, and instead has a 'code', you can set idAs: 'code'
+ *    @param {boolean} getIdFromParams - grab the id variable off the match.params object being passed in!
  
  * @return props: {xxxxQuery, data }
  */
 export default function withQuery(nameOrFragment, options = {}) {
-  const { isPlural, queryName, asFunction, idAs, client, ...rest } = options;
+  const {
+    isPlural,
+    queryName,
+    asFunction,
+    idAs,
+    client,
+    getIdFromParams,
+    ...rest
+  } = options;
   const fragment = typeof nameOrFragment === "string" ? null : nameOrFragment;
   const name = fragment
     ? fragment.definitions[0].typeCondition.name.value
     : nameOrFragment;
   // const {fragment, extraMutateArgs} = options
   const fragName = fragment && fragment.definitions[0].name.value;
-  const nameToUse = isPlural ? pluralize(name) : name;
-  const queryNameToUse = nameToUse + "Query" || queryName;
+  const nameToUse = queryName || isPlural ? pluralize(name) : name;
+  const queryNameToUse = nameToUse + "Query";
   // const pascalNameToUse = pascalCase(nameToUse)
   const queryInner = `${fragName ? `...${fragName}` : idAs || "id"}`;
   /* eslint-disable */
@@ -62,7 +71,17 @@ export default function withQuery(nameOrFragment, options = {}) {
 
   return graphql(gqlQuery, {
     //default options
-    options: ({ variables, ...rest }) => {
+
+    options: props => {
+      const { variables, ...rest } = props;
+      if (getIdFromParams) {
+        const id = parseInt(get(props, "match.params.id"), 10);
+        return {
+          variables: {
+            id
+          }
+        };
+      }
       return {
         variables,
         ...rest
