@@ -39,23 +39,30 @@ export default function withQuery(nameOrFragment, options = {}) {
   // const pascalNameToUse = pascalCase(nameToUse)
   const queryInner = `${fragName ? `...${fragName}` : idAs || "id"}`;
   /* eslint-disable */
-  const gqlQuery = gql`
-    query ${queryNameToUse} ( ${isPlural
-    ? "$pageSize: Int $sort: [String] $filter: JSON $pageNumber: Int"
-    : `$${idAs || "id"}: String!`}) {
-      ${nameToUse}( ${isPlural
-    ? `pageSize: $pageSize, sort: $sort, filter: $filter, pageNumber: $pageNumber`
-    : `${idAs || "id"}: $${idAs || "id"}`}) {
-        ${isPlural
-          ? `results {
+  let gqlQuery;
+  if (isPlural) {
+    gqlQuery = gql`
+      query ${queryNameToUse} ($pageSize: Int $sort: [String] $filter: JSON $pageNumber: Int {
+        ${nameToUse}(pageSize: $pageSize, sort: $sort, filter: $filter, pageNumber: $pageNumber) {
+          results {
             ${queryInner}
           }
-          totalResults`
-          : queryInner}
+          totalResults
+        }
       }
-    }
-    ${fragment ? fragment : ``}
-  `;
+      ${fragment ? fragment : ``}
+    `;
+  } else {
+    gqlQuery = gql`
+      query ${queryNameToUse} ($${idAs || "id"}: String!) {
+        ${nameToUse}(${idAs || "id"}: $${idAs || "id"}) {
+          ${queryInner}
+        }
+      }
+      ${fragment ? fragment : ``}
+    `;
+  }
+
   /* eslint-enable */
   if (asQueryObj) {
     return gqlQuery;
@@ -81,6 +88,16 @@ export default function withQuery(nameOrFragment, options = {}) {
       const { variables, ...rest } = props;
       if (getIdFromParams) {
         const id = parseInt(get(props, "match.params.id"), 10);
+        if (!id) {
+          console.log(
+            "There needs to be an id passed here to ",
+            queryNameToUse,
+            "but none was found"
+          );
+          /* eslint-disable */
+          debugger;
+          /* eslint-enable */
+        }
         return {
           variables: {
             id
@@ -110,6 +127,8 @@ export default function withQuery(nameOrFragment, options = {}) {
         data: newData,
         [queryNameToUse]: newData,
         [nameToUse]: results,
+        [nameToUse + "Error"]: data.error,
+        [nameToUse + "Loading"]: data.loading,
         [nameToUse + "Count"]: results
       };
     },
