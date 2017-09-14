@@ -606,8 +606,6 @@ export function getQueryParams({
 
     graphqlQueryParams.filter = qb.toJSON();
 
-    console.log("graphqlQueryParams:", graphqlQueryParams);
-
     return {
       ...toReturn,
       //the query params get passed directly to graphql
@@ -639,6 +637,5 @@ function getQueries(filters, qb, ccFields) {
     }
     return acc;
   }, {});
-  console.log("subQueries:", subQueries);
   return subQueries;
 }
