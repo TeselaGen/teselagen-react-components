@@ -18,7 +18,7 @@ import compose from "lodash/fp/compose";
  * @param {string} options.idAs - by default single record queries occur on an id. But, if the record doesn't have an id field, and instead has a 'code', you can set idAs: 'code'
  * @param {boolean} options.getIdFromParams - grab the id variable off the match.params object being passed in!
  * @param {boolean} options.showLoading - default=true show a loading spinner over the whole component while the data is loading
- * @param {boolean} options.showErrorMessage - default=true show an error message toastr if the an error occurs while loading the data
+ * @param {boolean} options.showError - default=true show an error message toastr if the an error occurs while loading the data
  * @return props: {xxxxQuery, data }
  */
 export default function withQuery(fragment, options = {}) {
@@ -32,6 +32,7 @@ export default function withQuery(fragment, options = {}) {
     variables,
     getIdFromParams,
     showLoading,
+    showError,
     ...rest
   } = options;
   if (typeof fragment === "string" || typeof fragment !== "object") {
@@ -155,9 +156,13 @@ export default function withQuery(fragment, options = {}) {
     function WithLoadingHOC(WrappedComponent) {
       return class WithLoadingComp extends React.Component {
         componentWillReceiveProps(nextProps) {
-          if (!deepEqual(nextProps.data.error, this.props.data.error)) {
+          if (
+            showError &&
+            !deepEqual(nextProps.data.error, this.props.data.error)
+          ) {
             const error = nextProps.data.error;
-            window.toastr.error((error && error.msg) || error);
+            console.error("error:", error);
+            window.toastr.error(`Error loading ${queryNameToUse}`);
           }
         }
         render() {
