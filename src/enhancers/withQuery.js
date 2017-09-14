@@ -10,6 +10,7 @@ import { get, upperFirst } from "lodash";
  *    @param {boolean} isPlural - are we searching for 1 thing or many?
  *    @param {string} queryName - what the props come back on ( by default = modelName + 'Query')
  *    @param {boolean} asFunction - if true, this gives you back a function you can call directly instead of a HOC
+ *    @param {boolean} asQueryObj - if true, this gives you back the gql query object aka gql`query myQuery () {}`
  *    @param {string} idAs - by default single record queries occur on an id. But, if the record doesn't have an id field, and instead has a 'code', you can set idAs: 'code'
  *    @param {boolean} getIdFromParams - grab the id variable off the match.params object being passed in!
  
@@ -20,8 +21,10 @@ export default function withQuery(nameOrFragment, options = {}) {
     isPlural,
     queryName,
     asFunction,
+    asQueryObj,
     idAs,
     client,
+    variables,
     getIdFromParams,
     ...rest
   } = options;
@@ -54,14 +57,16 @@ export default function withQuery(nameOrFragment, options = {}) {
     ${fragment ? fragment : ``}
   `;
   /* eslint-enable */
-
+  if (asQueryObj) {
+    return gqlQuery;
+  }
   if (asFunction) {
-    return function query(variables) {
+    return function query(localVars) {
       return client
         .query({
           query: gqlQuery,
           name: "createDataFile",
-          variables
+          variables: localVars || variables || rest.options.variables
         })
         .then(function(res) {
           return Promise.resolve(res.data[nameToUse].results);
