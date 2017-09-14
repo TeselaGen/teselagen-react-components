@@ -3,9 +3,22 @@ import pascalCase from "pascal-case";
 import { gql } from "react-apollo";
 import { graphql } from "react-apollo";
 import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
+import refetchMap from "./refetchMap";
+
+/**
+ * withUpsert 
+ * @param {string | gql fragment} nameOrFragment supply either a name or a top-level fragment
+ * @param options 
+ *    @param mutationName {string} optional rename of the default upsert function withXXXX to whatever you want
+ *    @param extraMutateArgs {obj | function} obj or function that returns obj to get passed to the actual mutation call
+ *    @param refetch (not yet implemented!) {[string]} supply array of strings of the names of queries that you'd like to refetch after the create/update
+ TODO *    @param invalidate {[string]} array of model types to invalidate after the mutate
+ TODO *    @param asFunction {boolean} if true, this gives you back a function you can call directly instead of a HOC
+ * @return deleteXXXX function that takes an id or an array of ids of records to delete. It returns a promise resolving to an array of created/updated outputs
+ */
 
 export default function(nameOrFragment, options = {}) {
-  const { mutationName, extraMutateArgs, ...rest } = options;
+  const { mutationName, extraMutateArgs, refetch, ...rest } = options;
   const fragment = typeof nameOrFragment === "string" ? null : nameOrFragment;
   const name = fragment
     ? fragment.definitions[0].typeCondition.name.value
@@ -65,6 +78,20 @@ export default function(nameOrFragment, options = {}) {
           update: invalidateQueriesOfTypes([pluralRecordType]),
           ...getExtraMutateArgs(...args)
         }).then(function({ data }) {
+          if (refetch) {
+            refetch.forEach(name => {
+              if (refetchMap[name]) {
+                refetchMap[name]();
+              } else {
+                console.log(
+                  "No query matching:",
+                  name,
+                  "found in refetchMap: ",
+                  refetchMap
+                );
+              }
+            });
+          }
           const { deletedCount } = data[`delete${recordType}`];
           if (deletedCount !== idArray.length) {
             console.error(
