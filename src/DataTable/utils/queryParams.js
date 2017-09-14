@@ -605,11 +605,10 @@ export function getQueryParams({
     }
 
     graphqlQueryParams.filter = qb.toJSON();
-
     return {
       ...toReturn,
-      //the query params get passed directly to graphql
-      queryParams: graphqlQueryParams,
+      //the query params will get passed directly to as variables to the graphql query
+      variables: graphqlQueryParams,
       errorParsingUrlString
     };
   }

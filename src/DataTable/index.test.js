@@ -36,7 +36,7 @@ describe("DataTableDemo", () => {
   //   expect(dataTableInstance.props().tableParams.searchTerm).toEqual(
   //     "search string"
   //   );
-  //   expect(dataTableInstance.props().queryParams).toEqual({
+  //   expect(dataTableInstance.props().variables).toEqual({
   //     include: {},
   //     limit: 10,
   //     offset: 0,
@@ -70,25 +70,25 @@ describe("DataTableDemo", () => {
       });
       expect(pagingInput.props().value).toBe(5);
       pagingInput.simulate("blur");
-      expect(dataTableInstance.props().queryParams.pageSize).toBe(5);
+      expect(dataTableInstance.props().variables.pageSize).toBe(5);
     });
 
     it("handles a page right", () => {
-      expect(dataTableInstance.props().queryParams.pageSize).toBe(5);
+      expect(dataTableInstance.props().variables.pageSize).toBe(5);
       pagingToolbarWrapper.find(".paging-arrow-right").simulate("click");
-      expect(dataTableInstance.props().queryParams.pageNumber).toBe(2);
+      expect(dataTableInstance.props().variables.pageNumber).toBe(2);
     });
 
     it("handles a page left after a page right", () => {
-      expect(dataTableInstance.props().queryParams.pageNumber).toBe(2);
+      expect(dataTableInstance.props().variables.pageNumber).toBe(2);
       pagingToolbarWrapper.find(".paging-arrow-left").simulate("click");
-      expect(dataTableInstance.props().queryParams.pageNumber).toBe(1);
+      expect(dataTableInstance.props().variables.pageNumber).toBe(1);
     });
 
     it("searching brings us back to page 1", () => {
-      expect(dataTableInstance.props().queryParams.pageNumber).toBe(1);
+      expect(dataTableInstance.props().variables.pageNumber).toBe(1);
       pagingToolbarWrapper.find(".paging-arrow-right").simulate("click");
-      expect(dataTableInstance.props().queryParams.pageNumber).toBe(2);
+      expect(dataTableInstance.props().variables.pageNumber).toBe(2);
       const input = dataTableInstance.find(".datatable-search-input");
       input
         .find("input")
@@ -98,13 +98,13 @@ describe("DataTableDemo", () => {
       expect(dataTableInstance.props().tableParams.searchTerm).toEqual(
         "search string"
       );
-      expect(dataTableInstance.props().queryParams.pageNumber).toBe(1);
+      expect(dataTableInstance.props().variables.pageNumber).toBe(1);
     });
     it("changing page size brings us back to page 1", () => {
-      expect(dataTableInstance.props().queryParams.pageNumber).toBe(1);
+      expect(dataTableInstance.props().variables.pageNumber).toBe(1);
       pagingToolbarWrapper.find(".paging-arrow-right").simulate("click");
-      expect(dataTableInstance.props().queryParams.pageNumber).toBe(2);
-      expect(dataTableInstance.props().queryParams.pageSize).toBe(5);
+      expect(dataTableInstance.props().variables.pageNumber).toBe(2);
+      expect(dataTableInstance.props().variables.pageSize).toBe(5);
       pagingInput.simulate("change", {
         target: {
           value: 10
@@ -112,8 +112,8 @@ describe("DataTableDemo", () => {
       });
       expect(pagingInput.props().value).toBe(10);
       pagingInput.simulate("blur");
-      expect(dataTableInstance.props().queryParams.pageSize).toBe(10);
-      expect(dataTableInstance.props().queryParams.pageNumber).toBe(1);
+      expect(dataTableInstance.props().variables.pageSize).toBe(10);
+      expect(dataTableInstance.props().variables.pageNumber).toBe(1);
     });
   });
 });

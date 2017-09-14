@@ -1,7 +1,7 @@
 import { graphql } from "react-apollo";
 import { gql } from "react-apollo";
 import pluralize from "pluralize";
-import { get, upperFirst } from "lodash";
+import { get, upperFirst, camelCase } from "lodash";
 import React from "react";
 import deepEqual from "deep-equal";
 import Loading from "../Loading";
@@ -148,7 +148,8 @@ export default function withQuery(fragment, options = {}) {
           [nameToUse]: results,
           [nameToUse + "Error"]: data.error,
           [nameToUse + "Loading"]: data.loading,
-          [nameToUse + "Count"]: results
+          [nameToUse + "Count"]: results && results.length,
+          [camelCase("refetch_" ) + "Refetch"]: data.refetch
         };
       },
       ...rest //overwrite defaults here
