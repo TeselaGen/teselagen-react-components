@@ -2,6 +2,9 @@ import { graphql } from "react-apollo";
 import { gql } from "react-apollo";
 import pluralize from "pluralize";
 import { get, upperFirst } from "lodash";
+import React from "react";
+import Loading from "../Loading";
+import compose from "lodash/fp/compose";
 
 /**
  * withQuery 
@@ -13,6 +16,7 @@ import { get, upperFirst } from "lodash";
  *    @param {boolean} asQueryObj - if true, this gives you back the gql query object aka gql`query myQuery () {}`
  *    @param {string} idAs - by default single record queries occur on an id. But, if the record doesn't have an id field, and instead has a 'code', you can set idAs: 'code'
  *    @param {boolean} getIdFromParams - grab the id variable off the match.params object being passed in!
+ *    @param {boolean} showLoading - show a loading spinner over the whole component
  
  * @return props: {xxxxQuery, data }
  */
@@ -26,6 +30,7 @@ export default function withQuery(nameOrFragment, options = {}) {
     client,
     variables,
     getIdFromParams,
+    showLoading,
     ...rest
   } = options;
   const fragment = typeof nameOrFragment === "string" ? null : nameOrFragment;
@@ -81,57 +86,73 @@ export default function withQuery(nameOrFragment, options = {}) {
     };
   }
 
-  return graphql(gqlQuery, {
-    //default options
+  const toCompose = [
+    graphql(gqlQuery, {
+      //default options
 
-    options: props => {
-      const { variables, ...rest } = props;
-      if (getIdFromParams) {
-        const id = parseInt(get(props, "match.params.id"), 10);
-        if (!id) {
-          console.log(
-            "There needs to be an id passed here to ",
-            queryNameToUse,
-            "but none was found"
-          );
-          /* eslint-disable */
-          debugger;
-          /* eslint-enable */
+      options: props => {
+        const { variables, ...rest } = props;
+        if (getIdFromParams) {
+          const id = parseInt(get(props, "match.params.id"), 10);
+          if (!id) {
+            console.log(
+              "There needs to be an id passed here to ",
+              queryNameToUse,
+              "but none was found"
+            );
+            /* eslint-disable */
+            debugger;
+            /* eslint-enable */
+          }
+          return {
+            variables: {
+              id
+            }
+          };
         }
         return {
-          variables: {
-            id
-          }
+          variables,
+          ...rest
         };
-      }
-      return {
-        variables,
-        ...rest
+      },
+      props: ({ data }) => {
+        const results = get(data, nameToUse + (isPlural ? ".results" : ""));
+        const totalResults = isPlural
+          ? get(data, nameToUse + ".totalResults", 0)
+          : results && 1;
+        const newData = {
+          ...data,
+          totalResults,
+          //adding these for consistency with withItemsQuery
+          entities: results,
+          entityCount: totalResults,
+          ["error" + upperFirst(nameToUse)]: data.error,
+          ["loading" + upperFirst(nameToUse)]: data.loading
+        };
+        return {
+          data: newData,
+          [queryNameToUse]: newData,
+          [nameToUse]: results,
+          [nameToUse + "Error"]: data.error,
+          [nameToUse + "Loading"]: data.loading,
+          [nameToUse + "Count"]: results
+        };
+      },
+      ...rest //overwrite defaults here
+    })
+  ];
+  if (showLoading) {
+    toCompose.push(function WithLoadingHOC(WrappedComponent) {
+      return class WithLoadingComp extends React.Component {
+        render() {
+          const { data: { loading } } = this.props;
+          if (loading) {
+            return <Loading />;
+          }
+          return <WrappedComponent {...this.props} />;
+        }
       };
-    },
-    props: ({ data }) => {
-      const results = get(data, nameToUse + (isPlural ? ".results" : ""));
-      const totalResults = isPlural
-        ? get(data, nameToUse + ".totalResults", 0)
-        : results && 1;
-      const newData = {
-        ...data,
-        totalResults,
-        //adding these for consistency with withItemsQuery
-        entities: results,
-        entityCount: totalResults,
-        ["error" + upperFirst(nameToUse)]: data.error,
-        ["loading" + upperFirst(nameToUse)]: data.loading
-      };
-      return {
-        data: newData,
-        [queryNameToUse]: newData,
-        [nameToUse]: results,
-        [nameToUse + "Error"]: data.error,
-        [nameToUse + "Loading"]: data.loading,
-        [nameToUse + "Count"]: results
-      };
-    },
-    ...rest //overwrite defaults here
-  });
+    });
+  }
+  return compose(toCompose);
 }
