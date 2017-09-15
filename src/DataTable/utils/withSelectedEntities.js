@@ -5,14 +5,20 @@ import { map } from "lodash";
 import { connect } from "react-redux";
 
 export default function withSelectedEntities({ formName, name }) {
-  connect(state => {
+  if (!formName) {
+    throw new Error(
+      "Please pass a {formName} option when using withSelectedEntities"
+    );
+  }
+  const selector = formValueSelector(formName);
+
+  return connect(state => {
+    const selectedEntityIdMap =
+      selector(state, "reduxFormSelectedEntityIdMap") || {};
     return {
-      [name || "selectedEntities"]: map(
-        formValueSelector(formName)(state, "reduxFormSelectedEntityIdMap"),
-        item => {
-          return item.entity;
-        }
-      )
+      [name || "selectedEntities"]: map(selectedEntityIdMap, item => {
+        return item.entity;
+      })
     };
   });
 }
