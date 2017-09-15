@@ -45,6 +45,7 @@ class ReactDataTable extends React.Component {
     hidePageSizeWhenPossible: false,
     pageSize: 10,
     extraClasses: "",
+    className: "",
     page: 1,
     style: {},
     maxHeight: 800,
@@ -53,6 +54,7 @@ class ReactDataTable extends React.Component {
     isLoading: false,
     isInfinite: false,
     isSingleSelect: false,
+    hideSelectedCount: false,
     withCheckboxes: false,
     setSearchTerm: noop,
     setFilter: noop,
@@ -128,6 +130,7 @@ class ReactDataTable extends React.Component {
   render() {
     const {
       extraClasses,
+      className,
       tableName,
       isLoading,
       searchTerm,
@@ -155,6 +158,7 @@ class ReactDataTable extends React.Component {
       compactPaging,
       entityCount,
       isSingleSelect,
+      hideSelectedCount,
       entities
     } = this.props;
     let compactClassName = "";
@@ -205,6 +209,7 @@ class ReactDataTable extends React.Component {
         className={classNames(
           "data-table-container",
           extraClasses,
+          className,
           compactClassName
         )}
       >
@@ -286,18 +291,16 @@ class ReactDataTable extends React.Component {
         <div
           className={"data-table-footer"}
           style={{
-            justifyContent: isSingleSelect ? "flex-end" : "space-between"
+            justifyContent:
+              isSingleSelect || hideSelectedCount ? "flex-end" : "space-between"
           }}
         >
-          {!isSingleSelect && (
+          {!isSingleSelect &&
+          !hideSelectedCount && (
             <div className={"tg-react-table-selected-count"}>
-              {selectedRowCount > 0 ? (
-                ` ${selectedRowCount} Record${selectedRowCount === 1
-                  ? ""
-                  : "s"} Selected `
-              ) : (
-                ""
-              )}
+              {`${selectedRowCount} Record${selectedRowCount === 1
+                ? ""
+                : "s"} Selected `}
             </div>
           )}
           {!isInfinite &&
