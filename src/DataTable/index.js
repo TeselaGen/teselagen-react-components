@@ -325,7 +325,8 @@ class ReactDataTable extends React.Component {
       entities
     } = this.props;
     if (!rowInfo) return {};
-    const rowId = getIdOrCode(rowInfo.original);
+    const entity = rowInfo.original;
+    const rowId = getIdOrCode(entity);
     const rowSelected = reduxFormSelectedEntityIdMap.input.value[rowId];
     return {
       onClick: e => {
@@ -342,7 +343,7 @@ class ReactDataTable extends React.Component {
         } else {
           // if we are not using checkboxes we need to make sure
           // that the id of the record gets added to the id map
-          newIdMap = oldIdMap[rowId] ? oldIdMap : { [rowId]: true };
+          newIdMap = oldIdMap[rowId] ? oldIdMap : { [rowId]: { entity } };
           finalizeSelection({ idMap: newIdMap, props: this.props });
         }
         this.showContextMenu(newIdMap, e);
@@ -383,12 +384,12 @@ class ReactDataTable extends React.Component {
           <Checkbox
             onChange={() => {
               const newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
-              range(entities.length).forEach(i => {
-                const entityId = getIdOrCode(entities[i]);
+              entities.forEach(entity => {
+                const entityId = getIdOrCode(entity);
                 if (checkboxProps.checked) {
                   delete newIdMap[entityId];
                 } else {
-                  newIdMap[entityId] = true;
+                  newIdMap[entityId] = { entity };
                 }
               });
 
@@ -431,7 +432,11 @@ class ReactDataTable extends React.Component {
             const isRowCurrentlyChecked = checkedRows.indexOf(rowIndex) > -1;
             const entityId = getIdOrCode(entity);
             if (isSingleSelect) {
-              newIdMap = { [entityId]: true };
+              newIdMap = {
+                [entityId]: {
+                  entity
+                }
+              };
             } else if (e.shiftKey && rowIndex !== lastCheckedRow) {
               const start = rowIndex;
               const end = lastCheckedRow;
@@ -445,7 +450,9 @@ class ReactDataTable extends React.Component {
                 const tempEntity = entities[i];
                 const tempEntityId = getIdOrCode(tempEntity);
                 if (isLastCheckedRowCurrentlyChecked) {
-                  newIdMap[tempEntityId] = true;
+                  newIdMap[tempEntityId] = {
+                    entity: tempEntity
+                  };
                 } else {
                   delete newIdMap[tempEntityId];
                 }
@@ -455,7 +462,7 @@ class ReactDataTable extends React.Component {
               if (isRowCurrentlyChecked) {
                 delete newIdMap[entityId];
               } else {
-                newIdMap[entityId] = true;
+                newIdMap[entityId] = { entity };
               }
             }
 
@@ -649,7 +656,7 @@ export default compose(
       return {};
     }
   }),
-  reduxForm() //the formname is passed via withTableParams and is often user overridden
+  reduxForm() //the formName is passed via withTableParams and is often user overridden
 )(props => {
   return (
     <Fields

@@ -70,7 +70,8 @@ export default class DataTableDemo extends React.Component {
     renderUnconnectedTable: false,
     urlConnected: true,
     onlyOneFilter: false,
-    inDialog: false
+    inDialog: false,
+    withSelectedEntities: false
   };
   componentWillMount() {
     //tnr: the following code allows the DataTable test to set defaults on the demo (which is used in the testing)
@@ -80,10 +81,11 @@ export default class DataTableDemo extends React.Component {
   render() {
     let ConnectedTable = withTableParams({
       //tnrtodo: this should be set up as an enhancer instead
-      formname: "example 1", //this should be a unique name
+      formName: "example 1", //this should be a unique name
       schema,
       urlConnected: this.state.urlConnected,
-      onlyOneFilter: this.state.onlyOneFilter
+      onlyOneFilter: this.state.onlyOneFilter,
+      withSelectedEntities: this.state.withSelectedEntities
     })(DataTableInstance);
     ConnectedTable = withRouter(ConnectedTable);
 
@@ -112,6 +114,11 @@ export default class DataTableDemo extends React.Component {
                 "onlyOneFilter",
                 "Setting this true makes the table only keep 1 filter/search term in memory instead of allowing multiple"
               )}
+              {renderToggle(
+                this,
+                "withSelectedEntities",
+                "Setting this true makes the table pass the selectedEntities"
+              )}
               <br />
               {this.state.inDialog ? (
                 <Dialog
@@ -128,7 +135,7 @@ export default class DataTableDemo extends React.Component {
                 <DataTableInstance
                   {...{
                     tableParams: {
-                      formname: "example 1", //this should be a unique name
+                      formName: "example 1", //this should be a unique name
                       schema,
                       urlConnected: this.state.urlConnected,
                       onlyOneFilter: this.state.onlyOneFilter
@@ -186,7 +193,6 @@ export class DataTableInstance extends React.Component {
     withCheckboxes: true,
     numOfEntities: 60,
     selectedIds: undefined,
-    selectedRecords: null,
     entities: generateFakeRows(defaultNumOfEntities)
   };
 
@@ -194,10 +200,9 @@ export class DataTableInstance extends React.Component {
     const {
       numOfEntities,
       entities,
-      selectedIds,
-      selectedRecords
+      selectedIds
     } = this.state;
-    const { tableParams } = this.props;
+    const { tableParams, selectedEntities } = this.props;
     const { page, pageSize, isTableParamsConnected } = tableParams;
     let entitiesToPass = [];
     if (this.state.isInfinite || !isTableParamsConnected) {
@@ -263,16 +268,14 @@ export class DataTableInstance extends React.Component {
           "maxHeight",
           "By default every table has a max height of 800px. Setting this true changes it to 200px"
         )}
-        <div>
-          The following records are selected (pass an onRowSelect prop to manage
-          this on table):
-          <div style={{ height: 40 }}>
-            {selectedRecords &&
-              selectedRecords
+        {selectedEntities && <div>
+          The following records are selected (pass withSelectedEntities: true to withTableParams):
+          <div style={{ height: 40, maxHeight: 40, maxWidth: 800, overflow: 'auto' }}>
+            {selectedEntities
                 .map(record => `${record.id}: ${record.name}`)
                 .join(", ")}
           </div>
-        </div>
+        </div>}
         <DataTable
           {...tableParams}
           entities={entitiesToPass}
@@ -329,7 +332,6 @@ export class DataTableInstance extends React.Component {
           onRefresh={() => {
             alert("clicked refresh!");
           }}
-          onRowSelect={selectedRecords => this.setState({ selectedRecords })}
           // history={history}
           onSingleRowSelect={noop}
           onDeselect={noop}

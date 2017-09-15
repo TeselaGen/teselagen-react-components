@@ -23,7 +23,7 @@ export { pageSizes };
 
 export function getMergedOpts(topLevel = {}, instanceLevel = {}) {
   return {
-    formname: "tgDataTable",
+    formName: "tgDataTable",
     ...topLevel,
     ...instanceLevel,
     defaults: {
