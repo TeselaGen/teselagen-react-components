@@ -11,13 +11,20 @@ import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
  *    @param refetchQueries {[queryNameStrings]} 
  *    @param mutationName {string} optional rename of the default upsert function withXXXX to whatever you want
  *    @param extraMutateArgs {obj | function} obj or function that returns obj to get passed to the actual mutation call
+ *    @param showError {boolean} default=true -- whether or not to show a default error message on failure
  TODO *    @param invalidate {[string]} array of model types to invalidate after the mutate
  TODO *    @param asFunction {boolean} if true, this gives you back a function you can call directly instead of a HOC
  * @return deleteXXXX function that takes an id or an array of ids of records to delete. It returns a promise resolving to an array of created/updated outputs
  */
 
 export default function(nameOrFragment, options = {}) {
-  const { mutationName, extraMutateArgs, refetchQueries, ...rest } = options;
+  const {
+    mutationName,
+    extraMutateArgs,
+    refetchQueries,
+    showError = true,
+    ...rest
+  } = options;
   const fragment = typeof nameOrFragment === "string" ? null : nameOrFragment;
   const name = fragment
     ? fragment.definitions[0].typeCondition.name.value
@@ -77,19 +84,27 @@ export default function(nameOrFragment, options = {}) {
           update: invalidateQueriesOfTypes([pluralRecordType]),
           refetchQueries,
           ...getExtraMutateArgs(...args)
-        }).then(function({ data }) {
-          const { deletedCount } = data[`delete${recordType}`];
-          if (deletedCount !== idArray.length) {
-            console.error(
-              `Uh oh, the number of deleted items does not match the number of IDs passed in to be deleted! `
-            );
-            console.error("idArray.length:", idArray.length);
-            console.error("deletedCount:", deletedCount);
-            console.error(
-              `make sure you passed in the correct type ${name} for the item you want to be deleting and that the item still exists! `
-            );
-          }
-        });
+        })
+          .then(function({ data }) {
+            const { deletedCount } = data[`delete${recordType}`];
+            if (deletedCount !== idArray.length) {
+              console.error(
+                `Uh oh, the number of deleted items does not match the number of IDs passed in to be deleted! `
+              );
+              console.error("idArray.length:", idArray.length);
+              console.error("deletedCount:", deletedCount);
+              console.error(
+                `make sure you passed in the correct type ${name} for the item you want to be deleting and that the item still exists! `
+              );
+            }
+          })
+          .catch(e => {
+            if (showError) {
+              window.toastr.error(`Error deleting ${recordType}`);
+              console.error("withUpsert Error:", e);
+            }
+            throw e; //rethrow the error so it can be caught again if need be
+          });
       }
     }),
     ...rest

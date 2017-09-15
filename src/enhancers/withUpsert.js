@@ -11,6 +11,7 @@ import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
  * @param options 
  *    @param mutationName {string} optional rename of the default upsert function withXXXX to whatever you want
  *    @param refetchQueries {[queryNameStrings]} 
+ *    @param showError {boolean} default=true -- whether or not to show a default error message on failure
  *    @param extraMutateArgs {obj | function} obj or function that returns obj to get passed to the actual mutation call
  *    @param invalidate {[string]} array of model types to invalidate after the mutate
  *    @param asFunction {boolean} if true, this gives you back a function you can call directly instead of a HOC
@@ -32,6 +33,7 @@ export default function withUpsert(nameOrFragment, options = {}) {
     forceUpdate,
     client,
     refetchQueries,
+    showError = true,
     ...rest
   } = options;
   const fragment = typeof nameOrFragment === "string" ? null : nameOrFragment;
@@ -186,16 +188,25 @@ export default function withUpsert(nameOrFragment, options = {}) {
           if (forceUpdate) {
             isUpdate = true;
           }
-          return (isUpdate ? updateItem : createItem)(
-            values,
-            ...rest
-          ).then(function(res) {
-            return Promise.resolve(
-              res.data[isUpdate ? updateName : createName][
-                isUpdate ? "updatedItemsCursor" : "createdItemsCursor"
-              ].results
-            );
-          });
+          return (isUpdate ? updateItem : createItem)(values, ...rest)
+            .then(function(res) {
+              return Promise.resolve(
+                res.data[isUpdate ? updateName : createName][
+                  isUpdate ? "updatedItemsCursor" : "createdItemsCursor"
+                ].results
+              );
+            })
+            .catch(e => {
+              if (showError) {
+                window.toastr.error(
+                  `Error ${isUpdate
+                    ? "updating"
+                    : "creating"} ${pascalCaseName}`
+                );
+                console.error("withUpsert Error:", e);
+              }
+              throw e; //rethrow the error so it can be caught again if need be
+            });
         }
       };
     })
