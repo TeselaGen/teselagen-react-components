@@ -2,7 +2,6 @@ import deepEqual from "deep-equal";
 import { connect } from "react-redux";
 import { Fields, reduxForm } from "redux-form";
 import { compose } from "redux";
-import { range } from "lodash";
 import React from "react";
 import moment from "moment";
 import uniqid from "uniqid";
@@ -83,7 +82,11 @@ class ReactDataTable extends React.Component {
             if (field.isHidden) {
               return columns;
             }
-            columns.push({ displayName: field.displayName, schemaIndex: i });
+            columns.push({
+              displayName: field.displayName,
+              schemaIndex: i,
+              width: field.width
+            });
             return columns;
           }, [])
         : [];
