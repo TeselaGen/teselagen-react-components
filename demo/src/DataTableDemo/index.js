@@ -60,10 +60,7 @@ const renderToggle = (that, type, description) => {
           });
         }}
       />
-      {description &&
-        <span>
-          {description}
-        </span>}
+      {description && <span>{description}</span>}
     </div>
   );
 };
@@ -81,8 +78,8 @@ export default class DataTableDemo extends React.Component {
   }
 
   render() {
-
-    let ConnectedTable = withTableParams({ //tnrtodo: this should be set up as an enhancer instead
+    let ConnectedTable = withTableParams({
+      //tnrtodo: this should be set up as an enhancer instead
       formname: "example 1", //this should be a unique name
       schema,
       urlConnected: this.state.urlConnected,
@@ -116,29 +113,31 @@ export default class DataTableDemo extends React.Component {
                 "Setting this true makes the table only keep 1 filter/search term in memory instead of allowing multiple"
               )}
               <br />
-              {this.state.inDialog
-                ? <Dialog
-                    onClose={() =>
-                      this.setState({
-                        inDialog: false
-                      })}
-                    title="Table inside a dialog"
-                    isOpen={this.state.inDialog}
-                  >
-                    <ConnectedTable />
-                  </Dialog>
-                : this.state.renderUnconnectedTable
-                  ? <DataTableInstance
-                      {...{
-                        tableParams: {
-                          formname: "example 1", //this should be a unique name
-                          schema,
-                          urlConnected: this.state.urlConnected,
-                          onlyOneFilter: this.state.onlyOneFilter
-                        }
-                      }}
-                    />
-                  : <ConnectedTable />}
+              {this.state.inDialog ? (
+                <Dialog
+                  onClose={() =>
+                    this.setState({
+                      inDialog: false
+                    })}
+                  title="Table inside a dialog"
+                  isOpen={this.state.inDialog}
+                >
+                  <ConnectedTable />
+                </Dialog>
+              ) : this.state.renderUnconnectedTable ? (
+                <DataTableInstance
+                  {...{
+                    tableParams: {
+                      formname: "example 1", //this should be a unique name
+                      schema,
+                      urlConnected: this.state.urlConnected,
+                      onlyOneFilter: this.state.onlyOneFilter
+                    }
+                  }}
+                />
+              ) : (
+                <ConnectedTable />
+              )}
               <br />
             </div>
           </Router>
@@ -164,7 +163,7 @@ const generateFakeRows = num => {
       type: "denicolaType",
       addedBy: chance.name(),
       updatedAt: chance.date(),
-      createdAt: chance.date(),
+      createdAt: chance.date()
     };
   });
 };
@@ -187,11 +186,17 @@ export class DataTableInstance extends React.Component {
     withCheckboxes: true,
     numOfEntities: 60,
     selectedIds: undefined,
+    selectedRecords: null,
     entities: generateFakeRows(defaultNumOfEntities)
   };
 
   render() {
-    const { numOfEntities, entities, selectedIds } = this.state;
+    const {
+      numOfEntities,
+      entities,
+      selectedIds,
+      selectedRecords
+    } = this.state;
     const { tableParams } = this.props;
     const { page, pageSize, isTableParamsConnected } = tableParams;
     let entitiesToPass = [];
@@ -230,19 +235,19 @@ export class DataTableInstance extends React.Component {
             });
           }}
         />
-       <br />
-       Select records by ids (a single number or numbers separated by ","):{" "}
-       <input
-         onChange={e => {
-           const val = e.target.value;
-           const selectedIds = (val.indexOf(",") > -1
-             ? val.split(",").map(num => parseInt(num, 10))
-             : [parseInt(val, 10)]).filter(val => !isNaN(val));
-           this.setState({
-             selectedIds
-           });
-         }}
-       />
+        <br />
+        Select records by ids (a single number or numbers separated by ","):{" "}
+        <input
+          onChange={e => {
+            const val = e.target.value;
+            const selectedIds = (val.indexOf(",") > -1
+              ? val.split(",").map(num => parseInt(num, 10))
+              : [parseInt(val, 10)]).filter(val => !isNaN(val));
+            this.setState({
+              selectedIds
+            });
+          }}
+        />
         {renderToggle(this, "withTitle")}
         {renderToggle(this, "withSearch")}
         {renderToggle(this, "withPaging")}
@@ -253,7 +258,21 @@ export class DataTableInstance extends React.Component {
         {renderToggle(this, "withCheckboxes")}
         {renderToggle(this, "isSingleSelect")}
         {renderToggle(this, "compact")}
-        {renderToggle(this, "maxHeight", "By default every table has a max height of 800px. Setting this true changes it to 200px")}
+        {renderToggle(
+          this,
+          "maxHeight",
+          "By default every table has a max height of 800px. Setting this true changes it to 200px"
+        )}
+        <div>
+          The following records are selected (pass an onRowSelect prop to manage
+          this on table):
+          <div style={{ height: 40 }}>
+            {selectedRecords &&
+              selectedRecords
+                .map(record => `${record.id}: ${record.name}`)
+                .join(", ")}
+          </div>
+        </div>
         <DataTable
           {...tableParams}
           entities={entitiesToPass}
@@ -302,15 +321,15 @@ export class DataTableInstance extends React.Component {
           doNotShowEmptyRows={this.state.doNotShowEmptyRows}
           withCheckboxes={this.state.withCheckboxes}
           isSingleSelect={this.state.isSingleSelect}
-          {
-            ...this.state.maxHeight ? {
-              maxHeight:"200px"
-            } : {}
-          }
-          
+          {...(this.state.maxHeight
+            ? {
+                maxHeight: "200px"
+              }
+            : {})}
           onRefresh={() => {
             alert("clicked refresh!");
           }}
+          onRowSelect={selectedRecords => this.setState({ selectedRecords })}
           // history={history}
           onSingleRowSelect={noop}
           onDeselect={noop}

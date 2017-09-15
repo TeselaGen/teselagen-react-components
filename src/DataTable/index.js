@@ -62,6 +62,7 @@ class ReactDataTable extends React.Component {
     setOrder: noop,
     setPage: noop,
     onDoubleClick: noop,
+    onRowSelect: noop,
     onMultiRowSelect: noop,
     onSingleRowSelect: noop,
     onDeselect: noop,
@@ -342,7 +343,7 @@ class ReactDataTable extends React.Component {
           // if we are not using checkboxes we need to make sure
           // that the id of the record gets added to the id map
           newIdMap = oldIdMap[rowId] ? oldIdMap : { [rowId]: true };
-          reduxFormSelectedEntityIdMap.input.onChange(newIdMap);
+          finalizeSelection({ idMap: newIdMap, props: this.props });
         }
         this.showContextMenu(newIdMap, e);
       },
@@ -391,7 +392,7 @@ class ReactDataTable extends React.Component {
                 }
               });
 
-              reduxFormSelectedEntityIdMap.input.onChange(newIdMap);
+              finalizeSelection({ idMap: newIdMap, props: this.props });
               this.setState({ lastCheckedRow: undefined });
             }}
             {...checkboxProps}
@@ -458,7 +459,10 @@ class ReactDataTable extends React.Component {
               }
             }
 
-            reduxFormSelectedEntityIdMap.input.onChange(newIdMap);
+            finalizeSelection({
+              idMap: newIdMap,
+              props: this.props
+            });
             this.setState({ lastCheckedRow: rowIndex });
           }}
           className={"tg-react-table-checkbox-cell-inner"}
