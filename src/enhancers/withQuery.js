@@ -176,7 +176,7 @@ export default function withQuery(fragment, options = {}) {
           const { data = {} } = this.props;
           const { loading } = data;
           if (loading && showLoading) {
-            return <Loading />;
+            return <Loading loading />;
           }
           return <WrappedComponent {...this.props} />;
         }
