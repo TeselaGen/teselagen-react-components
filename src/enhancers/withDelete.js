@@ -101,7 +101,7 @@ export default function(nameOrFragment, options = {}) {
           .catch(e => {
             if (showError) {
               window.toastr.error(`Error deleting ${recordType}`);
-              console.error("withUpsert Error:", e);
+              console.error(`withDelete ${recordType} Error:`, e);
             }
             throw e; //rethrow the error so it can be caught again if need be
           });

@@ -203,7 +203,7 @@ export default function withUpsert(nameOrFragment, options = {}) {
                     ? "updating"
                     : "creating"} ${pascalCaseName}`
                 );
-                console.error("withUpsert Error:", e);
+                console.error(`withUpsert ${pascalCaseName} Error:`, e);
               }
               throw e; //rethrow the error so it can be caught again if need be
             });

@@ -38,12 +38,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       schema,
       isInfinite
     } = mergedOpts;
-    if (
-      isLocalCall &&
-      !ownProps.isTableParamsConnected &&
-      !formName &&
-      !urlConnected
-    ) {
+    if (isLocalCall && !formName && !urlConnected) {
       console.error(
         "Please pass a unique 'formName' prop to the locally connected <DataTable/> component with schema: ",
         schema
