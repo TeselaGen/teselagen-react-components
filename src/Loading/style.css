@@ -1,0 +1,12 @@
+.tg-loading-spinner {
+  display: flex !important;
+  height: 100% !important;
+  width: 100% !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.tg-loading-spinner > * {
+  max-height: 140px;
+  max-width: 140px;
+}

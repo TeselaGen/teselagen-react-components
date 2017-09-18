@@ -9,6 +9,7 @@ import {
   getCurrentParamsFromUrl
 } from "./queryParams";
 import compose from "lodash/fp/compose";
+import { map } from "lodash";
 import { withRouter } from "react-router-dom";
 
 export default function withTableParams(compOrOpts, pTopLevelOpts) {
@@ -31,36 +32,42 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
     const {
       history,
       urlConnected,
-      formname,
+      withSelectedEntities,
+      formName,
       defaults,
       schema,
       isInfinite
     } = mergedOpts;
-    if (
-      isLocalCall &&
-      !ownProps.isTableParamsConnected &&
-      !formname &&
-      !urlConnected
-    ) {
+    if (isLocalCall && !formName && !urlConnected) {
       console.error(
-        "Please pass a unique 'formname' prop to the locally connected <DataTable/> component with schema: ",
+        "Please pass a unique 'formName' prop to the locally connected <DataTable/> component with schema: ",
         schema
       );
-    } else if (!isLocalCall && !formname && !urlConnected) {
+    } else if (!isLocalCall && !formName && !urlConnected) {
       console.error(
-        "Please pass a unique 'formname' prop to the withTableParams() with schema: ",
+        "Please pass a unique 'formName' prop to the withTableParams() with schema: ",
         schema
       );
     }
+
+    const formSelector = formValueSelector(formName);
     const currentParams =
       (urlConnected
         ? getCurrentParamsFromUrl(history.location) //important to use history location and not ownProps.location because for some reason the location path lags one render behind!!
-        : formValueSelector(formname)(state, "reduxFormQueryParams")) || {};
+        : formSelector(state, "reduxFormQueryParams")) || {};
+
+    let selectedEntities;
+    if (withSelectedEntities) {
+      const selectedEntityIdMap =
+        formSelector(state, "reduxFormSelectedEntityIdMap") || {};
+      selectedEntities = map(selectedEntityIdMap, ({ entity }) => entity);
+    }
+
     return {
       ...mergedOpts,
       ...getQueryParams({
         currentParams,
-        entities: ownProps.entities,
+        entities: ownProps.entities, // for local table
         urlConnected,
         defaults,
         schema,
@@ -68,6 +75,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         isLocalCall
       }),
       currentParams,
+      selectedEntities,
       initialValues: { reduxFormSearchInput: currentParams.searchTerm }
     };
   };
@@ -78,7 +86,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
     }
     const mergedOpts = getMergedOpts(topLevelOptions, ownProps);
     const {
-      formname,
+      formName,
       urlConnected,
       history,
       defaults,
@@ -86,18 +94,18 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
     } = mergedOpts;
     function resetSearch() {
       setTimeout(function() {
-        dispatch(change(formname, "reduxFormSearchInput", ""));
+        dispatch(change(formName, "reduxFormSearchInput", ""));
       });
     }
     let setNewParams;
     if (urlConnected) {
       setNewParams = function(newParams) {
         setCurrentParamsOnUrl(newParams, history.push);
-        dispatch(change(formname, "reduxFormQueryParams", newParams)); //we always will update the redux params as a workaround for withRouter not always working if inside a redux-connected container https://github.com/ReactTraining/react-router/issues/5037
+        dispatch(change(formName, "reduxFormQueryParams", newParams)); //we always will update the redux params as a workaround for withRouter not always working if inside a redux-connected container https://github.com/ReactTraining/react-router/issues/5037
       };
     } else {
       setNewParams = function(newParams) {
-        dispatch(change(formname, "reduxFormQueryParams", newParams));
+        dispatch(change(formName, "reduxFormQueryParams", newParams));
       };
     }
     return makeDataTableHandlers({
@@ -112,7 +120,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
     if (ownProps.isTableParamsConnected) {
       return ownProps;
     }
-    const { currentParams, formname } = stateProps;
+    const { currentParams, formName } = stateProps;
     let boundDispatchProps = {};
     //bind currentParams to actions
     Object.keys(dispatchProps).forEach(function(key) {
@@ -121,16 +129,17 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         action(...args, currentParams);
       };
     });
-
+    const { variables, selectedEntities, ...restStateProps } = stateProps;
     return {
       ...ownProps,
-      queryParams: stateProps.queryParams,
+      variables: stateProps.variables,
+      selectedEntities: stateProps.selectedEntities,
       tableParams: {
         ...ownProps.tableParams,
-        ...stateProps,
+        ...restStateProps,
         ...dispatchProps,
         ...boundDispatchProps,
-        form: formname, //this will override the default redux form name
+        form: formName, //this will override the default redux form name
         isTableParamsConnected: true //let the table know not to do local sorting/filtering etc.
       }
     };
@@ -141,10 +150,10 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       if (ownProps.isTableParamsConnected) {
         return {};
       }
-      const { formname } = getMergedOpts(topLevelOptions, ownProps);
+      const { formName } = getMergedOpts(topLevelOptions, ownProps);
       return {
         unusedProp:
-          formValueSelector(formname)(state, "reduxFormQueryParams") || {} //tnr: we need this to trigger withRouter and force it to update if it is nested in a redux-connected container.. very ugly but necessary
+          formValueSelector(formName)(state, "reduxFormQueryParams") || {} //tnr: we need this to trigger withRouter and force it to update if it is nested in a redux-connected container.. very ugly but necessary
       };
     }),
     withRouter,

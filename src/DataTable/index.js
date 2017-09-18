@@ -2,7 +2,6 @@ import deepEqual from "deep-equal";
 import { connect } from "react-redux";
 import { Fields, reduxForm } from "redux-form";
 import { compose } from "redux";
-import { range } from "lodash";
 import React from "react";
 import moment from "moment";
 import uniqid from "uniqid";
@@ -46,6 +45,7 @@ class ReactDataTable extends React.Component {
     hidePageSizeWhenPossible: false,
     pageSize: 10,
     extraClasses: "",
+    className: "",
     page: 1,
     style: {},
     maxHeight: 800,
@@ -54,6 +54,7 @@ class ReactDataTable extends React.Component {
     isLoading: false,
     isInfinite: false,
     isSingleSelect: false,
+    hideSelectedCount: false,
     withCheckboxes: false,
     setSearchTerm: noop,
     setFilter: noop,
@@ -62,6 +63,7 @@ class ReactDataTable extends React.Component {
     setOrder: noop,
     setPage: noop,
     onDoubleClick: noop,
+    onRowSelect: noop,
     onMultiRowSelect: noop,
     onSingleRowSelect: noop,
     onDeselect: noop,
@@ -82,7 +84,11 @@ class ReactDataTable extends React.Component {
             if (field.isHidden) {
               return columns;
             }
-            columns.push({ displayName: field.displayName, schemaIndex: i });
+            columns.push({
+              displayName: field.displayName,
+              schemaIndex: i,
+              width: field.width
+            });
             return columns;
           }, [])
         : [];
@@ -124,6 +130,7 @@ class ReactDataTable extends React.Component {
   render() {
     const {
       extraClasses,
+      className,
       tableName,
       isLoading,
       searchTerm,
@@ -151,6 +158,7 @@ class ReactDataTable extends React.Component {
       compactPaging,
       entityCount,
       isSingleSelect,
+      hideSelectedCount,
       entities
     } = this.props;
     let compactClassName = "";
@@ -201,6 +209,7 @@ class ReactDataTable extends React.Component {
         className={classNames(
           "data-table-container",
           extraClasses,
+          className,
           compactClassName
         )}
       >
@@ -282,18 +291,16 @@ class ReactDataTable extends React.Component {
         <div
           className={"data-table-footer"}
           style={{
-            justifyContent: isSingleSelect ? "flex-end" : "space-between"
+            justifyContent:
+              isSingleSelect || hideSelectedCount ? "flex-end" : "space-between"
           }}
         >
-          {!isSingleSelect && (
+          {!isSingleSelect &&
+          !hideSelectedCount && (
             <div className={"tg-react-table-selected-count"}>
-              {selectedRowCount > 0 ? (
-                ` ${selectedRowCount} Record${selectedRowCount === 1
-                  ? ""
-                  : "s"} Selected `
-              ) : (
-                ""
-              )}
+              {`${selectedRowCount} Record${selectedRowCount === 1
+                ? ""
+                : "s"} Selected `}
             </div>
           )}
           {!isInfinite &&
@@ -324,7 +331,8 @@ class ReactDataTable extends React.Component {
       entities
     } = this.props;
     if (!rowInfo) return {};
-    const rowId = getIdOrCode(rowInfo.original);
+    const entity = rowInfo.original;
+    const rowId = getIdOrCode(entity);
     const rowSelected = reduxFormSelectedEntityIdMap.input.value[rowId];
     return {
       onClick: e => {
@@ -341,8 +349,8 @@ class ReactDataTable extends React.Component {
         } else {
           // if we are not using checkboxes we need to make sure
           // that the id of the record gets added to the id map
-          newIdMap = oldIdMap[rowId] ? oldIdMap : { [rowId]: true };
-          reduxFormSelectedEntityIdMap.input.onChange(newIdMap);
+          newIdMap = oldIdMap[rowId] ? oldIdMap : { [rowId]: { entity } };
+          finalizeSelection({ idMap: newIdMap, props: this.props });
         }
         this.showContextMenu(newIdMap, e);
       },
@@ -382,16 +390,16 @@ class ReactDataTable extends React.Component {
           <Checkbox
             onChange={() => {
               const newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
-              range(entities.length).forEach(i => {
-                const entityId = getIdOrCode(entities[i]);
+              entities.forEach(entity => {
+                const entityId = getIdOrCode(entity);
                 if (checkboxProps.checked) {
                   delete newIdMap[entityId];
                 } else {
-                  newIdMap[entityId] = true;
+                  newIdMap[entityId] = { entity };
                 }
               });
 
-              reduxFormSelectedEntityIdMap.input.onChange(newIdMap);
+              finalizeSelection({ idMap: newIdMap, props: this.props });
               this.setState({ lastCheckedRow: undefined });
             }}
             {...checkboxProps}
@@ -430,7 +438,11 @@ class ReactDataTable extends React.Component {
             const isRowCurrentlyChecked = checkedRows.indexOf(rowIndex) > -1;
             const entityId = getIdOrCode(entity);
             if (isSingleSelect) {
-              newIdMap = { [entityId]: true };
+              newIdMap = {
+                [entityId]: {
+                  entity
+                }
+              };
             } else if (e.shiftKey && rowIndex !== lastCheckedRow) {
               const start = rowIndex;
               const end = lastCheckedRow;
@@ -444,7 +456,9 @@ class ReactDataTable extends React.Component {
                 const tempEntity = entities[i];
                 const tempEntityId = getIdOrCode(tempEntity);
                 if (isLastCheckedRowCurrentlyChecked) {
-                  newIdMap[tempEntityId] = true;
+                  newIdMap[tempEntityId] = {
+                    entity: tempEntity
+                  };
                 } else {
                   delete newIdMap[tempEntityId];
                 }
@@ -454,11 +468,14 @@ class ReactDataTable extends React.Component {
               if (isRowCurrentlyChecked) {
                 delete newIdMap[entityId];
               } else {
-                newIdMap[entityId] = true;
+                newIdMap[entityId] = { entity };
               }
             }
 
-            reduxFormSelectedEntityIdMap.input.onChange(newIdMap);
+            finalizeSelection({
+              idMap: newIdMap,
+              props: this.props
+            });
             this.setState({ lastCheckedRow: rowIndex });
           }}
           className={"tg-react-table-checkbox-cell-inner"}
@@ -503,12 +520,6 @@ class ReactDataTable extends React.Component {
       if (column.width) {
         tableColumn.width = column.width;
       }
-      if (schemaForColumn.type === "timestamp") {
-        tableColumn.Cell = props =>
-          moment(new Date(props.value)).format("MMM D, YYYY");
-      } else if (schemaForColumn.type === "boolean") {
-        tableColumn.Cell = props => (props.value ? "True" : "False");
-      }
       if (cellRenderer && cellRenderer[schemaForColumn.path]) {
         tableColumn.Cell = row => {
           const val = cellRenderer[schemaForColumn.path](
@@ -518,7 +529,18 @@ class ReactDataTable extends React.Component {
           );
           return val;
         };
+      } else if (schemaForColumn.render) {
+        tableColumn.Cell = row => {
+          const val = schemaForColumn.render(row.value, row.original, row);
+          return val;
+        };
+      } else if (schemaForColumn.type === "timestamp") {
+        tableColumn.Cell = props =>
+          moment(new Date(props.value)).format("MMM D, YYYY");
+      } else if (schemaForColumn.type === "boolean") {
+        tableColumn.Cell = props => (props.value ? "True" : "False");
       }
+
       columnsToRender.push(tableColumn);
     });
     return columnsToRender;
@@ -547,6 +569,7 @@ class ReactDataTable extends React.Component {
     } = this.props;
     const schemaIndex = column["schemaIndex"];
     const schemaForField = schema.fields[schemaIndex];
+    const { renderTitleInner } = schemaForField;
     const { displayName, sortDisabled } = schemaForField;
     const columnDataType = schemaForField.type;
     const ccDisplayName = camelCase(displayName);
@@ -577,7 +600,7 @@ class ReactDataTable extends React.Component {
     return (
       <div className={"tg-react-table-column-header"}>
         <span title={displayName} className={"tg-react-table-name"}>
-          {displayName + "  "}
+          {renderTitleInner ? renderTitleInner : displayName + "  "}
         </span>
         {!sortDisabled && (
           <div className={"tg-sort-arrow-container"}>
@@ -645,7 +668,7 @@ export default compose(
       return {};
     }
   }),
-  reduxForm() //the formname is passed via withTableParams and is often user overridden
+  reduxForm() //the formName is passed via withTableParams and is often user overridden
 )(props => {
   return (
     <Fields

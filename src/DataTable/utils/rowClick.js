@@ -6,7 +6,8 @@ import {
 import getIdOrCode from "./getIdOrCode";
 
 export default (e, rowInfo, entities, props) => {
-  const rowId = getIdOrCode(rowInfo.original);
+  const entity = rowInfo.original;
+  const rowId = getIdOrCode(entity);
   if (rowId === undefined) return;
 
   const { reduxFormSelectedEntityIdMap, isSingleSelect } = props;
@@ -14,7 +15,10 @@ export default (e, rowInfo, entities, props) => {
   const oldIdMap = reduxFormSelectedEntityIdMap.input.value || {};
   const rowSelected = oldIdMap[rowId];
   let newIdMap = {
-    [rowId]: new Date()
+    [rowId]: {
+      time: new Date(),
+      entity
+    }
   };
 
   if (isSingleSelect) {
@@ -34,7 +38,9 @@ export default (e, rowInfo, entities, props) => {
     };
   } else if (e.shiftKey && !isEmpty(oldIdMap)) {
     newIdMap = {
-      [rowId]: true
+      [rowId]: {
+        entity
+      }
     };
     const currentlySelectedRowIndices = getSelectedRowsFromEntities(
       entities,
@@ -45,11 +51,11 @@ export default (e, rowInfo, entities, props) => {
         id: null,
         time: null
       };
-      forEach(oldIdMap, (value, key) => {
-        if (typeof value !== "boolean" && value > timeToBeat.time)
+      forEach(oldIdMap, ({ time }, key) => {
+        if (time && time > timeToBeat.time)
           timeToBeat = {
             id: key,
-            time: value
+            time
           };
       });
       const mostRecentlySelectedIndex = entities.findIndex(e => {
@@ -82,7 +88,7 @@ export default (e, rowInfo, entities, props) => {
             : rowInfo.index;
         range(lowRange, highRange + 1).forEach(i => {
           const recordId = entities[i] && getIdOrCode(entities[i]);
-          if (recordId || recordId === 0) newIdMap[recordId] = true;
+          if (recordId || recordId === 0) newIdMap[recordId] = { entity };
         });
         newIdMap = {
           ...oldIdMap,
@@ -101,10 +107,13 @@ export function finalizeSelection({ idMap, props }) {
     entities,
     onDeselect,
     onSingleRowSelect,
-    onMultiRowSelect
+    onMultiRowSelect,
+    onRowSelect
   } = props;
   reduxFormSelectedEntityIdMap.input.onChange(idMap);
   const selectedRecords = getSelectedRecordsFromEntities(entities, idMap);
+  onRowSelect(selectedRecords);
+
   selectedRecords.length === 0
     ? onDeselect()
     : selectedRecords.length > 1

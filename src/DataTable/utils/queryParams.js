@@ -23,7 +23,7 @@ export { pageSizes };
 
 export function getMergedOpts(topLevel = {}, instanceLevel = {}) {
   return {
-    formname: "tgDataTable",
+    formName: "tgDataTable",
     ...topLevel,
     ...instanceLevel,
     defaults: {
@@ -605,13 +605,10 @@ export function getQueryParams({
     }
 
     graphqlQueryParams.filter = qb.toJSON();
-
-    console.log("graphqlQueryParams:", graphqlQueryParams);
-
     return {
       ...toReturn,
-      //the query params get passed directly to graphql
-      queryParams: graphqlQueryParams,
+      //the query params will get passed directly to as variables to the graphql query
+      variables: graphqlQueryParams,
       errorParsingUrlString
     };
   }
@@ -639,6 +636,5 @@ function getQueries(filters, qb, ccFields) {
     }
     return acc;
   }, {});
-  console.log("subQueries:", subQueries);
   return subQueries;
 }
