@@ -520,12 +520,6 @@ class ReactDataTable extends React.Component {
       if (column.width) {
         tableColumn.width = column.width;
       }
-      if (schemaForColumn.type === "timestamp") {
-        tableColumn.Cell = props =>
-          moment(new Date(props.value)).format("MMM D, YYYY");
-      } else if (schemaForColumn.type === "boolean") {
-        tableColumn.Cell = props => (props.value ? "True" : "False");
-      }
       if (cellRenderer && cellRenderer[schemaForColumn.path]) {
         tableColumn.Cell = row => {
           const val = cellRenderer[schemaForColumn.path](
@@ -535,7 +529,18 @@ class ReactDataTable extends React.Component {
           );
           return val;
         };
+      } else if (schemaForColumn.render) {
+        tableColumn.Cell = row => {
+          const val = schemaForColumn.render(row.value, row.original, row);
+          return val;
+        };
+      } else if (schemaForColumn.type === "timestamp") {
+        tableColumn.Cell = props =>
+          moment(new Date(props.value)).format("MMM D, YYYY");
+      } else if (schemaForColumn.type === "boolean") {
+        tableColumn.Cell = props => (props.value ? "True" : "False");
       }
+
       columnsToRender.push(tableColumn);
     });
     return columnsToRender;
@@ -564,6 +569,7 @@ class ReactDataTable extends React.Component {
     } = this.props;
     const schemaIndex = column["schemaIndex"];
     const schemaForField = schema.fields[schemaIndex];
+    const { renderTitleInner } = schemaForField;
     const { displayName, sortDisabled } = schemaForField;
     const columnDataType = schemaForField.type;
     const ccDisplayName = camelCase(displayName);
@@ -594,7 +600,7 @@ class ReactDataTable extends React.Component {
     return (
       <div className={"tg-react-table-column-header"}>
         <span title={displayName} className={"tg-react-table-name"}>
-          {displayName + "  "}
+          {renderTitleInner ? renderTitleInner : displayName + "  "}
         </span>
         {!sortDisabled && (
           <div className={"tg-sort-arrow-container"}>

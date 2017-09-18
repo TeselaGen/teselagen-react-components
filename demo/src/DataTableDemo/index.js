@@ -31,7 +31,23 @@ const schema: DataTableSchema = {
     },
     { path: "type", type: "lookup", displayName: "Special Type" },
     { path: "isShared", type: "boolean", displayName: "Is Shared?" },
-    { path: "name", type: "string", displayName: "Name" },
+    {
+      path: "name",
+      type: "string",
+      displayName: "Name",
+      render: (value, record, row) => {
+        return (
+          <span
+            style={{
+              color: (Math.random() > .5) ? "green" : "red"
+            }}
+          >
+            {value}
+          </span>
+        );
+      },
+      renderTitleInner: <span className={'pt-icon-search-around'}> &nbsp; Name</span> 
+    },
     { path: "createdAt", type: "timestamp", displayName: "Date Created" },
     { path: "updatedAt", type: "timestamp", displayName: "Last Edited" },
     {
@@ -198,11 +214,7 @@ export class DataTableInstance extends React.Component {
   };
 
   render() {
-    const {
-      numOfEntities,
-      entities,
-      selectedIds
-    } = this.state;
+    const { numOfEntities, entities, selectedIds } = this.state;
     const { tableParams, selectedEntities } = this.props;
     const { page, pageSize, isTableParamsConnected } = tableParams;
     let entitiesToPass = [];
@@ -270,14 +282,24 @@ export class DataTableInstance extends React.Component {
           "maxHeight",
           "By default every table has a max height of 800px. Setting this true changes it to 200px"
         )}
-        {selectedEntities && <div>
-          The following records are selected (pass withSelectedEntities: true to withTableParams):
-          <div style={{ height: 40, maxHeight: 40, maxWidth: 800, overflow: 'auto' }}>
-            {selectedEntities
+        {selectedEntities && (
+          <div>
+            The following records are selected (pass withSelectedEntities: true
+            to withTableParams):
+            <div
+              style={{
+                height: 40,
+                maxHeight: 40,
+                maxWidth: 800,
+                overflow: "auto"
+              }}
+            >
+              {selectedEntities
                 .map(record => `${record.id}: ${record.name}`)
                 .join(", ")}
+            </div>
           </div>
-        </div>}
+        )}
         <DataTable
           {...tableParams}
           entities={entitiesToPass}

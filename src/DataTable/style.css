@@ -101,7 +101,12 @@
   justify-content: flex-start;
 }
 
-.tg-react-table-column-header:hover * {
+.tg-react-table-column-header:hover > * {
+  transition: 0.2s;
+  display: inherit !important;
+}
+
+.tg-react-table-column-header:hover .tg-sort-arrow-container > * {
   transition: 0.2s;
   display: inherit !important;
 }
