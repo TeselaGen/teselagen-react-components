@@ -1,7 +1,8 @@
 import React from "react";
+import axios from "axios";
 import Dropzone from "react-dropzone";
 import { first } from "lodash";
-
+function noop() {}
 export default props => {
   const {
     accept,
@@ -14,7 +15,7 @@ export default props => {
     fileLimit,
     beforeUpload,
     fileList,
-    onChange,
+    onChange = noop,
     fileListItemRenderer
   } = props;
   let acceptToUse = Array.isArray(accept) ? accept.join(", ") : accept;
@@ -49,6 +50,35 @@ export default props => {
             }
             console.log("acceptedFiles:", acceptedFiles);
             onChange(acceptedFiles);
+
+            if (action) {
+              const data = new FormData();
+              acceptedFiles.forEach(file => {
+                data.append("file", file);
+              });
+
+              const config = {
+                onUploadProgress: function(progressEvent) {
+                  let percentCompleted = Math.round(
+                    progressEvent.loaded * 100 / progressEvent.total
+                  );
+                  console.log("percentCompleted:", percentCompleted);
+                }
+              };
+
+              axios
+                .put(action, data, config)
+                .then(function(res) {
+                  onChange(res.data);
+                })
+                .catch(function(err) {
+                  console.log("err:", err);
+                  {
+                    /* output.className = 'container text-danger';
+                  output.innerHTML = err.message; */
+                  }
+                });
+            }
 
             //if (beforeAction) {
             //}

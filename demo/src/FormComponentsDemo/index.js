@@ -40,6 +40,7 @@ class FormComponentsDemo extends React.Component {
               Blueprint Redux Form Components
             </h3>
             <Uploader
+              action={'docs.google.com/upload'}
               fileList={[
                 {
                   uid: 1, //you must set a unique id for this to work properly
