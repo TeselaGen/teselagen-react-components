@@ -9,7 +9,7 @@ import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
  * @param {string | gql fragment} nameOrFragment supply either a name or a top-level fragment
  * @param options 
  *    @param refetchQueries {[queryNameStrings]} 
- *    @param mutationName {string} optional rename of the default upsert function withXXXX to whatever you want
+ *    @param mutationName {string} optional rename of the default delete function deleteXXXX to whatever you want
  *    @param extraMutateArgs {obj | function} obj or function that returns obj to get passed to the actual mutation call
  *    @param showError {boolean} default=true -- whether or not to show a default error message on failure
  TODO *    @param invalidate {[string]} array of model types to invalidate after the mutate
@@ -53,8 +53,8 @@ export default function(nameOrFragment, options = {}) {
 
   /*eslint-enable*/
   return graphql(deleteByIdsMutation, {
-    props: ({ mutate }) => ({
-      [mutationName || `deleteEntities`]: (...args) => {
+    props: ({ mutate }) => {
+      function deleteMutation(...args) {
         const [maybeIdArray, { isCode } = {}] = args;
         const idArray = Array.isArray(maybeIdArray)
           ? maybeIdArray
@@ -106,7 +106,16 @@ export default function(nameOrFragment, options = {}) {
             throw e; //rethrow the error so it can be caught again if need be
           });
       }
-    }),
+      const toReturn = {
+        deleteEntities: deleteMutation,
+        [recordType]: deleteMutation
+      };
+      if (mutationName) {
+        toReturn[mutationName] = deleteMutation;
+      }
+      return toReturn;
+    },
+
     ...rest
   });
 }
