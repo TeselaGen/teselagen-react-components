@@ -10,9 +10,9 @@ import ReactList from "react-list";
 import "./style.css";
 import Combokeys from "combokeys";
 
-var defaultContainerWidth = 400;
-var defaultCharWidth = 12;
-var defaultMarginWidth = 50;
+let defaultContainerWidth = 400;
+let defaultCharWidth = 12;
+let defaultMarginWidth = 50;
 
 function noop() {}
 
@@ -33,30 +33,30 @@ const defaultProps = {
 
 class RowView extends React.Component {
   getNearestCursorPositionToMouseEvent(rowData, event, callback) {
-    var { charWidth = defaultCharWidth } = {
+    let { charWidth = defaultCharWidth } = {
       ...defaultProps,
       ...this.props.veWrapperProvidedProps,
       ...this.props
     };
-    var rowNotFound = true;
-    var visibleRowsContainer = this.InfiniteScroller.items;
+    let rowNotFound = true;
+    let visibleRowsContainer = this.InfiniteScroller.items;
     //loop through all the rendered rows to see if the click event lands in one of them
-    var nearestCaretPos = 0;
+    let nearestCaretPos = 0;
     some(visibleRowsContainer.childNodes, function(rowDomNode) {
-      var boundingRowRect = rowDomNode.getBoundingClientRect();
+      let boundingRowRect = rowDomNode.getBoundingClientRect();
       if (
         event.clientY > boundingRowRect.top &&
         event.clientY < boundingRowRect.top + boundingRowRect.height
       ) {
         //then the click is falls within this row
         rowNotFound = false;
-        var row = rowData[Number(rowDomNode.getAttribute("data-row-number"))];
+        let row = rowData[Number(rowDomNode.getAttribute("data-row-number"))];
         if (event.clientX - boundingRowRect.left < 0) {
           nearestCaretPos = row.start;
         } else {
-          var clickXPositionRelativeToRowContainer =
+          let clickXPositionRelativeToRowContainer =
             event.clientX - boundingRowRect.left;
-          var numberOfBPsInFromRowStart = Math.floor(
+          let numberOfBPsInFromRowStart = Math.floor(
             (clickXPositionRelativeToRowContainer + charWidth / 2) / charWidth
           );
           nearestCaretPos = numberOfBPsInFromRowStart + row.start;
@@ -68,10 +68,10 @@ class RowView extends React.Component {
       }
     });
     if (rowNotFound) {
-      var { top, bottom } = visibleRowsContainer.getBoundingClientRect();
-      var numbers = [top, bottom];
-      var target = event.clientY;
-      var topOrBottom = numbers
+      let { top, bottom } = visibleRowsContainer.getBoundingClientRect();
+      let numbers = [top, bottom];
+      let target = event.clientY;
+      let topOrBottom = numbers
         .map(function(value, index) {
           return [Math.abs(value - target), index];
         })
@@ -79,7 +79,7 @@ class RowView extends React.Component {
         .map(function(value) {
           return numbers[value[1]];
         })[0];
-      var rowDomNode;
+      let rowDomNode;
       if (topOrBottom === top) {
         rowDomNode = visibleRowsContainer.childNodes[0];
       } else {
@@ -89,7 +89,7 @@ class RowView extends React.Component {
           ];
       }
       if (rowDomNode) {
-        var row = rowData[Number(rowDomNode.getAttribute("data-row-number"))];
+        let row = rowData[Number(rowDomNode.getAttribute("data-row-number"))];
         //return the last bp index in the rendered rows
         nearestCaretPos = row.end;
       } else {
@@ -113,9 +113,9 @@ class RowView extends React.Component {
   }
 
   componentDidMount() {
-    var self = this;
+    let self = this;
 
-    var {
+    let {
       sequenceDataInserted = noop,
       backspacePressed = noop,
       selectAll = noop,
@@ -163,7 +163,7 @@ class RowView extends React.Component {
         }
       );
 
-    var moveCaretBindings = [
+    let moveCaretBindings = [
       { keyCombo: ["left", "shift+left"], type: "moveCaretLeftOne" },
       { keyCombo: ["right", "shift+right"], type: "moveCaretRightOne" },
       { keyCombo: ["up", "shift+up"], type: "moveCaretUpARow" },
@@ -188,13 +188,13 @@ class RowView extends React.Component {
 
     moveCaretBindings.forEach(function({ keyCombo, type }) {
       self.combokeys.bind(keyCombo, function(event) {
-        var shiftHeld = event.shiftKey;
-        var bpsPerRow = getBpsPerRow({
+        let shiftHeld = event.shiftKey;
+        let bpsPerRow = getBpsPerRow({
           ...defaultProps,
           ...self.props.veWrapperProvidedProps,
           ...self.props
         });
-        var {
+        let {
           selectionLayer,
           caretPosition,
           sequenceLength,
@@ -206,7 +206,7 @@ class RowView extends React.Component {
           ...self.props.veWrapperProvidedProps,
           ...self.props
         };
-        var moveBy = moveCaret({
+        let moveBy = moveCaret({
           sequenceLength,
           bpsPerRow,
           caretPosition,
@@ -249,28 +249,22 @@ class RowView extends React.Component {
   }
 
   componentWillReceiveProps(props) {
-    // var {keydown} = props
-    // if ( keydown && keydown.event ) {
-    //   // inspect the keydown event and decide what to do
-    //   console.log( keydown.event.which );
-    //   debugger
-    // }
-    var thisPropsToUse = {
+    let thisPropsToUse = {
       ...defaultProps,
       ...this.props.veWrapperProvidedProps,
       ...this.props
     };
-    var propsToUse = {
+    let propsToUse = {
       ...defaultProps,
       ...props.veWrapperProvidedProps,
       ...props
     };
 
-    var { caretPosition, selectionLayer } = propsToUse;
-    var bpsPerRow = getBpsPerRow(propsToUse);
+    let { caretPosition, selectionLayer } = propsToUse;
+    let bpsPerRow = getBpsPerRow(propsToUse);
     //UPDATE THE ROW VIEW'S POSITION BASED ON CARET OR SELECTION CHANGES
-    var previousBp;
-    var scrollToBp = -1;
+    let previousBp;
+    let scrollToBp = -1;
     if (caretPosition > -1 && caretPosition !== thisPropsToUse.caretPosition) {
       previousBp = thisPropsToUse.caretPosition;
       scrollToBp = caretPosition;
@@ -288,8 +282,8 @@ class RowView extends React.Component {
       scrollToBp = selectionLayer.end;
     }
     if (scrollToBp > -1 && this.InfiniteScroller.scrollTo) {
-      var rowToScrollTo = Math.floor(scrollToBp / bpsPerRow);
-      var [start, end] = this.InfiniteScroller.getVisibleRange();
+      let rowToScrollTo = Math.floor(scrollToBp / bpsPerRow);
+      let [start, end] = this.InfiniteScroller.getVisibleRange();
       if (rowToScrollTo < start || rowToScrollTo > end) {
         this.InfiniteScroller.scrollTo(rowToScrollTo, {
           jumpToBottomOfRow: scrollToBp > previousBp
@@ -299,12 +293,12 @@ class RowView extends React.Component {
   }
 
   render() {
-    var propsToUse = {
+    let propsToUse = {
       ...defaultProps,
       ...this.props.veWrapperProvidedProps,
       ...this.props
     };
-    var {
+    let {
       //currently found in props
       sequenceData,
       // bpToJumpTo,
@@ -321,14 +315,14 @@ class RowView extends React.Component {
     if (marginWidth < defaultMarginWidth) {
       marginWidth = defaultMarginWidth;
     }
-    var containerWidthMinusMargin = width - marginWidth;
-    var bpsPerRow = getBpsPerRow(propsToUse);
+    let containerWidthMinusMargin = width - marginWidth;
+    let bpsPerRow = getBpsPerRow(propsToUse);
     //the width we pass to the rowitem needs to be the exact width of the bps so we need to trim off any extra space:
-    var containerWidthMinusMarginMinusAnyExtraSpaceUpTo1Bp =
+    let containerWidthMinusMarginMinusAnyExtraSpaceUpTo1Bp =
       Math.floor(containerWidthMinusMargin / propsToUse.charWidth) * bpsPerRow;
-    var rowData = prepareRowData(sequenceData, bpsPerRow);
-    var showJumpButtons = rowData.length > 15;
-    var renderItem = (index, key) => {
+    let rowData = prepareRowData(sequenceData, bpsPerRow);
+    let showJumpButtons = rowData.length > 15;
+    let renderItem = (index, key) => {
       if (showJumpButtons) {
         if (index === 0) {
           return (
@@ -360,7 +354,7 @@ class RowView extends React.Component {
           );
         }
       }
-      var indexToUse = showJumpButtons ? index - 1 : index;
+      let indexToUse = showJumpButtons ? index - 1 : index;
       if (rowData[indexToUse]) {
         return (
           <div data-row-number={indexToUse} key={key}>
@@ -409,7 +403,7 @@ class RowView extends React.Component {
             overflowY: "auto",
             overflowX: "visible",
             height,
-            width: width,
+            width,
             paddingLeft: marginWidth / 2
           }}
           onScroll={onScroll}

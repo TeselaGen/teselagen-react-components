@@ -6,8 +6,7 @@ import PropTypes from "prop-types";
 import React from "react";
 
 // import './style.css'
-import getXStartAndWidthOfRowAnnotation
-  from "../getXStartAndWidthOfRowAnnotation";
+import getXStartAndWidthOfRowAnnotation from "../getXStartAndWidthOfRowAnnotation";
 
 import getAnnotationRangeType from "ve-range-utils/getAnnotationRangeType";
 import Primer from "./Primer";
@@ -15,7 +14,7 @@ import AnnotationContainerHolder from "../AnnotationContainerHolder";
 import AnnotationPositioner from "../AnnotationPositioner";
 
 function Primers(props) {
-  var {
+  let {
     annotationRanges = [],
     bpsPerRow,
     charWidth,
@@ -33,7 +32,7 @@ function Primers(props) {
   let maxAnnotationYOffset = 0;
   let annotationsSVG = [];
   forEach(annotationRanges, function(annotationRange, index) {
-    var seqInRow = getSequenceWithinRange(annotationRange, sequence);
+    let seqInRow = getSequenceWithinRange(annotationRange, sequence);
     if (annotationRange.yOffset > maxAnnotationYOffset) {
       maxAnnotationYOffset = annotationRange.yOffset;
     }
@@ -43,16 +42,6 @@ function Primers(props) {
       bpsPerRow,
       charWidth
     );
-    // var isStart = annotationRange.enclosingRangeType === "beginningAndEnd" || annotationRange.enclosingRangeType === "beginningAndEnd"
-    // console.log('annotationRange:', annotationRange)
-    // console.log('isStart:', isStart)
-    // var {color='orange'} = annotation
-    // var {startOffset} = result
-    // var width = seqInRow.length * charWidth
-    // var height = annotationHeight
-    // var bufferBottom = 4
-    // var bufferLeft = 2
-    // var arrowHeight = isStart ? 8 : 0
     annotationsSVG.push(
       <HoverHelper
         passJustOnMouseOverAndClassname
@@ -69,7 +58,7 @@ function Primers(props) {
             key={index}
             top={
               annotationRange.yOffset *
-                (annotationHeight + spaceBetweenAnnotations)
+              (annotationHeight + spaceBetweenAnnotations)
             }
             left={result.xStart}
           >
@@ -91,7 +80,6 @@ function Primers(props) {
               name={annotation.name}
             />
           </AnnotationPositioner>
-
         </div>
       </HoverHelper>
     );
