@@ -13,7 +13,6 @@ function emptyPromise() {
 export default props => {
   const {
     accept,
-    inputProps = {},
     contentOverride,
     innerIcon,
     innerText,
@@ -24,19 +23,21 @@ export default props => {
     showUploadList = true,
     beforeUpload,
     fileList,
-    onFileSuccess = emptyPromise,
-    onFieldSubmit = noop,
-    onRemove = noop,
-    onChange = noop,
-    fileListItemRenderer
+    fileListItemRenderer, // handle rendering the file list items yourself :)
+    onFileSuccess = emptyPromise, //called each time a file is finished and before the file.loading gets set to false, needs to return a promise!
+    onFieldSubmit = noop, //called when all files have successfully uploaded
+    onRemove = noop, //called when a file has been selected to be removed
+    onChange = noop, //this is almost always getting passed by redux-form, no need to pass this handler manually
+    ...rest //everything else gets spread on the <Dropzone/> https://react-dropzone.js.org/
   } = props;
-  let acceptToUse = Array.isArray(accept) ? accept.join(", ") : accept;
 
+  let acceptToUse = Array.isArray(accept) ? accept.join(", ") : accept;
   let fileListToUse = fileList ? fileList : [];
   return (
     <div>
       <Dropzone
         className={"tg-dropzone " + className}
+        multiple={fileLimit !== 1}
         activeClassName={"tg-dropzone-active"}
         rejectClassName={"tg-dropzone-reject"}
         //acceptClassName={"tg-dropzone-accept"} //tnr: commenting these out temporarily until https://github.com/react-dropzone/react-dropzone/pull/504 gets merged
@@ -146,6 +147,7 @@ export default props => {
             //}
           }
         }}
+        {...rest}
       >
         {contentOverride || (
           <div
@@ -197,19 +199,20 @@ export default props => {
                   {" "}
                   {name || originalName}{" "}
                 </a>
-                <span
-                  style={{ fontSize: "13px" }}
-                  className={"tg-upload-file-list-item-close pt-icon-cross"}
-                  onClick={() => {
-                    onRemove(file, index, fileList);
-
-                    onChange(
-                      fileList.filter((file, index2) => {
-                        return index2 !== index;
-                      })
-                    );
-                  }}
-                />
+                {!loading && (
+                  <span
+                    style={{ fontSize: "13px" }}
+                    className={"tg-upload-file-list-item-close pt-icon-cross"}
+                    onClick={() => {
+                      onRemove(file, index, fileList);
+                      onChange(
+                        fileList.filter((file, index2) => {
+                          return index2 !== index;
+                        })
+                      );
+                    }}
+                  />
+                )}
               </div>
             );
           })}
