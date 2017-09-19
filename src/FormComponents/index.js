@@ -210,7 +210,7 @@ export const renderFileUpload = props => {
   return (
     <Uploader
       fileList={input.value}
-      onSuccess={onFieldSubmit}
+      onFieldSubmit={onFieldSubmit}
       {...rest}
       onChange={input.onChange}
     />

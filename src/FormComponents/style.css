@@ -34,10 +34,15 @@
 .tg-dropzone {
   width: 100% !important;
   height: 100% !important;
-  border-width: 2px;
-  border-color: rgb(102, 102, 102);
+  border-width: 1px;
+  border-color: #d9d9d9;
   border-style: dashed;
   border-radius: 5px;
+  cursor: pointer;
+  transition: all 1s;
+}
+.tg-dropzone:hover {
+  border-color: rgb(91, 157, 211);
 }
 .tg-dropzone-active {
   border-color: rgb(91, 157, 211);
