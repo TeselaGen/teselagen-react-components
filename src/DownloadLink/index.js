@@ -1,19 +1,6 @@
 import React from "react";
 
 export default class DownloadLink extends React.Component {
-  propTypes: {
-    filename: React.PropTypes.string,
-    getFileString: React.PropTypes.func,
-    fileString: React.PropTypes.string
-  };
-
-  getDefaultProps() {
-    return {
-      filename: "file.txt",
-      fileString: "File text goes here"
-    };
-  }
-
   handleDownloadClick = event => {
     function magicDownload(text, fileName) {
       let blob = new Blob([text], {
