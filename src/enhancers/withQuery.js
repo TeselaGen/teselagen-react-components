@@ -110,7 +110,7 @@ export default function withQuery(fragment, options = {}) {
         if (getIdFromParams) {
           const id = parseInt(get(props, "match.params.id"), 10);
           if (!id) {
-            console.log(
+            console.error(
               "There needs to be an id passed here to ",
               queryNameToUse,
               "but none was found"

@@ -16,7 +16,7 @@ export default props => {
     action,
     className = "",
     fileLimit,
-    uploadInBulk,
+    uploadInBulk, //tnr: not yet implemented
     showUploadList = true,
     beforeUpload,
     fileList,
@@ -26,21 +26,15 @@ export default props => {
     fileListItemRenderer
   } = props;
   let acceptToUse = Array.isArray(accept) ? accept.join(", ") : accept;
-  // const fileMap = fileList.reduce((acc,file)=>{
-  //   if (!file.id) {
-  //     throw new Error('Please pass files with unique .id fields to Uploader so it can keep track')
-  //   }
-  //   acc[file.id] = new;
-  //   return acc;
-  // }, {})
+
   let fileListToUse = fileList ? fileList : [];
   return (
     <div>
       <Dropzone
         className={"tg-dropzone " + className}
         activeClassName={"tg-dropzone-active"}
-        //acceptClassName={"tg-dropzone-accept"}
         rejectClassName={"tg-dropzone-reject"}
+        //acceptClassName={"tg-dropzone-accept"} //tnr: commenting these out temporarily until https://github.com/react-dropzone/react-dropzone/pull/504 gets merged
         //disabledClassName={"tg-dropzone-disabled"}
         accept={acceptToUse}
         {...{
@@ -83,7 +77,8 @@ export default props => {
               });
 
               if (uploadInBulk) {
-                const config = {
+                //tnr: not yet implemented
+                /* const config = {
                   onUploadProgress: function(progressEvent) {
                     let percentCompleted = Math.round(
                       progressEvent.loaded * 100 / progressEvent.total
@@ -97,8 +92,7 @@ export default props => {
                     onChange(res.data);
                   })
                   .catch(function(err) {
-                    console.log("err:", err);
-                  });
+                  }); */
               } else {
                 const responses = [];
                 Promise.all(
@@ -106,7 +100,6 @@ export default props => {
                     return axios
                       .post(action, data)
                       .then(function(res) {
-                        console.log("res:", res);
                         responses.push(res.data && res.data[0]);
                         onChange(
                           (fileListToUse = fileListToUse.map(file => {
@@ -137,7 +130,6 @@ export default props => {
                       });
                   })
                 ).then(() => {
-                  console.log("responses:", responses);
                   onFieldSubmit(responses);
                 });
               }

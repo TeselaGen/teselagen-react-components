@@ -83,7 +83,6 @@ export default function withUpsert(nameOrFragment, options = {}) {
         throw new Error(
           'The invalidate option should be an array of model name strings eg ["user", "workflowRun"]'
         );
-      console.log("invalidate:", invalidate);
       extraArgs = { options: invalidateQueriesOfTypes(invalidate) };
     }
     if (typeof extraMutateArgs === "function") {
@@ -91,7 +90,6 @@ export default function withUpsert(nameOrFragment, options = {}) {
     } else {
       extraArgs = { ...extraArgs, ...extraMutateArgs };
     }
-    console.log("extraArgs:", JSON.stringify(extraArgs, null, 4));
     return extraArgs;
   };
 
@@ -154,9 +152,7 @@ export default function withUpsert(nameOrFragment, options = {}) {
               variables: {
                 input
               },
-              props: function(...args) {
-                console.logs(...args);
-              },
+              refetchQueries,
               ...getExtraMutateArgs(...args)
             });
           }
