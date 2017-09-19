@@ -15,13 +15,46 @@ import store from './store';
 import Perf from 'react-addons-perf'
 
 const demos = {
-  vectoreditor: VectorEditorDemo,
-  datatable: DataTableDemo,
-  infopopover: InfoPopoverDemo,
-  loading: LoadingDemo,
-  downloadLink: DownloadLinkDemo,
-  formcomponents: FormComponentsDemo,
-  fonticons: FontIconsDemo,
+  vectoreditor: {
+    demo: VectorEditorDemo,
+    url: 'https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/VectorEditorDemo/index.js'
+  },
+  datatable: {
+    demo: DataTableDemo,
+    url: 'https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/DataTableDemo/index.js'
+  },
+  infopopover: {
+    demo: InfoPopoverDemo,
+    url: 'https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/InfoPopoverDemo/index.js'
+  },
+  loading: {
+    demo: LoadingDemo,
+    url: 'https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/LoadingDemo/index.js'
+  },
+  downloadLink: {
+    demo: DownloadLinkDemo,
+    url: 'https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/DownloadLinkDemo/index.js'
+  },
+  formcomponents: {
+    demo: FormComponentsDemo,
+    url: 'https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/FormComponentsDemo/index.js'
+  },
+  fonticons: {
+    demo: FontIconsDemo,
+    url: 'https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/FontIconsDemo/index.js'
+  },
+}
+
+function DemoComponentWrapper({demo: Demo, url}) {
+    return () => {
+      return <div>
+        <br></br>
+        <Demo></Demo>
+        <br/>
+        <br/>
+        <a href={url}> See demo source! </a>
+      </div>
+    }
 }
 
 // Make the Perf object global for debugging purposes.
@@ -36,7 +69,7 @@ const Demo = () => {
             <Route path="/" component={HomePage} />
             {
               Object.keys(demos).map(function (key, index) {
-                return <Route key={index} path={`/${key}`} component={demos[key]} />
+                return <Route key={index} path={`/${key}`} url={demos[key].url} component={DemoComponentWrapper(demos[key])} />
               })
             }
           </div>
