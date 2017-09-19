@@ -106,7 +106,12 @@ export default function withQuery(fragment, options = {}) {
       //default options
 
       options: props => {
-        const { variables, ...rest } = props;
+        const {
+          variables,
+          fetchPolicy,
+          pollInterval,
+          notifyOnNetworkStatusChange
+        } = props;
         if (getIdFromParams) {
           const id = parseInt(get(props, "match.params.id"), 10);
           if (!id) {
@@ -122,12 +127,17 @@ export default function withQuery(fragment, options = {}) {
           return {
             variables: {
               id
-            }
+            },
+            fetchPolicy,
+            pollInterval,
+            notifyOnNetworkStatusChange
           };
         }
         return {
           variables,
-          ...rest
+          fetchPolicy,
+          pollInterval,
+          notifyOnNetworkStatusChange
         };
       },
       props: (...args) => {
