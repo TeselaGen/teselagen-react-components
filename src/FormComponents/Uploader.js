@@ -6,6 +6,10 @@ import uniqid from "uniqid";
 import classnames from "classnames";
 
 function noop() {}
+function emptyPromise() {
+  //wink wink
+  return Promise.resolve;
+}
 export default props => {
   const {
     accept,
@@ -20,6 +24,7 @@ export default props => {
     showUploadList = true,
     beforeUpload,
     fileList,
+    onFileSuccess = emptyPromise,
     onFieldSubmit = noop,
     onRemove = noop,
     onChange = noop,
@@ -101,15 +106,17 @@ export default props => {
                       .post(action, data)
                       .then(function(res) {
                         responses.push(res.data && res.data[0]);
-                        onChange(
-                          (fileListToUse = fileListToUse.map(file => {
-                            const fileToReturn = { ...file };
-                            if (fileToReturn.id === fileToUpload.id) {
-                              fileToReturn.loading = false;
-                            }
-                            return fileToReturn;
-                          }))
-                        );
+                        onFileSuccess(res.data[0]).then(() => {
+                          onChange(
+                            (fileListToUse = fileListToUse.map(file => {
+                              const fileToReturn = { ...file };
+                              if (fileToReturn.id === fileToUpload.id) {
+                                fileToReturn.loading = false;
+                              }
+                              return fileToReturn;
+                            }))
+                          );
+                        });
                       })
                       .catch(function(err) {
                         console.error("Error uploading file:", err);
@@ -122,7 +129,7 @@ export default props => {
                             const fileToReturn = { ...file };
                             if (fileToReturn.id === fileToUpload.id) {
                               fileToReturn.loading = false;
-                              fileToReturn.status = true;
+                              fileToReturn.error = true;
                             }
                             return fileToReturn;
                           }))
