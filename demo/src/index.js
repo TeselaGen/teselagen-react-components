@@ -6,6 +6,7 @@ import InfoPopoverDemo from './InfoPopoverDemo/index.js'
 import {withUpsert, withQuery} from '../../src'
 import VectorEditorDemo from './VectorEditorDemo/index.js'
 import LoadingDemo from './LoadingDemo/index.js'
+import DownloadLinkDemo from './DownloadLinkDemo/index.js'
 import FormComponentsDemo from './FormComponentsDemo'
 import FontIconsDemo from './FontIconsDemo'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
@@ -18,6 +19,7 @@ const demos = {
   datatable: DataTableDemo,
   infopopover: InfoPopoverDemo,
   loading: LoadingDemo,
+  downloadLink: DownloadLinkDemo,
   formcomponents: FormComponentsDemo,
   fonticons: FontIconsDemo,
 }
@@ -48,7 +50,7 @@ render(<Demo />, document.querySelector('#demo'))
 
 function HomePage() {
   return (
-    <div style={{display: 'flex'}}>
+    <div style={{display: 'flex', flexWrap: 'wrap'}}>
       {
         Object.keys(demos).map(function (name, index) {
           return <Link

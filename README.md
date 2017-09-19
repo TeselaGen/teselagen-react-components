@@ -207,7 +207,7 @@ import {
 />
 
 ```
-
+#Development: 
 ## Prerequisites
 
 [Node.js](http://nodejs.org/) >= v4 must be installed.
@@ -219,6 +219,22 @@ import {
 ## Demo Development Server
 
 - `npm start` will run a development server with the component's demo app at [http://localhost:3000](http://localhost:3000) with hot module reloading. You can check the /demo folder for the source code.
+
+## Developing linked to another folder: aka lims/hde
+```
+//link everything up:
+cd lims/node_modules/react
+yarn link 
+cd teselagen-react-components
+yarn link
+yarn link react
+cd lims
+yarn link teselagen-react-components
+
+//start the auto rebuild:
+cd teselagen-react-components
+yarn build-watch
+```
 
 ## Running Tests
 

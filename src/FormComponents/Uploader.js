@@ -169,7 +169,14 @@ export default props => {
       !!fileList.length && (
         <div>
           {fileList.map((file, index) => {
-            const { loading, error, name, originalName, url } = file;
+            const {
+              loading,
+              error,
+              name,
+              originalName,
+              url,
+              downloadName
+            } = file;
             return fileListItemRenderer ? (
               fileListItemRenderer(file)
             ) : (
@@ -186,6 +193,7 @@ export default props => {
                   style={{ width: "100%" }}
                   name={name || originalName}
                   {...(url ? { href: url } : {})}
+                  {...(downloadName ? { download: downloadName } : {})}
                 >
                   {" "}
                   {name || originalName}{" "}

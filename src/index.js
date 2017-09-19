@@ -4,6 +4,7 @@ export {
 } from "./DataTable/utils/withSelectedEntities";
 export { default as DataTable } from "./DataTable";
 export { default as Loading } from "./Loading";
+export { default as DownloadLink } from "./DownloadLink";
 export {
   default as routeDoubleClick
 } from "./DataTable/utils/routeDoubleClick";

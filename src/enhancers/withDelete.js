@@ -2,6 +2,7 @@ import pluralize from "pluralize";
 import pascalCase from "pascal-case";
 import { gql } from "react-apollo";
 import { graphql } from "react-apollo";
+import { camelCase } from "lodash";
 import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
 
 /**
@@ -108,7 +109,7 @@ export default function(nameOrFragment, options = {}) {
       }
       const toReturn = {
         deleteEntities: deleteMutation,
-        [recordType]: deleteMutation
+        [camelCase("delete_" + recordType)]: deleteMutation
       };
       if (mutationName) {
         toReturn[mutationName] = deleteMutation;
