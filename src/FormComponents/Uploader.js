@@ -55,115 +55,119 @@ export default props => {
                 file.id = uniqid();
               }
             });
-            if (beforeUpload) {
-              if (readBeforeUpload) {
-                /* const file = files[0];
-                let reader = new FileReader();
-                reader.readAsText(file, "UTF-8");
-                reader.onload = function(evt: Object) {
-                  const content: string = evt.target.result;
-                  anyToJson(content, result => {
-                    const parsedSequence: SequenceJson = processSequenceJson(
-                      result[0].parsedSequence
-                    );
-                    onCreateSubmit({ parsedSequence });
+
+            Promise.resolve()
+              .then(() => {
+                if (readBeforeUpload) {
+                  return Promise.all(
+                    acceptedFiles.map(file => {
+                      return new Promise((resolve, reject) => {
+                        let reader = new FileReader();
+                        reader.readAsText(file, "UTF-8");
+                        reader.onload = evt => {
+                          resolve(evt.target.result);
+                        };
+                        reader.onerror = err => {
+                          console.error("err:", err);
+                          reject(err);
+                        };
+                      });
+                    })
+                  );
+                } else {
+                  return acceptedFiles;
+                }
+              })
+              .then(acceptedFiles => {
+                return beforeUpload
+                  ? beforeUpload(acceptedFiles, onChange)
+                  : true;
+              })
+              .then(keepGoing => {
+                if (!keepGoing) return;
+                fileListToUse = [
+                  ...acceptedFiles.map(file => {
+                    return {
+                      id: file.id,
+                      lastModified: file.lastModified,
+                      lastModifiedDate: file.lastModifiedDate,
+                      loading: file.loading,
+                      name: file.name,
+                      preview: file.preview,
+                      size: file.size,
+                      type: file.type
+                    };
+                  }),
+                  ...fileListToUse
+                ].slice(0, fileLimit ? fileLimit : undefined);
+                onChange(fileListToUse);
+                if (action) {
+                  const data = new FormData();
+                  acceptedFiles.forEach(file => {
+                    data.append("file", file);
                   });
-                }; 
-                reader.onerror = function() {
-                  window.toastr.error("Failure reading file.");
-                };
-                */
-              }
-              const keepGoing = beforeUpload(acceptedFiles, onChange);
-              if (keepGoing === false) {
-                return;
-              }
-            }
-            fileListToUse = [
-              ...acceptedFiles.map(file => {
-                return {
-                  id: file.id,
-                  lastModified: file.lastModified,
-                  lastModifiedDate: file.lastModifiedDate,
-                  loading: file.loading,
-                  name: file.name,
-                  preview: file.preview,
-                  size: file.size,
-                  type: file.type
-                };
-              }),
-              ...fileListToUse
-            ].slice(0, fileLimit ? fileLimit : undefined);
-            onChange(fileListToUse);
-            if (action) {
-              const data = new FormData();
-              acceptedFiles.forEach(file => {
-                data.append("file", file);
-              });
 
-              if (uploadInBulk) {
-                //tnr: not yet implemented
-                /* const config = {
-                  onUploadProgress: function(progressEvent) {
-                    let percentCompleted = Math.round(
-                      progressEvent.loaded * 100 / progressEvent.total
-                    );
-                  }
-                };
+                  if (uploadInBulk) {
+                    //tnr: not yet implemented
+                    /* const config = {
+                      onUploadProgress: function(progressEvent) {
+                        let percentCompleted = Math.round(
+                          progressEvent.loaded * 100 / progressEvent.total
+                        );
+                      }
+                    };
 
-                axios
-                  .post(action, data, config)
-                  .then(function(res) {
-                    onChange(res.data);
-                  })
-                  .catch(function(err) {
-                  }); */
-              } else {
-                const responses = [];
-                Promise.all(
-                  acceptedFiles.map(fileToUpload => {
-                    return axios
-                      .post(action, data)
+                    axios
+                      .post(action, data, config)
                       .then(function(res) {
-                        responses.push(res.data && res.data[0]);
-                        onFileSuccess(res.data[0]).then(() => {
-                          onChange(
-                            (fileListToUse = fileListToUse.map(file => {
-                              const fileToReturn = { ...file };
-                              if (fileToReturn.id === fileToUpload.id) {
-                                fileToReturn.loading = false;
-                              }
-                              return fileToReturn;
-                            }))
-                          );
-                        });
+                        onChange(res.data);
                       })
                       .catch(function(err) {
-                        console.error("Error uploading file:", err);
-                        responses.push({
-                          ...fileToUpload,
-                          error: err && err.msg ? err.msg : err
-                        });
-                        onChange(
-                          (fileListToUse = fileListToUse.map(file => {
-                            const fileToReturn = { ...file };
-                            if (fileToReturn.id === fileToUpload.id) {
-                              fileToReturn.loading = false;
-                              fileToReturn.error = true;
-                            }
-                            return fileToReturn;
-                          }))
-                        );
-                      });
-                  })
-                ).then(() => {
-                  onFieldSubmit(responses);
-                });
-              }
-            }
-
-            //if (beforeAction) {
-            //}
+                      }); */
+                  } else {
+                    const responses = [];
+                    Promise.all(
+                      acceptedFiles.map(fileToUpload => {
+                        return axios
+                          .post(action, data)
+                          .then(function(res) {
+                            responses.push(res.data && res.data[0]);
+                            onFileSuccess(res.data[0]).then(() => {
+                              onChange(
+                                (fileListToUse = fileListToUse.map(file => {
+                                  const fileToReturn = { ...file };
+                                  if (fileToReturn.id === fileToUpload.id) {
+                                    fileToReturn.loading = false;
+                                  }
+                                  return fileToReturn;
+                                }))
+                              );
+                            });
+                          })
+                          .catch(function(err) {
+                            console.error("Error uploading file:", err);
+                            responses.push({
+                              ...fileToUpload,
+                              error: err && err.msg ? err.msg : err
+                            });
+                            onChange(
+                              (fileListToUse = fileListToUse.map(file => {
+                                const fileToReturn = { ...file };
+                                if (fileToReturn.id === fileToUpload.id) {
+                                  fileToReturn.loading = false;
+                                  fileToReturn.error = true;
+                                }
+                                return fileToReturn;
+                              }))
+                            );
+                          });
+                      })
+                    ).then(() => {
+                      onFieldSubmit(responses);
+                    });
+                  }
+                }
+              });
           }
         }}
         {...rest}
