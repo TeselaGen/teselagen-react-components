@@ -65,7 +65,8 @@ export default props => {
                         let reader = new FileReader();
                         reader.readAsText(file, "UTF-8");
                         reader.onload = evt => {
-                          resolve(evt.target.result);
+                          file.parseString = evt.target.result;
+                          resolve(file);
                         };
                         reader.onerror = err => {
                           console.error("err:", err);
@@ -78,15 +79,9 @@ export default props => {
                   return acceptedFiles;
                 }
               })
-              .then(acceptedFiles => {
-                return beforeUpload
-                  ? beforeUpload(acceptedFiles, onChange)
-                  : true;
-              })
-              .then(keepGoing => {
-                if (!keepGoing) return;
+              .then(files => {
                 fileListToUse = [
-                  ...acceptedFiles.map(file => {
+                  ...files.map(file => {
                     return {
                       id: file.id,
                       lastModified: file.lastModified,
@@ -95,12 +90,23 @@ export default props => {
                       name: file.name,
                       preview: file.preview,
                       size: file.size,
-                      type: file.type
+                      type: file.type,
+                      ...(file.parsedString
+                        ? { parsedString: file.parsedString }
+                        : {})
                     };
                   }),
                   ...fileListToUse
                 ].slice(0, fileLimit ? fileLimit : undefined);
                 onChange(fileListToUse);
+              })
+              .then(acceptedFiles => {
+                return beforeUpload
+                  ? beforeUpload(acceptedFiles, onChange)
+                  : true;
+              })
+              .then(keepGoing => {
+                if (!keepGoing) return;
                 if (action) {
                   const data = new FormData();
                   acceptedFiles.forEach(file => {
