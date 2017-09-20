@@ -29,7 +29,7 @@ export default props => {
     onFieldSubmit = noop, //called when all files have successfully uploaded
     onRemove = noop, //called when a file has been selected to be removed
     onChange = noop, //this is almost always getting passed by redux-form, no need to pass this handler manually
-    ...rest //everything else gets spread on the <Dropzone/> https://react-dropzone.js.org/
+    dropzoneProps = {}
   } = props;
 
   let acceptToUse = Array.isArray(accept) ? accept.join(", ") : accept;
@@ -178,7 +178,7 @@ export default props => {
               });
           }
         }}
-        {...rest}
+        {...dropzoneProps}
       >
         {contentOverride || (
           <div
