@@ -58,7 +58,6 @@ export default props => {
 
             Promise.resolve()
               .then(() => {
-                console.log("readBeforeUpload:", readBeforeUpload);
                 if (readBeforeUpload) {
                   return Promise.all(
                     acceptedFiles.map(file => {
@@ -81,7 +80,6 @@ export default props => {
                 }
               })
               .then(files => {
-                console.log("files:", files);
                 fileListToUse = [
                   ...files.map(file => {
                     return {
