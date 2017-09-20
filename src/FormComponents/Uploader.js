@@ -58,6 +58,7 @@ export default props => {
 
             Promise.resolve()
               .then(() => {
+                console.log("readBeforeUpload:", readBeforeUpload);
                 if (readBeforeUpload) {
                   return Promise.all(
                     acceptedFiles.map(file => {
@@ -65,7 +66,7 @@ export default props => {
                         let reader = new FileReader();
                         reader.readAsText(file, "UTF-8");
                         reader.onload = evt => {
-                          file.parseString = evt.target.result;
+                          file.parsedString = evt.target.result;
                           resolve(file);
                         };
                         reader.onerror = err => {
@@ -80,6 +81,7 @@ export default props => {
                 }
               })
               .then(files => {
+                console.log("files:", files);
                 fileListToUse = [
                   ...files.map(file => {
                     return {
