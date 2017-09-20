@@ -19,10 +19,11 @@ export default props => {
     action,
     className = "",
     fileLimit,
+    readBeforeUpload,
     uploadInBulk, //tnr: not yet implemented
     showUploadList = true,
     beforeUpload,
-    fileList,
+    fileList, //list of files with options: {name, loading, error, url, originalName, downloadName}
     fileListItemRenderer, // handle rendering the file list items yourself :)
     onFileSuccess = emptyPromise, //called each time a file is finished and before the file.loading gets set to false, needs to return a promise!
     onFieldSubmit = noop, //called when all files have successfully uploaded
@@ -55,7 +56,25 @@ export default props => {
               }
             });
             if (beforeUpload) {
-              const keepGoing = beforeUpload(acceptedFiles);
+              if (readBeforeUpload) {
+                /* const file = files[0];
+                let reader = new FileReader();
+                reader.readAsText(file, "UTF-8");
+                reader.onload = function(evt: Object) {
+                  const content: string = evt.target.result;
+                  anyToJson(content, result => {
+                    const parsedSequence: SequenceJson = processSequenceJson(
+                      result[0].parsedSequence
+                    );
+                    onCreateSubmit({ parsedSequence });
+                  });
+                }; 
+                reader.onerror = function() {
+                  window.toastr.error("Failure reading file.");
+                };
+                */
+              }
+              const keepGoing = beforeUpload(acceptedFiles, onChange);
               if (keepGoing === false) {
                 return;
               }
