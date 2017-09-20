@@ -98,7 +98,9 @@ export default props => {
                   }),
                   ...fileListToUse
                 ].slice(0, fileLimit ? fileLimit : undefined);
+
                 onChange(fileListToUse);
+                return fileListToUse;
               })
               .then(acceptedFiles => {
                 return beforeUpload
