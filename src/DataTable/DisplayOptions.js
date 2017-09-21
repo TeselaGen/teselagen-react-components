@@ -23,6 +23,7 @@ export default class PagingTool extends React.Component {
               if (!isHidden) numVisible++;
               return (
                 <Checkbox
+                  key={displayName}
                   onClick={() => {
                     if (numVisible <= 1) {
                       return window.toastr.warning(
