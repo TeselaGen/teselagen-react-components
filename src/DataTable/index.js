@@ -1,6 +1,6 @@
 import deepEqual from "deep-equal";
 import { connect } from "react-redux";
-import { Fields, reduxForm } from "redux-form";
+import { reduxForm } from "redux-form";
 import { compose } from "redux";
 import React from "react";
 import moment from "moment";
@@ -32,6 +32,7 @@ import tableConfigurationFragment from "./utils/tableConfigurationFragment";
 import currentUserFragment from "./utils/currentUserFragment";
 import fieldOptionFragment from "../../lib/DataTable/utils/fieldOptionFragment";
 import withDelete from "../enhancers/withDelete";
+import withFields from "../utils/withFields";
 
 import "../toastr";
 import "./style.css";
@@ -797,17 +798,12 @@ export default compose(
       updateColumnVisibility
     };
   }),
-  reduxForm() //the formName is passed via withTableParams and is often user overridden
-)(props => {
-  return (
-    <Fields
-      names={[
-        "reduxFormQueryParams",
-        "reduxFormSearchInput",
-        "reduxFormSelectedEntityIdMap"
-      ]}
-      {...props}
-      component={ReactDataTable}
-    />
-  );
-});
+  reduxForm(), //the formName is passed via withTableParams and is often user overridden
+  withFields({
+    names: [
+      "reduxFormQueryParams",
+      "reduxFormSearchInput",
+      "reduxFormSelectedEntityIdMap"
+    ]
+  })
+)(ReactDataTable);
