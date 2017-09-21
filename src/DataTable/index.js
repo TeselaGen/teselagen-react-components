@@ -737,7 +737,6 @@ export default compose(
       upsertFieldOption,
       currentUser
     } = propsToUse;
-    console.log("upsertTableConfiguration:", upsertTableConfiguration);
     let schemaToUse = schema;
     let tableConfigurationId;
     let fieldOptsByPath = {};
