@@ -29,7 +29,7 @@ export default props => {
     onFieldSubmit = noop, //called when all files have successfully uploaded
     onRemove = noop, //called when a file has been selected to be removed
     onChange = noop, //this is almost always getting passed by redux-form, no need to pass this handler manually
-    ...rest //everything else gets spread on the <Dropzone/> https://react-dropzone.js.org/
+    dropzoneProps = {}
   } = props;
 
   let acceptToUse = Array.isArray(accept) ? accept.join(", ") : accept;
@@ -65,7 +65,8 @@ export default props => {
                         let reader = new FileReader();
                         reader.readAsText(file, "UTF-8");
                         reader.onload = evt => {
-                          resolve(evt.target.result);
+                          file.parsedString = evt.target.result;
+                          resolve(file);
                         };
                         reader.onerror = err => {
                           console.error("err:", err);
@@ -78,15 +79,9 @@ export default props => {
                   return acceptedFiles;
                 }
               })
-              .then(acceptedFiles => {
-                return beforeUpload
-                  ? beforeUpload(acceptedFiles, onChange)
-                  : true;
-              })
-              .then(keepGoing => {
-                if (!keepGoing) return;
+              .then(files => {
                 fileListToUse = [
-                  ...acceptedFiles.map(file => {
+                  ...files.map(file => {
                     return {
                       id: file.id,
                       lastModified: file.lastModified,
@@ -95,12 +90,25 @@ export default props => {
                       name: file.name,
                       preview: file.preview,
                       size: file.size,
-                      type: file.type
+                      type: file.type,
+                      ...(file.parsedString
+                        ? { parsedString: file.parsedString }
+                        : {})
                     };
                   }),
                   ...fileListToUse
                 ].slice(0, fileLimit ? fileLimit : undefined);
+
                 onChange(fileListToUse);
+                return fileListToUse;
+              })
+              .then(acceptedFiles => {
+                return beforeUpload
+                  ? beforeUpload(acceptedFiles, onChange)
+                  : true;
+              })
+              .then(keepGoing => {
+                if (!keepGoing) return;
                 if (action) {
                   const data = new FormData();
                   acceptedFiles.forEach(file => {
@@ -170,7 +178,7 @@ export default props => {
               });
           }
         }}
-        {...rest}
+        {...dropzoneProps}
       >
         {contentOverride || (
           <div
