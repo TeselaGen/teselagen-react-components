@@ -7,6 +7,7 @@ import {
   ReactSelectField,
   DateInputField,
   CheckboxField,
+  SwitchField,
   TextareaField,
   EditableTextField,
   NumericInputField,
@@ -215,6 +216,14 @@ class FormComponentsDemo extends React.Component {
               defaultValue
               name={"checkboxField"}
               label="Checkbox"
+            />
+            <SwitchField
+              onFieldSubmit={function(val) {
+                console.info("on field submit!:", val);
+              }}
+              defaultValue
+              name={"switchField"}
+              label="I'm a SwitchField"
             />
             <TextareaField
               name={"textAreaField"}

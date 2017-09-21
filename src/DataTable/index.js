@@ -1,11 +1,11 @@
 import deepEqual from "deep-equal";
 import { connect } from "react-redux";
-import { Fields, reduxForm } from "redux-form";
+import { reduxForm } from "redux-form";
 import { compose } from "redux";
 import React from "react";
 import moment from "moment";
 import uniqid from "uniqid";
-import camelCase from "lodash/camelCase";
+import { camelCase, get } from "lodash";
 import {
   Button,
   Menu,
@@ -25,6 +25,15 @@ import FilterAndSortMenu from "./FilterAndSortMenu";
 import getIdOrCode from "./utils/getIdOrCode";
 import SearchBar from "./SearchBar";
 import { getSelectedRecordsFromEntities } from "./utils/selection";
+import DisplayOptions from "./DisplayOptions";
+import withQuery from "../enhancers/withQuery";
+import withUpsert from "../enhancers/withUpsert";
+import tableConfigurationFragment from "./utils/tableConfigurationFragment";
+import currentUserFragment from "./utils/currentUserFragment";
+import fieldOptionFragment from "../../lib/DataTable/utils/fieldOptionFragment";
+import withDelete from "../enhancers/withDelete";
+import withFields from "../utils/withFields";
+
 import "../toastr";
 import "./style.css";
 import withTableParams from "./utils/withTableParams";
@@ -147,9 +156,13 @@ class ReactDataTable extends React.Component {
       isInfinite,
       onRefresh,
       page,
+      withDisplayOptions,
+      updateColumnVisibility,
+      resetDefaultVisibility,
       maxHeight,
       style,
       pageSize,
+      formName,
       reduxFormSearchInput,
       reduxFormSelectedEntityIdMap,
       schema,
@@ -304,20 +317,30 @@ class ReactDataTable extends React.Component {
                 : "s"} Selected `}
             </div>
           )}
-          {!isInfinite &&
-          withPaging &&
-          (hidePageSizeWhenPossible ? entityCount > pageSize : true) ? (
-            <PagingTool
-              paging={{
-                total: entityCount,
-                page,
-                pageSize
-              }}
-              onRefresh={onRefresh}
-              setPage={setPage}
-              setPageSize={setPageSize}
-            />
-          ) : null}
+          <div style={{ display: "flex", flexWrap: "wrap" }}>
+            {!isInfinite &&
+            withPaging &&
+            (hidePageSizeWhenPossible ? entityCount > pageSize : true) ? (
+              <PagingTool
+                paging={{
+                  total: entityCount,
+                  page,
+                  pageSize
+                }}
+                onRefresh={onRefresh}
+                setPage={setPage}
+                setPageSize={setPageSize}
+              />
+            ) : null}
+            {withDisplayOptions && (
+              <DisplayOptions
+                resetDefaultVisibility={resetDefaultVisibility}
+                updateColumnVisibility={updateColumnVisibility}
+                formName={formName}
+                schema={schema}
+              />
+            )}
+          </div>
         </div>
       </div>
     );
@@ -659,27 +682,129 @@ export default compose(
   withTableParams({
     isLocalCall: true
   }),
-  connect((state, ownProps) => {
-    if (!ownProps.isTableParamsConnected) {
-      //this is the case where we're hooking up to withTableParams locally, so we need to take the tableParams off the props
+  withDelete(tableConfigurationFragment, {
+    refetchQueries: ["tableConfigurationQuery"]
+  }),
+  withUpsert(tableConfigurationFragment, {
+    refetchQueries: ["tableConfigurationQuery"]
+  }),
+  withUpsert(fieldOptionFragment, {
+    refetchQueries: ["tableConfigurationQuery"]
+  }),
+  withQuery(currentUserFragment, {
+    argsOverride: ["", ""],
+    nameOverride: "currentUser",
+    queryName: "dataTableCurrentUserQuery",
+    options: props => {
+      const { withDisplayOptions } = props;
       return {
-        ...ownProps.tableParams
+        skip: !withDisplayOptions
       };
-    } else {
-      return {};
     }
   }),
-  reduxForm() //the formName is passed via withTableParams and is often user overridden
-)(props => {
-  return (
-    <Fields
-      names={[
-        "reduxFormQueryParams",
-        "reduxFormSearchInput",
-        "reduxFormSelectedEntityIdMap"
-      ]}
-      {...props}
-      component={ReactDataTable}
-    />
-  );
-});
+  withQuery(tableConfigurationFragment, {
+    queryName: "tableConfigurationQuery",
+    isPlural: true,
+    options: props => {
+      const { formName, withDisplayOptions, currentUser } = props;
+      const userId = get(currentUser, "user.id");
+      return {
+        skip: !withDisplayOptions || !userId,
+        variables: {
+          filter: {
+            userId,
+            formName
+          }
+        }
+      };
+    }
+  }),
+  connect((state, ownProps) => {
+    let propsToUse = ownProps;
+    if (!ownProps.isTableParamsConnected) {
+      //this is the case where we're hooking up to withTableParams locally, so we need to take the tableParams off the props
+      propsToUse = {
+        ...ownProps,
+        ...ownProps.tableParams
+      };
+    }
+
+    const {
+      schema,
+      withDisplayOptions,
+      formName,
+      tableConfigurations,
+      deleteTableConfiguration,
+      upsertTableConfiguration,
+      upsertFieldOption,
+      currentUser
+    } = propsToUse;
+    let schemaToUse = schema;
+    let tableConfigurationId;
+    let fieldOptsByPath = {};
+    if (withDisplayOptions && tableConfigurations && tableConfigurations[0]) {
+      const tableConfig = tableConfigurations[0];
+      tableConfigurationId = tableConfig.id;
+      fieldOptsByPath = tableConfig.fieldOptions.reduce((acc, fieldOpt) => {
+        acc[fieldOpt.path] = fieldOpt;
+        return acc;
+      }, {});
+      schemaToUse = {
+        ...schema,
+        fields: schema.fields.map(field => {
+          const fieldOpt = fieldOptsByPath[field.path];
+          if (fieldOpt) {
+            return {
+              ...field,
+              isHidden: fieldOpt.isHidden
+            };
+          } else {
+            return field;
+          }
+        })
+      };
+    }
+    function resetDefaultVisibility() {
+      if (tableConfigurationId) {
+        deleteTableConfiguration(tableConfigurationId);
+      }
+    }
+    function updateColumnVisibility({ shouldShow, path }) {
+      if (tableConfigurationId) {
+        // toArray({...stripFields(fieldOptsByPath, ['__typename']), [path]: {isHidden: !shouldShow, path, ...stripFields(fieldOptsByPath[path] || {}, ['__typename']) }  })
+        const existingFieldOpt = fieldOptsByPath[path] || {};
+        upsertFieldOption({
+          id: existingFieldOpt.id,
+          path,
+          isHidden: !shouldShow,
+          tableConfigurationId
+        });
+      } else {
+        upsertTableConfiguration({
+          userId: currentUser.user.id,
+          formName,
+          fieldOptions: [
+            {
+              path,
+              isHidden: !shouldShow
+            }
+          ]
+        });
+      }
+    }
+    return {
+      ...propsToUse,
+      schema: schemaToUse,
+      resetDefaultVisibility,
+      updateColumnVisibility
+    };
+  }),
+  reduxForm(), //the formName is passed via withTableParams and is often user overridden
+  withFields({
+    names: [
+      "reduxFormQueryParams",
+      "reduxFormSearchInput",
+      "reduxFormSelectedEntityIdMap"
+    ]
+  })
+)(ReactDataTable);

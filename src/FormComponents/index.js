@@ -18,7 +18,8 @@ import {
   Checkbox,
   EditableText,
   Tooltip,
-  Position
+  Position,
+  Switch
 } from "@blueprintjs/core";
 
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
@@ -193,6 +194,22 @@ export const renderBlueprintCheckbox = props => {
   const { input, label, onFieldSubmit, ...rest } = props;
   return (
     <Checkbox
+      {...removeUnwantedProps(rest)}
+      {...input}
+      checked={input.value}
+      label={label}
+      onChange={function(e, val) {
+        input.onChange(e, val);
+        onFieldSubmit(e.target ? e.target.value : val);
+      }}
+    />
+  );
+};
+
+export const renderBlueprintSwitch = props => {
+  const { input, label, onFieldSubmit, ...rest } = props;
+  return (
+    <Switch
       {...removeUnwantedProps(rest)}
       {...input}
       checked={input.value}
@@ -486,6 +503,9 @@ export const FileUploadField = generateField(renderFileUpload);
 export const DateInputField = generateField(renderBlueprintDateInput);
 export const DateRangeInputField = generateField(renderBlueprintDateRangeInput);
 export const CheckboxField = generateField(renderBlueprintCheckbox, {
+  noOuterLabel: true
+});
+export const SwitchField = generateField(renderBlueprintSwitch, {
   noOuterLabel: true
 });
 export const TextareaField = generateField(renderBlueprintTextarea);
