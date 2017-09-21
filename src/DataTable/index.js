@@ -62,6 +62,7 @@ class ReactDataTable extends React.Component {
     setPageSize: noop,
     setOrder: noop,
     setPage: noop,
+    contextMenu: noop,
     onDoubleClick: noop,
     onRowSelect: noop,
     onMultiRowSelect: noop,
