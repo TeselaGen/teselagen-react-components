@@ -2,11 +2,14 @@
 import React from "react";
 import { MenuItem, Switch } from "@blueprintjs/core";
 import { FocusStyleManager, Dialog } from "@blueprintjs/core";
+import {ApolloProvider, ApolloClient} from 'react-apollo';
+
 // import { createStore, combineReducers } from "redux";
 // import { reducer as form } from "redux-form";
 import { withTableParams, DataTable } from "../../../src";
 // import { onEnterOrBlurHelper } from "../../../src";
 import "./style.css";
+
 // import { columns, schema } from "./new_mocks";
 import { BrowserRouter as Router, withRouter } from "react-router-dom";
 import { Provider } from "react-redux";
@@ -17,7 +20,7 @@ import { DataTableSchema } from "../../../src/flow_types";
 FocusStyleManager.onlyShowFocusOnTabs();
 
 //@flow
-
+const client = new ApolloClient({})
 const chance = new Chance();
 
 const schema: DataTableSchema = {
@@ -106,7 +109,7 @@ export default class DataTableDemo extends React.Component {
     ConnectedTable = withRouter(ConnectedTable);
 
     return (
-      <Provider store={store}>
+      <ApolloProvider client={client} store={store}>
         <div>
           <Router>
             <div>
@@ -165,7 +168,7 @@ export default class DataTableDemo extends React.Component {
             </div>
           </Router>
         </div>
-      </Provider>
+      </ApolloProvider>
     );
   }
 }
@@ -199,6 +202,7 @@ export class DataTableInstance extends React.Component {
     withTitle: true,
     withSearch: true,
     withPaging: true,
+    withDisplayOptions: true,
     isInfinite: false,
     isSingleSelect: false,
     maxHeight: false,
@@ -268,6 +272,7 @@ export class DataTableInstance extends React.Component {
         />
         {renderToggle(this, "withTitle")}
         {renderToggle(this, "withSearch")}
+        {renderToggle(this, "withDisplayOptions")}
         {renderToggle(this, "withPaging")}
         {renderToggle(this, "isInfinite")}
         {renderToggle(this, "isLoading")}
@@ -341,6 +346,7 @@ export class DataTableInstance extends React.Component {
           withTitle={this.state.withTitle}
           withSearch={this.state.withSearch}
           withPaging={this.state.withPaging}
+          withDisplayOptions={this.state.withDisplayOptions}
           isInfinite={this.state.isInfinite}
           isLoading={this.state.isLoading}
           compact={this.state.compact}

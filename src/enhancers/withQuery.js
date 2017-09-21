@@ -26,6 +26,8 @@ export default function withQuery(fragment, options = {}) {
   const {
     isPlural,
     queryName,
+    nameOverride,
+    argsOverride,
     asFunction,
     asQueryObj,
     idAs,
@@ -50,20 +52,33 @@ export default function withQuery(fragment, options = {}) {
   }
   // const {fragment, extraMutateArgs} = options
   const fragName = fragment && fragment.definitions[0].name.value;
-  const nameToUse = queryName || (isPlural ? pluralize(name) : name);
-  const queryNameToUse = nameToUse + "Query";
+  const nameToUse = nameOverride || (isPlural ? pluralize(name) : name);
+  const queryNameToUse = queryName || nameToUse + "Query";
   // const pascalNameToUse = pascalCase(nameToUse)
-  const queryInner = `${fragName ? `...${fragName}` : idAs || "id"}`;
+  let queryInner = `${fragName ? `...${fragName}` : idAs || "id"}`;
+  if (isPlural) {
+    queryInner = `results {
+      ${queryInner}
+    }
+    totalResults`;
+  }
+
   /* eslint-disable */
   let gqlQuery;
-  if (isPlural) {
+  if (argsOverride) {
+    gqlQuery = gql`
+    query ${queryNameToUse} ${argsOverride[0] || ""} {
+      ${nameToUse} ${argsOverride[1] || ""} {
+        ${queryInner}
+      }
+    }
+    ${fragment ? fragment : ``}
+  `;
+  } else if (isPlural) {
     gqlQuery = gql`
       query ${queryNameToUse} ($pageSize: Int $sort: [String] $filter: JSON $pageNumber: Int) {
         ${nameToUse}(pageSize: $pageSize, sort: $sort, filter: $filter, pageNumber: $pageNumber) {
-          results {
-            ${queryInner}
-          }
-          totalResults
+          ${queryInner}
         }
       }
       ${fragment ? fragment : ``}

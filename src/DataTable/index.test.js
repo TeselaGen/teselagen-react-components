@@ -1,16 +1,17 @@
 import React from "react";
 import { shallow, mount } from "enzyme";
+import { ApolloProvider, ApolloClient } from "react-apollo";
+
 import DataTable from "./index";
 import PagingTool from "./PagingTool";
 import DataTableDemo, { DataTableInstance } from "../../demo/src/DataTableDemo";
-import { Provider } from "react-redux";
-
+const client = new ApolloClient({});
 describe("(DataTable)", () => {
   it("renders without exploding", () => {
     const wrapper = shallow(
-      <Provider store={{}}>
+      <ApolloProvider client={client} store={{}}>
         <DataTable />
-      </Provider>
+      </ApolloProvider>
     );
     expect(wrapper).toHaveLength(1);
   });

@@ -13,7 +13,7 @@
   "scripts": {
     "build": "nwb build-react-component --copy-files --no-demo",
     "buildWithDemo": "nwb build-react-component --copy-files",
-    "build-watch": "nodemon  --watch src --exec \"yarn build\" ",
+    "build-watch": "nodemon  --watch src --exec \"rm .babelrc; yarn build\" ",
     "clean": "nwb clean-module && npm clean-demo",
     "start": "nwb serve-react-demo --port 3333",
     "precommit": "lint-staged",

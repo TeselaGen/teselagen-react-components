@@ -1,8 +1,7 @@
 //@flow
 import React from "react";
-import classNames from "classnames";
 import type { Paging } from "../flow_types";
-import { Button, NumericInput, Classes } from "@blueprintjs/core";
+import { Button } from "@blueprintjs/core";
 import { pageSizes } from "./utils/queryParams";
 import { onEnterOrBlurHelper } from "../utils/handlerHelpers";
 
