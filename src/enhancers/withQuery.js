@@ -17,7 +17,7 @@ import compose from "lodash/fp/compose";
  * @param {boolean} options.asQueryObj - if true, this gives you back the gql query object aka gql`query myQuery () {}`
  * @param {string} options.idAs - by default single record queries occur on an id. But, if the record doesn't have an id field, and instead has a 'code', you can set idAs: 'code'
  * @param {boolean} options.getIdFromParams - grab the id variable off the match.params object being passed in!
- * @param {boolean} options.showLoading - default=true show a loading spinner over the whole component while the data is loading
+ * @param {boolean} options.showLoading - show a loading spinner over the whole component while the data is loading
  * @param {boolean} options.showError - default=true show an error message toastr if the an error occurs while loading the data
  * @return props: {xxxxQuery, data }
  */
@@ -35,7 +35,7 @@ export default function withQuery(fragment, options = {}) {
     variables,
     props,
     getIdFromParams,
-    showLoading = true,
+    showLoading,
     showError = true,
     ...rest
   } = options;

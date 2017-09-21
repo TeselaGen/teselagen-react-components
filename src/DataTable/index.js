@@ -692,7 +692,6 @@ export default compose(
   withQuery(currentUserFragment, {
     argsOverride: ["", ""],
     nameOverride: "currentUser",
-    showLoading: false,
     queryName: "dataTableCurrentUserQuery",
     options: props => {
       const { withDisplayOptions } = props;
@@ -704,7 +703,6 @@ export default compose(
   withQuery(tableConfigurationFragment, {
     queryName: "tableConfigurationQuery",
     isPlural: true,
-    showLoading: false,
     options: props => {
       const { formName, withDisplayOptions, currentUser } = props;
       const userId = get(currentUser, "user.id");
