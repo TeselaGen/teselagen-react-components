@@ -41,6 +41,10 @@
   width: 100%;
 }
 
+.data-table-container.no-padding {
+  padding: 0;
+}
+
 .data-table-title-and-buttons {
   display: flex;
 }

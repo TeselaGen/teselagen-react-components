@@ -202,6 +202,9 @@ export class DataTableInstance extends React.Component {
     withTitle: true,
     withSearch: true,
     withPaging: true,
+    noHeader: false,
+    noFooter: false,
+    noPadding: false,
     withDisplayOptions: false,
     isInfinite: false,
     isSingleSelect: false,
@@ -274,6 +277,9 @@ export class DataTableInstance extends React.Component {
         {renderToggle(this, "withSearch")}
         {renderToggle(this, "withDisplayOptions", "This feature doesn't work currently without a data table connection")}
         {renderToggle(this, "withPaging")}
+        {renderToggle(this, "noHeader")}
+        {renderToggle(this, "noFooter")}
+        {renderToggle(this, "noPadding")}
         {renderToggle(this, "isInfinite")}
         {renderToggle(this, "isLoading")}
         {renderToggle(this, "hidePageSizeWhenPossible")}
@@ -346,6 +352,9 @@ export class DataTableInstance extends React.Component {
           withTitle={this.state.withTitle}
           withSearch={this.state.withSearch}
           withPaging={this.state.withPaging}
+          noPadding={this.state.noPadding}
+          noHeader={this.state.noHeader}
+          noFooter={this.state.noFooter}
           withDisplayOptions={this.state.withDisplayOptions}
           isInfinite={this.state.isInfinite}
           isLoading={this.state.isLoading}

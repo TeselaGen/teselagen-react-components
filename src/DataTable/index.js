@@ -51,6 +51,9 @@ class ReactDataTable extends React.Component {
     withTitle: true,
     withSearch: true,
     withPaging: true,
+    noHeader: false,
+    noFooter: false,
+    noPadding: false,
     hidePageSizeWhenPossible: false,
     pageSize: 10,
     extraClasses: "",
@@ -154,6 +157,9 @@ class ReactDataTable extends React.Component {
       withSearch,
       withPaging,
       isInfinite,
+      noHeader,
+      noFooter,
+      noPadding,
       onRefresh,
       page,
       withDisplayOptions,
@@ -239,65 +245,68 @@ class ReactDataTable extends React.Component {
           "data-table-container",
           extraClasses,
           className,
-          compactClassName
+          compactClassName,
+          { "no-padding": noPadding }
         )}
       >
-        <div className={"data-table-header"}>
-          <div className={"data-table-title-and-buttons"}>
-            {tableName &&
-            withTitle && (
-              <span className={"data-table-title"}>{tableName}</span>
-            )}
-            {this.props.children}
-          </div>
-          {errorParsingUrlString && (
-            <span className={"pt-icon-error pt-intent-warning"}>
-              Error parsing URL
-            </span>
-          )}
-          {filtersOnNonDisplayedFields.length ? (
-            filtersOnNonDisplayedFields.map(
-              ({ displayName, selectedFilter, filterValue }) => {
-                return (
-                  <div
-                    key={displayName}
-                    className={"tg-filter-on-non-displayed-field"}
-                  >
-                    <span className={"pt-icon-filter"} />
-                    <span>
-                      {" "}
-                      {displayName} {selectedFilter} {filterValue}{" "}
-                    </span>
-                  </div>
-                );
-              }
-            )
-          ) : (
-            ""
-          )}
-          {withSearch && (
-            <div className={"data-table-search-and-clear-filter-container"}>
-              {hasFilters ? (
-                <Button
-                  className={"data-table-clear-filters"}
-                  onClick={() => {
-                    clearFilters();
-                  }}
-                  text={"Clear filters"}
-                />
-              ) : (
-                ""
+        {!noHeader && (
+          <div className={"data-table-header"}>
+            <div className={"data-table-title-and-buttons"}>
+              {tableName &&
+              withTitle && (
+                <span className={"data-table-title"}>{tableName}</span>
               )}
-              <SearchBar
-                {...{
-                  reduxFormSearchInput,
-                  setSearchTerm,
-                  maybeSpinner
-                }}
-              />
+              {this.props.children}
             </div>
-          )}
-        </div>
+            {errorParsingUrlString && (
+              <span className={"pt-icon-error pt-intent-warning"}>
+                Error parsing URL
+              </span>
+            )}
+            {filtersOnNonDisplayedFields.length ? (
+              filtersOnNonDisplayedFields.map(
+                ({ displayName, selectedFilter, filterValue }) => {
+                  return (
+                    <div
+                      key={displayName}
+                      className={"tg-filter-on-non-displayed-field"}
+                    >
+                      <span className={"pt-icon-filter"} />
+                      <span>
+                        {" "}
+                        {displayName} {selectedFilter} {filterValue}{" "}
+                      </span>
+                    </div>
+                  );
+                }
+              )
+            ) : (
+              ""
+            )}
+            {withSearch && (
+              <div className={"data-table-search-and-clear-filter-container"}>
+                {hasFilters ? (
+                  <Button
+                    className={"data-table-clear-filters"}
+                    onClick={() => {
+                      clearFilters();
+                    }}
+                    text={"Clear filters"}
+                  />
+                ) : (
+                  ""
+                )}
+                <SearchBar
+                  {...{
+                    reduxFormSearchInput,
+                    setSearchTerm,
+                    maybeSpinner
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        )}
         <ReactTable
           data={entities}
           columns={this.renderColumns()}
@@ -317,46 +326,50 @@ class ReactDataTable extends React.Component {
             ...style
           }}
         />
-        <div
-          className={"data-table-footer"}
-          style={{
-            justifyContent:
-              isSingleSelect || hideSelectedCount ? "flex-end" : "space-between"
-          }}
-        >
-          {!isSingleSelect &&
-          !hideSelectedCount && (
-            <div className={"tg-react-table-selected-count"}>
-              {`${selectedRowCount} Record${selectedRowCount === 1
-                ? ""
-                : "s"} Selected `}
-            </div>
-          )}
-          <div style={{ display: "flex", flexWrap: "wrap" }}>
-            {!isInfinite &&
-            withPaging &&
-            (hidePageSizeWhenPossible ? entityCount > pageSize : true) ? (
-              <PagingTool
-                paging={{
-                  total: entityCount,
-                  page,
-                  pageSize
-                }}
-                onRefresh={onRefresh}
-                setPage={setPage}
-                setPageSize={setPageSize}
-              />
-            ) : null}
-            {withDisplayOptions && (
-              <DisplayOptions
-                resetDefaultVisibility={resetDefaultVisibilityToUse}
-                updateColumnVisibility={updateColumnVisibilityToUse}
-                formName={formName}
-                schema={schema}
-              />
+        {!noFooter && (
+          <div
+            className={"data-table-footer"}
+            style={{
+              justifyContent:
+                isSingleSelect || hideSelectedCount
+                  ? "flex-end"
+                  : "space-between"
+            }}
+          >
+            {!isSingleSelect &&
+            !hideSelectedCount && (
+              <div className={"tg-react-table-selected-count"}>
+                {`${selectedRowCount} Record${selectedRowCount === 1
+                  ? ""
+                  : "s"} Selected `}
+              </div>
             )}
+            <div style={{ display: "flex", flexWrap: "wrap" }}>
+              {!isInfinite &&
+              withPaging &&
+              (hidePageSizeWhenPossible ? entityCount > pageSize : true) ? (
+                <PagingTool
+                  paging={{
+                    total: entityCount,
+                    page,
+                    pageSize
+                  }}
+                  onRefresh={onRefresh}
+                  setPage={setPage}
+                  setPageSize={setPageSize}
+                />
+              ) : null}
+              {withDisplayOptions && (
+                <DisplayOptions
+                  resetDefaultVisibility={resetDefaultVisibilityToUse}
+                  updateColumnVisibility={updateColumnVisibilityToUse}
+                  formName={formName}
+                  schema={schema}
+                />
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     );
   }
