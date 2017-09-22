@@ -92,7 +92,7 @@ function HomePage() {
               style={{ color: 'inherit', textDecoration: 'none' }}
             >
               <div style={  {borderLeft: index !== 0 && '2px solid grey'}} className={'pt-popover-dismiss pt-menu-item'}>
-                {name} demo
+                {name} demo2
               </div>
 
             </Link>
