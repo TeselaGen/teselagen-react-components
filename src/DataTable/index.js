@@ -5,7 +5,7 @@ import { compose } from "redux";
 import React from "react";
 import moment from "moment";
 import uniqid from "uniqid";
-import { camelCase, get } from "lodash";
+import { camelCase, get, toArray } from "lodash";
 import {
   Button,
   Menu,
@@ -158,6 +158,8 @@ class ReactDataTable extends React.Component {
       page,
       withDisplayOptions,
       updateColumnVisibility,
+      localStorageForceUpdate,
+      syncDisplayOptionsToDb,
       resetDefaultVisibility,
       maxHeight,
       style,
@@ -175,6 +177,19 @@ class ReactDataTable extends React.Component {
       hideSelectedCount,
       entities
     } = this.props;
+    let updateColumnVisibilityToUse = updateColumnVisibility;
+    let resetDefaultVisibilityToUse = resetDefaultVisibility;
+    if (withDisplayOptions && !syncDisplayOptionsToDb) {
+      //little hack to make localstorage changes get reflected in UI (we force an update to get the enhancers to run again :)
+      updateColumnVisibilityToUse = (...args) => {
+        updateColumnVisibility(...args);
+        localStorageForceUpdate.input.onChange(Math.random());
+      };
+      resetDefaultVisibilityToUse = (...args) => {
+        resetDefaultVisibility(...args);
+        localStorageForceUpdate.input.onChange(Math.random());
+      };
+    }
     let compactClassName = "";
     if (compactPaging) {
       compactClassName += " tg-compact-paging";
@@ -334,8 +349,8 @@ class ReactDataTable extends React.Component {
             ) : null}
             {withDisplayOptions && (
               <DisplayOptions
-                resetDefaultVisibility={resetDefaultVisibility}
-                updateColumnVisibility={updateColumnVisibility}
+                resetDefaultVisibility={resetDefaultVisibilityToUse}
+                updateColumnVisibility={updateColumnVisibilityToUse}
                 formName={formName}
                 schema={schema}
               />
@@ -696,9 +711,9 @@ export default compose(
     nameOverride: "currentUser",
     queryName: "dataTableCurrentUserQuery",
     options: props => {
-      const { withDisplayOptions } = props;
+      const { withDisplayOptions, syncDisplayOptionsToDb } = props;
       return {
-        skip: !withDisplayOptions
+        skip: !syncDisplayOptionsToDb || !withDisplayOptions
       };
     }
   }),
@@ -706,10 +721,15 @@ export default compose(
     queryName: "tableConfigurationQuery",
     isPlural: true,
     options: props => {
-      const { formName, withDisplayOptions, currentUser } = props;
+      const {
+        formName,
+        withDisplayOptions,
+        syncDisplayOptionsToDb,
+        currentUser
+      } = props;
       const userId = get(currentUser, "user.id");
       return {
-        skip: !withDisplayOptions || !userId,
+        skip: !syncDisplayOptionsToDb || !withDisplayOptions || !userId,
         variables: {
           filter: {
             userId,
@@ -732,6 +752,7 @@ export default compose(
     const {
       schema,
       withDisplayOptions,
+      syncDisplayOptionsToDb,
       formName,
       tableConfigurations,
       deleteTableConfiguration,
@@ -739,12 +760,26 @@ export default compose(
       upsertFieldOption,
       currentUser
     } = propsToUse;
+
     let schemaToUse = schema;
-    let tableConfigurationId;
     let fieldOptsByPath = {};
-    if (withDisplayOptions && tableConfigurations && tableConfigurations[0]) {
-      const tableConfig = tableConfigurations[0];
-      tableConfigurationId = tableConfig.id;
+    let resetDefaultVisibility;
+    let updateColumnVisibility;
+    if (withDisplayOptions) {
+      let tableConfig;
+      if (syncDisplayOptionsToDb) {
+        tableConfig = tableConfigurations && tableConfigurations[0];
+      } else {
+        tableConfig = window.localStorage.getItem(formName);
+        tableConfig = tableConfig && JSON.parse(tableConfig);
+      }
+      console.log("tableConfig:", tableConfig);
+      if (!tableConfig) {
+        tableConfig = {
+          fieldOptions: []
+        };
+      }
+
       fieldOptsByPath = tableConfig.fieldOptions.reduce((acc, fieldOpt) => {
         acc[fieldOpt.path] = fieldOpt;
         return acc;
@@ -763,35 +798,56 @@ export default compose(
           }
         })
       };
-    }
-    function resetDefaultVisibility() {
-      if (tableConfigurationId) {
-        deleteTableConfiguration(tableConfigurationId);
-      }
-    }
-    function updateColumnVisibility({ shouldShow, path }) {
-      if (tableConfigurationId) {
-        // toArray({...stripFields(fieldOptsByPath, ['__typename']), [path]: {isHidden: !shouldShow, path, ...stripFields(fieldOptsByPath[path] || {}, ['__typename']) }  })
-        const existingFieldOpt = fieldOptsByPath[path] || {};
-        upsertFieldOption({
-          id: existingFieldOpt.id,
-          path,
-          isHidden: !shouldShow,
-          tableConfigurationId
-        });
-      } else {
-        upsertTableConfiguration({
-          userId: currentUser.user.id,
-          formName,
-          fieldOptions: [
-            {
+
+      if (syncDisplayOptionsToDb) {
+        //sync up to db
+        let tableConfigurationId;
+        resetDefaultVisibility = function() {
+          tableConfigurationId = tableConfig.id;
+
+          if (tableConfigurationId) {
+            deleteTableConfiguration(tableConfigurationId);
+          }
+        };
+        updateColumnVisibility = function({ shouldShow, path }) {
+          if (tableConfigurationId) {
+            // toArray({...stripFields(fieldOptsByPath, ['__typename']), [path]: {isHidden: !shouldShow, path, ...stripFields(fieldOptsByPath[path] || {}, ['__typename']) }  })
+            const existingFieldOpt = fieldOptsByPath[path] || {};
+            upsertFieldOption({
+              id: existingFieldOpt.id,
               path,
-              isHidden: !shouldShow
-            }
-          ]
-        });
+              isHidden: !shouldShow,
+              tableConfigurationId
+            });
+          } else {
+            upsertTableConfiguration({
+              userId: currentUser.user.id,
+              formName,
+              fieldOptions: [
+                {
+                  path,
+                  isHidden: !shouldShow
+                }
+              ]
+            });
+          }
+        };
+      } else {
+        //sync display options with localstorage
+        resetDefaultVisibility = function() {
+          window.localStorage.removeItem(formName);
+        };
+        updateColumnVisibility = function({ path, shouldShow }) {
+          tableConfig.fieldOptions = toArray({
+            ...fieldOptsByPath,
+            [path]: { path, isHidden: !shouldShow }
+          });
+          window.localStorage.setItem(formName, JSON.stringify(tableConfig));
+        };
       }
     }
+
+    console.log("schemaToUse:", schemaToUse);
     return {
       ...propsToUse,
       schema: schemaToUse,
@@ -802,6 +858,7 @@ export default compose(
   reduxForm(), //the formName is passed via withTableParams and is often user overridden
   withFields({
     names: [
+      "localStorageForceUpdate",
       "reduxFormQueryParams",
       "reduxFormSearchInput",
       "reduxFormSelectedEntityIdMap"

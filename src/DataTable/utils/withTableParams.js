@@ -74,6 +74,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         isInfinite,
         isLocalCall
       }),
+      // randomVarToForceLocalStorageUpdate: formSelector(state, "localStorageForceUpdate"),
       currentParams,
       selectedEntities,
       initialValues: { reduxFormSearchInput: currentParams.searchTerm }
