@@ -32,7 +32,7 @@ import tableConfigurationFragment from "./utils/tableConfigurationFragment";
 import currentUserFragment from "./utils/currentUserFragment";
 import fieldOptionFragment from "../../lib/DataTable/utils/fieldOptionFragment";
 import withDelete from "../enhancers/withDelete";
-import withFields from "../utils/withFields";
+import withFields from "../enhancers/withFields";
 
 import "../toastr";
 import "./style.css";
