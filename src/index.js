@@ -13,6 +13,8 @@ export { default as InfoPopover } from "./InfoPopover.js";
 export { default as withDelete } from "./enhancers/withDelete.js";
 export { default as withUpsert } from "./enhancers/withUpsert.js";
 export { default as withQuery } from "./enhancers/withQuery.js";
+export { default as withFields } from "./enhancers/withFields.js";
+export { default as withField } from "./enhancers/withField.js";
 
 export * from "./FormComponents";
 export * from "./toastr";
