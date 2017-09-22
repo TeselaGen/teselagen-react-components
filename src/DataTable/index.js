@@ -786,7 +786,6 @@ export default compose(
         tableConfig = window.localStorage.getItem(formName);
         tableConfig = tableConfig && JSON.parse(tableConfig);
       }
-      console.log("tableConfig:", tableConfig);
       if (!tableConfig) {
         tableConfig = {
           fieldOptions: []
@@ -860,7 +859,6 @@ export default compose(
       }
     }
 
-    console.log("schemaToUse:", schemaToUse);
     return {
       ...propsToUse,
       schema: schemaToUse,
