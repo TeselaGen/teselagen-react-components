@@ -83,6 +83,7 @@ export default props => {
                 fileListToUse = [
                   ...files.map(file => {
                     return {
+                      originFileObj: file,
                       id: file.id,
                       lastModified: file.lastModified,
                       lastModifiedDate: file.lastModifiedDate,
@@ -174,6 +175,15 @@ export default props => {
                       onFieldSubmit(responses);
                     });
                   }
+                } else {
+                  onChange(
+                    fileListToUse.map(function(file) {
+                      return {
+                        ...file,
+                        loading: false
+                      };
+                    })
+                  );
                 }
               });
           }
