@@ -695,9 +695,11 @@ class ReactDataTable extends React.Component {
 
     return (
       <div className={"tg-react-table-column-header"}>
-        <span title={displayName} className={"tg-react-table-name"}>
-          {renderTitleInner ? renderTitleInner : displayName + "  "}
-        </span>
+        {displayName && (
+          <span title={displayName} className={"tg-react-table-name"}>
+            {renderTitleInner ? renderTitleInner : displayName + "  "}
+          </span>
+        )}
         {!sortDisabled && !isActionColumn && sortComponent}
         {!isActionColumn && filterMenu}
       </div>
