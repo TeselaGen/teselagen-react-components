@@ -619,11 +619,10 @@ class ReactDataTable extends React.Component {
       filters,
       removeSingleFilter
     } = this.props;
-    const schemaIndex = column["schemaIndex"];
-    const schemaForField = schema.fields[schemaIndex];
-    const { renderTitleInner } = schemaForField;
-    const { displayName, sortDisabled } = schemaForField;
+    const schemaForField = schema.fields[column.schemaIndex];
+    const { displayName, sortDisabled, renderTitleInner } = schemaForField;
     const columnDataType = schemaForField.type;
+    const isActionColumn = columnDataType === "action";
     const ccDisplayName = camelCase(displayName);
     const currentFilter =
       filters &&
@@ -631,7 +630,6 @@ class ReactDataTable extends React.Component {
       filters.filter(({ filterOn }) => {
         return filterOn === ccDisplayName;
       })[0];
-    const activeFilterClass = currentFilter ? "tg-active-filter" : "";
     let ordering;
     if (order && order.length) {
       order.forEach(order => {
@@ -649,57 +647,59 @@ class ReactDataTable extends React.Component {
     const sortDown = ordering && ordering === "asc";
     const sortUp = ordering && !sortDown;
 
+    const sortComponent = (
+      <div className={"tg-sort-arrow-container"}>
+        <span
+          title={"Sort Z-A (Hold shift to sort multiple columns)"}
+          onClick={e => {
+            setOrder("-" + ccDisplayName, sortUp, e.shiftKey);
+          }}
+          className={classNames("pt-icon-standard", "pt-icon-chevron-up", {
+            "tg-active-sort": sortUp
+          })}
+        />
+        <span
+          title={"Sort A-Z (Hold shift to sort multiple columns)"}
+          onClick={e => {
+            setOrder(ccDisplayName, sortDown, e.shiftKey);
+          }}
+          className={classNames("pt-icon-standard", "pt-icon-chevron-down", {
+            "tg-active-sort": sortDown
+          })}
+        />
+      </div>
+    );
+
+    const filterMenu = (
+      <Popover position={Position.BOTTOM_RIGHT}>
+        <Button
+          title={"Filter"}
+          className={classNames(
+            "tg-filter-menu-button",
+            Classes.MINIMAL,
+            { "tg-active-filter": !!currentFilter },
+            Classes.SMALL
+          )}
+          iconName="filter"
+        />
+        <FilterAndSortMenu
+          addFilters={addFilters}
+          removeSingleFilter={removeSingleFilter}
+          currentFilter={currentFilter}
+          filterOn={ccDisplayName}
+          dataType={columnDataType}
+          schemaForField={schemaForField}
+        />
+      </Popover>
+    );
+
     return (
       <div className={"tg-react-table-column-header"}>
         <span title={displayName} className={"tg-react-table-name"}>
           {renderTitleInner ? renderTitleInner : displayName + "  "}
         </span>
-        {!sortDisabled && (
-          <div className={"tg-sort-arrow-container"}>
-            <span
-              title={"Sort Z-A (Hold shift to sort multiple columns)"}
-              onClick={e => {
-                setOrder("-" + ccDisplayName, sortUp, e.shiftKey);
-              }}
-              className={classNames("pt-icon-standard", "pt-icon-chevron-up", {
-                "tg-active-sort": sortUp
-              })}
-            />
-            <span
-              title={"Sort A-Z (Hold shift to sort multiple columns)"}
-              onClick={e => {
-                setOrder(ccDisplayName, sortDown, e.shiftKey);
-              }}
-              className={classNames(
-                "pt-icon-standard",
-                "pt-icon-chevron-down",
-                {
-                  "tg-active-sort": sortDown
-                }
-              )}
-            />
-          </div>
-        )}
-        <Popover position={Position.BOTTOM_RIGHT}>
-          <Button
-            title={"Filter"}
-            className={classNames(
-              "tg-filter-menu-button",
-              Classes.MINIMAL,
-              activeFilterClass,
-              Classes.SMALL
-            )}
-            iconName="filter"
-          />
-          <FilterAndSortMenu
-            addFilters={addFilters}
-            removeSingleFilter={removeSingleFilter}
-            currentFilter={currentFilter}
-            filterOn={ccDisplayName}
-            dataType={columnDataType}
-            schemaForField={schemaForField}
-          />
-        </Popover>
+        {!sortDisabled && !isActionColumn && sortComponent}
+        {!isActionColumn && filterMenu}
       </div>
     );
   };
