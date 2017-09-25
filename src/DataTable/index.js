@@ -322,7 +322,6 @@ class ReactDataTable extends React.Component {
             isLoading ? null : <div className="rt-noData">{children}</div>}
           style={{
             maxHeight,
-            margin: "20px 0",
             ...style
           }}
         />
