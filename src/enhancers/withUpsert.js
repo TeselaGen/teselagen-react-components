@@ -8,20 +8,19 @@ import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
 /**
  * withUpsert 
  * @param {string | gql fragment} nameOrFragment supply either a name or a top-level fragment
- * @param options 
- *    @param mutationName {string} optional rename of the default upsert function withXXXX to whatever you want
- *    @param refetchQueries {[queryNameStrings]} 
- *    @param showError {boolean} default=true -- whether or not to show a default error message on failure
- *    @param extraMutateArgs {obj | function} obj or function that returns obj to get passed to the actual mutation call
- *    @param invalidate {[string]} array of model types to invalidate after the mutate
- *    @param asFunction {boolean} if true, this gives you back a function you can call directly instead of a HOC
- *    @param idAs {string} if not using a fragment, you get an id field back as default. But, if the record doesn't have an id field, and instead has a 'code', you can set idAs: 'code'
- *    @param forceCreate {boolean} sometimes the thing you're creating won't have an id field (it might have a code or something else as its primary key). This lets you override the default behavior of updating if no id is found
- *    @param forceUpdate {boolean} sometimes the thing you're updating might have an id field. This lets you override that. This lets you override the default behavior of creating if an id is found
- 
+ * @param {options} options 
+ * @typedef {object} options
+ * @property {string} mutationName - optional rename of the default upsert function withXXXX to whatever you want
+ * @property {[queryNameStrings]} refetchQueries - 
+ * @property {boolean} showError - default=true -- whether or not to show a default error message on failure
+ * @property {obj | function} extraMutateArgs - obj or function that returns obj to get passed to the actual mutation call
+ * @property {[string]} invalidate - array of model types to invalidate after the mutate
+ * @property {boolean} asFunction - if true, this gives you back a function you can call directly instead of a HOC
+ * @property {string} idAs - if not using a fragment, you get an id field back as default. But, if the record doesn't have an id field, and instead has a 'code', you can set idAs: 'code'
+ * @property {boolean} forceCreate - sometimes the thing you're creating won't have an id field (it might have a code or something else as its primary key). This lets you override the default behavior of updating if no id is found
+ * @property {boolean} forceUpdate - sometimes the thing you're updating might have an id field. This lets you override that. This lets you override the default behavior of creating if an id is found
  * @return upsertXXXX function that takes an object or array of objects to upsert. It returns a promise resolving to an array of created/updated outputs
  */
-
 export default function withUpsert(nameOrFragment, options = {}) {
   const {
     mutationName,

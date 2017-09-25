@@ -10,16 +10,17 @@ import compose from "lodash/fp/compose";
 /**
  * withQuery 
  * @param {gql fragment} fragment supply a fragment as the first argument
- * @param options 
- * @param {boolean} options.isPlural - are we searching for 1 thing or many?
- * @param {string} options.queryName - what the props come back on ( by default = modelName + 'Query')
- * @param {boolean} options.asFunction - if true, this gives you back a function you can call directly instead of a HOC
- * @param {boolean} options.asQueryObj - if true, this gives you back the gql query object aka gql`query myQuery () {}`
- * @param {string} options.idAs - by default single record queries occur on an id. But, if the record doesn't have an id field, and instead has a 'code', you can set idAs: 'code'
- * @param {boolean} options.getIdFromParams - grab the id variable off the match.params object being passed in!
- * @param {boolean} options.showLoading - show a loading spinner over the whole component while the data is loading
- * @param {boolean} options.showError - default=true show an error message toastr if the an error occurs while loading the data
- * @return props: {xxxxQuery, data }
+ * @param {options} options 
+ * @typedef {object} options
+ * @property {boolean} isPlural Are we searching for 1 thing or many?
+ * @property {string} queryName What the props come back on ( by default = modelName + 'Query')
+ * @property {boolean} asFunction If true, this gives you back a function you can call directly instead of a HOC
+ * @property {boolean} asQueryObj If true, this gives you back the gql query object aka gql`query myQuery () {}`
+ * @property {string} idAs By default single record queries occur on an id. But, if the record doesn't have an id field, and instead has a 'code', you can set idAs: 'code'
+ * @property {boolean} getIdFromParams Grab the id variable off the match.params object being passed in!
+ * @property {boolean} showLoading Show a loading spinner over the whole component while the data is loading
+ * @property {boolean} showError Default=true show an error message toastr if the an error occurs while loading the data
+ * @return {props}: {xxxxQuery, data }
  */
 
 export default function withQuery(fragment, options = {}) {

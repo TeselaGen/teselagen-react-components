@@ -3,7 +3,11 @@
 import { formValueSelector } from "redux-form";
 import { map } from "lodash";
 import { connect } from "react-redux";
-
+/**
+ * 
+ * @param {*string} formName
+ * @param {*string} name
+ */
 export default function withSelectedEntities({ formName, name }) {
   if (!formName) {
     throw new Error(

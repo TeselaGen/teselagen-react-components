@@ -12,6 +12,19 @@ import compose from "lodash/fp/compose";
 import { map } from "lodash";
 import { withRouter } from "react-router-dom";
 
+/**
+ *  Note all these options can be passed at Design Time or at Runtime (like reduxForm())
+ * 
+ * @export
+ * 
+ * @param {compOrOpts} compOrOpts  
+ * @typedef {object} compOrOpts  
+ * @property {*string} formName - required unique identifier for the table
+ * @property {*boolean} schema - The data table schema
+ * @property {boolean} urlConnected - whether the table should connect to/update the URL
+ * @property {boolean} withSelectedEntities - whether or not to pass the selected entities
+ * @property {object} defaults - tableParam defaults such as pageSize, filter, etc
+ */
 export default function withTableParams(compOrOpts, pTopLevelOpts) {
   let topLevelOptions;
   let Component;
