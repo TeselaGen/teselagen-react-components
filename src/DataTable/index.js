@@ -30,9 +30,9 @@ import withQuery from "../enhancers/withQuery";
 import withUpsert from "../enhancers/withUpsert";
 import tableConfigurationFragment from "./utils/tableConfigurationFragment";
 import currentUserFragment from "./utils/currentUserFragment";
-import fieldOptionFragment from "../../lib/DataTable/utils/fieldOptionFragment";
 import withDelete from "../enhancers/withDelete";
 import withFields from "../enhancers/withFields";
+import fieldOptionFragment from "./utils/fieldOptionFragment";
 
 import "../toastr";
 import "./style.css";

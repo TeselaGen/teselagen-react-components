@@ -24,30 +24,50 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
   const { isLocalCall } = topLevelOptions;
 
   const mapStateToProps = (state, ownProps) => {
-    if (ownProps.isTableParamsConnected) {
-      //short circuit because we've already run this logic
-      return {};
-    }
     const mergedOpts = getMergedOpts(topLevelOptions, ownProps);
     const {
       history,
       urlConnected,
       withSelectedEntities,
       formName,
+      formNameFromWithTPCall,
       defaults,
       schema,
       isInfinite
     } = mergedOpts;
-    if (isLocalCall && !formName && !urlConnected) {
-      console.error(
-        "Please pass a unique 'formName' prop to the locally connected <DataTable/> component with schema: ",
-        schema
-      );
-    } else if (!isLocalCall && !formName && !urlConnected) {
-      console.error(
-        "Please pass a unique 'formName' prop to the withTableParams() with schema: ",
-        schema
-      );
+
+    if (ownProps.isTableParamsConnected) {
+      if (
+        formName &&
+        formNameFromWithTPCall &&
+        formName !== formNameFromWithTPCall
+      ) {
+        console.error(
+          `You passed a formName prop, ${formName} to a <DataTable/> component that is already withTableParams() connected, formNameFromWithTableParamsCall: ${formNameFromWithTPCall}`
+        );
+      }
+      //short circuit because we've already run this logic
+      return {};
+    }
+
+    let formNameFromWithTableParamsCall;
+    if (isLocalCall) {
+      if (!formName) {
+        console.error(
+          "Please pass a unique 'formName' prop to the locally connected <DataTable/> component with schema: ",
+          schema
+        );
+      }
+    } else {
+      //in user instantiated withTableParams() call
+      if (!formName) {
+        console.error(
+          "Please pass a unique 'formName' prop to the withTableParams() with schema: ",
+          schema
+        );
+      } else {
+        formNameFromWithTableParamsCall = formName;
+      }
     }
 
     const formSelector = formValueSelector(formName);
@@ -74,6 +94,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         isInfinite,
         isLocalCall
       }),
+      formNameFromWithTPCall: formNameFromWithTableParamsCall,
       // randomVarToForceLocalStorageUpdate: formSelector(state, "localStorageForceUpdate"),
       currentParams,
       selectedEntities,

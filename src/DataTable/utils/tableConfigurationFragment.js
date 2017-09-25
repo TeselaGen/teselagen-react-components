@@ -1,5 +1,5 @@
 import { gql } from "react-apollo";
-import fieldOptionFragment from "../../../lib/DataTable/utils/fieldOptionFragment";
+import fieldOptionFragment from "./fieldOptionFragment";
 
 export default gql`
   fragment tableConfigurationFragment on tableConfiguration {
