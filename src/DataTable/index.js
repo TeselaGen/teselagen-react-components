@@ -485,7 +485,7 @@ class ReactDataTable extends React.Component {
     return (
       <div className={"tg-react-table-checkbox-cell"} style={{ width: 40 }}>
         <Checkbox
-          onClick={e => {
+          onChange={e => {
             let newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
             const isRowCurrentlyChecked = checkedRows.indexOf(rowIndex) > -1;
             const entityId = getIdOrCode(entity);
