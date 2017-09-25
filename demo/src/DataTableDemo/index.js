@@ -28,6 +28,7 @@ const schema: DataTableSchema = {
   fields: [
     {
       path: "notDisplayedField",
+
       isHidden: true,
       type: "string",
       displayName: "Not Displayed"
@@ -275,7 +276,7 @@ export class DataTableInstance extends React.Component {
         />
         {renderToggle(this, "withTitle")}
         {renderToggle(this, "withSearch")}
-        {renderToggle(this, "withDisplayOptions", "This feature doesn't work currently without a data table connection")}
+        {renderToggle(this, "withDisplayOptions")}
         {renderToggle(this, "withPaging")}
         {renderToggle(this, "noHeader")}
         {renderToggle(this, "noFooter")}
