@@ -1,24 +1,8 @@
 import React from "react";
+import magicDownload from "./magicDownload";
 
 export default class DownloadLink extends React.Component {
   handleDownloadClick = event => {
-    function magicDownload(text, fileName) {
-      let blob = new Blob([text], {
-        type: "text/csv;charset=utf8;"
-      });
-
-      // create hidden link
-      let element = document.createElement("a");
-      document.body.appendChild(element);
-      element.setAttribute("href", window.URL.createObjectURL(blob));
-      element.setAttribute("download", fileName);
-      element.style.display = "";
-
-      element.click();
-
-      document.body.removeChild(element);
-      event.stopPropagation();
-    }
     const { getFileString, filename, fileString } = this.props;
 
     let fileType = event.target.innerText;
@@ -29,6 +13,7 @@ export default class DownloadLink extends React.Component {
     } else {
       magicDownload(text, filename);
     }
+    event.stopPropagation();
   };
 
   render() {

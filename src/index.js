@@ -5,6 +5,8 @@ export {
 export { default as DataTable } from "./DataTable";
 export { default as Loading } from "./Loading";
 export { default as DownloadLink } from "./DownloadLink";
+export { default as magicDownload } from "./DownloadLink/magicDownload";
+
 export {
   default as routeDoubleClick
 } from "./DataTable/utils/routeDoubleClick";
