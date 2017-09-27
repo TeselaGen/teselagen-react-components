@@ -1,4 +1,5 @@
 import "./fontello/css/fontello.css";
+import "./style.css";
 export {
   default as withSelectedEntities
 } from "./DataTable/utils/withSelectedEntities";
@@ -11,7 +12,9 @@ export {
   default as routeDoubleClick
 } from "./DataTable/utils/routeDoubleClick";
 export { default as withTableParams } from "./DataTable/utils/withTableParams";
-export { default as InfoPopover } from "./InfoPopover.js";
+export { default as InfoHelper } from "./InfoHelper";
+export { default as CollapsibleCard } from "./CollapsibleCard";
+export { default as J5ReportRecordView } from "./J5ReportRecordView";
 export { default as withDelete } from "./enhancers/withDelete.js";
 export { default as withUpsert } from "./enhancers/withUpsert.js";
 export { default as withQuery } from "./enhancers/withQuery.js";

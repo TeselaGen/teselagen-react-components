@@ -1,0 +1,11 @@
+.tg-card-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tg-card-header-title {
+  display: flex;
+  flex-direction: row;
+}

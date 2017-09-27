@@ -1,10 +1,11 @@
+import InfoHelperDemo from './InfoHelperDemo';
 import './style.css'
 import React from 'react'
 import { render } from 'react-dom'
 import DataTableDemo from './DataTableDemo/index.js'
-import InfoPopoverDemo from './InfoPopoverDemo/index.js'
 import {withUpsert, withQuery} from '../../src'
 import VectorEditorDemo from './VectorEditorDemo/index.js'
+import CollapsibleCardDemo from './CollapsibleCardDemo/index.js'
 import LoadingDemo from './LoadingDemo/index.js'
 import DownloadLinkDemo from './DownloadLinkDemo/index.js'
 import FormComponentsDemo from './FormComponentsDemo'
@@ -15,27 +16,31 @@ import store from './store';
 import Perf from 'react-addons-perf'
 
 const demos = {
-  vectoreditor: {
+  VectorEditor: {
     demo: VectorEditorDemo,
     url: 'https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/VectorEditorDemo/index.js'
   },
-  datatable: {
+  DataTable: {
     demo: DataTableDemo,
     url: 'https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/DataTableDemo/index.js'
   },
-  infopopover: {
-    demo: InfoPopoverDemo,
-    url: 'https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/InfoPopoverDemo/index.js'
+  InfoHelper: {
+    demo: InfoHelperDemo,
+    url: 'https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/InfoHelperDemo/index.js'
   },
-  loading: {
+  CollapsibleCard: {
+    demo: CollapsibleCardDemo,
+    url: 'https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/CollapsibleCardDemo/index.js'
+  },
+  Loading: {
     demo: LoadingDemo,
     url: 'https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/LoadingDemo/index.js'
   },
-  downloadLink: {
+  DownloadLink: {
     demo: DownloadLinkDemo,
     url: 'https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/DownloadLinkDemo/index.js'
   },
-  formcomponents: {
+  FormComponents: {
     demo: FormComponentsDemo,
     url: 'https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/FormComponentsDemo/index.js'
   },

@@ -1,4 +1,5 @@
 import React from "react";
+import {} from '@blueprintjs/core';
 import {DownloadLink} from '../../../src';
 
 export default class DownloadLinkDemo extends React.Component {
@@ -17,6 +18,11 @@ export default class DownloadLinkDemo extends React.Component {
 					<button> Download Some Different Stuff</button>
 				</DownloadLink>
 
+					<span>
+						* Note that the underlying function magicDownload can also be imported and used like: 
+						import magicDownload from 'teselagen-react-components'
+						magicDownload('I am some content','file1.csv')
+					</span>
 			</div>
 		);
 
