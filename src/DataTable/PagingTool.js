@@ -34,30 +34,26 @@ export default class PagingTool extends React.Component {
     } = this.props;
     const pageStart = (page - 1) * pageSize + 1;
     if (pageStart < 0) throw new Error("We should never have page be <0");
-    const pageEnd =
-      (page - 1) * pageSize + pageSize < total
-        ? (page - 1) * pageSize + pageSize
-        : total;
+    // const pageEnd =
+    //   (page - 1) * pageSize + pageSize < total
+    //     ? (page - 1) * pageSize + pageSize
+    //     : total;
     const backEnabled = page - 1 > 0;
     const forwardEnabled = page * pageSize < total;
     const lastPage = Math.ceil(total / pageSize);
 
     return (
       <div className={"paging-toolbar-container"}>
-        <div style={{ marginRight: 10 }}>
-          {total ? (
-            `Displaying ${parseInt(pageStart, 10)}-${parseInt(
-              pageEnd,
-              10
-            )} of ${total}`
-          ) : (
-            "No Rows"
-          )}
-        </div>
-        {onRefresh && <Button iconName="refresh" onClick={() => onRefresh()} />}
-        <div className="pt-select">
+        {onRefresh && (
+          <Button
+            className={"pt-minimal"}
+            iconName="refresh"
+            onClick={() => onRefresh()}
+          />
+        )}
+        <div className="pt-select pt-minimal">
           <select
-            style={{ width: 55, marginLeft: 10 }}
+            style={{ width: 55 }}
             onChange={e => {
               setPageSize(parseInt(e.target.value, 10));
             }}
@@ -77,28 +73,20 @@ export default class PagingTool extends React.Component {
             ]}
           </select>
         </div>
-        <div style={{ marginLeft: 10 }} className="pt-button-group">
+        <div style={{}} className="pt-button-group">
           <Button
-            disabled={!backEnabled}
-            iconName="double-chevron-left"
-            onClick={() => {
-              setPage(1);
-            }}
-          />
-          <Button
-            style={{ marginRight: 10 }}
+            style={{}}
             onClick={() => {
               setPage(parseInt(page, 10) - 1);
             }}
             disabled={!backEnabled}
             className="paging-arrow-left"
-            iconName="arrow-left"
+            iconName="chevron-left"
           />
         </div>
         <div>
           {total ? (
             <div>
-              Page
               <input
                 style={{ width: 35, marginLeft: 8, marginRight: 8 }}
                 value={selectedPage}
@@ -130,17 +118,10 @@ export default class PagingTool extends React.Component {
           <Button
             style={{ marginLeft: 10 }}
             disabled={!forwardEnabled}
-            iconName="arrow-right"
+            iconName="chevron-right"
             className="paging-arrow-right"
             onClick={() => {
               setPage(parseInt(page, 10) + 1);
-            }}
-          />
-          <Button
-            disabled={!forwardEnabled}
-            iconName="double-chevron-right"
-            onClick={() => {
-              setPage(lastPage);
             }}
           />
         </div>
