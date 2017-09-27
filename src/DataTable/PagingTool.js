@@ -80,7 +80,7 @@ export default class PagingTool extends React.Component {
               setPage(parseInt(page, 10) - 1);
             }}
             disabled={!backEnabled}
-            className="paging-arrow-left"
+            className="pt-minimal paging-arrow-left"
             iconName="chevron-left"
           />
         </div>
@@ -88,7 +88,7 @@ export default class PagingTool extends React.Component {
           {total ? (
             <div>
               <input
-                style={{ width: 35, marginLeft: 8, marginRight: 8 }}
+                style={{ marginLeft: 5, width: 35, marginRight: 8 }}
                 value={selectedPage}
                 onChange={e => {
                   this.setState({
@@ -116,10 +116,10 @@ export default class PagingTool extends React.Component {
         </div>
         <div className="pt-button-group">
           <Button
-            style={{ marginLeft: 10 }}
+            style={{ marginLeft: 5 }}
             disabled={!forwardEnabled}
             iconName="chevron-right"
-            className="paging-arrow-right"
+            className="pt-minimal  paging-arrow-right"
             onClick={() => {
               setPage(parseInt(page, 10) + 1);
             }}

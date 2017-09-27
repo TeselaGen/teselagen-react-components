@@ -344,6 +344,14 @@ class ReactDataTable extends React.Component {
               </div>
             )}
             <div style={{ display: "flex", flexWrap: "wrap" }}>
+              {withDisplayOptions && (
+                <DisplayOptions
+                  resetDefaultVisibility={resetDefaultVisibilityToUse}
+                  updateColumnVisibility={updateColumnVisibilityToUse}
+                  formName={formName}
+                  schema={schema}
+                />
+              )}
               {!isInfinite &&
               withPaging &&
               (hidePageSizeWhenPossible ? entityCount > pageSize : true) ? (
@@ -358,14 +366,6 @@ class ReactDataTable extends React.Component {
                   setPageSize={setPageSize}
                 />
               ) : null}
-              {withDisplayOptions && (
-                <DisplayOptions
-                  resetDefaultVisibility={resetDefaultVisibilityToUse}
-                  updateColumnVisibility={updateColumnVisibilityToUse}
-                  formName={formName}
-                  schema={schema}
-                />
-              )}
             </div>
           </div>
         )}

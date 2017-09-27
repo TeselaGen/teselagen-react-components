@@ -25,7 +25,7 @@ export default class PagingTool extends React.Component {
                 <Checkbox
                   key={displayName}
                   onClick={() => {
-                    if (numVisible <= 1) {
+                    if (numVisible <= 1 && !isHidden) {
                       return window.toastr.warning(
                         "We have to display at least one column :)"
                       );
@@ -56,7 +56,7 @@ export default class PagingTool extends React.Component {
         }
         position={Position.TOP_RIGHT}
       >
-        <Button iconName={"cog"} />
+        <Button className={"pt-minimal"} iconName={"cog"} />
       </Popover>
     );
   }
