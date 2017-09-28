@@ -5,7 +5,7 @@ import { compose } from "redux";
 import React from "react";
 import moment from "moment";
 import uniqid from "uniqid";
-import { camelCase, get, toArray } from "lodash";
+import { camelCase, get, toArray, startCase } from "lodash";
 import {
   Button,
   Menu,
@@ -41,33 +41,60 @@ import withTableParams from "./utils/withTableParams";
 const ROW_HEIGHT = 35;
 
 const noop = () => {};
+
+//we use this to make adding preset prop groups simpler
+function computePresets(props) {
+  const { isSimple } = props;
+  let toReturn = { ...props };
+  if (isSimple) {
+    //isSimplePreset
+    toReturn = {
+      noFooter: true,
+      noPadding: true,
+      hidePageSizeWhenPossible: true,
+      isInfinite: true,
+      hideSelectedCount: true,
+      withTitle: false,
+      withSearch: false,
+      withPaging: false,
+      ...toReturn
+    };
+  } else {
+    toReturn = {
+      // the usual defaults:
+      noFooter: false,
+      noPadding: false,
+      hidePageSizeWhenPossible: false,
+      isInfinite: false,
+      hideSelectedCount: false,
+      withTitle: true,
+      withSearch: true,
+      withPaging: true,
+      ...toReturn
+    };
+  }
+  return toReturn;
+}
+
 class ReactDataTable extends React.Component {
   state = {
     columns: []
   };
 
   static defaultProps = {
+    //NOTE: DO NOT SET DEFAULTS HERE FOR PROPS THAT GET COMPUTED AS PART OF PRESET GROUPS IN computePresets
     entities: [],
-    withTitle: true,
-    withSearch: true,
-    withPaging: true,
     noHeader: false,
-    noFooter: false,
-    noPadding: false,
-    hidePageSizeWhenPossible: false,
     pageSize: 10,
     extraClasses: "",
     className: "",
     page: 1,
     style: {},
+    isLoading: false,
     maxHeight: 800,
+    isSimple: false,
     reduxFormSearchInput: {},
     reduxFormSelectedEntityIdMap: {},
-    isLoading: false,
-    isInfinite: false,
-    isSingleSelect: false,
-    hideSelectedCount: false,
-    withCheckboxes: false,
     setSearchTerm: noop,
     setFilter: noop,
     clearFilters: noop,
@@ -82,7 +109,9 @@ class ReactDataTable extends React.Component {
     onDeselect: noop,
     addFilters: noop,
     removeSingleFilter: noop,
-    filters: []
+    filters: [],
+    isSingleSelect: false,
+    withCheckboxes: false
   };
 
   componentWillMountOrReceiveProps = (oldProps, newProps) => {
@@ -98,7 +127,7 @@ class ReactDataTable extends React.Component {
               return columns;
             }
             columns.push({
-              displayName: field.displayName,
+              displayName: field.displayName || startCase(field.path),
               schemaIndex: i,
               width: field.width
             });
@@ -131,13 +160,16 @@ class ReactDataTable extends React.Component {
   };
 
   componentWillReceiveProps(newProps) {
-    this.componentWillMountOrReceiveProps(this.props, newProps);
+    this.componentWillMountOrReceiveProps(
+      computePresets(this.props),
+      computePresets(newProps)
+    );
   }
   componentWillMount() {
     // table id is used for programmatic scroll
     const tableId = uniqid();
     this.setState({ tableId });
-    this.componentWillMountOrReceiveProps({}, this.props);
+    this.componentWillMountOrReceiveProps({}, computePresets(this.props));
   }
 
   render() {
@@ -181,8 +213,9 @@ class ReactDataTable extends React.Component {
       entityCount,
       isSingleSelect,
       hideSelectedCount,
-      entities
-    } = this.props;
+      entities,
+      children
+    } = computePresets(this.props);
     let updateColumnVisibilityToUse = updateColumnVisibility;
     let resetDefaultVisibilityToUse = resetDefaultVisibility;
     if (withDisplayOptions && !syncDisplayOptionsToDb) {
@@ -207,8 +240,8 @@ class ReactDataTable extends React.Component {
     const hasFilters = filters.length || searchTerm;
     const filtersOnNonDisplayedFields = [];
     if (filters && filters.length) {
-      schema.fields.forEach(({ isHidden, displayName }) => {
-        const ccDisplayName = camelCase(displayName);
+      schema.fields.forEach(({ isHidden, displayName, path }) => {
+        const ccDisplayName = camelCase(displayName || path);
         if (isHidden) {
           filters.forEach(filter => {
             if (filter.filterOn === ccDisplayName) {
@@ -256,7 +289,7 @@ class ReactDataTable extends React.Component {
               withTitle && (
                 <span className={"data-table-title"}>{tableName}</span>
               )}
-              {this.props.children}
+              {children}
             </div>
             {errorParsingUrlString && (
               <span className={"pt-icon-error pt-intent-warning"}>
@@ -265,16 +298,17 @@ class ReactDataTable extends React.Component {
             )}
             {filtersOnNonDisplayedFields.length ? (
               filtersOnNonDisplayedFields.map(
-                ({ displayName, selectedFilter, filterValue }) => {
+                ({ displayName, path, selectedFilter, filterValue }) => {
                   return (
                     <div
-                      key={displayName}
+                      key={displayName || startCase(path)}
                       className={"tg-filter-on-non-displayed-field"}
                     >
                       <span className={"pt-icon-filter"} />
                       <span>
                         {" "}
-                        {displayName} {selectedFilter} {filterValue}{" "}
+                        {displayName || startCase(path)} {selectedFilter}{" "}
+                        {filterValue}{" "}
                       </span>
                     </div>
                   );
@@ -380,7 +414,7 @@ class ReactDataTable extends React.Component {
       onDoubleClick,
       history,
       entities
-    } = this.props;
+    } = computePresets(this.props);
     if (!rowInfo) return {};
     const entity = rowInfo.original;
     const rowId = getIdOrCode(entity);
@@ -388,7 +422,7 @@ class ReactDataTable extends React.Component {
     return {
       onClick: e => {
         if (withCheckboxes) return;
-        rowClick(e, rowInfo, entities, this.props);
+        rowClick(e, rowInfo, entities, computePresets(this.props));
       },
       onContextMenu: e => {
         e.preventDefault();
@@ -401,7 +435,10 @@ class ReactDataTable extends React.Component {
           // if we are not using checkboxes we need to make sure
           // that the id of the record gets added to the id map
           newIdMap = oldIdMap[rowId] ? oldIdMap : { [rowId]: { entity } };
-          finalizeSelection({ idMap: newIdMap, props: this.props });
+          finalizeSelection({
+            idMap: newIdMap,
+            props: computePresets(this.props)
+          });
         }
         this.showContextMenu(newIdMap, e);
       },
@@ -417,7 +454,7 @@ class ReactDataTable extends React.Component {
       reduxFormSelectedEntityIdMap,
       isSingleSelect,
       entities
-    } = this.props;
+    } = computePresets(this.props);
     const checkedRows = getSelectedRowsFromEntities(
       entities,
       reduxFormSelectedEntityIdMap.input.value
@@ -450,7 +487,10 @@ class ReactDataTable extends React.Component {
                 }
               });
 
-              finalizeSelection({ idMap: newIdMap, props: this.props });
+              finalizeSelection({
+                idMap: newIdMap,
+                props: computePresets(this.props)
+              });
               this.setState({ lastCheckedRow: undefined });
             }}
             {...checkboxProps}
@@ -467,7 +507,7 @@ class ReactDataTable extends React.Component {
       reduxFormSelectedEntityIdMap,
       isSingleSelect,
       entities
-    } = this.props;
+    } = computePresets(this.props);
     const checkedRows = getSelectedRowsFromEntities(
       entities,
       reduxFormSelectedEntityIdMap.input.value
@@ -525,7 +565,7 @@ class ReactDataTable extends React.Component {
 
             finalizeSelection({
               idMap: newIdMap,
-              props: this.props
+              props: computePresets(this.props)
             });
             this.setState({ lastCheckedRow: rowIndex });
           }}
@@ -537,7 +577,7 @@ class ReactDataTable extends React.Component {
   };
 
   renderColumns = () => {
-    const { schema, cellRenderer, withCheckboxes } = this.props;
+    const { schema, cellRenderer, withCheckboxes } = computePresets(this.props);
     const { columns } = this.state;
     if (!columns.length) {
       return;
@@ -598,7 +638,7 @@ class ReactDataTable extends React.Component {
   };
 
   showContextMenu = (idMap, e) => {
-    const { history, contextMenu, entities } = this.props;
+    const { history, contextMenu, entities } = computePresets(this.props);
     const selectedRecords = getSelectedRecordsFromEntities(entities, idMap);
     const itemsToRender = contextMenu({
       selectedRecords,
@@ -617,12 +657,17 @@ class ReactDataTable extends React.Component {
       order,
       filters,
       removeSingleFilter
-    } = this.props;
+    } = computePresets(this.props);
     const schemaForField = schema.fields[column.schemaIndex];
-    const { displayName, sortDisabled, renderTitleInner } = schemaForField;
+    const {
+      displayName,
+      sortDisabled,
+      renderTitleInner,
+      path
+    } = schemaForField;
     const columnDataType = schemaForField.type;
     const isActionColumn = columnDataType === "action";
-    const ccDisplayName = camelCase(displayName);
+    const ccDisplayName = camelCase(displayName || path);
     const currentFilter =
       filters &&
       filters.length &&
@@ -694,9 +739,16 @@ class ReactDataTable extends React.Component {
 
     return (
       <div className={"tg-react-table-column-header"}>
-        {displayName && (
-          <span title={displayName} className={"tg-react-table-name"}>
-            {renderTitleInner ? renderTitleInner : displayName + "  "}
+        {(displayName || startCase(path)) && (
+          <span
+            title={displayName || startCase(path)}
+            className={"tg-react-table-name"}
+          >
+            {renderTitleInner ? (
+              renderTitleInner
+            ) : (
+              (displayName || startCase(path)) + "  "
+            )}
           </span>
         )}
         {!sortDisabled && !isActionColumn && sortComponent}

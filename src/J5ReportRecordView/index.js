@@ -13,6 +13,7 @@ const sharedTableProps = {
   withSearch: false,
   isInfinite: true,
   maxHeight: 400,
+  withDisplayOptions: true,
   hidePageSizeWhenPossible: true,
   doNotShowEmptyRows: true,
   isLoading: false,

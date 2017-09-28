@@ -31,6 +31,7 @@ const schemas = {
   },
   j5OligoSyntheses: {
     fields: [
+      { path: "id", type: "string", displayName: "Id", isHidden: true },
       { path: "name", type: "string", displayName: "Name" },
       { path: "cost", type: "number", displayName: "Cost" },
       { path: "tm", type: "number", displayName: "Tm" },
@@ -40,6 +41,7 @@ const schemas = {
         type: "boolean",
         displayName: "Is Linked"
       }
+      // id first target part last target part tm tm 3' length cost
       // { path: 'sequence', type: 'string', displayName: 'Sequence' }
     ]
   },
@@ -67,6 +69,12 @@ const schemas = {
   },
   j5InputSequences: {
     fields: [
+      {
+        path: "sequence.id",
+        type: "string",
+        displayName: "ID",
+        isHidden: true
+      },
       { path: "sequence.name", type: "string", displayName: "Name" },
       { path: "sequence.size", type: "number", displayName: "Size" },
       { path: "inStock", type: "boolean", displayName: "In Stock" },
@@ -79,6 +87,12 @@ const schemas = {
   },
   j5InputParts: {
     fields: [
+      {
+        path: "sequence.id",
+        type: "string",
+        displayName: "ID",
+        isHidden: true
+      },
       { path: "sequencePart.name", type: "string", displayName: "Name" },
       { path: "sequencePart.start", type: "number", displayName: "Start" },
       { path: "sequencePart.end", type: "number", displayName: "End" },

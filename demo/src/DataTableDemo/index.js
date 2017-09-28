@@ -200,6 +200,7 @@ const defaultNumOfEntities = 60;
 export class DataTableInstance extends React.Component {
   state = {
     additionalFilters: false,
+    isSimple: false,
     withTitle: true,
     withSearch: true,
     withPaging: true,
@@ -222,6 +223,8 @@ export class DataTableInstance extends React.Component {
   };
 
   render() {
+    
+
     const { numOfEntities, entities, selectedIds } = this.state;
     const { tableParams, selectedEntities } = this.props;
     const { page, pageSize, isTableParamsConnected } = tableParams;
@@ -274,6 +277,18 @@ export class DataTableInstance extends React.Component {
             });
           }}
         />
+        {renderToggle(this, "isSimple", ` This sets: 
+        noHeader: true,
+        noFooter: true,
+        noPadding: true,
+        hidePageSizeWhenPossible: true,
+        isInfinite: true,
+        hideSelectedCount: true,
+        withTitle: false,
+        withSearch: false,
+        withPaging: false,
+        by default, but they are all individually overridable (which is why nothing changes when this is toggled here)
+        `)}
         {renderToggle(this, "withTitle")}
         {renderToggle(this, "withSearch")}
         {renderToggle(this, "withDisplayOptions")}
@@ -351,6 +366,7 @@ export class DataTableInstance extends React.Component {
             ];
           }}
           withTitle={this.state.withTitle}
+          isSimple={this.state.isSimple}
           withSearch={this.state.withSearch}
           withPaging={this.state.withPaging}
           noPadding={this.state.noPadding}
