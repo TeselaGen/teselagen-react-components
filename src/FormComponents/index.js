@@ -1,7 +1,6 @@
 import sortify from "./sortify"; //tnr TODO: export this from json.sortify when https://github.com/ThomasR/JSON.sortify/issues/11 is resolved
 import isNumber from "lodash/isNumber";
 import mathExpressionEvaluator from "math-expression-evaluator";
-import cloneDeep from "lodash/cloneDeep";
 import deepEqual from "deep-equal";
 import React from "react";
 import { Field } from "redux-form";
@@ -44,6 +43,7 @@ function removeUnwantedProps(props) {
   delete cleanedProps.intentClass;
   delete cleanedProps.meta;
   delete cleanedProps.defaultValue;
+  delete cleanedProps.enableReinitialize;
   delete cleanedProps.tabIndex;
   delete cleanedProps.tooltipError;
   delete cleanedProps.tooltipProps;
@@ -78,8 +78,11 @@ class AbstractInput extends React.Component {
     defaultValue,
     input: { name, value }
   }) {
-    const { defaultValue: oldDefaultValue } = this.props;
-    if (!value && !deepEqual(defaultValue, oldDefaultValue)) {
+    const { defaultValue: oldDefaultValue, enableReinitialize } = this.props;
+    if (
+      (!value || enableReinitialize) &&
+      !deepEqual(defaultValue, oldDefaultValue)
+    ) {
       dispatch({
         type: "@@redux-form/CHANGE",
         meta: {
