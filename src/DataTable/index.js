@@ -33,7 +33,6 @@ import currentUserFragment from "./utils/currentUserFragment";
 import withDelete from "../enhancers/withDelete";
 import withFields from "../enhancers/withFields";
 import fieldOptionFragment from "./utils/fieldOptionFragment";
-
 import "../toastr";
 import "./style.css";
 import withTableParams from "./utils/withTableParams";
@@ -758,6 +757,12 @@ class ReactDataTable extends React.Component {
   };
 }
 
+/**
+ * @param {options} options 
+ * @typedef {object} options
+ * @property {boolean} isPlural Are we searching for 1 thing or many?
+ * @property {string} queryName What the props come back on ( by default = modelName + 'Query')
+ */
 export default compose(
   //connect to withTableParams here in the dataTable component so that, in the case that the table is not manually connected,
   withTableParams({

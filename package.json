@@ -2,7 +2,7 @@
   "name": "teselagen-react-components",
   "version": "17.3.0",
   "description": "Teselagen React Component Library",
-  "main": "lib/index.js",
+  "main": "es/index.js",
   "module": "es/index.js",
   "files": [
     "css",

@@ -1,0 +1,46 @@
+// TypeScript Version: 2.3
+
+import { Component } from "react";
+
+export interface DataTableProps {
+    entities: [],
+    noHeader: boolean,
+    pageSize: number,
+    extraClasses: string,
+    className: string,
+    page: number,
+    style: {},
+    isLoading: boolean,
+    maxHeight: number,
+    isSimple: boolean,
+    reduxFormSearchInput: {},
+    reduxFormSelectedEntityIdMap: {},
+    setSearchTerm?(): void,
+    setFilter?(): void,
+    clearFilters?(): void,
+    setPageSize?(): void,
+    setOrder?(): void,
+    setPage?(): void,
+    contextMenu?(): void,
+    onDoubleClick?(): void,
+    onRowSelect?(): void,
+    onMultiRowSelect?(): void,
+    onSingleRowSelect?(): void,
+    onDeselect?(): void,
+    addFilters?(): void,
+    removeSingleFilter?(): void,
+    filters: [],
+    isSimple: boolean,
+    isSingleSelect: boolean,
+    withCheckboxes: boolean,
+    noFooter: boolean,
+    noPadding: boolean,
+    hidePageSizeWhenPossible: boolean,
+    isInfinite: boolean,
+    hideSelectedCount: boolean,
+    withTitle: boolean,
+    withSearch: boolean,
+    withPaging: boolean,
+}
+
+export default class DataTable extends Component<DataTableProps> {}
