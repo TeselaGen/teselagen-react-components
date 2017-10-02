@@ -4,13 +4,14 @@ import { Component } from "react";
 
 export interface DataTableProps {
     entities: [],
+    destroyOnUnmount: boolean,
     noHeader: boolean,
     pageSize: number,
     extraClasses: string,
     className: string,
     page: number,
     style: {},
-    isLoading: boolean,
+    isLoading: boolean, 
     maxHeight: number,
     isSimple: boolean,
     reduxFormSearchInput: {},

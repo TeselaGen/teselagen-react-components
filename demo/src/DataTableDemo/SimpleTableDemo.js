@@ -2,8 +2,9 @@
 import React from "react";
 import { Button } from "@blueprintjs/core";
 import { FocusStyleManager } from "@blueprintjs/core";
-import {  DataTable } from "../../../lib";
+import {  DataTable } from "../../../src";
 import "./style.css";
+
 
 
 
@@ -39,6 +40,6 @@ const entities = [
 ]
 export default function SimpleTable() {
     return <div>
-      <DataTable withCheckboxes entities={entities} schema={schema}></DataTable>
+      <DataTable entities={entities} schema={schema}></DataTable>
     </div>
 }
