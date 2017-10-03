@@ -1,8 +1,8 @@
-export default function withDelete(nameOrFragment: String | Object, options: {
-  refetchQueries: [String],
-  mutationName: String,
-  extraMutateArgs: Function | Object,
-  showError: Boolean,
-  invalidate: [String],
-  asFunction: Boolean,
+export default function withDelete(nameOrFragment: string | object, options: {
+  refetchQueries: [string],
+  mutationName: string,
+  extraMutateArgs: function | object,
+  showError: boolean,
+  invalidate: [string],
+  asFunction: boolean,
 }){}

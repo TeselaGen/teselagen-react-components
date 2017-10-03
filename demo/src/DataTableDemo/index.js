@@ -9,7 +9,7 @@ import {ApolloProvider, ApolloClient} from 'react-apollo';
 import { withTableParams, DataTable } from "../../../src";
 import withSelectedEntities from '../../../es/DataTable/utils/withSelectedEntities';
 
-import { withDelete, withUpsert } from "../../../src";
+import { withDelete, withUpsert, withQuery } from "../../../src";
 
 import "./style.css";
 
@@ -21,6 +21,7 @@ import Chance from "chance";
 import times from "lodash/times";
 import { DataTableSchema } from "../../../src/flow_types";
 FocusStyleManager.onlyShowFocusOnTabs();
+
 //@flow
 const client = new ApolloClient({})
 const chance = new Chance();

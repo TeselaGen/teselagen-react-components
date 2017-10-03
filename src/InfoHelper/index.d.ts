@@ -3,12 +3,12 @@
 import { Component } from "react";
 
 export interface IInfoHelper {
-  className: String,
+  className: string,
   content: any,
   children: any,
-  iconName: String,
-  isPopover: Boolean,
-  size: Number,
+  iconName: string,
+  isPopover: boolean,
+  size: number,
 }
 
 export default class InfoHelper extends Component<IInfoHelper>{}
