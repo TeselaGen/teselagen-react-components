@@ -1,4 +1,5 @@
-export default function withFields(fragment: Object, {
+interface IWithQuery {}
+export default function withQuery(fragment: Object, options: {
   isPlural: Boolean, // Are we searching for 1 thing or many?
   queryName: String, // What the props come back on ( by default = modelName + 'Query')
   asFunction: Boolean, // If true, this gives you back a function you can call directly instead of a HOC

@@ -1,4 +1,4 @@
-export default function withDelete(nameOrFragment: String | Object, {
+export default function withDelete(nameOrFragment: String | Object, options: {
   refetchQueries: [String],
   mutationName: String,
   extraMutateArgs: Function | Object,

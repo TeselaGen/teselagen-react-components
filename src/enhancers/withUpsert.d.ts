@@ -1,4 +1,4 @@
-export default function withUpsert(modelNameOrFragment: Object, {
+export default function withUpsert(modelNameOrFragment: Object, options: {
   refetchQueries: [String], // - this is just the apollo option exposed on the top level
   invalidate: [String], // - array of model types to invalidate after the mutate
   mutationName: String, // - optional rename of the default upsert function withXXXX to whatever you want
