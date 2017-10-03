@@ -7,7 +7,10 @@ import {ApolloProvider, ApolloClient} from 'react-apollo';
 // import { createStore, combineReducers } from "redux";
 // import { reducer as form } from "redux-form";
 import { withTableParams, DataTable } from "../../../src";
-// import { onEnterOrBlurHelper } from "../../../src";
+import withSelectedEntities from '../../../es/DataTable/utils/withSelectedEntities';
+
+import { withDelete, withUpsert } from "../../../src";
+
 import "./style.css";
 
 // import { columns, schema } from "./new_mocks";
@@ -18,7 +21,6 @@ import Chance from "chance";
 import times from "lodash/times";
 import { DataTableSchema } from "../../../src/flow_types";
 FocusStyleManager.onlyShowFocusOnTabs();
-
 //@flow
 const client = new ApolloClient({})
 const chance = new Chance();
@@ -97,7 +99,6 @@ export default class DataTableDemo extends React.Component {
     //tnr: the following code allows the DataTable test to set defaults on the demo (which is used in the testing)
     this.setState(this.props);
   }
-
   render() {
     let ConnectedTable = withTableParams({
       //tnrtodo: this should be set up as an enhancer instead
