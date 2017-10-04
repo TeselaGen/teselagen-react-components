@@ -157,7 +157,8 @@ export default function withQuery(fragment, options = {}) {
         };
       },
       props: (...args) => {
-        const { data } = args[0];
+        const { data, ownProps } = args[0];
+        const { tableParams } = ownProps;
         const results = get(data, nameToUse + (isPlural ? ".results" : ""));
         const totalResults = isPlural
           ? get(data, nameToUse + ".totalResults", 0)
@@ -171,14 +172,26 @@ export default function withQuery(fragment, options = {}) {
           ["error" + upperFirst(nameToUse)]: data.error,
           ["loading" + upperFirst(nameToUse)]: data.loading
         };
+
         return {
+          ...(tableParams && !tableParams.entities
+            ? {
+                tableParams: {
+                  ...tableParams,
+                  isLoading: data.loading,
+                  entities: results,
+                  entityCount: totalResults,
+                  onRefresh: data.refetch
+                }
+              }
+            : {}),
           ...(props ? props(...args) : {}),
           data: newData,
           [queryNameToUse]: newData,
           [nameToUse]: results,
           [nameToUse + "Error"]: data.error,
           [nameToUse + "Loading"]: data.loading,
-          [nameToUse + "Count"]: results && results.length,
+          [nameToUse + "Count"]: totalResults,
           [camelCase("refetch_" + nameToUse)]: data.refetch
         };
       },
