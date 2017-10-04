@@ -59,6 +59,11 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
           `You passed a formName prop, ${formName} to a <DataTable/> component that is already withTableParams() connected, formNameFromWithTableParamsCall: ${formNameFromWithTPCall}`
         );
       }
+      if (!ownProps.entities) {
+        console.error(
+          `No entities array detected in tableParams object (<DataTable {...tableParams}/>). You need to compose(withTableParams(), withQuery(something)). formNameFromWithTableParamsCall: ${formNameFromWithTPCall}`
+        );
+      }
       //short circuit because we've already run this logic
       return {};
     }
