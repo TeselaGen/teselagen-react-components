@@ -1,12 +1,10 @@
 import React from "react";
-import { Intent, Spinner } from "@blueprintjs/core";
 import "./style.css";
-export default function Loading({ loading, children, ...rest }) {
+export default function Loading({ loading, children /* ...rest */ }) {
   if (loading) {
     return (
       <div className={"tg-flex justify-center"}>
-        <br />
-        ... Loading ...
+        <br />`` ... Loading ...
         <br />
       </div>
     );
