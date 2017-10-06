@@ -15,11 +15,11 @@ export { default as withTableParams } from "./DataTable/utils/withTableParams";
 export { default as InfoHelper } from "./InfoHelper";
 export { default as CollapsibleCard } from "./CollapsibleCard";
 export { default as J5ReportRecordView } from "./J5ReportRecordView";
-export { default as withDelete } from "./enhancers/withDelete.js";
-export { default as withUpsert } from "./enhancers/withUpsert.js";
-export { default as withQuery } from "./enhancers/withQuery.js";
-export { default as withFields } from "./enhancers/withFields.js";
-export { default as withField } from "./enhancers/withField.js";
+export { default as withDelete } from "./enhancers/withDelete";
+export { default as withUpsert } from "./enhancers/withUpsert";
+export { default as withQuery } from "./enhancers/withQuery";
+export { default as withFields } from "./enhancers/withFields";
+export { default as withField } from "./enhancers/withField";
 
 export * from "./FormComponents";
 export * from "./toastr";

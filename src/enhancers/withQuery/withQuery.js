@@ -4,7 +4,6 @@ import pluralize from "pluralize";
 import { get, upperFirst, camelCase } from "lodash";
 import React from "react";
 import deepEqual from "deep-equal";
-import Loading from "../Loading";
 import compose from "lodash/fp/compose";
 
 /**
@@ -32,6 +31,7 @@ export default function withQuery(fragment, options = {}) {
     asFunction,
     asQueryObj,
     idAs,
+    LoadingComp,
     client,
     variables,
     props,
@@ -215,7 +215,7 @@ export default function withQuery(fragment, options = {}) {
           const { data = {} } = this.props;
           const { loading } = data;
           if (loading && showLoading) {
-            return <Loading loading />;
+            return <LoadingComp loading />;
           }
           return <WrappedComponent {...this.props} />;
         }
