@@ -92,11 +92,9 @@ const Demo = () => {
             <Route path="/" component={HomePage} />
             {Object.keys(demos).map(function(key, index) {
               const demo = demos[key];
-              console.log("demo.childLinks:", demo.childLinks);
               return (
-                <div style={{ display: "flex" }}>
+                <div key={key + index} style={{ display: "flex" }}>
                   <Route
-                    key={key + index}
                     path={`/${key}/index`}
                     url={demo.url}
                     component={DemoComponentWrapper(demo)}
@@ -135,22 +133,20 @@ function HomePage() {
       {Object.keys(demos).map(function(name, index) {
         const childLinks = demos[name].childLinks || [];
         return (
-          <div>
-
-          <Link
-            key={index}
-            to={`/${name}/index`}
-            style={{ color: "inherit", textDecoration: "none" }}
-          >
-            <div
-              style={{ borderLeft: index !== 0 && "2px solid grey" }}
-              className={"pt-popover-dismiss pt-menu-item"}
+          <div key={index}>
+            <Link
+              key={index}
+              to={`/${name}/index`}
+              style={{ color: "inherit", textDecoration: "none" }}
             >
-              {name} demo
-            </div>
-            
-          </Link>
-          {Object.keys(childLinks).map(function(linkName, index) {
+              <div
+                style={{ borderLeft: index !== 0 && "2px solid grey" }}
+                className={"pt-popover-dismiss pt-menu-item"}
+              >
+                {name} demo
+              </div>
+            </Link>
+            {Object.keys(childLinks).map(function(linkName, index) {
               return (
                 <Link
                   key={index}
@@ -162,7 +158,7 @@ function HomePage() {
                     className={"pt-popover-dismiss pt-menu-item"}
                   >
                     {linkName} demo
-                  </div>  
+                  </div>
                 </Link>
               );
             })}

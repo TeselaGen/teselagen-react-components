@@ -8,7 +8,8 @@ export default class PagingTool extends React.Component {
     const {
       schema,
       updateColumnVisibility = noop,
-      resetDefaultVisibility = noop
+      resetDefaultVisibility = noop,
+      disabled
     } = this.props;
     const { fields } = schema;
 
@@ -56,7 +57,7 @@ export default class PagingTool extends React.Component {
         }
         position={Position.TOP_RIGHT}
       >
-        <Button className={"pt-minimal"} iconName={"cog"} />
+        <Button disabled={disabled} className={"pt-minimal"} iconName={"cog"} />
       </Popover>
     );
   }

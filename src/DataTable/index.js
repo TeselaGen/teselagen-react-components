@@ -33,6 +33,7 @@ import currentUserFragment from "./utils/currentUserFragment";
 import withDelete from "../enhancers/withDelete";
 import withFields from "../enhancers/withFields";
 import fieldOptionFragment from "./utils/fieldOptionFragment";
+import DisabledLoadingComponent from "./DisabledLoadingComponent";
 import "../toastr";
 import "./style.css";
 import withTableParams from "./utils/withTableParams";
@@ -90,6 +91,7 @@ class ReactDataTable extends React.Component {
     page: 1,
     style: {},
     isLoading: false,
+    disabled: false,
     maxHeight: 800,
     isSimple: false,
     reduxFormSearchInput: {},
@@ -188,6 +190,7 @@ class ReactDataTable extends React.Component {
       withSearch,
       withPaging,
       isInfinite,
+      disabled,
       noHeader,
       noFooter,
       noPadding,
@@ -320,6 +323,7 @@ class ReactDataTable extends React.Component {
               <div className={"data-table-search-and-clear-filter-container"}>
                 {hasFilters ? (
                   <Button
+                    disabled={disabled}
                     className={"data-table-clear-filters"}
                     onClick={() => {
                       clearFilters();
@@ -333,7 +337,8 @@ class ReactDataTable extends React.Component {
                   {...{
                     reduxFormSearchInput,
                     setSearchTerm,
-                    maybeSpinner
+                    maybeSpinner,
+                    disabled
                   }}
                 />
               </div>
@@ -346,13 +351,16 @@ class ReactDataTable extends React.Component {
           pageSize={rowsToShow}
           showPagination={false}
           sortable={false}
-          loading={isLoading}
+          loading={isLoading || disabled}
           getTbodyProps={() => ({
             id: tableId
           })}
           getTrGroupProps={this.getTableRowProps}
           NoDataComponent={({ children }) =>
             isLoading ? null : <div className="rt-noData">{children}</div>}
+          LoadingComponent={props => (
+            <DisabledLoadingComponent {...{ ...props, disabled }} />
+          )}
           style={{
             maxHeight,
             ...style
@@ -379,6 +387,7 @@ class ReactDataTable extends React.Component {
             <div style={{ display: "flex", flexWrap: "wrap" }}>
               {withDisplayOptions && (
                 <DisplayOptions
+                  disabled={disabled}
                   resetDefaultVisibility={resetDefaultVisibilityToUse}
                   updateColumnVisibility={updateColumnVisibilityToUse}
                   formName={formName}
@@ -394,6 +403,7 @@ class ReactDataTable extends React.Component {
                     page,
                     pageSize
                   }}
+                  disabled={disabled}
                   onRefresh={onRefresh}
                   setPage={setPage}
                   setPageSize={setPageSize}

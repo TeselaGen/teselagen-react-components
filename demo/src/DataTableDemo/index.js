@@ -214,6 +214,7 @@ export class DataTableInstance extends React.Component {
     isSingleSelect: false,
     maxHeight: false,
     isLoading: false,
+    disabled: false,
     compact: false,
     hidePageSizeWhenPossible: false,
     hideSelectedCount: false,
@@ -300,6 +301,7 @@ export class DataTableInstance extends React.Component {
         {renderToggle(this, "noPadding")}
         {renderToggle(this, "isInfinite")}
         {renderToggle(this, "isLoading")}
+        {renderToggle(this, "disabled")}
         {renderToggle(this, "hidePageSizeWhenPossible")}
         {renderToggle(this, "doNotShowEmptyRows")}
         {renderToggle(this, "withCheckboxes")}
@@ -377,6 +379,7 @@ export class DataTableInstance extends React.Component {
           withDisplayOptions={this.state.withDisplayOptions}
           isInfinite={this.state.isInfinite}
           isLoading={this.state.isLoading}
+          disabled={this.state.disabled}
           compact={this.state.compact}
           hidePageSizeWhenPossible={this.state.hidePageSizeWhenPossible}
           doNotShowEmptyRows={this.state.doNotShowEmptyRows}

@@ -30,8 +30,10 @@ export default class PagingTool extends React.Component {
       paging: { pageSize, page, total },
       setPageSize,
       setPage,
-      onRefresh
+      onRefresh,
+      disabled
     } = this.props;
+    console.log("disabled:", disabled);
     const pageStart = (page - 1) * pageSize + 1;
     if (pageStart < 0) throw new Error("We should never have page be <0");
     // const pageEnd =
@@ -48,6 +50,7 @@ export default class PagingTool extends React.Component {
           <Button
             className={"pt-minimal"}
             iconName="refresh"
+            disabled={disabled}
             onClick={() => onRefresh()}
           />
         )}
@@ -57,6 +60,7 @@ export default class PagingTool extends React.Component {
             onChange={e => {
               setPageSize(parseInt(e.target.value, 10));
             }}
+            disabled={disabled}
             value={pageSize}
           >
             {[
@@ -79,7 +83,7 @@ export default class PagingTool extends React.Component {
             onClick={() => {
               setPage(parseInt(page, 10) - 1);
             }}
-            disabled={!backEnabled}
+            disabled={!backEnabled || disabled}
             className="pt-minimal paging-arrow-left"
             iconName="chevron-left"
           />
@@ -90,6 +94,7 @@ export default class PagingTool extends React.Component {
               <input
                 style={{ marginLeft: 5, width: 35, marginRight: 8 }}
                 value={selectedPage}
+                disabled={disabled}
                 onChange={e => {
                   this.setState({
                     selectedPage: e.target.value
@@ -117,7 +122,7 @@ export default class PagingTool extends React.Component {
         <div className="pt-button-group">
           <Button
             style={{ marginLeft: 5 }}
-            disabled={!forwardEnabled}
+            disabled={!forwardEnabled || disabled}
             iconName="chevron-right"
             className="pt-minimal  paging-arrow-right"
             onClick={() => {
