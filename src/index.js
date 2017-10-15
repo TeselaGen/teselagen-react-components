@@ -25,7 +25,6 @@ export { default as tg_modalState } from "./enhancers/withDialog/tg_modalState";
 
 export * from "./FormComponents";
 export * from "./toastr";
-export * from "./VectorEditor";
 export * from "./toastr";
 export * from "./flow_types";
 export * from "./utils/handlerHelpers";
