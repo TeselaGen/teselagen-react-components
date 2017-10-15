@@ -2,7 +2,7 @@
   "name": "teselagen-react-components",
   "version": "18.0.0",
   "description": "Teselagen React Component Library",
-  "main": "es/index.js",
+  "main": "lib/index.js",
   "module": "es/index.js",
   "files": [
     "css",
@@ -66,7 +66,7 @@
     "teselagen-interval-tree": "1.1.1",
     "uniqid": "^4.1.1",
     "ve-range-utils": "^2.0.37",
-    "ve-sequence-utils": "^3.1.18"
+    "ve-sequence-utils": "3.1.22"
   },
   "peerDependencies": {
     "@blueprintjs/core": "^1.18.0",

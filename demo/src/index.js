@@ -5,7 +5,6 @@ import React from "react";
 import { render } from "react-dom";
 import DataTableDemo from "./DataTableDemo/index.js";
 import { withUpsert, withQuery } from "../../src";
-import VectorEditorDemo from "./VectorEditorDemo/index.js";
 import CollapsibleCardDemo from "./CollapsibleCardDemo/index.js";
 import LoadingDemo from "./LoadingDemo/index.js";
 import DownloadLinkDemo from "./DownloadLinkDemo/index.js";
@@ -17,11 +16,6 @@ import store from "./store";
 import Perf from "react-addons-perf";
 
 const demos = {
-  VectorEditor: {
-    demo: VectorEditorDemo,
-    url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/VectorEditorDemo/index.js"
-  },
   DataTable: {
     demo: DataTableDemo,
     url:
