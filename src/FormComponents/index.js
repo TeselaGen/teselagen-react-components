@@ -61,7 +61,8 @@ class AbstractInput extends React.Component {
       defaultValue,
       input: { name, value }
     } = this.props;
-    !value &&
+    value !== false &&
+      !value &&
       defaultValue !== undefined &&
       dispatch({
         type: "@@redux-form/CHANGE",
@@ -80,7 +81,7 @@ class AbstractInput extends React.Component {
   }) {
     const { defaultValue: oldDefaultValue, enableReinitialize } = this.props;
     if (
-      (!value || enableReinitialize) &&
+      ((value !== false && !value) || enableReinitialize) &&
       !deepEqual(defaultValue, oldDefaultValue)
     ) {
       dispatch({

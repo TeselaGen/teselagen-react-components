@@ -20,6 +20,8 @@ export { default as withUpsert } from "./enhancers/withUpsert";
 export { default as withQuery } from "./enhancers/withQuery";
 export { default as withFields } from "./enhancers/withFields";
 export { default as withField } from "./enhancers/withField";
+export { default as withDialog } from "./enhancers/withDialog";
+export { default as tg_modalState } from "./enhancers/withDialog/tg_modalState";
 
 export * from "./FormComponents";
 export * from "./toastr";

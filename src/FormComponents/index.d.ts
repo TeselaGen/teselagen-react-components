@@ -3,6 +3,7 @@
 import { Component } from "react";
 import {INumericInputProps, IRadioGroupProps, ICheckboxProps, IEditableTextProps, ISwitchProps} from '@blueprintjs/core';
 import {IDateInputProps, IDateRangePickerProps} from '@blueprintjs/datetime';
+import {BaseFieldProps} from 'redux-form';
 
 export interface FormComponentProps {
   defaultValue: any,
@@ -14,6 +15,14 @@ export interface FormComponentProps {
   className: String,
   showErrorIfUntouched: Boolean,
   noOuterLabel: Boolean,
+  //redux form Props:
+  name: string;
+  format?: Formatter | null;
+  normalize?: Normalizer;
+  parse?: Parser;
+  validate?: Validator | Validator[];
+  warn?: Validator | Validator[];
+  withRef?: boolean;
 }
 export interface NumericInputFieldProps extends FormComponentProps, INumericInputProps {}
 export interface InputFieldProps extends FormComponentProps, IInputProps {}
