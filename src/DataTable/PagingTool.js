@@ -33,7 +33,6 @@ export default class PagingTool extends React.Component {
       onRefresh,
       disabled
     } = this.props;
-    console.log("disabled:", disabled);
     const pageStart = (page - 1) * pageSize + 1;
     if (pageStart < 0) throw new Error("We should never have page be <0");
     // const pageEnd =

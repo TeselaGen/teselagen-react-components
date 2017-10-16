@@ -7,15 +7,15 @@ import {ApolloProvider, ApolloClient} from 'react-apollo';
 // import { createStore, combineReducers } from "redux";
 // import { reducer as form } from "redux-form";
 import { withTableParams, DataTable } from "../../../src";
-import withSelectedEntities from '../../../es/DataTable/utils/withSelectedEntities';
 
-import { withDelete, withUpsert, withQuery } from "../../../src";
+// import { withDelete, withUpsert, withQuery } from "../../../src";
+// import withSelectedEntities from '../../../src/DataTable/utils/withSelectedEntities';
 
 import "./style.css";
 
 // import { columns, schema } from "./new_mocks";
 import { BrowserRouter as Router, withRouter } from "react-router-dom";
-import { Provider } from "react-redux";
+// import { Provider } from "react-redux";
 import store from "../store";
 import Chance from "chance";
 import times from "lodash/times";
@@ -42,7 +42,8 @@ const schema: DataTableSchema = {
       path: "name",
       type: "string",
       displayName: "Name",
-      render: (value, record, row) => {
+      render: (value, record) => {
+        console.log('record:', record)
         return (
           <span
             style={{
@@ -339,7 +340,7 @@ export class DataTableInstance extends React.Component {
             console.log("double clicked");
           }}
           cellRenderer={{
-            isShared: (value, record, row) => {
+            isShared: (value) => {
               return (
                 <span
                   style={{
@@ -353,7 +354,7 @@ export class DataTableInstance extends React.Component {
           }}
           additionalFilters={additionalFilters}
           title={"Demo table"}
-          contextMenu={function({ selectedRecords, history }) {
+          contextMenu={function(/*{ selectedRecords, history }*/) {
             return [
               <MenuItem
                 onClick={function() {
