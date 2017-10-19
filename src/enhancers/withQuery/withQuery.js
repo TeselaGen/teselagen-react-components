@@ -105,6 +105,7 @@ export default function withQuery(fragment, options = {}) {
         .query({
           query: gqlQuery,
           name: "createDataFile",
+          ...(rest.options ? rest.options : {}),
           variables:
             localVars ||
             variables ||
