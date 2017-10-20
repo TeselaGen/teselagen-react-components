@@ -7,6 +7,29 @@ Demo: http://reactcomponents.teselagen.com/
 [![npm package][npm-badge]][npm]
 [![codecov](https://codecov.io/gh/TeselaGen/teselagen-react-components/branch/master/graph/badge.svg)](https://codecov.io/gh/TeselaGen/teselagen-react-components)
 
+
+<!-- TOC -->
+
+- [TeselaGen-React-Components](#teselagen-react-components)
+- [Using:](#using)
+  - [Enhancers:](#enhancers)
+    - [withDelete, withUpsert, withQuery](#withdelete-withupsert-withquery)
+  - [getApolloMethods (query, upsert, delete)](#getapollomethods-query-upsert-delete)
+    - [query](#query)
+    - [upsert](#upsert)
+    - [delete](#delete)
+  - [Data Table](#data-table)
+- [Development:](#development)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Demo Development Server](#demo-development-server)
+  - [Developing linked to another folder: aka lims/hde](#developing-linked-to-another-folder-aka-limshde)
+  - [Running Tests](#running-tests)
+  - [Releasing](#releasing)
+  - [Adding custom svg icons](#adding-custom-svg-icons)
+
+<!-- /TOC -->
+
 # Using: 
 ```
 yarn add teselagen-react-components
@@ -17,7 +40,7 @@ yarn add @blueprintjs/core @blueprintjs/datetime @blueprintjs/table react-addons
 ```
 
 ## Enhancers:
-
+### withDelete, withUpsert, withQuery
 ```js
 import {withDelete, withUpsert, withQuery} from "teselagen-react-components";
 import jobWorkflowRunsQuery from '../graphql/queries/jobWorkflowRunsQuery';
@@ -61,7 +84,33 @@ export default compose(
 )(AddToWorkQueueDialog);
 ```
 
-Any of the withQuery/withDelete/withUpsert enhancers can be passed an `{asFunction: true}` option which will make them return a function that can then be invoked. 
+## getApolloMethods (query, upsert, delete)
+```js
+//pass an apollo client here:
+const {upsert, query, delete} = getApolloMethods(client);
+```
+
+### query
+```js
+const resultArray = await query(fragment, options)
+//examples: 
+const aliquot = await query(aliquotFragment, {variables: {id: 2}})
+const aliquots = await query(aliquotFragment, {isPlural: true, variables: {filter: {name: 'aliquotX'}}})
+```
+### upsert
+```js
+const resultArray = await upsert(modelNameOrFragment [, options], modelOrModels)
+//examples: 
+const [aliquot] = await upsert('aliquot', {name: 'aliquot1'})
+const aliquots = await upsert('aliquot', [{name: 'aliquot1'}, {name: 'aliquot2'}])
+```
+### delete
+```js
+await delete(modelNameOrFragment, [, options], modelOrModels)
+//examples: 
+await delete('aliquot', 1)
+await delete('aliquot', [1,2,6,1616])
+```
 
 
 ##Data Table
