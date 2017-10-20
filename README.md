@@ -113,7 +113,7 @@ await delete('aliquot', [1,2,6,1616])
 ```
 
 
-##Data Table
+## Data Table
 ```js
 import {DataTable, routeDoubleClick, queryParams} from "teselagen-react-components";
 import {toastr} from 'teselagen-react-components';
@@ -138,7 +138,7 @@ import {
 />
 
 ```
-#Development: 
+# Development: 
 ## Prerequisites
 
 [Node.js](http://nodejs.org/) >= v4 must be installed.
