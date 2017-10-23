@@ -96,12 +96,8 @@ export default function withDialog(topLevelDialogProps) {
     }),
     lifecycle({
       componentWillMount: function() {
-        const { dialogProps, dispatch, dialogName } = this.props;
-        const prefix =
-          (dialogProps && dialogProps.title) ||
-          (topLevelDialogProps && topLevelDialogProps.title) ||
-          "";
-        const uniqueName = uniqueId(prefix);
+        const { dispatch, dialogName } = this.props;
+        const uniqueName = uniqueId();
         const nameToUse = dialogName || uniqueName;
         this.setState({
           nameToUse,

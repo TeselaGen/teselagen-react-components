@@ -7,7 +7,6 @@ Demo: http://reactcomponents.teselagen.com/
 [![npm package][npm-badge]][npm]
 [![codecov](https://codecov.io/gh/TeselaGen/teselagen-react-components/branch/master/graph/badge.svg)](https://codecov.io/gh/TeselaGen/teselagen-react-components)
 
-
 <!-- TOC -->
 
 - [TeselaGen-React-Components](#teselagen-react-components)
@@ -29,6 +28,7 @@ Demo: http://reactcomponents.teselagen.com/
   - [Adding custom svg icons](#adding-custom-svg-icons)
 
 <!-- /TOC -->
+
 
 # Using: 
 ```
