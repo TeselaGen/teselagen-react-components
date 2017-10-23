@@ -53,6 +53,11 @@ export default function withDialog(topLevelDialogProps) {
           alreadyRendering,
           ...rest
         } = this.props;
+        const extraDialogProps = {
+          ...topLevelDialogProps,
+          ...dialogProps
+        };
+        const isOpen = isDialogOpen || extraDialogProps.isOpen;
         const targetEl = target || children;
         if (!targetEl && !noTarget)
           throw new Error(
@@ -60,15 +65,14 @@ export default function withDialog(topLevelDialogProps) {
           );
         return (
           <div>
-            {isDialogOpen && (
+            {isOpen && (
               <Dialog
                 onClose={function() {
                   hideModal();
                 }}
                 title={title}
-                isOpen={isDialogOpen}
-                {...topLevelDialogProps}
-                {...dialogProps}
+                isOpen={isOpen}
+                {...extraDialogProps}
               >
                 <WrappedComponent
                   {...{
