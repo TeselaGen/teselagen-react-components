@@ -4,6 +4,7 @@ import { Component } from "react";
 
 export interface DataTableProps {
     entities: [],
+    schema: DataTableSchema, //Only use if you're in an app where you don't have react-router set up.
     noRouter: Boolean, //Only use if you're in an app where you don't have react-router set up.
     destroyOnUnmount: Boolean,
     noHeader: Boolean,
@@ -43,6 +44,15 @@ export interface DataTableProps {
     withTitle: Boolean,
     withSearch: Boolean,
     withPaging: Boolean,
+}
+export interface DataTableSchema {
+    model: string, //optional (eg. user)
+    fields: [DataTableSchemaField]
+}
+export interface DataTableSchemaField {
+    path: string,  //eg. "firstName" || "post.type"
+    type: "string"|"number"|"timestamp", 
+    displayName: string, //must be unique! eg. "First Name" || Post Type
 }
 
 export default class DataTable extends Component<DataTableProps> {}

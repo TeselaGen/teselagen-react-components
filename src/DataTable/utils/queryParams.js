@@ -61,7 +61,7 @@ function safeParse(val) {
 }
 function getFieldsMappedByCCDisplayName(schema) {
   return schema.fields.reduce((acc, field) => {
-    acc[camelCase(field.displayName)] = field;
+    acc[camelCase(field.displayName || field.path)] = field;
     return acc;
   }, {});
 }
