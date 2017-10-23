@@ -11,6 +11,7 @@ import {
 import compose from "lodash/fp/compose";
 import { map } from "lodash";
 import { withRouter } from "react-router-dom";
+import { branch } from "recompose";
 
 /**
  *  Note all these options can be passed at Design Time or at Runtime (like reduxForm())
@@ -25,6 +26,7 @@ import { withRouter } from "react-router-dom";
  * @property {boolean} withSelectedEntities - whether or not to pass the selected entities
  * @property {object} defaults - tableParam defaults such as pageSize, filter, etc
  */
+
 export default function withTableParams(compOrOpts, pTopLevelOpts) {
   let topLevelOptions;
   let Component;
@@ -196,7 +198,10 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
           formValueSelector(formName)(state, "reduxFormQueryParams") || {} //tnr: we need this to trigger withRouter and force it to update if it is nested in a redux-connected container.. very ugly but necessary
       };
     }),
-    withRouter,
+    branch(props => {
+      //don't use withRouter if noRouter is passed!
+      return !props.noRouter;
+    }, withRouter),
     connect(mapStateToProps, mapDispatchToProps, mergeProps)
   );
   if (Component) {

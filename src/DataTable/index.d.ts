@@ -4,6 +4,7 @@ import { Component } from "react";
 
 export interface DataTableProps {
     entities: [],
+    noRouter: Boolean, //Only use if you're in an app where you don't have react-router set up.
     destroyOnUnmount: Boolean,
     noHeader: Boolean,
     pageSize: Number,
