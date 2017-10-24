@@ -13,7 +13,6 @@ import FontIconsDemo from "./FontIconsDemo";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./store";
-import Perf from "react-addons-perf";
 
 const demos = {
   DataTable: {
@@ -73,9 +72,6 @@ function DemoComponentWrapper({ demo: Demo, url }) {
     );
   };
 }
-
-// Make the Perf object global for debugging purposes.
-window.Perf = Perf;
 
 const Demo = () => {
   return (
