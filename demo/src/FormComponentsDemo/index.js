@@ -53,7 +53,7 @@ class FormComponentsDemo extends React.Component {
             <RadioGroupField
               name={"radioGroup"}
               label={"Radio Group Input"}
-              defaultValue={"false"}
+              defaultValue={"true"}
               onFieldSubmit={function(val) {
                 console.info("on field submit!:", val);
               }}
@@ -64,7 +64,7 @@ class FormComponentsDemo extends React.Component {
                 },
                 {
                   label: "Option 2",
-                  value: "false"
+                  value: ""
                 }
               ]}
             />

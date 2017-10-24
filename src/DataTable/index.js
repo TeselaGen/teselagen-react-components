@@ -57,6 +57,7 @@ function computePresets(props) {
       withTitle: false,
       withSearch: false,
       withPaging: false,
+      withFilter: false,
       ...toReturn
     };
   } else {
@@ -70,6 +71,7 @@ function computePresets(props) {
       withTitle: true,
       withSearch: true,
       withPaging: true,
+      withFilter: true,
       ...toReturn
     };
   }
@@ -664,6 +666,7 @@ class ReactDataTable extends React.Component {
       addFilters,
       setOrder,
       order,
+      withFilter,
       filters,
       removeSingleFilter
     } = computePresets(this.props);
@@ -723,7 +726,7 @@ class ReactDataTable extends React.Component {
       </div>
     );
 
-    const filterMenu = (
+    const filterMenu = withFilter ? (
       <Popover position={Position.BOTTOM_RIGHT}>
         <Button
           title={"Filter"}
@@ -744,7 +747,7 @@ class ReactDataTable extends React.Component {
           schemaForField={schemaForField}
         />
       </Popover>
-    );
+    ) : null;
 
     return (
       <div className={"tg-react-table-column-header"}>

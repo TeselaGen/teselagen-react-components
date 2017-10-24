@@ -207,6 +207,7 @@ export class DataTableInstance extends React.Component {
     withTitle: true,
     withSearch: true,
     withPaging: true,
+    withFilter: true,
     noHeader: false,
     noFooter: false,
     noPadding: false,
@@ -291,12 +292,14 @@ export class DataTableInstance extends React.Component {
         withTitle: false,
         withSearch: false,
         withPaging: false,
+        withFilter: false,
         by default, but they are all individually overridable (which is why nothing changes when this is toggled here)
         `)}
         {renderToggle(this, "withTitle")}
         {renderToggle(this, "withSearch")}
         {renderToggle(this, "withDisplayOptions")}
         {renderToggle(this, "withPaging")}
+        {renderToggle(this, "withFilter")}
         {renderToggle(this, "noHeader")}
         {renderToggle(this, "noFooter")}
         {renderToggle(this, "noPadding")}
@@ -374,6 +377,7 @@ export class DataTableInstance extends React.Component {
           isSimple={this.state.isSimple}
           withSearch={this.state.withSearch}
           withPaging={this.state.withPaging}
+          withFilter={this.state.withFilter}
           noPadding={this.state.noPadding}
           noHeader={this.state.noHeader}
           noFooter={this.state.noFooter}
