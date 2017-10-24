@@ -58,24 +58,26 @@ describe("DataTableDemo", () => {
       expect(pagingToolbarWrapper).toHaveLength(1);
     });
 
-    const pagingInput = pagingToolbarWrapper.find("select");
+    const pagingSelect = pagingToolbarWrapper.find(".paging-page-size");
+
     it("pagesize is initialized with a value of 10", () => {
-      expect(pagingInput.props().value).toBe(10);
+      expect(pagingSelect.props().value).toBe(10);
     });
 
     it("handles a page size change", () => {
-      pagingInput.simulate("change", {
+      pagingSelect.simulate("change", {
         target: {
-          value: 2 //setting a value of 2 should bring us to the nearest allowed paging increment of 5
+          value: 25 // must be a valid option in the select field
         }
       });
-      expect(pagingInput.props().value).toBe(5);
-      pagingInput.simulate("blur");
-      expect(dataTableInstance.props().variables.pageSize).toBe(5);
+      console.log('pagingSelect.props().value:', pagingSelect.props().value)
+      expect(pagingSelect.props().value).toBe(25);
+      pagingSelect.simulate("blur");
+      expect(dataTableInstance.props().variables.pageSize).toBe(25);
     });
 
     it("handles a page right", () => {
-      expect(dataTableInstance.props().variables.pageSize).toBe(5);
+      expect(dataTableInstance.props().variables.pageSize).toBe(10);
       pagingToolbarWrapper.find(".paging-arrow-right").simulate("click");
       expect(dataTableInstance.props().variables.pageNumber).toBe(2);
     });
@@ -106,13 +108,13 @@ describe("DataTableDemo", () => {
       pagingToolbarWrapper.find(".paging-arrow-right").simulate("click");
       expect(dataTableInstance.props().variables.pageNumber).toBe(2);
       expect(dataTableInstance.props().variables.pageSize).toBe(5);
-      pagingInput.simulate("change", {
+      pagingSelect.simulate("change", {
         target: {
           value: 10
         }
       });
-      expect(pagingInput.props().value).toBe(10);
-      pagingInput.simulate("blur");
+      expect(pagingSelect.props().value).toBe(10);
+      pagingSelect.simulate("blur");
       expect(dataTableInstance.props().variables.pageSize).toBe(10);
       expect(dataTableInstance.props().variables.pageNumber).toBe(1);
     });

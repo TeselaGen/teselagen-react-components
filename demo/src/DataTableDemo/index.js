@@ -2,7 +2,7 @@
 import React from "react";
 import { MenuItem, Switch } from "@blueprintjs/core";
 import { FocusStyleManager, Dialog } from "@blueprintjs/core";
-import {ApolloProvider, ApolloClient} from 'react-apollo';
+import { ApolloProvider, ApolloClient } from "react-apollo";
 
 // import { createStore, combineReducers } from "redux";
 // import { reducer as form } from "redux-form";
@@ -23,7 +23,7 @@ import { DataTableSchema } from "../../../src/flow_types";
 FocusStyleManager.onlyShowFocusOnTabs();
 
 //@flow
-const client = new ApolloClient({})
+const client = new ApolloClient({});
 const chance = new Chance();
 
 const schema: DataTableSchema = {
@@ -42,19 +42,20 @@ const schema: DataTableSchema = {
       path: "name",
       type: "string",
       displayName: "Name",
-      render: (value, record) => {
-        console.log('record:', record)
+      render: (value /* record, index */) => {
         return (
           <span
             style={{
-              color: (Math.random() > .5) ? "green" : "red"
+              color: Math.random() > 0.5 ? "green" : "red"
             }}
           >
             {value}
           </span>
         );
       },
-      renderTitleInner: <span className={'pt-icon-search-around'}> &nbsp; Name</span> 
+      renderTitleInner: (
+        <span className={"pt-icon-search-around"}> &nbsp; Name</span>
+      )
     },
     { path: "createdAt", type: "timestamp", displayName: "Date Created" },
     { path: "updatedAt", type: "timestamp", displayName: "Last Edited" },
@@ -78,11 +79,14 @@ const renderToggle = (that, type, description) => {
       <Switch
         checked={that.state[type]}
         label={type}
+        /* eslint-disable react/jsx-no-bind */
+
         onChange={() => {
           that.setState({
             [type]: !that.state[type]
           });
         }}
+        /* eslint-enable react/jsx-no-bind */
       />
       {description && <span>{description}</span>}
     </div>
@@ -101,6 +105,13 @@ export default class DataTableDemo extends React.Component {
     //tnr: the following code allows the DataTable test to set defaults on the demo (which is used in the testing)
     this.setState(this.props);
   }
+
+  closeDialog = () => {
+    this.setState({
+      inDialog: false
+    });
+  };
+
   render() {
     let ConnectedTable = withTableParams({
       //tnrtodo: this should be set up as an enhancer instead
@@ -145,10 +156,7 @@ export default class DataTableDemo extends React.Component {
               <br />
               {this.state.inDialog ? (
                 <Dialog
-                  onClose={() =>
-                    this.setState({
-                      inDialog: false
-                    })}
+                  onClose={this.closeDialog}
                   title="Table inside a dialog"
                   isOpen={this.state.inDialog}
                 >
@@ -227,9 +235,29 @@ export class DataTableInstance extends React.Component {
     entities: generateFakeRows(defaultNumOfEntities)
   };
 
-  render() {
-    
+  changeNumEntities = e => {
+    const numOfEntities = parseInt(e.target.value, 10);
+    this.setState({
+      numOfEntities,
+      entities: generateFakeRows(numOfEntities)
+    });
+  };
 
+  changeSelectedRecords = e => {
+    const val = e.target.value;
+    const selectedIds = (val.indexOf(",") > -1
+      ? val.split(",").map(num => parseInt(num, 10))
+      : [parseInt(val, 10)]).filter(val => !isNaN(val));
+    this.setState({
+      selectedIds
+    });
+  };
+
+  onRefresh = () => {
+    alert("clicked refresh!");
+  };
+
+  render() {
     const { numOfEntities, entities, selectedIds } = this.state;
     const { tableParams, selectedEntities } = this.props;
     const { page, pageSize, isTableParamsConnected } = tableParams;
@@ -261,28 +289,15 @@ export class DataTableInstance extends React.Component {
         <input
           type="number"
           value={numOfEntities}
-          onChange={e => {
-            const numOfEntities = parseInt(e.target.value, 10);
-            this.setState({
-              numOfEntities,
-              entities: generateFakeRows(numOfEntities)
-            });
-          }}
+          onChange={this.changeNumEntities}
         />
         <br />
         Select records by ids (a single number or numbers separated by ","):{" "}
-        <input
-          onChange={e => {
-            const val = e.target.value;
-            const selectedIds = (val.indexOf(",") > -1
-              ? val.split(",").map(num => parseInt(num, 10))
-              : [parseInt(val, 10)]).filter(val => !isNaN(val));
-            this.setState({
-              selectedIds
-            });
-          }}
-        />
-        {renderToggle(this, "isSimple", ` This sets: 
+        <input onChange={this.changeSelectedRecords} />
+        {renderToggle(
+          this,
+          "isSimple",
+          ` This sets: 
         noHeader: true,
         noFooter: true,
         noPadding: true,
@@ -294,7 +309,8 @@ export class DataTableInstance extends React.Component {
         withPaging: false,
         withFilter: false,
         by default, but they are all individually overridable (which is why nothing changes when this is toggled here)
-        `)}
+        `
+        )}
         {renderToggle(this, "withTitle")}
         {renderToggle(this, "withSearch")}
         {renderToggle(this, "withDisplayOptions")}
@@ -343,7 +359,7 @@ export class DataTableInstance extends React.Component {
             console.log("double clicked");
           }}
           cellRenderer={{
-            isShared: (value) => {
+            isShared: value => {
               return (
                 <span
                   style={{
@@ -360,12 +376,14 @@ export class DataTableInstance extends React.Component {
           contextMenu={function(/*{ selectedRecords, history }*/) {
             return [
               <MenuItem
+                key="menuItem1"
                 onClick={function() {
                   console.log("I got clicked!");
                 }}
                 text={"Menu text here"}
               />,
               <MenuItem
+                key="menuItem2"
                 onClick={function() {
                   console.log("I also got clicked!");
                 }}
@@ -396,9 +414,7 @@ export class DataTableInstance extends React.Component {
                 maxHeight: "200px"
               }
             : {})}
-          onRefresh={() => {
-            alert("clicked refresh!");
-          }}
+          onRefresh={this.onRefresh}
           // history={history}
           onSingleRowSelect={noop}
           onDeselect={noop}

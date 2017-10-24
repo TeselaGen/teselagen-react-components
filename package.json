@@ -92,6 +92,7 @@
     "babel-preset-react": "^6.24.1",
     "chance": "^1.0.11",
     "enzyme": "^3.1.0",
+    "enzyme-adapter-react-16": "^1.0.2",
     "enzyme-to-json": "^3.1.4",
     "eslint": "^4.9.0",
     "eslint-config-react-app": "^2.0.1",
@@ -147,7 +148,8 @@
       "/node_modules/",
       "/lib/",
       "/es/"
-    ]
+    ],
+    "setupTestFrameworkScriptFile": "<rootDir>/setupTests.js"
   },
   "license": "MIT",
   "repository": "https://github.com/TeselaGen/teselagen-react-components",

@@ -5,7 +5,11 @@ import "./style.css";
 export default function Loading({ loading, children /* ...rest */ }) {
   if (loading) {
     return (
-      <div className={"tg-flex justify-center"}>
+      <div
+        className={
+          "tg-dna-loader-container tg-flex justify-center align-center"
+        }
+      >
         <DNALoader />
       </div>
     );

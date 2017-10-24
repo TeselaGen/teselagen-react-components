@@ -55,6 +55,7 @@ export default class PagingTool extends React.Component {
         )}
         <div className="pt-select pt-minimal">
           <select
+            className="paging-page-size"
             style={{ width: 55 }}
             onChange={e => {
               setPageSize(parseInt(e.target.value, 10));
