@@ -1,11 +1,12 @@
 import React from "react";
+import DNALoader from "../DNALoader";
 import "./style.css";
+
 export default function Loading({ loading, children /* ...rest */ }) {
   if (loading) {
     return (
       <div className={"tg-flex justify-center"}>
-        <br />`` ... Loading ...
-        <br />
+        <DNALoader />
       </div>
     );
     // return ( //tnr: commenting this out for the time being. Going with a simple static loading message
