@@ -108,8 +108,10 @@ export function finalizeSelection({ idMap, props }) {
     onDeselect,
     onSingleRowSelect,
     onMultiRowSelect,
-    onRowSelect
+    onRowSelect,
+    noSelect
   } = props;
+  if (noSelect) return;
   reduxFormSelectedEntityIdMap.input.onChange(idMap);
   const selectedRecords = getSelectedRecordsFromEntities(entities, idMap);
   onRowSelect(selectedRecords);

@@ -27,6 +27,7 @@ export interface DataTableProps {
     hidePageSizeWhenPossible: Boolean,
     isInfinite: Boolean,
     hideSelectedCount: Boolean,
+    noSelect: Boolean,
     withTitle: Boolean,
     withSearch: Boolean,
     withPaging: Boolean,

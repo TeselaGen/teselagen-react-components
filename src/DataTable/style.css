@@ -180,11 +180,11 @@
   color: rgba(0, 0, 0, 0.65);
   font-size: 12px;
 }
-
+/*  //tnr: hopefully this isn't needed because it messes up the row "expander" styling
 .ReactTable .rt-tr-group {
   flex: initial;
   min-height: 35px !important;
-}
+} */
 
 .ReactTable .rt-tbody .rt-tr-group {
   border-bottom-color: rgb(233, 233, 233);
