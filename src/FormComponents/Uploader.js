@@ -6,10 +6,9 @@ import uniqid from "uniqid";
 import classnames from "classnames";
 
 function noop() {}
-function emptyPromise() {
-  //wink wink
-  return Promise.resolve;
-}
+// wink wink
+const emptyPromise = Promise.resolve;
+
 export default props => {
   const {
     accept,
@@ -193,11 +192,9 @@ export default props => {
         {contentOverride || (
           <div
             title={
-              acceptToUse ? (
-                "Accepts only the following file types: " + acceptToUse
-              ) : (
-                "Accepts any file input"
-              )
+              acceptToUse
+                ? "Accepts only the following file types: " + acceptToUse
+                : "Accepts any file input"
             }
             className={"tg-upload-inner"}
           >
@@ -207,58 +204,61 @@ export default props => {
         )}
       </Dropzone>
       {fileList &&
-      showUploadList &&
-      !!fileList.length && (
-        <div>
-          {fileList.map((file, index) => {
-            const {
-              loading,
-              error,
-              name,
-              originalName,
-              url,
-              downloadName
-            } = file;
-            return fileListItemRenderer ? (
-              fileListItemRenderer(file)
-            ) : (
-              <div key={index} className={"tg-upload-file-list-item"}>
-                <span
-                  style={{ fontSize: "13px", marginRight: 11 }}
-                  className={classnames({
-                    "pt-icon-saved": !loading && !error,
-                    "pt-icon-error": error,
-                    "pt-icon-repeat tg-spin": loading
-                  })}
-                />
-                <a
-                  style={{ width: "100%" }}
-                  name={name || originalName}
-                  {...(url ? { href: url } : {})}
-                  {...(downloadName ? { download: downloadName } : {})}
-                >
-                  {" "}
-                  {name || originalName}{" "}
-                </a>
-                {!loading && (
+        showUploadList &&
+        !!fileList.length && (
+          <div>
+            {fileList.map((file, index) => {
+              const {
+                loading,
+                error,
+                name,
+                originalName,
+                url,
+                downloadName
+              } = file;
+              return fileListItemRenderer ? (
+                fileListItemRenderer(file)
+              ) : (
+                <div key={index} className={"tg-upload-file-list-item"}>
                   <span
-                    style={{ fontSize: "13px" }}
-                    className={"tg-upload-file-list-item-close pt-icon-cross"}
-                    onClick={() => {
-                      onRemove(file, index, fileList);
-                      onChange(
-                        fileList.filter((file, index2) => {
-                          return index2 !== index;
-                        })
-                      );
-                    }}
+                    style={{ fontSize: "13px", marginRight: 11 }}
+                    className={classnames({
+                      "pt-icon-saved": !loading && !error,
+                      "pt-icon-error": error,
+                      "pt-icon-repeat tg-spin": loading
+                    })}
                   />
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
+                  <a
+                    style={{ width: "100%" }}
+                    name={name || originalName}
+                    {...(url ? { href: url } : {})}
+                    {...(downloadName ? { download: downloadName } : {})}
+                  >
+                    {" "}
+                    {name || originalName}{" "}
+                  </a>
+                  {!loading && (
+                    <span
+                      style={{ fontSize: "13px" }}
+                      className={"tg-upload-file-list-item-close pt-icon-cross"}
+                      /* eslint-disable react/jsx-no-bind*/
+
+                      onClick={() => {
+                        onRemove(file, index, fileList);
+                        onChange(
+                          fileList.filter((file, index2) => {
+                            return index2 !== index;
+                          })
+                        );
+                      }}
+                      /* eslint-enable react/jsx-no-bind*/
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
     </div>
   );
 };
