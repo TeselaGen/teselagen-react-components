@@ -49,6 +49,7 @@ function computePresets(props) {
   if (isSimple) {
     //isSimplePreset
     toReturn = {
+      noHeader: true,
       noFooter: true,
       noPadding: true,
       hidePageSizeWhenPossible: true,
