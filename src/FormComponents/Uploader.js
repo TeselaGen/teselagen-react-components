@@ -7,7 +7,7 @@ import classnames from "classnames";
 
 function noop() {}
 // wink wink
-const emptyPromise = Promise.resolve;
+const emptyPromise = Promise.resolve.bind(Promise);
 
 export default props => {
   const {
