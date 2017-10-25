@@ -224,7 +224,6 @@ class ReactDataTable extends React.Component {
       entities,
       children
     } = computePresets(this.props);
-    console.log("noSelect:", noSelect);
     let updateColumnVisibilityToUse = updateColumnVisibility;
     let resetDefaultVisibilityToUse = resetDefaultVisibility;
     if (withDisplayOptions && !syncDisplayOptionsToDb) {
@@ -354,6 +353,7 @@ class ReactDataTable extends React.Component {
           data={entities}
           columns={this.renderColumns()}
           pageSize={rowsToShow}
+          freezeWhenExpanded
           showPagination={false}
           sortable={false}
           loading={isLoading || disabled}

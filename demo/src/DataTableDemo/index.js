@@ -438,5 +438,9 @@ export class DataTableInstance extends React.Component {
 function noop() {}
 
 function SubComp(row) {
-    return <div style={{ margin: 10 }}> !!Row Index: {row.index}</div>;
+    return <div style={{ margin: 10 }}> !!Row Index: {row.index}
+      <DataTable formName={'something'} entities={[]} schema={{fields: [{
+        path: 'something'
+      }]}}></DataTable>
+    </div>;
 }
