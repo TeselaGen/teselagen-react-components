@@ -69,6 +69,9 @@ const schema: DataTableSchema = {
       path: "user.lastName",
       type: "string",
       displayName: "Added By"
+    },
+    {
+      expander: true
     }
   ]
 };
@@ -357,6 +360,9 @@ export class DataTableInstance extends React.Component {
           entityCount={entities.length}
           onDoubleClick={function() {
             console.log("double clicked");
+          }}
+          SubComponent={row => {
+            return <div style={{ margin: 10 }}> Row Index: {row.index}</div>;
           }}
           cellRenderer={{
             isShared: value => {

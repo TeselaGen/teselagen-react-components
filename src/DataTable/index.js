@@ -216,6 +216,8 @@ class ReactDataTable extends React.Component {
       compactPaging,
       entityCount,
       isSingleSelect,
+      SubComponent,
+      ReactTableProps = {},
       hideSelectedCount,
       entities,
       children
@@ -290,9 +292,9 @@ class ReactDataTable extends React.Component {
           <div className={"data-table-header"}>
             <div className={"data-table-title-and-buttons"}>
               {tableName &&
-              withTitle && (
-                <span className={"data-table-title"}>{tableName}</span>
-              )}
+                withTitle && (
+                  <span className={"data-table-title"}>{tableName}</span>
+                )}
               {children}
             </div>
             {errorParsingUrlString && (
@@ -300,27 +302,25 @@ class ReactDataTable extends React.Component {
                 Error parsing URL
               </span>
             )}
-            {filtersOnNonDisplayedFields.length ? (
-              filtersOnNonDisplayedFields.map(
-                ({ displayName, path, selectedFilter, filterValue }) => {
-                  return (
-                    <div
-                      key={displayName || startCase(path)}
-                      className={"tg-filter-on-non-displayed-field"}
-                    >
-                      <span className={"pt-icon-filter"} />
-                      <span>
-                        {" "}
-                        {displayName || startCase(path)} {selectedFilter}{" "}
-                        {filterValue}{" "}
-                      </span>
-                    </div>
-                  );
-                }
-              )
-            ) : (
-              ""
-            )}
+            {filtersOnNonDisplayedFields.length
+              ? filtersOnNonDisplayedFields.map(
+                  ({ displayName, path, selectedFilter, filterValue }) => {
+                    return (
+                      <div
+                        key={displayName || startCase(path)}
+                        className={"tg-filter-on-non-displayed-field"}
+                      >
+                        <span className={"pt-icon-filter"} />
+                        <span>
+                          {" "}
+                          {displayName || startCase(path)} {selectedFilter}{" "}
+                          {filterValue}{" "}
+                        </span>
+                      </div>
+                    );
+                  }
+                )
+              : ""}
             {withSearch && (
               <div className={"data-table-search-and-clear-filter-container"}>
                 {hasFilters ? (
@@ -367,6 +367,8 @@ class ReactDataTable extends React.Component {
             maxHeight,
             ...style
           }}
+          SubComponent={SubComponent}
+          {...ReactTableProps}
         />
         {!noFooter && (
           <div
@@ -379,13 +381,13 @@ class ReactDataTable extends React.Component {
             }}
           >
             {!isSingleSelect &&
-            !hideSelectedCount && (
-              <div className={"tg-react-table-selected-count"}>
-                {`${selectedRowCount} Record${selectedRowCount === 1
-                  ? ""
-                  : "s"} Selected `}
-              </div>
-            )}
+              !hideSelectedCount && (
+                <div className={"tg-react-table-selected-count"}>
+                  {`${selectedRowCount} Record${selectedRowCount === 1
+                    ? ""
+                    : "s"} Selected `}
+                </div>
+              )}
             <div style={{ display: "flex", flexWrap: "wrap" }}>
               {withDisplayOptions && (
                 <DisplayOptions
@@ -616,6 +618,7 @@ class ReactDataTable extends React.Component {
     columns.forEach(column => {
       const schemaForColumn = schema.fields[column.schemaIndex];
       const tableColumn = {
+        ...schemaForColumn,
         Header: this.renderColumnHeader(column),
         accessor: schemaForColumn.path
       };
@@ -756,11 +759,9 @@ class ReactDataTable extends React.Component {
             title={displayName || startCase(path)}
             className={"tg-react-table-name"}
           >
-            {renderTitleInner ? (
-              renderTitleInner
-            ) : (
-              (displayName || startCase(path)) + "  "
-            )}
+            {renderTitleInner
+              ? renderTitleInner
+              : (displayName || startCase(path)) + "  "}
           </span>
         )}
         {!sortDisabled && !isActionColumn && sortComponent}
