@@ -710,7 +710,7 @@ class ReactDataTable extends React.Component {
     } = schemaForField;
     const columnDataType = schemaForField.type;
     const isActionColumn = columnDataType === "action";
-    const ccDisplayName = camelCase(displayName || path);
+    const ccDisplayName = isActionColumn ? "" : camelCase(displayName || path);
     const currentFilter =
       filters &&
       filters.length &&
