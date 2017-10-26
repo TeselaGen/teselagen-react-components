@@ -69,7 +69,10 @@ const schema: DataTableSchema = {
       path: "user.lastName",
       type: "string",
       displayName: "Added By"
-    }
+    },
+    // {
+    //   expander: true
+    // }
   ]
 };
 
@@ -212,6 +215,7 @@ export class DataTableInstance extends React.Component {
   state = {
     additionalFilters: false,
     isSimple: false,
+    noSelect: false,
     withTitle: true,
     withSearch: true,
     withPaging: true,
@@ -312,6 +316,7 @@ export class DataTableInstance extends React.Component {
         `
         )}
         {renderToggle(this, "withTitle")}
+        {renderToggle(this, "noSelect")}
         {renderToggle(this, "withSearch")}
         {renderToggle(this, "withDisplayOptions")}
         {renderToggle(this, "withPaging")}
@@ -358,6 +363,7 @@ export class DataTableInstance extends React.Component {
           onDoubleClick={function() {
             console.log("double clicked");
           }}
+          SubComponent={SubComp}
           cellRenderer={{
             isShared: value => {
               return (
@@ -392,6 +398,7 @@ export class DataTableInstance extends React.Component {
             ];
           }}
           withTitle={this.state.withTitle}
+          noSelect={this.state.noSelect}
           isSimple={this.state.isSimple}
           withSearch={this.state.withSearch}
           withPaging={this.state.withPaging}
@@ -429,3 +436,11 @@ export class DataTableInstance extends React.Component {
 }
 
 function noop() {}
+
+function SubComp(row) {
+    return <div style={{ margin: 10 }}> !!Row Index: {row.index}
+      <DataTable formName={'something'} entities={[]} schema={{fields: [{
+        path: 'something'
+      }]}}></DataTable>
+    </div>;
+}

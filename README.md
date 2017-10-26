@@ -1,3 +1,4 @@
+
 # TeselaGen-React-Components
 
 Demo: http://reactcomponents.teselagen.com/
@@ -19,6 +20,8 @@ Demo: http://reactcomponents.teselagen.com/
     - [upsert](#upsert)
     - [delete](#delete)
   - [Data Table](#data-table)
+    - [withTableParams  (enhancer)](#withtableparams--enhancer)
+  - [Form Components](#form-components)
 - [Development:](#development)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
@@ -153,9 +156,33 @@ await delete('aliquot', [1,2,6,1616])
 
 
 ## Data Table
+Use the <DataTable/> component with withTableParams() enhancer or by itself (locally connected)
+[DataTable props](./src/DataTable/index.d.ts)
 ```js
-import {DataTable, routeDoubleClick, queryParams} from "teselagen-react-components";
-import {toastr} from 'teselagen-react-components';
+import {DataTable} from "teselagen-react-components";
+<DataTable {DataTableProps here} /> 
+```
+[Simple DataTable Demo Src Code](./demo/src/DataTableDemo/SimpleTableDemo.js)
+
+### withTableParams  (enhancer)
+Use withTableParams in conjunction with withQuery
+```js
+withTableParams({
+  formName: String; // - required unique identifier for the table
+  schema: Boolean; //  - The data table schema
+  urlConnected: Boolean; //  - default: false - whether the table should connect to/update the URL
+  withSelectedEntities: Boolean; //  - whether or not to pass the selected entities
+  defaults: defaults; // - tableParam defaults such as pageSize, filter, etc
+})
+withQuery() //the usual withQuery stuff here
+```
+withTableParams returns a prop called tableParams which you can spread like: 
+```js
+<DataTable {...tableParams}/> //this provides, entities, schema, handlers etc
+```
+
+## Form Components
+```js
 import {
 	InputField,
 	SelectField,

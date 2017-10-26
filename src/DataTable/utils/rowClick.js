@@ -5,7 +5,7 @@ import {
 } from "./selection";
 import getIdOrCode from "./getIdOrCode";
 
-export default (e, rowInfo, entities, props) => {
+export default function rowClick(e, rowInfo, entities, props) {
   const entity = rowInfo.original;
   const rowId = getIdOrCode(entity);
   if (rowId === undefined) return;
@@ -99,7 +99,7 @@ export default (e, rowInfo, entities, props) => {
   }
 
   finalizeSelection({ idMap: newIdMap, props });
-};
+}
 
 export function finalizeSelection({ idMap, props }) {
   const {
@@ -108,8 +108,10 @@ export function finalizeSelection({ idMap, props }) {
     onDeselect,
     onSingleRowSelect,
     onMultiRowSelect,
-    onRowSelect
+    onRowSelect,
+    noSelect
   } = props;
+  if (noSelect) return;
   reduxFormSelectedEntityIdMap.input.onChange(idMap);
   const selectedRecords = getSelectedRecordsFromEntities(entities, idMap);
   onRowSelect(selectedRecords);

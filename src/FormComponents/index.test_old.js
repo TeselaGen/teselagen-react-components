@@ -1,35 +1,167 @@
+// import each from 'lodash/each';
+import {
+  InputField,
+  SelectField,
+  // FileUploadField,
+  // AntFileUploadField,
+  // DateInputField,
+  // CheckboxField,
+  // TextareaField,
+  // EditableTextField,
+  NumericInputField
+  // RadioGroupField,
+  // ReactSelectField,
+} from "./index";
 import React from "react";
-import { shallow } from "enzyme";
-import toJson from "enzyme-to-json";
 
-import renderBlueprintInput from "./index";
-import renderBlueprintCheckbox from "./index";
-import renderBlueprintTextarea from "./index";
-import renderBlueprintNumericInput from "./index";
-import renderBlueprintNumericRadio from "./index";
-import renderBlueprintNumericSelector from "./index";
+// See README for discussion of chai, enzyme, and sinon
+import { mount } from "enzyme";
+// import sinon from 'sinon'
 
-const wrapper = [
-  shallow(<renderBlueprintInput />),
-  shallow(<renderBlueprintCheckbox />),
-  shallow(<renderBlueprintTextarea />),
-  shallow(<renderBlueprintNumericInput />),
-  shallow(<renderBlueprintNumericRadio />),
-  shallow(<renderBlueprintNumericSelector />)
-];
+// In this file we're doing an integration test. Thus we need to hook up our
+// form component to Redux and Redux-Form. To do that, we need to create the
+// simplest redux store possible that will work with Redux-Form.
+import { reducer as formReducer, reduxForm } from "redux-form";
+import { createStore, combineReducers } from "redux";
+import { Provider } from "react-redux";
 
-const tests = () => {
-  return wrapper.forEach(component => {
-    it("renders without exploding", () => {
-      expect(component).toHaveLength(1);
+describe("form components", function() {
+  it("InputField", function() {
+    const FormContainer = reduxForm({
+      form: "testForm",
+      validate: function(values) {
+        const errors = {};
+        if (!values.testField) {
+          errors.testField = "Required";
+        }
+        return errors;
+      }
+    })(function(argument) {
+      return (
+        <div>
+          <InputField name="testField" />
+        </div>
+      );
     });
 
-    it("renders a snapshot", () => {
-      expect(toJson(component)).toMatchSnapshot();
-    });
+    const mountedForm = mount(
+      <Provider store={createStore(combineReducers({ form: formReducer }))}>
+        <FormContainer />
+      </Provider>
+    );
+
+    const input = mountedForm.find("input").first();
+    expect(input).toHaveLength(1);
+    // Our form component only shows error messages (help text) if the
+    // field has been touched. To mimic touching the field, we simulate a
+    // blur event, which means the input's onBlur method will run, which
+    // will call the onBlur method supplied by Redux-Form.
+    input.simulate("blur");
+
+    expect(input).toHaveLength(1);
+    input.simulate("change", { target: { value: "testValue" } });
+    const { value } = input.props();
+    expect(value).toEqual("testValue");
   });
-};
+  const nestedJson = { my: "nestedJson" };
 
-describe("Component", () => {
-  tests();
+  it("NumericInputField functions as expected", function() {
+    const FormContainer = reduxForm({
+      form: "testForm",
+      validate: function(values) {
+        const errors = {};
+        if (!values.testField) {
+          errors.testField = "Required";
+        }
+        return errors;
+      }
+    })(function(argument) {
+      return (
+        <div>
+          <NumericInputField name="testField" /> // defaultValue={1}
+        </div>
+      );
+    });
+    const store = createStore(combineReducers({ form: formReducer }));
+    const mountedForm = mount(
+      <Provider store={store}>
+        <FormContainer />
+      </Provider>
+    );
+
+    const input = mountedForm.find("input").first();
+    expect(input).toHaveLength(1);
+    // Our form component only shows error messages (help text) if the
+    // field has been touched. To mimic touching the field, we simulate a
+    // blur event, which means the input's onBlur method will run, which
+    // will call the onBlur method supplied by Redux-Form.
+    input.simulate("blur");
+    const errorTextContainer = mountedForm.find(".tg-field-error-holder");
+    expect(errorTextContainer).toHaveLength(1);
+
+    expect(input).toHaveLength(1);
+    input.simulate("change", { target: { value: "2" } });
+    expect(store.getState().form.testForm.values.testField).toEqual("2");
+
+    input.simulate("change", { target: { value: "-2" } });
+    expect(store.getState().form.testForm.values.testField).toEqual("-2");
+
+    input.simulate("change", { target: { value: "ab" } });
+    expect(store.getState().form.testForm.values.testField).toEqual("ab");
+    input.simulate("blur", { target: { value: "ab" } });
+    mountedForm.find(".tg-field-error-holder");
+    expect(errorTextContainer).toHaveLength(1);
+  });
+
+  it("SelectField functions as expected", function() {
+    const FormContainer = reduxForm({
+      form: "testForm",
+      validate: function(values) {
+        const errors = {};
+        if (!values.testField) {
+          errors.testField = "Required";
+        }
+        return errors;
+      }
+    })(function(argument) {
+      return (
+        <div>
+          <SelectField
+            defaultValue={"firstVal"}
+            options={[
+              { value: "firstVal", label: "firstLabel" },
+              { value: "testValue", name: "myOpt1" },
+              { value: nestedJson, name: "anotherValuename" }
+            ]}
+            name="testField"
+          />
+        </div>
+      );
+    });
+    const store = createStore(combineReducers({ form: formReducer }));
+    const mountedForm = mount(
+      <Provider store={store}>
+        <FormContainer />
+      </Provider>
+    );
+
+    const input = mountedForm.find("select").first();
+    expect(input).toHaveLength(1);
+    // Our form component only shows error messages (help text) if the
+    // field has been touched. To mimic touching the field, we simulate a
+    // blur event, which means the input's onBlur method will run, which
+    // will call the onBlur method supplied by Redux-Form.
+    input.simulate("blur");
+    expect(store.getState().form.testForm.values.testField).toEqual("firstVal");
+    expect(input.props().value).toEqual("firstVal");
+
+    expect(input).toHaveLength(1);
+    input.simulate("change", { target: { value: "anotherValue" } });
+    expect(store.getState().form.testForm.values.testField).toEqual(
+      "anotherValue"
+    );
+
+    input.simulate("change", { target: { value: JSON.stringify(nestedJson) } });
+    expect(store.getState().form.testForm.values.testField).toEqual(nestedJson);
+  });
 });

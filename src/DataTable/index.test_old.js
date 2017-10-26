@@ -1,7 +1,6 @@
 import React from "react";
 import { shallow, mount } from "enzyme";
 import { ApolloProvider, ApolloClient } from "react-apollo";
-
 import DataTable from "./index";
 import PagingTool from "./PagingTool";
 import DataTableDemo, { DataTableInstance } from "../../demo/src/DataTableDemo";
@@ -64,13 +63,16 @@ describe("DataTableDemo", () => {
       expect(pagingSelect.props().value).toBe(10);
     });
 
-    it("handles a page size change", () => {
+    it.only("handles a page size change", () => {
       pagingSelect.simulate("change", {
         target: {
           value: 25 // must be a valid option in the select field
         }
       });
-      console.log('pagingSelect.props().value:', pagingSelect.props().value)
+      // dataTableDemo.update()
+
+      // debugger
+      console.log("pagingSelect.props().value:", pagingSelect.props().value);
       expect(pagingSelect.props().value).toBe(25);
       pagingSelect.simulate("blur");
       expect(dataTableInstance.props().variables.pageSize).toBe(25);
