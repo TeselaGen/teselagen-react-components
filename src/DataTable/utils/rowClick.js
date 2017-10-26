@@ -3,11 +3,11 @@ import {
   getSelectedRowsFromEntities,
   getSelectedRecordsFromEntities
 } from "./selection";
-import getIdOrCode from "./getIdOrCode";
+import getIdOrCodeOrIndex from "./getIdOrCodeOrIndex";
 
 export default function rowClick(e, rowInfo, entities, props) {
   const entity = rowInfo.original;
-  const rowId = getIdOrCode(entity);
+  const rowId = getIdOrCodeOrIndex(entity, rowInfo.index);
   if (rowId === undefined) return;
 
   const { reduxFormSelectedEntityIdMap, isSingleSelect } = props;
@@ -58,8 +58,8 @@ export default function rowClick(e, rowInfo, entities, props) {
             time
           };
       });
-      const mostRecentlySelectedIndex = entities.findIndex(e => {
-        let id = getIdOrCode(e);
+      const mostRecentlySelectedIndex = entities.findIndex((e, i) => {
+        let id = getIdOrCodeOrIndex(e, i);
         if (!id && id !== 0) id = "";
         return id.toString() === timeToBeat.id;
       });
@@ -67,13 +67,13 @@ export default function rowClick(e, rowInfo, entities, props) {
       if (mostRecentlySelectedIndex !== -1) {
         // clear out other selections in current group
         for (let i = mostRecentlySelectedIndex + 1; i < entities.length; i++) {
-          const entityId = getIdOrCode(entities[i]);
+          const entityId = getIdOrCodeOrIndex(entities[i], i);
           if (!oldIdMap[entityId]) break;
           delete oldIdMap[entityId];
         }
 
         for (let i = mostRecentlySelectedIndex - 1; i >= 0; i--) {
-          const entityId = getIdOrCode(entities[i]);
+          const entityId = getIdOrCodeOrIndex(entities[i], i);
           if (!oldIdMap[entityId]) break;
           delete oldIdMap[entityId];
         }
@@ -87,7 +87,7 @@ export default function rowClick(e, rowInfo, entities, props) {
             ? mostRecentlySelectedIndex + 1
             : rowInfo.index;
         range(lowRange, highRange + 1).forEach(i => {
-          const recordId = entities[i] && getIdOrCode(entities[i]);
+          const recordId = entities[i] && getIdOrCodeOrIndex(entities[i], i);
           if (recordId || recordId === 0) newIdMap[recordId] = { entity };
         });
         newIdMap = {

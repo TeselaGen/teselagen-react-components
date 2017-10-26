@@ -22,7 +22,7 @@ import rowClick, { finalizeSelection } from "./utils/rowClick";
 import ReactTable from "react-table";
 import PagingTool from "./PagingTool";
 import FilterAndSortMenu from "./FilterAndSortMenu";
-import getIdOrCode from "./utils/getIdOrCode";
+import getIdOrCodeOrIndex from "./utils/getIdOrCodeOrIndex";
 import SearchBar from "./SearchBar";
 import { getSelectedRecordsFromEntities } from "./utils/selection";
 import DisplayOptions from "./DisplayOptions";
@@ -416,6 +416,7 @@ class ReactDataTable extends React.Component {
                   onRefresh={onRefresh}
                   setPage={setPage}
                   setPageSize={setPageSize}
+                  onPageChange={this.onPageChange}
                 />
               ) : null}
             </div>
@@ -424,6 +425,16 @@ class ReactDataTable extends React.Component {
       </div>
     );
   }
+
+  onPageChange = () => {
+    const { reduxFormSelectedEntityIdMap, entities } = computePresets(
+      this.props
+    );
+    const record = get(entities, "[0]");
+    if (!record || (!record.id && record.id !== 0 && !record.code)) {
+      reduxFormSelectedEntityIdMap.input.onChange({});
+    }
+  };
 
   getTableRowProps = (state, rowInfo) => {
     const {
@@ -435,7 +446,7 @@ class ReactDataTable extends React.Component {
     } = computePresets(this.props);
     if (!rowInfo) return {};
     const entity = rowInfo.original;
-    const rowId = getIdOrCode(entity);
+    const rowId = getIdOrCodeOrIndex(entity, rowInfo.index);
     const rowSelected = reduxFormSelectedEntityIdMap.input.value[rowId];
     return {
       onClick: e => {
@@ -496,10 +507,12 @@ class ReactDataTable extends React.Component {
         {!isSingleSelect && (
           <Checkbox
             disabled={noSelect}
+            /* eslint-disable react/jsx-no-bind */
+
             onChange={() => {
               const newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
-              entities.forEach(entity => {
-                const entityId = getIdOrCode(entity);
+              entities.forEach((entity, i) => {
+                const entityId = getIdOrCodeOrIndex(entity, i);
                 if (checkboxProps.checked) {
                   delete newIdMap[entityId];
                 } else {
@@ -513,6 +526,8 @@ class ReactDataTable extends React.Component {
               });
               this.setState({ lastCheckedRow: undefined });
             }}
+            /* eslint-enable react/jsx-no-bind */
+
             {...checkboxProps}
             className={"tg-react-table-checkbox-cell-inner"}
           />
@@ -546,10 +561,12 @@ class ReactDataTable extends React.Component {
       <div className={"tg-react-table-checkbox-cell"} style={{ width: 40 }}>
         <Checkbox
           disabled={noSelect}
+          /* eslint-disable react/jsx-no-bind*/
+
           onChange={e => {
             let newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
             const isRowCurrentlyChecked = checkedRows.indexOf(rowIndex) > -1;
-            const entityId = getIdOrCode(entity);
+            const entityId = getIdOrCodeOrIndex(entity, rowIndex);
             if (isSingleSelect) {
               newIdMap = {
                 [entityId]: {
@@ -567,7 +584,7 @@ class ReactDataTable extends React.Component {
                 const isLastCheckedRowCurrentlyChecked =
                   checkedRows.indexOf(lastCheckedRow) > -1;
                 const tempEntity = entities[i];
-                const tempEntityId = getIdOrCode(tempEntity);
+                const tempEntityId = getIdOrCodeOrIndex(tempEntity, i);
                 if (isLastCheckedRowCurrentlyChecked) {
                   newIdMap[tempEntityId] = {
                     entity: tempEntity
@@ -591,6 +608,8 @@ class ReactDataTable extends React.Component {
             });
             this.setState({ lastCheckedRow: rowIndex });
           }}
+          /* eslint-enable react/jsx-no-bind*/
+
           className={"tg-react-table-checkbox-cell-inner"}
           checked={isSelected}
         />

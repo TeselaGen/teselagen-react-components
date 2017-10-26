@@ -1,15 +1,15 @@
-import getIdOrCode from "./getIdOrCode";
+import getIdOrCodeOrIndex from "./getIdOrCodeOrIndex";
 
 export const getSelectedRecordsFromEntities = (entities, idMap) => {
   if (!idMap) return [];
-  return entities.reduce((acc, entity) => {
-    return idMap[getIdOrCode(entity)] ? acc.concat(entity) : acc;
+  return entities.reduce((acc, entity, i) => {
+    return idMap[getIdOrCodeOrIndex(entity, i)] ? acc.concat(entity) : acc;
   }, []);
 };
 
 export const getSelectedRowsFromEntities = (entities, idMap) => {
   if (!idMap) return [];
   return entities.reduce((acc, entity, i) => {
-    return idMap[getIdOrCode(entity)] ? acc.concat(i) : acc;
+    return idMap[getIdOrCodeOrIndex(entity, i)] ? acc.concat(i) : acc;
   }, []);
 };
