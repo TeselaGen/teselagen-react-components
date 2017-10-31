@@ -6,11 +6,12 @@ import {
 import getIdOrCodeOrIndex from "./getIdOrCodeOrIndex";
 
 export default function rowClick(e, rowInfo, entities, props) {
+  const { reduxFormSelectedEntityIdMap, isSingleSelect, noSelect } = props;
+  if (noSelect) return;
   const entity = rowInfo.original;
   const rowId = getIdOrCodeOrIndex(entity, rowInfo.index);
   if (rowId === undefined) return;
 
-  const { reduxFormSelectedEntityIdMap, isSingleSelect } = props;
   const ctrl = e.metaKey || e.ctrlKey;
   const oldIdMap = reduxFormSelectedEntityIdMap.input.value || {};
   const rowSelected = oldIdMap[rowId];
