@@ -29,7 +29,6 @@
   },
   "dependencies": {
     "basiccontext": "^3.5.1",
-    "bio-parsers": "^4.2.0",
     "classnames": "^2.2.5",
     "clipboard": "^1.7.1",
     "clone": "^2.1.1",
@@ -48,21 +47,14 @@
     "paths-js": "^0.4.5",
     "pluralize": "^7.0.0",
     "query-string": "^5.0.1",
-    "randomcolor": "^0.5.3",
-    "rc-slider": "^8.3.5",
     "react-addons-pure-render-mixin": "^15.6.0",
-    "react-draggable": "^3.0.3",
     "react-dropzone": "^4.2.1",
     "react-icons": "^2.2.3",
     "react-list": "^0.8.7",
     "react-mouse-aware": "^0.3.0",
     "recompose": "^0.26.0",
     "redux": "^3.7.2",
-    "redux-act": "^1.5.0",
-    "reselect": "^3.0.0",
-    "teselagen-interval-tree": "1.1.1",
-    "uniqid": "^4.1.1",
-    "ve-sequence-utils": "^3.2.0"
+    "uniqid": "^4.1.1"
   },
   "peerDependencies": {
     "@blueprintjs/core": "^1.18.0",
