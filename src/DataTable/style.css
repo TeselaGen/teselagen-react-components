@@ -38,7 +38,7 @@
 
 .data-table-container {
   padding: 20px;
-  height: 100%;
+  /* height: 100%;  tnr: this rule messes up  */
   width: 100%;
   display: flex;
   flex-direction: column;
