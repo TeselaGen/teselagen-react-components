@@ -356,78 +356,81 @@ export class DataTableInstance extends React.Component {
             </div>
           </div>
         )}
-        <DataTable
-          {...tableParams}
-          entities={entitiesToPass}
-          entityCount={entities.length}
-          onDoubleClick={function() {
-            console.log("double clicked");
-          }}
-          SubComponent={SubComp}
-          cellRenderer={{
-            isShared: value => {
-              return (
-                <span
-                  style={{
-                    color: value ? "green" : "red"
-                  }}
-                >
-                  {value ? "True" : "False"} <button>click me</button>
-                </span>
-              );
-            }
-          }}
-          additionalFilters={additionalFilters}
-          title={"Demo table"}
-          contextMenu={function(/*{ selectedRecords, history }*/) {
-            return [
-              <MenuItem
-                key="menuItem1"
-                onClick={function() {
-                  console.log("I got clicked!");
-                }}
-                text={"Menu text here"}
-              />,
-              <MenuItem
-                key="menuItem2"
-                onClick={function() {
-                  console.log("I also got clicked!");
-                }}
-                text={"Some more"}
-              />
-            ];
-          }}
-          withTitle={this.state.withTitle}
-          noSelect={this.state.noSelect}
-          isSimple={this.state.isSimple}
-          withSearch={this.state.withSearch}
-          withPaging={this.state.withPaging}
-          withFilter={this.state.withFilter}
-          noPadding={this.state.noPadding}
-          noHeader={this.state.noHeader}
-          noFooter={this.state.noFooter}
-          withDisplayOptions={this.state.withDisplayOptions}
-          isInfinite={this.state.isInfinite}
-          isLoading={this.state.isLoading}
-          disabled={this.state.disabled}
-          compact={this.state.compact}
-          hidePageSizeWhenPossible={this.state.hidePageSizeWhenPossible}
-          doNotShowEmptyRows={this.state.doNotShowEmptyRows}
-          withCheckboxes={this.state.withCheckboxes}
-          isSingleSelect={this.state.isSingleSelect}
-          hideSelectedCount={this.state.hideSelectedCount}
-          {...(this.state.maxHeight
-            ? {
-                maxHeight: "200px"
+        <div className={'wrappingdiv'}>
+
+          <DataTable
+            {...tableParams}
+            entities={entitiesToPass}
+            entityCount={entities.length}
+            onDoubleClick={function() {
+              console.log("double clicked");
+            }}
+            SubComponent={SubComp}
+            cellRenderer={{
+              isShared: value => {
+                return (
+                  <span
+                    style={{
+                      color: value ? "green" : "red"
+                    }}
+                  >
+                    {value ? "True" : "False"} <button>click me</button>
+                  </span>
+                );
               }
-            : {})}
-          onRefresh={this.onRefresh}
-          // history={history}
-          onSingleRowSelect={noop}
-          onDeselect={noop}
-          onMultiRowSelect={noop}
-          selectedIds={selectedIds}
-        />
+            }}
+            additionalFilters={additionalFilters}
+            title={"Demo table"}
+            contextMenu={function(/*{ selectedRecords, history }*/) {
+              return [
+                <MenuItem
+                  key="menuItem1"
+                  onClick={function() {
+                    console.log("I got clicked!");
+                  }}
+                  text={"Menu text here"}
+                />,
+                <MenuItem
+                  key="menuItem2"
+                  onClick={function() {
+                    console.log("I also got clicked!");
+                  }}
+                  text={"Some more"}
+                />
+              ];
+            }}
+            withTitle={this.state.withTitle}
+            noSelect={this.state.noSelect}
+            isSimple={this.state.isSimple}
+            withSearch={this.state.withSearch}
+            withPaging={this.state.withPaging}
+            withFilter={this.state.withFilter}
+            noPadding={this.state.noPadding}
+            noHeader={this.state.noHeader}
+            noFooter={this.state.noFooter}
+            withDisplayOptions={this.state.withDisplayOptions}
+            isInfinite={this.state.isInfinite}
+            isLoading={this.state.isLoading}
+            disabled={this.state.disabled}
+            compact={this.state.compact}
+            hidePageSizeWhenPossible={this.state.hidePageSizeWhenPossible}
+            doNotShowEmptyRows={this.state.doNotShowEmptyRows}
+            withCheckboxes={this.state.withCheckboxes}
+            isSingleSelect={this.state.isSingleSelect}
+            hideSelectedCount={this.state.hideSelectedCount}
+            {...(this.state.maxHeight
+              ? {
+                  maxHeight: "200px"
+                }
+              : {})}
+            onRefresh={this.onRefresh}
+            // history={history}
+            onSingleRowSelect={noop}
+            onDeselect={noop}
+            onMultiRowSelect={noop}
+            selectedIds={selectedIds}
+          />
+        </div>
         <br />
         <br />
       </div>
