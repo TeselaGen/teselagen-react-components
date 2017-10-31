@@ -225,3 +225,21 @@
 .ReactTable .-loading.disabled {
   cursor: not-allowed;
 }
+
+/* to get the height to resize based on its container:  */
+.ReactTable {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.rt-table {
+  flex: 100000 0 auto;
+}
+
+.-pagination,
+.rt-body,
+.rt-tr-group,
+.rt-tr {
+  flex: 1 0 auto;
+}
