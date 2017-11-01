@@ -2,12 +2,7 @@ import React from "react";
 import DNALoader from "../DNALoader";
 import "./style.css";
 
-export default function Loading({
-  loading,
-  style,
-  className,
-  children /* ...rest */
-}) {
+export default function Loading({ loading, style, className, children }) {
   if (loading) {
     return (
       <div
