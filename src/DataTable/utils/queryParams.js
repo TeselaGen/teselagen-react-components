@@ -121,7 +121,7 @@ function filterEntitiesLocal(filters = [], searchTerm, entities, schema) {
   });
   if (allFilters.length) {
     const ccFields = getFieldsMappedByCCDisplayName(schema);
-    const { andFilters, orFilters } = getAndAndOrFilters(filters);
+    const { andFilters, orFilters } = getAndAndOrFilters(allFilters);
     //filter ands first
     andFilters.forEach(filter => {
       entities = getEntitiesForGivenFilter(entities, filter, ccFields);
