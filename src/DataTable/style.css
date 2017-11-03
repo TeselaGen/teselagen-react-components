@@ -206,6 +206,8 @@
 
 .tg-compact-table .rt-tbody .rt-td {
   padding: 4px 7px;
+  display: flex;
+  align-items: center;
 }
 
 .tg-compact-table .rt-tr-group {
