@@ -45,6 +45,7 @@ function removeUnwantedProps(props) {
   delete cleanedProps.defaultValue;
   delete cleanedProps.enableReinitialize;
   delete cleanedProps.tabIndex;
+  delete cleanedProps.secondaryLabel;
   delete cleanedProps.tooltipError;
   delete cleanedProps.tooltipProps;
   if (cleanedProps.inputClassName) {
@@ -101,6 +102,7 @@ class AbstractInput extends React.Component {
       tooltipProps,
       tooltipError,
       label,
+      secondaryLabel,
       className,
       showErrorIfUntouched,
       meta,
@@ -123,20 +125,30 @@ class AbstractInput extends React.Component {
       children
     );
 
+    const secondaryLabelComp = secondaryLabel ? (
+      <span className="pt-text-muted"> {secondaryLabel}</span>
+    ) : null;
+
     return (
       <div
         className={`pt-form-group tg-form-component ${getIntentClass(
           this.props
         ) || ""} ${className || ""}`}
       >
-        {label && !noOuterLabel && <label className="pt-label">{label}</label>}
+        {label &&
+          !noOuterLabel && (
+            <label className="pt-label">
+              {label}
+              {secondaryLabelComp}
+            </label>
+          )}
         {componentToWrap}
         {!tooltipError &&
-        showError && (
-          <div className={"tg-field-error-holder pt-form-helper-text"}>
-            {error}
-          </div>
-        )}
+          showError && (
+            <div className={"tg-field-error-holder pt-form-helper-text"}>
+              {error}
+            </div>
+          )}
       </div>
     );
   }
@@ -339,20 +351,20 @@ export const renderSelect = props => {
       <select
         {...removeUnwantedProps(rest)}
         value={
-          placeholder && value === "" ? (
-            "__placeholder__"
-          ) : typeof value !== "string" ? (
-            sortify(value) //deterministically sort and stringify the object/number coming in because select fields only support string values
-          ) : (
-            value
-          )
+          placeholder && value === ""
+            ? "__placeholder__"
+            : typeof value !== "string"
+              ? sortify(value) //deterministically sort and stringify the object/number coming in because select fields only support string values
+              : value
         }
         {...(hideValue ? { value: "" } : {})}
         onChange={function(e) {
           let val = e.target.value;
           try {
             val = JSON.parse(e.target.value); //try to json parse the string coming in
-          } catch (e) {}
+          } catch (e) {
+            //empty
+          }
           onChange(val);
           onFieldSubmit(val);
         }}
@@ -385,11 +397,9 @@ export const renderSelect = props => {
             <option
               key={index}
               value={
-                typeof value !== "string" ? (
-                  sortify(value) //deterministically sort and stringify the object/number coming in because select fields only support string values
-                ) : (
-                  value
-                )
+                typeof value !== "string"
+                  ? sortify(value) //deterministically sort and stringify the object/number coming in because select fields only support string values
+                  : value
               }
             >
               {label}
