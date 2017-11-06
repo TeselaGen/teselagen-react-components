@@ -72,7 +72,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
 
     let formNameFromWithTableParamsCall;
     if (isLocalCall) {
-      if (!formName) {
+      if (!formName || formName === "tgDataTable") {
         console.error(
           "Please pass a unique 'formName' prop to the locally connected <DataTable/> component with schema: ",
           schema
@@ -80,7 +80,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       }
     } else {
       //in user instantiated withTableParams() call
-      if (!formName) {
+      if (!formName || formName === "tgDataTable") {
         console.error(
           "Please pass a unique 'formName' prop to the withTableParams() with schema: ",
           schema
