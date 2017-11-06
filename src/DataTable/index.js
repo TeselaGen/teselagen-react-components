@@ -5,7 +5,7 @@ import { compose } from "redux";
 import React from "react";
 import moment from "moment";
 import uniqid from "uniqid";
-import { camelCase, get, toArray, startCase } from "lodash";
+import { camelCase, get, toArray, startCase, noop } from "lodash";
 import {
   Button,
   Menu,
@@ -17,6 +17,7 @@ import {
   Checkbox
 } from "@blueprintjs/core";
 import classNames from "classnames";
+import scrollIntoView from "dom-scroll-into-view";
 import { getSelectedRowsFromEntities } from "./utils/selection";
 import rowClick, { finalizeSelection } from "./utils/rowClick";
 import ReactTable from "react-table";
@@ -37,10 +38,6 @@ import DisabledLoadingComponent from "./DisabledLoadingComponent";
 import "../toastr";
 import "./style.css";
 import withTableParams from "./utils/withTableParams";
-
-const ROW_HEIGHT = 35;
-
-const noop = () => {};
 
 //we use this to make adding preset prop groups simpler
 function computePresets(props) {
@@ -159,9 +156,14 @@ class ReactDataTable extends React.Component {
       e => e.id === idToScrollTo || e.code === idToScrollTo
     );
     if (entityIndexToScrollTo === -1) return;
-    const scrollHeight = ROW_HEIGHT * entityIndexToScrollTo;
     const tableBody = document.getElementById(tableId);
-    if (tableBody) tableBody.scrollTop = scrollHeight;
+    const rowEl = tableBody.getElementsByClassName("rt-tr-group")[
+      entityIndexToScrollTo
+    ];
+    if (!rowEl) return;
+    scrollIntoView(rowEl, tableBody, {
+      alignWithTop: true
+    });
   };
 
   componentWillReceiveProps(newProps) {
