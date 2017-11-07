@@ -131,20 +131,24 @@ export default function withDialog(topLevelDialogProps) {
         };
         return newProps;
       },
-      function(dispatch, { nameToUse }) {
+      function(dispatch, { nameToUse, hideModal, showModal }) {
         return {
-          showModal: function() {
-            dispatch({
-              type: "TG_SHOW_MODAL",
-              name: nameToUse
-            });
-          },
-          hideModal: function() {
-            dispatch({
-              type: "TG_HIDE_MODAL",
-              name: nameToUse
-            });
-          }
+          showModal:
+            showModal ||
+            function() {
+              dispatch({
+                type: "TG_SHOW_MODAL",
+                name: nameToUse
+              });
+            },
+          hideModal:
+            hideModal ||
+            function() {
+              dispatch({
+                type: "TG_HIDE_MODAL",
+                name: nameToUse
+              });
+            }
         };
       }
     ),
