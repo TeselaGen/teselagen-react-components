@@ -25,6 +25,8 @@ export default function(nameOrFragment, options = {}) {
     extraMutateArgs,
     refetchQueries,
     showError = true,
+    client,
+    asFunction,
     ...rest
   } = options;
   const fragment = typeof nameOrFragment === "string" ? null : nameOrFragment;
@@ -41,6 +43,7 @@ export default function(nameOrFragment, options = {}) {
       }
     }
   `;
+  /*eslint-enable*/
 
   const getExtraMutateArgs = (...args) => {
     let extraArgs = {};
@@ -61,7 +64,7 @@ export default function(nameOrFragment, options = {}) {
         .mutate({
           mutation: deleteByIdsMutation,
           variables: {
-            input: values
+            input
           }
         })
         .then(function(res) {
@@ -81,7 +84,6 @@ export default function(nameOrFragment, options = {}) {
     };
   }
 
-  /*eslint-enable*/
   return graphql(deleteByIdsMutation, {
     props: ({ mutate }) => {
       function deleteMutation(...args) {
