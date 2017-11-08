@@ -53,35 +53,43 @@ export default function(nameOrFragment, options = {}) {
     return extraArgs;
   };
 
+  if (asFunction) {
+    return function deleteEntities(...args) {
+      const { input, idArray } = prepareArgs(args);
+
+      return client
+        .mutate({
+          mutation: deleteByIdsMutation,
+          variables: {
+            input: values
+          }
+        })
+        .then(function(res) {
+          const deletedCount = res.data.deletedCount;
+          if (deletedCount !== idArray.length) {
+            console.error(
+              `Uh oh, the number of deleted items does not match the number of IDs passed in to be deleted! `
+            );
+            console.error("idArray.length:", idArray.length);
+            console.error("deletedCount:", deletedCount);
+            console.error(
+              `make sure you passed in the correct type ${name} for the item you want to be deleting and that the item still exists! `
+            );
+          }
+          return deletedCount;
+        });
+    };
+  }
+
   /*eslint-enable*/
   return graphql(deleteByIdsMutation, {
     props: ({ mutate }) => {
       function deleteMutation(...args) {
-        const [maybeIdArray, { isCode } = {}] = args;
-        const idArray = Array.isArray(maybeIdArray)
-          ? maybeIdArray
-          : [maybeIdArray];
-        if (idArray.length < 1) {
-          console.error(
-            "Something went wrong, you need to pass at least one id when making a delete!"
-          );
-        }
-        // idArray.forEach(function(id) {
-        //   if (!Number.isInteger(id)) {
-        //     console.error(
-        //       "Ids passed to the delete mutation should all be integers but we got ",
-        //       id,
-        //       " instead"
-        //     );
-        //   }
-        // });
+        const { input, idArray } = prepareArgs(args);
+
         return mutate({
           variables: {
-            input: idArray.map(id => {
-              return {
-                [isCode ? "code" : "id"]: id
-              };
-            })
+            input
           },
           update: invalidateQueriesOfTypes([pluralRecordType]),
           refetchQueries,
@@ -120,4 +128,23 @@ export default function(nameOrFragment, options = {}) {
 
     ...rest
   });
+}
+
+function prepareArgs(args) {
+  const [maybeIdArray, { isCode } = {}] = args;
+  const idArray = Array.isArray(maybeIdArray) ? maybeIdArray : [maybeIdArray];
+  if (idArray.length < 1) {
+    console.error(
+      "Something went wrong, you need to pass at least one id when making a delete!"
+    );
+  }
+  const input = idArray.map(id => {
+    return {
+      [isCode ? "code" : "id"]: id
+    };
+  });
+  return {
+    input,
+    idArray
+  };
 }
