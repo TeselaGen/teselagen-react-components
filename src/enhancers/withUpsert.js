@@ -28,8 +28,8 @@ export default function withUpsert(nameOrFragment, options = {}) {
     invalidate,
     asFunction,
     idAs,
-    forceCreate,
-    forceUpdate,
+    forceCreate: topLevelForceCreate,
+    forceUpdate: topLevelForceUpdate,
     client,
     refetchQueries,
     showError = true,
@@ -98,10 +98,10 @@ export default function withUpsert(nameOrFragment, options = {}) {
         ? valueOrValues
         : [valueOrValues];
       let isUpdate = !!(values[0].id || values[0].code);
-      if (forceCreate) {
+      if (topLevelForceCreate) {
         isUpdate = false;
       }
-      if (forceUpdate) {
+      if (topLevelForceUpdate) {
         isUpdate = true;
       }
       return client
@@ -160,7 +160,12 @@ export default function withUpsert(nameOrFragment, options = {}) {
       ...rest
     }),
     connect((state, ownProps) => {
-      const { createItem, updateItem } = ownProps;
+      const { createItem, updateItem, apolloOptions = {} } = ownProps;
+      const {
+        forceCreate = topLevelForceCreate,
+        forceUpdate = topLevelForceUpdate
+      } = apolloOptions;
+
       return {
         createItem: undefined, //set these to undefined so people won't be tempted to use them
         updateItem: undefined,
