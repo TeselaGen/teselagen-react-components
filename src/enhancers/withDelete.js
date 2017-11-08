@@ -14,8 +14,8 @@ import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
  * @property {string} mutationName - optional rename of the default delete function deleteXXXX to whatever you want
  * @property {obj | function} extraMutateArgs - obj or function that returns obj to get passed to the actual mutation call
  * @property {boolean} showError - default=true -- whether or not to show a default error message on failure
+ * @property {boolean} asFunction {boolean} if true, this gives you back a function you can call directly instead of a HOC
  TODO *    @param invalidate {[string]} array of model types to invalidate after the mutate
- TODO *    @param asFunction {boolean} if true, this gives you back a function you can call directly instead of a HOC
  * @return deleteXXXX function that takes an id or an array of ids of records to delete. It returns a promise resolving to an array of created/updated outputs
  */
 
