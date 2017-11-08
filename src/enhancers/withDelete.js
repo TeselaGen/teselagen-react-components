@@ -57,9 +57,12 @@ export default function(nameOrFragment, options = {}) {
   };
 
   if (asFunction) {
+    if (!client)
+      return console.error(
+        "You need to pass the apollo client to withDelete if using as a function"
+      );
     return function deleteEntities(...args) {
       const { input, idArray } = prepareArgs(args);
-
       return client
         .mutate({
           mutation: deleteByIdsMutation,

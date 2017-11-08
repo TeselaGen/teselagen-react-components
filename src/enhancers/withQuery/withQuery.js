@@ -100,6 +100,11 @@ export default function withQuery(fragment, options = {}) {
     return gqlQuery;
   }
   if (asFunction) {
+    if (!client)
+      return console.error(
+        "You need to pass the apollo client to withQuery if using as a function"
+      );
+
     return function query(localVars) {
       return client
         .query({

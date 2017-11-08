@@ -93,6 +93,10 @@ export default function withUpsert(nameOrFragment, options = {}) {
   };
 
   if (asFunction) {
+    if (!client)
+      return console.error(
+        "You need to pass the apollo client to withUpsert if using as a function"
+      );
     return function upsert(valueOrValues) {
       const values = Array.isArray(valueOrValues)
         ? valueOrValues
