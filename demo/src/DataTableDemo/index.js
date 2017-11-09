@@ -36,6 +36,7 @@ const schema: DataTableSchema = {
       type: "string",
       displayName: "Not Displayed"
     },
+    { path: "hungerLevel", type: "string" },
     { path: "type", type: "lookup", displayName: "Special Type" },
     { path: "isShared", type: "boolean", displayName: "Is Shared?" },
     {

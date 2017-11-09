@@ -157,10 +157,11 @@ function getFiltersFromSearchTerm(searchTerm, schema) {
   const searchTermFilters = [];
   if (searchTerm) {
     schema.fields.forEach(field => {
-      const { type, displayName } = field;
+      const { type, displayName, path } = field;
+      const nameToUse = camelCase(displayName || path);
       if (type === "string" || type === "lookup") {
         searchTermFilters.push({
-          filterOn: camelCase(displayName),
+          filterOn: nameToUse,
           filterValue: searchTerm,
           selectedFilter: "contains",
           isOrFilter: true
@@ -168,7 +169,7 @@ function getFiltersFromSearchTerm(searchTerm, schema) {
       } else if (type === "boolean") {
         if ("true".replace(new RegExp("^" + searchTerm, "ig"), "") !== "true") {
           searchTermFilters.push({
-            filterOn: camelCase(displayName),
+            filterOn: nameToUse,
             filterValue: true,
             selectedFilter: "true",
             isOrFilter: true
@@ -177,7 +178,7 @@ function getFiltersFromSearchTerm(searchTerm, schema) {
           "false".replace(new RegExp("^" + searchTerm, "ig"), "") !== "false"
         ) {
           searchTermFilters.push({
-            filterOn: camelCase(displayName),
+            filterOn: nameToUse,
             filterValue: false,
             selectedFilter: "false",
             isOrFilter: true
@@ -202,18 +203,21 @@ function getSubFilter(
     return qb
       ? qb.startsWith(filterValue)
       : fieldVal => {
+          if (!fieldVal || !fieldVal.toLowerCase) return false;
           return startsWith(fieldVal.toLowerCase(), filterValLower);
         };
   } else if (ccSelectedFilter === "endsWith") {
     return qb
       ? qb.endsWith(filterValue)
       : fieldVal => {
+          if (!fieldVal || !fieldVal.toLowerCase) return false;
           return endsWith(fieldVal.toLowerCase(), filterValLower);
         };
   } else if (ccSelectedFilter === "contains") {
     return qb
       ? qb.contains(filterValue)
       : fieldVal => {
+          if (!fieldVal || !fieldVal.toLowerCase) return false;
           return (
             fieldVal.toLowerCase().replace(filterValLower, "") !==
             fieldVal.toLowerCase()
