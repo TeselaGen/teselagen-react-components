@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 // import EditViewHOC from '../../EditViewHOC'
 import { reduxForm } from "redux-form";
-import { Spinner, Button, Intent, Dialog } from "@blueprintjs/core";
+import { Button, Dialog } from "@blueprintjs/core";
 import { each } from "lodash";
 import CollapsibleCard from "../CollapsibleCard";
 import InfoHelper from "../InfoHelper";
 import schemas from "./schemas";
 import DataTable from "../DataTable";
+import Loading from "../Loading";
 import "./style.css";
 
 const sharedTableProps = {
@@ -60,12 +61,7 @@ class J5ReportRecordView extends Component {
     } = this.props;
     const { linkDialogName } = this.state;
 
-    if (data.loading)
-      return (
-        <div className={"loading-task-body"}>
-          <Spinner intent={Intent.PRIMARY} className={"task-body-spinner"} />
-        </div>
-      );
+    if (data.loading) return <Loading loading />;
 
     if (!data.j5Report) {
       return <div>No report found!</div>;

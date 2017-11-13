@@ -13,13 +13,6 @@ export default function Loading({ loading, style, className, children }) {
         <DNALoader style={style} className={className} />
       </div>
     );
-    // return ( //tnr: commenting this out for the time being. Going with a simple static loading message
-    //   <Spinner
-    //     intent={Intent.PRIMARY}
-    //     className={"tg-loading-spinner"}
-    //     {...rest}
-    //   />
-    // );
   } else {
     return children || null;
   }
