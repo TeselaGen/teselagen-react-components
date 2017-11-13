@@ -1,3 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`(Component) renders without exploding 1`] = `""`;
+exports[`(Component) renders without exploding 1`] = `
+<div
+  className="tg-dna-loader-container tg-flex justify-center align-center"
+>
+  <DNALoader />
+</div>
+`;

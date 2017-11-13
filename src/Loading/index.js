@@ -3,7 +3,7 @@ import DNALoader from "../DNALoader";
 import "./style.css";
 
 export default function Loading({ loading, style, className, children }) {
-  if (loading) {
+  if (loading || !children) {
     return (
       <div
         className={
