@@ -47,6 +47,7 @@ export default function withDialog(topLevelDialogProps) {
           showModal,
           onClickRename,
           hideModal,
+          fetchPolicy = "network-only",
           children,
           dialogProps,
           title,
@@ -77,6 +78,8 @@ export default function withDialog(topLevelDialogProps) {
                 <WrappedComponent
                   {...{
                     ...rest,
+                    fetchPolicy,
+                    ssr: false,
                     hideModal
                   }}
                 />
