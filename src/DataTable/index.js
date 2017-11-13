@@ -157,6 +157,7 @@ class ReactDataTable extends React.Component {
     );
     if (entityIndexToScrollTo === -1) return;
     const tableBody = document.getElementById(tableId);
+    if (!tableBody) return;
     const rowEl = tableBody.getElementsByClassName("rt-tr-group")[
       entityIndexToScrollTo
     ];
