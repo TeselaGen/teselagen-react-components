@@ -5,7 +5,7 @@ import { compose } from "redux";
 import React from "react";
 import moment from "moment";
 import uniqid from "uniqid";
-import { camelCase, get, toArray, startCase, noop } from "lodash";
+import { camelCase, get, toArray, startCase, noop, isEqual } from "lodash";
 import {
   Button,
   Menu,
@@ -143,7 +143,7 @@ class ReactDataTable extends React.Component {
     const { tableId } = this.state;
     const { selectedIds, entities } = newProps;
     const { selectedIds: oldSelectedIds } = oldProps;
-    if (selectedIds === oldSelectedIds) return;
+    if (isEqual(selectedIds, oldSelectedIds)) return;
     const idArray = Array.isArray(selectedIds) ? selectedIds : [selectedIds];
     const newIdMap = idArray.reduce((acc, idOrCode) => {
       if (idOrCode || idOrCode === 0) acc[idOrCode] = true;
