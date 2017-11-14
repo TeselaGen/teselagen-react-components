@@ -157,7 +157,7 @@ class ReactDataTable extends React.Component {
       e => idArray.indexOf(getIdOrCodeOrIndex(e)) > -1
     );
     const newIdMap = selectedEntities.reduce((acc, entity) => {
-      acc[getIdOrCodeOrIndex(entity)] = entity;
+      acc[getIdOrCodeOrIndex(entity)] = { entity };
       return acc;
     }, {});
     finalizeSelection({ idMap: newIdMap, props: newProps });
