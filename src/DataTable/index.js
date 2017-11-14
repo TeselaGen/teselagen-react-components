@@ -683,7 +683,10 @@ class ReactDataTable extends React.Component {
         };
       } else if (schemaForColumn.type === "timestamp") {
         tableColumn.Cell = props =>
-          moment(new Date(props.value)).format("MMM D, YYYY");
+          {
+            console.log("timestamp",props.value)
+            return props.value ? moment(new Date(props.value)).format("MMM D, YYYY") : "";
+          }
       } else if (schemaForColumn.type === "boolean") {
         tableColumn.Cell = props => (props.value ? "True" : "False");
       }
