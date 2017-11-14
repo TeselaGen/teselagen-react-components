@@ -479,7 +479,8 @@ export function getQueryParams({
   schema,
   isInfinite,
   entities,
-  isLocalCall
+  isLocalCall,
+  additionalFilter
 }) {
   Object.keys(currentParams).forEach(function(key) {
     if (currentParams[key] === undefined) {
@@ -591,9 +592,11 @@ export function getQueryParams({
       return val !== "";
     }); //get rid of erroneous filters
     const { andFilters, orFilters } = getAndAndOrFilters(allFilters);
+    const additionalFilterToUse = additionalFilter(qb);
     try {
       qb
         .whereAll(getQueries(andFilters, qb, ccFields))
+        .andWhereAll(additionalFilterToUse)
         .andWhereAny(getQueries(orFilters, qb, ccFields));
     } catch (e) {
       if (urlConnected) {
