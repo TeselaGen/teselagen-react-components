@@ -5,7 +5,15 @@ import { compose } from "redux";
 import React from "react";
 import moment from "moment";
 import uniqid from "uniqid";
-import { camelCase, get, toArray, startCase, noop } from "lodash";
+import {
+  camelCase,
+  get,
+  toArray,
+  startCase,
+  noop,
+  isEqual,
+  isEmpty
+} from "lodash";
 import {
   Button,
   Menu,
@@ -143,10 +151,13 @@ class ReactDataTable extends React.Component {
     const { tableId } = this.state;
     const { selectedIds, entities } = newProps;
     const { selectedIds: oldSelectedIds } = oldProps;
-    if (selectedIds === oldSelectedIds) return;
+    if (isEqual(selectedIds, oldSelectedIds)) return;
     const idArray = Array.isArray(selectedIds) ? selectedIds : [selectedIds];
-    const newIdMap = idArray.reduce((acc, idOrCode) => {
-      if (idOrCode || idOrCode === 0) acc[idOrCode] = true;
+    const selectedEntities = entities.filter(
+      e => idArray.indexOf(getIdOrCodeOrIndex(e)) > -1
+    );
+    const newIdMap = selectedEntities.reduce((acc, entity) => {
+      acc[getIdOrCodeOrIndex(entity)] = { entity };
       return acc;
     }, {});
     finalizeSelection({ idMap: newIdMap, props: newProps });
@@ -672,9 +683,11 @@ class ReactDataTable extends React.Component {
         };
       } else if (schemaForColumn.type === "timestamp") {
         tableColumn.Cell = props => {
-          return moment(new Date(props.value)).format(
-            "MMM D, YYYY -- h:mm:ss a"
-          );
+          return props.value
+            ? moment(new Date(props.value)).format(
+              "MMM D, YYYY -- h:mm:ss a"
+            )
+            : "";
         };
       } else if (schemaForColumn.type === "boolean") {
         tableColumn.Cell = props => (props.value ? "True" : "False");

@@ -61,9 +61,14 @@ const schemas = {
       { path: "name", type: "string", displayName: "Name" },
       { path: "sequence.size", type: "number", displayName: "Size" },
       {
+        path: "nextLevelParts",
+        type: "string",
+        displayName: "Next level parts"
+      },
+      {
         path: "partsContainedNames",
         type: "string",
-        displayName: "Parts Contained"
+        displayName: "Parts contained"
       }
     ]
   },
@@ -94,8 +99,9 @@ const schemas = {
         isHidden: true
       },
       { path: "sequencePart.name", type: "string", displayName: "Name" },
-      { path: "sequencePart.start", type: "number", displayName: "Start" },
-      { path: "sequencePart.end", type: "number", displayName: "End" },
+      { path: "sequencePart.start", type: "number", displayName: "Start (bp)" },
+      { path: "sequencePart.end", type: "number", displayName: "End (bp)" },
+      { path: "size", type: "number", displayName: "Length (bp)" },
       { path: "sequencePart.strand", type: "number", displayName: "Strand" },
       {
         path: "sequencePart.sequence.name",

@@ -217,15 +217,19 @@ export default function withQuery(fragment, options = {}) {
             !deepEqual(nextProps.data.error, this.props.data.error)
           ) {
             const error = nextProps.data.error;
-            console.error("error:", error);
-            window.toastr.error(`Error loading ${queryNameToUse}`);
+            if (this.props.loggedIn) {
+              console.error("error:", error);
+              window.toastr.error(`Error loading ${queryNameToUse}`);
+            } else {
+              console.log("Error supressed, not logged in");
+            }
           }
         }
         render() {
           const { data = {} } = this.props;
           const { loading } = data;
           if (loading && showLoading) {
-            return <LoadingComp loading />;
+            return <LoadingComp style={{ minHeight: 200 }} />;
           }
           return <WrappedComponent {...this.props} />;
         }

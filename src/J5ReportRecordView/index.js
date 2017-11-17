@@ -2,12 +2,13 @@ import React, { Component } from "react";
 // import EditViewHOC from '../../EditViewHOC'
 import { reduxForm } from "redux-form";
 import { Button, Dialog } from "@blueprintjs/core";
-import { each } from "lodash";
+import { each, get } from "lodash";
 import CollapsibleCard from "../CollapsibleCard";
 import InfoHelper from "../InfoHelper";
 import schemas from "./schemas";
 import DataTable from "../DataTable";
 import Loading from "../Loading";
+import { getRangeLength } from "ve-range-utils"
 import "./style.css";
 
 const sharedTableProps = {
@@ -21,12 +22,22 @@ const sharedTableProps = {
   urlConnected: false
 };
 
+const processInputParts = InputParts =>
+  
+  InputParts.map(InputPart => { 
+    return({
+      ...InputPart,
+      size: getRangeLength({ start: InputPart.sequencePart.start, end: InputPart.sequencePart.end }, get(InputPart, 'sequencePart.sequence.size'))
+    })
+  });
+
 const processJ5RunConstructs = j5RunConstructs =>
   j5RunConstructs.map(j5RunConstruct => ({
     ...j5RunConstruct,
-    partsContainedNames: (j5RunConstruct.sequence.sequenceParts || [])
+    nextLevelParts: (get(j5RunConstruct,'sequence.sequenceParts') || [])
       .map(part => part.name)
-      .join(", ")
+      .join(", "),
+    partsContainedNames: get(j5RunConstruct,'j5ConstructAssemblyPieces[0].assemblyPiece.j5AssemblyPieceParts[0].j5InputPart.sequencePart.name') && j5RunConstruct.j5ConstructAssemblyPieces.map(j5ConstructAssemblyPiece=>j5ConstructAssemblyPiece.assemblyPiece.j5AssemblyPieceParts.map(j5InputPart=>j5InputPart.j5InputPart.sequencePart.name)).join(','),
   }));
 
 const getInputPartsFromInputSequences = j5InputSequences =>
@@ -277,7 +288,7 @@ class J5ReportRecordView extends Component {
             {...sharedTableProps}
             schema={schemas["j5InputParts"]}
             formName={"j5InputParts"} //because these tables are currently not connected to table params, we need to manually pass a formName here
-            entities={j5InputParts}
+            entities={processInputParts(j5InputParts)}
           />
         </CollapsibleCard>
         <CollapsibleCard

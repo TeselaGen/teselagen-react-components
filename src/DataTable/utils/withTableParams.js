@@ -48,7 +48,8 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       formNameFromWithTPCall,
       defaults,
       schema,
-      isInfinite
+      isInfinite,
+      additionalFilter = {}
     } = mergedOpts;
 
     if (ownProps.isTableParamsConnected) {
@@ -102,7 +103,10 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         formSelector(state, "reduxFormSelectedEntityIdMap") || {};
       selectedEntities = map(selectedEntityIdMap, ({ entity }) => entity);
     }
-
+    const additionalFilterToUse =
+      typeof additionalFilter === "function"
+        ? additionalFilter.bind(this, ownProps)
+        : () => additionalFilter;
     return {
       ...mergedOpts,
       ...getQueryParams({
@@ -112,7 +116,8 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         defaults,
         schema,
         isInfinite,
-        isLocalCall
+        isLocalCall,
+        additionalFilter: additionalFilterToUse
       }),
       formNameFromWithTPCall: formNameFromWithTableParamsCall,
       // randomVarToForceLocalStorageUpdate: formSelector(state, "localStorageForceUpdate"),
