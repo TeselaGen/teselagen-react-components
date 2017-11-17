@@ -671,11 +671,30 @@ class ReactDataTable extends React.Component {
           return val;
         };
       } else if (schemaForColumn.type === "timestamp") {
-        tableColumn.Cell = props =>
-          moment(new Date(props.value)).format("MMM D, YYYY");
+        tableColumn.Cell = props => {
+          return moment(new Date(props.value)).format(
+            "MMM D, YYYY -- h:mm:ss a"
+          );
+        };
       } else if (schemaForColumn.type === "boolean") {
         tableColumn.Cell = props => (props.value ? "True" : "False");
+      } else {
+        tableColumn.Cell = props => props.value;
       }
+      const oldFunc = tableColumn.Cell;
+      tableColumn.Cell = (...args) => {
+        //wrap the original tableColumn.Cell function in another div in order to add a title attribute
+        const val = oldFunc(...args)
+        let title = String((typeof val !== 'string') ? args[0].value : val)
+        return (
+          <div
+            style={{ textOverflow: "ellipsis", overflow: "hidden" }}
+            title={title}
+          >
+            {val}
+          </div>
+        );
+      };
 
       columnsToRender.push(tableColumn);
     });
