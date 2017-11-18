@@ -161,7 +161,7 @@ export const renderBlueprintDateInput = props => {
       {...removeUnwantedProps(rest)}
       intent={intent}
       format="MM/DD/YYYY"
-      {...input}
+      inputProps={{ ...input }}
       onChange={function(selectedDate) {
         input.onChange(selectedDate);
         onFieldSubmit(selectedDate);
