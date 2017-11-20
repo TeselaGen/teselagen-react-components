@@ -11,6 +11,7 @@ import {
   TextareaField,
   EditableTextField,
   NumericInputField,
+  DateRangeInputField,
   RadioGroupField,
   FileUploadField
 } from "../../../src";
@@ -208,6 +209,17 @@ class FormComponentsDemo extends React.Component {
             minDate={new Date()}
             maxDate={
               new Date(new Date().setFullYear(new Date().getFullYear() + 10))
+            }
+          />
+          <DateRangeInputField
+            name={"dateRangeInputField"}
+            label="Date Range Input"
+            onFieldSubmit={function(val) {
+              console.info("on field submit!:", val);
+            }}
+            minDate={new Date()}
+            maxDate={
+              new Date(new Date().setFullYear(new Date().getFullYear() + 1000))
             }
           />
           <CheckboxField
