@@ -110,11 +110,6 @@ export default props => {
               .then(keepGoing => {
                 if (!keepGoing) return;
                 if (action) {
-                  const data = new FormData();
-                  acceptedFiles.forEach(file => {
-                    data.append("file", file);
-                  });
-
                   if (uploadInBulk) {
                     //tnr: not yet implemented
                     /* const config = {
@@ -136,6 +131,8 @@ export default props => {
                     const responses = [];
                     Promise.all(
                       acceptedFiles.map(fileToUpload => {
+                        const data = new FormData();
+                        data.append("file", fileToUpload);
                         return axios
                           .post(action, data)
                           .then(function(res) {
