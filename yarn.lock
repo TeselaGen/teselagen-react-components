@@ -8577,6 +8577,33 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "~1.0.0"
     spdx-expression-parse "~1.0.0"
 
+validate.io-array@^1.0.3:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/validate.io-array/-/validate.io-array-1.0.6.tgz#5b5a2cafd8f8b85abb2f886ba153f2d93a27774d"
+
+validate.io-integer@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/validate.io-integer/-/validate.io-integer-1.0.5.tgz#168496480b95be2247ec443f2233de4f89878068"
+  dependencies:
+    validate.io-number "^1.0.3"
+
+validate.io-nonnegative-integer-array@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/validate.io-nonnegative-integer-array/-/validate.io-nonnegative-integer-array-1.0.1.tgz#66330a665f5598b96f25f69081f81f632ea4db4f"
+  dependencies:
+    validate.io-array "^1.0.3"
+    validate.io-nonnegative-integer "^1.0.0"
+
+validate.io-nonnegative-integer@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/validate.io-nonnegative-integer/-/validate.io-nonnegative-integer-1.0.0.tgz#8069243a08c5f98e95413c929dfd7b18f3f6f29f"
+  dependencies:
+    validate.io-integer "^1.0.5"
+
+validate.io-number@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/validate.io-number/-/validate.io-number-1.0.3.tgz#f63ffeda248bf28a67a8d48e0e3b461a1665baf8"
+
 value-equal@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/value-equal/-/value-equal-0.4.0.tgz#c5bdd2f54ee093c04839d71ce2e4758a6890abc7"
@@ -8584,6 +8611,13 @@ value-equal@^0.4.0:
 vary@~1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.1.tgz#67535ebb694c1d52257457984665323f587e8d37"
+
+ve-range-utils@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/ve-range-utils/-/ve-range-utils-2.3.3.tgz#364d0fdfaa047b6e3b967ff287886fa09edbc027"
+  dependencies:
+    lodash "^4.17.4"
+    validate.io-nonnegative-integer-array "^1.0.1"
 
 vendors@^1.0.0:
   version "1.0.1"
