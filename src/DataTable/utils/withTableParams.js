@@ -49,6 +49,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       defaults,
       schema,
       isInfinite,
+      isSimple,
       additionalFilter = {}
     } = mergedOpts;
 
@@ -115,7 +116,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         urlConnected,
         defaults,
         schema,
-        isInfinite,
+        isInfinite: isInfinite || isSimple,
         isLocalCall,
         additionalFilter: additionalFilterToUse
       }),
