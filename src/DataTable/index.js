@@ -464,7 +464,9 @@ class ReactDataTable extends React.Component {
     const rowSelected = reduxFormSelectedEntityIdMap.input.value[rowId];
     return {
       onClick: e => {
-        if (withCheckboxes) return;
+        // if checkboxes are activated or row expander is clicked don't select row
+        if (withCheckboxes || e.target.classList.contains("rt-expander"))
+          return;
         rowClick(e, rowInfo, entities, computePresets(this.props));
       },
       onContextMenu: e => {
