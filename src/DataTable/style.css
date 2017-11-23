@@ -182,6 +182,12 @@
   color: rgba(0, 0, 0, 0.65);
   font-size: 12px;
 }
+
+/* fix padding in custom row expander cell */
+.ReactTable .rt-tbody .rt-expandable {
+  padding: 3px 5px;
+}
+
 /*  //tnr: hopefully this isn't needed because it messes up the row "expander" styling
 .ReactTable .rt-tr-group {
   flex: initial;

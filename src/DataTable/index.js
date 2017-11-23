@@ -1,3 +1,4 @@
+/* eslint react/jsx-no-bind: 0 */
 import deepEqual from "deep-equal";
 import { connect } from "react-redux";
 import { reduxForm } from "redux-form";
@@ -5,15 +6,7 @@ import { compose } from "redux";
 import React from "react";
 import moment from "moment";
 import uniqid from "uniqid";
-import {
-  camelCase,
-  get,
-  toArray,
-  startCase,
-  noop,
-  isEqual,
-  isEmpty
-} from "lodash";
+import { camelCase, get, toArray, startCase, noop, isEqual } from "lodash";
 import {
   Button,
   Menu,
@@ -385,6 +378,18 @@ class ReactDataTable extends React.Component {
             maxHeight,
             ...style
           }}
+          ExpanderComponent={({ isExpanded }) => {
+            return (
+              <Button
+                className={classNames(
+                  "tg-expander",
+                  Classes.MINIMAL,
+                  Classes.SMALL
+                )}
+                iconName={isExpanded ? "chevron-down" : "chevron-right"}
+              />
+            );
+          }}
           SubComponent={SubComponent}
           {...ReactTableProps}
         />
@@ -465,7 +470,7 @@ class ReactDataTable extends React.Component {
     return {
       onClick: e => {
         // if checkboxes are activated or row expander is clicked don't select row
-        if (withCheckboxes || e.target.classList.contains("rt-expander"))
+        if (withCheckboxes || e.target.classList.contains("tg-expander"))
           return;
         rowClick(e, rowInfo, entities, computePresets(this.props));
       },

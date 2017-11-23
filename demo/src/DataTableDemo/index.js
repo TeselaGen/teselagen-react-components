@@ -70,7 +70,7 @@ const schema: DataTableSchema = {
       path: "user.lastName",
       type: "string",
       displayName: "Added By"
-    },
+    }
     // {
     //   expander: true
     // }
@@ -221,6 +221,7 @@ export class DataTableInstance extends React.Component {
     withSearch: true,
     withPaging: true,
     withFilter: true,
+    withSubComponent: true,
     noHeader: false,
     noFooter: false,
     noPadding: false,
@@ -252,7 +253,8 @@ export class DataTableInstance extends React.Component {
     const val = e.target.value;
     const selectedIds = (val.indexOf(",") > -1
       ? val.split(",").map(num => parseInt(num, 10))
-      : [parseInt(val, 10)]).filter(val => !isNaN(val));
+      : [parseInt(val, 10)]
+    ).filter(val => !isNaN(val));
     this.setState({
       selectedIds
     });
@@ -318,6 +320,7 @@ export class DataTableInstance extends React.Component {
         )}
         {renderToggle(this, "withTitle")}
         {renderToggle(this, "noSelect")}
+        {renderToggle(this, "withSubComponent")}
         {renderToggle(this, "withSearch")}
         {renderToggle(this, "withDisplayOptions")}
         {renderToggle(this, "withPaging")}
@@ -357,8 +360,7 @@ export class DataTableInstance extends React.Component {
             </div>
           </div>
         )}
-        <div className={'wrappingdiv'}>
-
+        <div className={"wrappingdiv"}>
           <DataTable
             {...tableParams}
             entities={entitiesToPass}
@@ -366,7 +368,7 @@ export class DataTableInstance extends React.Component {
             onDoubleClick={function() {
               console.log("double clicked");
             }}
-            SubComponent={SubComp}
+            SubComponent={this.state.withSubComponent ? SubComp : null}
             cellRenderer={{
               isShared: value => {
                 return (
@@ -442,9 +444,21 @@ export class DataTableInstance extends React.Component {
 function noop() {}
 
 function SubComp(row) {
-    return <div style={{ margin: 10 }}> !!Row Index: {row.index}
-      <DataTable formName={'something'} entities={[]} schema={{fields: [{
-        path: 'something'
-      }]}}></DataTable>
-    </div>;
+  return (
+    <div style={{ margin: 10 }}>
+      {" "}
+      !!Row Index: {row.index}
+      <DataTable
+        formName={"something"}
+        entities={[]}
+        schema={{
+          fields: [
+            {
+              path: "something"
+            }
+          ]
+        }}
+      />
+    </div>
+  );
 }
