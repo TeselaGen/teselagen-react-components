@@ -98,6 +98,7 @@ class ReactDataTable extends React.Component {
     isSimple: false,
     reduxFormSearchInput: {},
     reduxFormSelectedEntityIdMap: {},
+    reduxFormExpandedEntityIdMap: {},
     setSearchTerm: noop,
     setFilter: noop,
     clearFilters: noop,
@@ -218,6 +219,7 @@ class ReactDataTable extends React.Component {
       formName,
       reduxFormSearchInput,
       reduxFormSelectedEntityIdMap,
+      reduxFormExpandedEntityIdMap,
       schema,
       filters,
       errorParsingUrlString,
@@ -288,6 +290,11 @@ class ReactDataTable extends React.Component {
     // no rows found message
     if (entities.length === 0 && rowsToShow < 3) rowsToShow = 3;
 
+    const expandedRows = entities.reduce((acc, row, index) => {
+      const rowId = getIdOrCodeOrIndex(row, index);
+      acc[index] = reduxFormExpandedEntityIdMap.input.value[rowId];
+      return acc;
+    }, {});
     return (
       <div
         className={classNames(
@@ -361,7 +368,7 @@ class ReactDataTable extends React.Component {
           data={entities}
           columns={this.renderColumns()}
           pageSize={rowsToShow}
-          freezeWhenExpanded
+          expanded={expandedRows}
           showPagination={false}
           sortable={false}
           loading={isLoading || disabled}
@@ -458,6 +465,7 @@ class ReactDataTable extends React.Component {
   getTableRowProps = (state, rowInfo) => {
     const {
       reduxFormSelectedEntityIdMap,
+      reduxFormExpandedEntityIdMap,
       withCheckboxes,
       onDoubleClick,
       history,
@@ -467,11 +475,20 @@ class ReactDataTable extends React.Component {
     const entity = rowInfo.original;
     const rowId = getIdOrCodeOrIndex(entity, rowInfo.index);
     const rowSelected = reduxFormSelectedEntityIdMap.input.value[rowId];
+    const isExpanded = reduxFormExpandedEntityIdMap.input.value[rowId];
     return {
       onClick: e => {
         // if checkboxes are activated or row expander is clicked don't select row
-        if (withCheckboxes || e.target.classList.contains("tg-expander"))
+        if (e.target.classList.contains("tg-expander")) {
+          reduxFormExpandedEntityIdMap.input.onChange({
+            ...reduxFormExpandedEntityIdMap.input.value,
+            [rowId]: !isExpanded
+          });
           return;
+        } else if (withCheckboxes) {
+          return;
+        }
+
         rowClick(e, rowInfo, entities, computePresets(this.props));
       },
       onContextMenu: e => {
@@ -1010,7 +1027,8 @@ export default compose(
       "localStorageForceUpdate",
       "reduxFormQueryParams",
       "reduxFormSearchInput",
-      "reduxFormSelectedEntityIdMap"
+      "reduxFormSelectedEntityIdMap",
+      "reduxFormExpandedEntityIdMap"
     ]
   })
 )(ReactDataTable);
