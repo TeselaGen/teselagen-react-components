@@ -28,6 +28,7 @@ export default props => {
     onFieldSubmit = noop, //called when all files have successfully uploaded
     onRemove = noop, //called when a file has been selected to be removed
     onChange = noop, //this is almost always getting passed by redux-form, no need to pass this handler manually
+    onFileClick, // called when a file link in the filelist is clicked
     dropzoneProps = {}
   } = props;
 
@@ -228,7 +229,10 @@ export default props => {
                   <a
                     style={{ width: "100%" }}
                     name={name || originalName}
-                    {...(url ? { href: url } : {})}
+                    {...(url && !onFileClick ? { href: url } : {})}
+                    /* eslint-disable react/jsx-no-bind*/
+                    onClick={() => onFileClick && onFileClick(file)}
+                    /* eslint-enable react/jsx-no-bind*/
                     {...(downloadName ? { download: downloadName } : {})}
                   >
                     {" "}
