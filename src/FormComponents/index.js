@@ -220,7 +220,11 @@ export const renderBlueprintCheckbox = props => {
       label={label}
       onChange={function(e, val) {
         input.onChange(e, val);
-        onFieldSubmit(e.target ? e.target.value : val);
+        let valToUse = val;
+        if (e.target) {
+          valToUse = e.target.value !== "false";
+        }
+        onFieldSubmit(valToUse);
       }}
     />
   );
