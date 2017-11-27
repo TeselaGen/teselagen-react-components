@@ -33,6 +33,7 @@ export interface DataTableProps {
     withPaging: Boolean,
     reduxFormSearchInput: {},
     reduxFormSelectedEntityIdMap: {},
+    reduxFormExpandedEntityIdMap: {},
     setSearchTerm?(): void,
     setFilter?(): void,
     clearFilters?(): void,
