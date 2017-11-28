@@ -14,7 +14,8 @@ const SearchBar = ({
       className={"pt-round datatable-search-input"}
       placeholder="Search..."
       {...reduxFormSearchInput.input}
-      {...onEnterHelper(() => {
+      {...onEnterHelper(e => {
+        e.preventDefault();
         setSearchTerm(reduxFormSearchInput.input.value);
       })}
       rightElement={
