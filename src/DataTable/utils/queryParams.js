@@ -566,7 +566,7 @@ export function getQueryParams({
         const schemaForField = ccFields[ccDisplayName];
         if (schemaForField) {
           const { path } = schemaForField;
-          let reversed = ccDisplayName !== tableQueryParams.order;
+          let reversed = ccDisplayName !== orderVal;
           const prefix = reversed ? "-" : "";
           graphqlQueryParams.sort = [
             ...(graphqlQueryParams.sort || []),
