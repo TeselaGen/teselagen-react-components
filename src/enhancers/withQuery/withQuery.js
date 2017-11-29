@@ -110,6 +110,8 @@ export default function withQuery(fragment, options = {}) {
         .query({
           query: gqlQuery,
           name: "createDataFile",
+          ssr: false,
+          fetchPolicy: "network-only",
           ...(rest.options ? rest.options : {}),
           variables:
             localVars ||
@@ -154,14 +156,16 @@ export default function withQuery(fragment, options = {}) {
             variables: {
               id
             },
-            fetchPolicy,
+            fetchPolicy: fetchPolicy || "network-only",
+            ssr: false,
             pollInterval,
             notifyOnNetworkStatusChange
           };
         }
         return {
           variables,
-          fetchPolicy,
+          fetchPolicy: fetchPolicy || "network-only",
+          ssr: false,
           pollInterval,
           notifyOnNetworkStatusChange
         };
