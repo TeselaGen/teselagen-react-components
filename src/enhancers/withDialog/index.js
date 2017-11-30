@@ -65,7 +65,7 @@ export default function withDialog(topLevelDialogProps) {
             "withDialog error: Please provide a target or child element to the withDialog() enhanced component. If you really don't want a target, please pass a 'noTarget=true' prop"
           );
         return (
-          <div>
+          <React.Fragment>
             {isOpen && (
               <Dialog
                 onClose={function() {
@@ -91,7 +91,7 @@ export default function withDialog(topLevelDialogProps) {
                   showModal();
                 }
               })}
-          </div>
+          </React.Fragment>
         );
       }
     };

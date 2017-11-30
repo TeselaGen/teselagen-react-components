@@ -1,5 +1,6 @@
 import InfoHelperDemo from "./InfoHelperDemo";
 import SimpleTableDemo from "./DataTableDemo/SimpleTableDemo";
+import WithDialogDemo from './WithDialogDemo';
 import "./style.css";
 import React from "react";
 import { render } from "react-dom";
@@ -51,6 +52,11 @@ const demos = {
     demo: FormComponentsDemo,
     url:
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/FormComponentsDemo/index.js"
+  },
+  withDialog: {
+    demo: WithDialogDemo,
+    url:
+      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/WithDialogDemo/index.js"
   },
   fonticons: {
     demo: FontIconsDemo,
