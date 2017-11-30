@@ -18,14 +18,15 @@ export default class PagingTool extends React.Component {
       <Popover
         content={
           <div style={{ padding: 10, paddingLeft: 20, paddingRight: 20 }}>
-            <h5>Displayed Columns:</h5>
+            <h5 style={{ marginBottom: 10 }}>Displayed Columns:</h5>
             {fields.map(field => {
               const { displayName, isHidden, path } = field;
               if (!isHidden) numVisible++;
               return (
                 <Checkbox
                   key={displayName}
-                  onClick={() => {
+                  /* eslint-disable react/jsx-no-bind*/
+                  onChange={() => {
                     if (numVisible <= 1 && !isHidden) {
                       return window.toastr.warning(
                         "We have to display at least one column :)"
@@ -33,6 +34,7 @@ export default class PagingTool extends React.Component {
                     }
                     updateColumnVisibility({ shouldShow: isHidden, path });
                   }}
+                  /* eslint-enable react/jsx-no-bind*/
                   checked={!isHidden}
                   label={displayName}
                 />
