@@ -4,8 +4,8 @@ import { connect } from "react-redux";
 import { reduxForm } from "redux-form";
 import { compose } from "redux";
 import React from "react";
+import ReactDOM from "react-dom";
 import moment from "moment";
-import uniqid from "uniqid";
 import { camelCase, get, toArray, startCase, noop, isEqual } from "lodash";
 import {
   Button,
@@ -142,7 +142,6 @@ class ReactDataTable extends React.Component {
     }
 
     // handle programmatic selection and scrolling
-    const { tableId } = this.state;
     const { selectedIds, entities } = newProps;
     const { selectedIds: oldSelectedIds } = oldProps;
     if (isEqual(selectedIds, oldSelectedIds)) return;
@@ -160,8 +159,9 @@ class ReactDataTable extends React.Component {
     const entityIndexToScrollTo = entities.findIndex(
       e => e.id === idToScrollTo || e.code === idToScrollTo
     );
-    if (entityIndexToScrollTo === -1) return;
-    const tableBody = document.getElementById(tableId);
+    const table = ReactDOM.findDOMNode(this.table);
+    if (entityIndexToScrollTo === -1 || !table) return;
+    const tableBody = table.querySelector(".rt-tbody");
     if (!tableBody) return;
     const rowEl = tableBody.getElementsByClassName("rt-tr-group")[
       entityIndexToScrollTo
@@ -179,10 +179,17 @@ class ReactDataTable extends React.Component {
     );
   }
   componentWillMount() {
-    // table id is used for programmatic scroll
-    const tableId = uniqid();
-    this.setState({ tableId });
     this.componentWillMountOrReceiveProps({}, computePresets(this.props));
+  }
+
+  componentDidUpdate() {
+    const table = ReactDOM.findDOMNode(this.table);
+    const tableBody = table.querySelector(".rt-tbody");
+    const headerNode = table.querySelector(".rt-thead.-header");
+    if (headerNode) headerNode.style.overflowY = "inherit";
+    if (tableBody && tableBody.scrollHeight > tableBody.clientHeight) {
+      if (headerNode) headerNode.style.overflowY = "scroll";
+    }
   }
 
   render() {
@@ -295,6 +302,7 @@ class ReactDataTable extends React.Component {
       acc[index] = reduxFormExpandedEntityIdMap.input.value[rowId];
       return acc;
     }, {});
+
     return (
       <div
         className={classNames(
@@ -366,6 +374,9 @@ class ReactDataTable extends React.Component {
         )}
         <ReactTable
           data={entities}
+          ref={n => {
+            if (n) this.table = n;
+          }}
           columns={this.renderColumns()}
           pageSize={rowsToShow}
           expanded={expandedRows}
@@ -860,6 +871,7 @@ class ReactDataTable extends React.Component {
  * @property {boolean} isPlural Are we searching for 1 thing or many?
  * @property {string} queryName What the props come back on ( by default = modelName + 'Query')
  */
+
 export default compose(
   //connect to withTableParams here in the dataTable component so that, in the case that the table is not manually connected,
   withTableParams({
