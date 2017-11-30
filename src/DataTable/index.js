@@ -774,6 +774,8 @@ class ReactDataTable extends React.Component {
       renderTitleInner,
       path
     } = schemaForField;
+    const disableSorting =
+      sortDisabled || (typeof path === "string" && path.indexOf(".") > -1);
     const columnDataType = schemaForField.type;
     const isActionColumn = columnDataType === "action";
     const ccDisplayName = isActionColumn ? "" : camelCase(displayName || path);
@@ -858,7 +860,7 @@ class ReactDataTable extends React.Component {
               : (displayName || startCase(path)) + "  "}
           </span>
         )}
-        {!sortDisabled && !isActionColumn && sortComponent}
+        {!disableSorting && !isActionColumn && sortComponent}
         {!isActionColumn && filterMenu}
       </div>
     );
