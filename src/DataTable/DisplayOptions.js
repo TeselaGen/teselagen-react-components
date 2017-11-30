@@ -19,12 +19,12 @@ export default class PagingTool extends React.Component {
         content={
           <div style={{ padding: 10, paddingLeft: 20, paddingRight: 20 }}>
             <h5 style={{ marginBottom: 10 }}>Displayed Columns:</h5>
-            {fields.map(field => {
+            {fields.map((field, i) => {
               const { displayName, isHidden, path } = field;
               if (!isHidden) numVisible++;
               return (
                 <Checkbox
-                  key={displayName}
+                  key={path || i}
                   /* eslint-disable react/jsx-no-bind*/
                   onChange={() => {
                     if (numVisible <= 1 && !isHidden) {
