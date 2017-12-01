@@ -1,6 +1,6 @@
 import pluralize from "pluralize";
 import pascalCase from "pascal-case";
-import { gql } from "react-apollo";
+import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { camelCase } from "lodash";
 import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";

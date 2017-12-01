@@ -1,5 +1,5 @@
 import { graphql } from "react-apollo";
-import { gql } from "react-apollo";
+import gql from "graphql-tag";
 import pluralize from "pluralize";
 import { get, upperFirst, camelCase } from "lodash";
 import React from "react";

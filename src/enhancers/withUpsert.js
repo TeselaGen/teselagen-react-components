@@ -1,7 +1,7 @@
 import { graphql } from "react-apollo";
 import { connect } from "react-redux";
 import compose from "lodash/fp/compose";
-import { gql } from "react-apollo";
+import gql from "graphql-tag";
 import pascalCase from "pascal-case";
 import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
 
