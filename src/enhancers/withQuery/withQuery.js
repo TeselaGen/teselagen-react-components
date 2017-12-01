@@ -41,7 +41,7 @@ export default function withQuery(fragment, options = {}) {
     ...rest
   } = options;
   if (typeof fragment === "string" || typeof fragment !== "object") {
-    throw new Error("");
+    throw new Error("Please provide a valid fragment when using withQuery!");
   }
   const name = get(fragment, "definitions[0].typeCondition.name.value");
   if (!name) {
