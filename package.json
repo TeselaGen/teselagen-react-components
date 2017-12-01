@@ -1,6 +1,6 @@
 {
   "name": "teselagen-react-components",
-  "version": "18.3.18",
+  "version": "18.3.19",
   "description": "Teselagen React Component Library",
   "main": "lib/index.js",
   "//module": "es/index.js",
