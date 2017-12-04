@@ -34,6 +34,7 @@ export interface DataTableProps {
     reduxFormSearchInput: {},
     reduxFormSelectedEntityIdMap: {},
     reduxFormExpandedEntityIdMap: {},
+    getCellHoverText?(): void,
     setSearchTerm?(): void,
     setFilter?(): void,
     clearFilters?(): void,

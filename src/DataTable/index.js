@@ -667,7 +667,12 @@ class ReactDataTable extends React.Component {
   };
 
   renderColumns = () => {
-    const { schema, cellRenderer, withCheckboxes } = computePresets(this.props);
+    const {
+      schema,
+      cellRenderer,
+      withCheckboxes,
+      getCellHoverText
+    } = computePresets(this.props);
     const { columns } = this.state;
     if (!columns.length) {
       return;
@@ -728,8 +733,11 @@ class ReactDataTable extends React.Component {
       const oldFunc = tableColumn.Cell;
       tableColumn.Cell = (...args) => {
         //wrap the original tableColumn.Cell function in another div in order to add a title attribute
+
         const val = oldFunc(...args);
-        let title = String(typeof val !== "string" ? args[0].value : val);
+        let title = getCellHoverText
+          ? getCellHoverText(...args)
+          : String(typeof val !== "string" ? args[0].value : val);
         return (
           <div
             style={{ textOverflow: "ellipsis", overflow: "hidden" }}
