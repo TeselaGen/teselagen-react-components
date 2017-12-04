@@ -944,6 +944,11 @@ export default compose(
     } = propsToUse;
 
     let schemaToUse = schema;
+    if (!schemaToUse.fields && Array.isArray(schema)) {
+      schemaToUse = {
+        fields: schema
+      };
+    }
     let fieldOptsByPath = {};
     let resetDefaultVisibility;
     let updateColumnVisibility;
