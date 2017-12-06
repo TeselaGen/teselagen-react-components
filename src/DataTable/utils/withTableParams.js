@@ -124,6 +124,11 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       // randomVarToForceLocalStorageUpdate: formSelector(state, "localStorageForceUpdate"),
       currentParams,
       selectedEntities,
+      ...(withSelectedEntities && typeof withSelectedEntities === "string"
+        ? {
+            [withSelectedEntities]: selectedEntities
+          }
+        : {}),
       initialValues: { reduxFormSearchInput: currentParams.searchTerm }
     };
   };
