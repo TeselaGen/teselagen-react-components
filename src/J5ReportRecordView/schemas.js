@@ -36,7 +36,7 @@ const schemas = {
       { path: "cost", type: "number", displayName: "Cost" },
       { path: "tm", type: "number", displayName: "Tm" },
       { path: "tm_3prime", type: "number", displayName: "Tm 3'" },
-      { path: "bps", type: "number", displayName: "Bps" },
+      { path: "bps", type: "string", displayName: "Bps" },
       {
         path: "oligo.sequence.polynucleotideMaterialId",
         type: "boolean",
@@ -83,6 +83,27 @@ const schemas = {
       },
       { path: "sequence.name", type: "string", displayName: "Name" },
       { path: "sequence.size", type: "number", displayName: "Size" },
+      { path: "inStock", type: "boolean", displayName: "In Stock" },
+      {
+        path: "sequence.polynucleotideMaterialId",
+        type: "boolean",
+        displayName: "Is Linked"
+      }
+    ]
+  },
+  j5DirectSyntheses: {
+    fields: [
+      {
+        path: "id",
+        type: "string",
+        isHidden: true
+      },
+      { path: "sequence.name", type: "string", displayName: "Name" },
+      { path: "sequence.size", type: "number", displayName: "Size" },
+      { path: "bps", type: "string" },
+      { path: "cost", type: "number" },
+      // { path: "firstTargetPart", type: "string"  },
+      // { path: "lastTargetPart", type: "string"  },
       { path: "inStock", type: "boolean", displayName: "In Stock" },
       {
         path: "sequence.polynucleotideMaterialId",

@@ -49,6 +49,17 @@ const processJ5OligoSynthesis = j5Oligos =>
         .join("")
     };
   });
+const processJ5DirectSyntheses = j5DirectSynths =>
+  j5DirectSynths.map(j5DirectSynth => {
+    return {
+      ...j5DirectSynth,
+      bps: get(j5DirectSynth, "sequence.sequenceFragments", [])
+        .map(({ fragment }) => {
+          return fragment;
+        })
+        .join("")
+    };
+  });
 
 const processJ5RunConstructs = j5RunConstructs =>
   j5RunConstructs.map(j5RunConstruct => ({
@@ -122,7 +133,8 @@ class J5ReportRecordView extends Component {
       j5OligoSyntheses,
       j5AssemblyPieces,
       j5RunConstructs,
-      j5InputSequences
+      j5InputSequences,
+      j5DirectSyntheses
       // j5InputParts
     } = data.j5Report;
 
@@ -132,6 +144,7 @@ class J5ReportRecordView extends Component {
       j5InputSequences: j5InputSequences,
       j5InputParts: processInputParts(j5InputParts),
       j5OligoSyntheses: processJ5OligoSynthesis(j5OligoSyntheses),
+      j5DirectSyntheses: processJ5DirectSyntheses(j5DirectSyntheses),
       j5PcrReactions: j5PcrReactions,
       j5AssemblyPieces: j5AssemblyPieces
     };
@@ -341,7 +354,7 @@ class J5ReportRecordView extends Component {
           >
             <DataTable
               {...sharedTableProps}
-              schema={schemas["j5RunConstructs"]}
+              schema={schemas.j5RunConstructs}
               formName={"j5RunConstructs"} //because these tables are currently not connected to table params, we need to manually pass a formName here
               entities={entitiesForAllTables.j5RunConstructs}
             />
@@ -369,7 +382,7 @@ class J5ReportRecordView extends Component {
           >
             <DataTable
               {...sharedTableProps}
-              schema={schemas["j5InputSequences"]}
+              schema={schemas.j5InputSequences}
               formName={"j5InputSequences"} //because these tables are currently not connected to table params, we need to manually pass a formName here
               cellRenderer={
                 getIsLinkedCellRenderer &&
@@ -394,7 +407,7 @@ class J5ReportRecordView extends Component {
           >
             <DataTable
               {...sharedTableProps}
-              schema={schemas["j5InputParts"]}
+              schema={schemas.j5InputParts}
               formName={"j5InputParts"} //because these tables are currently not connected to table params, we need to manually pass a formName here
               entities={entitiesForAllTables.j5InputParts}
             />
@@ -421,7 +434,7 @@ class J5ReportRecordView extends Component {
           >
             <DataTable
               {...sharedTableProps}
-              schema={schemas["j5OligoSyntheses"]}
+              schema={schemas.j5OligoSyntheses}
               formName={"j5OligoSyntheses"} //because these tables are currently not connected to table params, we need to manually pass a formName here
               cellRenderer={
                 getIsLinkedCellRenderer &&
@@ -439,6 +452,43 @@ class J5ReportRecordView extends Component {
           <CollapsibleCard
             icon={
               <InfoHelper>
+                This is the list DNA pieces that need to be directly synthesized
+              </InfoHelper>
+            }
+            title={"DNA Synthesis"}
+            openTitleElements={
+              LinkJ5TableDialog && (
+                <Button
+                  onClick={() => {
+                    this.showLinkModal("dnaSynthesis");
+                  }}
+                >
+                  {" "}
+                  Link DNA Synthesis Pieces
+                </Button>
+              )
+            }
+          >
+            <DataTable
+              {...sharedTableProps}
+              schema={schemas.j5DirectSyntheses}
+              formName={"j5DirectSyntheses"} //because these tables are currently not connected to table params, we need to manually pass a formName here
+              cellRenderer={
+                getIsLinkedCellRenderer &&
+                getIsLinkedCellRenderer(
+                  "oligo.sequence.polynucleotideMaterialId",
+                  "oligo.sequence.hash",
+                  "oligo",
+                  upsertSequence
+                )
+              }
+              entities={entitiesForAllTables.j5DirectSyntheses}
+            />
+          </CollapsibleCard>
+
+          <CollapsibleCard
+            icon={
+              <InfoHelper>
                 These are the PCR reactions that need to be run to generate the
                 assembly pieces.
               </InfoHelper>
@@ -447,7 +497,7 @@ class J5ReportRecordView extends Component {
           >
             <DataTable
               {...sharedTableProps}
-              schema={schemas["j5PcrReactions"]}
+              schema={schemas.j5PcrReactions}
               formName={"j5PcrReactions"} //because these tables are currently not connected to table params, we need to manually pass a formName here
               entities={entitiesForAllTables.j5PcrReactions}
             />
@@ -477,7 +527,7 @@ class J5ReportRecordView extends Component {
           >
             <DataTable
               {...sharedTableProps}
-              schema={schemas["j5AssemblyPieces"]}
+              schema={schemas.j5AssemblyPieces}
               formName={"j5AssemblyPieces"} //because these tables are currently not connected to table params, we need to manually pass a formName here
               cellRenderer={
                 getIsLinkedCellRenderer &&
