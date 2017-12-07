@@ -108,6 +108,7 @@ class ReactDataTable extends React.Component {
     contextMenu: noop,
     onDoubleClick: noop,
     onRowSelect: noop,
+    onRowClick: noop,
     onMultiRowSelect: noop,
     onSingleRowSelect: noop,
     onDeselect: noop,
