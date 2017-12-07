@@ -5,5 +5,6 @@
   },
   "prettier.singleQuote": false,
   "prettier.semi": true,
-  "javascript.validate.enable": false
+  "javascript.validate.enable": false,
+  "eslint.enable": true
 }

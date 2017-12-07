@@ -2,7 +2,7 @@ import React, { Component } from "react";
 // import EditViewHOC from '../../EditViewHOC'
 import { reduxForm } from "redux-form";
 import { Button, Dialog } from "@blueprintjs/core";
-import { each, get } from "lodash";
+import { each, get, startCase } from "lodash";
 import CollapsibleCard from "../CollapsibleCard";
 import InfoHelper from "../InfoHelper";
 import schemas from "./schemas";
@@ -10,6 +10,8 @@ import DataTable from "../DataTable";
 import Loading from "../Loading";
 import { getRangeLength } from "ve-range-utils";
 import "./style.css";
+import papaparse from "papaparse";
+import magicDownload from "../DownloadLink/magicDownload";
 
 const sharedTableProps = {
   withSearch: false,
@@ -79,7 +81,120 @@ class J5ReportRecordView extends Component {
     this.setState({ linkDialogName: name });
   };
 
-  renderInstructions() {
+  downloadCSV = () => {
+    const entitiesForAllTables = this.getEntitiesForAllTables();
+    let csvString = "";
+    each(schemas, (schema, modelType) => {
+      const entities = entitiesForAllTables[modelType];
+      const tableCsvString = papaparse.unparse(
+        entities.map(row => {
+          return schema.fields.reduce((acc, field) => {
+            acc[field.displayName || field.path] = get(row, field.path);
+            return acc;
+          }, {});
+        })
+      );
+      csvString +=
+        startCase(modelType).replace("J 5", "j5") +
+        "\n" +
+        tableCsvString +
+        "\n\n";
+    });
+    magicDownload(csvString, "j5_Report.csv");
+  };
+
+  getEntitiesForAllTables = () => {
+    const { data } = this.props;
+    const {
+      j5PcrReactions,
+      j5OligoSyntheses,
+      j5AssemblyPieces,
+      j5RunConstructs,
+      j5InputSequences
+      // j5InputParts
+    } = data.j5Report;
+
+    const j5InputParts = getInputPartsFromInputSequences(j5InputSequences);
+    return {
+      j5RunConstructs: processJ5RunConstructs(j5RunConstructs),
+      j5InputSequences: j5InputSequences,
+      j5InputParts: processInputParts(j5InputParts),
+      j5OligoSyntheses: j5OligoSyntheses,
+      j5PcrReactions: j5PcrReactions,
+      j5AssemblyPieces: j5AssemblyPieces
+    };
+  };
+
+  renderDownloadButton = () => {
+    return <Button onClick={this.downloadCSV}>Export as CSV</Button>;
+  };
+  linkInputSequences = () => {
+    this.showLinkModal("inputSequences");
+  };
+  renderHeader = () => {
+    const { data, additionalHeaderItems = "", LinkJ5TableDialog } = this.props;
+
+    if (data.loading) return <Loading loading />;
+
+    if (!data.j5Report) {
+      return <div>No report found!</div>;
+    }
+
+    // JSON.parse(localStorage.getItem('TEMPORARY_j5Run')) || {}
+    const { name, assemblyMethod, assemblyType } = data.j5Report;
+
+    return (
+      <div className="j5-report-header tg-card">
+        {/*{Title}
+  <form onSubmit={handleSubmit(onSubmit)} className={'form-layout'}>
+    <InputField name="designName" label="Design Name" />
+    <InputField name="runDate" label="Run Date" />
+    <InputField name="parameterPreset" label="Parameter Preset" />
+    <InputField name="assemblyMethod" label="Assembly Method" />
+    <InputField name="assemblyType" label="Assembly Type" />
+    {Footer}
+  </form>*/}
+        <div>
+          <span className="j5-report-fieldname">Name:</span> {name}
+        </div>
+        <div>
+          <span className="j5-report-fieldname">Assembly Method:</span>{" "}
+          {assemblyMethod}
+        </div>
+        <div>
+          <span className="j5-report-fieldname">Assembly Type:</span>{" "}
+          {assemblyType}
+        </div>
+        {/* tnr: add these in when they are available in lims/hde */}
+        {/* <div>
+      <span className="j5-report-fieldname">User Name:</span>{" "}
+      {assemblyType}
+    </div>
+    <div>
+      <span className="j5-report-fieldname">Design Name:</span>{" "}
+      {assemblyType}
+    </div>
+    <div>
+      <span className="j5-report-fieldname">Run Date:</span>{" "}
+      {assemblyType}
+    </div>
+    <div>
+      <span className="j5-report-fieldname">Parameter Preset:</span>{" "}
+      {assemblyType}
+    </div> */}
+
+        {this.renderDownloadButton()}
+        {additionalHeaderItems}
+        {LinkJ5TableDialog && (
+          <Button onClick={this.linkInputSequences} style={{ marginTop: 10 }}>
+            Link Tables to Materials
+          </Button>
+        )}
+      </div>
+    );
+  };
+
+  render() {
     const {
       data,
       upsertSequence,
@@ -96,19 +211,13 @@ class J5ReportRecordView extends Component {
 
     // JSON.parse(localStorage.getItem('TEMPORARY_j5Run')) || {}
     const {
-      name,
-      assemblyMethod,
-      assemblyType,
-
-      j5PcrReactions,
       j5OligoSyntheses,
       j5AssemblyPieces,
-      j5RunConstructs,
       j5InputSequences
       // j5InputParts
     } = data.j5Report;
 
-    const j5InputParts = getInputPartsFromInputSequences(j5InputSequences);
+    const entitiesForAllTables = this.getEntitiesForAllTables();
 
     const linkDialogProps = {
       inputSequences: {
@@ -177,61 +286,32 @@ class J5ReportRecordView extends Component {
         });
     }
     return (
-      <div style={{ display: "flex-columns" }}>
-        {LinkJ5TableDialog && (
-          <Dialog
-            {...(currentLink ? currentLink.dialogProps : {})}
-            onClose={this.hideLinkModal}
-            isOpen={!!linkDialogName}
-          >
-            <LinkJ5TableDialog
-              {...{
-                ...currentLink,
-                moveToNextTable,
-                moveToPreviousTable,
-                tabs: linkDialogProps,
-                selectedTab: linkDialogName,
-                handleTabChange: this.handleLinkTabChange
-              }}
-              hideModal={this.hideLinkModal}
-            />
-          </Dialog>
-        )}
-        <div className="tg-card">
-          {/*{Title}
-          <form onSubmit={handleSubmit(onSubmit)} className={'form-layout'}>
-            <InputField name="designName" label="Design Name" />
-            <InputField name="runDate" label="Run Date" />
-            <InputField name="parameterPreset" label="Parameter Preset" />
-            <InputField name="assemblyMethod" label="Assembly Method" />
-            <InputField name="assemblyType" label="Assembly Type" />
-            {Footer}
-          </form>*/}
-          <div>
-            <span className="j5-report-fieldname">Name:</span> {name}
-          </div>
-          <div>
-            <span className="j5-report-fieldname">Assembly Method:</span>{" "}
-            {assemblyMethod}
-          </div>
-          <div>
-            <span className="j5-report-fieldname">Assembly Type:</span>{" "}
-            {assemblyType}
-          </div>
+      <div className={"j5-report-container"}>
+        <div style={{ display: "flex-columns" }}>
+          {this.renderHeader()}
 
+          {/* tnr: this is just the dialog that needs to be on the page. not actually rendering anything */}
           {LinkJ5TableDialog && (
-            <Button
-              onClick={() => {
-                this.showLinkModal("inputSequences");
-              }}
-              style={{ marginTop: 10 }}
+            <Dialog
+              {...(currentLink ? currentLink.dialogProps : {})}
+              onClose={this.hideLinkModal}
+              isOpen={!!linkDialogName}
             >
-              Link Tables to Materials
-            </Button>
+              <LinkJ5TableDialog
+                {...{
+                  ...currentLink,
+                  moveToNextTable,
+                  moveToPreviousTable,
+                  tabs: linkDialogProps,
+                  selectedTab: linkDialogName,
+                  handleTabChange: this.handleLinkTabChange
+                }}
+                hideModal={this.hideLinkModal}
+              />
+            </Dialog>
           )}
-        </div>
 
-        {/*<div className="tg-card">
+          {/*<div className="tg-card">
           <div className="pt-button-group">
             <Button>Show DNA Assembly Parameters</Button>
             <Button>Export as CSV</Button>
@@ -239,168 +319,168 @@ class J5ReportRecordView extends Component {
             <Button>Export Constructs</Button>
           </div>
         </div>*/}
-        <CollapsibleCard
-          icon={
-            <InfoHelper>
-              Constructs are the desired sequences to be built in a j5 run.
-            </InfoHelper>
-          }
-          title={"Constructs"}
-        >
-          <DataTable
-            {...sharedTableProps}
-            schema={schemas["j5RunConstructs"]}
-            formName={"j5RunConstructs"} //because these tables are currently not connected to table params, we need to manually pass a formName here
-            entities={processJ5RunConstructs(j5RunConstructs)}
-          />
-        </CollapsibleCard>
+          <CollapsibleCard
+            icon={
+              <InfoHelper>
+                Constructs are the desired sequences to be built in a j5 run.
+              </InfoHelper>
+            }
+            title={"Constructs"}
+          >
+            <DataTable
+              {...sharedTableProps}
+              schema={schemas["j5RunConstructs"]}
+              formName={"j5RunConstructs"} //because these tables are currently not connected to table params, we need to manually pass a formName here
+              entities={entitiesForAllTables.j5RunConstructs}
+            />
+          </CollapsibleCard>
 
-        <CollapsibleCard
-          title={"Input Sequences"}
-          icon={
-            <InfoHelper>
-              Input Sequences are the sequences that contain the Input Parts
-            </InfoHelper>
-          }
-          openTitleElements={
-            LinkJ5TableDialog && (
-              <Button
-                onClick={() => {
-                  this.showLinkModal("inputSequences");
-                }}
-              >
-                {" "}
-                Link Input Sequences
-              </Button>
-            )
-          }
-        >
-          <DataTable
-            {...sharedTableProps}
-            schema={schemas["j5InputSequences"]}
-            formName={"j5InputSequences"} //because these tables are currently not connected to table params, we need to manually pass a formName here
-            cellRenderer={
-              getIsLinkedCellRenderer &&
-              getIsLinkedCellRenderer(
-                "sequence.polynucleotideMaterialId",
-                "sequence.hash",
-                "j5InputSequence",
-                upsertSequence
+          <CollapsibleCard
+            title={"Input Sequences"}
+            icon={
+              <InfoHelper>
+                Input Sequences are the sequences that contain the Input Parts
+              </InfoHelper>
+            }
+            openTitleElements={
+              LinkJ5TableDialog && (
+                <Button
+                  onClick={() => {
+                    this.showLinkModal("inputSequences");
+                  }}
+                >
+                  {" "}
+                  Link Input Sequences
+                </Button>
               )
             }
-            entities={j5InputSequences}
-          />
-        </CollapsibleCard>
-        <CollapsibleCard
-          title={"Input Parts"}
-          icon={
-            <InfoHelper>
-              Input Parts are the segments of sequence that are being used in a
-              j5 run
-            </InfoHelper>
-          }
-        >
-          <DataTable
-            {...sharedTableProps}
-            schema={schemas["j5InputParts"]}
-            formName={"j5InputParts"} //because these tables are currently not connected to table params, we need to manually pass a formName here
-            entities={processInputParts(j5InputParts)}
-          />
-        </CollapsibleCard>
-        <CollapsibleCard
-          icon={
-            <InfoHelper>
-              This is the list of oligos that need to be directly synthesized
-            </InfoHelper>
-          }
-          title={"Oligo Synthesis"}
-          openTitleElements={
-            LinkJ5TableDialog && (
-              <Button
-                onClick={() => {
-                  this.showLinkModal("oligos");
-                }}
-              >
-                {" "}
-                Link Oligos
-              </Button>
-            )
-          }
-        >
-          <DataTable
-            {...sharedTableProps}
-            schema={schemas["j5OligoSyntheses"]}
-            formName={"j5OligoSyntheses"} //because these tables are currently not connected to table params, we need to manually pass a formName here
-            cellRenderer={
-              getIsLinkedCellRenderer &&
-              getIsLinkedCellRenderer(
-                "oligo.sequence.polynucleotideMaterialId",
-                "oligo.sequence.hash",
-                "oligo",
-                upsertSequence
+          >
+            <DataTable
+              {...sharedTableProps}
+              schema={schemas["j5InputSequences"]}
+              formName={"j5InputSequences"} //because these tables are currently not connected to table params, we need to manually pass a formName here
+              cellRenderer={
+                getIsLinkedCellRenderer &&
+                getIsLinkedCellRenderer(
+                  "sequence.polynucleotideMaterialId",
+                  "sequence.hash",
+                  "j5InputSequence",
+                  upsertSequence
+                )
+              }
+              entities={entitiesForAllTables.j5InputSequences}
+            />
+          </CollapsibleCard>
+          <CollapsibleCard
+            title={"Input Parts"}
+            icon={
+              <InfoHelper>
+                Input Parts are the segments of sequence that are being used in
+                a j5 run
+              </InfoHelper>
+            }
+          >
+            <DataTable
+              {...sharedTableProps}
+              schema={schemas["j5InputParts"]}
+              formName={"j5InputParts"} //because these tables are currently not connected to table params, we need to manually pass a formName here
+              entities={entitiesForAllTables.j5InputParts}
+            />
+          </CollapsibleCard>
+          <CollapsibleCard
+            icon={
+              <InfoHelper>
+                This is the list of oligos that need to be directly synthesized
+              </InfoHelper>
+            }
+            title={"Oligo Synthesis"}
+            openTitleElements={
+              LinkJ5TableDialog && (
+                <Button
+                  onClick={() => {
+                    this.showLinkModal("oligos");
+                  }}
+                >
+                  {" "}
+                  Link Oligos
+                </Button>
               )
             }
-            entities={j5OligoSyntheses}
-          />
-        </CollapsibleCard>
+          >
+            <DataTable
+              {...sharedTableProps}
+              schema={schemas["j5OligoSyntheses"]}
+              formName={"j5OligoSyntheses"} //because these tables are currently not connected to table params, we need to manually pass a formName here
+              cellRenderer={
+                getIsLinkedCellRenderer &&
+                getIsLinkedCellRenderer(
+                  "oligo.sequence.polynucleotideMaterialId",
+                  "oligo.sequence.hash",
+                  "oligo",
+                  upsertSequence
+                )
+              }
+              entities={entitiesForAllTables.j5OligoSyntheses}
+            />
+          </CollapsibleCard>
 
-        <CollapsibleCard
-          icon={
-            <InfoHelper>
-              These are the PCR reactions that need to be run to generate the
-              assembly pieces.
-            </InfoHelper>
-          }
-          title={"PCR Reactions"}
-        >
-          <DataTable
-            {...sharedTableProps}
-            schema={schemas["j5PcrReactions"]}
-            formName={"j5PcrReactions"} //because these tables are currently not connected to table params, we need to manually pass a formName here
-            entities={j5PcrReactions}
-          />
-        </CollapsibleCard>
+          <CollapsibleCard
+            icon={
+              <InfoHelper>
+                These are the PCR reactions that need to be run to generate the
+                assembly pieces.
+              </InfoHelper>
+            }
+            title={"PCR Reactions"}
+          >
+            <DataTable
+              {...sharedTableProps}
+              schema={schemas["j5PcrReactions"]}
+              formName={"j5PcrReactions"} //because these tables are currently not connected to table params, we need to manually pass a formName here
+              entities={entitiesForAllTables.j5PcrReactions}
+            />
+          </CollapsibleCard>
 
-        <CollapsibleCard
-          icon={
-            <InfoHelper>
-              These are the pieces of DNA that will get put together in a final
-              assembly reaction (Gibson/CPEC/SLIC/Golden-Gate) to give the
-              desired Constructs
-            </InfoHelper>
-          }
-          title={"DNA Pieces to be Assembled"}
-          openTitleElements={
-            LinkJ5TableDialog && (
-              <Button
-                onClick={() => {
-                  this.showLinkModal("dnaPieces");
-                }}
-              >
-                {" "}
-                Link DNA Pieces
-              </Button>
-            )
-          }
-        >
-          <DataTable
-            {...sharedTableProps}
-            schema={schemas["j5AssemblyPieces"]}
-            formName={"j5AssemblyPieces"} //because these tables are currently not connected to table params, we need to manually pass a formName here
-            cellRenderer={
-              getIsLinkedCellRenderer &&
-              getIsLinkedCellRenderer(
-                "sequence.polynucleotideMaterialId",
-                "sequence.hash",
-                "j5AssemblyPiece",
-                upsertSequence
+          <CollapsibleCard
+            icon={
+              <InfoHelper>
+                These are the pieces of DNA that will get put together in a
+                final assembly reaction (Gibson/CPEC/SLIC/Golden-Gate) to give
+                the desired Constructs
+              </InfoHelper>
+            }
+            title={"DNA Pieces to be Assembled"}
+            openTitleElements={
+              LinkJ5TableDialog && (
+                <Button
+                  onClick={() => {
+                    this.showLinkModal("dnaPieces");
+                  }}
+                >
+                  {" "}
+                  Link DNA Pieces
+                </Button>
               )
             }
-            entities={j5AssemblyPieces}
-          />
-        </CollapsibleCard>
+          >
+            <DataTable
+              {...sharedTableProps}
+              schema={schemas["j5AssemblyPieces"]}
+              formName={"j5AssemblyPieces"} //because these tables are currently not connected to table params, we need to manually pass a formName here
+              cellRenderer={
+                getIsLinkedCellRenderer &&
+                getIsLinkedCellRenderer(
+                  "sequence.polynucleotideMaterialId",
+                  "sequence.hash",
+                  "j5AssemblyPiece",
+                  upsertSequence
+                )
+              }
+              entities={entitiesForAllTables.j5AssemblyPieces}
+            />
+          </CollapsibleCard>
 
-        {/*<div className="tg-card">
+          {/*<div className="tg-card">
           <div style={tableHeaderDivStyle}>
             Assembly Piece Combinations
             displays which assembly pieces to combine together to generate each of the desired combinatorial variants.
@@ -418,13 +498,8 @@ class J5ReportRecordView extends Component {
               urlConnected={false}
             />}
         </div>*/}
+        </div>
       </div>
-    );
-  }
-
-  render() {
-    return (
-      <div className={"j5-report-container"}>{this.renderInstructions()}</div>
     );
   }
 }
