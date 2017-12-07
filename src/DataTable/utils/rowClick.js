@@ -12,7 +12,7 @@ export default function rowClick(e, rowInfo, entities, props) {
     noSelect,
     onRowClick
   } = props;
-  onRowClick(e, rowInfo, entities);
+  onRowClick(e, rowInfo.original, rowInfo);
   if (noSelect) return;
   const entity = rowInfo.original;
   const rowId = getIdOrCodeOrIndex(entity, rowInfo.index);
