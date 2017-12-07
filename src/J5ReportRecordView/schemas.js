@@ -36,6 +36,7 @@ const schemas = {
       { path: "cost", type: "number", displayName: "Cost" },
       { path: "tm", type: "number", displayName: "Tm" },
       { path: "tm_3prime", type: "number", displayName: "Tm 3'" },
+      { path: "bps", type: "number", displayName: "Bps" },
       {
         path: "oligo.sequence.polynucleotideMaterialId",
         type: "boolean",

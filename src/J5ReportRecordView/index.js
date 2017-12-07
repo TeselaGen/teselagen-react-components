@@ -38,6 +38,18 @@ const processInputParts = InputParts =>
     };
   });
 
+const processJ5OligoSynthesis = j5Oligos =>
+  j5Oligos.map(j5Oligo => {
+    return {
+      ...j5Oligo,
+      bps: get(j5Oligo, "oligo.sequence.sequenceFragments", [])
+        .map(({ fragment }) => {
+          return fragment;
+        })
+        .join("")
+    };
+  });
+
 const processJ5RunConstructs = j5RunConstructs =>
   j5RunConstructs.map(j5RunConstruct => ({
     ...j5RunConstruct,
@@ -119,7 +131,7 @@ class J5ReportRecordView extends Component {
       j5RunConstructs: processJ5RunConstructs(j5RunConstructs),
       j5InputSequences: j5InputSequences,
       j5InputParts: processInputParts(j5InputParts),
-      j5OligoSyntheses: j5OligoSyntheses,
+      j5OligoSyntheses: processJ5OligoSynthesis(j5OligoSyntheses),
       j5PcrReactions: j5PcrReactions,
       j5AssemblyPieces: j5AssemblyPieces
     };
