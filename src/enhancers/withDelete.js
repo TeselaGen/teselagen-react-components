@@ -70,20 +70,7 @@ export default function(nameOrFragment, options = {}) {
             input
           }
         })
-        .then(function(res) {
-          const deletedCount = res.data.deletedCount;
-          if (deletedCount !== idArray.length) {
-            console.error(
-              `Uh oh, the number of deleted items does not match the number of IDs passed in to be deleted! `
-            );
-            console.error("idArray.length:", idArray.length);
-            console.error("deletedCount:", deletedCount);
-            console.error(
-              `make sure you passed in the correct type ${name} for the item you want to be deleting and that the item still exists! `
-            );
-          }
-          return deletedCount;
-        });
+        .then(afterDeleteFunction({ idArray, recordType, name }));
     };
   }
 
@@ -100,19 +87,7 @@ export default function(nameOrFragment, options = {}) {
           refetchQueries,
           ...getExtraMutateArgs(...args)
         })
-          .then(function({ data }) {
-            const { deletedCount } = data[`delete${recordType}`];
-            if (deletedCount !== idArray.length) {
-              console.error(
-                `Uh oh, the number of deleted items does not match the number of IDs passed in to be deleted! `
-              );
-              console.error("idArray.length:", idArray.length);
-              console.error("deletedCount:", deletedCount);
-              console.error(
-                `make sure you passed in the correct type ${name} for the item you want to be deleting and that the item still exists! `
-              );
-            }
-          })
+          .then(afterDeleteFunction({ idArray, recordType, name }))
           .catch(e => {
             if (showError) {
               window.toastr.error(`Error deleting ${recordType}`);
@@ -153,3 +128,17 @@ function prepareArgs(args) {
     idArray
   };
 }
+
+const afterDeleteFunction = ({ idArray, recordType, name }) => ({ data }) => {
+  const { deletedCount } = data[`delete${recordType}`];
+  if (deletedCount !== idArray.length) {
+    console.error(
+      `Uh oh, the number of deleted items does not match the number of IDs passed in to be deleted! `
+    );
+    console.error("idArray.length:", idArray.length);
+    console.error("deletedCount:", deletedCount);
+    console.error(
+      `make sure you passed in the correct type ${name} for the item you want to be deleting and that the item still exists! `
+    );
+  }
+};
