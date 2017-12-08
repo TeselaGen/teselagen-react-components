@@ -10,11 +10,12 @@ export default function rowClick(e, rowInfo, entities, props) {
     reduxFormSelectedEntityIdMap,
     isSingleSelect,
     noSelect,
-    onRowClick
+    onRowClick,
+    isEntityDisabled
   } = props;
-  onRowClick(e, rowInfo.original, rowInfo);
-  if (noSelect) return;
   const entity = rowInfo.original;
+  onRowClick(e, entity, rowInfo);
+  if (noSelect || isEntityDisabled(entity)) return;
   const rowId = getIdOrCodeOrIndex(entity, rowInfo.index);
   if (rowId === undefined) return;
 

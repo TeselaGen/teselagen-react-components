@@ -99,6 +99,7 @@ class ReactDataTable extends React.Component {
     reduxFormSearchInput: {},
     reduxFormSelectedEntityIdMap: {},
     reduxFormExpandedEntityIdMap: {},
+    isEntityDisabled: noop,
     setSearchTerm: noop,
     setFilter: noop,
     clearFilters: noop,
@@ -143,12 +144,12 @@ class ReactDataTable extends React.Component {
     }
 
     // handle programmatic selection and scrolling
-    const { selectedIds, entities } = newProps;
+    const { selectedIds, entities, isEntityDisabled } = newProps;
     const { selectedIds: oldSelectedIds } = oldProps;
     if (isEqual(selectedIds, oldSelectedIds)) return;
     const idArray = Array.isArray(selectedIds) ? selectedIds : [selectedIds];
     const selectedEntities = entities.filter(
-      e => idArray.indexOf(getIdOrCodeOrIndex(e)) > -1
+      e => idArray.indexOf(getIdOrCodeOrIndex(e)) > -1 && !isEntityDisabled(e)
     );
     const newIdMap = selectedEntities.reduce((acc, entity) => {
       acc[getIdOrCodeOrIndex(entity)] = { entity };
@@ -481,13 +482,15 @@ class ReactDataTable extends React.Component {
       withCheckboxes,
       onDoubleClick,
       history,
-      entities
+      entities,
+      isEntityDisabled
     } = computePresets(this.props);
     if (!rowInfo) return {};
     const entity = rowInfo.original;
     const rowId = getIdOrCodeOrIndex(entity, rowInfo.index);
     const rowSelected = reduxFormSelectedEntityIdMap.input.value[rowId];
     const isExpanded = reduxFormExpandedEntityIdMap.input.value[rowId];
+    const rowDisabled = isEntityDisabled(entity);
     return {
       onClick: e => {
         // if checkboxes are activated or row expander is clicked don't select row
@@ -500,12 +503,11 @@ class ReactDataTable extends React.Component {
         } else if (withCheckboxes) {
           return;
         }
-
         rowClick(e, rowInfo, entities, computePresets(this.props));
       },
       onContextMenu: e => {
         e.preventDefault();
-        if (rowId === undefined) return;
+        if (rowId === undefined || rowDisabled) return;
         const oldIdMap = reduxFormSelectedEntityIdMap.input.value || {};
         let newIdMap;
         if (withCheckboxes) {
@@ -523,6 +525,7 @@ class ReactDataTable extends React.Component {
       },
       className: rowSelected && !withCheckboxes ? "selected" : "",
       onDoubleClick: () => {
+        if (rowDisabled) return;
         onDoubleClick(rowInfo.original, rowInfo.index, history);
       }
     };
@@ -533,7 +536,8 @@ class ReactDataTable extends React.Component {
       reduxFormSelectedEntityIdMap,
       isSingleSelect,
       noSelect,
-      entities
+      entities,
+      isEntityDisabled
     } = computePresets(this.props);
     const checkedRows = getSelectedRowsFromEntities(
       entities,
@@ -558,10 +562,10 @@ class ReactDataTable extends React.Component {
           <Checkbox
             disabled={noSelect}
             /* eslint-disable react/jsx-no-bind */
-
             onChange={() => {
               const newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
               entities.forEach((entity, i) => {
+                if (isEntityDisabled(entity)) return;
                 const entityId = getIdOrCodeOrIndex(entity, i);
                 if (checkboxProps.checked) {
                   delete newIdMap[entityId];
@@ -577,7 +581,6 @@ class ReactDataTable extends React.Component {
               this.setState({ lastCheckedRow: undefined });
             }}
             /* eslint-enable react/jsx-no-bind */
-
             {...checkboxProps}
             className={"tg-react-table-checkbox-cell-inner"}
           />
@@ -592,7 +595,8 @@ class ReactDataTable extends React.Component {
       reduxFormSelectedEntityIdMap,
       isSingleSelect,
       noSelect,
-      entities
+      entities,
+      isEntityDisabled
     } = computePresets(this.props);
     const checkedRows = getSelectedRowsFromEntities(
       entities,
@@ -610,9 +614,8 @@ class ReactDataTable extends React.Component {
     return (
       <div className={"tg-react-table-checkbox-cell"} style={{ width: 40 }}>
         <Checkbox
-          disabled={noSelect}
+          disabled={noSelect || isEntityDisabled(entity)}
           /* eslint-disable react/jsx-no-bind*/
-
           onChange={e => {
             let newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
             const isRowCurrentlyChecked = checkedRows.indexOf(rowIndex) > -1;
