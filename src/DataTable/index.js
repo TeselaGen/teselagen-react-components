@@ -739,13 +739,13 @@ class ReactDataTable extends React.Component {
         //wrap the original tableColumn.Cell function in another div in order to add a title attribute
 
         const val = oldFunc(...args);
-        let title = getCellHoverText
-          ? getCellHoverText(...args)
-          : String(typeof val !== "string" ? args[0].value : val);
+        let title = typeof val !== "string" ? args[0].value : val;
+        if (title) title = String(title);
+        if (getCellHoverText) title = getCellHoverText(...args);
         return (
           <div
             style={{ textOverflow: "ellipsis", overflow: "hidden" }}
-            title={title || null}
+            title={title}
           >
             {val}
           </div>
