@@ -783,6 +783,7 @@ class ReactDataTable extends React.Component {
     const {
       displayName,
       sortDisabled,
+      filterDisabled,
       renderTitleInner,
       path
     } = schemaForField;
@@ -814,51 +815,53 @@ class ReactDataTable extends React.Component {
     const sortDown = ordering && ordering === "asc";
     const sortUp = ordering && !sortDown;
 
-    const sortComponent = (
-      <div className={"tg-sort-arrow-container"}>
-        <span
-          title={"Sort Z-A (Hold shift to sort multiple columns)"}
-          onClick={e => {
-            setOrder("-" + ccDisplayName, sortUp, e.shiftKey);
-          }}
-          className={classNames("pt-icon-standard", "pt-icon-chevron-up", {
-            "tg-active-sort": sortUp
-          })}
-        />
-        <span
-          title={"Sort A-Z (Hold shift to sort multiple columns)"}
-          onClick={e => {
-            setOrder(ccDisplayName, sortDown, e.shiftKey);
-          }}
-          className={classNames("pt-icon-standard", "pt-icon-chevron-down", {
-            "tg-active-sort": sortDown
-          })}
-        />
-      </div>
-    );
+    const sortComponent =
+      !disableSorting && !isActionColumn ? (
+        <div className={"tg-sort-arrow-container"}>
+          <span
+            title={"Sort Z-A (Hold shift to sort multiple columns)"}
+            onClick={e => {
+              setOrder("-" + ccDisplayName, sortUp, e.shiftKey);
+            }}
+            className={classNames("pt-icon-standard", "pt-icon-chevron-up", {
+              "tg-active-sort": sortUp
+            })}
+          />
+          <span
+            title={"Sort A-Z (Hold shift to sort multiple columns)"}
+            onClick={e => {
+              setOrder(ccDisplayName, sortDown, e.shiftKey);
+            }}
+            className={classNames("pt-icon-standard", "pt-icon-chevron-down", {
+              "tg-active-sort": sortDown
+            })}
+          />
+        </div>
+      ) : null;
 
-    const filterMenu = withFilter ? (
-      <Popover position={Position.BOTTOM_RIGHT}>
-        <Button
-          title={"Filter"}
-          className={classNames(
-            "tg-filter-menu-button",
-            Classes.MINIMAL,
-            { "tg-active-filter": !!currentFilter },
-            Classes.SMALL
-          )}
-          iconName="filter"
-        />
-        <FilterAndSortMenu
-          addFilters={addFilters}
-          removeSingleFilter={removeSingleFilter}
-          currentFilter={currentFilter}
-          filterOn={ccDisplayName}
-          dataType={columnDataType}
-          schemaForField={schemaForField}
-        />
-      </Popover>
-    ) : null;
+    const filterMenu =
+      withFilter && !isActionColumn && !filterDisabled ? (
+        <Popover position={Position.BOTTOM_RIGHT}>
+          <Button
+            title={"Filter"}
+            className={classNames(
+              "tg-filter-menu-button",
+              Classes.MINIMAL,
+              { "tg-active-filter": !!currentFilter },
+              Classes.SMALL
+            )}
+            iconName="filter"
+          />
+          <FilterAndSortMenu
+            addFilters={addFilters}
+            removeSingleFilter={removeSingleFilter}
+            currentFilter={currentFilter}
+            filterOn={ccDisplayName}
+            dataType={columnDataType}
+            schemaForField={schemaForField}
+          />
+        </Popover>
+      ) : null;
 
     return (
       <div className={"tg-react-table-column-header"}>
@@ -872,8 +875,8 @@ class ReactDataTable extends React.Component {
               : (displayName || startCase(path)) + "  "}
           </span>
         )}
-        {!disableSorting && !isActionColumn && sortComponent}
-        {!isActionColumn && filterMenu}
+        {sortComponent}
+        {filterMenu}
       </div>
     );
   };
