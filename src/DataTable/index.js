@@ -745,7 +745,7 @@ class ReactDataTable extends React.Component {
         return (
           <div
             style={{ textOverflow: "ellipsis", overflow: "hidden" }}
-            title={title}
+            title={title || null}
           >
             {val}
           </div>
