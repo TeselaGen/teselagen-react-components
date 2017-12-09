@@ -157,7 +157,8 @@ function getFiltersFromSearchTerm(searchTerm, schema) {
   const searchTermFilters = [];
   if (searchTerm) {
     schema.fields.forEach(field => {
-      const { type, displayName, path } = field;
+      const { type, displayName, path, disableSearch } = field;
+      if (disableSearch) return;
       const nameToUse = camelCase(displayName || path);
       if (type === "string" || type === "lookup") {
         searchTermFilters.push({
