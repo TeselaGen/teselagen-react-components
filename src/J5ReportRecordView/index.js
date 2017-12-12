@@ -322,7 +322,8 @@ class J5ReportRecordView extends Component {
     const {
       j5OligoSyntheses,
       j5AssemblyPieces,
-      j5InputSequences
+      j5InputSequences,
+      j5RunConstructs
       // j5InputParts
     } = data.j5Report;
 
@@ -335,6 +336,16 @@ class J5ReportRecordView extends Component {
         },
         items: j5InputSequences,
         sequenceHashes: j5InputSequences.map(({ sequence }) => {
+          return sequence.hash;
+        })
+      },
+
+      constructs: {
+        dialogProps: {
+          title: "Link Constructs to Materials"
+        },
+        items: j5RunConstructs,
+        sequenceHashes: j5RunConstructs.map(({ sequence }) => {
           return sequence.hash;
         })
       },
@@ -435,6 +446,18 @@ class J5ReportRecordView extends Component {
               </InfoHelper>
             }
             title={"Constructs"}
+            openTitleElements={
+              LinkJ5TableDialog && (
+                <Button
+                  onClick={() => {
+                    this.showLinkModal("constructs");
+                  }}
+                >
+                  {" "}
+                  Link Constructs
+                </Button>
+              )
+            }
           >
             <DataTable
               {...sharedTableProps}
