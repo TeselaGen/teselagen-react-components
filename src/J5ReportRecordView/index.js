@@ -2,7 +2,7 @@ import React, { Component } from "react";
 // import EditViewHOC from '../../EditViewHOC'
 import { reduxForm } from "redux-form";
 import { Button, Dialog } from "@blueprintjs/core";
-import { each, get, startCase } from "lodash";
+import { each, get, startCase, times, zip, flatten } from "lodash";
 import CollapsibleCard from "../CollapsibleCard";
 import InfoHelper from "../InfoHelper";
 import schemas from "./schemas";
@@ -38,10 +38,21 @@ const processInputParts = InputParts =>
     };
   });
 
-const processJ5OligoSynthesis = j5Oligos =>
-  j5Oligos.map(j5Oligo => {
+function getWrappedInParensMatches(s) {
+  const matches = [];
+  s.replace(/\((.*?)\)/g, function(g0, g1) {
+    matches.push(g1);
+  });
+  return matches;
+}
+
+function processJ5OligoSynthesis(j5Oligos) {
+  return j5Oligos.map(j5Oligo => {
+    const partCids = getWrappedInParensMatches(j5Oligo.name);
     return {
       ...j5Oligo,
+      firstTargetPart: get(this.partCidMap, `${partCids[0]}.name`),
+      lastTargetPart: get(this.partCidMap, `${partCids[1]}.name`),
       bps: get(j5Oligo, "oligo.sequence.sequenceFragments", [])
         .map(({ fragment }) => {
           return fragment;
@@ -49,6 +60,8 @@ const processJ5OligoSynthesis = j5Oligos =>
         .join("")
     };
   });
+}
+
 const processJ5DirectSyntheses = j5DirectSynths =>
   j5DirectSynths.map(j5DirectSynth => {
     return {
@@ -78,7 +91,7 @@ const processJ5RunConstructs = j5RunConstructs =>
             j5InputPart => j5InputPart.j5InputPart.sequencePart.name
           )
         )
-        .join(",")
+        .join(", ")
   }));
 
 const getInputPartsFromInputSequences = j5InputSequences =>
@@ -143,7 +156,7 @@ class J5ReportRecordView extends Component {
       j5RunConstructs: processJ5RunConstructs(j5RunConstructs),
       j5InputSequences: j5InputSequences,
       j5InputParts: processInputParts(j5InputParts),
-      j5OligoSyntheses: processJ5OligoSynthesis(j5OligoSyntheses),
+      j5OligoSyntheses: processJ5OligoSynthesis.call(this, j5OligoSyntheses),
       j5DirectSyntheses: processJ5DirectSyntheses(j5DirectSyntheses),
       j5PcrReactions: j5PcrReactions,
       j5AssemblyPieces: j5AssemblyPieces
@@ -156,6 +169,30 @@ class J5ReportRecordView extends Component {
   linkInputSequences = () => {
     this.showLinkModal("inputSequences");
   };
+  getAssemblyMethod = () => {
+    const { assemblyMethod } = this.props.data.j5Report;
+    return startCase(assemblyMethod);
+  };
+
+  componentWillReceiveProps = nextProps => {
+    const j5InputSequences = get(nextProps, "data.j5Report.j5InputSequences");
+    const oldJ5InputSequences = get(
+      this.props,
+      "data.j5Report.j5InputSequences"
+    );
+    if (!(j5InputSequences === oldJ5InputSequences)) {
+      this.partCidMap = j5InputSequences.reduce((acc, s) => {
+        s.j5InputParts.forEach(p => {
+          const sequencePart = p.sequencePart;
+          if (sequencePart.cid && !acc[sequencePart.cid]) {
+            acc[sequencePart.cid.split("-")[1]] = sequencePart;
+          }
+        });
+        return acc;
+      }, {});
+    }
+  };
+
   renderHeader = () => {
     const { data, additionalHeaderItems = "", LinkJ5TableDialog } = this.props;
 
@@ -166,7 +203,7 @@ class J5ReportRecordView extends Component {
     }
 
     // JSON.parse(localStorage.getItem('TEMPORARY_j5Run')) || {}
-    const { name, assemblyMethod, assemblyType } = data.j5Report;
+    const { name, assemblyType } = data.j5Report;
 
     return (
       <div className="j5-report-header tg-card">
@@ -184,7 +221,7 @@ class J5ReportRecordView extends Component {
         </div>
         <div>
           <span className="j5-report-fieldname">Assembly Method:</span>{" "}
-          {assemblyMethod}
+          {this.getAssemblyMethod()}
         </div>
         <div>
           <span className="j5-report-fieldname">Assembly Type:</span>{" "}
@@ -207,16 +244,57 @@ class J5ReportRecordView extends Component {
       <span className="j5-report-fieldname">Parameter Preset:</span>{" "}
       {assemblyType}
     </div> */}
-
-        {this.renderDownloadButton()}
-        {additionalHeaderItems}
-        {LinkJ5TableDialog && (
-          <Button onClick={this.linkInputSequences} style={{ marginTop: 10 }}>
-            Link Tables to Materials
-          </Button>
-        )}
+        <div className="pt-button-group" style={{ marginTop: 10 }}>
+          {this.renderDownloadButton()}
+          {additionalHeaderItems}
+          {LinkJ5TableDialog && (
+            <Button onClick={this.linkInputSequences}>
+              Link Tables to Materials
+            </Button>
+          )}
+        </div>
       </div>
     );
+  };
+
+  createSchemaForCombinationOfAssemblyPieces = j5RunConstructs => {
+    let maxNumAssemblyPieces = 0;
+    j5RunConstructs.forEach(c => {
+      const numAssemblyPieces = c.j5ConstructAssemblyPieces.length;
+      if (numAssemblyPieces > maxNumAssemblyPieces)
+        maxNumAssemblyPieces = numAssemblyPieces;
+    });
+    const assemblyPieceColumns = times(maxNumAssemblyPieces, i => ({
+      path: `j5ConstructAssemblyPieces[${i}].assemblyPiece.id`,
+      displayName: `Assembly Piece ${i + 1} ID`
+    }));
+    const partsContainedColumns = times(maxNumAssemblyPieces, i => {
+      return {
+        path: `j5ConstructAssemblyPieces[${i}].assemblyPiece.j5AssemblyPieceParts`,
+        displayName: `Parts Contained`,
+        render: v =>
+          v && v.map(p => get(p, "j5InputPart.sequencePart.name")).join(", ")
+      };
+    });
+    const extraColumns = flatten(
+      zip(assemblyPieceColumns, partsContainedColumns)
+    );
+    return {
+      fields: [
+        {
+          path: "id",
+          type: "string",
+          displayName: "Assembly ID"
+        },
+        { path: "name", type: "string", displayName: "Construct Name" },
+        {
+          type: "string",
+          displayName: "Assembly Method",
+          render: () => this.getAssemblyMethod()
+        },
+        ...extraColumns
+      ]
+    };
   };
 
   render() {
@@ -539,6 +617,25 @@ class J5ReportRecordView extends Component {
                 )
               }
               entities={entitiesForAllTables.j5AssemblyPieces}
+            />
+          </CollapsibleCard>
+
+          <CollapsibleCard
+            icon={
+              <InfoHelper>
+                This lists which assembly pieces need to be combined to create
+                each construct.
+              </InfoHelper>
+            }
+            title={"Combination of Assembly Pieces"}
+          >
+            <DataTable
+              {...sharedTableProps}
+              schema={this.createSchemaForCombinationOfAssemblyPieces(
+                entitiesForAllTables.j5RunConstructs
+              )}
+              formName={"combinationOfAssemblyPieces"} //because these tables are currently not connected to table params, we need to manually pass a formName here
+              entities={entitiesForAllTables.j5RunConstructs}
             />
           </CollapsibleCard>
 

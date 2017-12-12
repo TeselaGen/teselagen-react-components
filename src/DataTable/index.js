@@ -190,7 +190,10 @@ class ReactDataTable extends React.Component {
     const headerNode = table.querySelector(".rt-thead.-header");
     if (headerNode) headerNode.style.overflowY = "inherit";
     if (tableBody && tableBody.scrollHeight > tableBody.clientHeight) {
-      if (headerNode) headerNode.style.overflowY = "scroll";
+      if (headerNode) {
+        headerNode.style.overflowY = "scroll";
+        headerNode.style.overflowX = "hidden";
+      }
     }
   }
 
@@ -814,7 +817,6 @@ class ReactDataTable extends React.Component {
 
     const sortDown = ordering && ordering === "asc";
     const sortUp = ordering && !sortDown;
-
     const sortComponent =
       !disableSorting && !isActionColumn ? (
         <div className={"tg-sort-arrow-container"}>
