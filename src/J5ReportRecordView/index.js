@@ -164,7 +164,13 @@ class J5ReportRecordView extends Component {
   };
 
   renderDownloadButton = () => {
-    return <Button onClick={this.downloadCSV}>Export as CSV</Button>;
+    // option to override export handler
+    const { onExportAsCsvClick } = this.props;
+    return (
+      <Button onClick={onExportAsCsvClick || this.downloadCSV}>
+        Export as CSV
+      </Button>
+    );
   };
   linkInputSequences = () => {
     this.showLinkModal("inputSequences");
