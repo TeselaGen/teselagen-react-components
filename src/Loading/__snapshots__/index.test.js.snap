@@ -2,8 +2,6 @@
 
 exports[`(Component) renders without exploding 1`] = `
 <div
-  className="tg-dna-loader-container tg-flex justify-center align-center"
->
-  <DNALoader />
-</div>
+  className="tg-flex justify-center align-center"
+/>
 `;

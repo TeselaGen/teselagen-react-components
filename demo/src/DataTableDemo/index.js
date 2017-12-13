@@ -1,12 +1,13 @@
 //@flow
 import React from "react";
-import { MenuItem, Switch } from "@blueprintjs/core";
+import { MenuItem } from "@blueprintjs/core";
 import { FocusStyleManager, Dialog } from "@blueprintjs/core";
 import { ApolloProvider, ApolloClient } from "react-apollo";
 
 // import { createStore, combineReducers } from "redux";
 // import { reducer as form } from "redux-form";
 import { withTableParams, DataTable } from "../../../src";
+import renderToggle from '../renderToggle';
 
 // import { withDelete, withUpsert, withQuery } from "../../../src";
 // import withSelectedEntities from '../../../src/DataTable/utils/withSelectedEntities';
@@ -75,26 +76,6 @@ const schema: DataTableSchema = {
     //   expander: true
     // }
   ]
-};
-
-const renderToggle = (that, type, description) => {
-  return (
-    <div className={"toggle-button-holder"}>
-      <Switch
-        checked={that.state[type]}
-        label={type}
-        /* eslint-disable react/jsx-no-bind */
-
-        onChange={() => {
-          that.setState({
-            [type]: !that.state[type]
-          });
-        }}
-        /* eslint-enable react/jsx-no-bind */
-      />
-      {description && <span>{description}</span>}
-    </div>
-  );
 };
 
 export default class DataTableDemo extends React.Component {

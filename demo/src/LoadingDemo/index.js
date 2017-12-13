@@ -1,24 +1,37 @@
+/* eslint react/jsx-no-bind: 0 */
 import React from "react";
-import {Loading} from '../../../src';
+import { Loading } from "../../../src";
+import renderToggle from "../renderToggle";
 
 export default class LoadingComponentDemo extends React.Component {
-	render() {
-		var {loading} = this.state || {}
+  state = {
+    loading: false,
+    bounce: false
+  };
 
-		return (
-			<div>
-				<button onClick={()=>{
-					this.setState({loading: false})
-				}}>
-					stop loading
-				</button>
-			<Loading loading={loading}>
-				<button onClick={()=>{
-					this.setState({loading: true})
-				}}> start loading</button>
-			</Loading>
-			</div>
-		);
+  render() {
+    const { loading, bounce } = this.state;
 
-	}
+    return (
+      <div>
+        {renderToggle(this, "bounce")}
+        <button
+          onClick={() => {
+            this.setState({ loading: false });
+          }}
+        >
+          stop loading
+        </button>
+        <Loading loading={loading} bounce={bounce}>
+          <button
+            onClick={() => {
+              this.setState({ loading: true });
+            }}
+          >
+            start loading
+          </button>
+        </Loading>
+      </div>
+    );
+  }
 }
