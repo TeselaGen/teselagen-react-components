@@ -51,6 +51,7 @@
 
 .data-table-title-and-buttons {
   display: flex;
+  align-items: center;
 }
 
 .datatable-search-input {
