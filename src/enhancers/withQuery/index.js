@@ -6,8 +6,6 @@ export default function withQuery(fragment, options = {}) {
   //passing a default LoadingComponent to withQuery
   return _withQuery(fragment, {
     ...options,
-    LoadingComp: ({ loading }) => (
-      <Loading loading={loading} style={{ minHeight: 200 }} />
-    )
+    LoadingComp: props => <Loading {...props} />
   });
 }

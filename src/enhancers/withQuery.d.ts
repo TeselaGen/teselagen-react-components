@@ -8,6 +8,7 @@ export declare interface IWithQuery<TProps, TResult> extends OperationOption {
   idAs: string, // By default single record queries occur on an id. But, if the record doesn't have an id field, and instead has a 'code', you can set idAs: 'code'
   getIdFromParams: boolean, // Grab the id variable off the match.params object being passed in!
   showLoading: boolean, // Show a loading spinner over the whole component while the data is loading
+  inDialog: boolean, // whether the component withQuery is wrapping is a dialog
   showError: boolean, // Default=true show an error message toastr if the an error occurs while loading the data
 }
 

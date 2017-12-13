@@ -32,7 +32,8 @@
 }
 
 .data-table-title {
-  font-size: 1.6em;
+  font-size: 1.8em;
+  font-weight: 300;
   margin-right: 10px;
 }
 
@@ -122,10 +123,10 @@
   white-space: nowrap;
   overflow: hidden;
   min-width: 0px;
-  padding: 8px 0 8px;
+  padding: 6px 0 6px;
   text-overflow: ellipsis;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 400;
   color: rgba(0, 0, 0, 0.65);
 }
 

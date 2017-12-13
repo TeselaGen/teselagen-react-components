@@ -17,7 +17,7 @@ import compose from "lodash/fp/compose";
  * @property {boolean} asQueryObj If true, this gives you back the gql query object aka gql`query myQuery () {}`
  * @property {string} idAs By default single record queries occur on an id. But, if the record doesn't have an id field, and instead has a 'code', you can set idAs: 'code'
  * @property {boolean} getIdFromParams Grab the id variable off the match.params object being passed in!
- * @property {boolean} showLoading Show a loading spinner over the whole component while the data is loading
+ * @property {boolean || string} showLoading Show a loading spinner over the whole component while the data is loading
  * @property {boolean} showError Default=true show an error message toastr if the an error occurs while loading the data
  * @return {props}: {xxxxQuery, data }
  */
@@ -37,6 +37,7 @@ export default function withQuery(fragment, options = {}) {
     props,
     getIdFromParams,
     showLoading,
+    inDialog,
     showError = true,
     ...rest
   } = options;
@@ -225,7 +226,7 @@ export default function withQuery(fragment, options = {}) {
               console.error("error:", error);
               window.toastr.error(`Error loading ${queryNameToUse}`);
             } else {
-              console.log("Error supressed, not logged in");
+              console.warn("Error supressed, not logged in");
             }
           }
         }
@@ -233,7 +234,8 @@ export default function withQuery(fragment, options = {}) {
           const { data = {} } = this.props;
           const { loading } = data;
           if (loading && showLoading) {
-            return <LoadingComp style={{ minHeight: 200 }} />;
+            const bounce = inDialog || showLoading === "bounce";
+            return <LoadingComp inDialog={inDialog} bounce={bounce} />;
           }
           return <WrappedComponent {...this.props} />;
         }
