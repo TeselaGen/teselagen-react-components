@@ -45,14 +45,12 @@ export default class Card extends Component {
         <div className="tg-card-header" style={{ marginBottom: 8 }}>
           <div className="tg-card-header-title">
             {iconName && <div className={"pt-icon-" + iconName} style={{}} />}
-            {icon && <div style={{ paddingTop: 3 }}>{icon}</div>}
+            {icon && <div>{icon}</div>}
             <h6
               style={{
-                paddingLeft: 10,
                 marginBottom: 0,
-                paddingTop: 5,
-                marginTop: 3,
-                marginRight: 10
+                marginRight: 10,
+                marginLeft: 10
               }}
             >
               {title}

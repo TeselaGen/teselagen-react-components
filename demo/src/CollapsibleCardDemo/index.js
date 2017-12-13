@@ -1,13 +1,17 @@
 //@flow
 import React from "react";
 import { CollapsibleCard } from "../../../src";
+import { Button } from "@blueprintjs/core";
 export default function InfoHelperDemo() {
   return (
     <div>
-      <CollapsibleCard> 
+      <CollapsibleCard
+        title="Jobs"
+        openTitleElements={<Button text="hey" icon="add" />}
+        iconName="build"
+      >
         I'm some content!
       </CollapsibleCard>
-     
     </div>
   );
 }

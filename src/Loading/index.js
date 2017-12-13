@@ -34,10 +34,10 @@ export default class Loading extends React.Component {
       ...userStyle,
       ...(inDialog && { minHeight: 120 })
     };
-    const LoaderComp = bounce ? BounceLoader : DNALoader;
+    const LoaderComp = bounce || inDialog ? BounceLoader : DNALoader;
 
     if (loading || !children) {
-      if (!longerThan200MS && !bounce) {
+      if (!longerThan200MS && !bounce && !inDialog) {
         return <div className={"tg-flex justify-center align-center"} />;
       }
       return (

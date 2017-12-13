@@ -307,6 +307,7 @@ class ReactDataTable extends React.Component {
       acc[index] = reduxFormExpandedEntityIdMap.input.value[rowId];
       return acc;
     }, {});
+    const showHeader = (withTitle || withSearch || children) && !noHeader;
 
     return (
       <div
@@ -318,7 +319,7 @@ class ReactDataTable extends React.Component {
           { "no-padding": noPadding }
         )}
       >
-        {!noHeader && (
+        {showHeader && (
           <div className={"data-table-header"}>
             <div className={"data-table-title-and-buttons"}>
               {tableName &&
