@@ -49,10 +49,15 @@ function getWrappedInParensMatches(s) {
 function processJ5OligoSynthesis(j5Oligos) {
   return j5Oligos.map(j5Oligo => {
     const partCids = getWrappedInParensMatches(j5Oligo.name);
+    const firstTargetPart = get(this.partCidMap, `${partCids[0]}.name`);
+    const lastTargetPart = get(this.partCidMap, `${partCids[1]}.name`);
     return {
       ...j5Oligo,
-      firstTargetPart: get(this.partCidMap, `${partCids[0]}.name`),
-      lastTargetPart: get(this.partCidMap, `${partCids[1]}.name`),
+      name: j5Oligo.name
+        .replace(partCids[0], firstTargetPart)
+        .replace(partCids[1], lastTargetPart),
+      firstTargetPart,
+      lastTargetPart,
       bps: get(j5Oligo, "oligo.sequence.sequenceFragments", [])
         .map(({ fragment }) => {
           return fragment;
