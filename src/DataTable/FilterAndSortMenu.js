@@ -157,8 +157,9 @@ export default class FilterAndSortMenu extends React.Component {
           />
         </div>
         <MenuDivider />
-        {
-          <div className={"custom-menu-item menu-buttons"}>
+        <div className="pt-dialog-footer">
+          <div className="pt-dialog-footer-actions">
+            <Button className={"pt-popover-dismiss pt-minimal"} text="Cancel" />
             <Button
               className={"pt-popover-dismiss"}
               intent={Intent.SUCCESS}
@@ -167,9 +168,8 @@ export default class FilterAndSortMenu extends React.Component {
               }}
               text="Ok"
             />
-            <Button className={"pt-popover-dismiss"} text="Cancel" />
           </div>
-        }
+        </div>
       </Menu>
     );
   }
@@ -260,14 +260,12 @@ class FilterInput extends React.Component {
           <div className={"custom-menu-item"}>
             <DateRangeInput
               value={
-                filterValue && filterValue[0] && filterValue[1] ? (
-                  [
-                    moment(filterValue[0]).toDate(),
-                    moment(filterValue[1]).toDate()
-                  ]
-                ) : (
-                  undefined
-                )
+                filterValue && filterValue[0] && filterValue[1]
+                  ? [
+                      moment(filterValue[0]).toDate(),
+                      moment(filterValue[1]).toDate()
+                    ]
+                  : undefined
               }
               minDate={moment(0).toDate()}
               maxDate={moment(99999999999999).toDate()}
