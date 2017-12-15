@@ -133,10 +133,12 @@ export default function withUpsert(nameOrFragment, options = {}) {
         return {
           createItem: (...args) => {
             const input = args[0];
+            const { update } = args[1] || {};
             return createItem({
               variables: {
                 input
               },
+              update,
               refetchQueries,
               ...getExtraMutateArgs(...args)
             });
@@ -151,10 +153,12 @@ export default function withUpsert(nameOrFragment, options = {}) {
         return {
           updateItem: (...args) => {
             const input = args[0];
+            const { update } = args[1] || {};
             return updateItem({
               variables: {
                 input
               },
+              update,
               refetchQueries,
               ...getExtraMutateArgs(...args)
             });
