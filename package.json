@@ -55,6 +55,7 @@
   "peerDependencies": {
     "@blueprintjs/core": "^1.18.0",
     "@blueprintjs/datetime": "^1.16.0",
+    "@blueprintjs/labs": "^0.14.1",
     "@blueprintjs/table": "^1.15.0",
     "apollo-cache-invalidation": "^0.0.3",
     "react-addons-css-transition-group": "^15.5.2",
@@ -67,9 +68,10 @@
     "tg-client-query-builder": "^2.6.0"
   },
   "devDependencies": {
-    "@blueprintjs/core": "^1.27.0",
-    "@blueprintjs/datetime": "^1.22.0",
-    "@blueprintjs/table": "^1.24.1",
+    "@blueprintjs/core": "^1.35.0",
+    "@blueprintjs/datetime": "^1.25.1",
+    "@blueprintjs/labs": "^0.14.1",
+    "@blueprintjs/table": "^1.31.0",
     "apollo-cache-invalidation": "^0.0.3",
     "axios": "^0.17.1",
     "babel-eslint": "^8.0.1",

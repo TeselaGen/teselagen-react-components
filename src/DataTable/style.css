@@ -49,6 +49,10 @@
   padding: 0;
 }
 
+.data-table-container.hide-column-header .rt-thead.-header {
+  display: none;
+}
+
 .data-table-title-and-buttons {
   display: flex;
   align-items: center;

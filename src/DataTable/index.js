@@ -11,12 +11,13 @@ import {
   Button,
   Menu,
   Spinner,
-  Popover,
+  // Popover,
   Classes,
   Position,
   ContextMenu,
   Checkbox
 } from "@blueprintjs/core";
+import { Popover2 as Popover } from "@blueprintjs/labs";
 import classNames from "classnames";
 import scrollIntoView from "dom-scroll-into-view";
 import { getSelectedRowsFromEntities } from "./utils/selection";
@@ -243,6 +244,8 @@ class ReactDataTable extends React.Component {
       SubComponent,
       ReactTableProps = {},
       hideSelectedCount,
+      hideColumnHeader,
+      subHeader,
       entities,
       children
     } = computePresets(this.props);
@@ -316,7 +319,10 @@ class ReactDataTable extends React.Component {
           extraClasses,
           className,
           compactClassName,
-          { "no-padding": noPadding }
+          {
+            "no-padding": noPadding,
+            "hide-column-header": hideColumnHeader
+          }
         )}
       >
         {showHeader && (
@@ -378,6 +384,7 @@ class ReactDataTable extends React.Component {
             )}
           </div>
         )}
+        {subHeader}
         <ReactTable
           data={entities}
           ref={n => {
@@ -749,7 +756,7 @@ class ReactDataTable extends React.Component {
         return (
           <div
             style={{ textOverflow: "ellipsis", overflow: "hidden" }}
-            title={title}
+            title={title || undefined}
           >
             {val}
           </div>
@@ -841,10 +848,15 @@ class ReactDataTable extends React.Component {
           />
         </div>
       ) : null;
-
+    const FilterMenu = schemaForField.FilterMenu || FilterAndSortMenu;
     const filterMenu =
       withFilter && !isActionColumn && !filterDisabled ? (
-        <Popover position={Position.BOTTOM_RIGHT}>
+        <Popover
+          placement="bottom"
+          modifiers={{
+            arrow: false
+          }}
+        >
           <Button
             title={"Filter"}
             className={classNames(
@@ -855,7 +867,7 @@ class ReactDataTable extends React.Component {
             )}
             iconName="filter"
           />
-          <FilterAndSortMenu
+          <FilterMenu
             addFilters={addFilters}
             removeSingleFilter={removeSingleFilter}
             currentFilter={currentFilter}
