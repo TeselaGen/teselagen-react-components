@@ -113,9 +113,9 @@ export default function withUpsert(nameOrFragment, options = {}) {
           mutation: isUpdate ? updateMutation : createMutation,
           name: "createDataFile",
           variables: {
-            input: values,
-            update
-          }
+            input: values
+          },
+          update
         })
         .then(function(res) {
           return Promise.resolve(
