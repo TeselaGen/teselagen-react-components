@@ -97,7 +97,7 @@ export default function withUpsert(nameOrFragment, options = {}) {
       return console.error(
         "You need to pass the apollo client to withUpsert if using as a function"
       );
-    return function upsert(valueOrValues) {
+    return function upsert(valueOrValues, { update } = {}) {
       const values = Array.isArray(valueOrValues)
         ? valueOrValues
         : [valueOrValues];
@@ -113,7 +113,8 @@ export default function withUpsert(nameOrFragment, options = {}) {
           mutation: isUpdate ? updateMutation : createMutation,
           name: "createDataFile",
           variables: {
-            input: values
+            input: values,
+            update
           }
         })
         .then(function(res) {
@@ -133,10 +134,12 @@ export default function withUpsert(nameOrFragment, options = {}) {
         return {
           createItem: (...args) => {
             const input = args[0];
+            const { update } = args[1] || {};
             return createItem({
               variables: {
                 input
               },
+              update,
               refetchQueries,
               ...getExtraMutateArgs(...args)
             });
@@ -151,10 +154,12 @@ export default function withUpsert(nameOrFragment, options = {}) {
         return {
           updateItem: (...args) => {
             const input = args[0];
+            const { update } = args[1] || {};
             return updateItem({
               variables: {
                 input
               },
+              update,
               refetchQueries,
               ...getExtraMutateArgs(...args)
             });

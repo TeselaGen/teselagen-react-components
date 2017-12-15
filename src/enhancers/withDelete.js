@@ -62,10 +62,11 @@ export default function(nameOrFragment, options = {}) {
         "You need to pass the apollo client to withDelete if using as a function"
       );
     return function deleteEntities(...args) {
-      const { input, idArray } = prepareArgs(args);
+      const { input, idArray, update } = prepareArgs(args);
       return client
         .mutate({
           mutation: deleteByIdsMutation,
+          update,
           variables: {
             input
           }
@@ -77,13 +78,13 @@ export default function(nameOrFragment, options = {}) {
   return graphql(deleteByIdsMutation, {
     props: ({ mutate }) => {
       function deleteMutation(...args) {
-        const { input, idArray } = prepareArgs(args);
+        const { input, idArray, update } = prepareArgs(args);
 
         return mutate({
           variables: {
             input
           },
-          update: invalidateQueriesOfTypes([pluralRecordType]),
+          update: update || invalidateQueriesOfTypes([pluralRecordType]),
           refetchQueries,
           ...getExtraMutateArgs(...args)
         })
@@ -111,7 +112,7 @@ export default function(nameOrFragment, options = {}) {
 }
 
 function prepareArgs(args) {
-  const [maybeIdArray, { isCode } = {}] = args;
+  const [maybeIdArray, { isCode, update } = {}] = args;
   const idArray = Array.isArray(maybeIdArray) ? maybeIdArray : [maybeIdArray];
   if (idArray.length < 1) {
     console.error(
@@ -125,7 +126,8 @@ function prepareArgs(args) {
   });
   return {
     input,
-    idArray
+    idArray,
+    update
   };
 }
 
