@@ -469,7 +469,8 @@ export function makeDataTableHandlers({
     removeSingleFilter,
     setPageSize,
     setPage,
-    setOrder
+    setOrder,
+    setNewParams
   };
 }
 
@@ -593,7 +594,7 @@ export function getQueryParams({
       return val !== "";
     }); //get rid of erroneous filters
     const { andFilters, orFilters } = getAndAndOrFilters(allFilters);
-    const additionalFilterToUse = additionalFilter(qb);
+    const additionalFilterToUse = additionalFilter(qb, currentParams);
     try {
       qb
         .whereAll(getQueries(andFilters, qb, ccFields))

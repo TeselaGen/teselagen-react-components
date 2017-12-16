@@ -12,8 +12,8 @@ import {
   Menu,
   Spinner,
   // Popover,
+  // Position,
   Classes,
-  Position,
   ContextMenu,
   Checkbox
 } from "@blueprintjs/core";
@@ -788,7 +788,9 @@ class ReactDataTable extends React.Component {
       order,
       withFilter,
       filters,
-      removeSingleFilter
+      removeSingleFilter,
+      currentParams,
+      setNewParams
     } = computePresets(this.props);
     const schemaForField = schema.fields[column.schemaIndex];
     const {
@@ -796,6 +798,7 @@ class ReactDataTable extends React.Component {
       sortDisabled,
       filterDisabled,
       renderTitleInner,
+      filterIsActive = noop,
       path
     } = schemaForField;
     const disableSorting =
@@ -809,6 +812,8 @@ class ReactDataTable extends React.Component {
       filters.filter(({ filterOn }) => {
         return filterOn === ccDisplayName;
       })[0];
+    const filterActiveForColumn =
+      !!currentFilter || filterIsActive(currentParams);
     let ordering;
     if (order && order.length) {
       order.forEach(order => {
@@ -862,7 +867,7 @@ class ReactDataTable extends React.Component {
             className={classNames(
               "tg-filter-menu-button",
               Classes.MINIMAL,
-              { "tg-active-filter": !!currentFilter },
+              { "tg-active-filter": !!filterActiveForColumn },
               Classes.SMALL
             )}
             iconName="filter"
@@ -874,6 +879,8 @@ class ReactDataTable extends React.Component {
             filterOn={ccDisplayName}
             dataType={columnDataType}
             schemaForField={schemaForField}
+            currentParams={currentParams}
+            setNewParams={setNewParams}
           />
         </Popover>
       ) : null;
