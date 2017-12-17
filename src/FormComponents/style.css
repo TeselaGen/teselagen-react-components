@@ -91,3 +91,8 @@
     transform: rotate(360deg);
   }
 }
+
+.Select-multi-value-wrapper {
+  max-height: 100px;
+  overflow: scroll;
+}

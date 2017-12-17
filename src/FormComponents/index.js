@@ -330,7 +330,7 @@ export const renderReactSelect = props => {
     ...removeUnwantedProps(rest),
     options: optsToUse,
     value: valueToUse,
-    closeOnSelect: false,
+    closeOnSelect: !rest.multi,
     onChange(valOrVals, ...rest) {
       const valToPass = Array.isArray(valOrVals)
         ? valOrVals.map(function(val) {
