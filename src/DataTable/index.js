@@ -1114,17 +1114,15 @@ export default compose(
           const fieldsByPath = keyBy(schema.fields, "path");
           columnOrderings.forEach((path, i) => {
             if (fieldsByPath[path].isHidden) {
-              if (i <= oldColumnIndex) oldColumnIndexToUse++;
-              if (i <= columnIndex) columnIndexToUse++;
+              if (i <= oldColumnIndexToUse) oldColumnIndexToUse++;
+              if (i <= columnIndexToUse) columnIndexToUse++;
             }
           });
-          console.log("columnOrderings:", columnOrderings);
           const newOrderings = arrayMove(
             columnOrderings,
             oldColumnIndexToUse,
             columnIndexToUse
           );
-          console.log("newOrderings:", newOrderings);
           tableConfig.columnOrderings = newOrderings;
           window.localStorage.setItem(formName, JSON.stringify(tableConfig));
         };
