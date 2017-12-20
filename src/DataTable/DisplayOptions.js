@@ -3,7 +3,7 @@ import React from "react";
 
 import { Button, Popover, Position, Checkbox } from "@blueprintjs/core";
 function noop() {}
-export default class PagingTool extends React.Component {
+export default class DisplayOptions extends React.Component {
   render() {
     const {
       schema,

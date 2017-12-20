@@ -109,17 +109,17 @@
   justify-content: flex-start;
 }
 
-.tg-react-table-column-header:hover > * {
+.rt-th:hover > * {
   transition: 0.2s;
   display: inherit !important;
 }
 
-.tg-react-table-column-header:hover .tg-sort-arrow-container > * {
+.rt-th:hover .tg-sort-arrow-container > * {
   transition: 0.2s;
   display: inherit !important;
 }
 
-.tg-react-table-column-header:hover .tg-filter-menu-button {
+.rt-th:hover .tg-filter-menu-button {
   transition: 0.2s;
   display: block !important;
 }
@@ -253,7 +253,24 @@
   flex: 100000 0 auto;
 }
 
+.rt-noData {
+  top: 65%;
+}
+
 .-pagination,
 .rt-body {
   flex: 1 0 auto;
+}
+
+/* .tg-movable-table-column {
+  border-right: 1px solid rgba(0, 0, 0, 0.05);
+} */
+
+.ReactTable .rt-thead .rt-th,
+.ReactTable .rt-thead .rt-td {
+  border-right: none;
+}
+
+.tg-movable-table-column:hover {
+  border-right: 1px solid rgba(0, 0, 0, 0.05);
 }

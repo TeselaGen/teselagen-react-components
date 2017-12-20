@@ -6,7 +6,16 @@ import { compose } from "redux";
 import React from "react";
 import ReactDOM from "react-dom";
 import moment from "moment";
-import { camelCase, get, toArray, startCase, noop, isEqual } from "lodash";
+import { arrayMove } from "react-sortable-hoc";
+import {
+  camelCase,
+  get,
+  toArray,
+  startCase,
+  noop,
+  isEqual,
+  keyBy
+} from "lodash";
 import {
   Button,
   Menu,
@@ -40,6 +49,7 @@ import DisabledLoadingComponent from "./DisabledLoadingComponent";
 import "../toastr";
 import "./style.css";
 import withTableParams from "./utils/withTableParams";
+import SortableColumns from "./SortableColumns";
 
 //we use this to make adding preset prop groups simpler
 function computePresets(props) {
@@ -135,7 +145,7 @@ class ReactDataTable extends React.Component {
             }
             columns.push({
               displayName: field.displayName || startCase(field.path),
-              schemaIndex: i,
+              columnIndex: field.columnIndex || i,
               width: field.width
             });
             return columns;
@@ -198,6 +208,12 @@ class ReactDataTable extends React.Component {
     }
   }
 
+  moveColumn = ({ oldIndex, newIndex }) => {
+    this.setState({
+      columns: arrayMove(this.state.columns, oldIndex, newIndex)
+    });
+  };
+
   render() {
     const {
       extraClasses,
@@ -223,6 +239,7 @@ class ReactDataTable extends React.Component {
       page,
       withDisplayOptions,
       updateColumnVisibility,
+      moveColumnPersist,
       localStorageForceUpdate,
       syncDisplayOptionsToDb,
       resetDefaultVisibility,
@@ -251,6 +268,7 @@ class ReactDataTable extends React.Component {
     } = computePresets(this.props);
     let updateColumnVisibilityToUse = updateColumnVisibility;
     let resetDefaultVisibilityToUse = resetDefaultVisibility;
+    let moveColumnPersistToUse = moveColumnPersist;
     if (withDisplayOptions && !syncDisplayOptionsToDb) {
       //little hack to make localstorage changes get reflected in UI (we force an update to get the enhancers to run again :)
       updateColumnVisibilityToUse = (...args) => {
@@ -259,6 +277,10 @@ class ReactDataTable extends React.Component {
       };
       resetDefaultVisibilityToUse = (...args) => {
         resetDefaultVisibility(...args);
+        localStorageForceUpdate.input.onChange(Math.random());
+      };
+      moveColumnPersistToUse = (...args) => {
+        moveColumnPersist(...args);
         localStorageForceUpdate.input.onChange(Math.random());
       };
     }
@@ -399,6 +421,13 @@ class ReactDataTable extends React.Component {
           getTbodyProps={() => ({
             id: tableId
           })}
+          TheadComponent={props => (
+            <SortableColumns
+              {...props}
+              moveColumn={this.moveColumn}
+              moveColumnPersist={moveColumnPersistToUse}
+            />
+          )}
           getTrGroupProps={this.getTableRowProps}
           NoDataComponent={({ children }) =>
             isLoading ? null : <div className="rt-noData">{children}</div>}
@@ -713,7 +742,7 @@ class ReactDataTable extends React.Component {
         ]
       : [];
     columns.forEach(column => {
-      const schemaForColumn = schema.fields[column.schemaIndex];
+      const schemaForColumn = schema.fields[column.columnIndex];
       const tableColumn = {
         ...schemaForColumn,
         Header: this.renderColumnHeader(column),
@@ -792,7 +821,7 @@ class ReactDataTable extends React.Component {
       currentParams,
       setNewParams
     } = computePresets(this.props);
-    const schemaForField = schema.fields[column.schemaIndex];
+    const schemaForField = schema.fields[column.columnIndex];
     const {
       displayName,
       sortDisabled,
@@ -989,6 +1018,7 @@ export default compose(
     let fieldOptsByPath = {};
     let resetDefaultVisibility;
     let updateColumnVisibility;
+    let moveColumnPersist;
     if (withDisplayOptions) {
       let tableConfig;
       if (syncDisplayOptionsToDb) {
@@ -1002,18 +1032,16 @@ export default compose(
           fieldOptions: []
         };
       }
-
-      fieldOptsByPath = tableConfig.fieldOptions.reduce((acc, fieldOpt) => {
-        acc[fieldOpt.path] = fieldOpt;
-        return acc;
-      }, {});
+      const columnOrderings = tableConfig.columnOrderings;
+      fieldOptsByPath = keyBy(tableConfig.fieldOptions, "path");
       schemaToUse = {
         ...schema,
-        fields: schema.fields.map(field => {
+        fields: schema.fields.map((field, index) => {
           const fieldOpt = fieldOptsByPath[field.path];
           if (fieldOpt) {
             return {
               ...field,
+              columnIndex: fieldOpt.columnIndex || index,
               isHidden: fieldOpt.isHidden
             };
           } else {
@@ -1021,6 +1049,15 @@ export default compose(
           }
         })
       };
+      if (columnOrderings) {
+        schemaToUse.fields = schemaToUse.fields.sort(
+          ({ path: path1 }, { path: path2 }) => {
+            return (
+              columnOrderings.indexOf(path1) > columnOrderings.indexOf(path2)
+            );
+          }
+        );
+      }
 
       if (syncDisplayOptionsToDb) {
         //sync up to db
@@ -1067,6 +1104,30 @@ export default compose(
           });
           window.localStorage.setItem(formName, JSON.stringify(tableConfig));
         };
+        moveColumnPersist = function({ columnIndex, oldColumnIndex }) {
+          //we might already have an array of the fields [path1, path2, ..etc]
+          const columnOrderings =
+            tableConfig.columnOrderings ||
+            schema.fields.map(({ path }) => path); // columnOrderings is [path1, path2, ..etc]
+          let columnIndexToUse = columnIndex;
+          let oldColumnIndexToUse = oldColumnIndex;
+          const fieldsByPath = keyBy(schema.fields, "path");
+          columnOrderings.forEach((path, i) => {
+            if (fieldsByPath[path].isHidden) {
+              if (i <= oldColumnIndex) oldColumnIndexToUse++;
+              if (i <= columnIndex) columnIndexToUse++;
+            }
+          });
+          console.log("columnOrderings:", columnOrderings);
+          const newOrderings = arrayMove(
+            columnOrderings,
+            oldColumnIndexToUse,
+            columnIndexToUse
+          );
+          console.log("newOrderings:", newOrderings);
+          tableConfig.columnOrderings = newOrderings;
+          window.localStorage.setItem(formName, JSON.stringify(tableConfig));
+        };
       }
     }
 
@@ -1074,7 +1135,8 @@ export default compose(
       ...propsToUse,
       schema: schemaToUse,
       resetDefaultVisibility,
-      updateColumnVisibility
+      updateColumnVisibility,
+      moveColumnPersist
     };
   }),
   reduxForm(), //the formName is passed via withTableParams and is often user overridden
