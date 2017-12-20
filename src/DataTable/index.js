@@ -5,7 +5,6 @@ import { reduxForm } from "redux-form";
 import {
   SortableContainer,
   SortableElement,
-  SortableHandle,
   arrayMove
 } from "react-sortable-hoc";
 import { compose } from "redux";
@@ -47,20 +46,10 @@ import "../toastr";
 import "./style.css";
 import withTableParams from "./utils/withTableParams";
 
-const DragHandle = SortableHandle(() => (
-  <span
-    style={{
-      position: "absolute",
-      cursor: "move",
-      right: 20
-    }}
-    className="pt-icon-drag-handle-vertical"
-  />
-));
-
 const SortableItem = SortableElement(({ children }) => {
   return (
     <div
+      className="tg-movable-table-column"
       style={{
         position: "relative",
         display: "flex",
@@ -70,18 +59,28 @@ const SortableItem = SortableElement(({ children }) => {
       }}
     >
       {children}
-      <DragHandle />
     </div>
   );
 });
 
 function CustomTheadComponent(props) {
   const headerColumns = props.children.props.children;
+  // hacky but using the undefined keys to make a column not movable
+  // these undefined key columns will always be first so this might mess up
+  // order if something was funky
+  const [immovableColumns, movableColumns] = headerColumns.reduce(
+    (acc, col) => {
+      if (col.key.indexOf("undefined") > -1) acc[0].push(col);
+      else acc[1].push(col);
+      return acc;
+    },
+    [[], []]
+  );
   return (
     <div className={"rt-thead " + props.className} style={props.style}>
       <div className="rt-tr">
-        {headerColumns.map((column, index) => {
-          if (column.key.indexOf("undefined") > -1) return column;
+        {immovableColumns}
+        {movableColumns.map((column, index) => {
           return (
             <SortableItem key={`item-${index}`} index={index}>
               {column}
@@ -135,13 +134,6 @@ function computePresets(props) {
 class ReactDataTable extends React.Component {
   state = {
     columns: []
-  };
-
-  moveColumn = ({ oldIndex, newIndex }) => {
-    // -2 offset for header and expander columns shouldn't be there
-    this.setState({
-      columns: arrayMove(this.state.columns, oldIndex - 2, newIndex - 2)
-    });
   };
 
   static defaultProps = {
@@ -258,6 +250,19 @@ class ReactDataTable extends React.Component {
       }
     }
   }
+
+  moveColumn = ({ oldIndex, newIndex }) => {
+    this.setState({
+      columns: arrayMove(this.state.columns, oldIndex, newIndex)
+    });
+  };
+
+  shouldCancelStart = e => {
+    const className = e.target.className;
+    return (
+      className.indexOf("pt-icon") > -1 || className.indexOf("rt-resizer") > -1
+    );
+  };
 
   render() {
     const {
@@ -465,7 +470,7 @@ class ReactDataTable extends React.Component {
               {...props}
               lockAxis="x"
               axis="x"
-              useDragHandle
+              shouldCancelStart={this.shouldCancelStart}
               onSortEnd={this.moveColumn}
             />
           )}
