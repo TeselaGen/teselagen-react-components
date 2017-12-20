@@ -7,7 +7,7 @@ import { ApolloProvider, ApolloClient } from "react-apollo";
 // import { createStore, combineReducers } from "redux";
 // import { reducer as form } from "redux-form";
 import { withTableParams, DataTable } from "../../../src";
-import renderToggle from '../renderToggle';
+import renderToggle from "../renderToggle";
 
 // import { withDelete, withUpsert, withQuery } from "../../../src";
 // import withSelectedEntities from '../../../src/DataTable/utils/withSelectedEntities';
@@ -206,7 +206,7 @@ export class DataTableInstance extends React.Component {
     noHeader: false,
     noFooter: false,
     noPadding: false,
-    withDisplayOptions: false,
+    withDisplayOptions: true,
     isInfinite: false,
     isSingleSelect: false,
     maxHeight: false,
