@@ -2,6 +2,12 @@
 import deepEqual from "deep-equal";
 import { connect } from "react-redux";
 import { reduxForm } from "redux-form";
+import {
+  SortableContainer,
+  SortableElement,
+  SortableHandle,
+  arrayMove
+} from "react-sortable-hoc";
 import { compose } from "redux";
 import React from "react";
 import ReactDOM from "react-dom";
@@ -40,6 +46,54 @@ import DisabledLoadingComponent from "./DisabledLoadingComponent";
 import "../toastr";
 import "./style.css";
 import withTableParams from "./utils/withTableParams";
+
+const DragHandle = SortableHandle(() => (
+  <span
+    style={{
+      position: "absolute",
+      cursor: "move",
+      right: 20
+    }}
+    className="pt-icon-drag-handle-vertical"
+  />
+));
+
+const SortableItem = SortableElement(({ children }) => {
+  return (
+    <div
+      style={{
+        position: "relative",
+        display: "flex",
+        alignItems: "center",
+        height: "100%",
+        ...children.props.style
+      }}
+    >
+      {children}
+      <DragHandle />
+    </div>
+  );
+});
+
+function CustomTheadComponent(props) {
+  const headerColumns = props.children.props.children;
+  return (
+    <div className={"rt-thead " + props.className} style={props.style}>
+      <div className="rt-tr">
+        {headerColumns.map((column, index) => {
+          if (column.key.indexOf("undefined") > -1) return column;
+          return (
+            <SortableItem key={`item-${index}`} index={index}>
+              {column}
+            </SortableItem>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+const SortableCustomTheadComponent = SortableContainer(CustomTheadComponent);
 
 //we use this to make adding preset prop groups simpler
 function computePresets(props) {
@@ -81,6 +135,13 @@ function computePresets(props) {
 class ReactDataTable extends React.Component {
   state = {
     columns: []
+  };
+
+  moveColumn = ({ oldIndex, newIndex }) => {
+    // -2 offset for header and expander columns shouldn't be there
+    this.setState({
+      columns: arrayMove(this.state.columns, oldIndex - 2, newIndex - 2)
+    });
   };
 
   static defaultProps = {
@@ -399,6 +460,15 @@ class ReactDataTable extends React.Component {
           getTbodyProps={() => ({
             id: tableId
           })}
+          TheadComponent={props => (
+            <SortableCustomTheadComponent
+              {...props}
+              lockAxis="x"
+              axis="x"
+              useDragHandle
+              onSortEnd={this.moveColumn}
+            />
+          )}
           getTrGroupProps={this.getTableRowProps}
           NoDataComponent={({ children }) =>
             isLoading ? null : <div className="rt-noData">{children}</div>}
