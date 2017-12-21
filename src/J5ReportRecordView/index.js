@@ -2,7 +2,7 @@ import React, { Component } from "react";
 // import EditViewHOC from '../../EditViewHOC'
 import { reduxForm } from "redux-form";
 import { Button, Dialog } from "@blueprintjs/core";
-import { each, get, startCase, times, zip, flatten } from "lodash";
+import { each, get, startCase, times, zip, flatten, noop } from "lodash";
 import CollapsibleCard from "../CollapsibleCard";
 import InfoHelper from "../InfoHelper";
 import schemas from "./schemas";
@@ -313,7 +313,8 @@ class J5ReportRecordView extends Component {
       data,
       upsertSequence,
       getIsLinkedCellRenderer,
-      LinkJ5TableDialog
+      LinkJ5TableDialog,
+      onConstructDoubleClick = noop
     } = this.props;
     const { linkDialogName } = this.state;
 
@@ -466,6 +467,7 @@ class J5ReportRecordView extends Component {
           >
             <DataTable
               {...sharedTableProps}
+              onDoubleClick={onConstructDoubleClick}
               schema={schemas.j5RunConstructs}
               formName={"j5RunConstructs"} //because these tables are currently not connected to table params, we need to manually pass a formName here
               entities={entitiesForAllTables.j5RunConstructs}
