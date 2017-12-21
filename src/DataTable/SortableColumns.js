@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { noop } from "lodash";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
 
 const SortableItem = SortableElement(({ children }) => {
@@ -32,13 +31,16 @@ function CustomTheadComponent(props) {
     },
     [[], []]
   );
+  const stateColumns = props.columns;
   return (
     <div className={"rt-thead " + props.className} style={props.style}>
       <div className="rt-tr">
         {immovableColumns}
-        {movableColumns.map((column, index) => {
+        {movableColumns.map((column, i) => {
+          // keeps track of hidden columns here so columnIndex might not equal i
+          const columnIndex = stateColumns[i] ? stateColumns[i].columnIndex : i;
           return (
-            <SortableItem key={`item-${index}`} index={index}>
+            <SortableItem key={`item-${columnIndex}`} index={columnIndex}>
               {column}
             </SortableItem>
           );
@@ -62,8 +64,8 @@ class SortableColumns extends Component {
     const { moveColumnPersist, moveColumn } = this.props;
     if (moveColumnPersist) {
       moveColumnPersist({
-        columnIndex: newIndex,
-        oldColumnIndex: oldIndex
+        oldColumnIndex: oldIndex,
+        columnIndex: newIndex
       });
     } else {
       moveColumn({ oldIndex, newIndex });

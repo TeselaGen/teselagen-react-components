@@ -145,7 +145,7 @@ class ReactDataTable extends React.Component {
             }
             columns.push({
               displayName: field.displayName || startCase(field.path),
-              columnIndex: field.columnIndex || i,
+              columnIndex: i,
               width: field.width
             });
             return columns;
@@ -214,6 +214,31 @@ class ReactDataTable extends React.Component {
     });
   };
 
+  getTheadComponent = props => {
+    const {
+      withDisplayOptions,
+      moveColumnPersist,
+      localStorageForceUpdate,
+      syncDisplayOptionsToDb
+    } = computePresets(this.props);
+    let moveColumnPersistToUse = moveColumnPersist;
+    if (withDisplayOptions && !syncDisplayOptionsToDb) {
+      //little hack to make localstorage changes get reflected in UI (we force an update to get the enhancers to run again :)
+      moveColumnPersistToUse = (...args) => {
+        moveColumnPersist(...args);
+        localStorageForceUpdate.input.onChange(Math.random());
+      };
+    }
+    return (
+      <SortableColumns
+        {...props}
+        columns={this.state.columns}
+        moveColumn={this.moveColumn}
+        moveColumnPersist={moveColumnPersistToUse}
+      />
+    );
+  };
+
   render() {
     const {
       extraClasses,
@@ -239,7 +264,6 @@ class ReactDataTable extends React.Component {
       page,
       withDisplayOptions,
       updateColumnVisibility,
-      moveColumnPersist,
       localStorageForceUpdate,
       syncDisplayOptionsToDb,
       resetDefaultVisibility,
@@ -268,7 +292,6 @@ class ReactDataTable extends React.Component {
     } = computePresets(this.props);
     let updateColumnVisibilityToUse = updateColumnVisibility;
     let resetDefaultVisibilityToUse = resetDefaultVisibility;
-    let moveColumnPersistToUse = moveColumnPersist;
     if (withDisplayOptions && !syncDisplayOptionsToDb) {
       //little hack to make localstorage changes get reflected in UI (we force an update to get the enhancers to run again :)
       updateColumnVisibilityToUse = (...args) => {
@@ -277,10 +300,6 @@ class ReactDataTable extends React.Component {
       };
       resetDefaultVisibilityToUse = (...args) => {
         resetDefaultVisibility(...args);
-        localStorageForceUpdate.input.onChange(Math.random());
-      };
-      moveColumnPersistToUse = (...args) => {
-        moveColumnPersist(...args);
         localStorageForceUpdate.input.onChange(Math.random());
       };
     }
@@ -421,13 +440,7 @@ class ReactDataTable extends React.Component {
           getTbodyProps={() => ({
             id: tableId
           })}
-          TheadComponent={props => (
-            <SortableColumns
-              {...props}
-              moveColumn={this.moveColumn}
-              moveColumnPersist={moveColumnPersistToUse}
-            />
-          )}
+          TheadComponent={this.getTheadComponent}
           getTrGroupProps={this.getTableRowProps}
           NoDataComponent={({ children }) =>
             isLoading ? null : <div className="rt-noData">{children}</div>}
@@ -1036,12 +1049,11 @@ export default compose(
       fieldOptsByPath = keyBy(tableConfig.fieldOptions, "path");
       schemaToUse = {
         ...schema,
-        fields: schema.fields.map((field, index) => {
+        fields: schema.fields.map(field => {
           const fieldOpt = fieldOptsByPath[field.path];
           if (fieldOpt) {
             return {
               ...field,
-              columnIndex: fieldOpt.columnIndex || index,
               isHidden: fieldOpt.isHidden
             };
           } else {
@@ -1109,21 +1121,12 @@ export default compose(
           const columnOrderings =
             tableConfig.columnOrderings ||
             schema.fields.map(({ path }) => path); // columnOrderings is [path1, path2, ..etc]
-          let columnIndexToUse = columnIndex;
-          let oldColumnIndexToUse = oldColumnIndex;
-          const fieldsByPath = keyBy(schema.fields, "path");
-          columnOrderings.forEach((path, i) => {
-            if (fieldsByPath[path].isHidden) {
-              if (i <= oldColumnIndexToUse) oldColumnIndexToUse++;
-              if (i <= columnIndexToUse) columnIndexToUse++;
-            }
-          });
-          const newOrderings = arrayMove(
+
+          tableConfig.columnOrderings = arrayMove(
             columnOrderings,
-            oldColumnIndexToUse,
-            columnIndexToUse
+            oldColumnIndex,
+            columnIndex
           );
-          tableConfig.columnOrderings = newOrderings;
           window.localStorage.setItem(formName, JSON.stringify(tableConfig));
         };
       }
