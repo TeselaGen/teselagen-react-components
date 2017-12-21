@@ -23,6 +23,9 @@ export { default as withFields } from "./enhancers/withFields";
 export { default as withField } from "./enhancers/withField";
 export { default as withDialog } from "./enhancers/withDialog";
 export { default as tg_modalState } from "./enhancers/withDialog/tg_modalState";
+export {
+  default as generateFragmentWithFields
+} from "./utils/generateFragmentWithFields";
 
 export * from "./FormComponents";
 export * from "./toastr";
