@@ -48,19 +48,14 @@ export default class DisplayOptions extends React.Component {
           <div style={{ padding: 10, paddingLeft: 20, paddingRight: 20 }}>
             <h5 style={{ marginBottom: 10 }}>Display Density:</h5>
             <div className="pt-select">
-              <select onChange={this.changeTableDensity}>
-                <option
-                  className="pt-popover-dismiss"
-                  selected={!userSpecifiedCompact}
-                  value="normal"
-                >
+              <select
+                onChange={this.changeTableDensity}
+                value={userSpecifiedCompact ? "compact" : "normal"}
+              >
+                <option className="pt-popover-dismiss" value="normal">
                   Normal
                 </option>
-                <option
-                  className="pt-popover-dismiss"
-                  selected={userSpecifiedCompact}
-                  value="compact"
-                >
+                <option className="pt-popover-dismiss" value="compact">
                   Compact
                 </option>
               </select>

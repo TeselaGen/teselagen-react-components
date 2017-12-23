@@ -78,6 +78,7 @@ class SortableColumns extends Component {
         {...this.props}
         lockAxis="x"
         axis="x"
+        distance={10}
         shouldCancelStart={this.shouldCancelStart}
         onSortEnd={this.onSortEnd}
       />

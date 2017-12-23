@@ -187,6 +187,9 @@
   border-right: none;
   color: rgba(0, 0, 0, 0.65);
   font-size: 12px;
+  display: flex;
+  align-items: center;
+  padding: 12px 12px;
 }
 
 /* fix padding in custom row expander cell */
@@ -214,10 +217,6 @@
 
 .tg-react-table-checkbox-cell-container {
   padding: 11px 0 0 8px !important;
-}
-
-.ReactTable .rt-td {
-  padding: 12px 12px;
 }
 
 .tg-compact-table .rt-tbody .rt-td {
