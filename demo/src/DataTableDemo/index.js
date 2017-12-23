@@ -202,7 +202,7 @@ export class DataTableInstance extends React.Component {
     withSearch: true,
     withPaging: true,
     withFilter: true,
-    withSubComponent: true,
+    withSubComponent: false,
     noHeader: false,
     noFooter: false,
     noPadding: false,
