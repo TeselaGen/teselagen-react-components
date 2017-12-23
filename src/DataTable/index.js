@@ -264,6 +264,7 @@ class ReactDataTable extends React.Component {
       page,
       withDisplayOptions,
       updateColumnVisibility,
+      updateTableDisplayDensity,
       localStorageForceUpdate,
       syncDisplayOptionsToDb,
       resetDefaultVisibility,
@@ -277,6 +278,7 @@ class ReactDataTable extends React.Component {
       schema,
       filters,
       errorParsingUrlString,
+      userSpecifiedCompact,
       compact,
       compactPaging,
       entityCount,
@@ -291,11 +293,16 @@ class ReactDataTable extends React.Component {
       children
     } = computePresets(this.props);
     let updateColumnVisibilityToUse = updateColumnVisibility;
+    let updateTableDisplayDensityToUse = updateTableDisplayDensity;
     let resetDefaultVisibilityToUse = resetDefaultVisibility;
     if (withDisplayOptions && !syncDisplayOptionsToDb) {
       //little hack to make localstorage changes get reflected in UI (we force an update to get the enhancers to run again :)
       updateColumnVisibilityToUse = (...args) => {
         updateColumnVisibility(...args);
+        localStorageForceUpdate.input.onChange(Math.random());
+      };
+      updateTableDisplayDensityToUse = (...args) => {
+        updateTableDisplayDensity(...args);
         localStorageForceUpdate.input.onChange(Math.random());
       };
       resetDefaultVisibilityToUse = (...args) => {
@@ -307,7 +314,7 @@ class ReactDataTable extends React.Component {
     if (compactPaging) {
       compactClassName += " tg-compact-paging";
     }
-    if (compact) {
+    if (compact || userSpecifiedCompact) {
       compactClassName += "tg-compact-table";
     }
     const { tableId } = this.state;
@@ -491,6 +498,8 @@ class ReactDataTable extends React.Component {
                   disabled={disabled}
                   resetDefaultVisibility={resetDefaultVisibilityToUse}
                   updateColumnVisibility={updateColumnVisibilityToUse}
+                  updateTableDisplayDensity={updateTableDisplayDensityToUse}
+                  userSpecifiedCompact={userSpecifiedCompact}
                   formName={formName}
                   schema={schema}
                 />
@@ -1032,6 +1041,8 @@ export default compose(
     let resetDefaultVisibility;
     let updateColumnVisibility;
     let moveColumnPersist;
+    let updateTableDisplayDensity;
+    let userSpecifiedCompact;
     if (withDisplayOptions) {
       let tableConfig;
       if (syncDisplayOptionsToDb) {
@@ -1045,6 +1056,7 @@ export default compose(
           fieldOptions: []
         };
       }
+      userSpecifiedCompact = tableConfig.density === "compact";
       const columnOrderings = tableConfig.columnOrderings;
       fieldOptsByPath = keyBy(tableConfig.fieldOptions, "path");
       schemaToUse = {
@@ -1116,6 +1128,10 @@ export default compose(
           });
           window.localStorage.setItem(formName, JSON.stringify(tableConfig));
         };
+        updateTableDisplayDensity = function(density) {
+          tableConfig.density = density;
+          window.localStorage.setItem(formName, JSON.stringify(tableConfig));
+        };
         moveColumnPersist = function({ columnIndex, oldColumnIndex }) {
           //we might already have an array of the fields [path1, path2, ..etc]
           const columnOrderings =
@@ -1137,6 +1153,8 @@ export default compose(
       schema: schemaToUse,
       resetDefaultVisibility,
       updateColumnVisibility,
+      updateTableDisplayDensity,
+      userSpecifiedCompact,
       moveColumnPersist
     };
   }),

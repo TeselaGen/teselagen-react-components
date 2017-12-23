@@ -1,24 +1,45 @@
 //@flow
 import React from "react";
 
-import { Button, Popover, Position, Checkbox } from "@blueprintjs/core";
+import { Button, Checkbox } from "@blueprintjs/core";
+import { Popover2 } from "@blueprintjs/labs";
+
 function noop() {}
 export default class DisplayOptions extends React.Component {
+  changeTableDensity = e => {
+    const { updateTableDisplayDensity = noop } = this.props;
+    updateTableDisplayDensity(e.target.value);
+  };
+
   render() {
     const {
       schema,
       updateColumnVisibility = noop,
       resetDefaultVisibility = noop,
+      userSpecifiedCompact,
       disabled
     } = this.props;
     const { fields } = schema;
 
     let numVisible = 0;
     return (
-      <Popover
+      <Popover2
         content={
           <div style={{ padding: 10, paddingLeft: 20, paddingRight: 20 }}>
-            <h5 style={{ marginBottom: 10 }}>Displayed Columns:</h5>
+            <h5 style={{ marginBottom: 10 }}>Display Density:</h5>
+            <div className="pt-select">
+              <select onChange={this.changeTableDensity}>
+                <option selected={!userSpecifiedCompact} value="normal">
+                  Normal
+                </option>
+                <option selected={userSpecifiedCompact} value="compact">
+                  Compact
+                </option>
+              </select>
+            </div>
+            <h5 style={{ marginBottom: 10, marginTop: 10 }}>
+              Displayed Columns:
+            </h5>
             {fields.map((field, i) => {
               const { displayName, isHidden, path } = field;
               if (!isHidden) numVisible++;
@@ -57,10 +78,9 @@ export default class DisplayOptions extends React.Component {
             </div>
           </div>
         }
-        position={Position.TOP_RIGHT}
       >
         <Button disabled={disabled} className={"pt-minimal"} iconName={"cog"} />
-      </Popover>
+      </Popover2>
     );
   }
 }
