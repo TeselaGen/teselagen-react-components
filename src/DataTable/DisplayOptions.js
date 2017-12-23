@@ -6,12 +6,30 @@ import { Popover2 } from "@blueprintjs/labs";
 
 function noop() {}
 export default class DisplayOptions extends React.Component {
+  state = {
+    isOpen: false
+  };
+
+  openPopover = () => {
+    this.setState({
+      isOpen: true
+    });
+  };
+
+  closePopover = () => {
+    this.setState({
+      isOpen: false
+    });
+  };
+
   changeTableDensity = e => {
     const { updateTableDisplayDensity = noop } = this.props;
     updateTableDisplayDensity(e.target.value);
+    this.closePopover();
   };
 
   render() {
+    const { isOpen } = this.state;
     const {
       schema,
       updateColumnVisibility = noop,
@@ -24,15 +42,25 @@ export default class DisplayOptions extends React.Component {
     let numVisible = 0;
     return (
       <Popover2
+        isOpen={isOpen}
+        onClose={this.closePopover}
         content={
           <div style={{ padding: 10, paddingLeft: 20, paddingRight: 20 }}>
             <h5 style={{ marginBottom: 10 }}>Display Density:</h5>
             <div className="pt-select">
               <select onChange={this.changeTableDensity}>
-                <option selected={!userSpecifiedCompact} value="normal">
+                <option
+                  className="pt-popover-dismiss"
+                  selected={!userSpecifiedCompact}
+                  value="normal"
+                >
                   Normal
                 </option>
-                <option selected={userSpecifiedCompact} value="compact">
+                <option
+                  className="pt-popover-dismiss"
+                  selected={userSpecifiedCompact}
+                  value="compact"
+                >
                   Compact
                 </option>
               </select>
@@ -79,7 +107,12 @@ export default class DisplayOptions extends React.Component {
           </div>
         }
       >
-        <Button disabled={disabled} className={"pt-minimal"} iconName={"cog"} />
+        <Button
+          onClick={this.openPopover}
+          disabled={disabled}
+          className={"pt-minimal"}
+          iconName={"cog"}
+        />
       </Popover2>
     );
   }
