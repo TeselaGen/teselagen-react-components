@@ -1,5 +1,5 @@
 import sortify from "./sortify"; //tnr TODO: export this from json.sortify when https://github.com/ThomasR/JSON.sortify/issues/11 is resolved
-import isNumber from "lodash/isNumber";
+import { isNumber, noop } from "lodash";
 import mathExpressionEvaluator from "math-expression-evaluator";
 import deepEqual from "deep-equal";
 import React from "react";
@@ -191,13 +191,15 @@ export const renderBlueprintDateRangeInput = props => {
 };
 
 export const renderBlueprintInput = props => {
-  const { input, intent, onFieldSubmit, ...rest } = props;
+  const { input, intent, onFieldSubmit, onKeyDown = noop, ...rest } = props;
   return (
     <InputGroup
       {...removeUnwantedProps(rest)}
       intent={intent}
       {...input}
-      onKeyDown={function(e) {
+      onKeyDown={function(...args) {
+        onKeyDown(...args);
+        const e = args[0];
         if (e.key === "Enter") {
           onFieldSubmit(e.target.value, { enter: true }, e);
         }
@@ -259,7 +261,14 @@ export const renderFileUpload = props => {
 };
 
 export const renderBlueprintTextarea = props => {
-  const { input, intentClass, inputClassName, onFieldSubmit, ...rest } = props;
+  const {
+    input,
+    intentClass,
+    inputClassName,
+    onFieldSubmit,
+    onKeyDown = noop,
+    ...rest
+  } = props;
   return (
     <textarea
       {...removeUnwantedProps(rest)}
@@ -270,7 +279,9 @@ export const renderBlueprintTextarea = props => {
         input.onBlur(e, val);
         onFieldSubmit(e.target ? e.target.value : val, { blur: true }, e);
       }}
-      onKeyDown={function(e) {
+      onKeyDown={function(...args) {
+        const e = args[0];
+        onKeyDown(...args);
         if (e.keyCode === 13 && (e.metaKey || e.ctrlKey)) {
           onFieldSubmit(e.target.value, { cmdEnter: true }, e);
         }
@@ -490,7 +501,7 @@ export const renderBlueprintRadioGroup = ({
 
 function generateField(component, opts) {
   const compWithDefaultVal = withAbstractWrapper(component, opts);
-  return function FieldMaker({ name, onFieldSubmit = () => {}, ...rest }) {
+  return function FieldMaker({ name, onFieldSubmit = noop, ...rest }) {
     // function onFieldSubmit(e,val) {
     //   _onFieldSubmit && _onFieldSubmit(e.target ? e.target.value : val)
     // }
