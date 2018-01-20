@@ -38,7 +38,10 @@ function CustomTheadComponent(props) {
         {immovableColumns}
         {movableColumns.map((column, i) => {
           // keeps track of hidden columns here so columnIndex might not equal i
-          const columnIndex = stateColumns[i] ? stateColumns[i].columnIndex : i;
+          const columnIndex =
+            props.withDisplayOptions && stateColumns[i]
+              ? stateColumns[i].columnIndex
+              : i;
           return (
             <SortableItem key={`item-${columnIndex}`} index={columnIndex}>
               {column}
