@@ -243,7 +243,6 @@ export default props => {
                       style={{ fontSize: "13px" }}
                       className={"tg-upload-file-list-item-close pt-icon-cross"}
                       /* eslint-disable react/jsx-no-bind*/
-
                       onClick={() => {
                         onRemove(file, index, fileList);
                         onChange(

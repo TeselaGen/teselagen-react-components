@@ -234,6 +234,7 @@ class ReactDataTable extends React.Component {
       <SortableColumns
         {...props}
         columns={this.state.columns}
+        withDisplayOptions={withDisplayOptions}
         moveColumn={this.moveColumn}
         moveColumnPersist={moveColumnPersistToUse}
       />
