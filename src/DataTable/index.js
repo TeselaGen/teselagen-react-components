@@ -50,6 +50,7 @@ import "../toastr";
 import "./style.css";
 import withTableParams from "./utils/withTableParams";
 import SortableColumns from "./SortableColumns";
+export { PagingTool };
 
 //we use this to make adding preset prop groups simpler
 function computePresets(props) {
@@ -248,10 +249,8 @@ class ReactDataTable extends React.Component {
       searchTerm,
       setSearchTerm,
       clearFilters,
-      setPageSize,
       hidePageSizeWhenPossible,
       doNotShowEmptyRows,
-      setPage,
       withTitle,
       withSearch,
       withPaging,
@@ -260,8 +259,6 @@ class ReactDataTable extends React.Component {
       noHeader,
       noFooter,
       noPadding,
-      onRefresh,
-      page,
       withDisplayOptions,
       updateColumnVisibility,
       updateTableDisplayDensity,
@@ -507,18 +504,7 @@ class ReactDataTable extends React.Component {
               {!isInfinite &&
               withPaging &&
               (hidePageSizeWhenPossible ? entityCount > pageSize : true) ? (
-                <PagingTool
-                  paging={{
-                    total: entityCount,
-                    page,
-                    pageSize
-                  }}
-                  disabled={disabled}
-                  onRefresh={onRefresh}
-                  setPage={setPage}
-                  setPageSize={setPageSize}
-                  onPageChange={this.onPageChange}
-                />
+                <PagingTool {...computePresets(this.props)} />
               ) : null}
             </div>
           </div>
@@ -526,16 +512,6 @@ class ReactDataTable extends React.Component {
       </div>
     );
   }
-
-  onPageChange = () => {
-    const { reduxFormSelectedEntityIdMap, entities } = computePresets(
-      this.props
-    );
-    const record = get(entities, "[0]");
-    if (!record || (!record.id && record.id !== 0 && !record.code)) {
-      reduxFormSelectedEntityIdMap.input.onChange({});
-    }
-  };
 
   getTableRowProps = (state, rowInfo) => {
     const {

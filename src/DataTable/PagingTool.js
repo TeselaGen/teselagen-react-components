@@ -1,12 +1,13 @@
 //@flow
 import React from "react";
+import { withProps, withHandlers, compose } from "recompose";
 import type { Paging } from "../flow_types";
-import { noop } from "lodash";
+import { noop, get } from "lodash";
 import { Button } from "@blueprintjs/core";
 import { pageSizes } from "./utils/queryParams";
 import { onEnterOrBlurHelper } from "../utils/handlerHelpers";
 
-export default class PagingTool extends React.Component {
+export class PagingTool extends React.Component {
   static defaultProps = {
     onPageChange: noop
   };
@@ -157,3 +158,39 @@ export default class PagingTool extends React.Component {
     );
   }
 }
+
+const ConnectedPagingTool = compose(
+  withProps(props => {
+    const {
+      entityCount,
+      page,
+      pageSize,
+      disabled,
+      onRefresh,
+      setPage,
+      setPageSize
+    } = props;
+    return {
+      paging: {
+        total: entityCount,
+        page,
+        pageSize
+      },
+      disabled: disabled,
+      onRefresh: onRefresh,
+      setPage: setPage,
+      setPageSize: setPageSize,
+      onPageChange: this.onPageChange
+    };
+  }),
+  withHandlers({
+    onPageChange: ({ entities, reduxFormSelectedEntityIdMap }) => () => {
+      const record = get(entities, "[0]");
+      if (!record || (!record.id && record.id !== 0 && !record.code)) {
+        reduxFormSelectedEntityIdMap.input.onChange({});
+      }
+    }
+  })
+)(PagingTool);
+
+export default ConnectedPagingTool;
