@@ -50,7 +50,6 @@ import "../toastr";
 import "./style.css";
 import withTableParams from "./utils/withTableParams";
 import SortableColumns from "./SortableColumns";
-export { PagingTool };
 
 //we use this to make adding preset prop groups simpler
 function computePresets(props) {
@@ -939,7 +938,7 @@ class ReactDataTable extends React.Component {
  * @property {string} queryName What the props come back on ( by default = modelName + 'Query')
  */
 
-export default compose(
+const enhancer = compose(
   //connect to withTableParams here in the dataTable component so that, in the case that the table is not manually connected,
   withTableParams({
     isLocalCall: true
@@ -1145,4 +1144,9 @@ export default compose(
       "reduxFormExpandedEntityIdMap"
     ]
   })
-)(ReactDataTable);
+);
+
+export default enhancer(ReactDataTable);
+
+const ConnectedPagingTool = enhancer(PagingTool);
+export { ConnectedPagingTool };
