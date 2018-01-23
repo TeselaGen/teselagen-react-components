@@ -179,8 +179,7 @@ const ConnectedPagingTool = compose(
       disabled: disabled,
       onRefresh: onRefresh,
       setPage: setPage,
-      setPageSize: setPageSize,
-      onPageChange: this.onPageChange
+      setPageSize: setPageSize
     };
   }),
   withHandlers({
