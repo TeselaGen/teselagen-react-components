@@ -33,5 +33,5 @@ if (!window.toastr.warning) {
 }
 
 if (!window.toastr.info) {
-  window.toastr.info = generateToast();
+  window.toastr.info = generateToast(Intent.PRIMARY);
 }
