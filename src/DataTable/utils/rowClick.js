@@ -96,7 +96,8 @@ export default function rowClick(e, rowInfo, entities, props) {
             : rowInfo.index;
         range(lowRange, highRange + 1).forEach(i => {
           const recordId = entities[i] && getIdOrCodeOrIndex(entities[i], i);
-          if (recordId || recordId === 0) newIdMap[recordId] = { entity };
+          if (recordId || recordId === 0)
+            newIdMap[recordId] = { entity: entities[i] };
         });
         newIdMap = {
           ...oldIdMap,
