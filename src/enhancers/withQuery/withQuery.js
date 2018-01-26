@@ -196,7 +196,8 @@ export default function withQuery(fragment, options = {}) {
                   isLoading: data.loading,
                   entities: results,
                   entityCount: totalResults,
-                  onRefresh: data.refetch
+                  onRefresh: data.refetch,
+                  fragment
                 }
               }
             : {}),
@@ -207,7 +208,8 @@ export default function withQuery(fragment, options = {}) {
           [nameToUse + "Error"]: data.error,
           [nameToUse + "Loading"]: data.loading,
           [nameToUse + "Count"]: totalResults,
-          [camelCase("refetch_" + nameToUse)]: data.refetch
+          [camelCase("refetch_" + nameToUse)]: data.refetch,
+          fragment
         };
       },
       ...rest //overwrite defaults here

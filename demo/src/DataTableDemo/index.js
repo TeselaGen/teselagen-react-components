@@ -6,7 +6,7 @@ import { ApolloProvider, ApolloClient } from "react-apollo";
 
 // import { createStore, combineReducers } from "redux";
 // import { reducer as form } from "redux-form";
-import { withTableParams, DataTable } from "../../../src";
+import { withTableParams, DataTable, PagingTool } from "../../../src";
 import renderToggle from "../renderToggle";
 
 // import { withDelete, withUpsert, withQuery } from "../../../src";
@@ -202,7 +202,7 @@ export class DataTableInstance extends React.Component {
     withSearch: true,
     withPaging: true,
     withFilter: true,
-    withSubComponent: true,
+    withSubComponent: false,
     noHeader: false,
     noFooter: false,
     noPadding: false,
@@ -341,6 +341,11 @@ export class DataTableInstance extends React.Component {
             </div>
           </div>
         )}
+
+        PagingTool used outside of the datatable: 
+        <PagingTool {...tableParams} entities={entitiesToPass}
+            entityCount={entities.length} onRefresh={this.onRefresh}></PagingTool>
+        --------------
         <div className={"wrappingdiv"}>
           <DataTable
             {...tableParams}

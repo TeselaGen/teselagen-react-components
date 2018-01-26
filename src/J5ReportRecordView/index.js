@@ -46,27 +46,6 @@ function getWrappedInParensMatches(s) {
   return matches;
 }
 
-function processJ5OligoSynthesis(j5Oligos) {
-  return j5Oligos.map(j5Oligo => {
-    const partCids = getWrappedInParensMatches(j5Oligo.name);
-    const firstTargetPart = get(this.partCidMap, `${partCids[0]}.name`);
-    const lastTargetPart = get(this.partCidMap, `${partCids[1]}.name`);
-    return {
-      ...j5Oligo,
-      name: j5Oligo.name
-        .replace(partCids[0], firstTargetPart)
-        .replace(partCids[1], lastTargetPart),
-      firstTargetPart,
-      lastTargetPart,
-      bps: get(j5Oligo, "oligo.sequence.sequenceFragments", [])
-        .map(({ fragment }) => {
-          return fragment;
-        })
-        .join("")
-    };
-  });
-}
-
 const processJ5DirectSyntheses = j5DirectSynths =>
   j5DirectSynths.map(j5DirectSynth => {
     return {
@@ -110,7 +89,8 @@ const getInputPartsFromInputSequences = j5InputSequences =>
 
 class J5ReportRecordView extends Component {
   state = {
-    linkDialogName: undefined
+    linkDialogName: undefined,
+    partCidMap: {}
   };
   showLinkModal = name => {
     this.setState({ linkDialogName: name });
@@ -121,6 +101,27 @@ class J5ReportRecordView extends Component {
   handleLinkTabChange = name => {
     this.setState({ linkDialogName: name });
   };
+
+  processJ5OligoSynthesis(j5Oligos) {
+    return j5Oligos.map(j5Oligo => {
+      const partCids = getWrappedInParensMatches(j5Oligo.name);
+      const firstTargetPart = get(this.state.partCidMap, `${partCids[0]}.name`);
+      const lastTargetPart = get(this.state.partCidMap, `${partCids[1]}.name`);
+      return {
+        ...j5Oligo,
+        name: j5Oligo.name
+          .replace(partCids[0], firstTargetPart)
+          .replace(partCids[1], lastTargetPart),
+        firstTargetPart,
+        lastTargetPart,
+        bps: get(j5Oligo, "oligo.sequence.sequenceFragments", [])
+          .map(({ fragment }) => {
+            return fragment;
+          })
+          .join("")
+      };
+    });
+  }
 
   downloadCSV = () => {
     const entitiesForAllTables = this.getEntitiesForAllTables();
@@ -161,7 +162,7 @@ class J5ReportRecordView extends Component {
       j5RunConstructs: processJ5RunConstructs(j5RunConstructs),
       j5InputSequences: j5InputSequences,
       j5InputParts: processInputParts(j5InputParts),
-      j5OligoSyntheses: processJ5OligoSynthesis.call(this, j5OligoSyntheses),
+      j5OligoSyntheses: this.processJ5OligoSynthesis(j5OligoSyntheses),
       j5DirectSyntheses: processJ5DirectSyntheses(j5DirectSyntheses),
       j5PcrReactions: j5PcrReactions,
       j5AssemblyPieces: j5AssemblyPieces
@@ -185,6 +186,23 @@ class J5ReportRecordView extends Component {
     return startCase(assemblyMethod);
   };
 
+  createPartCidMap(props) {
+    const j5InputSequences = get(props, "data.j5Report.j5InputSequences");
+    if (!j5InputSequences) return;
+    const partCidMap = j5InputSequences.reduce((acc, s) => {
+      s.j5InputParts.forEach(p => {
+        const sequencePart = p.sequencePart;
+        if (sequencePart.cid && !acc[sequencePart.cid]) {
+          acc[sequencePart.cid.split("-")[1]] = sequencePart;
+        }
+      });
+      return acc;
+    }, {});
+    this.setState({
+      partCidMap
+    });
+  }
+
   componentWillReceiveProps = nextProps => {
     const j5InputSequences = get(nextProps, "data.j5Report.j5InputSequences");
     const oldJ5InputSequences = get(
@@ -192,17 +210,13 @@ class J5ReportRecordView extends Component {
       "data.j5Report.j5InputSequences"
     );
     if (!(j5InputSequences === oldJ5InputSequences)) {
-      this.partCidMap = j5InputSequences.reduce((acc, s) => {
-        s.j5InputParts.forEach(p => {
-          const sequencePart = p.sequencePart;
-          if (sequencePart.cid && !acc[sequencePart.cid]) {
-            acc[sequencePart.cid.split("-")[1]] = sequencePart;
-          }
-        });
-        return acc;
-      }, {});
+      this.createPartCidMap(nextProps);
     }
   };
+
+  componentWillMount() {
+    this.createPartCidMap(this.props);
+  }
 
   renderHeader = () => {
     const { data, additionalHeaderItems = "", LinkJ5TableDialog } = this.props;

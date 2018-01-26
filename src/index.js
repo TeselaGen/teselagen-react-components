@@ -3,7 +3,10 @@ import "./style.css";
 export {
   default as withSelectedEntities
 } from "./DataTable/utils/withSelectedEntities";
-export { default as DataTable } from "./DataTable";
+export {
+  default as DataTable,
+  ConnectedPagingTool as PagingTool
+} from "./DataTable";
 export { default as Loading } from "./Loading";
 export { default as DownloadLink } from "./DownloadLink";
 export { default as magicDownload } from "./DownloadLink/magicDownload";

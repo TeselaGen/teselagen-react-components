@@ -125,6 +125,19 @@ export default compose(
   }),
 )(AddToWorkQueueDialog);
 ```
+They can also be used as functions but you must pass in the apolloClient:
+
+```js
+withQuery(userFragment, {
+    asFunction: true,
+    isPlural: true,
+    client: apolloClient
+  })({
+    filter: {
+      email: newEmail
+    }
+  })
+```
 
 ## getApolloMethods (query, upsert, delete)
 ```js
