@@ -479,6 +479,7 @@ export const renderBlueprintRadioGroup = ({
   return (
     <RadioGroup
       {...input}
+      {...removeUnwantedProps(rest)}
       selectedValue={input.value}
       onChange={function(e, val, ...args) {
         input.onChange(e, val, ...args);
@@ -486,14 +487,7 @@ export const renderBlueprintRadioGroup = ({
       }}
     >
       {options.map(function({ label, value }, index) {
-        return (
-          <Radio
-            {...removeUnwantedProps(rest)}
-            key={index}
-            value={value}
-            label={label}
-          />
-        );
+        return <Radio key={index} value={value} label={label} />;
       })}
     </RadioGroup>
   );
