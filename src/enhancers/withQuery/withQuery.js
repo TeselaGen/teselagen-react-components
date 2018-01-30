@@ -5,6 +5,7 @@ import { get, upperFirst, camelCase } from "lodash";
 import React from "react";
 import deepEqual from "deep-equal";
 import compose from "lodash/fp/compose";
+import generateFragmentWithFields from "../generateFragmentWithFields";
 
 /**
  * withQuery 
@@ -22,7 +23,7 @@ import compose from "lodash/fp/compose";
  * @return {props}: {xxxxQuery, data }
  */
 
-export default function withQuery(fragment, options = {}) {
+export default function withQuery(inputFragment, options = {}) {
   const {
     isPlural,
     queryName,
@@ -41,6 +42,10 @@ export default function withQuery(fragment, options = {}) {
     showError = true,
     ...rest
   } = options;
+  let fragment = inputFragment;
+  if (Array.isArray(fragment)) {
+    fragment = generateFragmentWithFields(...fragment);
+  }
   if (typeof fragment === "string" || typeof fragment !== "object") {
     throw new Error("Please provide a valid fragment when using withQuery!");
   }
