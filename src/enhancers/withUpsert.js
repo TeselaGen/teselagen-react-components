@@ -76,6 +76,11 @@ export default function withUpsert(nameOrFragment, options = {}) {
   /* eslint-enable */
 
   const getExtraMutateArgs = (...args) => {
+    const runtimeOptions = args && args[1];
+    const extraMutateArgsToUse =
+      runtimeOptions && runtimeOptions.extraMutateArgs
+        ? runtimeOptions.extraMutateArgs
+        : extraMutateArgs;
     let extraArgs = {};
     if (invalidate) {
       if (!Array.isArray(invalidate))
@@ -84,10 +89,10 @@ export default function withUpsert(nameOrFragment, options = {}) {
         );
       extraArgs = { options: invalidateQueriesOfTypes(invalidate) };
     }
-    if (typeof extraMutateArgs === "function") {
-      extraArgs = { ...extraArgs, ...extraMutateArgs(...args) };
+    if (typeof extraMutateArgsToUse === "function") {
+      extraArgs = { ...extraArgs, ...extraMutateArgsToUse(...args) };
     } else {
-      extraArgs = { ...extraArgs, ...extraMutateArgs };
+      extraArgs = { ...extraArgs, ...extraMutateArgsToUse };
     }
     return extraArgs;
   };
