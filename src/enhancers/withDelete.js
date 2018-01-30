@@ -4,6 +4,7 @@ import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { camelCase } from "lodash";
 import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
+import generateFragmentWithFields from "./generateFragmentWithFields";
 
 /**
  * withUpsert 
@@ -29,7 +30,10 @@ export default function(nameOrFragment, options = {}) {
     asFunction,
     ...rest
   } = options;
-  const fragment = typeof nameOrFragment === "string" ? null : nameOrFragment;
+  let fragment = typeof nameOrFragment === "string" ? null : nameOrFragment;
+  if (Array.isArray(fragment)) {
+    fragment = generateFragmentWithFields(...fragment);
+  }
   const name = fragment
     ? fragment.definitions[0].typeCondition.name.value
     : nameOrFragment;
