@@ -131,7 +131,7 @@ export default function withDialog(topLevelDialogProps) {
             open &&
             (__registeredAs
               ? Object.keys(__registeredAs)[
-                  Object.keys(__registeredAs).length
+                  Object.keys(__registeredAs).length - 1
                 ] === uniqueName
               : true)
         };
