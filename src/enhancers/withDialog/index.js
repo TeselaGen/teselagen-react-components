@@ -31,11 +31,12 @@ export default function withDialog(topLevelDialogProps) {
   function dialogHoc(WrappedComponent) {
     return class DialogWrapper extends React.Component {
       componentWillUnmount() {
-        const { dispatch, dialogName } = this.props;
+        const { dispatch, dialogName, uniqueName } = this.props;
         if (dialogName) {
           dispatch({
             type: "TG_UNREGISTER_MODAL",
-            name: dialogName
+            name: dialogName,
+            uniqueName
           });
         }
       }
@@ -129,7 +130,9 @@ export default function withDialog(topLevelDialogProps) {
           isDialogOpen:
             open &&
             (__registeredAs
-              ? Object.keys(__registeredAs)[0] === uniqueName
+              ? Object.keys(__registeredAs)[
+                  Object.keys(__registeredAs).length
+                ] === uniqueName
               : true)
         };
         return newProps;
