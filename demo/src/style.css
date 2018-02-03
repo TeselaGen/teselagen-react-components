@@ -5,7 +5,14 @@
 @import url(~react-table/react-table.css);
 
 body {
-  margin: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+h1,
+h4,
+h6 {
+  font-weight: 400;
 }
 
 /* fixes issue with pt icons not showing up */

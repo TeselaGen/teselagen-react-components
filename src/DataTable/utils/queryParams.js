@@ -60,7 +60,8 @@ function safeParse(val) {
   }
 }
 function getFieldsMappedByCCDisplayName(schema) {
-  return schema.fields.reduce((acc, field) => {
+  const fieldsToUse = Array.isArray(schema) ? schema : schema.fields;
+  return fieldsToUse.reduce((acc, field) => {
     acc[camelCase(field.displayName || field.path)] = field;
     return acc;
   }, {});

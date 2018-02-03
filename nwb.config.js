@@ -1,5 +1,5 @@
 module.exports = {
-  type: 'react-component',
+  type: "react-component",
   npm: {
     esModules: true,
     umd: false
@@ -7,13 +7,14 @@ module.exports = {
   webpack: {
     uglify: false,
     extra: {
-      devtool: 'source-map'
-    },
+      devtool: "source-map",
+      module: {
+        rules: [{ test: /demo\/src\/examples\//, loader: "raw-loader" }]
+      }
+    }
   }
-}
+};
 
-
-    
 // webpack: {
 //     extra: {
 //         devtool: 'inline-source-map'
