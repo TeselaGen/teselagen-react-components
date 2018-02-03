@@ -4,6 +4,7 @@ import compose from "lodash/fp/compose";
 import gql from "graphql-tag";
 import pascalCase from "pascal-case";
 import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
+import generateFragmentWithFields from "./generateFragmentWithFields";
 
 /**
  * withUpsert 
@@ -21,6 +22,7 @@ import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
  * @property {boolean} forceUpdate - sometimes the thing you're updating might have an id field. This lets you override that. This lets you override the default behavior of creating if an id is found
  * @return upsertXXXX function that takes an object or array of objects to upsert. It returns a promise resolving to an array of created/updated outputs
  */
+
 export default function withUpsert(nameOrFragment, options = {}) {
   const {
     mutationName,
@@ -35,7 +37,10 @@ export default function withUpsert(nameOrFragment, options = {}) {
     showError = true,
     ...rest
   } = options;
-  const fragment = typeof nameOrFragment === "string" ? null : nameOrFragment;
+  let fragment = typeof nameOrFragment === "string" ? null : nameOrFragment;
+  if (Array.isArray(fragment)) {
+    fragment = generateFragmentWithFields(...fragment);
+  }
   const name = fragment
     ? fragment.definitions[0].typeCondition.name.value
     : nameOrFragment;

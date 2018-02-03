@@ -491,6 +491,7 @@ export const renderBlueprintRadioGroup = ({
       {...input}
       {...removeUnwantedProps(rest)}
       selectedValue={input.value}
+      label={undefined} //removing label from radio group because our label already handles it
       onChange={function(e, val, ...args) {
         input.onChange(e, val, ...args);
         onFieldSubmit(e.target ? e.target.value : val);
