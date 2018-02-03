@@ -32,37 +32,9 @@ class DemoNav extends Component {
       <div className="demo-nav-container">
         <h4>Components</h4>
         {Object.keys(demos).map(function(name, index) {
-          const childLinks = demos[name].childLinks;
-          let menu;
-          if (childLinks) {
-            menu = (
-              <Menu>
-                {Object.keys(childLinks).map(childKey => {
-                  return (
-                    <Link
-                      key={childKey}
-                      to={`/${name}/${childKey}`}
-                      style={{ color: "inherit", textDecoration: "none" }}
-                    >
-                      <div className={"pt-popover-dismiss pt-menu-item"}>
-                        {childKey}
-                      </div>
-                    </Link>
-                  );
-                })}
-              </Menu>
-            );
-          }
-          console.log("!menu:", !menu);
+          const childLinks = demos[name].childLinks || {};
           return (
-            <Popover
-              key={index}
-              isDisabled={!menu}
-              interactionKind={PopoverInteractionKind.HOVER}
-              position={Position.RIGHT}
-              className="demo-nav-popover"
-              content={menu}
-            >
+            <React.Fragment key={index}>
               <NavLink
                 to={`/${name}/index`}
                 activeClassName="demo-nav-link-active"
@@ -70,7 +42,19 @@ class DemoNav extends Component {
               >
                 {name}
               </NavLink>
-            </Popover>
+              {Object.keys(childLinks).map(childKey => {
+                return (
+                  <NavLink
+                    key={childKey}
+                    to={`/${name}/${childKey}`}
+                    activeClassName="demo-nav-link-active"
+                    className="demo-nav-link nested"
+                  >
+                    {childKey}
+                  </NavLink>
+                );
+              })}
+            </React.Fragment>
           );
         })}
       </div>

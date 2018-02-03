@@ -15,6 +15,12 @@
   border-left: 2px solid transparent;
 }
 
+.demo-nav-link.nested {
+  margin: 3px 20px 8px 20px;
+  font-size: 12px;
+  padding: 4px 10px;
+}
+
 .demo-nav-link-active,
 .demo-nav-link:hover {
   border-color: #006cab;

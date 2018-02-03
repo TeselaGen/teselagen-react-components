@@ -1,32 +1,59 @@
-import SimpleTableDemo from "./DataTableDemo/SimpleTableDemo";
-import WithDialogDemo from "./WithDialogDemo";
 import ReactPlayground from "./ReactPlayground";
 import CollapsibleCard from "./examples/CollapsibleCard";
+import DataTableExample from "./examples/DataTable";
+import FormComponents from "./examples/FormComponents";
+import WithDialog from "./examples/WithDialog";
+import SimpleTable from "./examples/SimpleTable";
 import InfoHelper from "./examples/InfoHelper";
 import Loading from "./examples/Loading";
 import DownloadLink from "./examples/DownloadLink";
 import DemoNav from "./DemoNav";
 import DemoHeader from "./DemoHeader";
-import { DataTable } from "../../src";
-import DataTableDemo from "./DataTableDemo";
+import { withTableParams, DataTable, PagingTool } from "../../src";
+import Uploader from "../../src/FormComponents/Uploader";
 import "./style.css";
 import React from "react";
 import { render } from "react-dom";
-import FormComponentsDemo from "./FormComponentsDemo";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, withRouter } from "react-router-dom";
 import { Provider } from "react-redux";
+import { reduxForm } from "redux-form";
 import store from "./store";
+import {
+  Dialog,
+  MenuItem,
+  FocusStyleManager,
+  Position,
+  Intent
+} from "@blueprintjs/core";
+import { ApolloProvider, ApolloClient } from "react-apollo";
+import renderToggle from "./renderToggle";
+import Chance from "chance";
+import times from "lodash/times";
+FocusStyleManager.onlyShowFocusOnTabs();
 
 const demos = {
   DataTable: {
-    withoutLive: true,
-    demo: DataTableDemo,
+    demo: DataTableExample,
+    scope: {
+      MenuItem,
+      Dialog,
+      ApolloProvider,
+      ApolloClient,
+      withTableParams,
+      DataTable,
+      PagingTool,
+      renderToggle,
+      Router,
+      withRouter,
+      store,
+      Chance,
+      times
+    },
     url:
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/DataTableDemo/index.js",
     childLinks: {
       SimpleTable: {
-        withoutLive: true,
-        demo: SimpleTableDemo,
+        demo: SimpleTable,
         url:
           "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/DataTableDemo/SimpleTableDemo.js"
       }
@@ -165,14 +192,20 @@ const demos = {
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/DownloadLinkDemo/index.js"
   },
   FormComponents: {
-    demo: FormComponentsDemo,
-    withoutLive: true,
+    demo: FormComponents,
+    scope: {
+      Position,
+      Intent,
+      Provider,
+      store,
+      reduxForm,
+      Uploader
+    },
     url:
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/FormComponentsDemo/index.js"
   },
   withDialog: {
-    demo: WithDialogDemo,
-    withoutLive: true,
+    demo: WithDialog,
     url:
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/WithDialogDemo/index.js"
   }
@@ -203,13 +236,11 @@ const demoPropsSchema = [
 ];
 
 function DemoComponentWrapper(
-  { demo: Demo, scope, withoutLive, url, props = [] },
+  { demo: Demo, scope, url, props = [] },
   demoTitle
 ) {
   return () => {
-    const component = withoutLive ? (
-      <Demo />
-    ) : (
+    const component = (
       <div>
         <ReactPlayground codeText={Demo} scope={scope} />
         {!!props.length && (
