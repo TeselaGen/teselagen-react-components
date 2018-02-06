@@ -69,7 +69,7 @@
     "tg-client-query-builder": "^2.6.0"
   },
   "devDependencies": {
-    "@blueprintjs/core": "^1.35.0",
+    "@blueprintjs/core": "^1.35.2",
     "@blueprintjs/datetime": "^1.25.1",
     "@blueprintjs/labs": "^0.14.1",
     "@blueprintjs/table": "^1.31.0",
