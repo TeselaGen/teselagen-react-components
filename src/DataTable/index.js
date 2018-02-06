@@ -105,6 +105,7 @@ class ReactDataTable extends React.Component {
     isLoading: false,
     disabled: false,
     noSelect: false,
+    noUserSelect: false,
     maxHeight: 800,
     isSimple: false,
     reduxFormSearchInput: {},
@@ -574,6 +575,7 @@ class ReactDataTable extends React.Component {
       reduxFormSelectedEntityIdMap,
       isSingleSelect,
       noSelect,
+      noUserSelect,
       entities,
       isEntityDisabled
     } = computePresets(this.props);
@@ -598,7 +600,7 @@ class ReactDataTable extends React.Component {
       <div>
         {!isSingleSelect && (
           <Checkbox
-            disabled={noSelect}
+            disabled={noSelect || noUserSelect}
             /* eslint-disable react/jsx-no-bind */
             onChange={() => {
               const newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
@@ -633,6 +635,7 @@ class ReactDataTable extends React.Component {
       reduxFormSelectedEntityIdMap,
       isSingleSelect,
       noSelect,
+      noUserSelect,
       entities,
       isEntityDisabled
     } = computePresets(this.props);
@@ -652,7 +655,7 @@ class ReactDataTable extends React.Component {
     return (
       <div className={"tg-react-table-checkbox-cell"} style={{ width: 40 }}>
         <Checkbox
-          disabled={noSelect || isEntityDisabled(entity)}
+          disabled={noSelect || noUserSelect || isEntityDisabled(entity)}
           /* eslint-disable react/jsx-no-bind*/
           onChange={e => {
             let newIdMap = reduxFormSelectedEntityIdMap.input.value || {};

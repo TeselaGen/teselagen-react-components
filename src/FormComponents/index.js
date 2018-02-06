@@ -342,14 +342,24 @@ export const renderReactSelect = props => {
     options: optsToUse,
     value: valueToUse,
     closeOnSelect: !rest.multi,
-    onChange(valOrVals, ...rest) {
+    onChange(valOrVals, ...rest2) {
       const valToPass = Array.isArray(valOrVals)
         ? valOrVals.map(function(val) {
             return val.value;
           })
         : valOrVals ? valOrVals.value : "";
-      onChange(valToPass, ...rest);
-      onFieldSubmit(valToPass);
+      onChange(valToPass, ...rest2);
+      if (!rest.submitOnBlur) onFieldSubmit(valToPass);
+    },
+    onBlur() {
+      const valToPass = Array.isArray(valueToUse)
+        ? valueToUse.filter(val => !!val).map(function(val) {
+            return val.value;
+          })
+        : valueToUse ? valueToUse.value : "";
+      if (rest.submitOnBlur) {
+        onFieldSubmit(valToPass);
+      }
     }
   };
   return async ? <Select.Async {...propsToUse} /> : <Select {...propsToUse} />;
