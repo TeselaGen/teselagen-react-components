@@ -203,26 +203,43 @@ function getSubFilter(
 
   if (ccSelectedFilter === "startsWith") {
     return qb
-      ? qb.startsWith(filterValue)
+      ? qb.startsWith(filterValue) //filter using qb (aka we're backend connected)
       : fieldVal => {
+          //filter using plain old javascript (aka we've got a local table that isn't backend connected)
           if (!fieldVal || !fieldVal.toLowerCase) return false;
           return startsWith(fieldVal.toLowerCase(), filterValLower);
         };
   } else if (ccSelectedFilter === "endsWith") {
     return qb
-      ? qb.endsWith(filterValue)
+      ? qb.endsWith(filterValue) //filter using qb (aka we're backend connected)
       : fieldVal => {
+          //filter using plain old javascript (aka we've got a local table that isn't backend connected)
           if (!fieldVal || !fieldVal.toLowerCase) return false;
           return endsWith(fieldVal.toLowerCase(), filterValLower);
         };
   } else if (ccSelectedFilter === "contains") {
     return qb
-      ? qb.contains(filterValue)
+      ? qb.contains(filterValue) //filter using qb (aka we're backend connected)
       : fieldVal => {
+          //filter using plain old javascript (aka we've got a local table that isn't backend connected)
           if (!fieldVal || !fieldVal.toLowerCase) return false;
           return (
             fieldVal.toLowerCase().replace(filterValLower, "") !==
             fieldVal.toLowerCase()
+          );
+        };
+  } else if (ccSelectedFilter === "inList") {
+    const filterValueToUse =
+      filterValue && filterValue.split && filterValue.split(".");
+    return qb
+      ? qb.inList(filterValueToUse) //filter using qb (aka we're backend connected)
+      : fieldVal => {
+          //filter using plain old javascript (aka we've got a local table that isn't backend connected)
+          if (!fieldVal || !fieldVal.toLowerCase) return false;
+          return (
+            filterValueToUse
+              .map(val => val && val.toLowerCase())
+              .indexOf(fieldVal.toLowerCase()) > -1
           );
         };
   } else if (ccSelectedFilter === "isExactly") {
@@ -233,14 +250,16 @@ function getSubFilter(
         };
   } else if (ccSelectedFilter === "true") {
     return qb
-      ? qb.equals(true)
+      ? qb.equals(true) //filter using qb (aka we're backend connected)
       : fieldVal => {
+          //filter using plain old javascript (aka we've got a local table that isn't backend connected)
           return !!fieldVal;
         };
   } else if (ccSelectedFilter === "false") {
     return qb
-      ? qb.equals(false)
+      ? qb.equals(false) //filter using qb (aka we're backend connected)
       : fieldVal => {
+          //filter using plain old javascript (aka we've got a local table that isn't backend connected)
           return !fieldVal;
         };
   } else if (ccSelectedFilter === "isBetween") {
@@ -317,7 +336,7 @@ function stringifyFilters(newParams) {
         acc +=
           (index > 0 ? "___" : "") +
           `${filterOn}__${camelCase(selectedFilter)}__${safeStringify(
-            filterValue
+            Array.isArray(filterValue) ? filterValue.join(".") : filterValue
           )}`;
         return acc;
       },

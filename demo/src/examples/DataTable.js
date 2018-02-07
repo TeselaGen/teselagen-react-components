@@ -159,7 +159,7 @@ const generateFakeRows = num => {
       user: {
         lastName: chance.name(),
         status: {
-          name: chance.pickone(["pending", "added"])
+          name: chance.pickone(["pending", "added", "confirmed"])
         }
       },
       type: "denicolaType",
