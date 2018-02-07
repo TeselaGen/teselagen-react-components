@@ -1,5 +1,5 @@
 import { uniqueId } from "lodash";
-import { gql } from "react-apollo";
+import { gql } from "graphql-tag";
 
 /* eslint graphql/template-strings:0 */
 export default (model, fields, fragments = []) =>
