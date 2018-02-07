@@ -474,22 +474,19 @@ class ReactDataTable extends React.Component {
         {!noFooter && (
           <div
             className={"data-table-footer"}
-            style={{
-              justifyContent:
-                isSingleSelect || hideSelectedCount
-                  ? "flex-end"
-                  : "space-between"
-            }}
+            style={{ justifyContent: "space-between" }}
           >
-            {!noSelect &&
-              !isSingleSelect &&
-              !hideSelectedCount && (
-                <div className={"tg-react-table-selected-count"}>
-                  {`${selectedRowCount} Record${selectedRowCount === 1
-                    ? ""
-                    : "s"} Selected `}
-                </div>
-              )}
+            <div className={"tg-react-table-selected-count"}>
+              {!noSelect &&
+                !isSingleSelect &&
+                !hideSelectedCount &&
+                `${selectedRowCount} Record${selectedRowCount === 1
+                  ? ""
+                  : "s"} Selected | `}
+              {`${entityCount} ${entityCount === 1
+                ? "Record"
+                : "Total Records"}`}
+            </div>
             <div style={{ display: "flex", flexWrap: "wrap" }}>
               {withDisplayOptions && (
                 <DisplayOptions
@@ -935,7 +932,7 @@ class ReactDataTable extends React.Component {
 }
 
 /**
- * @param {options} options 
+ * @param {options} options
  * @typedef {object} options
  * @property {boolean} isPlural Are we searching for 1 thing or many?
  * @property {string} queryName What the props come back on ( by default = modelName + 'Query')
