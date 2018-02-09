@@ -60,10 +60,10 @@ class AbstractInput extends React.Component {
     const {
       meta: { dispatch, form },
       defaultValue,
+      enableReinitialize,
       input: { name, value }
     } = this.props;
-    value !== false &&
-      !value &&
+    ((value !== false && !value) || enableReinitialize) &&
       defaultValue !== undefined &&
       dispatch({
         type: "@@redux-form/CHANGE",
@@ -289,6 +289,13 @@ export const renderBlueprintTextarea = props => {
     />
   );
 };
+
+class ClickToEditWrapper extends React.Component {
+  state = { isEditing: false };
+  render() {
+    return <div />;
+  }
+}
 
 export const renderBlueprintEditableText = props => {
   const { input, onFieldSubmit, ...rest } = props;
