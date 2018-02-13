@@ -4,7 +4,7 @@ services:
     restart: always
     working_dir: /app
     container_name: teselagen-components
-    image: mhart/alpine-node:6
+    image: mhart/alpine-node:9.5
     ports:
       - "3333:3333"
       - "9001:9001"
