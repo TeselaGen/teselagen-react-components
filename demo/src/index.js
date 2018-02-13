@@ -14,7 +14,12 @@ import Uploader from "../../src/FormComponents/Uploader";
 import "./style.css";
 import React from "react";
 import { render } from "react-dom";
-import { BrowserRouter as Router, Route, withRouter } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  withRouter,
+  Redirect
+} from "react-router-dom";
 import { Provider } from "react-redux";
 import { reduxForm } from "redux-form";
 import store from "./store";
@@ -297,29 +302,38 @@ const Demo = () => {
           >
             <DemoNav demos={demos} />
             <div style={{ margin: 15, width: "100%" }}>
+              <Route
+                exact
+                path="/"
+                render={() => <Redirect to={Object.keys(demos)[0]} />}
+              />
               {Object.keys(demos).map(function(key, index) {
                 const demo = demos[key];
                 return (
                   <React.Fragment key={key}>
                     <Route
-                      path={`/${key}/index`}
+                      exact
+                      path={`/${key}`}
                       url={demo.url}
                       component={DemoComponentWrapper(demo, key)}
                     />
-                    {Object.keys(
-                      demo.childLinks || []
-                    ).map((childKey, index2) => {
-                      const childDemo = demo.childLinks[childKey];
-                      return (
-                        <Route
-                          exact
-                          key={key + childKey + index + index2}
-                          path={`/${key}/${childKey}`}
-                          url={childDemo.url}
-                          component={DemoComponentWrapper(childDemo, childKey)}
-                        />
-                      );
-                    })}
+                    {Object.keys(demo.childLinks || []).map(
+                      (childKey, index2) => {
+                        const childDemo = demo.childLinks[childKey];
+                        return (
+                          <Route
+                            exact
+                            key={key + childKey + index + index2}
+                            path={`/${key}/${childKey}`}
+                            url={childDemo.url}
+                            component={DemoComponentWrapper(
+                              childDemo,
+                              childKey
+                            )}
+                          />
+                        );
+                      }
+                    )}
                   </React.Fragment>
                 );
               })}

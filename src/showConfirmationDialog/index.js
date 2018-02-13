@@ -1,6 +1,6 @@
 //@flow
 import React, { Component } from "react";
-import { Alert } from "@blueprintjs/core";
+import { Alert, Intent } from "@blueprintjs/core";
 import ReactDOM from "react-dom";
 
 export function renderOnDoc(fn) {
@@ -33,11 +33,13 @@ class AlertWrapper extends Component {
       onCancel = () => {},
       cancelButtonText = "Cancel",
       onConfirm = () => {},
+      intent = Intent.PRIMARY,
       ...rest
     } = this.props;
     return (
       <Alert
         isOpen={this.state.isOpen}
+        intent={intent}
         onCancel={(...args) => {
           handleClose();
           this.setState({ isOpen: false });

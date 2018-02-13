@@ -3,13 +3,9 @@
   "version": "19.1.41",
   "description": "Teselagen React Component Library",
   "main": "lib/index.js",
+  "homepage": "http://teselagen.github.io/teselagen-react-components",
   "//module": "es/index.js",
-  "files": [
-    "css",
-    "es",
-    "lib",
-    "umd"
-  ],
+  "files": ["css", "es", "lib", "umd"],
   "scripts": {
     "build": "nwb build-react-component --copy-files --no-demo",
     "buildWithDemo": "nwb build-react-component --copy-files",
@@ -18,14 +14,18 @@
     "start": "nwb serve-react-demo --port 3333",
     "precommit": "lint-staged",
     "prepublish": "in-publish && npm run build || not-in-publish",
+    "predeploy": "nwb build-demo",
+    "deploy": "gh-pages -d demo/dist",
     "fontopen": "make fontopen",
     "fontsave": "make fontsave",
     "test": "jest --env=jsdom --maxWorkers 2",
     "test-coverage": "yarn test -- --coverage",
     "test:staged": "cross-env CI=true yarn test -- --findRelatedTests",
-    "test-fix": "git reset . && cross-env CI=true yarn test --onlyChanged --updateSnapshot",
+    "test-fix":
+      "git reset . && cross-env CI=true yarn test --onlyChanged --updateSnapshot",
     "test-watch": "yarn test -- --watch",
-    "test-debug": "node --inspect --debug-brk ./node_modules/.bin/jest src --runInBand "
+    "test-debug":
+      "node --inspect --debug-brk ./node_modules/.bin/jest src --runInBand "
   },
   "dependencies": {
     "classnames": "^2.2.5",
@@ -83,20 +83,21 @@
     "enzyme": "^3.1.0",
     "enzyme-adapter-react-16": "^1.0.2",
     "enzyme-to-json": "^3.1.4",
-    "eslint": "^4.10.0",
-    "eslint-config-react-app": "^2.0.1",
-    "eslint-config-teselagen": "^4.0.9",
+    "eslint": "^4.17.0",
+    "eslint-config-react-app": "^2.1.0",
+    "eslint-config-teselagen": "^4.0.11",
     "eslint-loader": "^1.7.1",
-    "eslint-plugin-flowtype": "^2.34.0",
+    "eslint-plugin-flowtype": "^2.42.0",
     "eslint-plugin-import": "^2.3.0",
-    "eslint-plugin-react": "^7.0.1",
+    "eslint-plugin-react": "^7.6.1",
+    "gh-pages": "^1.1.0",
     "husky": "^0.14.3",
     "identity-obj-proxy": "^3.0.0",
     "in-publish": "^2.0.0",
     "jest": "^21.2.1",
     "lint-staged": "^4.1.0",
-    "nwb": "^0.19.0",
-    "prettier": "^1.6.1",
+    "nwb": "^0.21.5",
+    "prettier": "^1.10.2",
     "raw-loader": "^0.5.1",
     "react": "^16.2.0",
     "react-addons-css-transition-group": "^15.6.0",
@@ -121,36 +122,20 @@
       "yarn test:staged",
       "git add"
     ],
-    "*.css": [
-      "prettier --write",
-      "git add"
-    ]
+    "*.css": ["prettier --write", "git add"]
   },
   "jest": {
     "moduleNameMapper": {
       "\\.(css|scss|png)$": "identity-obj-proxy"
     },
-    "snapshotSerializers": [
-      "<rootDir>/node_modules/enzyme-to-json/serializer"
-    ],
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/lib/",
-      "/es/"
-    ],
+    "snapshotSerializers": ["<rootDir>/node_modules/enzyme-to-json/serializer"],
+    "testPathIgnorePatterns": ["/node_modules/", "/lib/", "/es/"],
     "setupTestFrameworkScriptFile": "<rootDir>/setupTests.js"
   },
   "license": "MIT",
   "repository": "https://github.com/TeselaGen/teselagen-react-components",
-  "keywords": [
-    "react-component",
-    "teselagen"
-  ],
+  "keywords": ["react-component", "teselagen"],
   "babel": {
-    "presets": [
-      "es2015",
-      "stage-0",
-      "react"
-    ]
+    "presets": ["es2015", "stage-0", "react"]
   }
 }

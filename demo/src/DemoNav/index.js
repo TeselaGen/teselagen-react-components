@@ -36,7 +36,8 @@ class DemoNav extends Component {
           return (
             <React.Fragment key={index}>
               <NavLink
-                to={`/${name}/index`}
+                exact
+                to={`/${name}`}
                 activeClassName="demo-nav-link-active"
                 className="demo-nav-link"
               >
@@ -45,6 +46,7 @@ class DemoNav extends Component {
               {Object.keys(childLinks).map(childKey => {
                 return (
                   <NavLink
+                    exact
                     key={childKey}
                     to={`/${name}/${childKey}`}
                     activeClassName="demo-nav-link-active"
