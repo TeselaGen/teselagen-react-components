@@ -15,7 +15,7 @@ import "./style.css";
 import React from "react";
 import { render } from "react-dom";
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Route,
   withRouter,
   Redirect

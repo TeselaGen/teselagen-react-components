@@ -31,10 +31,19 @@ export default class Card extends Component {
 
   render() {
     const { open }: State = this.state;
-    const { title, iconName, icon, openTitleElements }: Props = this.props;
+    const {
+      title,
+      iconName,
+      icon,
+      openTitleElements,
+      noCard = false
+    }: Props = this.props;
     return (
       <div
-        className={classNames("tg-card", { open }, this.props.className)}
+        className={classNames(
+          { "tg-card": !noCard, open },
+          this.props.className
+        )}
         style={{
           paddingTop: 10,
           paddingBottom: 10,

@@ -157,7 +157,8 @@ function getEntitiesForGivenFilter(entities, filter, ccFields) {
 function getFiltersFromSearchTerm(searchTerm, schema) {
   const searchTermFilters = [];
   if (searchTerm) {
-    schema.fields.forEach(field => {
+    const fields = Array.isArray(schema) ? schema : schema.fields;
+    fields.forEach(field => {
       const { type, displayName, path, searchDisabled } = field;
       if (searchDisabled || field.filterDisabled) return;
       const nameToUse = camelCase(displayName || path);

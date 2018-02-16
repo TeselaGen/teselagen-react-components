@@ -448,7 +448,8 @@ class ReactDataTable extends React.Component {
           TheadComponent={this.getTheadComponent}
           getTrGroupProps={this.getTableRowProps}
           NoDataComponent={({ children }) =>
-            isLoading ? null : <div className="rt-noData">{children}</div>}
+            isLoading ? null : <div className="rt-noData">{children}</div>
+          }
           LoadingComponent={props => (
             <DisabledLoadingComponent {...{ ...props, disabled }} />
           )}
@@ -485,9 +486,9 @@ class ReactDataTable extends React.Component {
               !isSingleSelect &&
               !hideSelectedCount && (
                 <div className={"tg-react-table-selected-count"}>
-                  {`${selectedRowCount} Record${selectedRowCount === 1
-                    ? ""
-                    : "s"} Selected `}
+                  {`${selectedRowCount} Record${
+                    selectedRowCount === 1 ? "" : "s"
+                  } Selected `}
                 </div>
               )}
             <div style={{ display: "flex", flexWrap: "wrap" }}>
@@ -835,7 +836,9 @@ class ReactDataTable extends React.Component {
       sortDisabled || (typeof path === "string" && path.indexOf(".") > -1);
     const columnDataType = schemaForField.type;
     const isActionColumn = columnDataType === "action";
-    const ccDisplayName = isActionColumn ? "" : camelCase(displayName || path);
+    const ccDisplayName = camelCase(displayName || path);
+    let columnTitle = displayName || startCase(path);
+    if (isActionColumn) columnTitle = "";
     const currentFilter =
       filters &&
       filters.length &&
@@ -918,13 +921,8 @@ class ReactDataTable extends React.Component {
     return (
       <div className={"tg-react-table-column-header"}>
         {(displayName || startCase(path)) && (
-          <span
-            title={displayName || startCase(path)}
-            className={"tg-react-table-name"}
-          >
-            {renderTitleInner
-              ? renderTitleInner
-              : (displayName || startCase(path)) + "  "}
+          <span title={columnTitle} className={"tg-react-table-name"}>
+            {renderTitleInner ? renderTitleInner : columnTitle}
           </span>
         )}
         {sortComponent}
@@ -935,7 +933,7 @@ class ReactDataTable extends React.Component {
 }
 
 /**
- * @param {options} options 
+ * @param {options} options
  * @typedef {object} options
  * @property {boolean} isPlural Are we searching for 1 thing or many?
  * @property {string} queryName What the props come back on ( by default = modelName + 'Query')
@@ -1100,11 +1098,15 @@ const enhancer = compose(
         resetDefaultVisibility = function() {
           window.localStorage.removeItem(formName);
         };
-        updateColumnVisibility = function({ path, shouldShow }) {
-          tableConfig.fieldOptions = toArray({
-            ...fieldOptsByPath,
-            [path]: { path, isHidden: !shouldShow }
+        updateColumnVisibility = function({ path, paths, shouldShow }) {
+          const newFieldOpts = {
+            ...fieldOptsByPath
+          };
+          let pathsToUse = paths ? paths : [path];
+          pathsToUse.forEach(path => {
+            newFieldOpts[path] = { path, isHidden: !shouldShow };
           });
+          tableConfig.fieldOptions = toArray(newFieldOpts);
           window.localStorage.setItem(formName, JSON.stringify(tableConfig));
         };
         updateTableDisplayDensity = function(density) {

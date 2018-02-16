@@ -8,9 +8,9 @@ import compose from "lodash/fp/compose";
 import generateFragmentWithFields from "../generateFragmentWithFields";
 
 /**
- * withQuery 
+ * withQuery
  * @param {gql fragment} fragment supply a fragment as the first argument
- * @param {options} options 
+ * @param {options} options
  * @typedef {object} options
  * @property {boolean} isPlural Are we searching for 1 thing or many?
  * @property {string} queryName What the props come back on ( by default = modelName + 'Query')
@@ -194,7 +194,7 @@ export default function withQuery(inputFragment, options = {}) {
         };
 
         return {
-          ...(tableParams && !tableParams.entities
+          ...(tableParams && !tableParams.entities && !tableParams.isLoading
             ? {
                 tableParams: {
                   ...tableParams,
