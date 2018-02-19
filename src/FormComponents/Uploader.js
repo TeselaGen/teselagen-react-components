@@ -18,7 +18,7 @@ export default props => {
     action,
     className = "",
     fileLimit,
-    readBeforeUpload,
+    readBeforeUpload, //read the file using the browser's FileReader before passing it to onChange and/or uploading it
     uploadInBulk, //tnr: not yet implemented
     showUploadList = true,
     beforeUpload,
