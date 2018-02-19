@@ -1,7 +1,7 @@
 
 # TeselaGen-React-Components
 
-Demo: https://teselagen.github.io
+Demo: https://teselagen.github.io/teselagen-react-components/
 
 
 [![CircleCI](https://circleci.com/gh/TeselaGen/teselagen-react-components/tree/master.svg?style=shield)](https://circleci.com/gh/TeselaGen/teselagen-react-components/tree/master)
