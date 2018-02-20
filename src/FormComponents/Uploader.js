@@ -84,6 +84,7 @@ export default props => {
                   ...files.map(file => {
                     return {
                       originFileObj: file,
+                      originalFileObj: file,
                       id: file.id,
                       lastModified: file.lastModified,
                       lastModifiedDate: file.lastModifiedDate,
