@@ -15,11 +15,11 @@ import { branch } from "recompose";
 
 /**
  *  Note all these options can be passed at Design Time or at Runtime (like reduxForm())
- * 
+ *
  * @export
- * 
- * @param {compOrOpts} compOrOpts  
- * @typedef {object} compOrOpts  
+ *
+ * @param {compOrOpts} compOrOpts
+ * @typedef {object} compOrOpts
  * @property {*string} formName - required unique identifier for the table
  * @property {*boolean} schema - The data table schema
  * @property {boolean} urlConnected - whether the table should connect to/update the URL
@@ -153,7 +153,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
     let setNewParams;
     if (urlConnected) {
       setNewParams = function(newParams) {
-        setCurrentParamsOnUrl(newParams, history.push);
+        setCurrentParamsOnUrl(newParams, history.replace);
         dispatch(change(formName, "reduxFormQueryParams", newParams)); //we always will update the redux params as a workaround for withRouter not always working if inside a redux-connected container https://github.com/ReactTraining/react-router/issues/5037
       };
     } else {

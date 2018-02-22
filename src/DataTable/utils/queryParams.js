@@ -144,10 +144,10 @@ function filterEntitiesLocal(filters = [], searchTerm, entities, schema) {
 function getEntitiesForGivenFilter(entities, filter, ccFields) {
   const { filterOn, filterValue, selectedFilter } = filter;
   const field = ccFields[filterOn];
-  const { path } = field;
+  const { path, getValue } = field;
   const subFilter = getSubFilter(false, selectedFilter, filterValue);
   entities = entities.filter(entity => {
-    const fieldVal = get(entity, path);
+    const fieldVal = getValue ? getValue(entity) : get(entity, path);
     const shouldKeep = subFilter(fieldVal);
     return shouldKeep;
   });
@@ -322,9 +322,9 @@ export function getCurrentParamsFromUrl(location) {
   const { search } = location;
   return parseFilters(queryString.parse(search));
 }
-export function setCurrentParamsOnUrl(newParams, push) {
+export function setCurrentParamsOnUrl(newParams, replace) {
   const stringifiedFilters = stringifyFilters(newParams);
-  push({
+  replace({
     search: `?${queryString.stringify(stringifiedFilters)}`
   });
 }

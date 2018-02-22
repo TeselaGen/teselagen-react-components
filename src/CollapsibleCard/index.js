@@ -14,7 +14,7 @@ type State = {
   open: boolean
 };
 
-export default class Card extends Component {
+export default class CollapsibleCard extends Component {
   state = {
     open: true
   };

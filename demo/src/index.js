@@ -128,6 +128,11 @@ const demos = {
         description: "Items to be displayed in header when card is open"
       },
       {
+        name: "noCard",
+        description: "Removes card styling",
+        type: "boolean"
+      },
+      {
         name: "children",
         type: "React Element",
         description: "Content of the card when open"
