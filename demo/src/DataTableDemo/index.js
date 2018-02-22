@@ -211,6 +211,7 @@ export class DataTableInstance extends React.Component {
     isSingleSelect: false,
     maxHeight: false,
     isLoading: false,
+    showCount: false,
     disabled: false,
     compact: false,
     hidePageSizeWhenPossible: false,
@@ -317,6 +318,7 @@ export class DataTableInstance extends React.Component {
         {renderToggle(this, "withCheckboxes")}
         {renderToggle(this, "isSingleSelect")}
         {renderToggle(this, "hideSelectedCount")}
+        {renderToggle(this, "showCount")}
         {renderToggle(this, "compact")}
         {renderToggle(
           this,

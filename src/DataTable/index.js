@@ -115,6 +115,7 @@ class ReactDataTable extends React.Component {
     isEntityDisabled: noop,
     setSearchTerm: noop,
     setFilter: noop,
+    showCount: false,
     clearFilters: noop,
     setPageSize: noop,
     setOrder: noop,
@@ -281,6 +282,7 @@ class ReactDataTable extends React.Component {
       compact,
       compactPaging,
       entityCount,
+      showCount,
       isSingleSelect,
       noSelect,
       SubComponent,
@@ -492,6 +494,10 @@ class ReactDataTable extends React.Component {
                   } Selected `}
                 </div>
               )}
+            {showCount &&
+              `${entityCount} ${
+                entityCount === 1 ? "Record" : "Total Records"
+              }`}
             <div style={{ display: "flex", flexWrap: "wrap" }}>
               {withDisplayOptions && (
                 <DisplayOptions
