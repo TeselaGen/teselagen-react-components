@@ -3,7 +3,7 @@ import React from "react";
 import { Dialog } from "@blueprintjs/core";
 import { connect } from "react-redux";
 import { lifecycle } from "recompose";
-import { uniqueId } from "lodash";
+import uniqid from "uniqid";
 
 /**
  * usage:
@@ -11,22 +11,23 @@ import { uniqueId } from "lodash";
  * compose(
  *   withDialog({ title: "Select Aliquot(s) From", other bp dialog props here  })
  * )
- * 
+ *
  * in react component
  * import MyDialogEnhancedComponent from "./MyDialogEnhancedComponent"
- * 
+ *
  * render() {
  *  return <div>
  *    <MyDialogEnhancedComponent
  *      dialogProps={} //bp dialog overrides can go here
  *      dialogName={string} **OPTIONAL** a unique dialog name can optionally be passed
- *      target={<button>Open Dialog</button> } //target can also be passed as a child component 
+ *      target={<button>Open Dialog</button> } //target can also be passed as a child component
  *      myRandomProp={'yuppp'} //pass any other props like normal to the component
- *      
+ *
  *    />
  *  </div>
  * }
  */
+
 export default function withDialog(topLevelDialogProps) {
   function dialogHoc(WrappedComponent) {
     return class DialogWrapper extends React.Component {
@@ -105,7 +106,7 @@ export default function withDialog(topLevelDialogProps) {
     lifecycle({
       componentWillMount: function() {
         const { dispatch, dialogName } = this.props;
-        const uniqueName = uniqueId();
+        const uniqueName = uniqid();
         const nameToUse = dialogName || uniqueName;
         this.setState({
           nameToUse,

@@ -4,7 +4,7 @@ import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { camelCase } from "lodash";
 import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
-import generateFragmentWithFields from "./generateFragmentWithFields";
+import generateFragmentWithFields from "../utils/generateFragmentWithFields";
 
 /**
  * withUpsert 

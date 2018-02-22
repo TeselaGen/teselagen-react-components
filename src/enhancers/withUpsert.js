@@ -4,15 +4,15 @@ import compose from "lodash/fp/compose";
 import gql from "graphql-tag";
 import pascalCase from "pascal-case";
 import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
-import generateFragmentWithFields from "./generateFragmentWithFields";
+import generateFragmentWithFields from "../utils/generateFragmentWithFields";
 
 /**
- * withUpsert 
+ * withUpsert
  * @param {string | gql fragment} nameOrFragment supply either a name or a top-level fragment
- * @param {options} options 
+ * @param {options} options
  * @typedef {object} options
  * @property {string} mutationName - optional rename of the default upsert function withXXXX to whatever you want
- * @property {[queryNameStrings]} refetchQueries - 
+ * @property {[queryNameStrings]} refetchQueries -
  * @property {boolean} showError - default=true -- whether or not to show a default error message on failure
  * @property {obj | function} extraMutateArgs - obj or function that returns obj to get passed to the actual mutation call
  * @property {[string]} invalidate - array of model types to invalidate after the mutate
@@ -218,9 +218,9 @@ export default function withUpsert(nameOrFragment, options = {}) {
             .catch(e => {
               if (showError) {
                 window.toastr.error(
-                  `Error ${isUpdate
-                    ? "updating"
-                    : "creating"} ${pascalCaseName}`
+                  `Error ${
+                    isUpdate ? "updating" : "creating"
+                  } ${pascalCaseName}`
                 );
                 console.error(`withUpsert ${pascalCaseName} Error:`, e);
               }

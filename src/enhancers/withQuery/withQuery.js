@@ -5,7 +5,7 @@ import { get, upperFirst, camelCase } from "lodash";
 import React from "react";
 import deepEqual from "deep-equal";
 import compose from "lodash/fp/compose";
-import generateFragmentWithFields from "../generateFragmentWithFields";
+import generateFragmentWithFields from "../../utils/generateFragmentWithFields";
 
 /**
  * withQuery
