@@ -26,6 +26,7 @@ import { branch } from "recompose";
  * @property {boolean} withSelectedEntities - whether or not to pass the selected entities
  * @property {object} defaults - tableParam defaults such as pageSize, filter, etc
  */
+import convertSchema from "./convertSchema";
 
 export default function withTableParams(compOrOpts, pTopLevelOpts) {
   let topLevelOptions;
@@ -115,7 +116,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         entities: ownProps.entities, // for local table
         urlConnected,
         defaults,
-        schema,
+        schema: convertSchema(schema),
         isInfinite: isInfinite || isSimple,
         isLocalCall,
         additionalFilter: additionalFilterToUse

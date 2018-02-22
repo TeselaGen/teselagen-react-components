@@ -60,8 +60,7 @@ function safeParse(val) {
   }
 }
 function getFieldsMappedByCCDisplayName(schema) {
-  const fieldsToUse = Array.isArray(schema) ? schema : schema.fields;
-  return fieldsToUse.reduce((acc, field) => {
+  return schema.fields.reduce((acc, field) => {
     acc[camelCase(field.displayName || field.path)] = field;
     return acc;
   }, {});
@@ -157,8 +156,7 @@ function getEntitiesForGivenFilter(entities, filter, ccFields) {
 function getFiltersFromSearchTerm(searchTerm, schema) {
   const searchTermFilters = [];
   if (searchTerm) {
-    const fields = Array.isArray(schema) ? schema : schema.fields;
-    fields.forEach(field => {
+    schema.fields.forEach(field => {
       const { type, displayName, path, searchDisabled } = field;
       if (searchDisabled || field.filterDisabled) return;
       const nameToUse = camelCase(displayName || path);

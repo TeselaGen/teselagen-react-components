@@ -46,6 +46,7 @@ import withDelete from "../enhancers/withDelete";
 import withFields from "../enhancers/withFields";
 import fieldOptionFragment from "./utils/fieldOptionFragment";
 import DisabledLoadingComponent from "./DisabledLoadingComponent";
+import convertSchema from "./utils/convertSchema";
 import "../toastr";
 import "./style.css";
 import withTableParams from "./utils/withTableParams";
@@ -1008,12 +1009,7 @@ const enhancer = compose(
       currentUser
     } = propsToUse;
 
-    let schemaToUse = schema;
-    if (!schemaToUse.fields && Array.isArray(schema)) {
-      schemaToUse = {
-        fields: schema
-      };
-    }
+    let schemaToUse = convertSchema(schema);
     let fieldOptsByPath = {};
     let resetDefaultVisibility;
     let updateColumnVisibility;
