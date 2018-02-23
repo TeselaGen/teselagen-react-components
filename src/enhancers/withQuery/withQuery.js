@@ -40,6 +40,7 @@ export default function withQuery(inputFragment, options = {}) {
     showLoading,
     inDialog,
     showError = true,
+    options: queryOptions,
     ...rest
   } = options;
   let fragment = inputFragment;
@@ -118,11 +119,11 @@ export default function withQuery(inputFragment, options = {}) {
           name: "createDataFile",
           ssr: false,
           fetchPolicy: "network-only",
-          ...(rest.options ? rest.options : {}),
+          ...queryOptions,
           variables:
             localVars ||
             variables ||
-            (rest.options && rest.options.variables) ||
+            (queryOptions && queryOptions.variables) ||
             undefined
         })
         .then(function(res) {
@@ -138,10 +139,9 @@ export default function withQuery(inputFragment, options = {}) {
   return compose(
     graphql(gqlQuery, {
       //default options
-
       options: props => {
         const {
-          variables,
+          variables: propVariables,
           fetchPolicy,
           pollInterval,
           notifyOnNetworkStatusChange
@@ -168,12 +168,17 @@ export default function withQuery(inputFragment, options = {}) {
             notifyOnNetworkStatusChange
           };
         }
+        let extraOptions = queryOptions;
+        if (typeof queryOptions === "function") {
+          extraOptions = queryOptions(props);
+        }
         return {
-          variables,
+          variables: propVariables || variables,
           fetchPolicy: fetchPolicy || "network-only",
           ssr: false,
           pollInterval,
-          notifyOnNetworkStatusChange
+          notifyOnNetworkStatusChange,
+          ...extraOptions
         };
       },
       props: (...args) => {
