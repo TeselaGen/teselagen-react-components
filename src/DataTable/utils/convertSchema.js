@@ -14,6 +14,11 @@ export default schema => {
         path: field,
         type: "string"
       };
+    } else if (!field.type) {
+      return {
+        ...field,
+        type: "string"
+      };
     } else {
       return field;
     }
