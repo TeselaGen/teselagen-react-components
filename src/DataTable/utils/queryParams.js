@@ -650,17 +650,23 @@ function getQueries(filters, qb, ccFields) {
     }
     const { selectedFilter, filterValue, filterOn } = filter;
     const subFilter = getSubFilter(qb, selectedFilter, filterValue);
-    const { path, reference } = ccFields[filterOn];
-
-    if (reference) {
-      acc[reference.sourceField] = buildRef(
-        qb,
-        reference,
-        last(path.split(".")),
-        subFilter
-      );
+    const fieldSchema = ccFields[filterOn];
+    if (fieldSchema) {
+      const { path, reference } = fieldSchema;
+      if (reference) {
+        acc[reference.sourceField] = buildRef(
+          qb,
+          reference,
+          last(path.split(".")),
+          subFilter
+        );
+      } else {
+        acc[path] = subFilter;
+      }
+    } else if (filterOn === "id") {
+      acc[filterOn] = subFilter;
     } else {
-      acc[path] = subFilter;
+      console.error("Trying to filter on unknown field");
     }
     return acc;
   }, {});
