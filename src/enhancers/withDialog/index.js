@@ -52,7 +52,6 @@ export default function withDialog(topLevelDialogProps) {
           fetchPolicy = "network-only",
           children,
           dialogProps,
-          noButtonClickPropagate,
           title,
           alreadyRendering,
           ...rest
@@ -60,6 +59,10 @@ export default function withDialog(topLevelDialogProps) {
         const extraDialogProps = {
           ...topLevelDialogProps,
           ...dialogProps
+        };
+        const { noButtonClickPropagate } = {
+          ...this.props,
+          ...extraDialogProps
         };
         const isOpen = isDialogOpen || extraDialogProps.isOpen;
         const targetEl = target || children;
