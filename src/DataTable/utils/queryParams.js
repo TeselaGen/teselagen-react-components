@@ -612,6 +612,23 @@ export function getQueryParams({
     allFilters = allFilters.filter(val => {
       return val !== "";
     }); //get rid of erroneous filters
+
+    // if an inList value only has two items like
+    // 2.3 then it will get parsed to a number and
+    // break, convert it back to a string here
+    allFilters = allFilters.map(val => {
+      if (
+        val.selectedFilter === "inList" &&
+        typeof val.filterValue === "number"
+      ) {
+        return {
+          ...val,
+          filterValue: val.filterValue.toString()
+        };
+      }
+      return val;
+    });
+
     const { andFilters, orFilters } = getAndAndOrFilters(allFilters);
     const additionalFilterToUse = additionalFilter(qb, currentParams);
     try {
