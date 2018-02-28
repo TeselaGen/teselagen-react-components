@@ -180,6 +180,7 @@ class DataTableInstance extends React.Component {
       isSimple: false,
       noSelect: false,
       withTitle: true,
+      isViewable: true,
       withSearch: true,
       withPaging: true,
       withFilter: true,
@@ -277,7 +278,7 @@ class DataTableInstance extends React.Component {
         noPadding: true,
         hidePageSizeWhenPossible: true,
         isInfinite: true,
-        hideSelectedCount: true,
+        hideSelectedCount: true,        
         withTitle: false,
         withSearch: false,
         withPaging: false,
@@ -291,6 +292,7 @@ class DataTableInstance extends React.Component {
         {renderToggle(this, "noSelect")}
         {renderToggle(this, "withSubComponent")}
         {renderToggle(this, "withSearch")}
+        {renderToggle(this, "isViewable"), `Make sure withCheckboxes is off when using this`}
         {renderToggle(this, "withDisplayOptions")}
         {renderToggle(this, "withPaging")}
         {renderToggle(this, "withFilter")}
@@ -380,6 +382,7 @@ class DataTableInstance extends React.Component {
                 />
               ];
             }}
+            isViewable={this.state.isViewable}
             withTitle={this.state.withTitle}
             noSelect={this.state.noSelect}
             isSimple={this.state.isSimple}

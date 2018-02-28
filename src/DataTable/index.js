@@ -24,7 +24,8 @@ import {
   // Position,
   Classes,
   ContextMenu,
-  Checkbox
+  Checkbox,
+  Icon
 } from "@blueprintjs/core";
 import { Popover2 as Popover } from "@blueprintjs/labs";
 import classNames from "classnames";
@@ -290,6 +291,7 @@ class ReactDataTable extends React.Component {
       hideSelectedCount,
       hideColumnHeader,
       subHeader,
+      isViewable,
       entities,
       children
     } = computePresets(this.props);
@@ -369,6 +371,7 @@ class ReactDataTable extends React.Component {
           className,
           compactClassName,
           {
+            "dt-isViewable": isViewable,
             "no-padding": noPadding,
             "hide-column-header": hideColumnHeader
           }
@@ -451,8 +454,7 @@ class ReactDataTable extends React.Component {
           TheadComponent={this.getTheadComponent}
           getTrGroupProps={this.getTableRowProps}
           NoDataComponent={({ children }) =>
-            isLoading ? null : <div className="rt-noData">{children}</div>
-          }
+            isLoading ? null : <div className="rt-noData">{children}</div>}
           LoadingComponent={props => (
             <DisabledLoadingComponent {...{ ...props, disabled }} />
           )}
@@ -489,15 +491,15 @@ class ReactDataTable extends React.Component {
               !isSingleSelect &&
               !hideSelectedCount && (
                 <div className={"tg-react-table-selected-count"}>
-                  {`${selectedRowCount} Record${
-                    selectedRowCount === 1 ? "" : "s"
-                  } Selected `}
+                  {`${selectedRowCount} Record${selectedRowCount === 1
+                    ? ""
+                    : "s"} Selected `}
                 </div>
               )}
             {showCount &&
-              `${entityCount} ${
-                entityCount === 1 ? "Record" : "Total Records"
-              }`}
+              `${entityCount} ${entityCount === 1
+                ? "Record"
+                : "Total Records"}`}
             <div style={{ display: "flex", flexWrap: "wrap" }}>
               {withDisplayOptions && (
                 <DisplayOptions
@@ -793,7 +795,11 @@ class ReactDataTable extends React.Component {
         if (getCellHoverText) title = getCellHoverText(...args);
         return (
           <div
-            style={{ textOverflow: "ellipsis", overflow: "hidden" }}
+            style={
+              schemaForColumn.noEllipsis
+                ? {}
+                : { textOverflow: "ellipsis", overflow: "hidden" }
+            }
             title={title || undefined}
           >
             {val}
@@ -1012,7 +1018,8 @@ const enhancer = compose(
       deleteTableConfiguration,
       upsertTableConfiguration,
       upsertFieldOption,
-      currentUser
+      currentUser,
+      isViewable
     } = propsToUse;
 
     let schemaToUse = convertSchema(schema);
@@ -1060,6 +1067,9 @@ const enhancer = compose(
             );
           }
         );
+      }
+      if (isViewable) {
+        schemaToUse.fields = [viewColumn, ...schemaToUse.fields];
       }
 
       if (syncDisplayOptionsToDb) {
@@ -1157,3 +1167,12 @@ export default enhancer(ReactDataTable);
 
 const ConnectedPagingTool = enhancer(PagingTool);
 export { ConnectedPagingTool };
+
+const viewColumn = {
+  width: 35,
+  noEllipsis: true,
+  type: "action",
+  render: () => {
+    return <Icon className="dt-eyeIcon" iconName="eye-open" />;
+  }
+};

@@ -210,6 +210,14 @@
 .ReactTable .rt-tr-group.selected {
   background: lightblue !important;
 }
+.dt-isViewable .ReactTable .rt-tr-group.selected {
+  background: inherit !important;
+}
+
+.dt-isViewable .ReactTable .rt-tr-group.selected .dt-eyeIcon {
+  color: #137cbd;
+  transform: scale(1.2);
+}
 
 .tg-react-table-checkbox-header-container {
   padding: 12px 0 0 8px !important;
