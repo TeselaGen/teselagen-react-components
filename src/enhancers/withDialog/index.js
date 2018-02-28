@@ -52,6 +52,7 @@ export default function withDialog(topLevelDialogProps) {
           fetchPolicy = "network-only",
           children,
           dialogProps,
+          noButtonClickPropagate,
           title,
           alreadyRendering,
           ...rest
@@ -89,8 +90,12 @@ export default function withDialog(topLevelDialogProps) {
             )}
             {targetEl &&
               React.cloneElement(targetEl, {
-                [onClickRename || "onClick"]: () => {
+                [onClickRename || "onClick"]: e => {
                   showModal();
+                  if (noButtonClickPropagate) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }
                 }
               })}
           </React.Fragment>
