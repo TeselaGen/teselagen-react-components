@@ -1029,6 +1029,9 @@ const enhancer = compose(
     let moveColumnPersist;
     let updateTableDisplayDensity;
     let userSpecifiedCompact;
+    if (isViewable) {
+      schemaToUse.fields = [viewColumn, ...schemaToUse.fields];
+    }
     if (withDisplayOptions) {
       let tableConfig;
       if (syncDisplayOptionsToDb) {
@@ -1067,9 +1070,6 @@ const enhancer = compose(
             );
           }
         );
-      }
-      if (isViewable) {
-        schemaToUse.fields = [viewColumn, ...schemaToUse.fields];
       }
 
       if (syncDisplayOptionsToDb) {
