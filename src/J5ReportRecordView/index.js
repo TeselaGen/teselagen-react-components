@@ -12,6 +12,7 @@ import { getRangeLength } from "ve-range-utils";
 import "./style.css";
 import papaparse from "papaparse";
 import magicDownload from "../DownloadLink/magicDownload";
+import exportOligosFields from "./exportOligosFields";
 
 const sharedTableProps = {
   withSearch: false,
@@ -123,6 +124,21 @@ class J5ReportRecordView extends Component {
     });
   }
 
+  handleExportOligosToCsv = () => {
+    const { data } = this.props;
+    const j5OligoSyntheses = this.processJ5OligoSynthesis(
+      data.j5Report.j5OligoSyntheses
+    );
+    const csvString = papaparse.unparse([
+      ["OligoSynthesis"],
+      exportOligosFields.map(field => field.displayName),
+      ...j5OligoSyntheses.map(j5Oligo =>
+        exportOligosFields.map(field => get(j5Oligo, field.path))
+      )
+    ]);
+    magicDownload(csvString, `Oligo_Synthesis_${data.j5Report.name}.csv`);
+  };
+
   downloadCSV = () => {
     const entitiesForAllTables = this.getEntitiesForAllTables();
     let csvString = "";
@@ -178,6 +194,19 @@ class J5ReportRecordView extends Component {
       </Button>
     );
   };
+
+  renderDownloadOligoButton = () => {
+    // option to override export handler
+    const { onExportOligosAsCsvClick } = this.props;
+    return (
+      <Button
+        onClick={onExportOligosAsCsvClick || this.handleExportOligosToCsv}
+      >
+        Export as CSV
+      </Button>
+    );
+  };
+
   linkInputSequences = () => {
     this.showLinkModal("inputSequences");
   };
@@ -575,6 +604,9 @@ class J5ReportRecordView extends Component {
               }
               entities={entitiesForAllTables.j5OligoSyntheses}
             />
+            <div className="pt-button-group" style={{ marginTop: 10 }}>
+              {this.renderDownloadOligoButton()}
+            </div>
           </CollapsibleCard>
 
           <CollapsibleCard

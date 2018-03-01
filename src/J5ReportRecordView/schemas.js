@@ -81,7 +81,6 @@ const schemas = {
         type: "string",
         displayName: "Last Target Part"
       },
-      { path: "cost", type: "number", displayName: "Cost" },
       { path: "tm", type: "number", displayName: "Tm (°C)" },
       { path: "tm3Prime", type: "number", displayName: "Tm 3' Only (°C)" },
       {
@@ -92,7 +91,7 @@ const schemas = {
       {
         path: "cost",
         type: "number",
-        displayName: "Cost (USD/bp)"
+        displayName: "Cost (USD)"
       },
       {
         path: "oligo.sequence.polynucleotideMaterialId",
