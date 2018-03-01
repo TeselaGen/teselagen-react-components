@@ -274,15 +274,11 @@
   flex: 1 0 auto;
 }
 
-/* .tg-movable-table-column {
-  border-right: 1px solid rgba(0, 0, 0, 0.05);
-} */
-
 .ReactTable .rt-thead .rt-th,
 .ReactTable .rt-thead .rt-td {
   border-right: none;
 }
 
-.tg-movable-table-column:hover {
+.ReactTable .rt-thead .rt-resizable-header:hover {
   border-right: 1px solid rgba(0, 0, 0, 0.05);
 }

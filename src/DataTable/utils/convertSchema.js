@@ -7,6 +7,9 @@ export default schema => {
       fields: schema
     };
   }
+  schemaToUse = {
+    ...schemaToUse
+  };
   schemaToUse.fields = schemaToUse.fields.map(field => {
     if (typeof field === "string") {
       return {

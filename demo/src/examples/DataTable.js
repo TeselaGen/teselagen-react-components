@@ -6,7 +6,6 @@ const schema = {
   fields: [
     {
       path: "notDisplayedField",
-
       isHidden: true,
       type: "string",
       displayName: "Not Displayed"
@@ -292,7 +291,11 @@ class DataTableInstance extends React.Component {
         {renderToggle(this, "noSelect")}
         {renderToggle(this, "withSubComponent")}
         {renderToggle(this, "withSearch")}
-        {renderToggle(this, "isViewable"), `Make sure withCheckboxes is off when using this`}
+        {renderToggle(
+          this,
+          "isViewable",
+          "Make sure withCheckboxes is off when using this"
+        )}
         {renderToggle(this, "withDisplayOptions")}
         {renderToggle(this, "withPaging")}
         {renderToggle(this, "withFilter")}
@@ -364,24 +367,26 @@ class DataTableInstance extends React.Component {
             }}
             additionalFilters={additionalFilters}
             title={"Demo table"}
-            contextMenu={function(/*{ selectedRecords, history }*/) {
-              return [
-                <MenuItem
-                  key="menuItem1"
-                  onClick={function() {
-                    console.log("I got clicked!");
-                  }}
-                  text={"Menu text here"}
-                />,
-                <MenuItem
-                  key="menuItem2"
-                  onClick={function() {
-                    console.log("I also got clicked!");
-                  }}
-                  text={"Some more"}
-                />
-              ];
-            }}
+            contextMenu={
+              function(/*{ selectedRecords, history }*/) {
+                return [
+                  <MenuItem
+                    key="menuItem1"
+                    onClick={function() {
+                      console.log("I got clicked!");
+                    }}
+                    text={"Menu text here"}
+                  />,
+                  <MenuItem
+                    key="menuItem2"
+                    onClick={function() {
+                      console.log("I also got clicked!");
+                    }}
+                    text={"Some more"}
+                  />
+                ];
+              }
+            }
             isViewable={this.state.isViewable}
             withTitle={this.state.withTitle}
             noSelect={this.state.noSelect}

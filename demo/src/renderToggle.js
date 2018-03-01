@@ -7,14 +7,11 @@ export default function renderToggle(that, type, description) {
       <Switch
         checked={that.state[type]}
         label={type}
-        /* eslint-disable react/jsx-no-bind */
-
         onChange={() => {
           that.setState({
             [type]: !that.state[type]
           });
         }}
-        /* eslint-enable react/jsx-no-bind */
       />
       {description && <span>{description}</span>}
     </div>

@@ -454,7 +454,8 @@ class ReactDataTable extends React.Component {
           TheadComponent={this.getTheadComponent}
           getTrGroupProps={this.getTableRowProps}
           NoDataComponent={({ children }) =>
-            isLoading ? null : <div className="rt-noData">{children}</div>}
+            isLoading ? null : <div className="rt-noData">{children}</div>
+          }
           LoadingComponent={props => (
             <DisabledLoadingComponent {...{ ...props, disabled }} />
           )}
@@ -491,15 +492,15 @@ class ReactDataTable extends React.Component {
               !isSingleSelect &&
               !hideSelectedCount && (
                 <div className={"tg-react-table-selected-count"}>
-                  {`${selectedRowCount} Record${selectedRowCount === 1
-                    ? ""
-                    : "s"} Selected `}
+                  {`${selectedRowCount} Record${
+                    selectedRowCount === 1 ? "" : "s"
+                  } Selected `}
                 </div>
               )}
             {showCount &&
-              `${entityCount} ${entityCount === 1
-                ? "Record"
-                : "Total Records"}`}
+              `${entityCount} ${
+                entityCount === 1 ? "Record" : "Total Records"
+              }`}
             <div style={{ display: "flex", flexWrap: "wrap" }}>
               {withDisplayOptions && (
                 <DisplayOptions
@@ -741,7 +742,8 @@ class ReactDataTable extends React.Component {
             resizable: false,
             getHeaderProps: () => {
               return {
-                className: "tg-react-table-checkbox-header-container"
+                className: "tg-react-table-checkbox-header-container",
+                immovable: "true"
               };
             },
             getProps: () => {
@@ -757,7 +759,13 @@ class ReactDataTable extends React.Component {
       const tableColumn = {
         ...schemaForColumn,
         Header: this.renderColumnHeader(column),
-        accessor: schemaForColumn.path
+        accessor: schemaForColumn.path,
+        getHeaderProps: () => ({
+          // needs to be a string because it is getting passed
+          // to the dom
+          immovable: schemaForColumn.immovable ? "true" : "false",
+          columnindex: column.columnIndex
+        })
       };
       if (column.width) {
         tableColumn.width = column.width;
@@ -1021,7 +1029,6 @@ const enhancer = compose(
       currentUser,
       isViewable
     } = propsToUse;
-
     let schemaToUse = convertSchema(schema);
     let fieldOptsByPath = {};
     let resetDefaultVisibility;
@@ -1049,8 +1056,8 @@ const enhancer = compose(
       const columnOrderings = tableConfig.columnOrderings;
       fieldOptsByPath = keyBy(tableConfig.fieldOptions, "path");
       schemaToUse = {
-        ...schema,
-        fields: schema.fields.map(field => {
+        ...schemaToUse,
+        fields: schemaToUse.fields.map(field => {
           const fieldOpt = fieldOptsByPath[field.path];
           if (fieldOpt) {
             return {
@@ -1129,7 +1136,7 @@ const enhancer = compose(
           //we might already have an array of the fields [path1, path2, ..etc]
           const columnOrderings =
             tableConfig.columnOrderings ||
-            schema.fields.map(({ path }) => path); // columnOrderings is [path1, path2, ..etc]
+            schemaToUse.fields.map(({ path }) => path); // columnOrderings is [path1, path2, ..etc]
 
           tableConfig.columnOrderings = arrayMove(
             columnOrderings,
@@ -1140,7 +1147,6 @@ const enhancer = compose(
         };
       }
     }
-
     return {
       ...propsToUse,
       schema: schemaToUse,
@@ -1171,6 +1177,7 @@ export { ConnectedPagingTool };
 const viewColumn = {
   width: 35,
   noEllipsis: true,
+  immovable: true,
   type: "action",
   render: () => {
     return <Icon className="dt-eyeIcon" iconName="eye-open" />;

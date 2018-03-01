@@ -20,28 +20,18 @@ const SortableItem = SortableElement(({ children }) => {
 
 function CustomTheadComponent(props) {
   const headerColumns = props.children.props.children;
-  // hacky but using the undefined keys to make a column not movable
-  // these undefined key columns will always be first so this might mess up
-  // order if something was funky
-  const [immovableColumns, movableColumns] = headerColumns.reduce(
-    (acc, col) => {
-      if (col.key.indexOf("undefined") > -1) acc[0].push(col);
-      else acc[1].push(col);
-      return acc;
-    },
-    [[], []]
-  );
-  const stateColumns = props.columns;
+
   return (
     <div className={"rt-thead " + props.className} style={props.style}>
       <div className="rt-tr">
-        {immovableColumns}
-        {movableColumns.map((column, i) => {
+        {headerColumns.map((column, i) => {
+          // if a column is marked as immovable just return regular column
+          if (column.props.immovable === "true") return column;
           // keeps track of hidden columns here so columnIndex might not equal i
-          const columnIndex =
-            props.withDisplayOptions && stateColumns[i]
-              ? stateColumns[i].columnIndex
-              : i;
+          const columnIndex = column.props.columnindex || i;
+          if (!column.props.columnindex) {
+            console.warn("Sortable columns will break. Column index not found");
+          }
           return (
             <SortableItem key={`item-${columnIndex}`} index={columnIndex}>
               {column}
