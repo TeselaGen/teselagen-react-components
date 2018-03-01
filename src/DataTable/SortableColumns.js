@@ -27,9 +27,10 @@ function CustomTheadComponent(props) {
           // if a column is marked as immovable just return regular column
           if (column.props.immovable === "true") return column;
           // keeps track of hidden columns here so columnIndex might not equal i
-          const columnIndex = column.props.columnindex || i;
-          if (!column.props.columnindex && column.props.columnindex !== 0) {
+          let columnIndex = column.props.columnindex;
+          if (isNaN(columnIndex)) {
             console.warn("Sortable columns will break. Column index not found");
+            columnIndex = i;
           }
           return (
             <SortableItem key={`item-${columnIndex}`} index={columnIndex}>
