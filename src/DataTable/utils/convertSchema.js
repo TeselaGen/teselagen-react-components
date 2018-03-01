@@ -11,20 +11,22 @@ export default schema => {
     ...schemaToUse
   };
   schemaToUse.fields = schemaToUse.fields.map(field => {
+    let fieldToUse = field;
     if (typeof field === "string") {
-      return {
+      fieldToUse = {
         displayName: startCase(field),
         path: field,
         type: "string"
       };
     } else if (!field.type) {
-      return {
+      fieldToUse = {
         ...field,
         type: "string"
       };
-    } else {
-      return field;
     }
+    fieldToUse.displayName =
+      fieldToUse.displayName || startCase(fieldToUse.path);
+    return fieldToUse;
   });
   return schemaToUse;
 };

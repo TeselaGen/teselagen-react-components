@@ -20,7 +20,6 @@ const SortableItem = SortableElement(({ children }) => {
 
 function CustomTheadComponent(props) {
   const headerColumns = props.children.props.children;
-
   return (
     <div className={"rt-thead " + props.className} style={props.style}>
       <div className="rt-tr">
@@ -29,7 +28,7 @@ function CustomTheadComponent(props) {
           if (column.props.immovable === "true") return column;
           // keeps track of hidden columns here so columnIndex might not equal i
           const columnIndex = column.props.columnindex || i;
-          if (!column.props.columnindex) {
+          if (!column.props.columnindex && column.props.columnindex !== 0) {
             console.warn("Sortable columns will break. Column index not found");
           }
           return (
@@ -54,15 +53,10 @@ class SortableColumns extends Component {
   };
 
   onSortEnd = ({ oldIndex, newIndex }) => {
-    const { moveColumnPersist, moveColumn } = this.props;
-    if (moveColumnPersist) {
-      moveColumnPersist({
-        oldColumnIndex: oldIndex,
-        columnIndex: newIndex
-      });
-    } else {
-      moveColumn({ oldIndex, newIndex });
-    }
+    this.props.moveColumn({
+      oldIndex,
+      newIndex
+    });
   };
 
   render() {

@@ -147,12 +147,10 @@ class ReactDataTable extends React.Component {
             if (field.isHidden) {
               return columns;
             }
-            columns.push({
-              displayName: field.displayName || startCase(field.path),
-              columnIndex: i,
-              width: field.width
+            return columns.concat({
+              ...field,
+              columnIndex: i
             });
-            return columns;
           }, [])
         : [];
       this.setState({ columns });
@@ -213,8 +211,27 @@ class ReactDataTable extends React.Component {
   }
 
   moveColumn = ({ oldIndex, newIndex }) => {
+    const { columns } = this.state;
+    let oldStateColumnIndex, newStateColumnIndex;
+    columns.forEach((column, i) => {
+      if (oldIndex === column.columnIndex) oldStateColumnIndex = i;
+      if (newIndex === column.columnIndex) newStateColumnIndex = i;
+    });
+    // because it is all handled in state we need
+    // to perform the move and update the columnIndices
+    // because they are used for the sortable columns
+    const newColumns = arrayMove(
+      columns,
+      oldStateColumnIndex,
+      newStateColumnIndex
+    ).map((column, i) => {
+      return {
+        ...column,
+        columnIndex: i
+      };
+    });
     this.setState({
-      columns: arrayMove(this.state.columns, oldIndex, newIndex)
+      columns: newColumns
     });
   };
 
@@ -226,7 +243,7 @@ class ReactDataTable extends React.Component {
       syncDisplayOptionsToDb
     } = computePresets(this.props);
     let moveColumnPersistToUse = moveColumnPersist;
-    if (withDisplayOptions && !syncDisplayOptionsToDb) {
+    if (moveColumnPersist && withDisplayOptions && !syncDisplayOptionsToDb) {
       //little hack to make localstorage changes get reflected in UI (we force an update to get the enhancers to run again :)
       moveColumnPersistToUse = (...args) => {
         moveColumnPersist(...args);
@@ -236,10 +253,8 @@ class ReactDataTable extends React.Component {
     return (
       <SortableColumns
         {...props}
-        columns={this.state.columns}
         withDisplayOptions={withDisplayOptions}
-        moveColumn={this.moveColumn}
-        moveColumnPersist={moveColumnPersistToUse}
+        moveColumn={moveColumnPersistToUse || this.moveColumn}
       />
     );
   };
@@ -723,17 +738,14 @@ class ReactDataTable extends React.Component {
   };
 
   renderColumns = () => {
-    const {
-      schema,
-      cellRenderer,
-      withCheckboxes,
-      getCellHoverText
-    } = computePresets(this.props);
+    const { cellRenderer, withCheckboxes, getCellHoverText } = computePresets(
+      this.props
+    );
     const { columns } = this.state;
     if (!columns.length) {
       return;
     }
-    let columnsToRender = withCheckboxes
+    const columnsToRender = withCheckboxes
       ? [
           {
             Header: this.renderCheckboxHeader,
@@ -755,40 +767,35 @@ class ReactDataTable extends React.Component {
         ]
       : [];
     columns.forEach(column => {
-      const schemaForColumn = schema.fields[column.columnIndex];
       const tableColumn = {
-        ...schemaForColumn,
+        ...column,
         Header: this.renderColumnHeader(column),
-        accessor: schemaForColumn.path,
+        accessor: column.path,
         getHeaderProps: () => ({
           // needs to be a string because it is getting passed
           // to the dom
-          immovable: schemaForColumn.immovable ? "true" : "false",
+          immovable: column.immovable ? "true" : "false",
           columnindex: column.columnIndex
         })
       };
       if (column.width) {
         tableColumn.width = column.width;
       }
-      if (cellRenderer && cellRenderer[schemaForColumn.path]) {
+      if (cellRenderer && cellRenderer[column.path]) {
         tableColumn.Cell = row => {
-          const val = cellRenderer[schemaForColumn.path](
-            row.value,
-            row.original,
-            row
-          );
+          const val = cellRenderer[column.path](row.value, row.original, row);
           return val;
         };
-      } else if (schemaForColumn.render) {
+      } else if (column.render) {
         tableColumn.Cell = row => {
-          const val = schemaForColumn.render(row.value, row.original, row);
+          const val = column.render(row.value, row.original, row);
           return val;
         };
-      } else if (schemaForColumn.type === "timestamp") {
+      } else if (column.type === "timestamp") {
         tableColumn.Cell = props => {
           return props.value ? moment(new Date(props.value)).format("lll") : "";
         };
-      } else if (schemaForColumn.type === "boolean") {
+      } else if (column.type === "boolean") {
         tableColumn.Cell = props => (props.value ? "True" : "False");
       } else {
         tableColumn.Cell = props => props.value;
@@ -804,7 +811,7 @@ class ReactDataTable extends React.Component {
         return (
           <div
             style={
-              schemaForColumn.noEllipsis
+              column.noEllipsis
                 ? {}
                 : { textOverflow: "ellipsis", overflow: "hidden" }
             }
@@ -834,7 +841,6 @@ class ReactDataTable extends React.Component {
 
   renderColumnHeader = column => {
     const {
-      schema,
       addFilters,
       setOrder,
       order,
@@ -844,7 +850,6 @@ class ReactDataTable extends React.Component {
       currentParams,
       setNewParams
     } = computePresets(this.props);
-    const schemaForField = schema.fields[column.columnIndex];
     const {
       displayName,
       sortDisabled,
@@ -852,10 +857,10 @@ class ReactDataTable extends React.Component {
       renderTitleInner,
       filterIsActive = noop,
       path
-    } = schemaForField;
+    } = column;
     const disableSorting =
       sortDisabled || (typeof path === "string" && path.indexOf(".") > -1);
-    const columnDataType = schemaForField.type;
+    const columnDataType = column.type;
     const isActionColumn = columnDataType === "action";
     const ccDisplayName = camelCase(displayName || path);
     let columnTitle = displayName || startCase(path);
@@ -907,7 +912,7 @@ class ReactDataTable extends React.Component {
           />
         </div>
       ) : null;
-    const FilterMenu = schemaForField.FilterMenu || FilterAndSortMenu;
+    const FilterMenu = column.FilterMenu || FilterAndSortMenu;
     const filterMenu =
       withFilter && !isActionColumn && !filterDisabled ? (
         <Popover
@@ -932,7 +937,7 @@ class ReactDataTable extends React.Component {
             currentFilter={currentFilter}
             filterOn={ccDisplayName}
             dataType={columnDataType}
-            schemaForField={schemaForField}
+            schemaForField={column}
             currentParams={currentParams}
             setNewParams={setNewParams}
           />
@@ -1069,6 +1074,7 @@ const enhancer = compose(
           }
         })
       };
+
       if (columnOrderings) {
         schemaToUse.fields = schemaToUse.fields.sort(
           ({ path: path1 }, { path: path2 }) => {
@@ -1132,7 +1138,7 @@ const enhancer = compose(
           tableConfig.density = density;
           window.localStorage.setItem(formName, JSON.stringify(tableConfig));
         };
-        moveColumnPersist = function({ columnIndex, oldColumnIndex }) {
+        moveColumnPersist = function({ oldIndex, newIndex }) {
           //we might already have an array of the fields [path1, path2, ..etc]
           const columnOrderings =
             tableConfig.columnOrderings ||
@@ -1140,8 +1146,8 @@ const enhancer = compose(
 
           tableConfig.columnOrderings = arrayMove(
             columnOrderings,
-            oldColumnIndex,
-            columnIndex
+            oldIndex,
+            newIndex
           );
           window.localStorage.setItem(formName, JSON.stringify(tableConfig));
         };
