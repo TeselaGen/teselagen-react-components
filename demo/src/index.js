@@ -11,6 +11,8 @@ import DemoNav from "./DemoNav";
 import DemoHeader from "./DemoHeader";
 import { withTableParams, DataTable, PagingTool } from "../../src";
 import Uploader from "../../src/FormComponents/Uploader";
+import J5ReportRecordView from "./examples/J5ReportRecordView";
+import j5ReportRecordViewData from "./data/j5ReportRecordView";
 import "./style.css";
 import React from "react";
 import { render } from "react-dom";
@@ -218,6 +220,12 @@ const demos = {
     demo: WithDialog,
     url:
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/WithDialogDemo/index.js"
+  },
+  J5ReportRecordView: {
+    demo: J5ReportRecordView,
+    scope: {
+      data: j5ReportRecordViewData
+    }
   }
   // fonticons: {
   //   demo: FontIconsDemo,
@@ -302,11 +310,17 @@ const Demo = () => {
           <div
             style={{
               display: "flex",
-              padding: 40
+              padding: 40,
+              maxWidth: "100vw"
             }}
           >
             <DemoNav demos={demos} />
-            <div style={{ margin: 15, width: "100%" }}>
+            <div
+              style={{
+                overflow: "auto",
+                padding: 10
+              }}
+            >
               <Route
                 exact
                 path="/"

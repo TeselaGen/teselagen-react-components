@@ -33,7 +33,7 @@ const schemas = {
       {
         path: "reversePrimer.name",
         type: "string",
-        displayName: "Reverse Oligo"
+        displayName: "Reverse Oligo Name"
       },
       { path: "note", type: "string", displayName: "Notes" },
       {
@@ -81,7 +81,6 @@ const schemas = {
         type: "string",
         displayName: "Last Target Part"
       },
-      { path: "cost", type: "number", displayName: "Cost" },
       { path: "tm", type: "number", displayName: "Tm (°C)" },
       { path: "tm3Prime", type: "number", displayName: "Tm 3' Only (°C)" },
       {
@@ -92,42 +91,39 @@ const schemas = {
       {
         path: "cost",
         type: "number",
-        displayName: "Cost (USD/bp)"
+        displayName: "Cost (USD)"
       },
       {
         path: "oligo.sequence.polynucleotideMaterialId",
         type: "boolean",
         displayName: "Is Linked"
-      }
-      // id first target part last target part tm tm 3' length cost
-      // { path: 'sequence', type: 'string', displayName: 'Sequence' }
+      },
+      { path: "bps", type: "string", displayName: "Sequence" }
     ]
   },
   j5AssemblyPieces: {
     fields: [
-      { path: "id", type: "string", displayName: "Assembly ID" },
+      { path: "id", type: "string", displayName: "Piece ID" },
       { path: "name", type: "string", displayName: "Name" },
-      { path: "type", type: "string", displayName: "Type" },
+      { path: "type", type: "string", displayName: "Source" },
       {
         path: "sequence.polynucleotideMaterialId",
         type: "boolean",
         displayName: "Is Linked"
-      }
+      },
+      { path: "sequence.size", type: "number", displayName: "Length (bp)" },
+      { path: "bps", type: "string", displayName: "Sequence" }
     ]
   },
   j5RunConstructs: {
     fields: [
-      { path: "name", type: "string", displayName: "Name" },
-      { path: "sequence.size", type: "number", displayName: "Size" },
-      {
-        path: "nextLevelParts",
-        type: "string",
-        displayName: "Next level parts"
-      },
+      { path: "id", type: "string", displayName: "Construct ID" },
+      { path: "name", type: "string", displayName: "Construct Name" },
+      { path: "sequence.size", type: "number", displayName: "Length (bp)" },
       {
         path: "partsContainedNames",
         type: "string",
-        displayName: "Parts contained"
+        displayName: "Parts Contained"
       }
     ]
   },
@@ -136,8 +132,7 @@ const schemas = {
       {
         path: "sequence.id",
         type: "string",
-        displayName: "ID",
-        isHidden: true
+        displayName: "Sequence ID"
       },
       { path: "sequence.name", type: "string", displayName: "Name" },
       { path: "sequence.size", type: "number", displayName: "Length (bp)" },
@@ -154,12 +149,9 @@ const schemas = {
       {
         path: "id",
         type: "string",
-        isHidden: true
+        displayName: "DNA Synthesis ID"
       },
       { path: "sequence.name", type: "string", displayName: "Name" },
-      { path: "sequence.size", type: "number", displayName: "Size" },
-      { path: "bps", type: "string" },
-      { path: "cost", type: "number" },
       // { path: "firstTargetPart", type: "string"  },
       // { path: "lastTargetPart", type: "string"  },
       { path: "inStock", type: "boolean", displayName: "In Stock" },
@@ -167,7 +159,10 @@ const schemas = {
         path: "sequence.polynucleotideMaterialId",
         type: "boolean",
         displayName: "Is Linked"
-      }
+      },
+      { path: "sequence.size", type: "number", displayName: "Length (bp)" },
+      { path: "cost", type: "number", displayName: "Cost (USD)" },
+      { path: "bps", type: "string", displayName: "Sequence" }
     ]
   },
   j5InputParts: {
@@ -187,11 +182,12 @@ const schemas = {
         path: "sequencePart.strand",
         type: "number",
         displayName: "Reverse Complement",
-        render: v => (v === 1 ? "True" : "False")
+        render: v => (v === 1 ? "False" : "True")
       },
       { path: "sequencePart.start", type: "number", displayName: "Start (bp)" },
       { path: "sequencePart.end", type: "number", displayName: "End (bp)" },
-      { path: "size", type: "number", displayName: "Length (bp)" }
+      { path: "size", type: "number", displayName: "Length (bp)" },
+      { path: "bps", type: "string", displayName: "Sequence" }
     ]
   }
 };

@@ -54,7 +54,8 @@
     "recompose": "^0.26.0",
     "redux": "^3.7.2",
     "uniqid": "^4.1.1",
-    "ve-range-utils": "^2.3.3"
+    "ve-range-utils": "^2.3.3",
+    "ve-sequence-utils": "^3.2.31"
   },
   "peerDependencies": {
     "@blueprintjs/core": "^1.18.0",
