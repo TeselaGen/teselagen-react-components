@@ -13,6 +13,7 @@ import "./style.css";
 import papaparse from "papaparse";
 import magicDownload from "../DownloadLink/magicDownload";
 import exportOligosFields from "./exportOligosFields";
+import getSequenceStringOfJ5InputPart from "./getSequenceStringOfJ5InputPart";
 
 const sharedTableProps = {
   withSearch: false,
@@ -25,17 +26,23 @@ const sharedTableProps = {
   urlConnected: false
 };
 
-const processInputParts = InputParts =>
-  InputParts.map(InputPart => {
+const processInputParts = inputParts =>
+  inputParts.map(inputPart => {
+    const sequencePart = get(inputPart, "sequencePart", {});
     return {
-      ...InputPart,
+      ...inputPart,
+      sequencePart: {
+        ...sequencePart,
+        id: "part_" + sequencePart.id
+      },
       size: getRangeLength(
         {
-          start: InputPart.sequencePart.start,
-          end: InputPart.sequencePart.end
+          start: inputPart.sequencePart.start,
+          end: inputPart.sequencePart.end
         },
-        get(InputPart, "sequencePart.sequence.size")
-      )
+        get(inputPart, "sequencePart.sequence.size")
+      ),
+      bps: getSequenceStringOfJ5InputPart(inputPart)
     };
   });
 
@@ -51,10 +58,9 @@ const processJ5DirectSyntheses = j5DirectSynths =>
   j5DirectSynths.map(j5DirectSynth => {
     return {
       ...j5DirectSynth,
+      id: "dna_syn_" + j5DirectSynth.id,
       bps: get(j5DirectSynth, "sequence.sequenceFragments", [])
-        .map(({ fragment }) => {
-          return fragment;
-        })
+        .map(f => f.fragment)
         .join("")
     };
   });
@@ -62,6 +68,7 @@ const processJ5DirectSyntheses = j5DirectSynths =>
 const processJ5RunConstructs = j5RunConstructs =>
   j5RunConstructs.map(j5RunConstruct => ({
     ...j5RunConstruct,
+    id: "construct_" + j5RunConstruct.id,
     nextLevelParts: (get(j5RunConstruct, "sequence.sequenceParts") || [])
       .map(part => part.name)
       .join(", "),
@@ -88,6 +95,27 @@ const getInputPartsFromInputSequences = j5InputSequences =>
     )
     .reduce((a, b) => a.concat(b), []);
 
+const processJ5AssemblyPieces = j5AssemblyPieces =>
+  j5AssemblyPieces.map(ap => ({
+    ...ap,
+    id: "piece_" + ap.id,
+    bps: get(ap, "sequence.sequenceFragments", [])
+      .map(f => f.fragment)
+      .join("")
+  }));
+
+const processInputSequences = j5InputSequences =>
+  j5InputSequences.map(s => ({
+    ...s,
+    sequence: { ...s.sequence, id: "sequence_" + s.sequence.id }
+  }));
+
+const processJ5PcrReactions = j5PcrReactions =>
+  j5PcrReactions.map(pcr => ({
+    ...pcr,
+    id: "pcr_" + pcr.id
+  }));
+
 class J5ReportRecordView extends Component {
   state = {
     linkDialogName: undefined,
@@ -110,6 +138,7 @@ class J5ReportRecordView extends Component {
       const lastTargetPart = get(this.state.partCidMap, `${partCids[1]}.name`);
       return {
         ...j5Oligo,
+        id: "oligo_" + j5Oligo.id,
         name: j5Oligo.name
           .replace(partCids[0], firstTargetPart)
           .replace(partCids[1], lastTargetPart),
@@ -176,12 +205,12 @@ class J5ReportRecordView extends Component {
     const j5InputParts = getInputPartsFromInputSequences(j5InputSequences);
     return {
       j5RunConstructs: processJ5RunConstructs(j5RunConstructs),
-      j5InputSequences: j5InputSequences,
+      j5InputSequences: processInputSequences(j5InputSequences),
       j5InputParts: processInputParts(j5InputParts),
       j5OligoSyntheses: this.processJ5OligoSynthesis(j5OligoSyntheses),
       j5DirectSyntheses: processJ5DirectSyntheses(j5DirectSyntheses),
-      j5PcrReactions: j5PcrReactions,
-      j5AssemblyPieces: j5AssemblyPieces
+      j5PcrReactions: processJ5PcrReactions(j5PcrReactions),
+      j5AssemblyPieces: processJ5AssemblyPieces(j5AssemblyPieces)
     };
   };
 
@@ -271,7 +300,7 @@ class J5ReportRecordView extends Component {
     {Footer}
   </form>*/}
         <div>
-          <span className="j5-report-fieldname">Name:</span> {name}
+          <span className="j5-report-fieldname">Design Name:</span> {name}
         </div>
         <div>
           <span className="j5-report-fieldname">Assembly Method:</span>{" "}
@@ -303,7 +332,7 @@ class J5ReportRecordView extends Component {
           {additionalHeaderItems}
           {LinkJ5TableDialog && (
             <Button onClick={this.linkInputSequences}>
-              Link Tables to Materials
+              Link j5 Assembly Report Data to Materials
             </Button>
           )}
         </div>
@@ -320,12 +349,12 @@ class J5ReportRecordView extends Component {
     });
     const assemblyPieceColumns = times(maxNumAssemblyPieces, i => ({
       path: `j5ConstructAssemblyPieces[${i}].assemblyPiece.id`,
-      displayName: `Assembly Piece ${i + 1} ID`
+      displayName: `Piece-${i + 1} ID`
     }));
     const partsContainedColumns = times(maxNumAssemblyPieces, i => {
       return {
         path: `j5ConstructAssemblyPieces[${i}].assemblyPiece.j5AssemblyPieceParts`,
-        displayName: `Parts Contained`,
+        displayName: `Piece-${i + 1} Parts`,
         render: v =>
           v && v.map(p => get(p, "j5InputPart.sequencePart.name")).join(", ")
       };
@@ -494,7 +523,7 @@ class J5ReportRecordView extends Component {
                 Constructs are the desired sequences to be built in a j5 run.
               </InfoHelper>
             }
-            title={"Constructs"}
+            title="Assembled Constructs"
             openTitleElements={
               LinkJ5TableDialog && (
                 <Button
@@ -512,7 +541,7 @@ class J5ReportRecordView extends Component {
               {...sharedTableProps}
               onDoubleClick={onConstructDoubleClick}
               schema={schemas.j5RunConstructs}
-              formName={"j5RunConstructs"} //because these tables are currently not connected to table params, we need to manually pass a formName here
+              formName="j5RunConstructs" //because these tables are currently not connected to table params, we need to manually pass a formName here
               entities={entitiesForAllTables.j5RunConstructs}
             />
           </CollapsibleCard>
