@@ -223,9 +223,9 @@ const demos = {
   },
   J5ReportRecordView: {
     demo: J5ReportRecordView,
-   scope: {
-     data: j5ReportRecordViewData
-   }
+    scope: {
+      data: j5ReportRecordViewData
+    }
   }
   // fonticons: {
   //   demo: FontIconsDemo,
@@ -310,11 +310,17 @@ const Demo = () => {
           <div
             style={{
               display: "flex",
-              padding: 40
+              padding: 40,
+              maxWidth: "100vw"
             }}
           >
             <DemoNav demos={demos} />
-            <div style={{ margin: 15, width: "100%" }}>
+            <div
+              style={{
+                overflow: "auto",
+                padding: 10
+              }}
+            >
               <Route
                 exact
                 path="/"
