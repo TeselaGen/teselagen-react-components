@@ -24,8 +24,12 @@ export default schema => {
         type: "string"
       };
     }
-    fieldToUse.displayName =
-      fieldToUse.displayName || startCase(fieldToUse.path);
+    if (!fieldToUse.displayName) {
+      fieldToUse = {
+        ...fieldToUse,
+        displayName: startCase(fieldToUse.path)
+      };
+    }
     return fieldToUse;
   });
   return schemaToUse;
