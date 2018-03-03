@@ -363,7 +363,7 @@ export const renderReactSelect = props => {
         ? valueToUse.filter(val => !!val).map(function(val) {
             return val.value;
           })
-        : valueToUse ? valueToUse.value : "";
+        : valueToUse;
       if (rest.submitOnBlur) {
         onFieldSubmit(valToPass);
       }

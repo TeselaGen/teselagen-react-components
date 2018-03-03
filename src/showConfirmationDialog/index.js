@@ -3,6 +3,58 @@ import React, { Component } from "react";
 import { Alert, Intent } from "@blueprintjs/core";
 import ReactDOM from "react-dom";
 
+// usage
+// showConfirmationDialog({
+//   text:
+//     "Are you sure you want to re-run this tool? Downstream tools with linked outputs will need to be re-run as well!",
+//   onConfirm: async () => {
+//     //confirm stuff
+//   },
+//   onCancel: () => {
+//     //cancel Stuff
+//   }
+// });
+//returns a promise that resolves with true or false depending on if the user cancels or not!
+export default function showConfirmationDialog(opts) {
+  return new Promise(resolve => {
+    renderOnDoc(handleClose => {
+      return <AlertWrapper {...{ ...opts, handleClose, resolve }} />;
+    });
+  });
+}
+
+class AlertWrapper extends Component {
+  state = { isOpen: true };
+  render() {
+    const {
+      handleClose,
+      children,
+      text = "customize like --  {text: 'your text here'} ",
+      resolve,
+      cancelButtonText = "Cancel",
+      intent = Intent.PRIMARY,
+      ...rest
+    } = this.props;
+    const doClose = confirm => {
+      handleClose();
+      this.setState({ isOpen: false });
+      resolve(confirm);
+    };
+    return (
+      <Alert
+        isOpen={this.state.isOpen}
+        intent={intent}
+        cancelButtonText={cancelButtonText}
+        onCancel={() => doClose(false)}
+        onConfirm={() => doClose(true)}
+        {...rest}
+      >
+        {children || text}
+      </Alert>
+    );
+  }
+}
+
 export function renderOnDoc(fn) {
   const elemDiv = document.createElement("div");
   elemDiv.style.cssText =
@@ -15,46 +67,4 @@ export function renderOnDoc(fn) {
     });
   };
   return ReactDOM.render(fn(handleClose), elemDiv);
-}
-
-export default function showConfirmationDialog(opts) {
-  return renderOnDoc(handleClose => {
-    return <AlertWrapper {...{ ...opts, handleClose }} />;
-  });
-}
-
-class AlertWrapper extends Component {
-  state = { isOpen: true };
-  render() {
-    const {
-      handleClose,
-      children,
-      text = "customize like --  {text: 'your text here'} ",
-      onCancel = () => {},
-      cancelButtonText = "Cancel",
-      onConfirm = () => {},
-      intent = Intent.PRIMARY,
-      ...rest
-    } = this.props;
-    return (
-      <Alert
-        isOpen={this.state.isOpen}
-        intent={intent}
-        onCancel={(...args) => {
-          handleClose();
-          this.setState({ isOpen: false });
-          onCancel(...args);
-        }}
-        cancelButtonText={cancelButtonText}
-        onConfirm={(...args) => {
-          handleClose();
-          this.setState({ isOpen: false });
-          onConfirm(...args);
-        }}
-        {...rest}
-      >
-        {children || text}{" "}
-      </Alert>
-    );
-  }
 }
