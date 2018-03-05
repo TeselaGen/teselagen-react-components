@@ -51,6 +51,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       schema,
       isInfinite,
       isSimple,
+      initialValues,
       additionalFilter = {}
     } = mergedOpts;
 
@@ -130,7 +131,10 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
             [withSelectedEntities]: selectedEntities
           }
         : {}),
-      initialValues: { reduxFormSearchInput: currentParams.searchTerm }
+      initialValues: {
+        ...initialValues,
+        reduxFormSearchInput: currentParams.searchTerm
+      }
     };
   };
 
