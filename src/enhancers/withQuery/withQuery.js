@@ -127,11 +127,13 @@ export default function withQuery(inputFragment, options = {}) {
             undefined
         })
         .then(function(res) {
-          return Promise.resolve(
-            isPlural ? res.data[nameToUse].results : res.data[nameToUse],
-            res.data,
-            res
-          );
+          const toReturn = isPlural
+            ? [...res.data[nameToUse].results]
+            : res.data[nameToUse];
+          if (isPlural) {
+            toReturn.totalResults = res.data[nameToUse].totalResults;
+          }
+          return toReturn;
         });
     };
   }
