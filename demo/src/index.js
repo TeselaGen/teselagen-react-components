@@ -3,6 +3,7 @@ import CollapsibleCard from "./examples/CollapsibleCard";
 import DataTableExample from "./examples/DataTable";
 import FormComponents from "./examples/FormComponents";
 import WithDialog from "./examples/WithDialog";
+import Toastr from "./examples/Toastr";
 import SimpleTable from "./examples/SimpleTable";
 import InfoHelper from "./examples/InfoHelper";
 import Loading from "./examples/Loading";
@@ -219,7 +220,12 @@ const demos = {
   withDialog: {
     demo: WithDialog,
     url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/WithDialogDemo/index.js"
+      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/WithDialog/index.js"
+  },
+  toastr: {
+    demo: Toastr,
+    url:
+      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/Toastr/index.js"
   },
   J5ReportRecordView: {
     demo: J5ReportRecordView,
