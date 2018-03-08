@@ -1,3 +1,9 @@
+@import url(~@blueprintjs/core/lib/css/blueprint.css);
+@import url(~@blueprintjs/datetime/lib/css/blueprint-datetime.css);
+@import url(~@blueprintjs/icons/lib/css/blueprint-icons.css);
+@import url(~react-select/dist/react-select.css);
+@import url(~react-table/react-table.css);
+
 /* Use in the place of .pt-card */
 .tg-card {
   padding: 20px;
