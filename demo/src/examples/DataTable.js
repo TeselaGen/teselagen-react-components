@@ -1,4 +1,3 @@
-const client = new ApolloClient({});
 const chance = new Chance();
 
 const schema = {

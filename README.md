@@ -40,7 +40,7 @@ yarn add teselagen-react-components
 ```
 Add peer-dependencies: 
 ```
-yarn add @blueprintjs/core @blueprintjs/datetime @blueprintjs/table react-addons-css-transition-group react-redux react-select redux 
+yarn add @blueprintjs/core @blueprintjs/datetime react-addons-css-transition-group react-redux react-select redux 
 ```
 
 ## Enhancers:

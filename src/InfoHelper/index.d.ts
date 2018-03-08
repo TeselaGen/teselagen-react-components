@@ -6,7 +6,7 @@ export interface IInfoHelper {
   className: string,
   content: any,
   children: any,
-  iconName: string,
+  icon: string,
   isPopover: boolean,
   size: number,
 }

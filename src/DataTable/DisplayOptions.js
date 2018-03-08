@@ -7,9 +7,9 @@ import {
   Menu,
   MenuItem,
   Classes,
-  InputGroup
+  InputGroup,
+  Popover
 } from "@blueprintjs/core";
-import { Popover2 } from "@blueprintjs/labs";
 
 export default class DisplayOptions extends React.Component {
   state = {
@@ -119,7 +119,7 @@ export default class DisplayOptions extends React.Component {
     }
 
     return (
-      <Popover2
+      <Popover
         isOpen={isOpen}
         onClose={this.closePopover}
         content={
@@ -169,7 +169,7 @@ export default class DisplayOptions extends React.Component {
           className={"pt-minimal"}
           iconName={"cog"}
         />
-      </Popover2>
+      </Popover>
     );
   }
 }

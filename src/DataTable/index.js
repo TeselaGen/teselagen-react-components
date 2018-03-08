@@ -25,9 +25,9 @@ import {
   Classes,
   ContextMenu,
   Checkbox,
-  Icon
+  Icon,
+  Popover
 } from "@blueprintjs/core";
-import { Popover2 as Popover } from "@blueprintjs/labs";
 import classNames from "classnames";
 import scrollIntoView from "dom-scroll-into-view";
 import { getSelectedRowsFromEntities } from "./utils/selection";

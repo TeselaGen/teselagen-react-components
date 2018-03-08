@@ -33,10 +33,12 @@ import {
   Position,
   Intent
 } from "@blueprintjs/core";
-import { ApolloProvider, ApolloClient } from "react-apollo";
 import renderToggle from "./renderToggle";
 import Chance from "chance";
 import times from "lodash/times";
+import client from "./client";
+import { ApolloProvider } from 'react-apollo';
+
 FocusStyleManager.onlyShowFocusOnTabs();
 
 const demos = {
@@ -44,9 +46,9 @@ const demos = {
     demo: DataTableExample,
     scope: {
       MenuItem,
-      Dialog,
       ApolloProvider,
-      ApolloClient,
+      Dialog,
+      client,
       withTableParams,
       DataTable,
       PagingTool,

@@ -1,6 +1,6 @@
 //@flow
 import React, { Component } from "react";
-import { Button, Classes } from "@blueprintjs/core";
+import { Button, Classes, Icon } from "@blueprintjs/core";
 import classNames from "classnames";
 import "./style.css";
 
@@ -23,17 +23,16 @@ export default class CollapsibleCard extends Component {
     return this.props.children;
   }
 
-  toggleCardInfo(open) {
+  toggleCardInfo = () => {
     this.setState({
-      open
+      open: !this.state.open
     });
-  }
+  };
 
   render() {
     const { open }: State = this.state;
     const {
       title,
-      iconName,
       icon,
       openTitleElements,
       noCard = false
@@ -53,8 +52,7 @@ export default class CollapsibleCard extends Component {
       >
         <div className="tg-card-header" style={{ marginBottom: 8 }}>
           <div className="tg-card-header-title">
-            {iconName && <div className={"pt-icon-" + iconName} style={{}} />}
-            {icon && <div>{icon}</div>}
+            {icon && <Icon icon={icon} />}
             <h6
               style={{
                 marginBottom: 0,
@@ -68,11 +66,9 @@ export default class CollapsibleCard extends Component {
           </div>
           <div>
             <Button
-              iconName={open ? "minimize" : "maximize"}
+              icon={open ? "minimize" : "maximize"}
               className={classNames(Classes.MINIMAL, "info-btn")}
-              onClick={() => {
-                this.toggleCardInfo(!open);
-              }}
+              onClick={this.toggleCardInfo}
             />
           </div>
         </div>

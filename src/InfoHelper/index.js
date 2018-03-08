@@ -1,14 +1,14 @@
 //@flow
 import React, { Component } from "react";
-import { Popover, Button, Tooltip } from "@blueprintjs/core";
+import { Popover, Button, Tooltip, Icon } from "@blueprintjs/core";
 
-export default class Card extends Component {
+export default class InfoHelper extends Component {
   render() {
     const {
       className,
       content,
       children,
-      iconName,
+      icon = "info-sign",
       isPopover,
       size
     }: Props = this.props;
@@ -20,7 +20,7 @@ export default class Card extends Component {
             <Button
               style={{ borderRadius: 15, borderWidth: 5 }}
               className={"pt-minimal " + (className || "")}
-              iconName={iconName || "info-sign"}
+              icon={icon}
             />
           }
           content={<div style={{ padding: 5 }}>{content || children}</div>}
@@ -29,14 +29,7 @@ export default class Card extends Component {
     } else {
       return (
         <Tooltip
-          target={
-            <span
-              style={{ ...(size ? { fontSize: size } : {}) }}
-              className={
-                (className || "") + " pt-icon-" + (iconName || "info-sign")
-              }
-            />
-          }
+          target={<Icon icon={icon} className={className} iconSize={size} />}
           content={content || children}
         />
       );
