@@ -1,10 +1,10 @@
+//@flow
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
 import moment from "moment";
 import { camelCase } from "lodash";
 
 // import {DateRangeInputField, DateInputField} from '../FormComponents';
 
-//@flow
 import "../toastr";
 import { onEnterOrBlurHelper } from "../utils/handlerHelpers";
 import React from "react";
@@ -92,6 +92,7 @@ export default class FilterAndSortMenu extends React.Component {
       endsWith: "text",
       contains: "text",
       isExactly: "text",
+      inList: "text",
       true: "boolean",
       false: "boolean",
       dateIs: "date",
@@ -288,7 +289,13 @@ class FilterInput extends React.Component {
 function getFilterMenuItems(dataType) {
   let filterMenuItems = [];
   if (dataType === "string") {
-    filterMenuItems = ["Contains", "Starts with", "Ends with", "Is exactly"];
+    filterMenuItems = [
+      "Contains",
+      "Starts with",
+      "Ends with",
+      "Is exactly",
+      "In List"
+    ];
   } else if (dataType === "lookup") {
     filterMenuItems = ["Contains", "Starts with", "Ends with", "Is exactly"];
   } else if (dataType === "boolean") {
@@ -297,7 +304,13 @@ function getFilterMenuItems(dataType) {
     // else if (dataType === "lookup") {
     //   filterMenuItems = ["None"];
     // }
-    filterMenuItems = ["Greater than", "Less than", "In range", "Equal to"];
+    filterMenuItems = [
+      "Greater than",
+      "Less than",
+      "In range",
+      "Equal to",
+      "In List"
+    ];
   } else if (dataType === "timestamp") {
     filterMenuItems = ["Is between", "Is before", "Is after"];
   }

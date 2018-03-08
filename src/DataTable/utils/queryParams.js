@@ -112,13 +112,7 @@ function getAndAndOrFilters(allFilters) {
 }
 
 function filterEntitiesLocal(filters = [], searchTerm, entities, schema) {
-  let allFilters = [
-    ...filters,
-    ...getFiltersFromSearchTerm(searchTerm, schema)
-  ];
-  allFilters = allFilters.filter(val => {
-    return val !== "";
-  });
+  const allFilters = getAllFilters(filters, searchTerm, schema);
   if (allFilters.length) {
     const ccFields = getFieldsMappedByCCDisplayName(schema);
     const { andFilters, orFilters } = getAndAndOrFilters(allFilters);
@@ -493,6 +487,42 @@ export function makeDataTableHandlers({
   };
 }
 
+// if an inList value only has two items like
+// 2.3 then it will get parsed to a number and
+// break, convert it back to a string here
+function cleanupFilter(filter) {
+  let filterToUse = filter;
+  if (
+    filterToUse.selectedFilter === "inList" &&
+    typeof filterToUse.filterValue === "number"
+  ) {
+    filterToUse = {
+      ...filterToUse,
+      filterValue: filterToUse.filterValue.toString()
+    };
+  }
+  if (filterToUse.selectedFilter === "inList") {
+    filterToUse = {
+      ...filterToUse,
+      filterValue: filterToUse.filterValue.replace(/, |,/g, ".")
+    };
+  }
+  return filterToUse;
+}
+
+function getAllFilters(filters, searchTerm, schema) {
+  let allFilters = [
+    ...filters,
+    ...getFiltersFromSearchTerm(searchTerm, schema)
+  ];
+
+  allFilters = allFilters.filter(val => {
+    return val !== "";
+  }); //get rid of erroneous filters
+
+  return allFilters.map(cleanupFilter);
+}
+
 export function getQueryParams({
   currentParams,
   urlConnected,
@@ -604,31 +634,7 @@ export function getQueryParams({
     }
 
     let errorParsingUrlString;
-    let allFilters = [
-      ...filters,
-      ...getFiltersFromSearchTerm(searchTerm, schema)
-    ];
-
-    allFilters = allFilters.filter(val => {
-      return val !== "";
-    }); //get rid of erroneous filters
-
-    // if an inList value only has two items like
-    // 2.3 then it will get parsed to a number and
-    // break, convert it back to a string here
-    allFilters = allFilters.map(val => {
-      if (
-        val.selectedFilter === "inList" &&
-        typeof val.filterValue === "number"
-      ) {
-        return {
-          ...val,
-          filterValue: val.filterValue.toString()
-        };
-      }
-      return val;
-    });
-
+    const allFilters = getAllFilters(filters, searchTerm, schema);
     const { andFilters, orFilters } = getAndAndOrFilters(allFilters);
     const additionalFilterToUse = additionalFilter(qb, currentParams);
     try {
