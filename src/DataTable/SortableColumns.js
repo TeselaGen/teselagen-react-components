@@ -48,8 +48,9 @@ const SortableCustomTheadComponent = SortableContainer(CustomTheadComponent);
 class SortableColumns extends Component {
   shouldCancelStart = e => {
     const className = e.target.className;
+    // if its an svg then it's a blueprint icon
     return (
-      className.indexOf("pt-icon") > -1 || className.indexOf("rt-resizer") > -1
+      e.target instanceof SVGElement || className.indexOf("rt-resizer") > -1
     );
   };
 

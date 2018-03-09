@@ -83,7 +83,7 @@ export default class DisplayOptions extends React.Component {
         return (
           <MenuItem key={groupName} text={groupName}>
             <InputGroup
-              leftIconName="search"
+              leftIcon="search"
               value={searchTerm}
               onChange={e => {
                 this.setState({
@@ -167,7 +167,7 @@ export default class DisplayOptions extends React.Component {
           onClick={this.openPopover}
           disabled={disabled}
           className={"pt-minimal"}
-          iconName={"cog"}
+          icon={"cog"}
         />
       </Popover>
     );

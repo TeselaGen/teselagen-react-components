@@ -3,12 +3,3 @@
 @import url(~@blueprintjs/icons/lib/css/blueprint-icons.css);
 @import url(~react-select/dist/react-select.css);
 @import url(~react-table/react-table.css);
-
-/* Use in the place of .pt-card */
-.tg-card {
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 5px;
-  background: white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.18);
-}

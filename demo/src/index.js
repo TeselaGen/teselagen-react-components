@@ -101,7 +101,7 @@ const demos = {
         type: "number"
       },
       {
-        name: "iconName",
+        name: "icon",
         type: "string",
         description: "Override the default info icon."
       }
@@ -118,8 +118,8 @@ const demos = {
         type: "string | React Element"
       },
       {
-        name: "iconName",
-        description: "BlueprintJS iconName to be displayed in card header",
+        name: "icon",
+        description: "BlueprintJS icon to be displayed in card header",
         type: "string"
       },
       {

@@ -486,7 +486,7 @@ class ReactDataTable extends React.Component {
                   Classes.MINIMAL,
                   Classes.SMALL
                 )}
-                iconName={isExpanded ? "chevron-down" : "chevron-right"}
+                icon={isExpanded ? "chevron-down" : "chevron-right"}
               />
             );
           }}
@@ -916,20 +916,16 @@ class ReactDataTable extends React.Component {
     const filterMenu =
       withFilter && !isActionColumn && !filterDisabled ? (
         <Popover
-          placement="bottom"
+          position="bottom"
           modifiers={{
             arrow: false
           }}
         >
-          <Button
-            title={"Filter"}
-            className={classNames(
-              "tg-filter-menu-button",
-              Classes.MINIMAL,
-              { "tg-active-filter": !!filterActiveForColumn },
-              Classes.SMALL
-            )}
-            iconName="filter"
+          <Icon
+            icon="filter"
+            className={classNames("tg-filter-menu-button", {
+              "tg-active-filter": !!filterActiveForColumn
+            })}
           />
           <FilterMenu
             addFilters={addFilters}
@@ -1186,6 +1182,6 @@ const viewColumn = {
   immovable: true,
   type: "action",
   render: () => {
-    return <Icon className="dt-eyeIcon" iconName="eye-open" />;
+    return <Icon className="dt-eyeIcon" icon="eye-open" />;
   }
 };

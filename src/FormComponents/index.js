@@ -2,11 +2,11 @@ import sortify from "./sortify"; //tnr TODO: export this from json.sortify when 
 import { isNumber, noop } from "lodash";
 import mathExpressionEvaluator from "math-expression-evaluator";
 import deepEqual from "deep-equal";
-import moment from "moment";
 import React from "react";
 import { Field } from "redux-form";
 import Select from "react-select";
 import Uploader from "./Uploader";
+import getMomentFormatter from "../utils/getMomentFormatter";
 
 import "./style.css";
 import {
@@ -153,14 +153,6 @@ class AbstractInput extends React.Component {
       </div>
     );
   }
-}
-
-function getMomentFormatter(format) {
-  return {
-    formatDate: date => moment(date).format(format),
-    parseDate: str => moment(str, format).toDate(),
-    placeholder: format
-  };
 }
 
 export const renderBlueprintDateInput = props => {

@@ -6,7 +6,7 @@ import "./style.css";
 
 type Props = {
   title: string,
-  iconName: string,
+  icon: string,
   openTitleElements: boolean
 };
 

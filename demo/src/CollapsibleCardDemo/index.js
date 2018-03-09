@@ -8,7 +8,7 @@ export default function InfoHelperDemo() {
       <CollapsibleCard
         title="Jobs"
         openTitleElements={<Button text="hey" icon="add" />}
-        iconName="build"
+        icon="build"
       >
         I'm some content!
       </CollapsibleCard>

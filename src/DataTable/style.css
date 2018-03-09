@@ -1,5 +1,4 @@
-@import url(~react-table/react-table.css);
-
+/* DataTable style.css */
 .custom-menu-item {
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -110,17 +109,14 @@
 }
 
 .rt-th:hover > * {
-  transition: 0.2s;
   display: inherit !important;
 }
 
 .rt-th:hover .tg-sort-arrow-container > * {
-  transition: 0.2s;
   display: inherit !important;
 }
 
 .rt-th:hover .tg-filter-menu-button {
-  transition: 0.2s;
   display: block !important;
 }
 
@@ -151,16 +147,22 @@
 }
 
 .tg-active-sort {
-  color: blue;
+  color: #106ba3;
   display: inherit !important;
 }
 
 .tg-filter-menu-button {
   display: none !important;
+  cursor: pointer;
+  color: darkgrey;
+}
+
+.tg-filter-menu-button:hover {
+  color: #5c7080;
 }
 
 .tg-active-filter {
-  color: blue;
+  color: #106ba3;
   display: block !important;
 }
 

@@ -92,7 +92,7 @@ export class PagingTool extends React.Component {
         {onRefresh && (
           <Button
             className={"pt-minimal"}
-            iconName="refresh"
+            icon="refresh"
             disabled={disabled}
             onClick={this.onRefresh}
           />
@@ -125,7 +125,7 @@ export class PagingTool extends React.Component {
             onClick={this.pageBack}
             disabled={!backEnabled || disabled}
             className="pt-minimal paging-arrow-left"
-            iconName="chevron-left"
+            icon="chevron-left"
           />
         </div>
         <div>
@@ -149,7 +149,7 @@ export class PagingTool extends React.Component {
           <Button
             style={{ marginLeft: 5 }}
             disabled={!forwardEnabled || disabled}
-            iconName="chevron-right"
+            icon="chevron-right"
             className="pt-minimal  paging-arrow-right"
             onClick={this.pageForward}
           />

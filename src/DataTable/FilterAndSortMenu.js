@@ -2,6 +2,7 @@
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
 import moment from "moment";
 import { camelCase } from "lodash";
+import getMomentFormatter from "../utils/getMomentFormatter";
 
 // import {DateRangeInputField, DateInputField} from '../FormComponents';
 
@@ -246,6 +247,7 @@ class FilterInput extends React.Component {
           <div className={"custom-menu-item"}>
             <DateInput
               value={filterValue ? moment(filterValue).toDate() : undefined}
+              {...getMomentFormatter("MM/DD/YYYY")}
               minDate={moment(0).toDate()}
               maxDate={moment(9999999999999).toDate()}
               onChange={selectedDates => {
@@ -268,6 +270,7 @@ class FilterInput extends React.Component {
                     ]
                   : undefined
               }
+              {...getMomentFormatter("MM/DD/YYYY")}
               minDate={moment(0).toDate()}
               maxDate={moment(99999999999999).toDate()}
               onChange={selectedDates => {
