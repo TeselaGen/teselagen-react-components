@@ -85,10 +85,13 @@ function orderEntitiesLocal(orderArray, entities, schema) {
       const { path } = field;
       ascOrDescArray.push(ccDisplayName === order ? "asc" : "desc");
       //push the actual sorting function
-      orderFuncs.push(o => {
-        return get(o, path);
-      });
-      return true;
+      if (path && endsWith(path.toLowerCase(), "id")) {
+        orderFuncs.push(o => {
+          return parseInt(get(o, path), 10);
+        });
+      } else {
+        orderFuncs.push(path);
+      }
     });
     entities = orderBy(entities, orderFuncs, ascOrDescArray);
   }

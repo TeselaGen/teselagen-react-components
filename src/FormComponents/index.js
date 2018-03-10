@@ -114,7 +114,7 @@ class AbstractInput extends React.Component {
 
     const componentToWrap = tooltipError ? (
       <Tooltip
-        isDisabled={!showError}
+        disabled={!showError}
         intent={Intent.DANGER}
         content={error}
         position={Position.TOP}
