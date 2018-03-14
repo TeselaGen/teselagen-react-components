@@ -184,6 +184,7 @@ class FormComponentsDemo extends React.Component {
             onFieldSubmit={function(val) {
               console.info("on field submit!:", val);
             }}
+            defaultValue={new Date()}
             minDate={new Date()}
             maxDate={
               new Date(new Date().setFullYear(new Date().getFullYear() + 10))
