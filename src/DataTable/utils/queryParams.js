@@ -140,10 +140,10 @@ function filterEntitiesLocal(filters = [], searchTerm, entities, schema) {
 function getEntitiesForGivenFilter(entities, filter, ccFields) {
   const { filterOn, filterValue, selectedFilter } = filter;
   const field = ccFields[filterOn];
-  const { path, getValue } = field;
+  const { path, getValueToFilterOn } = field;
   const subFilter = getSubFilter(false, selectedFilter, filterValue);
   entities = entities.filter(entity => {
-    const fieldVal = getValue ? getValue(entity) : get(entity, path);
+    const fieldVal = getValueToFilterOn ? getValueToFilterOn(entity) : get(entity, path);
     const shouldKeep = subFilter(fieldVal);
     return shouldKeep;
   });
