@@ -589,7 +589,10 @@ export function getQueryParams({
     //we don't want to do the following gql stuff
     return toReturn;
   } else {
-    let graphqlQueryParams = {};
+    const graphqlQueryParams = {
+      // need to make sure sort exists because of https://github.com/apollographql/apollo-client/issues/3077
+      sort: []
+    };
     if (isInfinite) {
       graphqlQueryParams.pageSize = 999;
       graphqlQueryParams.pageNumber = 1;

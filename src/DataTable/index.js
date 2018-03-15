@@ -922,6 +922,7 @@ class ReactDataTable extends React.Component {
           }}
         >
           <Icon
+            style={{ marginLeft: 5 }}
             icon="filter"
             className={classNames("tg-filter-menu-button", {
               "tg-active-filter": !!filterActiveForColumn

@@ -122,7 +122,9 @@ class DataTableDemo extends React.Component {
                   title="Table inside a dialog"
                   isOpen={this.state.inDialog}
                 >
-                  <ConnectedTable />
+                  <div className="pt-dialog-body">
+                    <ConnectedTable />
+                  </div>
                 </Dialog>
               ) : this.state.renderUnconnectedTable ? (
                 <DataTableInstance
