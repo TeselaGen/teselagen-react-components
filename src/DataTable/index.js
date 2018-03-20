@@ -1076,7 +1076,7 @@ const enhancer = compose(
         schemaToUse.fields = schemaToUse.fields.sort(
           ({ path: path1 }, { path: path2 }) => {
             return (
-              columnOrderings.indexOf(path1) > columnOrderings.indexOf(path2)
+              columnOrderings.indexOf(path1) - columnOrderings.indexOf(path2)
             );
           }
         );
