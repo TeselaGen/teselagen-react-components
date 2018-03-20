@@ -7,6 +7,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import moment from "moment";
 import { arrayMove } from "react-sortable-hoc";
+import copy from 'copy-to-clipboard';
+
 import {
   camelCase,
   get,
@@ -22,6 +24,7 @@ import {
   Spinner,
   // Popover,
   // Position,
+  MenuItem,
   Classes,
   ContextMenu,
   Checkbox,
@@ -52,6 +55,8 @@ import "../toastr";
 import "./style.css";
 import withTableParams from "./utils/withTableParams";
 import SortableColumns from "./SortableColumns";
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+
 
 //we use this to make adding preset prop groups simpler
 function computePresets(props) {
@@ -105,6 +110,7 @@ class ReactDataTable extends React.Component {
     page: 1,
     style: {},
     isLoading: false,
+    isCopyable: false,
     disabled: false,
     noSelect: false,
     noUserSelect: false,
@@ -143,15 +149,15 @@ class ReactDataTable extends React.Component {
     if (!deepEqual(newProps.schema, oldProps.schema)) {
       const { schema = {} } = newProps;
       const columns = schema.fields
-        ? schema.fields.reduce(function(columns, field, i) {
-            if (field.isHidden) {
-              return columns;
-            }
-            return columns.concat({
-              ...field,
-              columnIndex: i
-            });
-          }, [])
+        ? schema.fields.reduce(function (columns, field, i) {
+          if (field.isHidden) {
+            return columns;
+          }
+          return columns.concat({
+            ...field,
+            columnIndex: i
+          });
+        }, [])
         : [];
       this.setState({ columns });
     }
@@ -265,6 +271,7 @@ class ReactDataTable extends React.Component {
       className,
       tableName,
       isLoading,
+      isCopyable,
       searchTerm,
       setSearchTerm,
       clearFilters,
@@ -357,8 +364,8 @@ class ReactDataTable extends React.Component {
     const maybeSpinner = isLoading ? (
       <Spinner className={Classes.SMALL} />
     ) : (
-      undefined
-    );
+        undefined
+      );
 
     const selectedRowCount = Object.keys(
       reduxFormSelectedEntityIdMap.input.value || {}
@@ -408,22 +415,22 @@ class ReactDataTable extends React.Component {
             )}
             {filtersOnNonDisplayedFields.length
               ? filtersOnNonDisplayedFields.map(
-                  ({ displayName, path, selectedFilter, filterValue }) => {
-                    return (
-                      <div
-                        key={displayName || startCase(path)}
-                        className={"tg-filter-on-non-displayed-field"}
-                      >
-                        <span className={"pt-icon-filter"} />
-                        <span>
-                          {" "}
-                          {displayName || startCase(path)} {selectedFilter}{" "}
-                          {filterValue}{" "}
-                        </span>
-                      </div>
-                    );
-                  }
-                )
+                ({ displayName, path, selectedFilter, filterValue }) => {
+                  return (
+                    <div
+                      key={displayName || startCase(path)}
+                      className={"tg-filter-on-non-displayed-field"}
+                    >
+                      <span className={"pt-icon-filter"} />
+                      <span>
+                        {" "}
+                        {displayName || startCase(path)} {selectedFilter}{" "}
+                        {filterValue}{" "}
+                      </span>
+                    </div>
+                  );
+                }
+              )
               : ""}
             {withSearch && (
               <div className={"data-table-search-and-clear-filter-container"}>
@@ -437,8 +444,8 @@ class ReactDataTable extends React.Component {
                     text={"Clear filters"}
                   />
                 ) : (
-                  ""
-                )}
+                    ""
+                  )}
                 <SearchBar
                   {...{
                     reduxFormSearchInput,
@@ -509,12 +516,12 @@ class ReactDataTable extends React.Component {
                 <div className={"tg-react-table-selected-count"}>
                   {`${selectedRowCount} Record${
                     selectedRowCount === 1 ? "" : "s"
-                  } Selected `}
+                    } Selected `}
                 </div>
               )}
             {showCount &&
               `${entityCount} ${
-                entityCount === 1 ? "Record" : "Total Records"
+              entityCount === 1 ? "Record" : "Total Records"
               }`}
             <div style={{ display: "flex", flexWrap: "wrap" }}>
               {withDisplayOptions && (
@@ -529,10 +536,10 @@ class ReactDataTable extends React.Component {
                 />
               )}
               {!isInfinite &&
-              withPaging &&
-              (hidePageSizeWhenPossible ? entityCount > pageSize : true) ? (
-                <PagingTool {...computePresets(this.props)} />
-              ) : null}
+                withPaging &&
+                (hidePageSizeWhenPossible ? entityCount > pageSize : true) ? (
+                  <PagingTool {...computePresets(this.props)} />
+                ) : null}
             </div>
           </div>
         )}
@@ -586,7 +593,7 @@ class ReactDataTable extends React.Component {
             props: computePresets(this.props)
           });
         }
-        this.showContextMenu(newIdMap, e);
+        this.showContextMenu(newIdMap, e, rowId);
       },
       className: rowSelected && !withCheckboxes ? "selected" : "",
       onDoubleClick: () => {
@@ -738,7 +745,7 @@ class ReactDataTable extends React.Component {
   };
 
   renderColumns = () => {
-    const { cellRenderer, withCheckboxes, getCellHoverText } = computePresets(
+    const { cellRenderer, withCheckboxes, getCellHoverText, isCopyable } = computePresets(
       this.props
     );
     const { columns } = this.state;
@@ -747,24 +754,24 @@ class ReactDataTable extends React.Component {
     }
     const columnsToRender = withCheckboxes
       ? [
-          {
-            Header: this.renderCheckboxHeader,
-            Cell: this.renderCheckboxCell,
-            width: 35,
-            resizable: false,
-            getHeaderProps: () => {
-              return {
-                className: "tg-react-table-checkbox-header-container",
-                immovable: "true"
-              };
-            },
-            getProps: () => {
-              return {
-                className: "tg-react-table-checkbox-cell-container"
-              };
-            }
+        {
+          Header: this.renderCheckboxHeader,
+          Cell: this.renderCheckboxCell,
+          width: 35,
+          resizable: false,
+          getHeaderProps: () => {
+            return {
+              className: "tg-react-table-checkbox-header-container",
+              immovable: "true"
+            };
+          },
+          getProps: () => {
+            return {
+              className: "tg-react-table-checkbox-cell-container"
+            };
           }
-        ]
+        }
+      ]
       : [];
     columns.forEach(column => {
       const tableColumn = {
@@ -803,7 +810,6 @@ class ReactDataTable extends React.Component {
       const oldFunc = tableColumn.Cell;
       tableColumn.Cell = (...args) => {
         //wrap the original tableColumn.Cell function in another div in order to add a title attribute
-
         const val = oldFunc(...args);
         let title = typeof val !== "string" ? args[0].value : val;
         if (title) title = String(title);
@@ -816,26 +822,77 @@ class ReactDataTable extends React.Component {
                 : { textOverflow: "ellipsis", overflow: "hidden" }
             }
             title={title || undefined}
+            className="hoverable"
           >
-            {val}
+            {typeof val === 'string' && val !== '' && isCopyable ?
+              <CopyToClipboard text={val}
+                onCopy={() => { window.toastr.success(`${val} - copy to clipboard`) }}>
+                <span className="pt-icon-standard pt-icon-clipboard show-on-hover" />
+              </CopyToClipboard>
+              : ''} {val}
           </div>
         );
       };
+
 
       columnsToRender.push(tableColumn);
     });
     return columnsToRender;
   };
 
-  showContextMenu = (idMap, e) => {
-    const { history, contextMenu, entities } = computePresets(this.props);
+  setRowToCopy = (rowId) => {
+    const { entities } = computePresets(this.props);
+    const { columns } = this.state
+    let row = entities[rowId];
+    let textRow;
+    columns.map((col) => {
+      if (typeof row[col.path] !== 'undefined') {
+        textRow = textRow !== '' ? textRow + '\t' + row[col.path] : row[col.path];
+      }
+    });
+    return textRow;
+  }
+
+  setManyRowsToCopy = (selectedRecords) => {
+    const { columns } = this.state;
+    let text;
+    selectedRecords.map((row) => {
+      let textByRow;
+      columns.map((col) => {
+        if (typeof row[col.path] !== "undefined") {
+          textByRow = textByRow ? textByRow + '\t' + row[col.path] : row[col.path];
+        }
+      });
+      text = text ? text + textByRow + '\n' : textByRow + '\n';
+    });
+    return text;
+  }
+
+  showContextMenu = (idMap, e, rowId) => {
+    const { history, contextMenu, entities, isCopyable } = computePresets(this.props);
     const selectedRecords = getSelectedRecordsFromEntities(entities, idMap);
+    const textRow = this.setRowToCopy(rowId);
+    const context = this;
     const itemsToRender = contextMenu({
       selectedRecords,
       history
     });
     if (!itemsToRender) return null;
-    const menu = <Menu>{itemsToRender}</Menu>;
+    const menu = <Menu>{itemsToRender}{isCopyable ? <MenuItem
+      key="copyRow"
+      onClick={function () {
+        copy(textRow);
+        window.toastr.success('Entire row copied');
+      }}
+      text={'Copy entire row'}
+    /> : ''}{selectedRecords.length > 0 && isCopyable? <MenuItem
+      key="copySelectedRows"
+      onClick={function () {
+        copy(context.setManyRowsToCopy(selectedRecords));
+        window.toastr.success('Selected rows copied');
+      }}
+      text={'Copy selected rows'}
+    /> : ''}</Menu>;
     ContextMenu.show(menu, { left: e.clientX, top: e.clientY });
   };
 
@@ -953,6 +1010,7 @@ class ReactDataTable extends React.Component {
       </div>
     );
   };
+
 }
 
 /**
@@ -1085,14 +1143,14 @@ const enhancer = compose(
       if (syncDisplayOptionsToDb) {
         //sync up to db
         let tableConfigurationId;
-        resetDefaultVisibility = function() {
+        resetDefaultVisibility = function () {
           tableConfigurationId = tableConfig.id;
 
           if (tableConfigurationId) {
             deleteTableConfiguration(tableConfigurationId);
           }
         };
-        updateColumnVisibility = function({ shouldShow, path }) {
+        updateColumnVisibility = function ({ shouldShow, path }) {
           if (tableConfigurationId) {
             // toArray({...stripFields(fieldOptsByPath, ['__typename']), [path]: {isHidden: !shouldShow, path, ...stripFields(fieldOptsByPath[path] || {}, ['__typename']) }  })
             const existingFieldOpt = fieldOptsByPath[path] || {};
@@ -1117,10 +1175,10 @@ const enhancer = compose(
         };
       } else {
         //sync display options with localstorage
-        resetDefaultVisibility = function() {
+        resetDefaultVisibility = function () {
           window.localStorage.removeItem(formName);
         };
-        updateColumnVisibility = function({ path, paths, shouldShow }) {
+        updateColumnVisibility = function ({ path, paths, shouldShow }) {
           const newFieldOpts = {
             ...fieldOptsByPath
           };
@@ -1131,11 +1189,11 @@ const enhancer = compose(
           tableConfig.fieldOptions = toArray(newFieldOpts);
           window.localStorage.setItem(formName, JSON.stringify(tableConfig));
         };
-        updateTableDisplayDensity = function(density) {
+        updateTableDisplayDensity = function (density) {
           tableConfig.density = density;
           window.localStorage.setItem(formName, JSON.stringify(tableConfig));
         };
-        moveColumnPersist = function({ oldIndex, newIndex }) {
+        moveColumnPersist = function ({ oldIndex, newIndex }) {
           //we might already have an array of the fields [path1, path2, ..etc]
           const columnOrderings =
             tableConfig.columnOrderings ||

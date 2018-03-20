@@ -286,3 +286,10 @@
 .ReactTable .rt-thead .rt-resizable-header:hover {
   border-right: 1px solid rgba(0, 0, 0, 0.05);
 }
+
+.show-on-hover{ 
+display: none;
+}
+.hoverable:hover .show-on-hover{
+display : inline;
+}

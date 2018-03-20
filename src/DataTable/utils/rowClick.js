@@ -5,7 +5,21 @@ import {
 } from "./selection";
 import getIdOrCodeOrIndex from "./getIdOrCodeOrIndex";
 
+
 export default function rowClick(e, rowInfo, entities, props) {
+  const selection = window.getSelection();
+  try {
+    document.execCommand('copy');
+    selection.removeAllRanges();
+    console.log('copy');
+  } catch (e) {
+    const errorMsg = document.querySelector('.error-msg');
+    errorMsg.classList.add('show');
+
+    setTimeout(() => {
+      errorMsg.classList.remove('show');
+    }, 1200);
+  }
   const {
     reduxFormSelectedEntityIdMap,
     isSingleSelect,
