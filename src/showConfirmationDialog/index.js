@@ -28,7 +28,6 @@ class AlertWrapper extends Component {
   render() {
     const {
       handleClose,
-      children,
       text = "customize like --  {text: 'your text here'} ",
       resolve,
       cancelButtonText = "Cancel",
@@ -49,7 +48,7 @@ class AlertWrapper extends Component {
         onConfirm={() => doClose(true)}
         {...rest}
       >
-        {children || text}
+        <p style={{ marginBottom: 10 }}>{text}</p>
       </Alert>
     );
   }

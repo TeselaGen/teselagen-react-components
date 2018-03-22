@@ -214,9 +214,6 @@
 .ReactTable .rt-tr-group.selected {
   background: lightblue !important;
 }
-.dt-isViewable .ReactTable .rt-tr-group.selected {
-  background: inherit !important;
-}
 
 .dt-isViewable .ReactTable .rt-tr-group.selected .dt-eyeIcon {
   color: #137cbd;
@@ -322,4 +319,8 @@
 
 .pt-dark .ReactTable .rt-tr-group.selected {
   background: #26738cb0 !important;
+}
+
+.dt-isViewable .ReactTable .rt-tr-group.selected {
+  background: inherit !important;
 }

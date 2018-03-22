@@ -150,3 +150,7 @@
   background: rgba(0, 126, 255, 0.08);
   color: #f5f8fa;
 }
+
+.pt-dark .tg-upload-file-list-item:hover {
+  background: #26738cb0;
+}
