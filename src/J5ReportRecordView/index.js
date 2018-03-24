@@ -399,7 +399,8 @@ class J5ReportRecordView extends Component {
       upsertSequence,
       getIsLinkedCellRenderer,
       LinkJ5TableDialog,
-      onConstructDoubleClick = noop
+      onConstructDoubleClick = noop,
+      pcrReactionsTitleElements
     } = this.props;
     const { linkDialogName } = this.state;
 
@@ -696,6 +697,7 @@ class J5ReportRecordView extends Component {
               </InfoHelper>
             }
             title={"PCR Reactions"}
+            openTitleElements={pcrReactionsTitleElements}
           >
             <DataTable
               {...sharedTableProps}
