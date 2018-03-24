@@ -324,3 +324,7 @@
 .dt-isViewable .ReactTable .rt-tr-group.selected {
   background: inherit !important;
 }
+
+.pt-dark .ReactTable .rt-thead .rt-resizable-header:hover {
+  border-right-color: #738694;
+}

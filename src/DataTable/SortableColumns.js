@@ -68,6 +68,7 @@ class SortableColumns extends Component {
         lockAxis="x"
         axis="x"
         distance={10}
+        helperClass="above-dialog"
         shouldCancelStart={this.shouldCancelStart}
         onSortEnd={this.onSortEnd}
       />

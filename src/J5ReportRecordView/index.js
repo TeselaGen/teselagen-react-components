@@ -2,7 +2,17 @@ import React, { Component } from "react";
 // import EditViewHOC from '../../EditViewHOC'
 import { reduxForm } from "redux-form";
 import { Button, Dialog } from "@blueprintjs/core";
-import { each, get, startCase, times, zip, flatten, noop } from "lodash";
+import {
+  each,
+  get,
+  startCase,
+  times,
+  zip,
+  flatten,
+  noop,
+  flatMap
+} from "lodash";
+import moment from "moment";
 import CollapsibleCard from "../CollapsibleCard";
 import InfoHelper from "../InfoHelper";
 import schemas from "./schemas";
@@ -77,13 +87,13 @@ const processJ5RunConstructs = j5RunConstructs =>
         j5RunConstruct,
         "j5ConstructAssemblyPieces[0].assemblyPiece.j5AssemblyPieceParts[0].j5InputPart.sequencePart.name"
       ) &&
-      j5RunConstruct.j5ConstructAssemblyPieces
-        .map(j5ConstructAssemblyPiece =>
+      flatMap(
+        j5RunConstruct.j5ConstructAssemblyPieces,
+        j5ConstructAssemblyPiece =>
           j5ConstructAssemblyPiece.assemblyPiece.j5AssemblyPieceParts.map(
             j5InputPart => j5InputPart.j5InputPart.sequencePart.name
           )
-        )
-        .join(", ")
+      ).join(", ")
   }));
 
 const getInputPartsFromInputSequences = j5InputSequences =>
@@ -140,6 +150,10 @@ class J5ReportRecordView extends Component {
         ...j5Oligo,
         id: "oligo_" + j5Oligo.id,
         name: j5Oligo.name
+          .replace("oli", "Oligo ")
+          .replace(/_/g, " ")
+          .replace("forward", "Forward")
+          .replace("reverse", "Reverse")
           .replace(partCids[0], firstTargetPart)
           .replace(partCids[1], lastTargetPart),
         firstTargetPart,
@@ -286,7 +300,7 @@ class J5ReportRecordView extends Component {
     }
 
     // JSON.parse(localStorage.getItem('TEMPORARY_j5Run')) || {}
-    const { name, assemblyType } = data.j5Report;
+    const { name, assemblyType, dateRan } = data.j5Report;
 
     return (
       <div className="j5-report-header tg-card">
@@ -299,17 +313,16 @@ class J5ReportRecordView extends Component {
     <InputField name="assemblyType" label="Assembly Type" />
     {Footer}
   </form>*/}
-        <div>
-          <span className="j5-report-fieldname">Design Name:</span> {name}
-        </div>
-        <div>
-          <span className="j5-report-fieldname">Assembly Method:</span>{" "}
-          {this.getAssemblyMethod()}
-        </div>
-        <div>
-          <span className="j5-report-fieldname">Assembly Type:</span>{" "}
-          {assemblyType}
-        </div>
+        <FieldWithLabel label="Design Name" field={name} />
+        <FieldWithLabel
+          label="Assembly Method"
+          field={this.getAssemblyMethod()}
+        />
+        <FieldWithLabel label="Assembly Type" field={assemblyType} />
+        <FieldWithLabel
+          label="Date Ran"
+          field={moment(dateRan).format("lll")}
+        />
         {/* tnr: add these in when they are available in lims/hde */}
         {/* <div>
       <span className="j5-report-fieldname">User Name:</span>{" "}
@@ -778,3 +791,12 @@ class J5ReportRecordView extends Component {
 export default reduxForm({
   form: "j5Report" // a unique name for this form
 })(J5ReportRecordView);
+
+function FieldWithLabel({ label, field }) {
+  return (
+    <div>
+      <span className="j5-report-fieldname">{label}: </span>
+      {field}
+    </div>
+  );
+}
