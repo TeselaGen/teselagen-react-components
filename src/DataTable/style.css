@@ -110,15 +110,15 @@
   justify-content: flex-start;
 }
 
-.rt-th:hover > * {
+.tg-react-table-column-header:hover > * {
   display: inherit !important;
 }
 
-.rt-th:hover .tg-sort-arrow-container > * {
+.tg-react-table-column-header:hover .tg-sort-arrow-container > * {
   display: inherit !important;
 }
 
-.rt-th:hover .tg-filter-menu-button {
+.tg-react-table-column-header:hover .tg-filter-menu-button {
   display: block !important;
 }
 
