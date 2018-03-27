@@ -1,11 +1,16 @@
 {
   "name": "teselagen-react-components",
-  "version": "22.0.13",
+  "version": "22.0.14",
   "description": "Teselagen React Component Library",
   "main": "lib/index.js",
   "homepage": "http://teselagen.github.io/teselagen-react-components",
   "//module": "es/index.js",
-  "files": ["css", "es", "lib", "umd"],
+  "files": [
+    "css",
+    "es",
+    "lib",
+    "umd"
+  ],
   "scripts": {
     "build": "nwb build-react-component --copy-files --no-demo",
     "buildWithDemo": "nwb build-react-component --copy-files",
@@ -21,11 +26,9 @@
     "test": "jest --env=jsdom --maxWorkers 2",
     "test-coverage": "yarn test -- --coverage",
     "test:staged": "cross-env CI=true yarn test -- --findRelatedTests",
-    "test-fix":
-      "git reset . && cross-env CI=true yarn test --onlyChanged --updateSnapshot",
+    "test-fix": "git reset . && cross-env CI=true yarn test --onlyChanged --updateSnapshot",
     "test-watch": "yarn test -- --watch",
-    "test-debug":
-      "node --inspect --debug-brk ./node_modules/.bin/jest src --runInBand "
+    "test-debug": "node --inspect --debug-brk ./node_modules/.bin/jest src --runInBand "
   },
   "dependencies": {
     "classnames": "^2.2.5",
@@ -121,20 +124,36 @@
       "yarn test:staged",
       "git add"
     ],
-    "*.css": ["prettier --write", "git add"]
+    "*.css": [
+      "prettier --write",
+      "git add"
+    ]
   },
   "jest": {
     "moduleNameMapper": {
       "\\.(css|scss|png)$": "identity-obj-proxy"
     },
-    "snapshotSerializers": ["<rootDir>/node_modules/enzyme-to-json/serializer"],
-    "testPathIgnorePatterns": ["/node_modules/", "/lib/", "/es/"],
+    "snapshotSerializers": [
+      "<rootDir>/node_modules/enzyme-to-json/serializer"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/lib/",
+      "/es/"
+    ],
     "setupTestFrameworkScriptFile": "<rootDir>/setupTests.js"
   },
   "license": "MIT",
   "repository": "https://github.com/TeselaGen/teselagen-react-components",
-  "keywords": ["react-component", "teselagen"],
+  "keywords": [
+    "react-component",
+    "teselagen"
+  ],
   "babel": {
-    "presets": ["es2015", "stage-0", "react"]
+    "presets": [
+      "es2015",
+      "stage-0",
+      "react"
+    ]
   }
 }
