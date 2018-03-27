@@ -5,12 +5,7 @@
   "main": "lib/index.js",
   "homepage": "http://teselagen.github.io/teselagen-react-components",
   "//module": "es/index.js",
-  "files": [
-    "css",
-    "es",
-    "lib",
-    "umd"
-  ],
+  "files": ["css", "es", "lib", "umd"],
   "scripts": {
     "build": "nwb build-react-component --copy-files --no-demo",
     "buildWithDemo": "nwb build-react-component --copy-files",
@@ -26,16 +21,17 @@
     "test": "jest --env=jsdom --maxWorkers 2",
     "test-coverage": "yarn test -- --coverage",
     "test:staged": "cross-env CI=true yarn test -- --findRelatedTests",
-    "test-fix": "git reset . && cross-env CI=true yarn test --onlyChanged --updateSnapshot",
+    "test-fix":
+      "git reset . && cross-env CI=true yarn test --onlyChanged --updateSnapshot",
     "test-watch": "yarn test -- --watch",
-    "test-debug": "node --inspect --debug-brk ./node_modules/.bin/jest src --runInBand "
+    "test-debug":
+      "node --inspect --debug-brk ./node_modules/.bin/jest src --runInBand "
   },
   "dependencies": {
     "classnames": "^2.2.5",
     "cross-env": "^5.1.4",
     "deep-equal": "^1.0.1",
     "dom-scroll-into-view": "^1.2.1",
-    "eslint-plugin-jsx-a11y": "5.1.1",
     "file-saver": "^1.3.8",
     "json.sortify": "^2.2.2",
     "lodash": "^4.17.5",
@@ -87,6 +83,7 @@
     "enzyme-to-json": "^3.3.3",
     "eslint": "^4.19.1",
     "eslint-config-react-app": "^2.1.0",
+    "eslint-plugin-jsx-a11y": "5.1.1",
     "eslint-config-teselagen": "^4.0.12",
     "eslint-plugin-flowtype": "^2.46.1",
     "eslint-plugin-import": "^2.9.0",
@@ -124,36 +121,20 @@
       "yarn test:staged",
       "git add"
     ],
-    "*.css": [
-      "prettier --write",
-      "git add"
-    ]
+    "*.css": ["prettier --write", "git add"]
   },
   "jest": {
     "moduleNameMapper": {
       "\\.(css|scss|png)$": "identity-obj-proxy"
     },
-    "snapshotSerializers": [
-      "<rootDir>/node_modules/enzyme-to-json/serializer"
-    ],
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/lib/",
-      "/es/"
-    ],
+    "snapshotSerializers": ["<rootDir>/node_modules/enzyme-to-json/serializer"],
+    "testPathIgnorePatterns": ["/node_modules/", "/lib/", "/es/"],
     "setupTestFrameworkScriptFile": "<rootDir>/setupTests.js"
   },
   "license": "MIT",
   "repository": "https://github.com/TeselaGen/teselagen-react-components",
-  "keywords": [
-    "react-component",
-    "teselagen"
-  ],
+  "keywords": ["react-component", "teselagen"],
   "babel": {
-    "presets": [
-      "es2015",
-      "stage-0",
-      "react"
-    ]
+    "presets": ["es2015", "stage-0", "react"]
   }
 }
