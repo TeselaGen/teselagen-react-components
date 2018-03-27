@@ -178,6 +178,7 @@ class DataTableInstance extends React.Component {
     this.state = {
       additionalFilters: false,
       isSimple: false,
+      isCopyable : false,
       noSelect: false,
       withTitle: true,
       isViewable: true,
@@ -283,6 +284,7 @@ class DataTableInstance extends React.Component {
         withSearch: false,
         withPaging: false,
         withFilter: false,
+        isCopyable: false,
         by default, but they are all 
         individually overridable (which 
           is why nothing changes when this is toggled here)
@@ -313,6 +315,7 @@ class DataTableInstance extends React.Component {
         {renderToggle(this, "hideSelectedCount")}
         {renderToggle(this, "showCount")}
         {renderToggle(this, "compact")}
+        {renderToggle(this, "isCopyable")}
         {renderToggle(
           this,
           "maxHeight",
@@ -409,6 +412,7 @@ class DataTableInstance extends React.Component {
             isSingleSelect={this.state.isSingleSelect}
             hideSelectedCount={this.state.hideSelectedCount}
             showCount={this.state.showCount}
+            isCopyable={this.state.isCopyable}
             {...(this.state.maxHeight
               ? {
                   maxHeight: "200px"

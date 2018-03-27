@@ -284,6 +284,14 @@
   border-right: 1px solid rgba(0, 0, 0, 0.05);
 }
 
+.show-on-hover {
+  display: none;
+}
+
+.hoverable:hover .show-on-hover {
+  display: inline;
+}
+
 /* dark styles */
 .pt-dark .ReactTable {
   background: #30404d !important;
