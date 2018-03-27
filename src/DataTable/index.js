@@ -801,7 +801,7 @@ class ReactDataTable extends React.Component {
         };
       } else if (column.type === "timestamp") {
         tableColumn.Cell = props => {
-          return props.value ? moment(new Date(props.value)).format("lll") : "";
+          return props.value ? moment(props.value).format("lll") : "";
         };
       } else if (column.type === "boolean") {
         tableColumn.Cell = props => (props.value ? "True" : "False");
@@ -1129,7 +1129,7 @@ const enhancer = compose(
         schemaToUse.fields = schemaToUse.fields.sort(
           ({ path: path1 }, { path: path2 }) => {
             return (
-              columnOrderings.indexOf(path1) > columnOrderings.indexOf(path2)
+              columnOrderings.indexOf(path1) - columnOrderings.indexOf(path2)
             );
           }
         );

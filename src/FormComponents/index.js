@@ -25,7 +25,7 @@ import {
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
 
 function getIntent({ showErrorIfUntouched, meta: { touched, error } }) {
-  return (touched || showErrorIfUntouched) && error ? Intent.DANGER : "";
+  return (touched || showErrorIfUntouched) && error ? Intent.DANGER : undefined;
 }
 
 function getIntentClass({ showErrorIfUntouched, meta: { touched, error } }) {

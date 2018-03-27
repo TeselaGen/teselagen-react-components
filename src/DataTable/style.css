@@ -110,15 +110,15 @@
   justify-content: flex-start;
 }
 
-.rt-th:hover > * {
+.tg-react-table-column-header:hover > * {
   display: inherit !important;
 }
 
-.rt-th:hover .tg-sort-arrow-container > * {
+.tg-react-table-column-header:hover .tg-sort-arrow-container > * {
   display: inherit !important;
 }
 
-.rt-th:hover .tg-filter-menu-button {
+.tg-react-table-column-header:hover .tg-filter-menu-button {
   display: block !important;
 }
 
@@ -214,9 +214,6 @@
 .ReactTable .rt-tr-group.selected {
   background: lightblue !important;
 }
-.dt-isViewable .ReactTable .rt-tr-group.selected {
-  background: inherit !important;
-}
 
 .dt-isViewable .ReactTable .rt-tr-group.selected .dt-eyeIcon {
   color: #137cbd;
@@ -287,9 +284,55 @@
   border-right: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.show-on-hover{ 
-display: none;
+.show-on-hover {
+  display: none;
 }
-.hoverable:hover .show-on-hover{
-display : inline;
+
+.hoverable:hover .show-on-hover {
+  display: inline;
+}
+
+/* dark styles */
+.pt-dark .ReactTable {
+  background: #30404d !important;
+  color: #f5f8fa !important;
+}
+
+.pt-dark .ReactTable .rt-thead.-header {
+  background: #202b33 !important;
+  color: #f5f8fa !important;
+}
+
+.pt-dark .ReactTable .rt-tbody .rt-td,
+.pt-dark .tg-react-table-name {
+  color: #f5f8fa !important;
+}
+
+.pt-dark .ReactTable .rt-tbody .rt-tr-group {
+  border-bottom-color: rgba(16, 22, 26, 0.15) !important;
+}
+
+.pt-dark .ReactTable .rt-noData {
+  background: #202b33 !important;
+  color: inherit !important;
+}
+
+.pt-dark .ReactTable .-loading {
+  background: #30404d !important;
+}
+
+.pt-dark .ReactTable .-loading > div {
+  color: #f5f8fa !important;
+}
+
+.pt-dark .ReactTable .rt-tr-group.selected {
+  background: #26738cb0 !important;
+}
+
+.dt-isViewable .ReactTable .rt-tr-group.selected {
+  background: inherit !important;
+}
+
+.pt-dark .ReactTable .rt-thead .rt-resizable-header:hover {
+  border-right-color: #738694;
 }
