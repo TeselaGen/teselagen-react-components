@@ -1,7 +1,7 @@
 import { graphql } from "react-apollo";
 import gql from "graphql-tag";
 import pluralize from "pluralize";
-import { get, upperFirst, camelCase } from "lodash";
+import { get, upperFirst, camelCase, isEmpty } from "lodash";
 import React from "react";
 import deepEqual from "deep-equal";
 import compose from "lodash/fp/compose";
@@ -162,21 +162,27 @@ export default function withQuery(inputFragment, options = {}) {
             /* eslint-enable */
           }
         }
-        let extraOptions = queryOptions;
+        let extraOptions = queryOptions || {};
         if (typeof queryOptions === "function") {
           extraOptions = queryOptions(props);
         }
+        const {
+          variables: extraOptionVariables,
+          ...otherExtraOptions
+        } = extraOptions;
+        const variablesToUse = {
+          ...(!!id && { id }),
+          ...variables,
+          ...propVariables,
+          ...(extraOptionVariables && extraOptionVariables)
+        };
         return {
-          variables: {
-            ...(!!id && { id }),
-            ...variables,
-            ...propVariables
-          },
+          ...(!isEmpty(variablesToUse) && { variables: variablesToUse }),
           fetchPolicy: fetchPolicy || "network-only",
           ssr: false,
           pollInterval,
           notifyOnNetworkStatusChange,
-          ...extraOptions
+          ...otherExtraOptions
         };
       },
       props: (...args) => {
