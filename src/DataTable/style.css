@@ -184,6 +184,7 @@
   box-shadow: none;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   background: #f7f7f7;
+  overflow-x: hidden;
 }
 
 .ReactTable .rt-tbody .rt-td {

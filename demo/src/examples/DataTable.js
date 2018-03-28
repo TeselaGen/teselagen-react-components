@@ -178,7 +178,7 @@ class DataTableInstance extends React.Component {
     this.state = {
       additionalFilters: false,
       isSimple: false,
-      isCopyable : false,
+      isCopyable: false,
       noSelect: false,
       withTitle: true,
       isViewable: true,
