@@ -285,11 +285,11 @@
 }
 
 .show-on-hover {
-  display: none;
+  display: none !important;
 }
 
 .hoverable:hover .show-on-hover {
-  display: inline;
+  display: inline !important;
 }
 
 /* dark styles */
