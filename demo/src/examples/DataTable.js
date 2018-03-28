@@ -185,6 +185,7 @@ class DataTableInstance extends React.Component {
       withSearch: true,
       withPaging: true,
       withFilter: true,
+      withSort: true,
       withSubComponent: false,
       noHeader: false,
       noFooter: false,
@@ -302,6 +303,7 @@ class DataTableInstance extends React.Component {
         {renderToggle(this, "withDisplayOptions")}
         {renderToggle(this, "withPaging")}
         {renderToggle(this, "withFilter")}
+        {renderToggle(this, "withSort")}
         {renderToggle(this, "noHeader")}
         {renderToggle(this, "noFooter")}
         {renderToggle(this, "noPadding")}
@@ -398,6 +400,7 @@ class DataTableInstance extends React.Component {
             withSearch={this.state.withSearch}
             withPaging={this.state.withPaging}
             withFilter={this.state.withFilter}
+            withSort={this.state.withSort}
             noPadding={this.state.noPadding}
             noHeader={this.state.noHeader}
             noFooter={this.state.noFooter}

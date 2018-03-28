@@ -137,7 +137,8 @@ class ReactDataTable extends React.Component {
     removeSingleFilter: noop,
     filters: [],
     isSingleSelect: false,
-    withCheckboxes: false
+    withCheckboxes: false,
+    withSort: true
   };
 
   componentWillMountOrReceiveProps = (oldProps, newProps) => {
@@ -899,6 +900,7 @@ class ReactDataTable extends React.Component {
       setOrder,
       order,
       withFilter,
+      withSort,
       filters,
       removeSingleFilter,
       currentParams,
@@ -944,7 +946,7 @@ class ReactDataTable extends React.Component {
     const sortDown = ordering && ordering === "asc";
     const sortUp = ordering && !sortDown;
     const sortComponent =
-      !disableSorting && !isActionColumn ? (
+      withSort && !disableSorting && !isActionColumn ? (
         <div className={"tg-sort-arrow-container"}>
           <span
             title={"Sort Z-A (Hold shift to sort multiple columns)"}
