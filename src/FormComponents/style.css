@@ -99,7 +99,8 @@
 
 /* dark styles */
 .pt-dark .Select.is-open > .Select-control,
-.pt-dark .Select-control {
+.pt-dark .Select-control,
+.pt-dark .Select.is-disabled > .Select-control {
   background: rgba(16, 22, 26, 0.3);
   box-shadow: 0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0),
     0 0 0 0 rgba(19, 124, 189, 0), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
