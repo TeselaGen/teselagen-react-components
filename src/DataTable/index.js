@@ -9,7 +9,7 @@ import moment from "moment";
 import { arrayMove } from "react-sortable-hoc";
 import {
   camelCase,
-  get,
+  // get,
   toArray,
   startCase,
   noop,
@@ -39,13 +39,13 @@ import getIdOrCodeOrIndex from "./utils/getIdOrCodeOrIndex";
 import SearchBar from "./SearchBar";
 import { getSelectedRecordsFromEntities } from "./utils/selection";
 import DisplayOptions from "./DisplayOptions";
-import withQuery from "../enhancers/withQuery";
-import withUpsert from "../enhancers/withUpsert";
-import tableConfigurationFragment from "./utils/tableConfigurationFragment";
-import currentUserFragment from "./utils/currentUserFragment";
-import withDelete from "../enhancers/withDelete";
+// import withQuery from "../enhancers/withQuery";
+// import withUpsert from "../enhancers/withUpsert";
+// import tableConfigurationFragment from "./utils/tableConfigurationFragment";
+// import currentUserFragment from "./utils/currentUserFragment";
+// import withDelete from "../enhancers/withDelete";
 import withFields from "../enhancers/withFields";
-import fieldOptionFragment from "./utils/fieldOptionFragment";
+// import fieldOptionFragment from "./utils/fieldOptionFragment";
 import DisabledLoadingComponent from "./DisabledLoadingComponent";
 import convertSchema from "./utils/convertSchema";
 import "../toastr";
@@ -967,48 +967,48 @@ const enhancer = compose(
   withTableParams({
     isLocalCall: true
   }),
-  withDelete(tableConfigurationFragment, {
-    refetchQueries: ["tableConfigurationQuery"]
-  }),
-  withUpsert(tableConfigurationFragment, {
-    refetchQueries: ["tableConfigurationQuery"]
-  }),
-  withUpsert(fieldOptionFragment, {
-    refetchQueries: ["tableConfigurationQuery"]
-  }),
-  withQuery(currentUserFragment, {
-    argsOverride: ["", ""],
-    nameOverride: "currentUser",
-    queryName: "dataTableCurrentUserQuery",
-    options: props => {
-      const { withDisplayOptions, syncDisplayOptionsToDb } = props;
-      return {
-        skip: !syncDisplayOptionsToDb || !withDisplayOptions
-      };
-    }
-  }),
-  withQuery(tableConfigurationFragment, {
-    queryName: "tableConfigurationQuery",
-    isPlural: true,
-    options: props => {
-      const {
-        formName,
-        withDisplayOptions,
-        syncDisplayOptionsToDb,
-        currentUser
-      } = props;
-      const userId = get(currentUser, "user.id");
-      return {
-        skip: !syncDisplayOptionsToDb || !withDisplayOptions || !userId,
-        variables: {
-          filter: {
-            userId,
-            formName
-          }
-        }
-      };
-    }
-  }),
+  // withDelete(tableConfigurationFragment, {
+  //   refetchQueries: ["tableConfigurationQuery"]
+  // }),
+  // withUpsert(tableConfigurationFragment, {
+  //   refetchQueries: ["tableConfigurationQuery"]
+  // }),
+  // withUpsert(fieldOptionFragment, {
+  //   refetchQueries: ["tableConfigurationQuery"]
+  // }),
+  // withQuery(currentUserFragment, {
+  //   argsOverride: ["", ""],
+  //   nameOverride: "currentUser",
+  //   queryName: "dataTableCurrentUserQuery",
+  //   options: props => {
+  //     const { withDisplayOptions, syncDisplayOptionsToDb } = props;
+  //     return {
+  //       skip: !syncDisplayOptionsToDb || !withDisplayOptions
+  //     };
+  //   }
+  // }),
+  // withQuery(tableConfigurationFragment, {
+  //   queryName: "tableConfigurationQuery",
+  //   isPlural: true,
+  //   options: props => {
+  //     const {
+  //       formName,
+  //       withDisplayOptions,
+  //       syncDisplayOptionsToDb,
+  //       currentUser
+  //     } = props;
+  //     const userId = get(currentUser, "user.id");
+  //     return {
+  //       skip: !syncDisplayOptionsToDb || !withDisplayOptions || !userId,
+  //       variables: {
+  //         filter: {
+  //           userId,
+  //           formName
+  //         }
+  //       }
+  //     };
+  //   }
+  // }),
   connect((state, ownProps) => {
     let propsToUse = ownProps;
     if (!ownProps.isTableParamsConnected) {
