@@ -143,7 +143,9 @@ function getEntitiesForGivenFilter(entities, filter, ccFields) {
   const { path, getValueToFilterOn } = field;
   const subFilter = getSubFilter(false, selectedFilter, filterValue);
   entities = entities.filter(entity => {
-    const fieldVal = getValueToFilterOn ? getValueToFilterOn(entity) : get(entity, path);
+    const fieldVal = getValueToFilterOn
+      ? getValueToFilterOn(entity)
+      : get(entity, path);
     const shouldKeep = subFilter(fieldVal);
     return shouldKeep;
   });
@@ -214,8 +216,11 @@ function getSubFilter(
           return endsWith(fieldVal.toLowerCase(), filterValLower);
         };
   } else if (ccSelectedFilter === "contains") {
+    const filterValueToUse = filterValue.toString
+      ? filterValue.toString()
+      : filterValue;
     return qb
-      ? qb.contains(filterValue) //filter using qb (aka we're backend connected)
+      ? qb.contains(filterValueToUse) //filter using qb (aka we're backend connected)
       : fieldVal => {
           //filter using plain old javascript (aka we've got a local table that isn't backend connected)
           if (!fieldVal || !fieldVal.toLowerCase) return false;

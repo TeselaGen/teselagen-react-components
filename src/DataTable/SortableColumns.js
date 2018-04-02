@@ -29,8 +29,7 @@ function CustomTheadComponent(props) {
           // keeps track of hidden columns here so columnIndex might not equal i
           let columnIndex = column.props.columnindex;
           if (isNaN(columnIndex)) {
-            console.warn("Sortable columns will break. Column index not found");
-            columnIndex = i;
+            return column;
           }
           return (
             <SortableItem key={`item-${columnIndex}`} index={columnIndex}>
@@ -68,6 +67,7 @@ class SortableColumns extends Component {
         lockAxis="x"
         axis="x"
         distance={10}
+        helperClass="above-dialog"
         shouldCancelStart={this.shouldCancelStart}
         onSortEnd={this.onSortEnd}
       />

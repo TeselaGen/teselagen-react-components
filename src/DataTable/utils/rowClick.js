@@ -5,6 +5,7 @@ import {
 } from "./selection";
 import getIdOrCodeOrIndex from "./getIdOrCodeOrIndex";
 
+
 export default function rowClick(e, rowInfo, entities, props) {
   const {
     reduxFormSelectedEntityIdMap,

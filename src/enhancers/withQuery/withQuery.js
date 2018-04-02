@@ -1,7 +1,7 @@
 import { graphql } from "react-apollo";
 import gql from "graphql-tag";
 import pluralize from "pluralize";
-import { get, upperFirst, camelCase } from "lodash";
+import { get, upperFirst, camelCase, isEmpty } from "lodash";
 import React from "react";
 import deepEqual from "deep-equal";
 import compose from "lodash/fp/compose";
@@ -148,8 +148,9 @@ export default function withQuery(inputFragment, options = {}) {
           pollInterval,
           notifyOnNetworkStatusChange
         } = props;
+        let id;
         if (getIdFromParams) {
-          const id = parseInt(get(props, "match.params.id"), 10);
+          id = parseInt(get(props, "match.params.id"), 10);
           if (!id) {
             console.error(
               "There needs to be an id passed here to ",
@@ -160,27 +161,28 @@ export default function withQuery(inputFragment, options = {}) {
             debugger;
             /* eslint-enable */
           }
-          return {
-            variables: {
-              id
-            },
-            fetchPolicy: fetchPolicy || "network-only",
-            ssr: false,
-            pollInterval,
-            notifyOnNetworkStatusChange
-          };
         }
-        let extraOptions = queryOptions;
+        let extraOptions = queryOptions || {};
         if (typeof queryOptions === "function") {
           extraOptions = queryOptions(props);
         }
+        const {
+          variables: extraOptionVariables,
+          ...otherExtraOptions
+        } = extraOptions;
+        const variablesToUse = {
+          ...(!!id && { id }),
+          ...variables,
+          ...propVariables,
+          ...(extraOptionVariables && extraOptionVariables)
+        };
         return {
-          variables: propVariables || variables,
+          ...(!isEmpty(variablesToUse) && { variables: variablesToUse }),
           fetchPolicy: fetchPolicy || "network-only",
           ssr: false,
           pollInterval,
           notifyOnNetworkStatusChange,
-          ...extraOptions
+          ...otherExtraOptions
         };
       },
       props: (...args) => {

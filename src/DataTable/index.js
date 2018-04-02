@@ -7,6 +7,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import moment from "moment";
 import { arrayMove } from "react-sortable-hoc";
+import copy from "copy-to-clipboard";
+
 import {
   camelCase,
   // get,
@@ -22,6 +24,7 @@ import {
   Spinner,
   // Popover,
   // Position,
+  MenuItem,
   Classes,
   ContextMenu,
   Checkbox,
@@ -52,6 +55,7 @@ import "../toastr";
 import "./style.css";
 import withTableParams from "./utils/withTableParams";
 import SortableColumns from "./SortableColumns";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 //we use this to make adding preset prop groups simpler
 function computePresets(props) {
@@ -105,6 +109,7 @@ class ReactDataTable extends React.Component {
     page: 1,
     style: {},
     isLoading: false,
+    isCopyable: false,
     disabled: false,
     noSelect: false,
     noUserSelect: false,
@@ -132,7 +137,8 @@ class ReactDataTable extends React.Component {
     removeSingleFilter: noop,
     filters: [],
     isSingleSelect: false,
-    withCheckboxes: false
+    withCheckboxes: false,
+    withSort: true
   };
 
   componentWillMountOrReceiveProps = (oldProps, newProps) => {
@@ -738,9 +744,12 @@ class ReactDataTable extends React.Component {
   };
 
   renderColumns = () => {
-    const { cellRenderer, withCheckboxes, getCellHoverText } = computePresets(
-      this.props
-    );
+    const {
+      cellRenderer,
+      withCheckboxes,
+      getCellHoverText,
+      isCopyable
+    } = computePresets(this.props);
     const { columns } = this.state;
     if (!columns.length) {
       return;
@@ -793,7 +802,7 @@ class ReactDataTable extends React.Component {
         };
       } else if (column.type === "timestamp") {
         tableColumn.Cell = props => {
-          return props.value ? moment(new Date(props.value)).format("lll") : "";
+          return props.value ? moment(props.value).format("lll") : "";
         };
       } else if (column.type === "boolean") {
         tableColumn.Cell = props => (props.value ? "True" : "False");
@@ -803,7 +812,6 @@ class ReactDataTable extends React.Component {
       const oldFunc = tableColumn.Cell;
       tableColumn.Cell = (...args) => {
         //wrap the original tableColumn.Cell function in another div in order to add a title attribute
-
         const val = oldFunc(...args);
         let title = typeof val !== "string" ? args[0].value : val;
         if (title) title = String(title);
@@ -816,7 +824,20 @@ class ReactDataTable extends React.Component {
                 : { textOverflow: "ellipsis", overflow: "hidden" }
             }
             title={title || undefined}
+            className="hoverable"
           >
+            {typeof val === "string" && val !== "" && isCopyable ? (
+              <CopyToClipboard
+                text={val}
+                onCopy={() => {
+                  window.toastr.success(`${val} - copy to clipboard`);
+                }}
+              >
+                <span className="pt-icon-standard pt-icon-clipboard show-on-hover" />
+              </CopyToClipboard>
+            ) : (
+              ""
+            )}{" "}
             {val}
           </div>
         );
@@ -827,15 +848,49 @@ class ReactDataTable extends React.Component {
     return columnsToRender;
   };
 
+  setManyRowsToCopy = selectedRecords => {
+    const { columns } = this.state;
+    let text;
+    selectedRecords.forEach(row => {
+      let textByRow;
+      columns.forEach(col => {
+        if (typeof row[col.path] !== "undefined") {
+          textByRow = textByRow
+            ? textByRow + "\t" + row[col.path]
+            : row[col.path];
+        }
+      });
+      text = text ? text + textByRow + "\n" : textByRow + "\n";
+    });
+    return text;
+  };
+
   showContextMenu = (idMap, e) => {
-    const { history, contextMenu, entities } = computePresets(this.props);
+    const { history, contextMenu, entities, isCopyable } = computePresets(
+      this.props
+    );
     const selectedRecords = getSelectedRecordsFromEntities(entities, idMap);
     const itemsToRender = contextMenu({
       selectedRecords,
       history
     });
-    if (!itemsToRender) return null;
-    const menu = <Menu>{itemsToRender}</Menu>;
+    if (!itemsToRender && !isCopyable) return null;
+    const menu = (
+      <Menu>
+        {itemsToRender}
+        {isCopyable && (
+          <MenuItem
+            key="copySelectedRows"
+            onClick={() => {
+              copy(this.setManyRowsToCopy(selectedRecords));
+              window.toastr.success("Selected rows copied");
+            }}
+            icon="clipboard"
+            text={"Copy Rows"}
+          />
+        )}
+      </Menu>
+    );
     ContextMenu.show(menu, { left: e.clientX, top: e.clientY });
   };
 
@@ -845,6 +900,7 @@ class ReactDataTable extends React.Component {
       setOrder,
       order,
       withFilter,
+      withSort,
       filters,
       removeSingleFilter,
       currentParams,
@@ -890,7 +946,7 @@ class ReactDataTable extends React.Component {
     const sortDown = ordering && ordering === "asc";
     const sortUp = ordering && !sortDown;
     const sortComponent =
-      !disableSorting && !isActionColumn ? (
+      withSort && !disableSorting && !isActionColumn ? (
         <div className={"tg-sort-arrow-container"}>
           <span
             title={"Sort Z-A (Hold shift to sort multiple columns)"}
@@ -1076,7 +1132,7 @@ const enhancer = compose(
         schemaToUse.fields = schemaToUse.fields.sort(
           ({ path: path1 }, { path: path2 }) => {
             return (
-              columnOrderings.indexOf(path1) > columnOrderings.indexOf(path2)
+              columnOrderings.indexOf(path1) - columnOrderings.indexOf(path2)
             );
           }
         );

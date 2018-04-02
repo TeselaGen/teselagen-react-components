@@ -220,7 +220,8 @@ export class DataTableInstance extends React.Component {
     withCheckboxes: true,
     numOfEntities: 60,
     selectedIds: undefined,
-    entities: generateFakeRows(defaultNumOfEntities)
+    isCopyable: false,
+    entities: generateFakeRows(defaultNumOfEntities),
   };
 
   changeNumEntities = e => {
@@ -297,6 +298,7 @@ export class DataTableInstance extends React.Component {
         withSearch: false,
         withPaging: false,
         withFilter: false,
+        isCopyable: false,
         by default, but they are all individually overridable (which is why nothing changes when this is toggled here)
         `
         )}
@@ -320,6 +322,7 @@ export class DataTableInstance extends React.Component {
         {renderToggle(this, "hideSelectedCount")}
         {renderToggle(this, "showCount")}
         {renderToggle(this, "compact")}
+        {renderToggle(this, "isCopyable")}
         {renderToggle(
           this,
           "maxHeight",
@@ -409,6 +412,7 @@ export class DataTableInstance extends React.Component {
             withCheckboxes={this.state.withCheckboxes}
             isSingleSelect={this.state.isSingleSelect}
             hideSelectedCount={this.state.hideSelectedCount}
+            isCopyable={this.state.isCopyable}
             {...(this.state.maxHeight
               ? {
                   maxHeight: "200px"
