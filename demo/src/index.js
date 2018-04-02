@@ -4,6 +4,7 @@ import DataTableExample from "./examples/DataTable";
 import FormComponents from "./examples/FormComponents";
 import WithDialog from "./examples/WithDialog";
 import Toastr from "./examples/Toastr";
+import CustomIcons from "./examples/CustomIcons";
 import SimpleTable from "./examples/SimpleTable";
 import InfoHelper from "./examples/InfoHelper";
 import Loading from "./examples/Loading";
@@ -14,6 +15,7 @@ import { withTableParams, DataTable, PagingTool } from "../../src";
 import Uploader from "../../src/FormComponents/Uploader";
 import J5ReportRecordView from "./examples/J5ReportRecordView";
 import j5ReportRecordViewData from "./data/j5ReportRecordView";
+import * as customIcons from "../../src/customIcons";
 import "./style.css";
 import React from "react";
 import { render } from "react-dom";
@@ -60,7 +62,7 @@ const demos = {
       times
     },
     url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/DataTableDemo/index.js",
+      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/DataTableDemo.js",
     childLinks: {
       SimpleTable: {
         demo: SimpleTable,
@@ -107,7 +109,7 @@ const demos = {
       }
     ],
     url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/InfoHelperDemo/index.js"
+      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/InfoHelperDemo.js"
   },
   CollapsibleCard: {
     demo: CollapsibleCard,
@@ -144,7 +146,7 @@ const demos = {
       }
     ],
     url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/CollapsibleCardDemo/index.js"
+      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/CollapsibleCardDemo.js"
   },
   Loading: {
     demo: Loading,
@@ -182,7 +184,7 @@ const demos = {
       }
     ],
     url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/LoadingDemo/index.js"
+      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/LoadingDemo.js"
   },
   DownloadLink: {
     demo: DownloadLink,
@@ -204,7 +206,7 @@ const demos = {
       }
     ],
     url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/DownloadLinkDemo/index.js"
+      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/DownloadLinkDemo.js"
   },
   FormComponents: {
     demo: FormComponents,
@@ -217,17 +219,25 @@ const demos = {
       Uploader
     },
     url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/FormComponentsDemo/index.js"
+      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/FormComponentsDemo.js"
   },
   withDialog: {
     demo: WithDialog,
     url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/WithDialog/index.js"
+      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/WithDialog.js"
   },
   toastr: {
     demo: Toastr,
     url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/Toastr/index.js"
+      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/Toastr.js"
+  },
+  customIcons: {
+    scope: {
+      customIcons
+    },
+    demo: CustomIcons,
+    url:
+    "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/CustomIcons.js"
   },
   J5ReportRecordView: {
     demo: J5ReportRecordView,
@@ -238,7 +248,7 @@ const demos = {
   // fonticons: {
   //   demo: FontIconsDemo,
   //   url:
-  //     "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/FontIconsDemo/index.js"
+  //     "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/FontIconsDemo.js"
   // }
 };
 
