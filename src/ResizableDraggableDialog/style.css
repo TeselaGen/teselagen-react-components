@@ -1,0 +1,31 @@
+.tg-pt-dialog-resizable-draggable
+  .pt-overlay.pt-overlay-scroll-container.pt-overlay-inline {
+  position: static;
+  height: 100%;
+  width: 100%;
+}
+.tg-pt-dialog-resizable-draggable .pt-overlay-inline .pt-overlay-content,
+.tg-pt-dialog-resizable-draggable
+  .pt-overlay-scroll-container
+  .pt-overlay-content {
+  position: static;
+  width: 100%;
+  height: 100%;
+}
+.tg-pt-dialog-resizable-draggable .pt-dialog-container .pt-dialog {
+  position: static;
+  width: 100%;
+  height: 100%;
+  margin: 0 !important;
+}
+.tg-pt-dialog-resizable-draggable .pt-dialog-header {
+  cursor: move;
+}
+.tg-pt-dialog-resizable-draggable .pt-dialog-body {
+  height: 100%;
+  width: -webkit-fill-available;
+  overflow: auto;
+}
+.tg-pt-dialog-resizable-draggable .pt-overlay-backdrop {
+  display: none;
+}

@@ -4,6 +4,7 @@ import { Dialog } from "@blueprintjs/core";
 import { connect } from "react-redux";
 import { lifecycle } from "recompose";
 import uniqid from "uniqid";
+import ResizableDraggableDialog from "../../ResizableDraggableDialog";
 
 /**
  * usage:
@@ -53,6 +54,7 @@ export default function withDialog(topLevelDialogProps) {
           children,
           dialogProps,
           title,
+          isDraggable,
           alreadyRendering,
           ...rest
         } = this.props;
@@ -70,10 +72,11 @@ export default function withDialog(topLevelDialogProps) {
           throw new Error(
             "withDialog error: Please provide a target or child element to the withDialog() enhanced component. If you really don't want a target, please pass a 'noTarget=true' prop"
           );
+          const DialogToUse = (isDraggable || extraDialogProps.isDraggable) ? ResizableDraggableDialog : Dialog
         return (
           <React.Fragment>
             {isOpen && (
-              <Dialog
+              <DialogToUse
                 onClose={function() {
                   hideModal();
                 }}
@@ -89,7 +92,7 @@ export default function withDialog(topLevelDialogProps) {
                     hideModal
                   }}
                 />
-              </Dialog>
+              </DialogToUse>
             )}
             {targetEl &&
               React.cloneElement(targetEl, {
