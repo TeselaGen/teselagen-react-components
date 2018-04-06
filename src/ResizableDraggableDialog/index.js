@@ -30,8 +30,8 @@ export default function ResizableDraggableDialog({
         default={{
           x: Math.max((windowWidth - defaultDialogWidth) / 2, 0),
           y: Math.max((windowHeight - defaultDialogHeight) / 2, 0),
-          width: defaultDialogWidth,
-          height: defaultDialogHeight
+          width: Math.min(defaultDialogWidth, windowWidth),
+          height: Math.min(defaultDialogHeight, windowHeight)
         }}
         dragHandleClassName={".pt-dialog-header"}
         {...RndProps}
