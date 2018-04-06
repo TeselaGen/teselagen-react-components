@@ -118,7 +118,8 @@
   display: inherit !important;
 }
 
-.tg-react-table-column-header:hover .tg-filter-menu-button {
+.tg-react-table-column-header:hover .tg-filter-menu-button,
+.tg-react-table-column-header .pt-popover-open .tg-filter-menu-button {
   display: block !important;
 }
 
