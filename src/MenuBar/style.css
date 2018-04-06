@@ -1,0 +1,24 @@
+.menu-bar {
+  background: white;
+  color: inherit;
+  text-decoration: none;
+  z-index: 19;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  height: 34px;
+  width: 100%;
+  padding-left: 15px;
+}
+
+.menu-bar-item {
+  margin: 2px;
+}
+
+.menu-bar .pt-popover {
+  margin-top: -1px !important;
+}
+
+.menu-bar-popover .pt-popover .pt-popover-arrow {
+  display: none;
+}
