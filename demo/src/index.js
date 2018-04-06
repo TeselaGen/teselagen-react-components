@@ -1,5 +1,6 @@
 import ReactPlayground from "./ReactPlayground";
 import CollapsibleCard from "./examples/CollapsibleCard";
+import MenuBar from "./examples/MenuBar";
 import DataTableExample from "./examples/DataTable";
 import FormComponents from "./examples/FormComponents";
 import WithDialog from "./examples/WithDialog";
@@ -147,6 +148,18 @@ const demos = {
     ],
     url:
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/CollapsibleCardDemo.js"
+  },
+  MenuBar: {
+    demo: MenuBar,
+    props: [
+      {
+        name: "menu",
+        description: "Menu structure. Array of objects with `text` and `submenu` properties.",
+        type: "Array"
+      },
+    ],
+    url:
+      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/MenuBarDemo/index.js"
   },
   Loading: {
     demo: Loading,
