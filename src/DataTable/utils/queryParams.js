@@ -82,12 +82,19 @@ function orderEntitiesLocal(orderArray, entities, schema) {
             schema.fields
         );
       }
-      const { path } = field;
+      const { path, getValueToFilterOn, sortFn } = field;
       ascOrDescArray.push(ccDisplayName === order ? "asc" : "desc");
       //push the actual sorting function
       if (path && endsWith(path.toLowerCase(), "id")) {
         orderFuncs.push(o => {
           return parseInt(get(o, path), 10);
+        });
+      } else if (sortFn) {
+        const toOrder = Array.isArray(sortFn) ? sortFn : [sortFn];
+        orderFuncs.push(...toOrder);
+      } else if (getValueToFilterOn) {
+        orderFuncs.push(o => {
+          return getValueToFilterOn(o);
         });
       } else {
         orderFuncs.push(path);

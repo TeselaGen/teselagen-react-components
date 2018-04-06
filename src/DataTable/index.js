@@ -904,6 +904,7 @@ class ReactDataTable extends React.Component {
       filters,
       removeSingleFilter,
       currentParams,
+      isLocalCall,
       setNewParams
     } = computePresets(this.props);
     const {
@@ -915,7 +916,8 @@ class ReactDataTable extends React.Component {
       path
     } = column;
     const disableSorting =
-      sortDisabled || (typeof path === "string" && path.indexOf(".") > -1);
+      sortDisabled ||
+      (!isLocalCall && typeof path === "string" && path.includes("."));
     const columnDataType = column.type;
     const isActionColumn = columnDataType === "action";
     const ccDisplayName = camelCase(displayName || path);
