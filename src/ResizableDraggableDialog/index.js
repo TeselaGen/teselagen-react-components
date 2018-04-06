@@ -27,6 +27,7 @@ export default function ResizableDraggableDialog({
           topLeft: true,
           topRight: true
         }}
+        bounds={"body"}
         default={{
           x: Math.max((windowWidth - defaultDialogWidth) / 2, 0),
           y: Math.max((windowHeight - defaultDialogHeight) / 2, 0),
