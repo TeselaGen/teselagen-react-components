@@ -19,6 +19,7 @@ export { default as InfoHelper } from "./InfoHelper";
 export { default as showConfirmationDialog } from "./showConfirmationDialog";
 export { default as CollapsibleCard } from "./CollapsibleCard";
 export { default as ResizableDraggableDialog } from "./ResizableDraggableDialog";
+export { default as MenuBar } from "./MenuBar";
 export { default as J5ReportRecordView } from "./J5ReportRecordView";
 export { default as withDelete } from "./enhancers/withDelete";
 export { default as withUpsert } from "./enhancers/withUpsert";
