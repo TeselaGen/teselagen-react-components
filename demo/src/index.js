@@ -40,7 +40,7 @@ import renderToggle from "./renderToggle";
 import Chance from "chance";
 import times from "lodash/times";
 import client from "./client";
-import { ApolloProvider } from 'react-apollo';
+import { ApolloProvider } from "react-apollo";
 
 FocusStyleManager.onlyShowFocusOnTabs();
 
@@ -154,9 +154,10 @@ const demos = {
     props: [
       {
         name: "menu",
-        description: "Menu structure. Array of objects with `text` and `submenu` properties.",
+        description:
+          "Menu structure. Array of objects with `text` and `submenu` properties.",
         type: "Array"
-      },
+      }
     ],
     url:
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/MenuBarDemo/index.js"
@@ -236,6 +237,9 @@ const demos = {
   },
   withDialog: {
     demo: WithDialog,
+    scope: {
+      renderToggle
+    },
     url:
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/WithDialog.js"
   },
@@ -250,7 +254,7 @@ const demos = {
     },
     demo: CustomIcons,
     url:
-    "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/CustomIcons.js"
+      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/CustomIcons.js"
   },
   J5ReportRecordView: {
     demo: J5ReportRecordView,
