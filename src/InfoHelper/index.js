@@ -10,10 +10,15 @@ export default class InfoHelper extends Component {
       children,
       icon = "info-sign",
       isPopover,
-      size
+      isButton,
+      size,
+      style,
+      ...rest
     }: Props = this.props;
+    const IconToUse = isButton ? Button : Icon;
+    let toReturn;
     if (isPopover) {
-      return (
+      toReturn = (
         <Popover
           popoverClassName="pt-dark"
           target={
@@ -27,12 +32,20 @@ export default class InfoHelper extends Component {
         />
       );
     } else {
-      return (
+      toReturn = (
         <Tooltip
-          target={<Icon icon={icon} className={className} iconSize={size} />}
+          target={
+            <IconToUse
+              icon={icon}
+              className={className}
+              iconSize={size}
+              {...rest}
+            />
+          }
           content={content || children}
         />
       );
     }
+    return <div className={'info-helper-wrapper'} style={style}>{toReturn}</div>;
   }
 }
