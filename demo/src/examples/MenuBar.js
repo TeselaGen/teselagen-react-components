@@ -5,18 +5,18 @@
         {
           text: 'File',
           submenu: [
-            { text: 'New', icon: 'add', onClick: () => alert('New file'), tooltip: 'May use tooltips' },
-            { text: 'Open...', icon: 'document', onClick: () => alert('Open file') },
+            { text: 'New', hotkey:"mod+n", icon: 'add', onClick: () => alert('New file'), tooltip: 'May use tooltips' },
+            { text: 'Open...', hotkey:"mod+o", icon: 'document', onClick: () => alert('Open file') },
             { divider: '' },
-            { text: 'Quit', icon: 'log-out', onClick: () => alert('Quit') },
+            { text: 'Quit', hotkey:"mod+q", icon: 'log-out', onClick: () => alert('Quit') },
           ]
         },
         {
           text: 'Edit',
           submenu: [
-            { text: 'Cut', icon: 'cut', onClick: () => alert('Cut') },
-            { text: 'Copy', icon: 'duplicate', onClick: () => alert('Copy') },
-            { text: 'Paste', icon: 'clipboard', onClick: () => alert('Paste') },
+            { text: 'Cut', hotkey:"mod+x", icon: 'cut', onClick: () => alert('Cut') },
+            { text: 'Copy', hotkey:"mod+c", icon: 'duplicate', onClick: () => alert('Copy') },
+            { text: 'Paste', hotkey:"mod+v", icon: 'clipboard', onClick: () => alert('Paste') },
             { divider: '' },
             { text: 'Other',
               submenu: [

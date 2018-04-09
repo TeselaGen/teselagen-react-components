@@ -22,3 +22,7 @@
 .menu-bar-popover .pt-popover .pt-popover-arrow {
   display: none;
 }
+
+.menu-bar-popover .pt-popover-wrapper {
+  width: 100%;
+}
