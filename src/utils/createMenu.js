@@ -1,5 +1,5 @@
 import React from "react";
-import { MenuDivider, Tooltip, MenuItem } from "@blueprintjs/core";
+import { MenuDivider, Tooltip, MenuItem, KeyCombo } from "@blueprintjs/core";
 import { omit } from "lodash";
 
 /**
@@ -63,11 +63,13 @@ export default function createMenu(input, i, customize) {
       if (!item.key && !item.text) {
         console.warn("Menu item with no key", item);
       }
+      console.log('hotkey:',item.hotkey)
       out = (
         <MenuItem
           key={key}
           {...omit(item, ["submenu"])}
           icon={item.icon || item.iconName}
+          labelElement={item.hotkey && <KeyCombo minimal combo={item.hotkey} />}
           text={item.text}
         >
           {item.submenu ? createMenu(item.submenu, 0, customize) : undefined}

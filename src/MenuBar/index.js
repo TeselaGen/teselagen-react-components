@@ -62,7 +62,7 @@ export default class MenuBar extends React.Component {
               }}
               inline
             >
-              {button}
+              {button} 
             </Popover>
           );
         })}
