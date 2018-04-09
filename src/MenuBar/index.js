@@ -12,6 +12,9 @@ export default class MenuBar extends React.Component {
   state = { isOpen: false, openIndex: null };
 
   handleInteraction = index => newOpenState => {
+    if (!newOpenState && index !== this.state.openIndex)  {
+      return //return early
+    }
     this.setState({
       isOpen: newOpenState,
       openIndex: newOpenState ? index : null
@@ -37,7 +40,7 @@ export default class MenuBar extends React.Component {
               key={i}
               className="pt-minimal menu-bar-item"
               onClick={topLevelItem.onClick}
-              onMouseOver={this.handleMouseOver(i)}
+              onMouseOver={topLevelItem.submenu ? this.handleMouseOver(i) : noop}
             >
               {topLevelItem.text}
             </Button>
@@ -67,4 +70,8 @@ export default class MenuBar extends React.Component {
       </div>
     );
   }
+}
+
+function noop() {
+    
 }
