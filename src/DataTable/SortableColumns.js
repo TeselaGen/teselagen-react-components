@@ -1,41 +1,17 @@
 import React, { Component } from "react";
-import { SortableContainer, SortableElement } from "react-sortable-hoc";
+import { SortableContainer } from "react-sortable-hoc";
 
-const SortableItem = SortableElement(({ children }) => {
-  return (
-    <div
-      className="tg-movable-table-column"
-      style={{
-        position: "relative",
-        display: "flex",
-        alignItems: "center",
-        height: "100%",
-        ...children.props.style
-      }}
-    >
-      {children}
-    </div>
-  );
-});
 
 function CustomTheadComponent(props) {
   const headerColumns = props.children.props.children;
   return (
     <div className={"rt-thead " + props.className} style={props.style}>
       <div className="rt-tr">
-        {headerColumns.map((column, i) => {
+        {headerColumns.map((column) => {
           // if a column is marked as immovable just return regular column
           if (column.props.immovable === "true") return column;
           // keeps track of hidden columns here so columnIndex might not equal i
-          let columnIndex = column.props.columnindex;
-          if (isNaN(columnIndex)) {
-            return column;
-          }
-          return (
-            <SortableItem key={`item-${columnIndex}`} index={columnIndex}>
-              {column}
-            </SortableItem>
-          );
+          return column;
         })}
       </div>
     </div>

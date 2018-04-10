@@ -33,6 +33,7 @@ import {
 } from "@blueprintjs/core";
 import classNames from "classnames";
 import scrollIntoView from "dom-scroll-into-view";
+import { SortableElement } from "react-sortable-hoc";
 import { getSelectedRowsFromEntities } from "./utils/selection";
 import rowClick, { finalizeSelection } from "./utils/rowClick";
 import ReactTable from "react-table";
@@ -56,6 +57,7 @@ import "./style.css";
 import withTableParams from "./utils/withTableParams";
 import SortableColumns from "./SortableColumns";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import { withProps } from "recompose";
 
 //we use this to make adding preset prop groups simpler
 function computePresets(props) {
@@ -264,6 +266,23 @@ class ReactDataTable extends React.Component {
       />
     );
   };
+  getThComponent = withProps(({ columnindex }) => {
+    return {
+      index: columnindex
+    };
+  })(
+    SortableElement(({ toggleSort, className, children, ...rest }) => (
+      <div
+        className={classNames("rt-th", className)}
+        onClick={e => toggleSort && toggleSort(e)}
+        role="columnheader"
+        tabIndex="-1" // Resolves eslint issues without implementing keyboard navigation incorrectly
+        {...rest}
+      >
+        {children}
+      </div>
+    ))
+  );
 
   render() {
     const {
@@ -473,6 +492,7 @@ class ReactDataTable extends React.Component {
             id: tableId
           })}
           TheadComponent={this.getTheadComponent}
+          ThComponent={this.getThComponent}
           getTrGroupProps={this.getTableRowProps}
           NoDataComponent={({ children }) =>
             isLoading ? null : <div className="rt-noData">{children}</div>
