@@ -13,7 +13,7 @@ export default class MenuBar extends React.Component {
 
   handleInteraction = index => newOpenState => {
     if (!newOpenState && index !== this.state.openIndex)  {
-      return //return early
+      return //return early because the "close" is being fired by another popover 
     }
     this.setState({
       isOpen: newOpenState,

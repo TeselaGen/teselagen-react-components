@@ -63,7 +63,6 @@ export default function createMenu(input, i, customize) {
       if (!item.key && !item.text) {
         console.warn("Menu item with no key", item);
       }
-      console.log('hotkey:',item.hotkey)
       out = (
         <MenuItem
           key={key}

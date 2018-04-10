@@ -1,9 +1,13 @@
+.tg-pt-dialog-resizable-draggable {
+  z-index: 40000; /* necessary for open-vector-editor */
+}
 .tg-pt-dialog-resizable-draggable
   .pt-overlay.pt-overlay-scroll-container.pt-overlay-inline {
   position: static;
   height: 100%;
   width: 100%;
 }
+
 .tg-pt-dialog-resizable-draggable .pt-overlay-inline .pt-overlay-content,
 .tg-pt-dialog-resizable-draggable
   .pt-overlay-scroll-container
