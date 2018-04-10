@@ -286,6 +286,10 @@
   border-right: none;
 }
 
+.ReactTable .rt-thead .rt-resizable-header {
+  border-right: 1px solid #f7f7f7;
+}
+
 .ReactTable .rt-thead .rt-resizable-header:hover {
   border-right: 1px solid rgba(0, 0, 0, 0.05);
 }
