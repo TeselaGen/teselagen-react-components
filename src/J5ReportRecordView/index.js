@@ -142,20 +142,26 @@ class J5ReportRecordView extends Component {
   };
 
   processJ5OligoSynthesis(j5Oligos) {
+    const { replaceOligoPartCids = true } = this.props;
     return j5Oligos.map(j5Oligo => {
       const partCids = getWrappedInParensMatches(j5Oligo.name);
       const firstTargetPart = get(this.state.partCidMap, `${partCids[0]}.name`);
       const lastTargetPart = get(this.state.partCidMap, `${partCids[1]}.name`);
+
+      let name = j5Oligo.name
+        .replace("oli", "Oligo ")
+        .replace(/_/g, " ")
+        .replace("forward", "Forward")
+        .replace("reverse", "Reverse");
+      if (replaceOligoPartCids) {
+        name = name
+          .replace(partCids[0], firstTargetPart)
+          .replace(partCids[1], lastTargetPart);
+      }
       return {
         ...j5Oligo,
         id: "oligo_" + j5Oligo.id,
-        name: j5Oligo.name
-          .replace("oli", "Oligo ")
-          .replace(/_/g, " ")
-          .replace("forward", "Forward")
-          .replace("reverse", "Reverse")
-          .replace(partCids[0], firstTargetPart)
-          .replace(partCids[1], lastTargetPart),
+        name,
         firstTargetPart,
         lastTargetPart,
         bps: get(j5Oligo, "oligo.sequence.sequenceFragments", [])
