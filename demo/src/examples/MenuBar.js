@@ -20,7 +20,7 @@
             { divider: '' },
             { text: 'Other',
               submenu: [
-                { text: 'Some command 1', icon: 'code', onClick: () => alert('Do something') },
+                { text: 'Some command 1', label: 'Label', icon: 'code', onClick: () => alert('Do something') },
                 { text: 'Some command 2', icon: 'numerical', onClick: () => alert('Do something else') },
               ]
             },
@@ -32,12 +32,12 @@
   </div>
   <br/>
   <p>
-    The <code>menu</code> prop must be an array of objects with <code>text</code>
-    and <code>submenu</code> properties. Each <code>submenu</code> is itself an
+    The <code>menu</code> prop must be an array of objects with <code>text</code> and
+    <code>submenu</code> properties. Each <code>submenu</code> is itself an
     array of item descriptor objects or <code>MenuItem</code> elements.
     Item descriptors may contain several properties, namely <code>text</code>,
-    <code>icon</code>, <code>label</code>, <code>onClick</code>, <code>tooltip</code>,
-    <code>key</code>, <code>divider</code>, and <code>submenu</code>.
-    Check the <code>createMenu()</code> util for more details.
+    <code>icon</code>, <code>label</code>, <code>hotkey</code>, <code>onClick</code>,
+    <code>tooltip</code>, <code>key</code>, <code>divider</code>, and
+    <code>submenu</code>. Check the <code>createMenu()</code> util for more details.
   </p>
 </div>
