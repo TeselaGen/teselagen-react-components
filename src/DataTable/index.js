@@ -57,7 +57,7 @@ import "./style.css";
 import withTableParams from "./utils/withTableParams";
 import SortableColumns from "./SortableColumns";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import { withProps } from "recompose";
+import { withProps, branch } from "recompose";
 
 //we use this to make adding preset prop groups simpler
 function computePresets(props) {
@@ -266,26 +266,27 @@ class ReactDataTable extends React.Component {
       />
     );
   };
-  getThComponent = withProps((props) => {
-    console.log('props:',props)
-    const { columnindex } = props
-    console.log('columnindex:',columnindex)
-    return {
-      index: columnindex || 0
-    };
-  })(
-    SortableElement(({ toggleSort, className, children, ...rest }) => (
-      <div
-        className={classNames("rt-th", className)}
-        onClick={e => toggleSort && toggleSort(e)}
-        role="columnheader"
-        tabIndex="-1" // Resolves eslint issues without implementing keyboard navigation incorrectly
-        {...rest}
-      >
-        {children}
-      </div>
-    ))
-  );
+  getThComponent = compose(
+    withProps(props => {
+      console.log("props:", props);
+      const { columnindex } = props;
+      console.log("columnindex:", columnindex);
+      return {
+        index: columnindex || 0
+      };
+    }),
+    branch(({ immovable }) => "true" !== immovable, SortableElement)
+  )(({ toggleSort, className, children, ...rest }) => (
+    <div
+      className={classNames("rt-th", className)}
+      onClick={e => toggleSort && toggleSort(e)}
+      role="columnheader"
+      tabIndex="-1" // Resolves eslint issues without implementing keyboard navigation incorrectly
+      {...rest}
+    >
+      {children}
+    </div>
+  ));
 
   render() {
     const {
