@@ -266,9 +266,12 @@ class ReactDataTable extends React.Component {
       />
     );
   };
-  getThComponent = withProps(({ columnindex }) => {
+  getThComponent = withProps((props) => {
+    console.log('props:',props)
+    const { columnindex } = props
+    console.log('columnindex:',columnindex)
     return {
-      index: columnindex
+      index: columnindex || 0
     };
   })(
     SortableElement(({ toggleSort, className, children, ...rest }) => (
