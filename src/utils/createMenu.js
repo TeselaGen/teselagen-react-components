@@ -12,6 +12,7 @@ import { omit } from "lodash";
  *   for a normal divider, or some label text for a labeled one
  * icon: name of icon to show (optional)
  * label: right-aligned label, used mostly for shortcuts (optional)
+ * hotkey: right-aligned label formatted with <KeyCombo> (optional)
  * tooltip: tooltip text to use (optional)
  * submenu: nested menu structure describing submenu (i.e. array of item objects),
  *   or array of MenuItem elements
@@ -66,7 +67,7 @@ export default function createMenu(input, i, customize) {
       out = (
         <MenuItem
           key={key}
-          {...omit(item, ["submenu"])}
+          {...omit(item, ["submenu", "hotkey"])}
           icon={item.icon || item.iconName}
           labelElement={item.hotkey && <KeyCombo minimal combo={item.hotkey} />}
           text={item.text}
