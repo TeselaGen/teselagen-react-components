@@ -155,3 +155,11 @@
 .pt-dark .tg-upload-file-list-item:hover {
   background: #26738cb0;
 }
+
+.tg-inlineLabel.pt-form-group {
+  flex-direction: row;
+}
+.tg-inlineLabel .pt-label {
+  flex-shrink: 6;
+  padding-right: 10px;
+}

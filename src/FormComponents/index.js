@@ -103,6 +103,7 @@ class AbstractInput extends React.Component {
       tooltipProps,
       tooltipError,
       label,
+      inlineLabel,
       secondaryLabel,
       className,
       showErrorIfUntouched,
@@ -134,7 +135,7 @@ class AbstractInput extends React.Component {
       <div
         className={`pt-form-group tg-form-component ${getIntentClass(
           this.props
-        ) || ""} ${className || ""}`}
+        ) || ""} ${className || ""}  ${inlineLabel ? "tg-inlineLabel" : ""}`}
       >
         {label &&
           !noOuterLabel && (
@@ -143,13 +144,15 @@ class AbstractInput extends React.Component {
               {secondaryLabelComp}
             </label>
           )}
-        {componentToWrap}
-        {!tooltipError &&
-          showError && (
-            <div className={"tg-field-error-holder pt-form-helper-text"}>
-              {error}
-            </div>
-          )}
+        <div>
+          {componentToWrap}
+          {!tooltipError &&
+            showError && (
+              <div className={"tg-field-error-holder pt-form-helper-text"}>
+                {error}
+              </div>
+            )}
+        </div>
       </div>
     );
   }
@@ -296,12 +299,12 @@ export const renderBlueprintTextarea = props => {
   );
 };
 
-class ClickToEditWrapper extends React.Component {
-  state = { isEditing: false };
-  render() {
-    return <div />;
-  }
-}
+// class ClickToEditWrapper extends React.Component {
+//   state = { isEditing: false };
+//   render() {
+//     return <div />;
+//   }
+// }
 
 export const renderBlueprintEditableText = props => {
   const { input, onFieldSubmit, ...rest } = props;

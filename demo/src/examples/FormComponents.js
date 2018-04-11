@@ -71,7 +71,8 @@ class FormComponentsDemo extends React.Component {
 
           <InputField
             name={"inputField"}
-            label="Input"
+            label="Input with inline label"
+            inlineLabel
             placeholder="Enter input..."
             onFieldSubmit={function(val) {
               console.info("on field submit!:", val);
@@ -105,6 +106,28 @@ class FormComponentsDemo extends React.Component {
             options={["hey", "you", "guys"]}
             name={"selectField"}
             label="Select Simple"
+          />
+          <InputField
+            name={"inlineinputFieldWithTooltipError"}
+            tooltipError
+            inlineLabel
+            tooltipProps={{
+              position: Position.TOP
+            }}
+            onFieldSubmit={function(val) {
+              console.info("on field submit!:", val);
+            }}
+            label="Input with toolTip error with inlineLabel = true"
+            placeholder="Enter input..."
+          />
+          <SelectField
+            onFieldSubmit={function(val) {
+              console.info("on field submit!:", val);
+            }}
+            inlineLabel
+            options={["hey", "you", "guys"]}
+            name={"inlineselectField"}
+            label="Select Simple with inlineLabel = true"
           />
           <SelectField
             onFieldSubmit={function(val) {
@@ -299,12 +322,12 @@ class FormComponentsDemo extends React.Component {
 
 const validate = values => {
   const errors = {};
-  // if (!values.inputField) {
-  //   errors.inputField = "required";
-  // }
-  // if (!values.untouchedSelect) {
-  //   errors.untouchedSelect = "required";
-  // }
+  if (!values.inputField) {
+    errors.inputField = "required";
+  }
+  if (!values.untouchedSelect) {
+    errors.untouchedSelect = "required";
+  }
   if (!values.inputFieldWithTooltipError) {
     errors.inputFieldWithTooltipError = "required";
   }
