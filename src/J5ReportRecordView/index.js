@@ -406,7 +406,8 @@ class J5ReportRecordView extends Component {
       getIsLinkedCellRenderer,
       LinkJ5TableDialog,
       onConstructDoubleClick = noop,
-      pcrReactionsTitleElements
+      pcrReactionsTitleElements,
+      constructsTitleElements = []
     } = this.props;
     const { linkDialogName } = this.state;
 
@@ -544,18 +545,22 @@ class J5ReportRecordView extends Component {
               </InfoHelper>
             }
             title="Assembled Constructs"
-            openTitleElements={
-              LinkJ5TableDialog && (
-                <Button
-                  onClick={() => {
-                    this.showLinkModal("constructs");
-                  }}
-                >
-                  {" "}
-                  Link Constructs
-                </Button>
-              )
-            }
+            openTitleElements={[
+              ...(LinkJ5TableDialog
+                ? [
+                    <Button
+                      key="linkConstructs"
+                      onClick={() => {
+                        this.showLinkModal("constructs");
+                      }}
+                    >
+                      {" "}
+                      Link Constructs
+                    </Button>
+                  ]
+                : []),
+              ...constructsTitleElements
+            ]}
           >
             <DataTable
               {...sharedTableProps}
