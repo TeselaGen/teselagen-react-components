@@ -32,6 +32,7 @@
   overflow: auto;
   margin: 0px;
   padding: 20px;
+  padding-bottom: 0px;
 }
 .tg-pt-dialog-resizable-draggable .pt-overlay-backdrop {
   display: none;

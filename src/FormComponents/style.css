@@ -163,3 +163,7 @@
   flex-shrink: 6;
   padding-right: 10px;
 }
+
+.tg-tooltipError .pt-popover-wrapper {
+  width: 100%;
+}

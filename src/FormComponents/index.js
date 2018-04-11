@@ -135,7 +135,7 @@ class AbstractInput extends React.Component {
       <div
         className={`pt-form-group tg-form-component ${getIntentClass(
           this.props
-        ) || ""} ${className || ""}  ${inlineLabel ? "tg-inlineLabel" : ""}`}
+        ) || ""} ${className || ""}   ${inlineLabel ? "tg-inlineLabel" : ""}   ${tooltipError ? "tg-tooltipError" : ""}`}
       >
         {label &&
           !noOuterLabel && (
