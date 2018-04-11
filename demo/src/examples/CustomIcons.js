@@ -7,7 +7,9 @@ function CustomIconsDemo() {
         be sure to add it to the `demo/src/examples/CustomIcons.js` page to TEST
         THAT IT WORKS and so that people know it exists!
       </h4>
-      <Button icon={customIcons.flaskIcon} text="flask" />
+      <Button icon={customIcons.flaskIcon} text="flaskIcon" />
+      <Button icon={customIcons.orfIcon} text="orfIcon" />
+      <Button icon={customIcons.featureIcon} text="featureIcon" />
     </div>
   );
 }
