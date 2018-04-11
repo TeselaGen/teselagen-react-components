@@ -268,9 +268,7 @@ class ReactDataTable extends React.Component {
   };
   getThComponent = compose(
     withProps(props => {
-      console.log("props:", props);
       const { columnindex } = props;
-      console.log("columnindex:", columnindex);
       return {
         index: columnindex || 0
       };
