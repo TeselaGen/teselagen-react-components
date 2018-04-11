@@ -35,19 +35,19 @@ export default class CollapsibleCard extends Component {
       title,
       icon,
       openTitleElements,
-      noCard = false
+      noCard = false,
+      className,
+      style
     }: Props = this.props;
     return (
       <div
-        className={classNames(
-          { "tg-card": !noCard, open },
-          this.props.className
-        )}
+        className={classNames({ "tg-card": !noCard, open }, className)}
         style={{
           paddingTop: 10,
           paddingBottom: 10,
           paddingLeft: 15,
-          paddingRight: 15
+          paddingRight: 15,
+          ...style
         }}
       >
         <div className="tg-card-header" style={{ marginBottom: 8 }}>
