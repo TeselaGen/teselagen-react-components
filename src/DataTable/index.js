@@ -137,6 +137,8 @@ class ReactDataTable extends React.Component {
     onDeselect: noop,
     addFilters: noop,
     removeSingleFilter: noop,
+    resizePersist: noop,
+    resized: [],
     filters: [],
     isSingleSelect: false,
     withCheckboxes: false,
@@ -306,6 +308,8 @@ class ReactDataTable extends React.Component {
       noFooter,
       noPadding,
       withDisplayOptions,
+      resized,
+      resizePersist,
       updateColumnVisibility,
       updateTableDisplayDensity,
       localStorageForceUpdate,
@@ -490,6 +494,11 @@ class ReactDataTable extends React.Component {
           showPagination={false}
           sortable={false}
           loading={isLoading || disabled}
+          resized={resized}
+          onResizedChange={newResized => {
+            resizePersist(newResized);
+            localStorageForceUpdate.input.onChange(Math.random());
+          }}
           getTbodyProps={() => ({
             id: tableId
           })}
@@ -1113,16 +1122,18 @@ const enhancer = compose(
     } = propsToUse;
     let schemaToUse = convertSchema(schema);
     let fieldOptsByPath = {};
+    let tableConfig = {};
     let resetDefaultVisibility;
     let updateColumnVisibility;
     let moveColumnPersist;
+    let resizePersist;
+    let resized;
     let updateTableDisplayDensity;
     let userSpecifiedCompact;
     if (isViewable) {
       schemaToUse.fields = [viewColumn, ...schemaToUse.fields];
     }
     if (withDisplayOptions) {
-      let tableConfig;
       if (syncDisplayOptionsToDb) {
         tableConfig = tableConfigurations && tableConfigurations[0];
       } else {
@@ -1228,15 +1239,22 @@ const enhancer = compose(
           );
           window.localStorage.setItem(formName, JSON.stringify(tableConfig));
         };
+        resizePersist = function(newResized) {
+          tableConfig.resized = newResized;
+          window.localStorage.setItem(formName, JSON.stringify(tableConfig));
+        };
       }
     }
+    resized = tableConfig.resized;
     return {
       ...propsToUse,
       schema: schemaToUse,
+      resized,
       resetDefaultVisibility,
       updateColumnVisibility,
       updateTableDisplayDensity,
       userSpecifiedCompact,
+      resizePersist,
       moveColumnPersist
     };
   }),
