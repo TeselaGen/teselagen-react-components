@@ -259,14 +259,16 @@ class FilterInput extends React.Component {
         );
         break;
       case "dateRange":
+        const filterValueToUse =
+          filterValue && filterValue.split && filterValue.split(".");
         inputGroup = (
           <div className={"custom-menu-item"}>
             <DateRangeInput
               value={
-                filterValue && filterValue[0] && filterValue[1]
+                filterValueToUse && filterValueToUse[0] && filterValueToUse[1]
                   ? [
-                      moment(filterValue[0]).toDate(),
-                      moment(filterValue[1]).toDate()
+                      new Date(filterValueToUse[0]),
+                      new Date(filterValueToUse[1])
                     ]
                   : undefined
               }

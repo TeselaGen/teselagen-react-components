@@ -271,15 +271,15 @@ function getSubFilter(
           return !fieldVal;
         };
   } else if (ccSelectedFilter === "isBetween") {
+    const filterValueToUse =
+      filterValue && filterValue.split && filterValue.split(".");
     return qb
-      ? qb.between([
-          moment(filterValue[0]).valueOf(),
-          moment(filterValue[1]).valueOf()
-        ])
+      ? qb.between(new Date(filterValueToUse[0]), new Date(filterValueToUse[1]))
       : fieldVal => {
           return (
-            moment(filterValue[0]).valueOf() <= moment(fieldVal).valueOf() &&
-            moment(fieldVal).valueOf() <= moment(filterValue[1]).valueOf()
+            moment(filterValueToUse[0]).valueOf() <=
+              moment(fieldVal).valueOf() &&
+            moment(fieldVal).valueOf() <= moment(filterValueToUse[1]).valueOf()
           );
         };
   } else if (ccSelectedFilter === "isBefore") {

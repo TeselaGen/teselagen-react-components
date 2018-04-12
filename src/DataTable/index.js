@@ -494,10 +494,9 @@ class ReactDataTable extends React.Component {
           showPagination={false}
           sortable={false}
           loading={isLoading || disabled}
-          resized={resized}
+          defaultResized={resized}
           onResizedChange={newResized => {
             resizePersist(newResized);
-            localStorageForceUpdate.input.onChange(Math.random());
           }}
           getTbodyProps={() => ({
             id: tableId
