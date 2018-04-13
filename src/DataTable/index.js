@@ -595,7 +595,7 @@ class ReactDataTable extends React.Component {
     return {
       onClick: e => {
         // if checkboxes are activated or row expander is clicked don't select row
-        if (e.target.classList.contains("tg-expander")) {
+        if (e.target.matches(".tg-expander, .tg-expander *")) {
           reduxFormExpandedEntityIdMap.input.onChange({
             ...reduxFormExpandedEntityIdMap.input.value,
             [rowId]: !isExpanded
