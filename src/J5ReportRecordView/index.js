@@ -18,12 +18,13 @@ import InfoHelper from "../InfoHelper";
 import schemas from "./schemas";
 import DataTable from "../DataTable";
 import Loading from "../Loading";
+import { getLinkDialogProps } from "./utils";
 import { getRangeLength } from "ve-range-utils";
-import "./style.css";
 import papaparse from "papaparse";
 import magicDownload from "../DownloadLink/magicDownload";
 import exportOligosFields from "./exportOligosFields";
 import getSequenceStringOfJ5InputPart from "./getSequenceStringOfJ5InputPart";
+import "./style.css";
 
 const sharedTableProps = {
   withSearch: false,
@@ -418,69 +419,9 @@ class J5ReportRecordView extends Component {
     }
 
     // JSON.parse(localStorage.getItem('TEMPORARY_j5Run')) || {}
-    const {
-      j5OligoSyntheses,
-      j5AssemblyPieces,
-      j5InputSequences,
-      j5RunConstructs
-      // j5InputParts
-    } = data.j5Report;
 
     const entitiesForAllTables = this.getEntitiesForAllTables();
-
-    const linkDialogProps = {
-      inputSequences: {
-        dialogProps: {
-          title: "Link Input Sequences to Materials"
-        },
-        items: j5InputSequences,
-        sequenceHashes: j5InputSequences.map(({ sequence }) => {
-          return sequence.hash;
-        })
-      },
-
-      constructs: {
-        dialogProps: {
-          title: "Link Constructs to Materials"
-        },
-        items: j5RunConstructs,
-        sequenceHashes: j5RunConstructs.map(({ sequence }) => {
-          return sequence.hash;
-        })
-      },
-
-      oligos: {
-        dialogProps: {
-          title: "Link Oligos to Materials"
-        },
-        items: j5OligoSyntheses.map(({ oligo }) => {
-          return oligo;
-        }),
-        sequenceHashes: j5OligoSyntheses.map(({ oligo }) => {
-          return oligo.sequence.hash;
-        })
-      },
-
-      dnaPieces: {
-        dialogProps: {
-          title: "Link DNA Pieces to Materials"
-        },
-        items: j5AssemblyPieces,
-        sequenceHashes: j5AssemblyPieces.map(({ sequence }) => {
-          return sequence.hash;
-        })
-      }
-    };
-    each(linkDialogProps, obj => {
-      obj.allLinked = true;
-      obj.items.some(item => {
-        if (item.sequence && !item.sequence.polynucleotideMaterialId) {
-          obj.allLinked = false;
-          return true;
-        }
-        return false;
-      });
-    });
+    const linkDialogProps = getLinkDialogProps(data.j5Report);
     const currentLink = linkDialogProps[linkDialogName];
     const linkKeys = Object.keys(linkDialogProps);
     let moveToNextTable;

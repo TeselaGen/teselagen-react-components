@@ -21,6 +21,7 @@ export { default as CollapsibleCard } from "./CollapsibleCard";
 export { default as ResizableDraggableDialog } from "./ResizableDraggableDialog";
 export { default as MenuBar } from "./MenuBar";
 export { default as J5ReportRecordView } from "./J5ReportRecordView";
+export * from "./J5ReportRecordView/utils";
 export { default as withDelete } from "./enhancers/withDelete";
 export { default as withUpsert } from "./enhancers/withUpsert";
 export { default as withQuery } from "./enhancers/withQuery";

@@ -72,7 +72,10 @@ export default function withDialog(topLevelDialogProps) {
           throw new Error(
             "withDialog error: Please provide a target or child element to the withDialog() enhanced component. If you really don't want a target, please pass a 'noTarget=true' prop"
           );
-          const DialogToUse = (isDraggable || extraDialogProps.isDraggable) ? ResizableDraggableDialog : Dialog
+        const DialogToUse =
+          isDraggable || extraDialogProps.isDraggable
+            ? ResizableDraggableDialog
+            : Dialog;
         return (
           <React.Fragment>
             {isOpen && (
