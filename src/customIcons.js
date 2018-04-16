@@ -3,7 +3,7 @@ import React from "react";
 const ptIconWrapper = (path, viewboxDefault = 24) => {
   return (
     <svg
-      class="pt-icon"
+      className="pt-icon"
       version="1.1"
       id="Capa_1"
       xmlns="http://www.w3.org/2000/svg"
