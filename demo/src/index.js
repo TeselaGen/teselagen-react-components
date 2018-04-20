@@ -1,6 +1,7 @@
 import ReactPlayground from "./ReactPlayground";
 import CollapsibleCard from "./examples/CollapsibleCard";
 import MenuBar from "./examples/MenuBar";
+import HotkeysDialog from "./examples/HotkeysDialog";
 import DataTableExample from "./examples/DataTable";
 import FormComponents from "./examples/FormComponents";
 import WithDialog from "./examples/WithDialog";
@@ -34,13 +35,16 @@ import {
   MenuItem,
   FocusStyleManager,
   Position,
-  Intent
+  Intent,
+  KeyCombo
 } from "@blueprintjs/core";
 import renderToggle from "./renderToggle";
 import Chance from "chance";
 import times from "lodash/times";
 import client from "./client";
 import { ApolloProvider } from "react-apollo";
+import { addMenuHotkeys, addMenuHandlers } from "../../src/utils/menuUtils";
+import { withHotkeys } from "../../src/utils/hotkeyUtils";
 
 FocusStyleManager.onlyShowFocusOnTabs();
 
@@ -149,8 +153,41 @@ const demos = {
     url:
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/CollapsibleCardDemo.js"
   },
-  MenuBar: {
+  'Hotkeys and HotkeysDialog': {
+    demo: HotkeysDialog,
+    scope: {
+      KeyCombo
+    },
+    props: [
+      {
+        name: "hotkeySets",
+        description:
+          "Object holding hotkey sets (keys are set names, values are hotkey objects)",
+        type: "Object"
+      },
+      {
+        name: "isOpen",
+        description:
+          "Flag indicating whether the dialog should be visible",
+        type: "boolean"
+      },
+      {
+        name: "onClose",
+        description:
+          "Callback to run when the user attempts to close the dialog",
+        type: "function"
+      }
+    ],
+    url:
+      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/HotkeysDialog.js"
+  },
+  'MenuBar': {
     demo: MenuBar,
+    scope: {
+      addMenuHotkeys,
+      addMenuHandlers,
+      withHotkeys
+    },
     props: [
       {
         name: "menu",
@@ -160,7 +197,7 @@ const demos = {
       }
     ],
     url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/MenuBarDemo/index.js"
+      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/MenuBar.js"
   },
   Loading: {
     demo: Loading,
