@@ -1,5 +1,6 @@
 import React from "react";
-import { MenuDivider, Tooltip, MenuItem, KeyCombo } from "@blueprintjs/core";
+import { MenuDivider, Tooltip, KeyCombo } from "@blueprintjs/core";
+import { EnhancedMenuItem } from "./menuUtils";
 import { omit } from "lodash";
 
 /**
@@ -17,6 +18,9 @@ import { omit } from "lodash";
  * submenu: nested menu structure describing submenu (i.e. array of item objects),
  *   or array of MenuItem elements
  * onClick: click handler
+ * navTo: a url to navigate to (assumes react-router)
+ * href: a url to link to
+ * target: link target
  *
  * Since this function is recursive (to handle nested submenus), and React
  * elements passed as input are returned unchanged, it is possible to freely mix
@@ -24,9 +28,9 @@ import { omit } from "lodash";
  * with its own output.
  *
  * A customize function may also be provided, and allows customization or
- * replacement of the created MenuItems, allowing for custom props or behavior
- * (e.g. supporting a `linkTo` prop). That function receives the original
- * created element and the item object, and must return an element.
+ * replacement of the created MenuItems, allowing for custom props or behavior.
+ * That function receives the original created element and the item object, and
+ * must return an element.
  *
  * Usage example:
  *
@@ -43,13 +47,17 @@ import { omit } from "lodash";
  * ]);
  *
  */
-export default function createMenu(input, i, customize) {
+export default function createMenu(structure, customize) {
+  return _createMenu(structure, 0, customize);
+}
+
+function _createMenu(input, i, customize) {
   let out;
   if (React.isValidElement(input)) {
     // Assume it's already a <MenuItem> element
     out = input;
   } else if (input instanceof Array) {
-    out = input.map((item, i) => createMenu(item, i, customize));
+    out = input.map((item, i) => _createMenu(item, i, customize));
   } else {
     const item = input;
     const key = item.key || item.text || item.divider || i;
@@ -65,15 +73,15 @@ export default function createMenu(input, i, customize) {
         console.warn("Menu item with no key", item);
       }
       out = (
-        <MenuItem
+        <EnhancedMenuItem
           key={key}
           {...omit(item, ["submenu", "hotkey"])}
           icon={item.icon || item.iconName}
           labelElement={item.hotkey && <KeyCombo minimal combo={item.hotkey} />}
           text={item.text}
         >
-          {item.submenu ? createMenu(item.submenu, 0, customize) : undefined}
-        </MenuItem>
+          {item.submenu ? _createMenu(item.submenu, 0, customize) : undefined}
+        </EnhancedMenuItem>
       );
     }
 
