@@ -18,14 +18,14 @@ export default function HotkeysDialog(props) {
       onClose={props.onClose}
       title="Keyboard Shortcuts"
     >
-      <Tabs className="hotkeys-dialog">
+      <Tabs className="tg-hotkeys-dialog">
         {sections.map(name => (
           <Tab
             key={name}
             id={name}
             title={name}
             panel={
-              <div className="table-wrapper">
+              <div className="tg-table-wrapper">
                 <table className="pt-table pt-striped pt-bordered">
                   <thead>
                     <tr>
