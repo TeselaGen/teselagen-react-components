@@ -1,5 +1,11 @@
 import React from "react";
-import { MenuDivider, Tooltip, KeyCombo } from "@blueprintjs/core";
+import {
+  MenuDivider,
+  Tooltip,
+  KeyCombo,
+  ContextMenu,
+  Menu
+} from "@blueprintjs/core";
 import { EnhancedMenuItem } from "./menuUtils";
 import { omit } from "lodash";
 
@@ -47,8 +53,22 @@ import { omit } from "lodash";
  * ]);
  *
  */
-export default function createMenu(structure, customize) {
-  return _createMenu(structure, 0, customize);
+export default function createMenu(_structure, customize, event, onClose) {
+  const structure = filterMenuForCorrectness(_structure);
+
+  if (!structure || !structure.length) return;
+
+  const menuToRender = _createMenu(structure, 0, customize);
+  if (event) {
+    //if an event is passed then we'll render a context menu at the event's position
+    ContextMenu.show(
+      <Menu>{menuToRender}</Menu>,
+      { left: event.clientX, top: event.clientY },
+      onClose
+    );
+  } else {
+    return menuToRender;
+  }
 }
 
 function _createMenu(input, i, customize) {
@@ -98,4 +118,8 @@ function _createMenu(input, i, customize) {
     }
   }
   return out;
+}
+
+function filterMenuForCorrectness(menu) {
+  return menu && menu.length && menu.filter(item => item);
 }

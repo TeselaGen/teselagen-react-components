@@ -18,6 +18,7 @@ import Uploader from "../../src/FormComponents/Uploader";
 import J5ReportRecordView from "./examples/J5ReportRecordView";
 import j5ReportRecordViewData from "./data/j5ReportRecordView";
 import * as customIcons from "../../src/customIcons";
+import createMenu from "../../src/utils/createMenu";
 import "./style.css";
 import React from "react";
 import { render } from "react-dom";
@@ -186,7 +187,8 @@ const demos = {
     scope: {
       addMenuHotkeys,
       addMenuHandlers,
-      withHotkeys
+      withHotkeys,
+      createMenu
     },
     props: [
       {

@@ -7,14 +7,13 @@ class MenuBarDemo extends React.Component {
     // This can be (re)used for hotkey processing, decorating bar or context
     // menus, and populating the hotkeys dialog
     const hotkeys = {
-      newFile: { combo: 'mod+ctrl+n', preventDefault: true }, // object syntax
-      openFile: ['mod+o', undefined, { preventDefault: true }], // no preventDefault: will also trigger browser's open
-      quit: ['mod+ctrl+q', 'Quit App', { preventDefault: true }], // custom label
-      cut: ['mod+x'], // array shorthand
-      copy: 'mod+c', // string shorthand
-      paste: 'mod+v',
+      newFile: { combo: "mod+ctrl+n", preventDefault: true }, // object syntax
+      openFile: ["mod+o", undefined, { preventDefault: true }], // no preventDefault: will also trigger browser's open
+      quit: ["mod+ctrl+q", "Quit App", { preventDefault: true }], // custom label
+      cut: ["mod+x"], // array shorthand
+      copy: "mod+c", // string shorthand
+      paste: "mod+v"
     };
-
 
     // This can be (re)used for hotkey handling, top menu clicks, context menu
     // clicks, etc.
@@ -32,51 +31,63 @@ class MenuBarDemo extends React.Component {
 
     let menu = [
       {
-        text: 'File',
+        text: "File",
         submenu: [
-          { text: 'New', icon: 'add', tooltip: 'May use tooltips', cmd: 'newFile' },
-          { text: 'Open...', icon: 'document', cmd: 'openFile' },
-          { divider: '' },
-          { cmd: 'showHotkeys' },
-          { divider: '' },
-          { icon: 'log-out', cmd: 'quit' }, // no text prop here
+          {
+            text: "New",
+            icon: "add",
+            tooltip: "May use tooltips",
+            cmd: "newFile"
+          },
+          { text: "Open...", icon: "document", cmd: "openFile" },
+          { divider: "" },
+          { cmd: "showHotkeys" },
+          { divider: "" },
+          { icon: "log-out", cmd: "quit" } // no text prop here
         ]
       },
       {
-        text: 'Edit',
+        text: "Edit",
         submenu: [
-          { icon: 'cut', cmd: 'cut' }, // no text props here
-          { icon: 'duplicate', cmd: 'copy' },
-          { icon: 'clipboard', cmd: 'paste' },
-          { divider: '' },
-          { text: 'Other',
+          { icon: "cut", cmd: "cut" }, // no text props here
+          { icon: "duplicate", disabled: true, cmd: "copy" },
+          { icon: "clipboard", cmd: "paste" },
+          { divider: "" },
+          {
+            text: "Other",
             submenu: [
               // no hotkeys or commands used here
-              { text: 'Some command 1', label: 'Label', icon: 'code', onClick: () => alert('Do something') },
-              { text: 'Some command 2', icon: 'numerical', onClick: () => alert('Do something else') },
+              {
+                text: "Some command 1",
+                label: "Label",
+                icon: "code",
+                onClick: () => alert("Do something")
+              },
+              {
+                text: "Some command 2",
+                icon: "numerical",
+                onClick: () => alert("Do something else")
+              }
             ]
-          },
+          }
         ]
       },
-      { text: 'No Submenu', onClick: () => alert('This triggers an action directly')}
+      {
+        text: "No Submenu",
+        onClick: () => alert("This triggers an action directly")
+      }
     ];
 
     // Enhance menu with hotkeys and handlers, based on each item's `cmd` property
-    this.menu = addMenuHotkeys(
-      addMenuHandlers(
-        menu,
-        handlers
-      ),
-      hotkeys
-    );
+    this.menu = addMenuHotkeys(addMenuHandlers(menu, handlers), hotkeys);
 
     // Sets will normally be different routes/modules/views of an app, but any
     // arbitrary separation criteria will work
     this.hotkeySets = {
-      'File Menu': hotkeys,
-      'Other Section': {
-        something: 'alt+shift+s',
-        somethingElse: 'alt+shift+e'
+      "File Menu": hotkeys,
+      "Other Section": {
+        something: "alt+shift+s",
+        somethingElse: "alt+shift+e"
       }
     };
 
@@ -86,7 +97,6 @@ class MenuBarDemo extends React.Component {
     this.state = {
       showDialog: false
     };
-
   }
 
   showDialog() {
@@ -97,33 +107,51 @@ class MenuBarDemo extends React.Component {
     this.setState({ showDialog: false });
   }
 
-
   render() {
     return (
       <div>
-        <div style={{ backgroundColor: '#f8f8f8', height: '300px', border: '1px solid #eee'}}>
-          <MenuBar
-            menu={this.menu}
-          />
+        <div
+          style={{
+            backgroundColor: "#f8f8f8",
+            height: "300px",
+            border: "1px solid #eee"
+          }}
+        >
+          <MenuBar menu={this.menu} />
         </div>
+        <button
+          
+          onClick={e => {
+            createMenu(
+              [{ text: "hey" }, { text: "you", submenu: [{ text: "yup" }] }],
+              undefined,
+              e
+            );
+          }}
+        >Click to see a menu created using the imperative createMenu(menu, undefined, event)</button>
         <this.hotkeyEnabler />
         <HotkeysDialog
           hotkeySets={this.hotkeySets}
           isOpen={this.state.showDialog}
           onClose={this.hideDialog}
         />
-        <br/>
+        <br />
         <p>
-          The <code>menu</code> prop must be an array of objects with <code>text</code> and
-          <code>submenu</code> properties. Each <code>submenu</code> is itself an
-          array of item descriptor objects or <code>MenuItem</code> elements.
-          Item descriptors may contain several properties, namely <code>text</code>,
-          <code>icon</code>, <code>label</code>, <code>hotkey</code>, <code>onClick</code>,
-          <code>tooltip</code>, <code>key</code>, <code>divider</code>, <code>navTo</code>,
-          <code>href</code>, <code>target</code> and <code>submenu</code>. You may also
-          use the <code>cmd</code> property in combination with <code>addMenuHotkeys</code>
-          and <code>addMenuHandlers</code>.
-          Check the <code>createMenu()</code> util for more details.
+          The <code>menu</code> prop must be an array of objects with{" "}
+          <code>text</code> and
+          <code>submenu</code> properties. Each <code>submenu</code> is itself
+          an array of item descriptor objects or <code>MenuItem</code> elements.
+          Item descriptors may contain several properties, namely{" "}
+          <code>text</code>,
+          <code>icon</code>, <code>label</code>, <code>hotkey</code>,{" "}
+          <code>onClick</code>,
+          <code>tooltip</code>, <code>key</code>, <code>divider</code>,{" "}
+          <code>navTo</code>,
+          <code>href</code>, <code>target</code> and <code>submenu</code>. You
+          may also use the <code>cmd</code> property in combination with{" "}
+          <code>addMenuHotkeys</code>
+          and <code>addMenuHandlers</code>. Check the <code>createMenu()</code>{" "}
+          util for more details.
         </p>
       </div>
     );
