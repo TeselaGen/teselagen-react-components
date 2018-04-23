@@ -135,7 +135,9 @@ class AbstractInput extends React.Component {
       <div
         className={`pt-form-group tg-form-component ${getIntentClass(
           this.props
-        ) || ""} ${className || ""}   ${inlineLabel ? "tg-inlineLabel" : ""}   ${tooltipError ? "tg-tooltipError" : ""}`}
+        ) || ""} ${className || ""}   ${
+          inlineLabel ? "tg-inlineLabel" : ""
+        }   ${tooltipError ? "tg-tooltipError" : ""}`}
       >
         {label &&
           !noOuterLabel && (
@@ -381,18 +383,23 @@ export const renderReactSelect = props => {
   return async ? <Select.Async {...propsToUse} /> : <Select {...propsToUse} />;
 };
 
+export const BPSelect = ({ value, onChange, ...rest }) => {
+  return renderSelect({ ...rest, input: { onChange, value } });
+};
+
 export const renderSelect = props => {
   // spreading input not working, grab the values needed instead
   const {
     input: { value, onChange },
     hideValue,
+    className,
     placeholder,
     onFieldSubmit,
     options,
     ...rest
   } = props;
   return (
-    <div className={"pt-select pt-fill"}>
+    <div className={"pt-select pt-fill " + (className || "")}>
       <select
         {...removeUnwantedProps(rest)}
         value={
@@ -411,7 +418,7 @@ export const renderSelect = props => {
             //empty
           }
           onChange(val);
-          onFieldSubmit(val);
+          onFieldSubmit && onFieldSubmit(val);
         }}
       >
         {placeholder && (

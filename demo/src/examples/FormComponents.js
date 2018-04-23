@@ -56,7 +56,6 @@ class FormComponentsDemo extends React.Component {
               console.info("on field submit!:", val);
             }}
           />
-
           <FileUploadField
             label="Upload component"
             onFieldSubmit={function(fileList) {
@@ -68,7 +67,6 @@ class FormComponentsDemo extends React.Component {
             action={"//jsonplaceholder.typicode.com/posts/"}
             name={"uploadfield"}
           />
-
           <InputField
             name={"inputField"}
             label="Input with inline label"
@@ -129,6 +127,17 @@ class FormComponentsDemo extends React.Component {
             name={"inlineselectField"}
             label="Select Simple with inlineLabel = true"
           />
+          {"<BPSelect onChange value /> component (not redux form connected):"}
+          <BPSelect
+            onChange={function(val) {
+              console.info("on field submit!:", val);
+            }}
+            value="hey"
+            inlineLabel
+            options={["hey", "you", "guys"]}
+            name={"inlineselectField"}
+            label="Select Simple with inlineLabel = true"
+          />
           <SelectField
             onFieldSubmit={function(val) {
               console.info("on field submit!:", val);
@@ -146,7 +155,6 @@ class FormComponentsDemo extends React.Component {
             defaultValue={"you"}
             label="Select Simple with defaultValue"
           />
-
           <SelectField
             onFieldSubmit={function(val) {
               console.info("on field submit!:", val);
