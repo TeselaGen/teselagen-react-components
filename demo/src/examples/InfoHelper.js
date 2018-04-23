@@ -2,12 +2,15 @@
   Default:
   <br />
   <InfoHelper content={"Hey I'm some helpful info!"} />
+  displayToSide :
   <br />
-  As different icon:
+  <InfoHelper displayToSide content={"Hey I'm some helpful info!"} />
+  <br />
+  As different icon (icon="align-left"):
   <br />
   <InfoHelper icon="align-left" content={"Hey I'm some helpful info!"} />
   <br />
-  As Button:
+  As Button (isButton=true):
   <br />
   <InfoHelper isButton text="Hello world!" icon="align-left" content={"Hey I'm some helpful info!"} />
   <br />
