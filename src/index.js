@@ -41,6 +41,6 @@ export * from "./toastr";
 export * from "./flow_types";
 export * from "./utils/handlerHelpers";
 export * from "./customIcons";
-export * from "./utils/createMenu";
+export {default as createMenu} from "./utils/createMenu";
 export * from "./utils/hotkeyUtils";
 export * from "./utils/menuUtils";
