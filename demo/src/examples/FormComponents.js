@@ -138,6 +138,18 @@ class FormComponentsDemo extends React.Component {
             name={"inlineselectField"}
             label="Select Simple with inlineLabel = true"
           />
+          {"<BPSelect onChange value /> component with className pt-minimal passed (not redux form connected):"}
+          <BPSelect
+            onChange={function(val) {
+              console.info("on field submit!:", val);
+            }}
+            className="pt-minimal"
+            value="hey"
+            inlineLabel
+            options={["hey", "you", "guys"]}
+            name={"inlineselectField"}
+            label="Select Simple with inlineLabel = true"
+          />
           <SelectField
             onFieldSubmit={function(val) {
               console.info("on field submit!:", val);

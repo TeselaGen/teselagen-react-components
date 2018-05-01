@@ -120,15 +120,34 @@ class MenuBarDemo extends React.Component {
           <MenuBar menu={this.menu} />
         </div>
         <button
-          
           onClick={e => {
             createMenu(
-              [{ text: "hey" }, { text: "you", submenu: [{ text: "yup" }] }],
+              [
+                { text: "hey" },
+                undefined,
+                {
+                  text: "you",
+                  submenu: [
+                    {
+                      text: "yup",
+                      willUnmount: () => {
+                        console.log("hellllo");
+                      },
+                      didMount: ({ className }) => {
+                        console.log("yaaa");
+                      }
+                    }
+                  ]
+                }
+              ], //the "undefined" will be filtered out
               undefined,
               e
             );
           }}
-        >Click to see a menu created using the imperative createMenu(menu, undefined, event)</button>
+        >
+          Click to see a menu created using the imperative createMenu(menu,
+          undefined, event)
+        </button>
         <this.hotkeyEnabler />
         <HotkeysDialog
           hotkeySets={this.hotkeySets}
