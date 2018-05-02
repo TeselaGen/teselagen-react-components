@@ -16,7 +16,8 @@ const generateToast = intent => (message, options) => {
 
   const uniqKey = toastToUse.show({
     intent,
-    message
+    message,
+    action: options.action
   });
   return function clear() {
     toastToUse.dismiss(uniqKey);

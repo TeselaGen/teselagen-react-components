@@ -520,8 +520,10 @@ export const renderBlueprintRadioGroup = ({
         onFieldSubmit(e.target ? e.target.value : val);
       }}
     >
-      {options.map(function({ label, value }, index) {
-        return <Radio key={index} value={value} label={label} />;
+      {options.map(function({ label, value, disabled }, index) {
+        return (
+          <Radio key={index} value={value} label={label} disabled={disabled} />
+        );
       })}
     </RadioGroup>
   );
