@@ -10,7 +10,7 @@ export default schema => {
   schemaToUse = {
     ...schemaToUse
   };
-  schemaToUse.fields = schemaToUse.fields.map(field => {
+  schemaToUse.fields = schemaToUse.fields.map((field, i) => {
     let fieldToUse = field;
     if (typeof field === "string") {
       fieldToUse = {
@@ -28,6 +28,13 @@ export default schema => {
       fieldToUse = {
         ...fieldToUse,
         displayName: startCase(fieldToUse.path)
+      };
+    }
+    // paths are needed for column resizing
+    if (!fieldToUse.path) {
+      fieldToUse = {
+        ...fieldToUse,
+        path: "fake-path" + i
       };
     }
     return fieldToUse;
