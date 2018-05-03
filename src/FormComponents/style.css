@@ -77,6 +77,14 @@
   opacity: 0.7;
 }
 
+.tg-upload-file-list-item a {
+  width: 100%;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .tg-spin {
   animation-name: spin;
   animation-duration: 1500ms;

@@ -228,7 +228,6 @@ export default props => {
                     })}
                   />
                   <a
-                    style={{ width: "100%" }}
                     name={name || originalName}
                     {...(url && !onFileClick ? { href: url } : {})}
                     /* eslint-disable react/jsx-no-bind*/
