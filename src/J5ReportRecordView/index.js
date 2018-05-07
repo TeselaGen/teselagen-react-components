@@ -77,7 +77,7 @@ const processJ5DirectSyntheses = j5DirectSynths =>
   });
 
 const processJ5RunConstructs = j5RunConstructs =>
-  j5RunConstructs.map(j5RunConstruct => ({
+  j5RunConstructs.filter(j5RunConstruct => !j5RunConstruct.isPrebuilt).map(j5RunConstruct => ({
     ...j5RunConstruct,
     id: "construct_" + j5RunConstruct.id,
     nextLevelParts: (get(j5RunConstruct, "sequence.sequenceParts") || [])
@@ -95,6 +95,16 @@ const processJ5RunConstructs = j5RunConstructs =>
             j5InputPart => j5InputPart.j5InputPart.sequencePart.name
           )
       ).join(", ")
+  }));
+
+const processPrebuiltConstructs = j5RunConstructs =>
+  j5RunConstructs.filter(j5RunConstruct => j5RunConstruct.isPrebuilt).map(j5RunConstruct => ({
+    ...j5RunConstruct,
+    id: "construct_" + j5RunConstruct.id,
+    nextLevelParts: (get(j5RunConstruct, "sequence.sequenceParts") || [])
+      .map(part => part.name)
+      .join(", "),
+    partsContainedNames: j5RunConstruct.partNames
   }));
 
 const getInputPartsFromInputSequences = j5InputSequences =>
@@ -225,6 +235,7 @@ class J5ReportRecordView extends Component {
 
     const j5InputParts = getInputPartsFromInputSequences(j5InputSequences);
     return {
+      prebuiltConstructs: processPrebuiltConstructs(j5RunConstructs),
       j5RunConstructs: processJ5RunConstructs(j5RunConstructs),
       j5InputSequences: processInputSequences(j5InputSequences),
       j5InputParts: processInputParts(j5InputParts),
@@ -482,6 +493,39 @@ class J5ReportRecordView extends Component {
           <CollapsibleCard
             icon={
               <InfoHelper>
+                Prebuilt constructs are the desired sequences that have already been built and are available in your library.
+              </InfoHelper>
+            }
+            title="Prebuilt Constructs"
+            openTitleElements={[
+              ...(LinkJ5TableDialog
+                ? [
+                    <Button
+                      key="linkConstructs"
+                      onClick={() => {
+                        this.showLinkModal("constructs");
+                      }}
+                    >
+                      {" "}
+                      Link Constructs
+                    </Button>
+                  ]
+                : []),
+              ...constructsTitleElements
+            ]}
+          >
+            <DataTable
+              {...sharedTableProps}
+              onDoubleClick={onConstructDoubleClick}
+              schema={schemas.j5RunConstructs}
+              formName="prebuiltConstructs" //because these tables are currently not connected to table params, we need to manually pass a formName here
+              entities={entitiesForAllTables.j5RunConstructs}
+            />
+          </CollapsibleCard>
+
+          <CollapsibleCard
+            icon={
+              <InfoHelper>
                 Constructs are the desired sequences to be built in a j5 run.
               </InfoHelper>
             }
@@ -537,7 +581,7 @@ class J5ReportRecordView extends Component {
               schema={schemas.j5InputSequences}
               formName={"j5InputSequences"} //because these tables are currently not connected to table params, we need to manually pass a formName here
               cellRenderer={
-                getIsLinkedCellRenderer &&
+                getIsLinkedCellRenderer && 
                 getIsLinkedCellRenderer(
                   "sequence.polynucleotideMaterialId",
                   "sequence.hash",
