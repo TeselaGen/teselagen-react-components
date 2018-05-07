@@ -856,14 +856,14 @@ class ReactDataTable extends React.Component {
             title={title || undefined}
             className="hoverable"
           >
-            {typeof val === "string" && val !== "" && isCopyable ? (
+            {title !== undefined && isCopyable ? (
               <CopyToClipboard
-                text={val}
+                text={title}
                 onCopy={() => {
-                  window.toastr.success(`${val} - copy to clipboard`);
+                  window.toastr.success(`${title} - copy to clipboard`);
                 }}
               >
-                <span style={{color : "#ccc", fontSize: "10px"}} className="pt-icon-standard pt-icon-clipboard" />
+                <span className="pt-icon-standard pt-icon-clipboard show-on-hover" />
               </CopyToClipboard>
             ) : (
               ""
@@ -884,19 +884,18 @@ class ReactDataTable extends React.Component {
     selectedRecords.forEach(row => {
       let textByRow;
       columns.forEach(col => {
-        let text =  get(row, col.path);
-        if (text) {
-          textByRow = textByRow
-            ? textByRow + "\t" + text.toString()
-            : text.toString();
-        }
+        let text = get(row, col.path);
+        if (text !== undefined) text = String(text); else text = " ";
+        textByRow = textByRow
+          ? textByRow + "\t" + text
+          : text;
       });
       text = text ? text + textByRow + "\n" : textByRow + "\n";
     });
     return text;
   };
 
-  showContextMenu = (idMap, e, entity) => {
+  showContextMenu = (idMap, e) => {
     const { history, contextMenu, entities, isCopyable } = computePresets(
       this.props
     );

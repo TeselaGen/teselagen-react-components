@@ -299,11 +299,13 @@
 }
 
 .show-on-hover {
-  display: none !important;
+  color : #fff;
+  font-size: 13px !important;
 }
 
 .hoverable:hover .show-on-hover {
   display: inline !important;
+  color : #ccc
 }
 
 /* dark styles */
