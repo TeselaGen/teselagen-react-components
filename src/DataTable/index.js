@@ -11,7 +11,7 @@ import copy from "copy-to-clipboard";
 
 import {
   camelCase,
-  // get,
+  get,
   toArray,
   startCase,
   noop,
@@ -622,7 +622,7 @@ class ReactDataTable extends React.Component {
             props: computePresets(this.props)
           });
         }
-        this.showContextMenu(newIdMap, e);
+        this.showContextMenu(newIdMap, e, entity);
       },
       className: rowSelected && !withCheckboxes ? "selected" : "",
       onDoubleClick: () => {
@@ -856,11 +856,11 @@ class ReactDataTable extends React.Component {
             title={title || undefined}
             className="hoverable"
           >
-            {typeof val === "string" && val !== "" && isCopyable ? (
+            {title !== undefined && isCopyable ? (
               <CopyToClipboard
-                text={val}
+                text={title}
                 onCopy={() => {
-                  window.toastr.success(`${val} - copy to clipboard`);
+                  window.toastr.success(`${title} - copy to clipboard`);
                 }}
               >
                 <span className="pt-icon-standard pt-icon-clipboard show-on-hover" />
@@ -884,11 +884,11 @@ class ReactDataTable extends React.Component {
     selectedRecords.forEach(row => {
       let textByRow;
       columns.forEach(col => {
-        if (typeof row[col.path] !== "undefined") {
-          textByRow = textByRow
-            ? textByRow + "\t" + row[col.path]
-            : row[col.path];
-        }
+        let text = get(row, col.path);
+        if (text !== undefined) text = String(text); else text = " ";
+        textByRow = textByRow
+          ? textByRow + "\t" + text
+          : text;
       });
       text = text ? text + textByRow + "\n" : textByRow + "\n";
     });
@@ -908,17 +908,18 @@ class ReactDataTable extends React.Component {
     const menu = (
       <Menu>
         {itemsToRender}
-        {isCopyable && (
-          <MenuItem
-            key="copySelectedRows"
-            onClick={() => {
-              copy(this.setManyRowsToCopy(selectedRecords));
-              window.toastr.success("Selected rows copied");
-            }}
-            icon="clipboard"
-            text={"Copy Rows"}
-          />
-        )}
+        {isCopyable &&
+          selectedRecords.length > 0 && (
+            <MenuItem
+              key="copySelectedRows"
+              onClick={() => {
+                copy(this.setManyRowsToCopy(selectedRecords));
+                window.toastr.success("Selected rows copied");
+              }}
+              icon="clipboard"
+              text={"Copy Rows to clipboard"}
+            />
+          )}
       </Menu>
     );
     ContextMenu.show(menu, { left: e.clientX, top: e.clientY });
