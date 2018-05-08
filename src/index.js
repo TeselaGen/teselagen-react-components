@@ -18,7 +18,9 @@ export { default as withTableParams } from "./DataTable/utils/withTableParams";
 export { default as InfoHelper } from "./InfoHelper";
 export { default as showConfirmationDialog } from "./showConfirmationDialog";
 export { default as CollapsibleCard } from "./CollapsibleCard";
-export { default as ResizableDraggableDialog } from "./ResizableDraggableDialog";
+export {
+  default as ResizableDraggableDialog
+} from "./ResizableDraggableDialog";
 export { default as MenuBar } from "./MenuBar";
 export { default as HotkeysDialog } from "./HotkeysDialog";
 export { default as J5ReportRecordView } from "./J5ReportRecordView";
@@ -40,6 +42,6 @@ export * from "./toastr";
 export * from "./flow_types";
 export * from "./utils/handlerHelpers";
 export * from "./customIcons";
-export {default as createMenu} from "./utils/createMenu";
+export { default as createMenu } from "./utils/createMenu";
 export * from "./utils/hotkeyUtils";
 export * from "./utils/menuUtils";
