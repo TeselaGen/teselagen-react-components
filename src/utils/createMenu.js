@@ -66,6 +66,8 @@ export default function createMenu(_structure, customize, event, onClose) {
       { left: event.clientX, top: event.clientY },
       onClose
     );
+    event.stopPropagation()
+    event.preventDefault()
   } else {
     return menuToRender;
   }
