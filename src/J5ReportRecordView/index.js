@@ -510,8 +510,7 @@ class J5ReportRecordView extends Component {
                       Link Constructs
                     </Button>
                   ]
-                : []),
-              ...constructsTitleElements
+                : [])
             ]}
           >
             <DataTable
