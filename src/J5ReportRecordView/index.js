@@ -510,8 +510,7 @@ class J5ReportRecordView extends Component {
                       Link Constructs
                     </Button>
                   ]
-                : []),
-              ...constructsTitleElements
+                : [])
             ]}
           >
             <DataTable
@@ -519,7 +518,7 @@ class J5ReportRecordView extends Component {
               onDoubleClick={onConstructDoubleClick}
               schema={schemas.j5RunConstructs}
               formName="prebuiltConstructs" //because these tables are currently not connected to table params, we need to manually pass a formName here
-              entities={entitiesForAllTables.j5RunConstructs}
+              entities={entitiesForAllTables.prebuiltConstructs}
             />
           </CollapsibleCard>
 

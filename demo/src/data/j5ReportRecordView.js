@@ -438,6 +438,7 @@ export default {
       {
         "id": "10",
         "name": "Construct 3",
+        "isPrebuilt": true,
         "sequence": {
           "id": "53",
           "name": "Construct 3",

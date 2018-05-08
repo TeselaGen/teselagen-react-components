@@ -119,7 +119,6 @@ const schemas = {
     fields: [
       { path: "id", type: "string", displayName: "Construct ID" },
       { path: "name", type: "string", displayName: "Construct Name" },
-      { path: "isPrebuilt", type: "boolean", displayName: "Already Built" },
       { path: "sequence.size", type: "number", displayName: "Length (bp)" },
       {
         path: "partsContainedNames",
