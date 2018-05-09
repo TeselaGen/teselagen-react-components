@@ -18,6 +18,8 @@ function CustomIconsDemo() {
       <Button icon={customIcons.inventoryIcon} text="inventoryIcon" />
       <Button icon={customIcons.workflowIcon} text="workflowIcon" />
       <Button icon={customIcons.strainIcon} text="strainIcon" />
+      <Button icon={customIcons.designIcon} text="designIcon" />
+      <Button icon={customIcons.moleculeIcon} text="moleculeIcon" />
     </div>
   );
 }
