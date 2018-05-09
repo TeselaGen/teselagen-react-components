@@ -141,7 +141,10 @@ class MenuBarDemo extends React.Component {
                 }
               ], //the "undefined" will be filtered out
               undefined,
-              e
+              e,
+              () => {
+                console.log('closin')
+              }
             );
           }}
         >

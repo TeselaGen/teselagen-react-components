@@ -1,23 +1,25 @@
 import React from "react";
-import { lifecycle, compose } from "recompose";
-import { withRouter} from 'react-router-dom'
+import { lifecycle, compose, branch } from "recompose";
+import { withRouter } from "react-router-dom";
 import { getHotkeyProps } from "./hotkeyUtils";
 import { MenuItem } from "@blueprintjs/core";
 import { startCase } from "lodash";
-import PropTypes from "prop-types";
 
 // Enhanced MenuItem that supports history-based navigation when passed a
 // `navTo` prop
-export const EnhancedMenuItem = compose(lifecycle({
-  componentDidMount: function() {
-    const { didMount = noop, className } = this.props;
-    didMount({ className });
-  },
-  componentWillUnmount: function() {
-    const { willUnmount = noop, className } = this.props;
-    willUnmount({ className });
-  }
-}), withRouter)(function({ navTo, ...props }, context) {
+export const EnhancedMenuItem = compose(
+  lifecycle({
+    componentDidMount: function() {
+      const { didMount = noop, className } = this.props;
+      didMount({ className });
+    },
+    componentWillUnmount: function() {
+      const { willUnmount = noop, className } = this.props;
+      willUnmount({ className });
+    }
+  }),
+  branch(({navTo}) => navTo, withRouter)
+)(function({ navTo, ...props }) {
   let clickHandler = props.onClick;
   if (navTo) {
     clickHandler = e => {
