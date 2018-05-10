@@ -19,7 +19,7 @@ export const EnhancedMenuItem = compose(
     }
   }),
   branch(({navTo}) => navTo, withRouter)
-)(function({ navTo, ...props }) {
+)(function({ navTo, staticContext, ...props }) {
   let clickHandler = props.onClick;
   if (navTo) {
     clickHandler = e => {
