@@ -12,25 +12,36 @@ export default class InfoHelper extends Component {
       isPopover,
       isButton,
       size,
+      popoverProps={},
+      disabled,
       displayToSide,
       style,
       ...rest
     }: Props = this.props;
     const IconToUse = isButton ? Button : Icon;
     const IconInner = (
-      <IconToUse icon={icon} className={className} iconSize={size} {...rest} />
+      <IconToUse
+        icon={icon}
+        className={className}
+        iconSize={size}
+        disabled={disabled}
+        {...rest}
+      />
     );
     let toReturn;
     if (displayToSide) {
       toReturn = (
         <React.Fragment>
           {IconInner}
-          <span style={{paddingLeft: 5}}>{content || children}</span>
+          <span style={{ paddingLeft: 5, fontStyle: "italic" }}>
+            {content || children}
+          </span>
         </React.Fragment>
       );
     } else if (isPopover) {
       toReturn = (
         <Popover
+          disabled={disabled}
           popoverClassName="pt-dark"
           target={
             <Button
@@ -40,10 +51,18 @@ export default class InfoHelper extends Component {
             />
           }
           content={<div style={{ padding: 5 }}>{content || children}</div>}
+          {...popoverProps}
         />
       );
     } else {
-      toReturn = <Tooltip target={IconInner} content={content || children} />;
+      toReturn = (
+        <Tooltip
+          disabled={disabled}
+          target={IconInner}
+          content={content || children}
+          {...popoverProps}
+        />
+      );
     }
     return (
       <div

@@ -2,6 +2,9 @@
   Default:
   <br />
   <InfoHelper content={"Hey I'm some helpful info!"} />
+  As Button disabled:
+  <br />
+  <InfoHelper isButton disabled content={"Hey I'm some helpful info!"} />
   displayToSide :
   <br />
   <InfoHelper displayToSide content={"Hey I'm some helpful info!"} />
