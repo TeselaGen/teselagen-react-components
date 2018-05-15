@@ -222,6 +222,7 @@ export default props => {
                   <span
                     style={{ fontSize: "13px", marginRight: 11 }}
                     className={classnames({
+                      "pt-icon-standard": true,
                       "pt-icon-saved": !loading && !error,
                       "pt-icon-error": error,
                       "pt-icon-repeat tg-spin": loading
