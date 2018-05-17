@@ -21,7 +21,7 @@ function preventBubble(e) {
 }
 //
 export default ({ modelNameToReadableName, withQueryAsFn }) => {
-  compose(
+  return compose(
     // useage example:
     // <GenericSelect {...{
     //   name: "selectedWorklists", //the field name within the redux form Field
