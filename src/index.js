@@ -49,3 +49,5 @@ export * from "./customIcons";
 export { default as createMenu } from "./utils/createMenu";
 export * from "./utils/hotkeyUtils";
 export * from "./utils/menuUtils";
+
+export {default as Tree} from './Tree'

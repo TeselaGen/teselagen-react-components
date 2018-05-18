@@ -1,0 +1,10 @@
+.tg-tree-minimap-viewport {
+  cursor: grab;
+  background: blue;
+  opacity: 0.25;
+}
+
+.tg-tree-minimap-viewport-dragging {
+  cursor: grabbing;
+  opacity: 0.35;
+}
