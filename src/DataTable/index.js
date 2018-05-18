@@ -98,7 +98,8 @@ function computePresets(props) {
 
 class ReactDataTable extends React.Component {
   state = {
-    columns: []
+    columns: [],
+    fullscreen: false
   };
 
   static defaultProps = {
@@ -143,6 +144,12 @@ class ReactDataTable extends React.Component {
     isSingleSelect: false,
     withCheckboxes: false,
     withSort: true
+  };
+
+  toggleFullscreen = () => {
+    this.setState({
+      fullscreen: !this.state.fullscreen
+    });
   };
 
   componentWillMountOrReceiveProps = (oldProps, newProps) => {
@@ -289,6 +296,7 @@ class ReactDataTable extends React.Component {
   ));
 
   render() {
+    const { fullscreen } = this.state;
     const {
       extraClasses,
       className,
@@ -414,6 +422,16 @@ class ReactDataTable extends React.Component {
       return acc;
     }, {});
     const showHeader = (withTitle || withSearch || children) && !noHeader;
+
+    const toggleFullscreenButton = (
+      <Button
+        icon="fullscreen"
+        active={fullscreen}
+        minimal
+        onClick={this.toggleFullscreen}
+      />
+    );
+
     return (
       <div
         className={classNames(
@@ -422,6 +440,7 @@ class ReactDataTable extends React.Component {
           className,
           compactClassName,
           {
+            fullscreen,
             "dt-isViewable": isViewable,
             "no-padding": noPadding,
             "hide-column-header": hideColumnHeader
@@ -558,6 +577,7 @@ class ReactDataTable extends React.Component {
                 entityCount === 1 ? "Record" : "Total Records"
               }`}
             <div style={{ display: "flex", flexWrap: "wrap" }}>
+              {toggleFullscreenButton}
               {withDisplayOptions && (
                 <DisplayOptions
                   disabled={disabled}

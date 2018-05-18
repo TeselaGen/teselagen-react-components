@@ -44,10 +44,22 @@
 
 .data-table-container {
   padding: 20px;
+  position: relative;
   /* height: 100%;  tnr: this rule messes up  */
   width: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.data-table-container.fullscreen {
+  background: white;
+  position: fixed;
+  z-index: 50;
+  padding: 20px !important;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
 }
 
 .data-table-container.no-padding {
@@ -351,4 +363,8 @@
 
 .pt-dark .ReactTable .rt-thead .rt-resizable-header:hover {
   border-right-color: #738694;
+}
+
+.pt-dark .data-table-container.fullscreen {
+  background: #293742;
 }
