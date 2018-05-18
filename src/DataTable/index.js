@@ -339,7 +339,8 @@ class ReactDataTable extends React.Component {
       subHeader,
       isViewable,
       entities,
-      children
+      children,
+      currentParams
     } = computePresets(this.props);
     let updateColumnVisibilityToUse = updateColumnVisibility;
     let updateTableDisplayDensityToUse = updateTableDisplayDensity;
@@ -367,7 +368,12 @@ class ReactDataTable extends React.Component {
       compactClassName += "tg-compact-table";
     }
     const { tableId } = this.state;
-    const hasFilters = filters.length || searchTerm;
+    const hasFilters =
+      filters.length ||
+      searchTerm ||
+      schema.fields.some(
+        field => field.filterIsActive && field.filterIsActive(currentParams)
+      );
     const filtersOnNonDisplayedFields = [];
     if (filters && filters.length) {
       schema.fields.forEach(({ isHidden, displayName, path }) => {
@@ -408,7 +414,6 @@ class ReactDataTable extends React.Component {
       return acc;
     }, {});
     const showHeader = (withTitle || withSearch || children) && !noHeader;
-
     return (
       <div
         className={classNames(
@@ -885,10 +890,9 @@ class ReactDataTable extends React.Component {
       let textByRow;
       columns.forEach(col => {
         let text = get(row, col.path);
-        if (text !== undefined) text = String(text); else text = " ";
-        textByRow = textByRow
-          ? textByRow + "\t" + text
-          : text;
+        if (text !== undefined) text = String(text);
+        else text = " ";
+        textByRow = textByRow ? textByRow + "\t" + text : text;
       });
       text = text ? text + textByRow + "\n" : textByRow + "\n";
     });

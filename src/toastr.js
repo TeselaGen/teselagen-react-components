@@ -17,7 +17,8 @@ const generateToast = intent => (message, options) => {
   const uniqKey = toastToUse.show({
     intent,
     message,
-    action: options.action
+    action: options.action,
+    icon: options.icon
   });
   return function clear() {
     toastToUse.dismiss(uniqKey);
@@ -34,7 +35,9 @@ function preventDuplicates(func) {
     setTimeout(() => {
       delete previousToasts[message];
     }, options.timeout || 5000);
-    previousToasts[message] = func(message, options);
+    const clearToast = func(message, options);
+    previousToasts[message] = clearToast;
+    return clearToast;
   };
 }
 
@@ -53,4 +56,8 @@ if (!window.toastr.warning) {
 
 if (!window.toastr.info) {
   window.toastr.info = preventDuplicates(generateToast(Intent.PRIMARY));
+}
+
+if (!window.toastr.default) {
+  window.toastr.default = preventDuplicates(generateToast(Intent.NONE));
 }

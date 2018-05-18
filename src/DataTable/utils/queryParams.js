@@ -445,7 +445,8 @@ export function makeDataTableHandlers({
     setNewParams({
       ...currentParams,
       filters: undefined,
-      searchTerm: undefined
+      searchTerm: undefined,
+      tags: undefined
     });
     resetSearch();
   }
