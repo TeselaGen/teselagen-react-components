@@ -47,6 +47,8 @@ export * from "./flow_types";
 export * from "./utils/handlerHelpers";
 export * from "./customIcons";
 export { default as createMenu } from "./utils/createMenu";
+export { default as basicHandleActionsWithFullState } from "./utils/basicHandleActionsWithFullState";
+export { default as combineReducersWithFullState } from "./utils/combineReducersWithFullState";
 export * from "./utils/hotkeyUtils";
 export * from "./utils/menuUtils";
 
