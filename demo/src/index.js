@@ -19,6 +19,8 @@ import J5ReportRecordView from "./examples/J5ReportRecordView";
 import j5ReportRecordViewData from "./data/j5ReportRecordView";
 import * as customIcons from "../../src/customIcons";
 import createMenu from "../../src/utils/createMenu";
+import Tree from "./examples/Tree";
+import { bigTreeData, smallTreeData } from "./data/treeData";
 import "./style.css";
 import React from "react";
 import { render } from "react-dom";
@@ -154,7 +156,7 @@ const demos = {
     url:
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/CollapsibleCardDemo.js"
   },
-  'Hotkeys and HotkeysDialog': {
+  "Hotkeys and HotkeysDialog": {
     demo: HotkeysDialog,
     scope: {
       KeyCombo
@@ -168,8 +170,7 @@ const demos = {
       },
       {
         name: "isOpen",
-        description:
-          "Flag indicating whether the dialog should be visible",
+        description: "Flag indicating whether the dialog should be visible",
         type: "boolean"
       },
       {
@@ -182,7 +183,7 @@ const demos = {
     url:
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/HotkeysDialog.js"
   },
-  'MenuBar': {
+  MenuBar: {
     demo: MenuBar,
     scope: {
       addMenuHotkeys,
@@ -299,6 +300,13 @@ const demos = {
     demo: J5ReportRecordView,
     scope: {
       data: j5ReportRecordViewData
+    }
+  },
+  tree: {
+    demo: Tree,
+    scope: {
+      bigTreeData,
+      smallTreeData
     }
   }
   // fonticons: {
