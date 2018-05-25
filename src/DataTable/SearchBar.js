@@ -22,7 +22,7 @@ const SearchBar = ({
         maybeSpinner || (
           <Button
             className={Classes.MINIMAL}
-            icon={"pt-icon-search"}
+            icon="search"
             onClick={() => {
               setSearchTerm(reduxFormSearchInput.input.value);
             }}
