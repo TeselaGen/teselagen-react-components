@@ -254,7 +254,6 @@ class FilterInput extends React.Component {
                 handleFilterValueChange(selectedDates);
               }}
             />
-            <div />
           </div>
         );
         break;

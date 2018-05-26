@@ -382,6 +382,10 @@ class ReactDataTable extends React.Component {
       schema.fields.some(
         field => field.filterIsActive && field.filterIsActive(currentParams)
       );
+    const additionalFilterKeys = schema.fields.reduce((acc, field) => {
+      if (field.filterKey) acc.push(field.filterKey);
+      return acc;
+    }, []);
     const filtersOnNonDisplayedFields = [];
     if (filters && filters.length) {
       schema.fields.forEach(({ isHidden, displayName, path }) => {
@@ -487,7 +491,7 @@ class ReactDataTable extends React.Component {
                     disabled={disabled}
                     className={"data-table-clear-filters"}
                     onClick={() => {
-                      clearFilters();
+                      clearFilters(additionalFilterKeys);
                     }}
                     text={"Clear filters"}
                   />
