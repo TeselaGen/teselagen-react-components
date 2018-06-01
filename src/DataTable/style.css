@@ -284,10 +284,6 @@
   flex: 100000 0 auto;
 }
 
-.rt-noData {
-  top: 65%;
-}
-
 .-pagination,
 .rt-body {
   flex: 1 0 auto;

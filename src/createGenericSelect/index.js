@@ -15,7 +15,6 @@ import adHoc from "../utils/adHoc";
 import DialogFooter from "../DialogFooter";
 import BlueprintError from "../BlueprintError";
 
-
 function preventBubble(e) {
   e.stopPropagation();
 }
@@ -122,8 +121,14 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
       };
 
       removeSelection = () => {
-        const { meta: { form }, input: { name }, clearFields } = this.props;
+        const {
+          meta: { form },
+          input: { name },
+          clearFields,
+          onClear = noop
+        } = this.props;
         clearFields(form, true, true, name);
+        onClear();
         this.setState({
           tempValue: null
         });
@@ -294,6 +299,7 @@ const PostSelectTable = branch(
       withQuery(additionalDataFragment, {
         isPlural: true,
         options: {
+          fetchPolicy: "cache-first",
           variables
         },
         props: ({ data }) => {
