@@ -417,7 +417,8 @@ class J5ReportRecordView extends Component {
       LinkJ5TableDialog,
       onConstructDoubleClick = noop,
       pcrReactionsTitleElements,
-      constructsTitleElements = []
+      constructsTitleElements = [],
+      oligosTitleElements = []
     } = this.props;
     const { linkDialogName } = this.state;
 
@@ -612,18 +613,21 @@ class J5ReportRecordView extends Component {
               </InfoHelper>
             }
             title={"Oligo Synthesis"}
-            openTitleElements={
-              LinkJ5TableDialog && (
-                <Button
-                  onClick={() => {
-                    this.showLinkModal("oligos");
-                  }}
-                >
-                  {" "}
-                  Link Oligos
-                </Button>
-              )
-            }
+            openTitleElements={[
+              ...(LinkJ5TableDialog
+                ? [
+                    <Button
+                      onClick={() => {
+                        this.showLinkModal("oligos");
+                      }}
+                    >
+                      {" "}
+                      Link Oligos
+                    </Button>
+                  ]
+                : []),
+              ...oligosTitleElements
+            ]}
           >
             <DataTable
               {...sharedTableProps}
