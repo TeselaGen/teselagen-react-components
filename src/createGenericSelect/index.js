@@ -6,6 +6,7 @@ import { compose } from "react-apollo";
 import { connect } from "react-redux";
 import { branch, withProps } from "recompose";
 import { change, clearFields, reduxForm } from "redux-form";
+import uniqid from "uniqid";
 import DataTable from "../DataTable";
 import withTableParams from "../DataTable/utils/withTableParams";
 import withDialog from "../enhancers/withDialog";
@@ -85,12 +86,15 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
       }
     ),
     withField(),
-    connect(null, dispatch => {
-      return {
-        changeFieldValue: (...args) => dispatch(change(...args)),
-        clearFields: (...args) => dispatch(clearFields(...args))
-      };
-    })
+    connect(
+      null,
+      dispatch => {
+        return {
+          changeFieldValue: (...args) => dispatch(change(...args)),
+          clearFields: (...args) => dispatch(clearFields(...args))
+        };
+      }
+    )
   )(
     class GenericSelectOuter extends React.Component {
       state = {
@@ -320,21 +324,28 @@ const PostSelectTable = branch(
   })
 )(
   class PostSelectTableInner extends Component {
-    componentWillReceiveProps(nextProps) {
-      if (!nextProps.entities || !this.props.entities) return;
+    componentDidMount() {
+      this.componentDidMountOrUpdate();
+    }
+
+    componentDidUpdate(prevProps) {
+      this.componentDidMountOrUpdate(prevProps);
+    }
+
+    componentDidMountOrUpdate(prevProps) {
+      if (!this.props.entities) return;
       const {
         isMultiSelect,
         changeGenericSelectValue,
         entities,
         genericSelectValue = []
-      } = nextProps;
+      } = this.props;
       const hasValue = isMultiSelect
         ? genericSelectValue.length
         : genericSelectValue;
-      if (
-        (!isEqual(this.props.entities, entities) && entities.length) ||
-        !hasValue
-      ) {
+      const prevEntitiesEqual =
+        prevProps && isEqual(prevProps.entities, entities);
+      if ((!prevEntitiesEqual || !hasValue) && entities.length) {
         const toSelect = isMultiSelect ? entities : entities[0];
         changeGenericSelectValue(toSelect);
       }
