@@ -1,11 +1,8 @@
 import { graphql } from "react-apollo";
-import gql from "graphql-tag";
-import pluralize from "pluralize";
 import { get, upperFirst, camelCase, isEmpty } from "lodash";
 import React from "react";
 import deepEqual from "deep-equal";
 import compose from "lodash/fp/compose";
-import generateFragmentWithFields from "../../utils/generateFragmentWithFields";
 import generateQuery from "../../utils/generateQuery";
 
 /**
@@ -33,15 +30,17 @@ export default function withQuery(inputFragment, options = {}) {
     client,
     variables,
     props,
+    queryName,
     getIdFromParams,
     showLoading,
     inDialog,
+    nameToUse,
     showError = true,
     options: queryOptions,
     ...rest
   } = options;
   const gqlQuery = generateQuery(inputFragment, options);
-
+  const queryNameToUse = queryName || nameToUse + "Query";
   /* eslint-enable */
   if (asQueryObj) {
     return gqlQuery;
@@ -151,7 +150,7 @@ export default function withQuery(inputFragment, options = {}) {
                   entities: results,
                   entityCount: totalResults,
                   onRefresh: data.refetch,
-                  fragment
+                  fragment: inputFragment
                 }
               }
             : {}),
@@ -163,14 +162,14 @@ export default function withQuery(inputFragment, options = {}) {
           [nameToUse + "Loading"]: data.loading,
           [nameToUse + "Count"]: totalResults,
           [camelCase("refetch_" + nameToUse)]: data.refetch,
-          fragment
+          fragment: inputFragment
         };
       },
       ...rest //overwrite defaults here
     }),
     function WithLoadingHOC(WrappedComponent) {
       return class WithLoadingComp extends React.Component {
-        componentWillReceiveProps(nextProps) {
+        UNSAFE_componentWillReceiveProps(nextProps) {
           if (
             showError &&
             nextProps.data &&
