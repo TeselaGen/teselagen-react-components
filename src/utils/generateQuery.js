@@ -1,5 +1,6 @@
 import { get } from "lodash";
 import pluralize from "pluralize";
+import gql from "graphql-tag";
 import generateFragmentWithFields from "./generateFragmentWithFields";
 
 export default function generateQuery(inputFragment, options = {}) {
