@@ -49,7 +49,6 @@ export default function withQuery(inputFragment, options = {}) {
   const name = get(fragment, "definitions[0].typeCondition.name.value");
   const nameToUse = nameOverride || (isPlural ? pluralize(name) : name);
   const queryNameToUse = queryName || nameToUse + "Query";
-  /* eslint-enable */
   if (asQueryObj) {
     return gqlQuery;
   }

@@ -20,11 +20,9 @@ export default function generateQuery(inputFragment, options = {}) {
       "No fragment name found in withQuery() call. This is due to passing in a string or something other than a gql fragment to withQuery"
     );
   }
-  // const {fragment, extraMutateArgs} = options
   const fragName = fragment && fragment.definitions[0].name.value;
   const nameToUse = nameOverride || (isPlural ? pluralize(name) : name);
   const queryNameToUse = queryName || nameToUse + "Query";
-  // const pascalNameToUse = pascalCase(nameToUse)
   let queryInner = `${fragName ? `...${fragName}` : idAs || "id"}`;
   if (isPlural) {
     queryInner = `results {
@@ -33,7 +31,6 @@ export default function generateQuery(inputFragment, options = {}) {
     totalResults`;
   }
 
-  /* eslint-disable */
   let gqlQuery;
   if (argsOverride) {
     gqlQuery = gql`

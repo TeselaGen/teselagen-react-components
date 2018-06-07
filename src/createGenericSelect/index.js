@@ -297,10 +297,15 @@ const PostSelectTable = branch(
         const {
           additionalDataFragment,
           isMultiSelect,
-          initialEntities
+          initialEntities,
+          postSelectDataTableGenerateQueryOptions,
+          postSelectDataTableQueryOptions
         } = this.props;
 
-        const gqlQuery = generateQuery(additionalDataFragment);
+        const gqlQuery = generateQuery(additionalDataFragment, {
+          isPlural: true,
+          ...postSelectDataTableGenerateQueryOptions
+        });
 
         return (
           <Query
@@ -312,6 +317,7 @@ const PostSelectTable = branch(
               }
             }}
             query={gqlQuery}
+            {...postSelectDataTableQueryOptions}
           >
             {({ loading, error, data }) => {
               const modelName = Array.isArray(additionalDataFragment)
@@ -326,7 +332,7 @@ const PostSelectTable = branch(
                   {...{
                     ...this.props,
                     error,
-                    loading: loading || data.loading,
+                    loading: loading || get(data, "loading"),
                     entities
                   }}
                 />
