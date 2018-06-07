@@ -6,6 +6,7 @@ import React from "react";
 import deepEqual from "deep-equal";
 import compose from "lodash/fp/compose";
 import generateFragmentWithFields from "../../utils/generateFragmentWithFields";
+import generateQuery from "../../utils/generateQuery";
 
 /**
  * withQuery
@@ -26,12 +27,8 @@ import generateFragmentWithFields from "../../utils/generateFragmentWithFields";
 export default function withQuery(inputFragment, options = {}) {
   const {
     isPlural,
-    queryName,
-    nameOverride,
-    argsOverride,
     asFunction,
     asQueryObj,
-    idAs,
     LoadingComp,
     client,
     variables,
@@ -43,64 +40,7 @@ export default function withQuery(inputFragment, options = {}) {
     options: queryOptions,
     ...rest
   } = options;
-  let fragment = inputFragment;
-  if (Array.isArray(fragment)) {
-    fragment = generateFragmentWithFields(...fragment);
-  }
-  if (typeof fragment === "string" || typeof fragment !== "object") {
-    throw new Error("Please provide a valid fragment when using withQuery!");
-  }
-  const name = get(fragment, "definitions[0].typeCondition.name.value");
-  if (!name) {
-    console.error("Bad fragment passed to withQuery!!");
-    console.error(fragment, options);
-    throw new Error(
-      "No fragment name found in withQuery() call. This is due to passing in a string or something other than a gql fragment to withQuery"
-    );
-  }
-  // const {fragment, extraMutateArgs} = options
-  const fragName = fragment && fragment.definitions[0].name.value;
-  const nameToUse = nameOverride || (isPlural ? pluralize(name) : name);
-  const queryNameToUse = queryName || nameToUse + "Query";
-  // const pascalNameToUse = pascalCase(nameToUse)
-  let queryInner = `${fragName ? `...${fragName}` : idAs || "id"}`;
-  if (isPlural) {
-    queryInner = `results {
-      ${queryInner}
-    }
-    totalResults`;
-  }
-
-  /* eslint-disable */
-  let gqlQuery;
-  if (argsOverride) {
-    gqlQuery = gql`
-    query ${queryNameToUse} ${argsOverride[0] || ""} {
-      ${nameToUse} ${argsOverride[1] || ""} {
-        ${queryInner}
-      }
-    }
-    ${fragment ? fragment : ``}
-  `;
-  } else if (isPlural) {
-    gqlQuery = gql`
-      query ${queryNameToUse} ($pageSize: Int $sort: [String] $filter: JSON $pageNumber: Int) {
-        ${nameToUse}(pageSize: $pageSize, sort: $sort, filter: $filter, pageNumber: $pageNumber) {
-          ${queryInner}
-        }
-      }
-      ${fragment ? fragment : ``}
-    `;
-  } else {
-    gqlQuery = gql`
-      query ${queryNameToUse} ($${idAs || "id"}: String!) {
-        ${nameToUse}(${idAs || "id"}: $${idAs || "id"}) {
-          ${queryInner}
-        }
-      }
-      ${fragment ? fragment : ``}
-    `;
-  }
+  const gqlQuery = generateQuery(inputFragment, options);
 
   /* eslint-enable */
   if (asQueryObj) {

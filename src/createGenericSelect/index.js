@@ -7,6 +7,7 @@ import { connect } from "react-redux";
 import { branch, withProps } from "recompose";
 import { change, clearFields, reduxForm } from "redux-form";
 import uniqid from "uniqid";
+import { Query } from "react-apollo";
 import DataTable from "../DataTable";
 import withTableParams from "../DataTable/utils/withTableParams";
 import withDialog from "../enhancers/withDialog";
@@ -15,6 +16,9 @@ import withQuery from "../enhancers/withQuery";
 import adHoc from "../utils/adHoc";
 import DialogFooter from "../DialogFooter";
 import BlueprintError from "../BlueprintError";
+import generateFragmentWithFields from "../utils/generateFragmentWithFields";
+import gql from "graphql-tag";
+import generateQuery from "../utils/generateQuery";
 
 function preventBubble(e) {
   e.stopPropagation();
@@ -290,38 +294,52 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
 
 const PostSelectTable = branch(
   ({ additionalDataFragment }) => !!additionalDataFragment,
-  adHoc(props => {
-    const { additionalDataFragment, isMultiSelect, initialEntities } = props;
-    const variables = {
-      filter: {
-        id: isMultiSelect
-          ? initialEntities.map(({ id }) => id)
-          : initialEntities[0].id
+  function WithQueryHOC(WrappedComponent) {
+    return class WithLoadingComp extends React.Component {
+      render() {
+        const {
+          additionalDataFragment,
+          isMultiSelect,
+          initialEntities
+        } = this.props;
+
+        const gqlQuery = generateQuery(additionalDataFragment);
+
+        return (
+          <Query
+            variables={{
+              filter: {
+                id: isMultiSelect
+                  ? initialEntities.map(({ id }) => id)
+                  : initialEntities[0].id
+              }
+            }}
+            query={gqlQuery}
+          >
+            {({ loading, error, data }) => {
+              const modelName = Array.isArray(additionalDataFragment)
+                ? additionalDataFragment[0]
+                : get(
+                    additionalDataFragment,
+                    "definitions[0].typeCondition.name.value"
+                  );
+              const entities = get(data, pluralize(modelName) + ".results", []);
+              return (
+                <WrappedComponent
+                  {...{
+                    ...this.props,
+                    error,
+                    loading: loading || data.loading,
+                    entities
+                  }}
+                />
+              );
+            }}
+          </Query>
+        );
       }
     };
-    return [
-      withQuery(additionalDataFragment, {
-        isPlural: true,
-        options: {
-          fetchPolicy: "cache-first",
-          variables
-        },
-        props: ({ data }) => {
-          const modelName = Array.isArray(additionalDataFragment)
-            ? additionalDataFragment[0]
-            : get(
-                additionalDataFragment,
-                "definitions[0].typeCondition.name.value"
-              );
-          const entities = get(data, pluralize(modelName) + ".results", []);
-          return {
-            loading: data.loading,
-            entities
-          };
-        }
-      })
-    ];
-  })
+  }
 )(
   class PostSelectTableInner extends Component {
     componentDidMount() {
