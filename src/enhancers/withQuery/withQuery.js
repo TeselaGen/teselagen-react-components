@@ -3,7 +3,9 @@ import { get, upperFirst, camelCase, isEmpty } from "lodash";
 import React from "react";
 import deepEqual from "deep-equal";
 import compose from "lodash/fp/compose";
+import pluralize from "pluralize";
 import generateQuery from "../../utils/generateQuery";
+import generateFragmentWithFields from "../../../es/utils/generateFragmentWithFields";
 
 /**
  * withQuery
@@ -27,6 +29,7 @@ export default function withQuery(inputFragment, options = {}) {
     asFunction,
     asQueryObj,
     LoadingComp,
+    nameOverride,
     client,
     variables,
     props,
@@ -34,12 +37,17 @@ export default function withQuery(inputFragment, options = {}) {
     getIdFromParams,
     showLoading,
     inDialog,
-    nameToUse,
     showError = true,
     options: queryOptions,
     ...rest
   } = options;
-  const gqlQuery = generateQuery(inputFragment, options);
+  const fragment = Array.isArray(inputFragment)
+    ? generateFragmentWithFields(...inputFragment)
+    : inputFragment;
+
+  const gqlQuery = generateQuery(fragment, options);
+  const name = get(fragment, "definitions[0].typeCondition.name.value");
+  const nameToUse = nameOverride || (isPlural ? pluralize(name) : name);
   const queryNameToUse = queryName || nameToUse + "Query";
   /* eslint-enable */
   if (asQueryObj) {
@@ -150,7 +158,7 @@ export default function withQuery(inputFragment, options = {}) {
                   entities: results,
                   entityCount: totalResults,
                   onRefresh: data.refetch,
-                  fragment: inputFragment
+                  fragment
                 }
               }
             : {}),
@@ -162,7 +170,7 @@ export default function withQuery(inputFragment, options = {}) {
           [nameToUse + "Loading"]: data.loading,
           [nameToUse + "Count"]: totalResults,
           [camelCase("refetch_" + nameToUse)]: data.refetch,
-          fragment: inputFragment
+          fragment
         };
       },
       ...rest //overwrite defaults here
