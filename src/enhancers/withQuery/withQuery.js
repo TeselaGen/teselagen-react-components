@@ -169,7 +169,8 @@ export default function withQuery(inputFragment, options = {}) {
           [nameToUse + "Loading"]: data.loading,
           [nameToUse + "Count"]: totalResults,
           [camelCase("refetch_" + nameToUse)]: data.refetch,
-          fragment
+          fragment,
+          gqlQuery
         };
       },
       ...rest //overwrite defaults here

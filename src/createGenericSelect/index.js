@@ -208,6 +208,13 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
           noForm
         } = this.props;
         const postSelectValueToUse = tempValue || value;
+        let postSelectDataTableValue = postSelectValueToUse;
+        if (
+          postSelectDataTableValue &&
+          !Array.isArray(postSelectDataTableValue)
+        ) {
+          postSelectDataTableValue = [postSelectDataTableValue];
+        }
         /* eslint-disable no-debugger*/
         if (postSelectDTProps && !postSelectDTProps.schema) debugger;
         /* eslint-enable no-debugger*/
@@ -263,12 +270,12 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
                   )}
               </div>
               {postSelectDTProps &&
-                postSelectValueToUse &&
-                !!postSelectValueToUse.length && (
+                postSelectDataTableValue &&
+                !!postSelectDataTableValue.length && (
                   <PostSelectTable
                     {...{
                       additionalDataFragment,
-                      initialEntities: postSelectValueToUse,
+                      initialEntities: postSelectDataTableValue,
                       genericSelectValue: value,
                       withSelectedTitle,
                       readableName,
