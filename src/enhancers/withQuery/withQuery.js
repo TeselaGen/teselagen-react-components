@@ -5,7 +5,7 @@ import deepEqual from "deep-equal";
 import compose from "lodash/fp/compose";
 import pluralize from "pluralize";
 import generateQuery from "../../utils/generateQuery";
-import generateFragmentWithFields from "../../../es/utils/generateFragmentWithFields";
+import generateFragmentWithFields from "../../../lib/utils/generateFragmentWithFields";
 
 /**
  * withQuery
