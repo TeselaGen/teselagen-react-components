@@ -305,52 +305,6 @@ const PostSelectTable = branch(
         const {
           additionalDataFragment,
           isMultiSelect,
-<<<<<<< Updated upstream
-          initialEntities,
-          postSelectDataTableGenerateQueryOptions,
-          postSelectDataTableQueryOptions
-        } = this.props;
-
-        const gqlQuery = generateQuery(additionalDataFragment, {
-          isPlural: true,
-          ...postSelectDataTableGenerateQueryOptions
-        });
-
-        return (
-          <Query
-            variables={{
-              filter: {
-                id: isMultiSelect
-                  ? initialEntities.map(({ id }) => id)
-                  : initialEntities[0].id
-              }
-            }}
-            query={gqlQuery}
-            {...postSelectDataTableQueryOptions}
-          >
-            {({ loading, error, data }) => {
-              const modelName = Array.isArray(additionalDataFragment)
-                ? additionalDataFragment[0]
-                : get(
-                    additionalDataFragment,
-                    "definitions[0].typeCondition.name.value"
-                  );
-              const entities = get(data, pluralize(modelName) + ".results", []);
-              return (
-                <WrappedComponent
-                  {...{
-                    ...this.props,
-                    error,
-                    loading: loading || get(data, "loading"),
-                    entities
-                  }}
-                />
-              );
-            }}
-          </Query>
-        );
-      }
-=======
           initialEntities
         } = this.props;
 
@@ -438,7 +392,6 @@ const PostSelectTable = branch(
           </Query>
         );
       }
->>>>>>> Stashed changes
     };
   }
 )(
