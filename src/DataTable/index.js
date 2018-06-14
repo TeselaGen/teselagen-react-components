@@ -112,7 +112,7 @@ class ReactDataTable extends React.Component {
     page: 1,
     style: {},
     isLoading: false,
-    isCopyable: false,
+    isCopyable: true,
     disabled: false,
     noSelect: false,
     noUserSelect: false,
