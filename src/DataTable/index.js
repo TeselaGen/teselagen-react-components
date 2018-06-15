@@ -807,7 +807,7 @@ class ReactDataTable extends React.Component {
     } = computePresets(this.props);
     const { columns } = this.state;
     if (!columns.length) {
-      return;
+      return columns
     }
     const columnsToRender = withCheckboxes
       ? [
