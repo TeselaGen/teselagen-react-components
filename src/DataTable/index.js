@@ -152,7 +152,7 @@ class ReactDataTable extends React.Component {
     });
   };
 
-  componentWillMountOrReceiveProps = (oldProps, newProps) => {
+  updateFromProps = (oldProps, newProps) => {
     //handle programatic filter adding
     if (!deepEqual(newProps.additionalFilters, oldProps.additionalFilters)) {
       newProps.addFilters(newProps.additionalFilters);
@@ -204,17 +204,11 @@ class ReactDataTable extends React.Component {
     });
   };
 
-  componentWillReceiveProps(newProps) {
-    this.componentWillMountOrReceiveProps(
-      computePresets(this.props),
-      computePresets(newProps)
-    );
-  }
-  componentWillMount() {
-    this.componentWillMountOrReceiveProps({}, computePresets(this.props));
+  componentDidMount() {
+    this.updateFromProps({}, computePresets(this.props));
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(oldProps) {
     const table = ReactDOM.findDOMNode(this.table);
     const tableBody = table.querySelector(".rt-tbody");
     const headerNode = table.querySelector(".rt-thead.-header");
@@ -225,6 +219,8 @@ class ReactDataTable extends React.Component {
         headerNode.style.overflowX = "hidden";
       }
     }
+
+    this.updateFromProps(computePresets(oldProps), computePresets(this.props));
   }
 
   moveColumn = ({ oldIndex, newIndex }) => {
