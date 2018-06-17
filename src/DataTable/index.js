@@ -807,7 +807,7 @@ class ReactDataTable extends React.Component {
     } = computePresets(this.props);
     const { columns } = this.state;
     if (!columns.length) {
-      return columns
+      return columns;
     }
     const columnsToRender = withCheckboxes
       ? [
@@ -879,20 +879,7 @@ class ReactDataTable extends React.Component {
                 : { textOverflow: "ellipsis", overflow: "hidden" }
             }
             title={title || undefined}
-            className="hoverable"
           >
-            {title !== undefined && isCopyable ? (
-              <CopyToClipboard
-                text={title}
-                onCopy={() => {
-                  window.toastr.success(`${title} - copy to clipboard`);
-                }}
-              >
-                <span className="pt-icon-standard pt-icon-clipboard show-on-hover" />
-              </CopyToClipboard>
-            ) : (
-              ""
-            )}{" "}
             {val}
           </div>
         );
