@@ -56,7 +56,6 @@ import "../toastr";
 import "./style.css";
 import withTableParams from "./utils/withTableParams";
 import SortableColumns from "./SortableColumns";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 import { withProps, branch } from "recompose";
 
 //we use this to make adding preset prop groups simpler
@@ -799,12 +798,9 @@ class ReactDataTable extends React.Component {
   };
 
   renderColumns = () => {
-    const {
-      cellRenderer,
-      withCheckboxes,
-      getCellHoverText,
-      isCopyable
-    } = computePresets(this.props);
+    const { cellRenderer, withCheckboxes, getCellHoverText } = computePresets(
+      this.props
+    );
     const { columns } = this.state;
     if (!columns.length) {
       return columns;
