@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "classnames": "^2.2.6",
+    "copy-to-clipboard": "^3.0.8",
     "cross-env": "^5.1.4",
     "deep-equal": "^1.0.1",
     "dom-scroll-into-view": "^1.2.1",
