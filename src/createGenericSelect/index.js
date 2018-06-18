@@ -396,9 +396,9 @@ const PostSelectTable = branch(
   }
 )(
   class PostSelectTableInner extends Component {
-    // componentDidMount() {
-    //   this.componentDidMountOrUpdate();
-    // }
+    componentDidMount() {
+      this.componentDidMountOrUpdate();
+    }
 
     componentDidUpdate(prevProps) {
       this.componentDidMountOrUpdate(prevProps);
