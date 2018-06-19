@@ -4,6 +4,7 @@ import { withRouter } from "react-router-dom";
 import { getHotkeyProps } from "./hotkeyUtils";
 import { MenuItem } from "@blueprintjs/core";
 import { startCase } from "lodash";
+import cn from "classnames";
 
 // Enhanced MenuItem that supports history-based navigation when passed a
 // `navTo` prop
@@ -19,15 +20,23 @@ export const EnhancedMenuItem = compose(
     }
   }),
   branch(({navTo}) => navTo, withRouter)
-)(function({ navTo, staticContext, ...props }) {
+)(function({ navTo, staticContext, className, checkQueryString, ...props }) {
   let clickHandler = props.onClick;
+  const classes = [className];
   if (navTo) {
+    const location = props.history.location;
+    const current = location.pathname + (checkQueryString ? location.search : '');
+    if (navTo === current) {
+      classes.push("active");
+    }
     clickHandler = e => {
-      props.history.push(navTo);
+      if (navTo !== current) {
+        props.history.push(navTo);
+      }
       if (props.onClick) props.onClick(e);
     };
   }
-  return <MenuItem {...props} onClick={clickHandler} />;
+  return <MenuItem {...props} onClick={clickHandler} className={cn(classes)} />;
 });
 
 // Populate the given menu definition with any defined hotkeys, matched using
