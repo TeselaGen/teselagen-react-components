@@ -23,7 +23,11 @@ export const EnhancedMenuItem = compose(
   let clickHandler = props.onClick;
   if (navTo) {
     clickHandler = e => {
-      props.history.push(navTo);
+      if (e.metaKey || e.ctrlKey) {
+        window.open(navTo);
+      } else {
+        props.history.push(navTo);
+      }
       if (props.onClick) props.onClick(e);
     };
   }
