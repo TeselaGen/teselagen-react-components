@@ -1,5 +1,6 @@
 import React from "react";
 import axios from "axios";
+import { Icon } from "@blueprintjs/core";
 import Dropzone from "react-dropzone";
 // import { first } from "lodash";
 import uniqid from "uniqid";
@@ -215,30 +216,37 @@ export default props => {
                 url,
                 downloadName
               } = file;
+              let icon;
+              if (loading) {
+                icon = "repeat";
+              } else if (error) {
+                icon = "error";
+              } else {
+                icon = "saved";
+              }
               return fileListItemRenderer ? (
                 fileListItemRenderer(file)
               ) : (
                 <div key={index} className={"tg-upload-file-list-item"}>
-                  <span
-                    style={{ fontSize: "13px", marginRight: 11 }}
-                    className={classnames({
-                      "pt-icon-standard": true,
-                      "pt-icon-saved": !loading && !error,
-                      "pt-icon-error": error,
-                      "pt-icon-repeat tg-spin": loading
-                    })}
-                  />
-                  <a
-                    name={name || originalName}
-                    {...(url && !onFileClick ? { href: url } : {})}
-                    /* eslint-disable react/jsx-no-bind*/
-                    onClick={() => onFileClick && onFileClick(file)}
-                    /* eslint-enable react/jsx-no-bind*/
-                    {...(downloadName ? { download: downloadName } : {})}
-                  >
-                    {" "}
-                    {name || originalName}{" "}
-                  </a>
+                  <div>
+                    <Icon
+                      className={classnames({
+                        "tg-spin": loading
+                      })}
+                      icon={icon}
+                    />
+                    <a
+                      name={name || originalName}
+                      {...(url && !onFileClick ? { href: url } : {})}
+                      /* eslint-disable react/jsx-no-bind*/
+                      onClick={() => onFileClick && onFileClick(file)}
+                      /* eslint-enable react/jsx-no-bind*/
+                      {...(downloadName ? { download: downloadName } : {})}
+                    >
+                      {" "}
+                      {name || originalName}{" "}
+                    </a>
+                  </div>
                   {!loading && (
                     <span
                       style={{ fontSize: "13px" }}

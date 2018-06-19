@@ -284,13 +284,13 @@ function getSubFilter(
         };
   } else if (ccSelectedFilter === "isBefore") {
     return qb
-      ? qb.lessThan(moment(filterValue).valueOf())
+      ? qb.lessThan(new Date(filterValue))
       : fieldVal => {
           return moment(fieldVal).valueOf() < moment(filterValue).valueOf();
         };
   } else if (ccSelectedFilter === "isAfter") {
     return qb
-      ? qb.greaterThan(moment(filterValue).valueOf())
+      ? qb.greaterThan(new Date(filterValue))
       : fieldVal => {
           return moment(fieldVal).valueOf() > moment(filterValue).valueOf();
         };
@@ -441,13 +441,16 @@ export function makeDataTableHandlers({
     };
     setNewParams(newParams);
   }
-  function clearFilters(currentParams) {
-    setNewParams({
-      ...currentParams,
+  function clearFilters(additionalFilterKeys = []) {
+    const toClear = {
       filters: undefined,
       searchTerm: undefined,
       tags: undefined
+    };
+    additionalFilterKeys.forEach(key => {
+      toClear[key] = undefined;
     });
+    setNewParams(toClear);
     resetSearch();
   }
   function setPageSize(pageSize, currentParams) {

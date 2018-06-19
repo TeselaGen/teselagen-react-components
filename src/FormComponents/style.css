@@ -59,10 +59,6 @@
 .tg-upload-file-list-item {
   display: flex;
   justify-content: space-between;
-}
-.tg-upload-file-list-item {
-  display: flex;
-  justify-content: space-between;
   margin: 2px;
   border-radius: 3px;
   padding: 2px;

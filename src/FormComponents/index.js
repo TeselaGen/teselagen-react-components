@@ -216,6 +216,7 @@ export const renderBlueprintInput = props => {
         }
       }}
       onBlur={function(e, val) {
+        if (rest.readOnly) return;
         input.onBlur(e, val);
         onFieldSubmit(e.target ? e.target.value : val, { blur: true }, e);
       }}
@@ -287,6 +288,7 @@ export const renderBlueprintTextarea = props => {
         ""} pt-input pt-fill`}
       {...input}
       onBlur={function(e, val) {
+        if (rest.readOnly) return;
         input.onBlur(e, val);
         onFieldSubmit(e.target ? e.target.value : val, { blur: true }, e);
       }}
@@ -365,7 +367,9 @@ export const renderReactSelect = props => {
         ? valOrVals.map(function(val) {
             return val.value;
           })
-        : valOrVals ? valOrVals.value : "";
+        : valOrVals
+          ? valOrVals.value
+          : "";
       onChange(valToPass, ...rest2);
       if (!rest.submitOnBlur) onFieldSubmit(valToPass);
     },
@@ -473,6 +477,7 @@ export const renderBlueprintNumericInput = props => {
     ...rest
   } = props;
   function handleBlurOrButtonClick(stringVal) {
+    if (rest.readOnly) return;
     try {
       const num = mathExpressionEvaluator.eval(stringVal);
       input.onBlur(num);

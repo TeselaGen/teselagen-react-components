@@ -56,7 +56,6 @@ import "../toastr";
 import "./style.css";
 import withTableParams from "./utils/withTableParams";
 import SortableColumns from "./SortableColumns";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 import { withProps, branch } from "recompose";
 
 //we use this to make adding preset prop groups simpler
@@ -112,7 +111,7 @@ class ReactDataTable extends React.Component {
     page: 1,
     style: {},
     isLoading: false,
-    isCopyable: false,
+    isCopyable: true,
     disabled: false,
     noSelect: false,
     noUserSelect: false,
@@ -152,7 +151,7 @@ class ReactDataTable extends React.Component {
     });
   };
 
-  componentWillMountOrReceiveProps = (oldProps, newProps) => {
+  updateFromProps = (oldProps, newProps) => {
     //handle programatic filter adding
     if (!deepEqual(newProps.additionalFilters, oldProps.additionalFilters)) {
       newProps.addFilters(newProps.additionalFilters);
@@ -204,17 +203,11 @@ class ReactDataTable extends React.Component {
     });
   };
 
-  componentWillReceiveProps(newProps) {
-    this.componentWillMountOrReceiveProps(
-      computePresets(this.props),
-      computePresets(newProps)
-    );
-  }
-  componentWillMount() {
-    this.componentWillMountOrReceiveProps({}, computePresets(this.props));
+  componentDidMount() {
+    this.updateFromProps({}, computePresets(this.props));
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(oldProps) {
     const table = ReactDOM.findDOMNode(this.table);
     const tableBody = table.querySelector(".rt-tbody");
     const headerNode = table.querySelector(".rt-thead.-header");
@@ -225,6 +218,8 @@ class ReactDataTable extends React.Component {
         headerNode.style.overflowX = "hidden";
       }
     }
+
+    this.updateFromProps(computePresets(oldProps), computePresets(this.props));
   }
 
   moveColumn = ({ oldIndex, newIndex }) => {
@@ -382,6 +377,10 @@ class ReactDataTable extends React.Component {
       schema.fields.some(
         field => field.filterIsActive && field.filterIsActive(currentParams)
       );
+    const additionalFilterKeys = schema.fields.reduce((acc, field) => {
+      if (field.filterKey) acc.push(field.filterKey);
+      return acc;
+    }, []);
     const filtersOnNonDisplayedFields = [];
     if (filters && filters.length) {
       schema.fields.forEach(({ isHidden, displayName, path }) => {
@@ -487,7 +486,7 @@ class ReactDataTable extends React.Component {
                     disabled={disabled}
                     className={"data-table-clear-filters"}
                     onClick={() => {
-                      clearFilters();
+                      clearFilters(additionalFilterKeys);
                     }}
                     text={"Clear filters"}
                   />
@@ -799,15 +798,12 @@ class ReactDataTable extends React.Component {
   };
 
   renderColumns = () => {
-    const {
-      cellRenderer,
-      withCheckboxes,
-      getCellHoverText,
-      isCopyable
-    } = computePresets(this.props);
+    const { cellRenderer, withCheckboxes, getCellHoverText } = computePresets(
+      this.props
+    );
     const { columns } = this.state;
     if (!columns.length) {
-      return;
+      return columns;
     }
     const columnsToRender = withCheckboxes
       ? [
@@ -879,20 +875,7 @@ class ReactDataTable extends React.Component {
                 : { textOverflow: "ellipsis", overflow: "hidden" }
             }
             title={title || undefined}
-            className="hoverable"
           >
-            {title !== undefined && isCopyable ? (
-              <CopyToClipboard
-                text={title}
-                onCopy={() => {
-                  window.toastr.success(`${title} - copy to clipboard`);
-                }}
-              >
-                <span className="pt-icon-standard pt-icon-clipboard show-on-hover" />
-              </CopyToClipboard>
-            ) : (
-              ""
-            )}{" "}
             {val}
           </div>
         );

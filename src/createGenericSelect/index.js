@@ -6,6 +6,8 @@ import { compose } from "react-apollo";
 import { connect } from "react-redux";
 import { branch, withProps } from "recompose";
 import { change, clearFields, reduxForm } from "redux-form";
+import uniqid from "uniqid";
+import { Query } from "react-apollo";
 import DataTable from "../DataTable";
 import withTableParams from "../DataTable/utils/withTableParams";
 import withDialog from "../enhancers/withDialog";
@@ -14,7 +16,8 @@ import withQuery from "../enhancers/withQuery";
 import adHoc from "../utils/adHoc";
 import DialogFooter from "../DialogFooter";
 import BlueprintError from "../BlueprintError";
-
+import generateFragmentWithFields from "../utils/generateFragmentWithFields";
+import gql from "graphql-tag";
 
 function preventBubble(e) {
   e.stopPropagation();
@@ -37,6 +40,7 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
     // getButtonText(selectedEntities) - function to override the button text if necessary
     // isMultiSelect=false - do you want users to be able to select multiple entities or just one
     // noDialog=false - set to true to not have the selector show up in a dialog
+    // noRemoveButton=false - set to true to not have the option to remove the selection
     // fragment - the fragment powering the lookup/datatable
     // dialogProps - any dialog overrides you might want to make
     // additionalDataFragment - optional fragment for fetching more data based on the initially selected data
@@ -122,8 +126,14 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
       };
 
       removeSelection = () => {
-        const { meta: { form }, input: { name }, clearFields } = this.props;
+        const {
+          meta: { form },
+          input: { name },
+          clearFields,
+          onClear = noop
+        } = this.props;
         clearFields(form, true, true, name);
+        onClear();
         this.setState({
           tempValue: null
         });
@@ -189,6 +199,7 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
           noDialog,
           postSelectFormName,
           getButtonText,
+          noRemoveButton,
           getButton,
           postSelectDTProps,
           withSelectedTitle,
@@ -198,6 +209,13 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
           noForm
         } = this.props;
         const postSelectValueToUse = tempValue || value;
+        let postSelectDataTableValue = postSelectValueToUse;
+        if (
+          postSelectDataTableValue &&
+          !Array.isArray(postSelectDataTableValue)
+        ) {
+          postSelectDataTableValue = [postSelectDataTableValue];
+        }
         /* eslint-disable no-debugger*/
         if (postSelectDTProps && !postSelectDTProps.schema) debugger;
         /* eslint-enable no-debugger*/
@@ -235,7 +253,7 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
                     />
                   )}
                 </GenericSelectInner>
-                {value &&
+                {value && !noRemoveButton &&
                   !noForm && (
                     <Tooltip
                       disabled={buttonProps.disabled}
@@ -253,12 +271,12 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
                   )}
               </div>
               {postSelectDTProps &&
-                postSelectValueToUse &&
-                !!postSelectValueToUse.length && (
+                postSelectDataTableValue &&
+                !!postSelectDataTableValue.length && (
                   <PostSelectTable
                     {...{
                       additionalDataFragment,
-                      initialEntities: postSelectValueToUse,
+                      initialEntities: postSelectDataTableValue,
                       genericSelectValue: value,
                       withSelectedTitle,
                       readableName,
@@ -281,54 +299,125 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
 
 const PostSelectTable = branch(
   ({ additionalDataFragment }) => !!additionalDataFragment,
-  adHoc(props => {
-    const { additionalDataFragment, isMultiSelect, initialEntities } = props;
-    const variables = {
-      filter: {
-        id: isMultiSelect
-          ? initialEntities.map(({ id }) => id)
-          : initialEntities[0].id
+  function WithQueryHOC(WrappedComponent) {
+    return class WithLoadingComp extends React.Component {
+      render() {
+        const {
+          additionalDataFragment,
+          isMultiSelect,
+          initialEntities
+        } = this.props;
+
+        let fragment = additionalDataFragment;
+        if (Array.isArray(fragment)) {
+          fragment = generateFragmentWithFields(...fragment);
+        }
+        if (typeof fragment === "string" || typeof fragment !== "object") {
+          throw new Error(
+            "Please provide a valid fragment when using withQuery!"
+          );
+        }
+        const name = get(fragment, "definitions[0].typeCondition.name.value");
+        if (!name) {
+          console.error("Bad fragment passed to withQuery!!");
+          // console.error(fragment, options);
+          throw new Error(
+            "No fragment name found in withQuery() call. This is due to passing in a string or something other than a gql fragment to withQuery"
+          );
+        }
+        // const {fragment, extraMutateArgs} = options
+        const fragName = fragment && fragment.definitions[0].name.value;
+        const nameToUse = pluralize(name);
+        const queryNameToUse = nameToUse + "Query";
+        // const pascalNameToUse = pascalCase(nameToUse)
+        let queryInner = `${fragName ? `...${fragName}` : "id"}`;
+        if (true) {
+          queryInner = `results {
+      ${queryInner}
+    }
+    totalResults`;
+        }
+
+        let gqlQuery;
+        if (true) {
+          gqlQuery = gql`
+      query ${queryNameToUse} ($pageSize: Int $sort: [String] $filter: JSON $pageNumber: Int) {
+        ${nameToUse}(pageSize: $pageSize, sort: $sort, filter: $filter, pageNumber: $pageNumber) {
+          ${queryInner}
+        }
+      }
+      ${fragment ? fragment : ``}
+    `;
+        } else {
+          gqlQuery = gql`
+      query ${queryNameToUse} ($${false || "id"}: String!) {
+        ${nameToUse}(${false || "id"}: $${false || "id"}) {
+          ${queryInner}
+        }
+      }
+      ${fragment ? fragment : ``}
+    `;
+        }
+
+        return (
+          <Query
+            variables={{
+              filter: {
+                id: isMultiSelect
+                  ? initialEntities.map(({ id }) => id)
+                  : initialEntities[0].id
+              }
+            }}
+            query={gqlQuery}
+          >
+            {({ loading, error, data }) => {
+              const modelName = Array.isArray(additionalDataFragment)
+                ? additionalDataFragment[0]
+                : get(
+                    additionalDataFragment,
+                    "definitions[0].typeCondition.name.value"
+                  );
+              const entities = get(data, pluralize(modelName) + ".results", []);
+              return (
+                <WrappedComponent
+                  {...{
+                    ...this.props,
+                    error,
+                    loading: loading || data.loading,
+                    entities
+                  }}
+                />
+              );
+            }}
+          </Query>
+        );
       }
     };
-    return [
-      withQuery(additionalDataFragment, {
-        isPlural: true,
-        options: {
-          variables
-        },
-        props: ({ data }) => {
-          const modelName = Array.isArray(additionalDataFragment)
-            ? additionalDataFragment[0]
-            : get(
-                additionalDataFragment,
-                "definitions[0].typeCondition.name.value"
-              );
-          const entities = get(data, pluralize(modelName) + ".results", []);
-          return {
-            loading: data.loading,
-            entities
-          };
-        }
-      })
-    ];
-  })
+  }
 )(
   class PostSelectTableInner extends Component {
-    componentWillReceiveProps(nextProps) {
-      if (!nextProps.entities || !this.props.entities) return;
+    componentDidMount() {
+      this.componentDidMountOrUpdate();
+    }
+
+    componentDidUpdate(prevProps) {
+      this.componentDidMountOrUpdate(prevProps);
+    }
+
+    componentDidMountOrUpdate(prevProps) {
+      if (!this.props.entities) return;
       const {
         isMultiSelect,
         changeGenericSelectValue,
         entities,
         genericSelectValue = []
-      } = nextProps;
+      } = this.props;
       const hasValue = isMultiSelect
         ? genericSelectValue.length
         : genericSelectValue;
-      if (
-        (!isEqual(this.props.entities, entities) && entities.length) ||
-        !hasValue
-      ) {
+      const prevEntitiesEqual =
+        prevProps && isEqual(prevProps.entities, entities);
+      if ((!prevEntitiesEqual || !hasValue) && entities.length) {
         const toSelect = isMultiSelect ? entities : entities[0];
         changeGenericSelectValue(toSelect);
       }

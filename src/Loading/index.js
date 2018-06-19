@@ -27,6 +27,7 @@ export default class Loading extends React.Component {
       className,
       children,
       bounce = false,
+      withTimeout,
       inDialog
     } = this.props;
     const { longerThan200MS } = this.state;
@@ -37,7 +38,7 @@ export default class Loading extends React.Component {
     const LoaderComp = bounce || inDialog ? BounceLoader : DNALoader;
 
     if (loading || !children) {
-      if (!longerThan200MS && !bounce && !inDialog) {
+      if (!longerThan200MS && ((!bounce && !inDialog) || withTimeout)) {
         return <div />;
       }
       return (

@@ -6,3 +6,7 @@
 .pt-dark .tg-card {
   background: #394b59 !important;
 }
+
+.preserve-newline {
+  white-space: pre-line;
+}
