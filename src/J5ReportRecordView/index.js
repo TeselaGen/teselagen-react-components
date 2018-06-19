@@ -75,35 +75,39 @@ const processJ5DirectSyntheses = j5DirectSynths =>
   });
 
 const processJ5RunConstructs = j5RunConstructs =>
-  j5RunConstructs.filter(j5RunConstruct => !j5RunConstruct.isPrebuilt).map(j5RunConstruct => ({
-    ...j5RunConstruct,
-    id: "construct_" + j5RunConstruct.id,
-    nextLevelParts: (get(j5RunConstruct, "sequence.sequenceParts") || [])
-      .map(part => part.name)
-      .join(", "),
-    partsContainedNames:
-      get(
-        j5RunConstruct,
-        "j5ConstructAssemblyPieces[0].assemblyPiece.j5AssemblyPieceParts[0].j5InputPart.sequencePart.name"
-      ) &&
-      flatMap(
-        j5RunConstruct.j5ConstructAssemblyPieces,
-        j5ConstructAssemblyPiece =>
-          j5ConstructAssemblyPiece.assemblyPiece.j5AssemblyPieceParts.map(
-            j5InputPart => j5InputPart.j5InputPart.sequencePart.name
-          )
-      ).join(", ")
-  }));
+  j5RunConstructs
+    .filter(j5RunConstruct => !j5RunConstruct.isPrebuilt)
+    .map(j5RunConstruct => ({
+      ...j5RunConstruct,
+      id: "construct_" + j5RunConstruct.id,
+      nextLevelParts: (get(j5RunConstruct, "sequence.sequenceParts") || [])
+        .map(part => part.name)
+        .join(", "),
+      partsContainedNames:
+        get(
+          j5RunConstruct,
+          "j5ConstructAssemblyPieces[0].assemblyPiece.j5AssemblyPieceParts[0].j5InputPart.sequencePart.name"
+        ) &&
+        flatMap(
+          j5RunConstruct.j5ConstructAssemblyPieces,
+          j5ConstructAssemblyPiece =>
+            j5ConstructAssemblyPiece.assemblyPiece.j5AssemblyPieceParts.map(
+              j5InputPart => j5InputPart.j5InputPart.sequencePart.name
+            )
+        ).join(", ")
+    }));
 
 const processPrebuiltConstructs = j5RunConstructs =>
-  j5RunConstructs.filter(j5RunConstruct => j5RunConstruct.isPrebuilt).map(j5RunConstruct => ({
-    ...j5RunConstruct,
-    id: "construct_" + j5RunConstruct.id,
-    nextLevelParts: (get(j5RunConstruct, "sequence.sequenceParts") || [])
-      .map(part => part.name)
-      .join(", "),
-    partsContainedNames: j5RunConstruct.partNames
-  }));
+  j5RunConstructs
+    .filter(j5RunConstruct => j5RunConstruct.isPrebuilt)
+    .map(j5RunConstruct => ({
+      ...j5RunConstruct,
+      id: "construct_" + j5RunConstruct.id,
+      nextLevelParts: (get(j5RunConstruct, "sequence.sequenceParts") || [])
+        .map(part => part.name)
+        .join(", "),
+      partsContainedNames: j5RunConstruct.partNames
+    }));
 
 const getInputPartsFromInputSequences = j5InputSequences =>
   j5InputSequences
@@ -491,10 +495,12 @@ class J5ReportRecordView extends Component {
           <CollapsibleCard
             icon={
               <InfoHelper>
-                Prebuilt constructs are the desired sequences that have already been built and are available in your library.
+                Prebuilt constructs are the desired sequences that have already
+                been built and are available in your library.
               </InfoHelper>
             }
             title="Prebuilt Constructs"
+            initialClosed={!entitiesForAllTables.prebuiltConstructs.length}
             openTitleElements={[
               ...(LinkJ5TableDialog
                 ? [
@@ -527,6 +533,7 @@ class J5ReportRecordView extends Component {
               </InfoHelper>
             }
             title="Assembled Constructs"
+            initialClosed={!entitiesForAllTables.j5RunConstructs.length}
             openTitleElements={[
               ...(LinkJ5TableDialog
                 ? [
@@ -560,6 +567,7 @@ class J5ReportRecordView extends Component {
                 Input Sequences are the sequences that contain the Input Parts
               </InfoHelper>
             }
+            initialClosed={!entitiesForAllTables.j5InputSequences.length}
             openTitleElements={
               LinkJ5TableDialog && (
                 <Button
@@ -578,7 +586,7 @@ class J5ReportRecordView extends Component {
               schema={schemas.j5InputSequences}
               formName={"j5InputSequences"} //because these tables are currently not connected to table params, we need to manually pass a formName here
               cellRenderer={
-                getIsLinkedCellRenderer && 
+                getIsLinkedCellRenderer &&
                 getIsLinkedCellRenderer(
                   "sequence.polynucleotideMaterialId",
                   "sequence.hash",
@@ -590,13 +598,14 @@ class J5ReportRecordView extends Component {
             />
           </CollapsibleCard>
           <CollapsibleCard
-            title={"Input Parts"}
+            title="Input Parts"
             icon={
               <InfoHelper>
                 Input Parts are the segments of sequence that are being used in
                 a j5 run
               </InfoHelper>
             }
+            initialClosed={!entitiesForAllTables.j5InputParts.length}
           >
             <DataTable
               {...sharedTableProps}
@@ -611,7 +620,8 @@ class J5ReportRecordView extends Component {
                 This is the list of oligos that need to be directly synthesized
               </InfoHelper>
             }
-            title={"Oligo Synthesis"}
+            title="Oligo Synthesis"
+            initialClosed={!entitiesForAllTables.j5OligoSyntheses.length}
             openTitleElements={
               LinkJ5TableDialog && (
                 <Button
@@ -651,7 +661,8 @@ class J5ReportRecordView extends Component {
                 This is the list DNA pieces that need to be directly synthesized
               </InfoHelper>
             }
-            title={"DNA Synthesis"}
+            title="DNA Synthesis"
+            initialClosed={!entitiesForAllTables.j5DirectSyntheses.length}
             openTitleElements={
               LinkJ5TableDialog && (
                 <Button
@@ -690,6 +701,7 @@ class J5ReportRecordView extends Component {
               </InfoHelper>
             }
             title={"PCR Reactions"}
+            initialClosed={!entitiesForAllTables.j5PcrReactions.length}
             openTitleElements={pcrReactionsTitleElements}
           >
             <DataTable
@@ -708,7 +720,8 @@ class J5ReportRecordView extends Component {
                 the desired Constructs
               </InfoHelper>
             }
-            title={"DNA Pieces to be Assembled"}
+            title="DNA Pieces to be Assembled"
+            initialClosed={!entitiesForAllTables.j5AssemblyPieces.length}
             openTitleElements={
               LinkJ5TableDialog && (
                 <Button
@@ -725,7 +738,7 @@ class J5ReportRecordView extends Component {
             <DataTable
               {...sharedTableProps}
               schema={schemas.j5AssemblyPieces}
-              formName={"j5AssemblyPieces"} //because these tables are currently not connected to table params, we need to manually pass a formName here
+              formName="j5AssemblyPieces" //because these tables are currently not connected to table params, we need to manually pass a formName here
               cellRenderer={
                 getIsLinkedCellRenderer &&
                 getIsLinkedCellRenderer(
@@ -746,14 +759,15 @@ class J5ReportRecordView extends Component {
                 each construct.
               </InfoHelper>
             }
-            title={"Combination of Assembly Pieces"}
+            title="Combination of Assembly Pieces"
+            initialClosed={!entitiesForAllTables.j5RunConstructs.length}
           >
             <DataTable
               {...sharedTableProps}
               schema={this.createSchemaForCombinationOfAssemblyPieces(
                 entitiesForAllTables.j5RunConstructs
               )}
-              formName={"combinationOfAssemblyPieces"} //because these tables are currently not connected to table params, we need to manually pass a formName here
+              formName="combinationOfAssemblyPieces" //because these tables are currently not connected to table params, we need to manually pass a formName here
               entities={entitiesForAllTables.j5RunConstructs}
             />
           </CollapsibleCard>

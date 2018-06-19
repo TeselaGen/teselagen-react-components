@@ -7,7 +7,8 @@ import "./style.css";
 type Props = {
   title: string,
   icon: string,
-  openTitleElements: boolean
+  openTitleElements: boolean,
+  initialClosed: boolean
 };
 
 type State = {
@@ -18,6 +19,13 @@ export default class CollapsibleCard extends Component {
   state = {
     open: true
   };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      open: !props.initialClosed
+    };
+  }
 
   renderOpenCard() {
     return this.props.children;
