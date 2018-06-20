@@ -888,18 +888,22 @@ class ReactDataTable extends React.Component {
 
   setManyRowsToCopy = selectedRecords => {
     const { columns } = this.state;
-    let text;
-    selectedRecords.forEach(row => {
-      let textByRow;
+    let allRowsText = [];
+    selectedRecords.forEach(record => {
+      let textForRow = [];
       columns.forEach(col => {
-        let text = get(row, col.path);
-        if (text !== undefined) text = String(text);
+        let text = get(record, col.path);
+        if (col.getClipboardData) {
+          text = col.getClipboardData(text, record);
+        } else if (text !== undefined) text = String(text);
         else text = " ";
-        textByRow = textByRow ? textByRow + "\t" + text : text;
+        if (text) {
+          textForRow.push(text);
+        }
       });
-      text = text ? text + textByRow + "\n" : textByRow + "\n";
+      allRowsText.push(textForRow.join("\t"));
     });
-    return text;
+    return allRowsText.join("\n");
   };
 
   showContextMenu = (idMap, e) => {
