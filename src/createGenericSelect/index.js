@@ -153,6 +153,7 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
           postSelectDTProps
         } = this.props;
         const toSelect = isMultiSelect ? records : records[0];
+        this.resetPostSelectSelection();
         if (!additionalDataFragment) {
           onSelect && onSelect(toSelect);
           onChange(toSelect);
@@ -175,7 +176,6 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
             const toSelect = isMultiSelect ? records : records[0];
             onSelect && onSelect(toSelect);
             onChange(toSelect);
-            this.resetPostSelectSelection();
           } catch (error) {
             console.error("err:", error);
             window.toastr.error("Error fetching " + readableName);
