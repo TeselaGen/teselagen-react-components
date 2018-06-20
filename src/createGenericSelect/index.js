@@ -90,12 +90,15 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
       }
     ),
     withField(),
-    connect(null, dispatch => {
-      return {
-        changeFieldValue: (...args) => dispatch(change(...args)),
-        clearFields: (...args) => dispatch(clearFields(...args))
-      };
-    })
+    connect(
+      null,
+      dispatch => {
+        return {
+          changeFieldValue: (...args) => dispatch(change(...args)),
+          clearFields: (...args) => dispatch(clearFields(...args))
+        };
+      }
+    )
   )(
     class GenericSelectOuter extends React.Component {
       state = {
@@ -206,6 +209,7 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
           additionalDataFragment,
           buttonProps = {},
           isMultiSelect,
+          onSelect,
           noForm
         } = this.props;
         const postSelectValueToUse = tempValue || value;
@@ -253,7 +257,8 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
                     />
                   )}
                 </GenericSelectInner>
-                {value && !noRemoveButton &&
+                {value &&
+                  !noRemoveButton &&
                   !noForm && (
                     <Tooltip
                       disabled={buttonProps.disabled}
@@ -278,6 +283,7 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
                       additionalDataFragment,
                       initialEntities: postSelectDataTableValue,
                       genericSelectValue: value,
+                      onSelect,
                       withSelectedTitle,
                       readableName,
                       postSelectFormName,
@@ -410,7 +416,8 @@ const PostSelectTable = branch(
         isMultiSelect,
         changeGenericSelectValue,
         entities,
-        genericSelectValue = []
+        genericSelectValue = [],
+        onSelect = noop
       } = this.props;
       const hasValue = isMultiSelect
         ? genericSelectValue.length
@@ -420,6 +427,7 @@ const PostSelectTable = branch(
       if ((!prevEntitiesEqual || !hasValue) && entities.length) {
         const toSelect = isMultiSelect ? entities : entities[0];
         changeGenericSelectValue(toSelect);
+        onSelect(toSelect);
       }
     }
 
