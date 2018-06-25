@@ -413,6 +413,30 @@ class J5ReportRecordView extends Component {
     };
   };
 
+  /**
+   * Given the model (pluralized) get the schema corresponding to the model. This
+   * will either be the default schema or the one returned by the prop `getSchema`
+   * if that prop is passed. The prop will be called with the model as the first argument and
+   * the default schema as its second argument. The prop should not mutate the schema.
+   * @param {string} model Should be pluralized.
+   */
+  getSchema(model) {
+    if (model === "combinationOfAssemblyPieces") {
+      throw new Error(
+        "Due pecularities in the code, we cannot override the schema for combinationOfAssemblyPieces"
+      );
+    }
+
+    const defaultSchema = schemas[model];
+    const passedGetSchema = this.props.getSchema;
+
+    if (passedGetSchema) {
+      return passedGetSchema(model, defaultSchema);
+    } else {
+      return defaultSchema;
+    }
+  }
+
   render() {
     const {
       data,
@@ -521,7 +545,7 @@ class J5ReportRecordView extends Component {
             <DataTable
               {...sharedTableProps}
               onDoubleClick={onConstructDoubleClick}
-              schema={schemas.j5RunConstructs}
+              schema={this.getSchema("j5RunConstructs")}
               formName="prebuiltConstructs" //because these tables are currently not connected to table params, we need to manually pass a formName here
               entities={entitiesForAllTables.prebuiltConstructs}
             />
@@ -555,7 +579,7 @@ class J5ReportRecordView extends Component {
             <DataTable
               {...sharedTableProps}
               onDoubleClick={onConstructDoubleClick}
-              schema={schemas.j5RunConstructs}
+              schema={this.getSchema("j5RunConstructs")}
               formName="j5RunConstructs" //because these tables are currently not connected to table params, we need to manually pass a formName here
               entities={entitiesForAllTables.j5RunConstructs}
             />
@@ -584,7 +608,7 @@ class J5ReportRecordView extends Component {
           >
             <DataTable
               {...sharedTableProps}
-              schema={schemas.j5InputSequences}
+              schema={this.getSchema("j5InputSequences")}
               formName={"j5InputSequences"} //because these tables are currently not connected to table params, we need to manually pass a formName here
               cellRenderer={
                 getIsLinkedCellRenderer &&
@@ -610,7 +634,7 @@ class J5ReportRecordView extends Component {
           >
             <DataTable
               {...sharedTableProps}
-              schema={schemas.j5InputParts}
+              schema={this.getSchema("j5InputParts")}
               formName={"j5InputParts"} //because these tables are currently not connected to table params, we need to manually pass a formName here
               entities={entitiesForAllTables.j5InputParts}
             />
@@ -642,7 +666,7 @@ class J5ReportRecordView extends Component {
           >
             <DataTable
               {...sharedTableProps}
-              schema={schemas.j5OligoSyntheses}
+              schema={this.getSchema("j5OligoSyntheses")}
               formName={"j5OligoSyntheses"} //because these tables are currently not connected to table params, we need to manually pass a formName here
               cellRenderer={
                 getIsLinkedCellRenderer &&
@@ -683,7 +707,7 @@ class J5ReportRecordView extends Component {
           >
             <DataTable
               {...sharedTableProps}
-              schema={schemas.j5DirectSyntheses}
+              schema={this.getSchema("j5DirectSyntheses")}
               formName={"j5DirectSyntheses"} //because these tables are currently not connected to table params, we need to manually pass a formName here
               cellRenderer={
                 getIsLinkedCellRenderer &&
@@ -711,7 +735,7 @@ class J5ReportRecordView extends Component {
           >
             <DataTable
               {...sharedTableProps}
-              schema={schemas.j5PcrReactions}
+              schema={this.getSchema("j5PcrReactions")}
               formName={"j5PcrReactions"} //because these tables are currently not connected to table params, we need to manually pass a formName here
               entities={entitiesForAllTables.j5PcrReactions}
             />
@@ -742,7 +766,7 @@ class J5ReportRecordView extends Component {
           >
             <DataTable
               {...sharedTableProps}
-              schema={schemas.j5AssemblyPieces}
+              schema={this.getSchema("j5AssemblyPieces")}
               formName="j5AssemblyPieces" //because these tables are currently not connected to table params, we need to manually pass a formName here
               cellRenderer={
                 getIsLinkedCellRenderer &&
