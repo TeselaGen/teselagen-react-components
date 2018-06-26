@@ -104,13 +104,8 @@ const schemas = {
   j5AssemblyPieces: {
     fields: [
       { path: "id", type: "string", displayName: "Piece ID" },
-      { path: "name", type: "string", displayName: "Name", isHidden: true },
-      { 
-        path: "j5AssemblyPieceParts",
-        type: "string",
-        displayName: "Parts Contained",
-        render: j5apps => j5apps.map(j5app => j5app.j5InputPart.sequencePart.name)
-      },
+      { path: "name", type: "string", displayName: "Name" },
+      { path: "type", type: "string", displayName: "Source" },
       {
         path: "sequence.polynucleotideMaterialId",
         type: "boolean",

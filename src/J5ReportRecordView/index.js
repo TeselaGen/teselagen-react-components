@@ -382,8 +382,7 @@ class J5ReportRecordView extends Component {
     });
     const assemblyPieceColumns = times(maxNumAssemblyPieces, i => ({
       path: `j5ConstructAssemblyPieces[${i}].assemblyPiece.id`,
-      displayName: `Piece-${i + 1} ID`,
-      render: ap => 'piece_' + ap.id
+      displayName: `Piece-${i + 1} ID`
     }));
     const partsContainedColumns = times(maxNumAssemblyPieces, i => {
       return {
