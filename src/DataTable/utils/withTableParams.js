@@ -9,9 +9,11 @@ import {
   getCurrentParamsFromUrl
 } from "./queryParams";
 import compose from "lodash/fp/compose";
-import { map } from "lodash";
+import { map, isFunction } from "lodash";
 import { withRouter } from "react-router-dom";
 import { branch } from "recompose";
+
+import convertSchema from "./convertSchema";
 
 /**
  *  Note all these options can be passed at Design Time or at Runtime (like reduxForm())
@@ -21,13 +23,11 @@ import { branch } from "recompose";
  * @param {compOrOpts} compOrOpts
  * @typedef {object} compOrOpts
  * @property {*string} formName - required unique identifier for the table
- * @property {*boolean} schema - The data table schema
+ * @property {Object | Function} schema - The data table schema or a function returning it. The function wll be called with props as the argument.
  * @property {boolean} urlConnected - whether the table should connect to/update the URL
  * @property {boolean} withSelectedEntities - whether or not to pass the selected entities
  * @property {object} defaults - tableParam defaults such as pageSize, filter, etc
  */
-import convertSchema from "./convertSchema";
-
 export default function withTableParams(compOrOpts, pTopLevelOpts) {
   let topLevelOptions;
   let Component;
@@ -48,12 +48,13 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       formName,
       formNameFromWithTPCall,
       defaults,
-      schema,
       isInfinite,
       isSimple,
       initialValues,
       additionalFilter = {}
     } = mergedOpts;
+
+    const schema = getSchema(mergedOpts);
 
     if (ownProps.isTableParamsConnected) {
       if (
@@ -224,4 +225,15 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
     return toReturn(Component);
   }
   return toReturn;
+}
+
+/**
+ * Given the options, get the schema. This enables the user to provide
+ * a function instead of an object for the schema.
+ * @param {Object} options Merged options
+ * @param {Object} props The props passed to the component.
+ */
+function getSchema(options, props) {
+  if (isFunction(schema)) return schema(props);
+  else return schema;
 }
