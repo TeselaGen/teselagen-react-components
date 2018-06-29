@@ -234,6 +234,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
  * @param {Object} props The props passed to the component.
  */
 function getSchema(options, props) {
+  const { schema } = options;
   if (isFunction(schema)) return schema(props);
   else return schema;
 }
