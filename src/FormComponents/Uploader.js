@@ -30,7 +30,9 @@ export default props => {
     onRemove = noop, //called when a file has been selected to be removed
     onChange = noop, //this is almost always getting passed by redux-form, no need to pass this handler manually
     onFileClick, // called when a file link in the filelist is clicked
-    dropzoneProps = {}
+    dropzoneProps = {},
+    overflowList,
+    showFilesCount
   } = props;
 
   let acceptToUse = Array.isArray(accept) ? accept.join(", ") : accept;
@@ -189,6 +191,11 @@ export default props => {
         }}
         {...dropzoneProps}
       >
+        {showFilesCount ? (
+          <div className="tg-upload-file-list-counter">
+            Files: {fileList ? fileList.length : 0}
+          </div>
+        ) : null}
         {contentOverride || (
           <div
             title={
@@ -206,7 +213,11 @@ export default props => {
       {fileList &&
         showUploadList &&
         !!fileList.length && (
-          <div>
+          <div
+            className={
+              overflowList ? "tg-upload-file-list-item-overflow" : null
+            }
+          >
             {fileList.map((file, index) => {
               const {
                 loading,
