@@ -81,6 +81,16 @@
   text-overflow: ellipsis;
 }
 
+.tg-upload-file-list-item-overflow {
+  overflow: auto;
+  height: 150px;
+}
+
+.tg-upload-file-list-counter {
+  position: absolute;
+  padding: 5px;
+}
+
 .tg-spin {
   animation-name: spin;
   animation-duration: 1500ms;
