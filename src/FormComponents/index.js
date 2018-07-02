@@ -57,7 +57,7 @@ function removeUnwantedProps(props) {
 }
 
 class AbstractInput extends React.Component {
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const {
       meta: { dispatch, form },
       defaultValue,
@@ -76,7 +76,7 @@ class AbstractInput extends React.Component {
       });
   }
 
-  componentWillReceiveProps({
+  UNSAFE_componentWillReceiveProps({
     meta: { dispatch, form },
     defaultValue,
     input: { name, value }

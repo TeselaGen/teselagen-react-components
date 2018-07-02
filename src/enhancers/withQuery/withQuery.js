@@ -148,7 +148,7 @@ export default function withQuery(inputFragment, options = {}) {
           ["loading" + upperFirst(nameToUse)]: data.loading
         };
 
-        return {
+        const propsToReturn = {
           ...(tableParams && !tableParams.entities && !tableParams.isLoading
             ? {
                 tableParams: {
@@ -161,7 +161,6 @@ export default function withQuery(inputFragment, options = {}) {
                 }
               }
             : {}),
-          ...(props ? props(...args) : {}),
           data: newData,
           [queryNameToUse]: newData,
           [nameToUse]: results,
@@ -171,6 +170,19 @@ export default function withQuery(inputFragment, options = {}) {
           [camelCase("refetch_" + nameToUse)]: data.refetch,
           fragment,
           gqlQuery
+        };
+
+        const [dataArgs, ...otherArgs] = args;
+        return {
+          ...propsToReturn,
+          ...(props &&
+            props(
+              {
+                ...dataArgs,
+                ...propsToReturn
+              },
+              ...otherArgs
+            ))
         };
       },
       ...rest //overwrite defaults here
