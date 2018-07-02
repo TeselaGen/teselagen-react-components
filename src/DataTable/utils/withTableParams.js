@@ -219,7 +219,11 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       //don't use withRouter if noRouter is passed!
       return !props.noRouter;
     }, withRouter),
-    connect(mapStateToProps, mapDispatchToProps, mergeProps)
+    connect(
+      mapStateToProps,
+      mapDispatchToProps,
+      mergeProps
+    )
   );
   if (Component) {
     return toReturn(Component);
@@ -231,10 +235,9 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
  * Given the options, get the schema. This enables the user to provide
  * a function instead of an object for the schema.
  * @param {Object} options Merged options
- * @param {Object} props The props passed to the component.
  */
-function getSchema(options, props) {
+function getSchema(options) {
   const { schema } = options;
-  if (isFunction(schema)) return schema(props);
+  if (isFunction(schema)) return schema(options);
   else return schema;
 }
