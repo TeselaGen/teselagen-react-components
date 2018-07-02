@@ -34,7 +34,7 @@ export default function ResizableDraggableDialog({
           width: Math.min(defaultDialogWidth, windowWidth),
           height: Math.min(defaultDialogHeight, windowHeight)
         }}
-        dragHandleClassName={".pt-dialog-header"}
+        dragHandleClassName={"pt-dialog-header"}
         {...RndProps}
       >
         <Dialog hasBackdrop={false} usePortal={false} {...rest} />
