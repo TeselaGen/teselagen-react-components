@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import sortify from "./sortify"; //tnr TODO: export this from json.sortify when https://github.com/ThomasR/JSON.sortify/issues/11 is resolved
 import { isNumber, noop } from "lodash";
 import mathExpressionEvaluator from "math-expression-evaluator";
@@ -108,7 +109,8 @@ class AbstractInput extends React.Component {
       className,
       showErrorIfUntouched,
       meta,
-      noOuterLabel
+      noOuterLabel,
+      noFillField
     } = this.props;
     const { touched, error } = meta;
     const showError = (touched || showErrorIfUntouched) && error;
@@ -128,24 +130,31 @@ class AbstractInput extends React.Component {
     );
 
     const secondaryLabelComp = secondaryLabel ? (
-      <span className="pt-text-muted"> {secondaryLabel}</span>
+      <span className="pt-text-muted">{secondaryLabel}</span>
     ) : null;
+
+    const labelComp = label &&
+      !noOuterLabel && (
+        <label className="pt-label">
+          {label}
+          {secondaryLabelComp}
+        </label>
+      );
 
     return (
       <div
-        className={`pt-form-group tg-form-component ${getIntentClass(
-          this.props
-        ) || ""} ${className || ""}   ${
-          inlineLabel ? "tg-inlineLabel" : ""
-        }   ${tooltipError ? "tg-tooltipError" : ""}`}
+        className={classNames(
+          "pt-form-group",
+          getIntentClass(this.props),
+          className,
+          {
+            "tg-inlineLabel": inlineLabel,
+            "tg-tooltipError": tooltipError,
+            "tg-no-fill-field": noFillField
+          }
+        )}
       >
-        {label &&
-          !noOuterLabel && (
-            <label className="pt-label">
-              {label}
-              {secondaryLabelComp}
-            </label>
-          )}
+        {labelComp}
         <div>
           {componentToWrap}
           {!tooltipError &&
@@ -571,14 +580,18 @@ export const FileUploadField = generateField(renderFileUpload);
 export const DateInputField = generateField(renderBlueprintDateInput);
 export const DateRangeInputField = generateField(renderBlueprintDateRangeInput);
 export const CheckboxField = generateField(renderBlueprintCheckbox, {
-  noOuterLabel: true
+  noOuterLabel: true,
+  noFillField: true
 });
 export const SwitchField = generateField(renderBlueprintSwitch, {
-  noOuterLabel: true
+  noOuterLabel: true,
+  noFillField: true
 });
 export const TextareaField = generateField(renderBlueprintTextarea);
 export const EditableTextField = generateField(renderBlueprintEditableText);
 export const NumericInputField = generateField(renderBlueprintNumericInput);
-export const RadioGroupField = generateField(renderBlueprintRadioGroup);
+export const RadioGroupField = generateField(renderBlueprintRadioGroup, {
+  noFillField: true
+});
 export const ReactSelectField = generateField(renderReactSelect);
 export const SelectField = generateField(renderSelect);

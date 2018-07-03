@@ -27,10 +27,6 @@
   display: none;
 }
 
-.tg-form-component > * {
-  width: 100%;
-}
-
 .tg-dropzone {
   width: 100% !important;
   height: 100% !important;
@@ -180,4 +176,8 @@
 
 .tg-tooltipError .pt-popover-wrapper {
   width: 100%;
+}
+
+.tg-no-fill-field {
+  display: table;
 }
