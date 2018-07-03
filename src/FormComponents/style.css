@@ -179,5 +179,5 @@
 }
 
 .tg-no-fill-field {
-  display: table;
+  display: table !important;
 }
