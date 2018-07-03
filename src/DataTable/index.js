@@ -68,6 +68,7 @@ function computePresets(props) {
       noHeader: true,
       noFooter: true,
       noPadding: true,
+      noFullscreenButton: true,
       hidePageSizeWhenPossible: true,
       isInfinite: true,
       hideSelectedCount: true,
@@ -82,6 +83,7 @@ function computePresets(props) {
       // the usual defaults:
       noFooter: false,
       noPadding: false,
+      noFullscreenButton: false,
       hidePageSizeWhenPossible: false,
       isInfinite: false,
       hideSelectedCount: false,
@@ -310,6 +312,7 @@ class ReactDataTable extends React.Component {
       noHeader,
       noFooter,
       noPadding,
+      noFullscreenButton,
       withDisplayOptions,
       resized,
       resizePersist,
@@ -576,7 +579,7 @@ class ReactDataTable extends React.Component {
                 entityCount === 1 ? "Record" : "Total Records"
               }`}
             <div style={{ display: "flex", flexWrap: "wrap" }}>
-              {toggleFullscreenButton}
+              {!noFullscreenButton && toggleFullscreenButton}
               {withDisplayOptions && (
                 <DisplayOptions
                   disabled={disabled}

@@ -190,6 +190,7 @@ class DataTableInstance extends React.Component {
       noHeader: false,
       noFooter: false,
       noPadding: false,
+      noFullscreenButton: false,
       withDisplayOptions: true,
       isInfinite: false,
       isSingleSelect: false,
@@ -277,6 +278,7 @@ class DataTableInstance extends React.Component {
           ` This sets: 
         noHeader: true,
         noFooter: true,
+        noFullscreenButton: true,
         noPadding: true,
         hidePageSizeWhenPossible: true,
         isInfinite: true,
@@ -306,6 +308,7 @@ class DataTableInstance extends React.Component {
         {renderToggle(this, "withSort")}
         {renderToggle(this, "noHeader")}
         {renderToggle(this, "noFooter")}
+        {renderToggle(this, "noFullscreenButton")}
         {renderToggle(this, "noPadding")}
         {renderToggle(this, "isInfinite")}
         {renderToggle(this, "isLoading")}
@@ -401,6 +404,7 @@ class DataTableInstance extends React.Component {
             withPaging={this.state.withPaging}
             withFilter={this.state.withFilter}
             withSort={this.state.withSort}
+            noFullscreenButton={this.state.noFullscreenButton}
             noPadding={this.state.noPadding}
             noHeader={this.state.noHeader}
             noFooter={this.state.noFooter}
