@@ -1,6 +1,6 @@
 
 
-function WithDialogDemo() {
+function Demo() {
   return (
     <div>
       <Button onClick={() => {
@@ -10,4 +10,4 @@ function WithDialogDemo() {
   );
 }
 
-render(WithDialogDemo);
+render(Demo);

@@ -57,7 +57,7 @@ class AlertWrapper extends Component {
 export function renderOnDoc(fn) {
   const elemDiv = document.createElement("div");
   elemDiv.style.cssText =
-    "position:absolute;width:100%;height:100%;top:0px;opacity:0.3;z-index:100;";
+    "position:absolute;width:100%;height:100%;top:0px;opacity:0.3;z-index:0;";
   document.body.appendChild(elemDiv);
   const handleClose = () => {
     setTimeout(() => {
