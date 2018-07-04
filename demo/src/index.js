@@ -292,7 +292,8 @@ const demos = {
   },
   showConfirmationDialog: {
     scope: {
-      KeyCombo
+      showConfirmationDialog,
+      Intent
     },
     demo: showConfirmationDialogDemo,
     url:
