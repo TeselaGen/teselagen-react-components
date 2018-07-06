@@ -27,7 +27,7 @@ export function getMergedOpts(topLevel = {}, instanceLevel = {}) {
     ...topLevel,
     ...instanceLevel,
     defaults: {
-      pageSize: 10,
+      pageSize: 25,
       order: [], //[-name, statusCode] //an array of camelCase display names with - sign to denote reverse
       searchTerm: "",
       page: 1,
