@@ -339,6 +339,7 @@
 .pt-dark .ReactTable .rt-noData {
   background: #202b33 !important;
   color: inherit !important;
+  z-index: unset;
 }
 
 .pt-dark .ReactTable .-loading {

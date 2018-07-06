@@ -327,7 +327,7 @@ export const renderBlueprintEditableText = props => {
       {...input}
       onConfirm={function(value) {
         input.onBlur && input.onBlur(value);
-        onFieldSubmit(value);
+        onFieldSubmit(value, { input, meta: rest.meta });
       }}
     />
   );

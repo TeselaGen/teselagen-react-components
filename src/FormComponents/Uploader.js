@@ -44,8 +44,8 @@ export default props => {
         multiple={fileLimit !== 1}
         activeClassName={"tg-dropzone-active"}
         rejectClassName={"tg-dropzone-reject"}
-        //acceptClassName={"tg-dropzone-accept"} //tnr: commenting these out temporarily until https://github.com/react-dropzone/react-dropzone/pull/504 gets merged
-        //disabledClassName={"tg-dropzone-disabled"}
+        acceptClassName={"tg-dropzone-accept"}
+        disabledClassName={"tg-dropzone-disabled"}
         accept={acceptToUse}
         {...{
           onDrop: acceptedFiles => {
