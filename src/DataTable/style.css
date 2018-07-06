@@ -106,7 +106,7 @@
 }
 
 .ReactTable .rt-tbody .rt-tr-group .-padRow {
-  border: none;
+  display: none;
 }
 
 .pt-icon-standard.pt-disabled {
