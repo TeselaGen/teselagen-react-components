@@ -95,9 +95,7 @@ class S3Upload {
     }
     const xhr = this.createCORSRequest(
       this.signingUrlMethod,
-      this.server
-        ? this.server + this.signingUrl + queryString
-        : "/" + this.signingUrl + queryString,
+      (this.server || "/") + this.signingUrl + queryString,
       { withCredentials: this.signingUrlWithCredentials }
     );
     if (this.signingUrlHeaders) {

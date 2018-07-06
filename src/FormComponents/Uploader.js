@@ -32,7 +32,7 @@ class Uploader extends Component {
     };
   }
 
-  componentDidUpdate(prevProps) {
+  /* componentDidUpdate(prevProps) {
     if (prevProps.startUpload !== this.props.startUpload) {
       if (this.props.startUpload) {
         this.sendFiles();
@@ -49,7 +49,7 @@ class Uploader extends Component {
     if (this.props.abortUploads) {
       this.abortAllUploads();
     }
-  }
+  } */
 
   showProgress = (progressEvent, fileId) => {
     if (progressEvent) {
@@ -57,7 +57,7 @@ class Uploader extends Component {
         (progressEvent.loaded * 100) / progressEvent.total
       );
       const up = this.state.uploading;
-      up[fileId] = merge(up[fileId],{
+      up[fileId] = merge(up[fileId], {
         percentage: percentCompleted,
         loading: true,
         saved: false,
@@ -68,7 +68,6 @@ class Uploader extends Component {
       });
     }
   };
-
 
   onFinishUpload = (saved, fileId) => {
     const up = this.state.uploading;
@@ -96,15 +95,13 @@ class Uploader extends Component {
   };
 
   sendFiles = async files => {
-    const up = {};
+    const up = this.state.uploading;
     files.forEach(file => {
       const f = new File([file.originFileObj], uuid(), {
         type: file.originFileObj.type,
         id: file.id
       });
-
       const options = this.props.S3Params;
-
       options.files = [f];
       options.fileId = file.id;
       options.onProgress = options.onProgress || this.showProgress;
@@ -116,10 +113,17 @@ class Uploader extends Component {
       // If you want to upload to a different bucket, pass a different signingURL and adjust params on the server!
       options.signingUrl = options.signingUrl || "/s3/sign";
 
-      up[file.id] = { loading: true, percentage: 0, error: null, saved: false, originalFileName: file.name };
-      file.loading = true;
-      if (!this.uploadingFiles[file.id])
+      if (!this.uploadingFiles[file.id]) {
+        up[file.id] = {
+          loading: true,
+          percentage: 0,
+          error: null,
+          saved: false,
+          originalFileName: file.name
+        };
+        file.loading = true;
         this.uploadingFiles[file.id] = new S3Upload(options);
+      }
     });
     this.setState({
       loading: true,
@@ -147,7 +151,7 @@ class Uploader extends Component {
     const m = map(items, item => item);
     const l = some(m, { loading: true });
     const s = every(m, { saved: true });
-    if (s||!l) this.props.onFieldSubmit(Object.values(items));
+    if (s || !l) this.props.onFieldSubmit(Object.values(items));
     this.setState({
       uploading: items,
       loading: l,
@@ -156,16 +160,16 @@ class Uploader extends Component {
   };
 
   deleteItem = item => {
-    console.log(item);
-    const fields = this.props[this.props.fieldName];
+    const fields = this.props.fileList;
     if (!fields) {
       console.log("Can't delete item");
-      return
+      return;
     }
     const i = findIndex(fields, { id: item.id });
     delete fields[i];
+    //we need to compact array to avoid empty fields
     const compactFields = compact(fields);
-    this.props.change(this.props.fieldName, compactFields);
+    this.props.onChange(compactFields);
   };
 
   itemListRender = item => {
@@ -310,7 +314,7 @@ class Uploader extends Component {
                 .then(({ keepGoing, acceptedFiles }) => {
                   if (!keepGoing) return;
                   if (S3Params) {
-                    // this is s3 upload
+                    // this is s3/minio upload
                     return this.sendFiles(acceptedFiles);
                   }
                   if (action) {

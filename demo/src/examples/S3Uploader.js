@@ -38,11 +38,13 @@ class FormComponentsDemo extends React.Component {
           />
           <Button
             onClick={() => {
-              S3Download("example.png").then(blob => {
-                magicDownload(blob, `Downloadme.png`);
-              });
+              S3Download(
+                Object.assign(S3Params, { file: "folder/demo_file.csv" })
+              )
+                .then(blob => magicDownload(blob, "example.csv"))
+                .catch(error => console.log("file doesn't exist in server"));
             }}
-            text="Download from s3 example"
+            text="Download file from S3"
           />
         </div>
       </Provider>
