@@ -21,10 +21,14 @@ import { FileUploadField } from "../../src/FormComponents";
 import J5ReportRecordView from "./examples/J5ReportRecordView";
 import j5ReportRecordViewData from "./data/j5ReportRecordView";
 import * as customIcons from "../../src/customIcons";
+
 import createMenu from "../../src/utils/createMenu";
 import Tree from "./examples/Tree";
 import { bigTreeData, smallTreeData } from "./data/treeData";
 import showConfirmationDialog from "../../src/showConfirmationDialog";
+import S3Download from "../../src/utils/S3Download";
+import magicDownload from "../../lib/DownloadLink/magicDownload";
+
 import "./style.css";
 import React from "react";
 import { render } from "react-dom";
@@ -317,7 +321,9 @@ const demos = {
       reduxForm,
       Uploader,
       FileUploadField,
-      Button
+      Button,
+      S3Download,
+      magicDownload
     },
     demo: S3Uploader,
     url:

@@ -1,6 +1,3 @@
-import S3Download from "../../../src/utils/S3Download";
-import magicDownload from "../../../src/DownloadLink/magicDownload";
-
 const getOptions = function(input, callback) {
   setTimeout(function() {
     callback(null, {
