@@ -8,6 +8,7 @@ import WithDialog from "./examples/WithDialog";
 import Toastr from "./examples/Toastr";
 import showConfirmationDialogDemo from "./examples/showConfirmationDialogDemo";
 import CustomIcons from "./examples/CustomIcons";
+import S3Uploader from "./examples/S3Uploader";
 import SimpleTable from "./examples/SimpleTable";
 import InfoHelper from "./examples/InfoHelper";
 import Loading from "./examples/Loading";
@@ -306,6 +307,17 @@ const demos = {
     demo: CustomIcons,
     url:
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/CustomIcons.js"
+  },
+  S3Uploader: {
+    scope: {
+      Provider,
+      store,
+      reduxForm,
+      Uploader
+    },
+    demo: S3Uploader,
+    url:
+      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/S3Uploader.js"
   },
   J5ReportRecordView: {
     demo: J5ReportRecordView,

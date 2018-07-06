@@ -5,8 +5,9 @@ import Dropzone from "react-dropzone";
 // import { first } from "lodash";
 import uniqid from "uniqid";
 import classnames from "classnames";
-import S3Upload from "../../lib/utils/s3upload";
 import { some, forEach, map, every, compact, findIndex } from "lodash";
+import ItemUpload from "./itemUpload";
+import S3Upload from "../utils/S3upload";
 
 function noop() {}
 // wink wink
@@ -22,7 +23,11 @@ class Uploader extends Component {
       uploadingFiles: {},
       allSaved: false,
       onDragOver: false,
-      startUploads: false
+      startUploads: false,
+
+      startUpload: false,
+      abortUploads: false,
+      fileSetId: null
     };
   }
 
@@ -45,31 +50,75 @@ class Uploader extends Component {
     }
   }
 
-  sendFiles = async () => {
-    const up = {};
-    if (Array.isArray(this.props[this.props.fieldName])) {
-      this.props[this.props.fieldName].forEach(file => {
-        const f = new File([file.originFileObj], file.originFileObj.name, {
-          type: file.originFileObj.type,
-          id: file.id
-        });
-
-        const options = this.props.s3params;
-
-        up[file.id] = {
-          loading: true,
-          percentage: 0,
-          error: null,
-          saved: false
-        };
-        file.loading = true;
-        this.uploadingFiles[file.id] = new S3Upload(options);
-      });
-      this.setState({
+  showProgress = (progressEvent, fileId) => {
+    if (progressEvent) {
+      const percentCompleted = Math.round(
+        (progressEvent.loaded * 100) / progressEvent.total
+      );
+      const up = this.state.uploading;
+      up[fileId] = {
+        percentage: percentCompleted,
         loading: true,
+        saved: false,
+        error: null
+      };
+      this.setState({
         uploading: up
       });
     }
+  };
+
+  onFinishUpload = (saved, fileId) => {
+    const up = this.state.uploading;
+    up[fileId] = {
+      percentage: 100,
+      loading: false,
+      saved: true,
+      error: null
+    };
+    this.props.fileSaved(saved, fileId);
+    this.checkLoadings(up);
+  };
+
+  onUploadError = (e, fileId) => {
+    const up = this.state.uploading;
+    up[fileId] = {
+      percentage: 0,
+      loading: false,
+      saved: false,
+      error: JSON.stringify(e)
+    };
+    this.checkLoadings(up);
+  };
+
+  sendFiles = async files => {
+    const up = {};
+    files.forEach(file => {
+      const f = new File([file.originFileObj], file.originFileObj.name, {
+        type: file.originFileObj.type,
+        id: file.id
+      });
+
+      const options = this.props.S3Params;
+
+      options.files = [f];
+      options.onProgress = options.onProgress || this.showProgress;
+      options.onFinish = options.onFinish || this.onFinishUpload;
+      options.onError = options.onError || this.onUploadError;
+
+      options.signingUrlWithCredentials = true;
+
+      // If you want to upload to a different bucket, pass a different signingURL and adjust params on the server!
+      options.signingUrl = options.signingUrl || "/s3/sign";
+
+      up[file.id] = { loading: true, percentage: 0, error: null, saved: false };
+      file.loading = true;
+      if (!this.uploadingFiles[file.id]) this.uploadingFiles[file.id] = new S3Upload(options);
+    });
+    this.setState({
+      loading: true,
+      uploading: up
+    });
   };
 
   abortUpload = item => {
@@ -161,7 +210,7 @@ class Uploader extends Component {
       dropzoneProps = {},
       overflowList,
       showFilesCount,
-      s3params // if this is defined we assume we want to upload to aws s3 (or minio)
+      S3Params // if this is defined we assume we want to upload to aws s3 (or minio)
     } = this.props;
     const self = this;
     let acceptToUse = Array.isArray(accept) ? accept.join(", ") : accept;
@@ -239,10 +288,14 @@ class Uploader extends Component {
                 .then(acceptedFiles => {
                   return beforeUpload
                     ? beforeUpload(acceptedFiles, onChange)
-                    : true;
+                    : {keepGoing: true, acceptedFiles};
                 })
-                .then(keepGoing => {
+                .then(({keepGoing, acceptedFiles}) => {
                   if (!keepGoing) return;
+                  if(this.props.S3Params){
+                    // this is s3 upload
+                    this.sendFiles(acceptedFiles);
+                  }
                   if (action) {
                     if (uploadInBulk) {
                       //tnr: not yet implemented
@@ -315,7 +368,7 @@ class Uploader extends Component {
                       })
                     );
                   }
-                });
+                })
             }
           }}
           {...dropzoneProps}
@@ -365,7 +418,9 @@ class Uploader extends Component {
                   icon = "saved";
                 }
                 return fileListItemRenderer ? (
-                  fileListItemRenderer(file,self)
+                  fileListItemRenderer(file, self)
+                ) : ( S3Params ? (
+                  this.itemListRender(file,self)
                 ) : (
                   <div key={index} className={"tg-upload-file-list-item"}>
                     <div>
@@ -406,7 +461,8 @@ class Uploader extends Component {
                       />
                     )}
                   </div>
-                );
+                )
+              )
               })}
             </div>
           )}
