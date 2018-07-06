@@ -93,6 +93,22 @@
   align-items: center;
 }
 
+.paging-page-size {
+  width: 62px;
+}
+
+.ReactTable .rt-tbody .rt-tr-group {
+  border: none;
+}
+
+.ReactTable .rt-tbody .rt-tr {
+  border-bottom: 1px solid rgb(233, 233, 233);
+}
+
+.ReactTable .rt-tbody .rt-tr-group .-padRow {
+  display: none;
+}
+
 .pt-icon-standard.pt-disabled {
   cursor: not-allowed;
   opacity: 0.7;
