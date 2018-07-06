@@ -1,9 +1,8 @@
-const S3Download = require('../../../src/utils/S3Download')
-const magicDownload = require('../../../lib/DownloadLink/magicDownload')
+import S3Download from "../../../src/utils/S3Download";
+import magicDownload from "../../../src/DownloadLink/magicDownload";
 
-
-const getOptions = function (input, callback) {
-  setTimeout(function () {
+const getOptions = function(input, callback) {
+  setTimeout(function() {
     callback(null, {
       options: [{ value: "one", label: "One" }, { value: "two", label: "Two" }],
       // CAREFUL! Only set this to true when there are no more options,
@@ -20,7 +19,7 @@ class FormComponentsDemo extends React.Component {
 
     const S3Params = {
       server: "http://localhost:3030", //optional
-      s3path: "uploads/",
+      s3path: "uploads/"
     };
 
     return (
@@ -31,7 +30,7 @@ class FormComponentsDemo extends React.Component {
           </h3>
           <FileUploadField
             label="Upload component"
-            onFieldSubmit={function (fileList) {
+            onFieldSubmit={function(fileList) {
               console.info(
                 "do something with the finished file list:",
                 fileList
@@ -40,16 +39,16 @@ class FormComponentsDemo extends React.Component {
             S3Params={S3Params}
             name={"uploadfield"}
           />
-
-          <Button onClick={() => {
-            S3Download.download("example.png").then(blob=>{
-              magicDownload(blob, `Downloadme.png`);
-            })
-          }}>Download from s3 example</Button>
+          <Button
+            onClick={() => {
+              S3Download("example.png").then(blob => {
+                magicDownload(blob, `Downloadme.png`);
+              });
+            }}
+            text="Download from s3 example"
+          />
         </div>
-
       </Provider>
-
     );
   }
 }

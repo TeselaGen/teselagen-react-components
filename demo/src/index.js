@@ -43,7 +43,8 @@ import {
   FocusStyleManager,
   Position,
   Intent,
-  KeyCombo
+  KeyCombo,
+  Button
 } from "@blueprintjs/core";
 import renderToggle from "./renderToggle";
 import Chance from "chance";
@@ -315,7 +316,8 @@ const demos = {
       store,
       reduxForm,
       Uploader,
-      FileUploadField
+      FileUploadField,
+      Button
     },
     demo: S3Uploader,
     url:
