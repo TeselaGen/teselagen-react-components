@@ -16,7 +16,8 @@ class FormComponentsDemo extends React.Component {
 
     const S3Params = {
       server: "http://localhost:3030", //optional
-      s3path: "uploads/"
+      s3path: "uploads/",
+      bucket: "testmodule"
     };
 
     return (

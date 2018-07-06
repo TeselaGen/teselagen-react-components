@@ -7,6 +7,7 @@ class S3Upload {
     this.fileElement = null;
     this.files = null;
     this.fileId = null;
+    this.bucket = null;
 
     if (options === null) {
       options = {};
@@ -82,6 +83,9 @@ class S3Upload {
     )}`;
     if (this.s3path) {
       queryString += `&path=${encodeURIComponent(this.s3path)}`;
+    }
+    if (this.bucket) {
+      queryString += `&bucket=${encodeURIComponent(this.bucket)}`;
     }
     if (this.signingUrlQueryParams) {
       const signingUrlQueryParams =
