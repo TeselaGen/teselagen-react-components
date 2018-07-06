@@ -17,6 +17,7 @@ import DemoNav from "./DemoNav";
 import DemoHeader from "./DemoHeader";
 import { withTableParams, DataTable, PagingTool } from "../../src";
 import Uploader from "../../src/FormComponents/Uploader";
+import { FileUploadField } from "../../src/FormComponents";
 import J5ReportRecordView from "./examples/J5ReportRecordView";
 import j5ReportRecordViewData from "./data/j5ReportRecordView";
 import * as customIcons from "../../src/customIcons";
@@ -313,7 +314,8 @@ const demos = {
       Provider,
       store,
       reduxForm,
-      Uploader
+      Uploader,
+      FileUploadField
     },
     demo: S3Uploader,
     url:

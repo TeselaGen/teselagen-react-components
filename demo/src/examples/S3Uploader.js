@@ -1,3 +1,7 @@
+const S3Download = require('../../../src/utils/S3Download')
+const magicDownload = require('../../../lib/DownloadLink/magicDownload')
+
+
 const getOptions = function (input, callback) {
   setTimeout(function () {
     callback(null, {
@@ -25,17 +29,27 @@ class FormComponentsDemo extends React.Component {
           <h3 className="form-component-title">
             Blueprint Redux Form Components
           </h3>
-          <Uploader
-            overflowList
-            showFilesCount
-            S3Params={S3Params}
-            fileSaved={file=>{
-              console.log("New file saved!");
-              console.log(file);
+          <FileUploadField
+            label="Upload component"
+            onFieldSubmit={function (fileList) {
+              console.info(
+                "do something with the finished file list:",
+                fileList
+              );
             }}
+            S3Params={S3Params}
+            name={"uploadfield"}
           />
+
+          <Button onClick={() => {
+            S3Download.download("example.png").then(blob=>{
+              magicDownload(blob, `Downloadme.png`);
+            })
+          }}>Download from s3 example</Button>
         </div>
+
       </Provider>
+
     );
   }
 }

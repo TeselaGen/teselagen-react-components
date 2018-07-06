@@ -5,9 +5,10 @@ import Dropzone from "react-dropzone";
 // import { first } from "lodash";
 import uniqid from "uniqid";
 import classnames from "classnames";
-import { some, forEach, map, every, compact, findIndex } from "lodash";
+import { some, forEach, map, every, compact, findIndex, merge } from "lodash";
 import ItemUpload from "./itemUpload";
 import S3Upload from "../utils/S3upload";
+import uuid from "uuid/v4";
 
 function noop() {}
 // wink wink
@@ -56,45 +57,48 @@ class Uploader extends Component {
         (progressEvent.loaded * 100) / progressEvent.total
       );
       const up = this.state.uploading;
-      up[fileId] = {
+      up[fileId] = merge(up[fileId],{
         percentage: percentCompleted,
         loading: true,
         saved: false,
         error: null
-      };
+      });
       this.setState({
         uploading: up
       });
     }
   };
 
+
   onFinishUpload = (saved, fileId) => {
     const up = this.state.uploading;
-    up[fileId] = {
+    up[fileId] = merge(up[fileId], {
       percentage: 100,
       loading: false,
       saved: true,
-      error: null
-    };
-    this.props.fileSaved(saved, fileId);
+      error: null,
+      info: saved,
+      path: saved.publicUrl
+    });
+    this.props.fileFinished && this.props.fileFinished(saved, fileId);
     this.checkLoadings(up);
   };
 
   onUploadError = (e, fileId) => {
     const up = this.state.uploading;
-    up[fileId] = {
+    up[fileId] = merge(up[fileId], {
       percentage: 0,
       loading: false,
       saved: false,
       error: JSON.stringify(e)
-    };
+    });
     this.checkLoadings(up);
   };
 
   sendFiles = async files => {
     const up = {};
     files.forEach(file => {
-      const f = new File([file.originFileObj], file.originFileObj.name, {
+      const f = new File([file.originFileObj], uuid(), {
         type: file.originFileObj.type,
         id: file.id
       });
@@ -102,6 +106,7 @@ class Uploader extends Component {
       const options = this.props.S3Params;
 
       options.files = [f];
+      options.fileId = file.id;
       options.onProgress = options.onProgress || this.showProgress;
       options.onFinish = options.onFinish || this.onFinishUpload;
       options.onError = options.onError || this.onUploadError;
@@ -111,9 +116,10 @@ class Uploader extends Component {
       // If you want to upload to a different bucket, pass a different signingURL and adjust params on the server!
       options.signingUrl = options.signingUrl || "/s3/sign";
 
-      up[file.id] = { loading: true, percentage: 0, error: null, saved: false };
+      up[file.id] = { loading: true, percentage: 0, error: null, saved: false, originalFileName: file.name };
       file.loading = true;
-      if (!this.uploadingFiles[file.id]) this.uploadingFiles[file.id] = new S3Upload(options);
+      if (!this.uploadingFiles[file.id])
+        this.uploadingFiles[file.id] = new S3Upload(options);
     });
     this.setState({
       loading: true,
@@ -141,6 +147,7 @@ class Uploader extends Component {
     const m = map(items, item => item);
     const l = some(m, { loading: true });
     const s = every(m, { saved: true });
+    if (s||!l) this.props.onFieldSubmit(Object.values(items));
     this.setState({
       uploading: items,
       loading: l,
@@ -149,7 +156,12 @@ class Uploader extends Component {
   };
 
   deleteItem = item => {
+    console.log(item);
     const fields = this.props[this.props.fieldName];
+    if (!fields) {
+      console.log("Can't delete item");
+      return
+    }
     const i = findIndex(fields, { id: item.id });
     delete fields[i];
     const compactFields = compact(fields);
@@ -178,6 +190,10 @@ class Uploader extends Component {
         value={value}
         error={error}
         saved={saved}
+        onClick={file => {
+          console.log("Try download file");
+          console.log(file);
+        }}
         onCancel={
           isActive
             ? this.abortUpload.bind(this, item)
@@ -204,6 +220,7 @@ class Uploader extends Component {
       fileListItemRenderer, // handle rendering the file list items yourself (receive filelist and context) :)
       onFileSuccess = emptyPromise, //called each time a file is finished and before the file.loading gets set to false, needs to return a promise!
       onFieldSubmit = noop, //called when all files have successfully uploaded
+      fileFinished = noop,
       onRemove = noop, //called when a file has been selected to be removed
       onChange = noop, //this is almost always getting passed by redux-form, no need to pass this handler manually
       onFileClick, // called when a file link in the filelist is clicked
@@ -288,13 +305,13 @@ class Uploader extends Component {
                 .then(acceptedFiles => {
                   return beforeUpload
                     ? beforeUpload(acceptedFiles, onChange)
-                    : {keepGoing: true, acceptedFiles};
+                    : { keepGoing: true, acceptedFiles };
                 })
-                .then(({keepGoing, acceptedFiles}) => {
+                .then(({ keepGoing, acceptedFiles }) => {
                   if (!keepGoing) return;
-                  if(this.props.S3Params){
+                  if (S3Params) {
                     // this is s3 upload
-                    this.sendFiles(acceptedFiles);
+                    return this.sendFiles(acceptedFiles);
                   }
                   if (action) {
                     if (uploadInBulk) {
@@ -368,7 +385,7 @@ class Uploader extends Component {
                       })
                     );
                   }
-                })
+                });
             }
           }}
           {...dropzoneProps}
@@ -419,8 +436,8 @@ class Uploader extends Component {
                 }
                 return fileListItemRenderer ? (
                   fileListItemRenderer(file, self)
-                ) : ( S3Params ? (
-                  this.itemListRender(file,self)
+                ) : S3Params ? (
+                  this.itemListRender(file, self)
                 ) : (
                   <div key={index} className={"tg-upload-file-list-item"}>
                     <div>
@@ -461,8 +478,7 @@ class Uploader extends Component {
                       />
                     )}
                   </div>
-                )
-              )
+                );
               })}
             </div>
           )}
