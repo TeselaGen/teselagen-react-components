@@ -98,7 +98,7 @@
 }
 
 .ReactTable .rt-tbody .rt-tr-group {
-  border: none;
+  border: none !important;
 }
 
 .ReactTable .rt-tbody .rt-tr {
