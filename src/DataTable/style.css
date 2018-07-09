@@ -254,12 +254,11 @@
   transform: scale(1.2);
 }
 
-.tg-react-table-checkbox-header-container {
-  padding: 12px 0 0 8px !important;
-}
-
+.tg-react-table-checkbox-header-container,
 .tg-react-table-checkbox-cell-container {
-  padding: 11px 0 0 8px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tg-compact-table .rt-tbody .rt-td {
@@ -348,8 +347,8 @@
   color: #f5f8fa !important;
 }
 
-.pt-dark .ReactTable .rt-tbody .rt-tr-group {
-  border-bottom-color: rgba(16, 22, 26, 0.15) !important;
+.pt-dark .ReactTable .rt-tbody .rt-tr {
+  border-bottom-color: #293742 !important;
 }
 
 .pt-dark .ReactTable .rt-noData {

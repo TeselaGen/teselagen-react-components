@@ -538,6 +538,7 @@ class ReactDataTable extends React.Component {
           )}
           style={{
             maxHeight,
+            minHeight: 150,
             ...style
           }}
           ExpanderComponent={({ isExpanded }) => {

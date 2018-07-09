@@ -60,7 +60,7 @@ class DataTableDemo extends React.Component {
     this.closeDialog = this.closeDialog.bind(this);
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     //tnr: the following code allows the DataTable test to set defaults on the demo (which is used in the testing)
     this.setState(this.props);
   }
@@ -84,7 +84,10 @@ class DataTableDemo extends React.Component {
 
     return (
       <ApolloProvider client={client} store={store}>
-        <div>
+        <div
+          className={this.state.darkMode ? "pt-dark" : ""}
+          style={{ background: this.state.darkMode ? "#293742" : undefined }}
+        >
           <Router>
             <div>
               <h3>Demo specific options:</h3>
@@ -98,6 +101,7 @@ class DataTableDemo extends React.Component {
                   " isInfinite to see something actually show up with it"
               )}
               {renderToggle(this, "inDialog", "Render the table in a dialog")}
+              {renderToggle(this, "darkMode", "Render the table in dark theme")}
               <h3>withTableParams options:</h3>
               <br />
               {renderToggle(
