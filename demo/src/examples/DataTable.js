@@ -188,6 +188,9 @@ class DataTableInstance extends React.Component {
       isViewable: true,
       withSearch: true,
       withPaging: true,
+      expandAllByDefault: false,
+      withExpandAndCollapseAllButton: false,
+      selectAllByDefault: false,
       withFilter: true,
       withSort: true,
       withSubComponent: true,
@@ -290,6 +293,9 @@ class DataTableInstance extends React.Component {
         withTitle: false,
         withSearch: false,
         withPaging: false,
+        withExpandAndCollapseAllButton: false,
+        expandAllByDefault: false,
+        selectAllByDefault: false,
         withFilter: false,
         isCopyable: false,
         by default, but they are all 
@@ -308,6 +314,9 @@ class DataTableInstance extends React.Component {
         )}
         {renderToggle(this, "withDisplayOptions")}
         {renderToggle(this, "withPaging")}
+        {renderToggle(this, "withExpandAndCollapseAllButton")}
+        {renderToggle(this, "expandAllByDefault")}
+        {renderToggle(this, "selectAllByDefault")}
         {renderToggle(this, "withFilter")}
         {renderToggle(this, "withSort")}
         {renderToggle(this, "noHeader")}
@@ -405,7 +414,10 @@ class DataTableInstance extends React.Component {
             noSelect={this.state.noSelect}
             isSimple={this.state.isSimple}
             withSearch={this.state.withSearch}
+            withExpandAndCollapseAllButton={this.state.withExpandAndCollapseAllButton}
+            expandAllByDefault={this.state.expandAllByDefault}
             withPaging={this.state.withPaging}
+            selectAllByDefault={this.state.selectAllByDefault}
             withFilter={this.state.withFilter}
             withSort={this.state.withSort}
             noFullscreenButton={this.state.noFullscreenButton}
