@@ -129,18 +129,8 @@
   margin-right: 20px;
 }
 
-.tg-react-table-checkbox-cell {
-  padding-top: 0;
-}
-
 .tg-react-table-checkbox-header-cell {
   padding-top: 0;
-}
-
-.tg-react-table-checkbox-cell-inner {
-  margin-top: 0;
-  margin-left: 0;
-  margin-bottom: 0;
 }
 
 .tg-react-table-column-header {
@@ -268,6 +258,11 @@
   justify-content: center;
 }
 
+.tg-react-table-checkbox-header-container .pt-control,
+.tg-react-table-checkbox-cell-container .pt-control {
+  margin-bottom: 0;
+}
+
 .tg-compact-table .rt-tbody .rt-td {
   padding: 8px 8px;
   display: flex;
@@ -280,10 +275,6 @@
 
 .tg-compact-table .tg-react-table-checkbox-header-container {
   padding-top: 10px !important;
-}
-
-.tg-compact-table .tg-react-table-checkbox-cell-container {
-  padding-top: 7px !important;
 }
 
 .tg-compact-table .tg-react-table-name {

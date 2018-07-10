@@ -712,37 +712,32 @@ class ReactDataTable extends React.Component {
       }
     }
 
-    return (
-      <div>
-        {!isSingleSelect && (
-          <Checkbox
-            disabled={noSelect || noUserSelect}
-            /* eslint-disable react/jsx-no-bind */
-            onChange={() => {
-              const newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
-              entities.forEach((entity, i) => {
-                if (isEntityDisabled(entity)) return;
-                const entityId = getIdOrCodeOrIndex(entity, i);
-                if (checkboxProps.checked) {
-                  newIdMap[entityId] = false;
-                } else {
-                  newIdMap[entityId] = { entity };
-                }
-              });
+    return !isSingleSelect ? (
+      <Checkbox
+        disabled={noSelect || noUserSelect}
+        /* eslint-disable react/jsx-no-bind */
+        onChange={() => {
+          const newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
+          entities.forEach((entity, i) => {
+            if (isEntityDisabled(entity)) return;
+            const entityId = getIdOrCodeOrIndex(entity, i);
+            if (checkboxProps.checked) {
+              newIdMap[entityId] = false;
+            } else {
+              newIdMap[entityId] = { entity };
+            }
+          });
 
-              finalizeSelection({
-                idMap: newIdMap,
-                props: computePresets(this.props)
-              });
-              this.setState({ lastCheckedRow: undefined });
-            }}
-            /* eslint-enable react/jsx-no-bind */
-            {...checkboxProps}
-            className={"tg-react-table-checkbox-cell-inner"}
-          />
-        )}
-      </div>
-    );
+          finalizeSelection({
+            idMap: newIdMap,
+            props: computePresets(this.props)
+          });
+          this.setState({ lastCheckedRow: undefined });
+        }}
+        /* eslint-enable react/jsx-no-bind */
+        {...checkboxProps}
+      />
+    ) : null;
   };
 
   renderCheckboxCell = row => {
@@ -769,61 +764,58 @@ class ReactDataTable extends React.Component {
     }
     const entity = entities[rowIndex];
     return (
-      <div className={"tg-react-table-checkbox-cell"} style={{ width: 40 }}>
-        <Checkbox
-          disabled={noSelect || noUserSelect || isEntityDisabled(entity)}
-          /* eslint-disable react/jsx-no-bind*/
-          onChange={e => {
-            let newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
-            const isRowCurrentlyChecked = checkedRows.indexOf(rowIndex) > -1;
-            const entityId = getIdOrCodeOrIndex(entity, rowIndex);
-            if (isSingleSelect) {
-              newIdMap = {
-                [entityId]: {
-                  entity
-                }
-              };
-            } else if (e.shiftKey && rowIndex !== lastCheckedRow) {
-              const start = rowIndex;
-              const end = lastCheckedRow;
-              for (
-                let i = Math.min(start, end);
-                i < Math.max(start, end) + 1;
-                i++
-              ) {
-                const isLastCheckedRowCurrentlyChecked =
-                  checkedRows.indexOf(lastCheckedRow) > -1;
-                const tempEntity = entities[i];
-                const tempEntityId = getIdOrCodeOrIndex(tempEntity, i);
-                if (isLastCheckedRowCurrentlyChecked) {
-                  newIdMap[tempEntityId] = {
-                    entity: tempEntity
-                  };
-                } else {
-                  newIdMap[tempEntityId] = false;
-                }
+      <Checkbox
+        disabled={noSelect || noUserSelect || isEntityDisabled(entity)}
+        /* eslint-disable react/jsx-no-bind*/
+        onChange={e => {
+          let newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
+          const isRowCurrentlyChecked = checkedRows.indexOf(rowIndex) > -1;
+          const entityId = getIdOrCodeOrIndex(entity, rowIndex);
+          if (isSingleSelect) {
+            newIdMap = {
+              [entityId]: {
+                entity
               }
-            } else {
-              //no shift key
-              if (isRowCurrentlyChecked) {
-                newIdMap[entityId] = false;
+            };
+          } else if (e.shiftKey && rowIndex !== lastCheckedRow) {
+            const start = rowIndex;
+            const end = lastCheckedRow;
+            for (
+              let i = Math.min(start, end);
+              i < Math.max(start, end) + 1;
+              i++
+            ) {
+              const isLastCheckedRowCurrentlyChecked =
+                checkedRows.indexOf(lastCheckedRow) > -1;
+              const tempEntity = entities[i];
+              const tempEntityId = getIdOrCodeOrIndex(tempEntity, i);
+              if (isLastCheckedRowCurrentlyChecked) {
+                newIdMap[tempEntityId] = {
+                  entity: tempEntity
+                };
               } else {
-                newIdMap[entityId] = { entity };
+                newIdMap[tempEntityId] = false;
               }
             }
+          } else {
+            //no shift key
+            if (isRowCurrentlyChecked) {
+              newIdMap[entityId] = false;
+            } else {
+              newIdMap[entityId] = { entity };
+            }
+          }
 
-            finalizeSelection({
-              idMap: newIdMap,
-              props: computePresets(this.props)
-            });
-            this.setState({ lastCheckedRow: rowIndex });
-          }}
-          /* eslint-enable react/jsx-no-bind*/
+          finalizeSelection({
+            idMap: newIdMap,
+            props: computePresets(this.props)
+          });
+          this.setState({ lastCheckedRow: rowIndex });
+        }}
+        /* eslint-enable react/jsx-no-bind*/
 
-          className={"tg-react-table-checkbox-cell-inner"}
-          checked={isSelected}
-        />
-      </div>
+        checked={isSelected}
+      />
     );
   };
 
