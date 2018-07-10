@@ -60,7 +60,7 @@ class DataTableDemo extends React.Component {
     this.closeDialog = this.closeDialog.bind(this);
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     //tnr: the following code allows the DataTable test to set defaults on the demo (which is used in the testing)
     this.setState(this.props);
   }
@@ -84,7 +84,10 @@ class DataTableDemo extends React.Component {
 
     return (
       <ApolloProvider client={client} store={store}>
-        <div>
+        <div
+          className={this.state.darkMode ? "pt-dark" : ""}
+          style={{ background: this.state.darkMode ? "#293742" : undefined }}
+        >
           <Router>
             <div>
               <h3>Demo specific options:</h3>
@@ -98,6 +101,7 @@ class DataTableDemo extends React.Component {
                   " isInfinite to see something actually show up with it"
               )}
               {renderToggle(this, "inDialog", "Render the table in a dialog")}
+              {renderToggle(this, "darkMode", "Render the table in dark theme")}
               <h3>withTableParams options:</h3>
               <br />
               {renderToggle(
@@ -184,12 +188,16 @@ class DataTableInstance extends React.Component {
       isViewable: true,
       withSearch: true,
       withPaging: true,
+      expandAllByDefault: false,
+      withExpandAndCollapseAllButton: false,
+      selectAllByDefault: false,
       withFilter: true,
       withSort: true,
-      withSubComponent: false,
+      withSubComponent: true,
       noHeader: false,
       noFooter: false,
       noPadding: false,
+      noFullscreenButton: false,
       withDisplayOptions: true,
       isInfinite: false,
       isSingleSelect: false,
@@ -277,6 +285,7 @@ class DataTableInstance extends React.Component {
           ` This sets: 
         noHeader: true,
         noFooter: true,
+        noFullscreenButton: true,
         noPadding: true,
         hidePageSizeWhenPossible: true,
         isInfinite: true,
@@ -284,6 +293,9 @@ class DataTableInstance extends React.Component {
         withTitle: false,
         withSearch: false,
         withPaging: false,
+        withExpandAndCollapseAllButton: false,
+        expandAllByDefault: false,
+        selectAllByDefault: false,
         withFilter: false,
         isCopyable: false,
         by default, but they are all 
@@ -302,10 +314,14 @@ class DataTableInstance extends React.Component {
         )}
         {renderToggle(this, "withDisplayOptions")}
         {renderToggle(this, "withPaging")}
+        {renderToggle(this, "withExpandAndCollapseAllButton")}
+        {renderToggle(this, "expandAllByDefault")}
+        {renderToggle(this, "selectAllByDefault")}
         {renderToggle(this, "withFilter")}
         {renderToggle(this, "withSort")}
         {renderToggle(this, "noHeader")}
         {renderToggle(this, "noFooter")}
+        {renderToggle(this, "noFullscreenButton")}
         {renderToggle(this, "noPadding")}
         {renderToggle(this, "isInfinite")}
         {renderToggle(this, "isLoading")}
@@ -398,9 +414,13 @@ class DataTableInstance extends React.Component {
             noSelect={this.state.noSelect}
             isSimple={this.state.isSimple}
             withSearch={this.state.withSearch}
+            withExpandAndCollapseAllButton={this.state.withExpandAndCollapseAllButton}
+            expandAllByDefault={this.state.expandAllByDefault}
+            selectAllByDefault={this.state.selectAllByDefault}
             withPaging={this.state.withPaging}
             withFilter={this.state.withFilter}
             withSort={this.state.withSort}
+            noFullscreenButton={this.state.noFullscreenButton}
             noPadding={this.state.noPadding}
             noHeader={this.state.noHeader}
             noFooter={this.state.noFooter}
@@ -443,7 +463,7 @@ function SubComp(row) {
     <div style={{ margin: 10 }}>
       {" "}
       !!Row Index: {row.index}
-      <DataTable
+      {/* <DataTable
         formName={"something"}
         entities={[]}
         schema={{
@@ -453,7 +473,7 @@ function SubComp(row) {
             }
           ]
         }}
-      />
+      /> */}
     </div>
   );
 }

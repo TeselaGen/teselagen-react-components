@@ -23,7 +23,7 @@ export class PagingTool extends React.Component {
     selectedPage: 1
   };
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { paging: { page } } = nextProps;
     this.setState({
       selectedPage: page
@@ -100,7 +100,6 @@ export class PagingTool extends React.Component {
         <div className="pt-select pt-minimal">
           <select
             className="paging-page-size"
-            style={{ width: 55 }}
             onChange={this.setPageSize}
             disabled={disabled}
             value={pageSize}

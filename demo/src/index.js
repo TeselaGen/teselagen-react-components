@@ -6,6 +6,7 @@ import DataTableExample from "./examples/DataTable";
 import FormComponents from "./examples/FormComponents";
 import WithDialog from "./examples/WithDialog";
 import Toastr from "./examples/Toastr";
+import showConfirmationDialogDemo from "./examples/showConfirmationDialogDemo";
 import CustomIcons from "./examples/CustomIcons";
 import SimpleTable from "./examples/SimpleTable";
 import InfoHelper from "./examples/InfoHelper";
@@ -21,6 +22,7 @@ import * as customIcons from "../../src/customIcons";
 import createMenu from "../../src/utils/createMenu";
 import Tree from "./examples/Tree";
 import { bigTreeData, smallTreeData } from "./data/treeData";
+import showConfirmationDialog from "../../src/showConfirmationDialog";
 import "./style.css";
 import React from "react";
 import { render } from "react-dom";
@@ -285,6 +287,15 @@ const demos = {
   },
   toastr: {
     demo: Toastr,
+    url:
+      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/Toastr.js"
+  },
+  showConfirmationDialog: {
+    scope: {
+      showConfirmationDialog,
+      Intent
+    },
+    demo: showConfirmationDialogDemo,
     url:
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/Toastr.js"
   },

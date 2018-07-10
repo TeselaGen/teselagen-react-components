@@ -143,9 +143,22 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
         this.resetPostSelectSelection();
       };
 
+      handleOnChange = newValue => {
+        const {
+          input: { onChange = noop, value = [] },
+          isMultiSelect,
+          preserveValue
+        } = this.props;
+        let toSelect = newValue;
+        if (isMultiSelect && value.length && preserveValue) {
+          const newIds = newValue.map(r => r.id);
+          toSelect = value.filter(r => !newIds.includes(r.id)).concat(newValue);
+        }
+        onChange(toSelect);
+      };
+
       handleSelection = async records => {
         const {
-          input: { onChange = noop },
           additionalDataFragment,
           readableName,
           onSelect,
@@ -156,7 +169,7 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
         this.resetPostSelectSelection();
         if (!additionalDataFragment) {
           onSelect && onSelect(toSelect);
-          onChange(toSelect);
+          this.handleOnChange(toSelect);
           return;
         }
 
@@ -175,13 +188,13 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
             })(queryFilter);
             const toSelect = isMultiSelect ? records : records[0];
             onSelect && onSelect(toSelect);
-            onChange(toSelect);
+            this.handleOnChange(toSelect);
           } catch (error) {
             console.error("err:", error);
             window.toastr.error("Error fetching " + readableName);
           }
         } else if (!additionalDataFragment) {
-          onChange(toSelect);
+          this.handleOnChange(toSelect);
         } else {
           // this is necessary because sometimes we are relying on the field to have
           // the full data
@@ -196,7 +209,7 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
       render() {
         const { fetchingData, tempValue } = this.state;
         const {
-          input: { value, onChange = noop },
+          input: { value },
           meta: { error },
           readableName,
           noDialog,
@@ -290,7 +303,7 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
                       postSelectDTProps,
                       isMultiSelect,
                       resetSelection: this.resetPostSelectSelection,
-                      changeGenericSelectValue: onChange
+                      changeGenericSelectValue: this.handleOnChange
                     }}
                   />
                 )}

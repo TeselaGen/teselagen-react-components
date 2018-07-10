@@ -4,16 +4,15 @@ import { Alert, Intent } from "@blueprintjs/core";
 import ReactDOM from "react-dom";
 
 // usage
-// showConfirmationDialog({
+// const doAction = await showConfirmationDialog({
 //   text:
 //     "Are you sure you want to re-run this tool? Downstream tools with linked outputs will need to be re-run as well!",
-//   onConfirm: async () => {
-//     //confirm stuff
-//   },
-//   onCancel: () => {
-//     //cancel Stuff
-//   }
+//     intent: Intent.DANGER, //applied to the right most confirm button
+//     confirmButtonText: "Yep!",
+//     cancelButtonText: "Nope",
+//     canEscapeKeyCancel: true //this is false by default
 // });
+// console.log("doAction:", doAction);
 //returns a promise that resolves with true or false depending on if the user cancels or not!
 export default function showConfirmationDialog(opts) {
   return new Promise(resolve => {
@@ -57,7 +56,7 @@ class AlertWrapper extends Component {
 export function renderOnDoc(fn) {
   const elemDiv = document.createElement("div");
   elemDiv.style.cssText =
-    "position:absolute;width:100%;height:100%;top:0px;opacity:0.3;z-index:100;";
+    "position:absolute;width:100%;height:100%;top:0px;opacity:0.3;z-index:0;";
   document.body.appendChild(elemDiv);
   const handleClose = () => {
     setTimeout(() => {

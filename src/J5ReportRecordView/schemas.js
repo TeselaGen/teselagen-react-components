@@ -104,15 +104,13 @@ const schemas = {
   j5AssemblyPieces: {
     fields: [
       { path: "id", type: "string", displayName: "Piece ID" },
-      { path: "name", type: "string", displayName: "Name" },
       { path: "type", type: "string", displayName: "Source" },
       {
         path: "sequence.polynucleotideMaterialId",
         type: "boolean",
         displayName: "Is Linked"
       },
-      { path: "sequence.size", type: "number", displayName: "Length (bp)" },
-      { path: "bps", type: "string", displayName: "Sequence" }
+      { path: "sequence.size", type: "number", displayName: "Length (bp)" }
     ]
   },
   j5RunConstructs: {
@@ -184,10 +182,19 @@ const schemas = {
         displayName: "Reverse Complement",
         render: v => (v === 1 ? "False" : "True")
       },
-      { path: "sequencePart.start", type: "number", displayName: "Start (bp)" },
-      { path: "sequencePart.end", type: "number", displayName: "End (bp)" },
-      { path: "size", type: "number", displayName: "Length (bp)" },
-      { path: "bps", type: "string", displayName: "Sequence" }
+      {
+        path: "sequencePart.start",
+        type: "number",
+        displayName: "Start (bp)",
+        render: n => n + 1
+      },
+      {
+        path: "sequencePart.end",
+        type: "number",
+        displayName: "End (bp)",
+        render: n => n + 1
+      },
+      { path: "size", type: "number", displayName: "Length (bp)" }
     ]
   }
 };

@@ -46,6 +46,9 @@
   padding: 20px;
   position: relative;
   /* height: 100%;  tnr: this rule messes up  */
+  /* jpc: restoring rule for now to see if it still causes
+   * problems, and if so, what are those */
+  height: 100%;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -91,6 +94,26 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
+}
+
+.paging-page-size {
+  width: 62px;
+}
+
+.ReactTable.ReactTable .rt-tbody .rt-tr-group {
+  border: none;
+}
+
+.ReactTable.ReactTable .rt-tbody .rt-tr {
+  border-bottom: 1px solid rgb(233, 233, 233);
+}
+
+.pt-dark .ReactTable.ReactTable .rt-tbody .rt-tr {
+  border-bottom-color: rgba(16, 22, 26, 0.15);
+}
+
+.ReactTable.ReactTable .rt-tbody .rt-tr-group .-padRow {
+  display: none;
 }
 
 .pt-icon-standard.pt-disabled {
@@ -238,12 +261,11 @@
   transform: scale(1.2);
 }
 
-.tg-react-table-checkbox-header-container {
-  padding: 12px 0 0 8px !important;
-}
-
+.tg-react-table-checkbox-header-container,
 .tg-react-table-checkbox-cell-container {
-  padding: 11px 0 0 8px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tg-compact-table .rt-tbody .rt-td {
@@ -332,13 +354,14 @@
   color: #f5f8fa !important;
 }
 
-.pt-dark .ReactTable .rt-tbody .rt-tr-group {
-  border-bottom-color: rgba(16, 22, 26, 0.15) !important;
+.pt-dark .ReactTable .rt-tbody .rt-tr {
+  border-bottom-color: #293742 !important;
 }
 
 .pt-dark .ReactTable .rt-noData {
   background: #202b33 !important;
   color: inherit !important;
+  z-index: unset;
 }
 
 .pt-dark .ReactTable .-loading {

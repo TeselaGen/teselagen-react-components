@@ -27,10 +27,6 @@
   display: none;
 }
 
-.tg-form-component > * {
-  width: 100%;
-}
-
 .tg-dropzone {
   width: 100% !important;
   height: 100% !important;
@@ -79,6 +75,16 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.tg-upload-file-list-item-overflow {
+  overflow: auto;
+  height: 150px;
+}
+
+.tg-upload-file-list-counter {
+  position: absolute;
+  padding: 5px;
 }
 
 .tg-spin {
@@ -170,4 +176,8 @@
 
 .tg-tooltipError .pt-popover-wrapper {
   width: 100%;
+}
+
+.tg-no-fill-field {
+  display: table !important;
 }
