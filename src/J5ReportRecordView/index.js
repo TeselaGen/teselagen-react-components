@@ -29,6 +29,7 @@ import "./style.css";
 const sharedTableProps = {
   withSearch: false,
   maxHeight: 400,
+  showCount: true,
   withDisplayOptions: true,
   doNotShowEmptyRows: true,
   isLoading: false,
