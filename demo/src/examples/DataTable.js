@@ -416,8 +416,8 @@ class DataTableInstance extends React.Component {
             withSearch={this.state.withSearch}
             withExpandAndCollapseAllButton={this.state.withExpandAndCollapseAllButton}
             expandAllByDefault={this.state.expandAllByDefault}
-            withPaging={this.state.withPaging}
             selectAllByDefault={this.state.selectAllByDefault}
+            withPaging={this.state.withPaging}
             withFilter={this.state.withFilter}
             withSort={this.state.withSort}
             noFullscreenButton={this.state.noFullscreenButton}

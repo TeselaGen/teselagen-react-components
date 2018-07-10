@@ -855,6 +855,12 @@ class ReactDataTable extends React.Component {
                     <InfoHelper
                       content={showCollapseAll ? "Collapse All" : "Expand All"}
                       isButton
+                      popoverProps={{
+                        modifiers: {
+                          preventOverflow: { enabled: false },
+                          hide: { enabled: false }
+                        }
+                      }}
                       onClick={() => {
                         showCollapseAll
                           ? reduxFormExpandedEntityIdMap.input.onChange({})
