@@ -12,7 +12,7 @@ export default class InfoHelper extends Component {
       isPopover,
       isButton,
       size,
-      popoverProps={},
+      popoverProps = {},
       disabled,
       displayToSide,
       style,
@@ -21,6 +21,7 @@ export default class InfoHelper extends Component {
     const IconToUse = isButton ? Button : Icon;
     const IconInner = (
       <IconToUse
+        title="thomas"
         icon={icon}
         className={className}
         iconSize={size}

@@ -52,6 +52,7 @@ import withFields from "../enhancers/withFields";
 // import fieldOptionFragment from "./utils/fieldOptionFragment";
 import DisabledLoadingComponent from "./DisabledLoadingComponent";
 import convertSchema from "./utils/convertSchema";
+import InfoHelper from "../InfoHelper";
 import "../toastr";
 import "./style.css";
 import withTableParams from "./utils/withTableParams";
@@ -154,6 +155,16 @@ class ReactDataTable extends React.Component {
   };
 
   updateFromProps = (oldProps, newProps) => {
+    const {
+      selectedIds,
+      entities,
+      isEntityDisabled,
+      expandAllByDefault,
+      selectAllByDefault,
+      reduxFormSelectedEntityIdMap,
+      reduxFormExpandedEntityIdMap
+    } = newProps;
+
     //handle programatic filter adding
     if (!deepEqual(newProps.additionalFilters, oldProps.additionalFilters)) {
       newProps.addFilters(newProps.additionalFilters);
@@ -173,9 +184,36 @@ class ReactDataTable extends React.Component {
         : [];
       this.setState({ columns });
     }
+    //handle selecting all or expanding all
+    if (
+      (selectAllByDefault || expandAllByDefault) &&
+      !deepEqual(
+        newProps.entities.map(({ id }) => id),
+        oldProps.entities && oldProps.entities.map(({ id }) => id)
+      )
+    ) {
+      if (selectAllByDefault) {
+        reduxFormSelectedEntityIdMap.input.onChange({
+          ...entities.reduce((acc, e) => {
+            acc[e.id] = true;
+            return acc;
+          }, {}),
+          ...(reduxFormSelectedEntityIdMap.input.value || {})
+        });
+      }
+      if (expandAllByDefault) {
+        reduxFormExpandedEntityIdMap.input.onChange({
+          ...entities.reduce((acc, e) => {
+            acc[e.id] = true;
+            return acc;
+          }, {}),
+          ...(reduxFormExpandedEntityIdMap.input.value || {})
+        });
+      }
+    }
 
     // handle programmatic selection and scrolling
-    const { selectedIds, entities, isEntityDisabled } = newProps;
+
     const { selectedIds: oldSelectedIds } = oldProps;
     if (isEqual(selectedIds, oldSelectedIds)) return;
     const idArray = Array.isArray(selectedIds) ? selectedIds : [selectedIds];
@@ -541,18 +579,6 @@ class ReactDataTable extends React.Component {
             minHeight: 150,
             ...style
           }}
-          ExpanderComponent={({ isExpanded }) => {
-            return (
-              <Button
-                className={classNames(
-                  "tg-expander",
-                  Classes.MINIMAL,
-                  Classes.SMALL
-                )}
-                icon={isExpanded ? "chevron-down" : "chevron-right"}
-              />
-            );
-          }}
           SubComponent={SubComponent}
           {...ReactTableProps}
         />
@@ -698,7 +724,7 @@ class ReactDataTable extends React.Component {
                 if (isEntityDisabled(entity)) return;
                 const entityId = getIdOrCodeOrIndex(entity, i);
                 if (checkboxProps.checked) {
-                  delete newIdMap[entityId];
+                  newIdMap[entityId] = false;
                 } else {
                   newIdMap[entityId] = { entity };
                 }
@@ -774,13 +800,13 @@ class ReactDataTable extends React.Component {
                     entity: tempEntity
                   };
                 } else {
-                  delete newIdMap[tempEntityId];
+                  newIdMap[tempEntityId] = false;
                 }
               }
             } else {
               //no shift key
               if (isRowCurrentlyChecked) {
-                delete newIdMap[entityId];
+                newIdMap[entityId] = false;
               } else {
                 newIdMap[entityId] = { entity };
               }
@@ -802,34 +828,91 @@ class ReactDataTable extends React.Component {
   };
 
   renderColumns = () => {
-    const { cellRenderer, withCheckboxes, getCellHoverText } = computePresets(
-      this.props
-    );
+    const {
+      cellRenderer,
+      withCheckboxes,
+      SubComponent,
+      entities,
+      getCellHoverText,
+      withExpandAndCollapseAllButton,
+      reduxFormExpandedEntityIdMap
+    } = computePresets(this.props);
     const { columns } = this.state;
     if (!columns.length) {
       return columns;
     }
-    const columnsToRender = withCheckboxes
-      ? [
-          {
-            Header: this.renderCheckboxHeader,
-            Cell: this.renderCheckboxCell,
-            width: 35,
-            resizable: false,
-            getHeaderProps: () => {
-              return {
-                className: "tg-react-table-checkbox-header-container",
-                immovable: "true"
-              };
-            },
-            getProps: () => {
-              return {
-                className: "tg-react-table-checkbox-cell-container"
-              };
+    const columnsToRender = [
+      ...(SubComponent
+        ? [
+            {
+              ...(withExpandAndCollapseAllButton && {
+                Header: () => {
+                  const showCollapseAll =
+                    Object.values(
+                      reduxFormExpandedEntityIdMap.input.value
+                    ).filter(i => i).length === entities.length;
+                  return (
+                    <InfoHelper
+                      content={showCollapseAll ? "Collapse All" : "Expand All"}
+                      isButton
+                      onClick={() => {
+                        showCollapseAll
+                          ? reduxFormExpandedEntityIdMap.input.onChange({})
+                          : reduxFormExpandedEntityIdMap.input.onChange(
+                              entities.reduce((acc, e) => {
+                                acc[e.id] = true;
+                                return acc;
+                              }, {})
+                            );
+                      }}
+                      className={classNames(
+                        "tg-expander-all",
+                        Classes.MINIMAL,
+                        Classes.SMALL
+                      )}
+                      icon={showCollapseAll ? "chevron-down" : "chevron-right"}
+                    />
+                  );
+                }
+              }),
+              expander: true,
+              Expander: ({ isExpanded }) => {
+                return (
+                  <Button
+                    className={classNames(
+                      "tg-expander",
+                      Classes.MINIMAL,
+                      Classes.SMALL
+                    )}
+                    icon={isExpanded ? "chevron-down" : "chevron-right"}
+                  />
+                );
+              }
             }
-          }
-        ]
-      : [];
+          ]
+        : []),
+      ...(withCheckboxes
+        ? [
+            {
+              Header: this.renderCheckboxHeader,
+              Cell: this.renderCheckboxCell,
+              width: 35,
+              resizable: false,
+              getHeaderProps: () => {
+                return {
+                  className: "tg-react-table-checkbox-header-container",
+                  immovable: "true"
+                };
+              },
+              getProps: () => {
+                return {
+                  className: "tg-react-table-checkbox-cell-container"
+                };
+              }
+            }
+          ]
+        : [])
+    ];
     columns.forEach(column => {
       const tableColumn = {
         ...column,
@@ -1145,6 +1228,7 @@ const enhancer = compose(
     let resized;
     let updateTableDisplayDensity;
     let userSpecifiedCompact;
+
     if (isViewable) {
       schemaToUse.fields = [viewColumn, ...schemaToUse.fields];
     }
@@ -1273,7 +1357,7 @@ const enhancer = compose(
       moveColumnPersist
     };
   }),
-  reduxForm(), //the formName is passed via withTableParams and is often user overridden
+  reduxForm({}), //the formName is passed via withTableParams and is often user overridden
   withFields({
     names: [
       "localStorageForceUpdate",

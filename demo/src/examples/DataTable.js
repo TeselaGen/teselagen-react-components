@@ -190,7 +190,7 @@ class DataTableInstance extends React.Component {
       withPaging: true,
       withFilter: true,
       withSort: true,
-      withSubComponent: false,
+      withSubComponent: true,
       noHeader: false,
       noFooter: false,
       noPadding: false,
@@ -451,7 +451,7 @@ function SubComp(row) {
     <div style={{ margin: 10 }}>
       {" "}
       !!Row Index: {row.index}
-      <DataTable
+      {/* <DataTable
         formName={"something"}
         entities={[]}
         schema={{
@@ -461,7 +461,7 @@ function SubComp(row) {
             }
           ]
         }}
-      />
+      /> */}
     </div>
   );
 }

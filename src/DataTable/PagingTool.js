@@ -23,7 +23,7 @@ export class PagingTool extends React.Component {
     selectedPage: 1
   };
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { paging: { page } } = nextProps;
     this.setState({
       selectedPage: page
