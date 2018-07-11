@@ -129,10 +129,6 @@
   margin-right: 20px;
 }
 
-.tg-react-table-checkbox-header-cell {
-  padding-top: 0;
-}
-
 .tg-react-table-column-header {
   display: flex;
   align-items: center;
@@ -271,10 +267,6 @@
 
 .tg-compact-table .rt-tr-group {
   min-height: 25px !important;
-}
-
-.tg-compact-table .tg-react-table-checkbox-header-container {
-  padding-top: 10px !important;
 }
 
 .tg-compact-table .tg-react-table-name {
