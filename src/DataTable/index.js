@@ -1,23 +1,12 @@
 /* eslint react/jsx-no-bind: 0 */
 import deepEqual from "deep-equal";
-import { connect } from "react-redux";
-import { reduxForm } from "redux-form";
 import { compose } from "redux";
 import React from "react";
 import ReactDOM from "react-dom";
 import moment from "moment";
 import { arrayMove } from "react-sortable-hoc";
 import copy from "copy-to-clipboard";
-
-import {
-  camelCase,
-  get,
-  toArray,
-  startCase,
-  noop,
-  isEqual,
-  keyBy
-} from "lodash";
+import { camelCase, get, startCase, noop, isEqual } from "lodash";
 import {
   Button,
   Menu,
@@ -48,105 +37,24 @@ import DisplayOptions from "./DisplayOptions";
 // import tableConfigurationFragment from "./utils/tableConfigurationFragment";
 // import currentUserFragment from "./utils/currentUserFragment";
 // import withDelete from "../enhancers/withDelete";
-import withFields from "../enhancers/withFields";
 // import fieldOptionFragment from "./utils/fieldOptionFragment";
 import DisabledLoadingComponent from "./DisabledLoadingComponent";
-import convertSchema from "./utils/convertSchema";
 import InfoHelper from "../InfoHelper";
-import "../toastr";
-import "./style.css";
-import withTableParams from "./utils/withTableParams";
 import SortableColumns from "./SortableColumns";
 import { withProps, branch } from "recompose";
+import computePresets from "./utils/computePresets";
+import dataTableEnhancer from "./dataTableEnhancer";
+import defaultProps from "./defaultProps";
+import "../toastr";
+import "./style.css";
 
-//we use this to make adding preset prop groups simpler
-function computePresets(props) {
-  const { isSimple } = props;
-  let toReturn = { ...props };
-  if (isSimple) {
-    //isSimplePreset
-    toReturn = {
-      noHeader: true,
-      noFooter: true,
-      noPadding: true,
-      noFullscreenButton: true,
-      hidePageSizeWhenPossible: true,
-      isInfinite: true,
-      hideSelectedCount: true,
-      withTitle: false,
-      withSearch: false,
-      withPaging: false,
-      withFilter: false,
-      ...toReturn
-    };
-  } else {
-    toReturn = {
-      // the usual defaults:
-      noFooter: false,
-      noPadding: false,
-      noFullscreenButton: false,
-      hidePageSizeWhenPossible: false,
-      isInfinite: false,
-      hideSelectedCount: false,
-      withTitle: true,
-      withSearch: true,
-      withPaging: true,
-      withFilter: true,
-      ...toReturn
-    };
-  }
-  return toReturn;
-}
-
-class ReactDataTable extends React.Component {
+class DataTable extends React.Component {
   state = {
     columns: [],
     fullscreen: false
   };
 
-  static defaultProps = {
-    //NOTE: DO NOT SET DEFAULTS HERE FOR PROPS THAT GET COMPUTED AS PART OF PRESET GROUPS IN computePresets
-    entities: [],
-    noHeader: false,
-    pageSize: 10,
-    extraClasses: "",
-    className: "",
-    page: 1,
-    style: {},
-    isLoading: false,
-    isCopyable: true,
-    disabled: false,
-    noSelect: false,
-    noUserSelect: false,
-    maxHeight: 800,
-    isSimple: false,
-    reduxFormSearchInput: {},
-    reduxFormSelectedEntityIdMap: {},
-    reduxFormExpandedEntityIdMap: {},
-    isEntityDisabled: noop,
-    setSearchTerm: noop,
-    setFilter: noop,
-    showCount: false,
-    clearFilters: noop,
-    setPageSize: noop,
-    setOrder: noop,
-    setPage: noop,
-    contextMenu: noop,
-    onDoubleClick: noop,
-    onRowSelect: noop,
-    onRowClick: noop,
-    onMultiRowSelect: noop,
-    onSingleRowSelect: noop,
-    onDeselect: noop,
-    addFilters: noop,
-    removeSingleFilter: noop,
-    resizePersist: noop,
-    resized: [],
-    filters: [],
-    isSingleSelect: false,
-    withCheckboxes: false,
-    withSort: true
-  };
+  static defaultProps = defaultProps;
 
   toggleFullscreen = () => {
     this.setState({
@@ -1140,244 +1048,6 @@ class ReactDataTable extends React.Component {
   };
 }
 
-/**
- * @param {options} options
- * @typedef {object} options
- * @property {boolean} isPlural Are we searching for 1 thing or many?
- * @property {string} queryName What the props come back on ( by default = modelName + 'Query')
- */
-
-const enhancer = compose(
-  //connect to withTableParams here in the dataTable component so that, in the case that the table is not manually connected,
-  withTableParams({
-    isLocalCall: true
-  }),
-  // withDelete(tableConfigurationFragment, {
-  //   refetchQueries: ["tableConfigurationQuery"]
-  // }),
-  // withUpsert(tableConfigurationFragment, {
-  //   refetchQueries: ["tableConfigurationQuery"]
-  // }),
-  // withUpsert(fieldOptionFragment, {
-  //   refetchQueries: ["tableConfigurationQuery"]
-  // }),
-  // withQuery(currentUserFragment, {
-  //   argsOverride: ["", ""],
-  //   nameOverride: "currentUser",
-  //   queryName: "dataTableCurrentUserQuery",
-  //   options: props => {
-  //     const { withDisplayOptions, syncDisplayOptionsToDb } = props;
-  //     return {
-  //       skip: !syncDisplayOptionsToDb || !withDisplayOptions
-  //     };
-  //   }
-  // }),
-  // withQuery(tableConfigurationFragment, {
-  //   queryName: "tableConfigurationQuery",
-  //   isPlural: true,
-  //   options: props => {
-  //     const {
-  //       formName,
-  //       withDisplayOptions,
-  //       syncDisplayOptionsToDb,
-  //       currentUser
-  //     } = props;
-  //     const userId = get(currentUser, "user.id");
-  //     return {
-  //       skip: !syncDisplayOptionsToDb || !withDisplayOptions || !userId,
-  //       variables: {
-  //         filter: {
-  //           userId,
-  //           formName
-  //         }
-  //       }
-  //     };
-  //   }
-  // }),
-  connect((state, ownProps) => {
-    let propsToUse = ownProps;
-    if (!ownProps.isTableParamsConnected) {
-      //this is the case where we're hooking up to withTableParams locally, so we need to take the tableParams off the props
-      propsToUse = {
-        ...ownProps,
-        ...ownProps.tableParams
-      };
-    }
-
-    const {
-      schema,
-      withDisplayOptions,
-      syncDisplayOptionsToDb,
-      formName,
-      tableConfigurations,
-      deleteTableConfiguration,
-      upsertTableConfiguration,
-      upsertFieldOption,
-      currentUser,
-      isViewable
-    } = propsToUse;
-    let schemaToUse = convertSchema(schema);
-    let fieldOptsByPath = {};
-    let tableConfig = {};
-    let resetDefaultVisibility;
-    let updateColumnVisibility;
-    let moveColumnPersist;
-    let resizePersist;
-    let resized;
-    let updateTableDisplayDensity;
-    let userSpecifiedCompact;
-
-    if (isViewable) {
-      schemaToUse.fields = [viewColumn, ...schemaToUse.fields];
-    }
-    if (withDisplayOptions) {
-      if (syncDisplayOptionsToDb) {
-        tableConfig = tableConfigurations && tableConfigurations[0];
-      } else {
-        tableConfig = window.localStorage.getItem(formName);
-        tableConfig = tableConfig && JSON.parse(tableConfig);
-      }
-      if (!tableConfig) {
-        tableConfig = {
-          fieldOptions: []
-        };
-      }
-      userSpecifiedCompact = tableConfig.density === "compact";
-      const columnOrderings = tableConfig.columnOrderings;
-      fieldOptsByPath = keyBy(tableConfig.fieldOptions, "path");
-      schemaToUse = {
-        ...schemaToUse,
-        fields: schemaToUse.fields.map(field => {
-          const fieldOpt = fieldOptsByPath[field.path];
-          if (fieldOpt) {
-            return {
-              ...field,
-              isHidden: fieldOpt.isHidden
-            };
-          } else {
-            return field;
-          }
-        })
-      };
-
-      if (columnOrderings) {
-        schemaToUse.fields = schemaToUse.fields.sort(
-          ({ path: path1 }, { path: path2 }) => {
-            return (
-              columnOrderings.indexOf(path1) - columnOrderings.indexOf(path2)
-            );
-          }
-        );
-      }
-
-      if (syncDisplayOptionsToDb) {
-        //sync up to db
-        let tableConfigurationId;
-        resetDefaultVisibility = function() {
-          tableConfigurationId = tableConfig.id;
-
-          if (tableConfigurationId) {
-            deleteTableConfiguration(tableConfigurationId);
-          }
-        };
-        updateColumnVisibility = function({ shouldShow, path }) {
-          if (tableConfigurationId) {
-            // toArray({...stripFields(fieldOptsByPath, ['__typename']), [path]: {isHidden: !shouldShow, path, ...stripFields(fieldOptsByPath[path] || {}, ['__typename']) }  })
-            const existingFieldOpt = fieldOptsByPath[path] || {};
-            upsertFieldOption({
-              id: existingFieldOpt.id,
-              path,
-              isHidden: !shouldShow,
-              tableConfigurationId
-            });
-          } else {
-            upsertTableConfiguration({
-              userId: currentUser.user.id,
-              formName,
-              fieldOptions: [
-                {
-                  path,
-                  isHidden: !shouldShow
-                }
-              ]
-            });
-          }
-        };
-      } else {
-        //sync display options with localstorage
-        resetDefaultVisibility = function() {
-          window.localStorage.removeItem(formName);
-        };
-        updateColumnVisibility = function({ path, paths, shouldShow }) {
-          const newFieldOpts = {
-            ...fieldOptsByPath
-          };
-          let pathsToUse = paths ? paths : [path];
-          pathsToUse.forEach(path => {
-            newFieldOpts[path] = { path, isHidden: !shouldShow };
-          });
-          tableConfig.fieldOptions = toArray(newFieldOpts);
-          window.localStorage.setItem(formName, JSON.stringify(tableConfig));
-        };
-        updateTableDisplayDensity = function(density) {
-          tableConfig.density = density;
-          window.localStorage.setItem(formName, JSON.stringify(tableConfig));
-        };
-        moveColumnPersist = function({ oldIndex, newIndex }) {
-          //we might already have an array of the fields [path1, path2, ..etc]
-          const columnOrderings =
-            tableConfig.columnOrderings ||
-            schemaToUse.fields.map(({ path }) => path); // columnOrderings is [path1, path2, ..etc]
-
-          tableConfig.columnOrderings = arrayMove(
-            columnOrderings,
-            oldIndex,
-            newIndex
-          );
-          window.localStorage.setItem(formName, JSON.stringify(tableConfig));
-        };
-        resizePersist = function(newResized) {
-          tableConfig.resized = newResized;
-          window.localStorage.setItem(formName, JSON.stringify(tableConfig));
-        };
-      }
-    }
-    resized = tableConfig.resized;
-    return {
-      ...propsToUse,
-      schema: schemaToUse,
-      resized,
-      resetDefaultVisibility,
-      updateColumnVisibility,
-      updateTableDisplayDensity,
-      userSpecifiedCompact,
-      resizePersist,
-      moveColumnPersist
-    };
-  }),
-  reduxForm({}), //the formName is passed via withTableParams and is often user overridden
-  withFields({
-    names: [
-      "localStorageForceUpdate",
-      "reduxFormQueryParams",
-      "reduxFormSearchInput",
-      "reduxFormSelectedEntityIdMap",
-      "reduxFormExpandedEntityIdMap"
-    ]
-  })
-);
-
-export default enhancer(ReactDataTable);
-
-const ConnectedPagingTool = enhancer(PagingTool);
+export default dataTableEnhancer(DataTable);
+const ConnectedPagingTool = dataTableEnhancer(PagingTool);
 export { ConnectedPagingTool };
-
-const viewColumn = {
-  width: 35,
-  noEllipsis: true,
-  immovable: true,
-  type: "action",
-  render: () => {
-    return <Icon className="dt-eyeIcon" icon="eye-open" />;
-  }
-};
