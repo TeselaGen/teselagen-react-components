@@ -345,10 +345,6 @@
   color: #f5f8fa !important;
 }
 
-.pt-dark .ReactTable .rt-tbody .rt-tr {
-  border-bottom-color: #293742 !important;
-}
-
 .pt-dark .ReactTable .rt-noData {
   background: #202b33 !important;
   color: inherit !important;
