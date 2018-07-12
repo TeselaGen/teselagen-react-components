@@ -147,7 +147,7 @@ class AbstractInput extends React.Component {
     return (
       <div
         className={classNames(
-          Classes.FORM_G,
+          Classes.FORM_GROUP,
           getIntentClass(this.props),
           className,
           {
