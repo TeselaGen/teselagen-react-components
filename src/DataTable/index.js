@@ -292,7 +292,10 @@ class DataTable extends React.Component {
       isViewable,
       entities,
       children,
-      currentParams
+      currentParams,
+      hasOptionForForcedHidden,
+      showForcedHiddenColumns,
+      setShowForcedHidden
     } = computePresets(this.props);
     let updateColumnVisibilityToUse = updateColumnVisibility;
     let updateTableDisplayDensityToUse = updateTableDisplayDensity;
@@ -522,6 +525,9 @@ class DataTable extends React.Component {
                   updateColumnVisibility={updateColumnVisibilityToUse}
                   updateTableDisplayDensity={updateTableDisplayDensityToUse}
                   userSpecifiedCompact={userSpecifiedCompact}
+                  showForcedHiddenColumns={showForcedHiddenColumns}
+                  setShowForcedHidden={setShowForcedHidden}
+                  hasOptionForForcedHidden={hasOptionForForcedHidden}
                   formName={formName}
                   schema={schema}
                 />
@@ -721,7 +727,6 @@ class DataTable extends React.Component {
           this.setState({ lastCheckedRow: rowIndex });
         }}
         /* eslint-enable react/jsx-no-bind*/
-
         checked={isSelected}
       />
     );

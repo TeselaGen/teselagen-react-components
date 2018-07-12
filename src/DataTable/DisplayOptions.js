@@ -8,7 +8,8 @@ import {
   MenuItem,
   Classes,
   InputGroup,
-  Popover
+  Popover,
+  Switch
 } from "@blueprintjs/core";
 
 export default class DisplayOptions extends React.Component {
@@ -35,6 +36,8 @@ export default class DisplayOptions extends React.Component {
     this.closePopover();
   };
 
+  toggleForcedHidden = e => this.props.setShowForcedHidden(e.target.checked);
+
   render() {
     const { isOpen, searchTerms } = this.state;
     const {
@@ -42,11 +45,14 @@ export default class DisplayOptions extends React.Component {
       updateColumnVisibility = noop,
       resetDefaultVisibility = noop,
       userSpecifiedCompact,
-      disabled
+      disabled,
+      hasOptionForForcedHidden,
+      showForcedHiddenColumns
     } = this.props;
     const { fields } = schema;
     const fieldGroups = {};
     const mainFields = [];
+
     fields.forEach(field => {
       if (!field.fieldGroup) return mainFields.push(field);
       if (!fieldGroups[field.fieldGroup]) fieldGroups[field.fieldGroup] = [];
@@ -56,8 +62,9 @@ export default class DisplayOptions extends React.Component {
     let numVisible = 0;
 
     const getFieldCheckbox = (field, i) => {
-      const { displayName, isHidden, path } = field;
+      const { displayName, isHidden, isForcedHidden, path } = field;
       if (!isHidden) numVisible++;
+      if (isForcedHidden) return;
       return (
         <Checkbox
           key={path || i}
@@ -79,7 +86,13 @@ export default class DisplayOptions extends React.Component {
     if (!isEmpty(fieldGroups)) {
       fieldGroupMenu = map(fieldGroups, (groupFields, groupName) => {
         const searchTerm = searchTerms[groupName] || "";
-        const anyVisible = groupFields.some(field => !field.isHidden);
+        const anyVisible = groupFields.some(
+          field => !field.isHidden && !field.isForcedHidden
+        );
+        const anyNotForcedHidden = groupFields.some(
+          field => !field.isForcedHidden
+        );
+        if (!anyNotForcedHidden) return;
         return (
           <MenuItem key={groupName} text={groupName}>
             <InputGroup
@@ -144,6 +157,15 @@ export default class DisplayOptions extends React.Component {
               </h5>
               {mainFields.map(getFieldCheckbox)}
               {fieldGroupMenu}
+              {hasOptionForForcedHidden && (
+                <div style={{ marginTop: 15 }}>
+                  <Switch
+                    label="Show Empty Columns"
+                    checked={showForcedHiddenColumns}
+                    onChange={this.toggleForcedHidden}
+                  />
+                </div>
+              )}
               <div
                 style={{
                   width: "100%",

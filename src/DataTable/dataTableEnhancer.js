@@ -8,9 +8,9 @@ import withTableParams from "../DataTable/utils/withTableParams";
 import { reduxForm } from "redux-form";
 import { compose } from "redux";
 import { arrayMove } from "react-sortable-hoc";
-import { toArray, keyBy } from "lodash";
+import { toArray, keyBy, get } from "lodash";
 import withFields from "../enhancers/withFields";
-import { withProps } from "recompose";
+import { withProps, withState } from "recompose";
 import pureNoFunc from "../utils/pureNoFunc";
 import convertSchema from "../DataTable/utils/convertSchema";
 import viewColumn from "../DataTable/viewColumn";
@@ -20,6 +20,7 @@ export default compose(
   withTableParams({
     isLocalCall: true
   }),
+  withState("showForcedHiddenColumns", "setShowForcedHidden", false),
   pureNoFunc,
   // withDelete(tableConfigurationFragment, {
   //   refetchQueries: ["tableConfigurationQuery"]
@@ -83,7 +84,12 @@ export default compose(
       upsertTableConfiguration,
       upsertFieldOption,
       currentUser,
-      isViewable
+      isViewable,
+      entities = [],
+      cellRenderer = {},
+      showForcedHiddenColumns,
+      isSimple,
+      isInfinite
     } = propsToUse;
     let schemaToUse = convertSchema(schema);
     let fieldOptsByPath = {};
@@ -99,6 +105,8 @@ export default compose(
     if (isViewable) {
       schemaToUse.fields = [viewColumn, ...schemaToUse.fields];
     }
+    let hasOptionForForcedHidden =
+      withDisplayOptions && (isSimple || isInfinite);
     if (withDisplayOptions) {
       if (syncDisplayOptionsToDb) {
         tableConfig = tableConfigurations && tableConfigurations[0];
@@ -118,7 +126,25 @@ export default compose(
         ...schemaToUse,
         fields: schemaToUse.fields.map(field => {
           const fieldOpt = fieldOptsByPath[field.path];
-          if (fieldOpt) {
+          let noValsForField = false;
+          // only add this hidden column ability if no paging
+          if (!showForcedHiddenColumns && hasOptionForForcedHidden) {
+            noValsForField = entities.every(e => {
+              const val = get(e, field.path);
+              return field.render
+                ? !field.render(val, e)
+                : cellRenderer[field.path]
+                  ? !cellRenderer[field.path](val, e)
+                  : !val;
+            });
+          }
+          if (noValsForField) {
+            return {
+              ...field,
+              isHidden: true,
+              isForcedHidden: true
+            };
+          } else if (fieldOpt) {
             return {
               ...field,
               isHidden: fieldOpt.isHidden
@@ -221,7 +247,8 @@ export default compose(
       updateTableDisplayDensity,
       userSpecifiedCompact,
       resizePersist,
-      moveColumnPersist
+      moveColumnPersist,
+      hasOptionForForcedHidden
     };
   }),
   reduxForm({}), //the formName is passed via withTableParams and is often user overridden
