@@ -18,7 +18,7 @@
     "clean": "nwb clean-module && npm clean-demo",
     "start": "nwb serve-react-demo --port 3333",
     "precommit": "lint-staged",
-    "prepublish": "in-publish && npm run build || not-in-publish",
+    "prepare": "in-publish && npm run build || not-in-publish",
     "postpublish": "yarn deploy",
     "predeploy": "yarn buildWithDemo",
     "deploy": "gh-pages -d demo/dist",

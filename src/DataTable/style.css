@@ -241,22 +241,25 @@
   transform: scale(1.2);
 }
 
-.tg-react-table-checkbox-header-container,
-.tg-react-table-checkbox-cell-container {
+.tg-compact-table .rt-tbody .rt-td {
+  padding: 8px 8px;
+  display: flex;
+  align-items: center;
+}
+
+.ReactTable .rt-thead .rt-th.tg-react-table-checkbox-header-container,
+.ReactTable .rt-tbody .rt-td.tg-react-table-checkbox-cell-container {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
 }
 
 .tg-react-table-checkbox-header-container .pt-control,
 .tg-react-table-checkbox-cell-container .pt-control {
   margin-bottom: 0;
-}
-
-.tg-compact-table .rt-tbody .rt-td {
-  padding: 8px 8px;
-  display: flex;
-  align-items: center;
+  /* there is a weird padding on the blueprint checkbox, so this centers it some */
+  padding-left: 18px;
 }
 
 .tg-compact-table .rt-tr-group {
