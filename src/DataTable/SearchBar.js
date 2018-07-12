@@ -1,5 +1,6 @@
 import React from "react";
 import { InputGroup, Button, Classes } from "@blueprintjs/core";
+import classNames from "classnames";
 import { onEnterHelper } from "../utils/handlerHelpers";
 
 const SearchBar = ({
@@ -11,7 +12,7 @@ const SearchBar = ({
   return (
     <InputGroup
       disabled={disabled}
-      className={"pt-round datatable-search-input"}
+      className={classNames(Classes.ROUND, "datatable-search-input")}
       placeholder="Search..."
       {...reduxFormSearchInput.input}
       {...onEnterHelper(e => {

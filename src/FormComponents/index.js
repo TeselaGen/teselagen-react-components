@@ -20,7 +20,8 @@ import {
   EditableText,
   Tooltip,
   Position,
-  Switch
+  Switch,
+  Classes
 } from "@blueprintjs/core";
 
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
@@ -30,7 +31,9 @@ function getIntent({ showErrorIfUntouched, meta: { touched, error } }) {
 }
 
 function getIntentClass({ showErrorIfUntouched, meta: { touched, error } }) {
-  return (touched || showErrorIfUntouched) && error ? "pt-intent-danger" : "";
+  return (touched || showErrorIfUntouched) && error
+    ? Classes.INTENT_DANGER
+    : "";
 }
 
 function removeUnwantedProps(props) {
@@ -130,12 +133,12 @@ class AbstractInput extends React.Component {
     );
 
     const secondaryLabelComp = secondaryLabel ? (
-      <span className="pt-text-muted">{secondaryLabel}</span>
+      <span className={Classes.TEXT_MUTED}>{secondaryLabel}</span>
     ) : null;
 
     const labelComp = label &&
       !noOuterLabel && (
-        <label className="pt-label">
+        <label className={Classes.LABEL}>
           {label}
           {secondaryLabelComp}
         </label>
@@ -144,7 +147,7 @@ class AbstractInput extends React.Component {
     return (
       <div
         className={classNames(
-          "pt-form-group",
+          Classes.FORM_G,
           getIntentClass(this.props),
           className,
           {
@@ -159,7 +162,12 @@ class AbstractInput extends React.Component {
           {componentToWrap}
           {!tooltipError &&
             showError && (
-              <div className={"tg-field-error-holder pt-form-helper-text"}>
+              <div
+                className={classNames(
+                  Classes.FORM_HELPER_TEXT,
+                  "tg-field-error-holder"
+                )}
+              >
                 {error}
               </div>
             )}
@@ -293,8 +301,12 @@ export const renderBlueprintTextarea = props => {
   return (
     <textarea
       {...removeUnwantedProps(rest)}
-      className={`${intentClass || ""} ${inputClassName ||
-        ""} pt-input pt-fill`}
+      className={classNames(
+        intentClass,
+        inputClassName,
+        Classes.INPUT,
+        Classes.FILL
+      )}
       {...input}
       onBlur={function(e, val) {
         if (rest.readOnly) return;
@@ -412,7 +424,7 @@ export const renderSelect = props => {
     ...rest
   } = props;
   return (
-    <div className={"pt-select pt-fill " + (className || "")}>
+    <div className={classNames(Classes.SELECT, Classes.FILL, className)}>
       <select
         {...removeUnwantedProps(rest)}
         value={
@@ -502,7 +514,7 @@ export const renderBlueprintNumericInput = props => {
       intent={intent}
       {...removeUnwantedProps(rest)}
       {...(hideValue ? { value: "" } : {})}
-      className={`pt-fill ${inputClassName || ""}`}
+      className={classNames(Classes.FILL, inputClassName)}
       onValueChange={(numericVal, stringVal) => {
         // needed for redux form to change value
         input.onChange(stringVal);

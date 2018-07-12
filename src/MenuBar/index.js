@@ -12,8 +12,8 @@ export default class MenuBar extends React.Component {
   state = { isOpen: false, openIndex: null };
 
   handleInteraction = index => newOpenState => {
-    if (!newOpenState && index !== this.state.openIndex)  {
-      return //return early because the "close" is being fired by another popover 
+    if (!newOpenState && index !== this.state.openIndex) {
+      return; //return early because the "close" is being fired by another popover
     }
     this.setState({
       isOpen: newOpenState,
@@ -38,9 +38,12 @@ export default class MenuBar extends React.Component {
           const button = (
             <Button
               key={i}
-              className="pt-minimal menu-bar-item"
+              minimal
+              className="menu-bar-item"
               onClick={topLevelItem.onClick}
-              onMouseOver={topLevelItem.submenu ? this.handleMouseOver(i) : noop}
+              onMouseOver={
+                topLevelItem.submenu ? this.handleMouseOver(i) : noop
+              }
             >
               {topLevelItem.text}
             </Button>
@@ -50,7 +53,7 @@ export default class MenuBar extends React.Component {
           ) : (
             <Popover
               key={i}
-              className="pt-minimal"
+              minimal
               portalClassName="menu-bar-popover"
               position={Position.BOTTOM_LEFT}
               isOpen={isOpen && i === openIndex}
@@ -62,7 +65,7 @@ export default class MenuBar extends React.Component {
               }}
               inline
             >
-              {button} 
+              {button}
             </Popover>
           );
         })}
@@ -72,6 +75,4 @@ export default class MenuBar extends React.Component {
   }
 }
 
-function noop() {
-    
-}
+function noop() {}

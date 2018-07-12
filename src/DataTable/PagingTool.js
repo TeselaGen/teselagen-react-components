@@ -1,9 +1,10 @@
 //@flow
 import React from "react";
 import { withProps, withHandlers, compose } from "recompose";
+import classNames from "classnames";
 import type { Paging } from "../flow_types";
 import { noop, get } from "lodash";
-import { Button } from "@blueprintjs/core";
+import { Button, Classes } from "@blueprintjs/core";
 import { pageSizes } from "./utils/queryParams";
 import { onEnterOrBlurHelper } from "../utils/handlerHelpers";
 
@@ -24,7 +25,9 @@ export class PagingTool extends React.Component {
   };
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    const { paging: { page } } = nextProps;
+    const {
+      paging: { page }
+    } = nextProps;
     this.setState({
       selectedPage: page
     });
@@ -44,12 +47,16 @@ export class PagingTool extends React.Component {
   };
 
   pageBack = () => {
-    const { paging: { page } } = this.props;
+    const {
+      paging: { page }
+    } = this.props;
     this.setPage(parseInt(page, 10) - 1);
   };
 
   pageForward = () => {
-    const { paging: { page } } = this.props;
+    const {
+      paging: { page }
+    } = this.props;
     this.setPage(parseInt(page, 10) + 1);
   };
 
@@ -60,13 +67,17 @@ export class PagingTool extends React.Component {
   };
 
   pageInputBlur = e => {
-    const { paging: { pageSize, total } } = this.props;
+    const {
+      paging: { pageSize, total }
+    } = this.props;
     const lastPage = Math.ceil(total / pageSize);
     const pageValue = parseInt(e.target.value, 10);
     const selectedPage =
       pageValue > lastPage
         ? lastPage
-        : pageValue < 1 || isNaN(pageValue) ? 1 : pageValue;
+        : pageValue < 1 || isNaN(pageValue)
+          ? 1
+          : pageValue;
 
     this.setState({
       selectedPage
@@ -91,13 +102,13 @@ export class PagingTool extends React.Component {
       <div className={"paging-toolbar-container"}>
         {onRefresh && (
           <Button
-            className={"pt-minimal"}
+            minimal
             icon="refresh"
             disabled={disabled}
             onClick={this.onRefresh}
           />
         )}
-        <div className="pt-select pt-minimal">
+        <div className={classNames(Classes.SELECT, Classes.MINIMAL)}>
           <select
             className="paging-page-size"
             onChange={this.setPageSize}
@@ -118,15 +129,13 @@ export class PagingTool extends React.Component {
             ]}
           </select>
         </div>
-        <div style={{}} className="pt-button-group">
-          <Button
-            style={{}}
-            onClick={this.pageBack}
-            disabled={!backEnabled || disabled}
-            className="pt-minimal paging-arrow-left"
-            icon="chevron-left"
-          />
-        </div>
+        <Button
+          onClick={this.pageBack}
+          disabled={!backEnabled || disabled}
+          minimal
+          className="paging-arrow-left"
+          icon="chevron-left"
+        />
         <div>
           {total ? (
             <div>
@@ -136,7 +145,7 @@ export class PagingTool extends React.Component {
                 disabled={disabled}
                 onChange={this.setSelectedPage}
                 {...onEnterOrBlurHelper(this.pageInputBlur)}
-                className="pt-input"
+                className={Classes.INPUT}
               />
               of {lastPage}
             </div>
@@ -144,15 +153,14 @@ export class PagingTool extends React.Component {
             "No Rows"
           )}
         </div>
-        <div className="pt-button-group">
-          <Button
-            style={{ marginLeft: 5 }}
-            disabled={!forwardEnabled || disabled}
-            icon="chevron-right"
-            className="pt-minimal  paging-arrow-right"
-            onClick={this.pageForward}
-          />
-        </div>
+        <Button
+          style={{ marginLeft: 5 }}
+          disabled={!forwardEnabled || disabled}
+          icon="chevron-right"
+          minimal
+          className="paging-arrow-right"
+          onClick={this.pageForward}
+        />
       </div>
     );
   }

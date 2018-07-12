@@ -1,7 +1,8 @@
 //@flow
-import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
+import { DateInput, DateRangeInput, Classes } from "@blueprintjs/datetime";
 import moment from "moment";
 import { camelCase } from "lodash";
+import classNames from "classnames";
 import getMomentFormatter from "../utils/getMomentFormatter";
 
 // import {DateRangeInputField, DateInputField} from '../FormComponents';
@@ -25,6 +26,7 @@ import {
 } from "@blueprintjs/core";
 
 import "./style.css";
+import DialogFooter from "../DialogFooter";
 export default class FilterAndSortMenu extends React.Component {
   constructor(props) {
     super(props);
@@ -67,7 +69,7 @@ export default class FilterAndSortMenu extends React.Component {
       }
     ]);
   };
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     if (this.props.currentFilter) {
       this.setState({
         ...this.props.currentFilter
@@ -120,9 +122,9 @@ export default class FilterAndSortMenu extends React.Component {
             onClick={() => {
               removeSingleFilter(currentFilter.filterOn);
             }}
-            className="pt-popover-dismiss custom-menu-item"
+            className={classNames(Classes.POPOVER_DISMISS, "custom-menu-item")}
           >
-            <Button className={"pt-intent-danger pt-icon-remove"}>
+            <Button intent={Intent.DANGER} icon="remove">
               Clear Filter
             </Button>
           </div>
@@ -130,7 +132,7 @@ export default class FilterAndSortMenu extends React.Component {
           ""
         )}
         <div className={"custom-menu-item"}>
-          <div className="pt-select pt-fill">
+          <div className={classNames(Classes.SELECT, Classes.FILL)}>
             <select
               onChange={function(e) {
                 const ccSelectedFilter = camelCase(e.target.value);
@@ -159,19 +161,14 @@ export default class FilterAndSortMenu extends React.Component {
           />
         </div>
         <MenuDivider />
-        <div className="pt-dialog-footer">
-          <div className="pt-dialog-footer-actions">
-            <Button className={"pt-popover-dismiss pt-minimal"} text="Cancel" />
-            <Button
-              className={"pt-popover-dismiss"}
-              intent={Intent.SUCCESS}
-              onClick={() => {
-                handleFilterSubmit();
-              }}
-              text="Ok"
-            />
-          </div>
-        </div>
+        <DialogFooter
+          secondaryClassName={Classes.POPOVER_DISMISS}
+          onClick={() => {
+            handleFilterSubmit();
+          }}
+          intent={Intent.SUCCESS}
+          text="OK"
+        />
       </Menu>
     );
   }

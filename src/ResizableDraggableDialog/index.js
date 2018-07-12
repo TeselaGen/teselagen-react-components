@@ -1,7 +1,7 @@
 import Rnd from "react-rnd";
 import React from "react";
+import { Dialog, Classes } from "@blueprintjs/core";
 import "./style.css";
-import { Dialog } from "@blueprintjs/core";
 
 export default function ResizableDraggableDialog({
   width: defaultDialogWidth = 400,
@@ -34,7 +34,7 @@ export default function ResizableDraggableDialog({
           width: Math.min(defaultDialogWidth, windowWidth),
           height: Math.min(defaultDialogHeight, windowHeight)
         }}
-        dragHandleClassName={"pt-dialog-header"}
+        dragHandleClassName={Classes.DIALOG_HEADER}
         {...RndProps}
       >
         <Dialog hasBackdrop={false} usePortal={false} {...rest} />

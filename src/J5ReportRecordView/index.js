@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 // import EditViewHOC from '../../EditViewHOC'
 import { reduxForm } from "redux-form";
-import { Button, Dialog } from "@blueprintjs/core";
+import { Button, Dialog, Classes } from "@blueprintjs/core";
 import {
   each,
   get,
@@ -296,7 +296,7 @@ class J5ReportRecordView extends Component {
     });
   }
 
-  componentWillReceiveProps = nextProps => {
+  UNSAFE_componentWillReceiveProps = nextProps => {
     const j5InputSequences = get(nextProps, "data.j5Report.j5InputSequences");
     const oldJ5InputSequences = get(
       this.props,
@@ -307,7 +307,7 @@ class J5ReportRecordView extends Component {
     }
   };
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.createPartCidMap(this.props);
   }
 
@@ -361,7 +361,7 @@ class J5ReportRecordView extends Component {
       <span className="j5-report-fieldname">Parameter Preset:</span>{" "}
       {assemblyType}
     </div> */}
-        <div className="pt-button-group" style={{ marginTop: 10 }}>
+        <div className={Classes.BUTTON_GROUP} style={{ marginTop: 10 }}>
           {this.renderDownloadButton()}
           {additionalHeaderItems}
           {LinkJ5TableDialog && (
@@ -511,7 +511,7 @@ class J5ReportRecordView extends Component {
           )}
 
           {/*<div className="tg-card">
-          <div className="pt-button-group">
+          <div className={Classes.BUTTON_GROUP}>
             <Button>Show DNA Assembly Parameters</Button>
             <Button>Export as CSV</Button>
             <Button>Export as JSON</Button>
@@ -680,7 +680,7 @@ class J5ReportRecordView extends Component {
               }
               entities={entitiesForAllTables.j5OligoSyntheses}
             />
-            <div className="pt-button-group" style={{ marginTop: 10 }}>
+            <div className={Classes.BUTTON_GROUP} style={{ marginTop: 10 }}>
               {this.renderDownloadOligoButton()}
             </div>
           </CollapsibleCard>

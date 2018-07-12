@@ -166,17 +166,11 @@
 }
 
 .tg-sort-arrow-container > * {
-  display: none !important;
-  font-size: 10px !important;
+  display: none;
 }
 
 .tg-sort-arrow-container > *:hover {
   background: rgba(167, 182, 194, 0.3);
-}
-
-.tg-active-sort {
-  color: #106ba3;
-  display: inherit !important;
 }
 
 .tg-filter-menu-button {

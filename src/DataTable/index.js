@@ -18,7 +18,9 @@ import {
   ContextMenu,
   Checkbox,
   Icon,
-  Popover
+  Popover,
+  Intent,
+  Callout
 } from "@blueprintjs/core";
 import classNames from "classnames";
 import scrollIntoView from "dom-scroll-into-view";
@@ -408,9 +410,9 @@ class DataTable extends React.Component {
               {children}
             </div>
             {errorParsingUrlString && (
-              <span className={"pt-icon-error pt-intent-warning"}>
+              <Callout icon="error" intent={Intent.WARNING}>
                 Error parsing URL
-              </span>
+              </Callout>
             )}
             {filtersOnNonDisplayedFields.length
               ? filtersOnNonDisplayedFields.map(
@@ -420,7 +422,7 @@ class DataTable extends React.Component {
                         key={displayName || startCase(path)}
                         className={"tg-filter-on-non-displayed-field"}
                       >
-                        <span className={"pt-icon-filter"} />
+                        <Icon icon="filter" />
                         <span>
                           {" "}
                           {displayName || startCase(path)} {selectedFilter}{" "}
@@ -990,23 +992,29 @@ class DataTable extends React.Component {
     const sortComponent =
       withSort && !disableSorting && !isActionColumn ? (
         <div className={"tg-sort-arrow-container"}>
-          <span
-            title={"Sort Z-A (Hold shift to sort multiple columns)"}
+          <Icon
+            title="Sort Z-A (Hold shift to sort multiple columns)"
+            icon="chevron-up"
+            color={sortUp ? "#106ba3" : ""}
+            style={{
+              display: sortUp ? "inherit" : undefined
+            }}
+            iconSize={12}
             onClick={e => {
               setOrder("-" + ccDisplayName, sortUp, e.shiftKey);
             }}
-            className={classNames("pt-icon-standard", "pt-icon-chevron-up", {
-              "tg-active-sort": sortUp
-            })}
           />
-          <span
+          <Icon
             title={"Sort A-Z (Hold shift to sort multiple columns)"}
+            icon="chevron-down"
+            color={sortDown ? "#106ba3" : ""}
+            iconSize={12}
+            style={{
+              display: sortDown ? "inherit" : undefined
+            }}
             onClick={e => {
               setOrder(ccDisplayName, sortDown, e.shiftKey);
             }}
-            className={classNames("pt-icon-standard", "pt-icon-chevron-down", {
-              "tg-active-sort": sortDown
-            })}
           />
         </div>
       ) : null;

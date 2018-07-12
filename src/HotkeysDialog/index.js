@@ -1,13 +1,22 @@
 import React from "react";
-import { Dialog, Tab, Tabs, KeyCombo/*, Tooltip*/ } from "@blueprintjs/core";
+import {
+  Dialog,
+  Tab,
+  Tabs,
+  KeyCombo,
+  Classes /*, Tooltip*/
+} from "@blueprintjs/core";
 // import { startCase } from "lodash";
-import { getHotkeyProps/*, hotkeysById, comboToLabel*/ } from "../utils/hotkeyUtils";
+import {
+  getHotkeyProps /*, hotkeysById, comboToLabel*/
+} from "../utils/hotkeyUtils";
+import classNames from "classnames";
 
 import "./style.css";
 
 export default function HotkeysDialog(props) {
   if (!props.hotkeySets) {
-    console.error('Missing hotkeySets in HotkeysDialog')
+    console.error("Missing hotkeySets in HotkeysDialog");
     return null;
   }
   const sections = Object.keys(props.hotkeySets);
@@ -26,7 +35,13 @@ export default function HotkeysDialog(props) {
             title={name}
             panel={
               <div className="tg-table-wrapper">
-                <table className="pt-table pt-striped pt-bordered">
+                <table
+                  className={classNames(
+                    Classes.HTML_TABLE,
+                    Classes.HTML_TABLE_STRIPED,
+                    Classes.HTML_TABLE_BORDERED
+                  )}
+                >
                   <thead>
                     <tr>
                       <th>Action</th>
@@ -35,7 +50,10 @@ export default function HotkeysDialog(props) {
                   </thead>
                   <tbody>
                     {Object.keys(props.hotkeySets[name]).map(id => {
-                      const def = getHotkeyProps(props.hotkeySets[name][id], id);
+                      const def = getHotkeyProps(
+                        props.hotkeySets[name][id],
+                        id
+                      );
                       return (
                         <tr key={id}>
                           <td>{def.label}</td>

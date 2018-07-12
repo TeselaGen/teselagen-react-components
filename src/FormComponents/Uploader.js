@@ -205,7 +205,7 @@ export default props => {
             }
             className={"tg-upload-inner"}
           >
-            {innerIcon || <span className={"pt-icon-upload pt-icon-large"} />}
+            {innerIcon || <Icon icon="upload" iconSize={30} />}
             {innerText || "Click or drag to upload"}
           </div>
         )}
@@ -259,10 +259,10 @@ export default props => {
                     </a>
                   </div>
                   {!loading && (
-                    <span
-                      style={{ fontSize: "13px" }}
-                      className={"tg-upload-file-list-item-close pt-icon-cross"}
-                      /* eslint-disable react/jsx-no-bind*/
+                    <Icon
+                      iconSize={13}
+                      icon="cross"
+                      className="tg-upload-file-list-item-close"
                       onClick={() => {
                         onRemove(file, index, fileList);
                         onChange(
@@ -271,7 +271,6 @@ export default props => {
                           })
                         );
                       }}
-                      /* eslint-enable react/jsx-no-bind*/
                     />
                   )}
                 </div>

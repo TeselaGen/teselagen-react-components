@@ -19,12 +19,13 @@ function DialogFooter({
   noCancel
 }) {
   return (
-    <div className="pt-dialog-footer">
-      <div className="pt-dialog-footer-actions">
+    <div className={Classes.DIALOG_FOOTER}>
+      <div className={Classes.DIALOG_FOOTER_ACTIONS}>
         {!noCancel && (
           <Button
             intent={secondaryIntent}
-            className={Classes.MINIMAL + " " + secondaryClassName}
+            minimal
+            className={secondaryClassName}
             text={secondaryText}
             onClick={secondaryAction || hideModal}
           />

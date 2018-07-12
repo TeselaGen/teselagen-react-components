@@ -139,15 +139,15 @@ export default class DisplayOptions extends React.Component {
           <Menu>
             <div style={{ padding: 10, paddingLeft: 20, paddingRight: 20 }}>
               <h5 style={{ marginBottom: 10 }}>Display Density:</h5>
-              <div className="pt-select">
+              <div className={Classes.SELECT}>
                 <select
                   onChange={this.changeTableDensity}
                   value={userSpecifiedCompact ? "compact" : "normal"}
                 >
-                  <option className="pt-popover-dismiss" value="normal">
+                  <option className={Classes.POPOVER_DISMISS} value="normal">
                     Normal
                   </option>
-                  <option className="pt-popover-dismiss" value="compact">
+                  <option className={Classes.POPOVER_DISMISS} value="compact">
                     Compact
                   </option>
                 </select>
@@ -176,7 +176,7 @@ export default class DisplayOptions extends React.Component {
                 <Button
                   onClick={resetDefaultVisibility}
                   title={"Display Options"}
-                  className={"pt-minimal"}
+                  minimal
                 >
                   Reset
                 </Button>
@@ -188,7 +188,7 @@ export default class DisplayOptions extends React.Component {
         <Button
           onClick={this.openPopover}
           disabled={disabled}
-          className={"pt-minimal"}
+          minimal
           icon={"cog"}
         />
       </Popover>

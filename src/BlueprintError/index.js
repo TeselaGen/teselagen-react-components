@@ -1,10 +1,14 @@
 import React from "react";
+import { Classes } from "@blueprintjs/core";
+import classNames from "classnames";
 
 export default function BlueprintError({ error }) {
   if (!error) return null;
   return (
-    <div className="pt-form-group pt-intent-danger">
-      <div className="pt-form-helper-text preserve-newline">{error}</div>
+    <div className={classNames(Classes.FORM_GROUP, Classes.INTENT_DANGER)}>
+      <div className={classNames(Classes.FORM_HELPER_TEXT, "preserve-newline")}>
+        {error}
+      </div>
     </div>
   );
 }

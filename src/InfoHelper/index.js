@@ -1,6 +1,6 @@
 //@flow
 import React, { Component } from "react";
-import { Popover, Button, Tooltip, Icon } from "@blueprintjs/core";
+import { Popover, Button, Tooltip, Icon, Classes } from "@blueprintjs/core";
 
 export default class InfoHelper extends Component {
   render() {
@@ -43,11 +43,12 @@ export default class InfoHelper extends Component {
       toReturn = (
         <Popover
           disabled={disabled}
-          popoverClassName="pt-dark"
+          popoverClassName={Classes.DARK}
           target={
             <Button
               style={{ borderRadius: 15, borderWidth: 5 }}
-              className={"pt-minimal " + (className || "")}
+              minimal
+              className={className}
               icon={icon}
             />
           }

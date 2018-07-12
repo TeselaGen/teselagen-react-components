@@ -19,10 +19,6 @@
   font-size: 16px;
 }
 
-.tg-upload-inner .pt-icon-upload {
-  font-size: 30px;
-}
-
 .tg-hide-drop-target .ant-upload.ant-upload-drag {
   display: none;
 }

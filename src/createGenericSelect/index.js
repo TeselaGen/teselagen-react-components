@@ -278,7 +278,7 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
                       content={"Clear " + readableName}
                     >
                       <Button
-                        className={"pt-minimal"}
+                        minimal
                         style={{ marginLeft: 4 }}
                         intent={Intent.DANGER}
                         disabled={buttonProps.disabled}
