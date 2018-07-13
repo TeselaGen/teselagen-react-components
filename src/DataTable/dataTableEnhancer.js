@@ -10,7 +10,7 @@ import { compose } from "redux";
 import { arrayMove } from "react-sortable-hoc";
 import { toArray, keyBy, get } from "lodash";
 import withFields from "../enhancers/withFields";
-import { withProps, withState } from "recompose";
+import { withProps, withState, branch } from "recompose";
 import pureNoFunc from "../utils/pureNoFunc";
 import convertSchema from "../DataTable/utils/convertSchema";
 import viewColumn from "../DataTable/viewColumn";
@@ -21,7 +21,7 @@ export default compose(
     isLocalCall: true
   }),
   withState("showForcedHiddenColumns", "setShowForcedHidden", false),
-  pureNoFunc,
+  branch(props => props.withPureRender, pureNoFunc),
   // withDelete(tableConfigurationFragment, {
   //   refetchQueries: ["tableConfigurationQuery"]
   // }),
