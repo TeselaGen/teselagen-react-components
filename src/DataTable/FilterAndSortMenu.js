@@ -1,13 +1,9 @@
 //@flow
-import { DateInput, DateRangeInput, Classes } from "@blueprintjs/datetime";
+import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
 import moment from "moment";
 import { camelCase } from "lodash";
 import classNames from "classnames";
 import getMomentFormatter from "../utils/getMomentFormatter";
-
-// import {DateRangeInputField, DateInputField} from '../FormComponents';
-
-import "../toastr";
 import { onEnterOrBlurHelper } from "../utils/handlerHelpers";
 import React from "react";
 import type {
@@ -16,17 +12,18 @@ import type {
   // QueryParams,
   // Paging,
 } from "../flow_types";
-
 import {
   Button,
   Menu,
   Intent,
   MenuDivider,
-  InputGroup
+  InputGroup,
+  Classes
 } from "@blueprintjs/core";
-
-import "./style.css";
 import DialogFooter from "../DialogFooter";
+import "./style.css";
+import "../toastr";
+
 export default class FilterAndSortMenu extends React.Component {
   constructor(props) {
     super(props);

@@ -166,7 +166,7 @@
 }
 
 .tg-sort-arrow-container > * {
-  display: none;
+  display: none !important;
 }
 
 .tg-sort-arrow-container > *:hover {
