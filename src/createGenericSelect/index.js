@@ -210,7 +210,7 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
         const { fetchingData, tempValue } = this.state;
         const {
           input: { value },
-          meta: { error },
+          meta: { error, touched },
           readableName,
           noDialog,
           postSelectFormName,
@@ -243,7 +243,7 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
         return noDialog ? (
           <div onClick={preventBubble}>
             <GenericSelectInner {...propsToPass} />
-            <div>{error && <BlueprintError error={error} />}</div>
+            <div>{touched && error && <BlueprintError error={error} />}</div>
           </div>
         ) : (
           <div>
@@ -308,7 +308,7 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
                   />
                 )}
             </div>
-            <div>{error && <BlueprintError error={error} />}</div>
+            <div>{touched && error && <BlueprintError error={error} />}</div>
           </div>
         );
       }
@@ -429,11 +429,11 @@ const PostSelectTable = branch(
         isMultiSelect,
         changeGenericSelectValue,
         entities,
-        genericSelectValue = [],
+        genericSelectValue,
         onSelect = noop
       } = this.props;
       const hasValue = isMultiSelect
-        ? genericSelectValue.length
+        ? genericSelectValue && genericSelectValue.length
         : genericSelectValue;
       const prevEntitiesEqual =
         prevProps && isEqual(prevProps.entities, entities);
