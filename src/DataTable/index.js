@@ -104,8 +104,8 @@ class DataTable extends React.Component {
     ) {
       if (selectAllByDefault) {
         reduxFormSelectedEntityIdMap.input.onChange({
-          ...entities.reduce((acc, e) => {
-            acc[e.id] = true;
+          ...entities.reduce((acc, entity) => {
+            acc[entity.id] = { entity };
             return acc;
           }, {}),
           ...(reduxFormSelectedEntityIdMap.input.value || {})
@@ -638,7 +638,7 @@ class DataTable extends React.Component {
             if (isEntityDisabled(entity)) return;
             const entityId = getIdOrCodeOrIndex(entity, i);
             if (checkboxProps.checked) {
-              newIdMap[entityId] = false;
+              delete newIdMap[entityId];
             } else {
               newIdMap[entityId] = { entity };
             }
@@ -710,13 +710,13 @@ class DataTable extends React.Component {
                   entity: tempEntity
                 };
               } else {
-                newIdMap[tempEntityId] = false;
+                delete newIdMap[tempEntityId];
               }
             }
           } else {
             //no shift key
             if (isRowCurrentlyChecked) {
-              newIdMap[entityId] = false;
+              delete newIdMap[entityId];
             } else {
               newIdMap[entityId] = { entity };
             }
