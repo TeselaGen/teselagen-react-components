@@ -10,6 +10,12 @@ const getOptions = function(input, callback) {
 };
 
 class FormComponentsDemo extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      inlineLabels: false
+    };
+  }
   render() {
     const { defaultSelectValue } = this.state || {};
     const { handleSubmit } = this.props;
@@ -19,6 +25,21 @@ class FormComponentsDemo extends React.Component {
           <h3 className="form-component-title">
             Blueprint Redux Form Components
           </h3>
+          
+################################################################################################
+          <h4>Options</h4>
+          <Switch
+            checked={this.state.inlineLabels}
+            label="Toggle Inline Labels"
+            onChange={() => {
+              this.setState({ inlineLabels: !this.state.inlineLabels });
+            }}
+          >
+          <br/>
+          <br/>
+################################################################################################
+            {" "}
+          </Switch>
           <Uploader
             action={"docs.google.com/upload"}
             fileList={[
@@ -31,6 +52,7 @@ class FormComponentsDemo extends React.Component {
           />
           <RadioGroupField
             name={"radioGroup"}
+            inlineLabel={this.state.inlineLabels}
             label={"Radio Group Input"}
             defaultValue={"true"}
             onFieldSubmit={function(val) {
@@ -50,6 +72,7 @@ class FormComponentsDemo extends React.Component {
           <NumericInputField
             secondaryLabel="(optional)"
             name={"numericInput"}
+            inlineLabel={this.state.inlineLabels}
             label="Numeric Input"
             placeholder="0"
             onFieldSubmit={function(val) {
@@ -66,18 +89,11 @@ class FormComponentsDemo extends React.Component {
             }}
             action={"//jsonplaceholder.typicode.com/posts/"}
             name={"uploadfield"}
-          />
-          <InputField
-            name={"inputField"}
-            label="Input with inline label"
-            inlineLabel
-            placeholder="Enter input..."
-            onFieldSubmit={function(val) {
-              console.info("on field submit!:", val);
-            }}
+            inlineLabel={this.state.inlineLabels}
           />
           <InputField
             name={"inputFieldWithDefaultValue"}
+            inlineLabel={this.state.inlineLabels}
             label="Input With Default"
             defaultValue={"Default Value Here!"}
             placeholder="Enter input..."
@@ -87,6 +103,7 @@ class FormComponentsDemo extends React.Component {
           />
           <InputField
             name={"inputFieldWithTooltipError"}
+            inlineLabel={this.state.inlineLabels}
             tooltipError
             tooltipProps={{
               position: Position.TOP
@@ -103,12 +120,13 @@ class FormComponentsDemo extends React.Component {
             }}
             options={["hey", "you", "guys"]}
             name={"selectField"}
+            inlineLabel={this.state.inlineLabels}
             label="Select Simple"
           />
           <InputField
             name={"inlineinputFieldWithTooltipError"}
+            inlineLabel={this.state.inlineLabels}
             tooltipError
-            inlineLabel
             tooltipProps={{
               position: Position.TOP
             }}
@@ -122,9 +140,9 @@ class FormComponentsDemo extends React.Component {
             onFieldSubmit={function(val) {
               console.info("on field submit!:", val);
             }}
-            inlineLabel
             options={["hey", "you", "guys"]}
             name={"inlineselectField"}
+            inlineLabel={this.state.inlineLabels}
             label="Select Simple with inlineLabel = true"
           />
           {"<BPSelect onChange value /> component (not redux form connected):"}
@@ -136,18 +154,21 @@ class FormComponentsDemo extends React.Component {
             inlineLabel
             options={["hey", "you", "guys"]}
             name={"inlineselectField"}
+            inlineLabel={this.state.inlineLabels}
             label="Select Simple with inlineLabel = true"
           />
-          {"<BPSelect onChange value /> component with className pt-minimal passed (not redux form connected):"}
+          {
+            "<BPSelect onChange value /> component with className pt-minimal passed (not redux form connected):"
+          }
           <BPSelect
             onChange={function(val) {
               console.info("on field submit!:", val);
             }}
             className="pt-minimal"
             value="hey"
-            inlineLabel
             options={["hey", "you", "guys"]}
             name={"inlineselectField"}
+            inlineLabel={this.state.inlineLabels}
             label="Select Simple with inlineLabel = true"
           />
           <SelectField
@@ -156,6 +177,7 @@ class FormComponentsDemo extends React.Component {
             }}
             options={[1, 2, 4]}
             name={"selectFieldWithNumbers"}
+            inlineLabel={this.state.inlineLabels}
             label="Select Simple with number values passed in simplified options obj"
           />
           <SelectField
@@ -164,6 +186,7 @@ class FormComponentsDemo extends React.Component {
             }}
             options={["hey", "you", "guys"]}
             name={"selectFieldWithDefaultValue"}
+            inlineLabel={this.state.inlineLabels}
             defaultValue={"you"}
             label="Select Simple with defaultValue"
           />
@@ -173,6 +196,7 @@ class FormComponentsDemo extends React.Component {
             }}
             options={["hey", "you", "guys"]}
             name={"selectFieldWithPlaceholderAndInitiallyUnsetDefault"}
+            inlineLabel={this.state.inlineLabels}
             defaultValue={defaultSelectValue}
             placeholder="I'm just hanging out"
             label="Select Simple with initially unset defaultValue and a placeholder"
@@ -186,6 +210,7 @@ class FormComponentsDemo extends React.Component {
           <SelectField
             options={["hey", "you", "guys"]}
             name={"selectFieldWithPlaceholder"}
+            inlineLabel={this.state.inlineLabels}
             onFieldSubmit={function(val) {
               console.info("on field submit!:", val);
             }}
@@ -195,6 +220,7 @@ class FormComponentsDemo extends React.Component {
           <SelectField
             options={["hey", "you", "guys"]}
             name={"selectFieldWithUntouchedErrors"}
+            inlineLabel={this.state.inlineLabels}
             onFieldSubmit={function(val) {
               console.info("on field submit!:", val);
             }}
@@ -219,10 +245,12 @@ class FormComponentsDemo extends React.Component {
               { label: "guys", value: { tree: "chart" } }
             ]}
             name={"selectFieldWithLabelAndValue"}
+            inlineLabel={this.state.inlineLabels}
             label="Select with name and value, supporting json values"
           />
           <DateInputField
             name={"dateInputField"}
+            inlineLabel={this.state.inlineLabels}
             label="Date Input"
             onFieldSubmit={function(val) {
               console.info("on field submit!:", val);
@@ -235,6 +263,7 @@ class FormComponentsDemo extends React.Component {
           />
           <DateRangeInputField
             name={"dateRangeInputField"}
+            inlineLabel={this.state.inlineLabels}
             label="Date Range Input"
             onFieldSubmit={function(val) {
               console.info("on field submit!:", val);
@@ -250,6 +279,7 @@ class FormComponentsDemo extends React.Component {
             }}
             defaultValue
             name={"checkboxField"}
+            inlineLabel={this.state.inlineLabels}
             label="Checkbox"
           />
           <SwitchField
@@ -258,10 +288,12 @@ class FormComponentsDemo extends React.Component {
             }}
             defaultValue
             name={"switchField"}
+            inlineLabel={this.state.inlineLabels}
             label="I'm a SwitchField"
           />
           <TextareaField
             name={"textAreaField"}
+            inlineLabel={this.state.inlineLabels}
             onFieldSubmit={function(val) {
               console.info("on field submit!:", val);
             }}
@@ -270,6 +302,7 @@ class FormComponentsDemo extends React.Component {
           />
           <EditableTextField
             name={"editableTextField"}
+            inlineLabel={this.state.inlineLabels}
             onFieldSubmit={function(val) {
               console.info("on field submit!:", val);
             }}
@@ -278,6 +311,7 @@ class FormComponentsDemo extends React.Component {
           />
           <ReactSelectField
             name="reactSelectField"
+            inlineLabel={this.state.inlineLabels}
             label="Collaborators"
             onFieldSubmit={function(val) {
               console.info("on field submit!:", val);
@@ -298,6 +332,7 @@ class FormComponentsDemo extends React.Component {
           />
           <ReactSelectField
             name="reactSelectFieldMulti"
+            inlineLabel={this.state.inlineLabels}
             label="Collaborators Multi"
             onFieldSubmit={function(val) {
               console.info("on field submit!:", val);
@@ -320,6 +355,7 @@ class FormComponentsDemo extends React.Component {
           <ReactSelectField
             async
             name="reactSelectFieldMultiAsync"
+            inlineLabel={this.state.inlineLabels}
             label="React Select AsyncCollaborators"
             multi
             onFieldSubmit={function(val) {

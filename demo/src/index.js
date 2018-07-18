@@ -41,7 +41,8 @@ import {
   FocusStyleManager,
   Position,
   Intent,
-  KeyCombo
+  KeyCombo,
+  Switch
 } from "@blueprintjs/core";
 import renderToggle from "./renderToggle";
 import Chance from "chance";
@@ -271,6 +272,7 @@ const demos = {
       Intent,
       Provider,
       store,
+      Switch,
       reduxForm,
       Uploader
     },

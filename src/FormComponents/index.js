@@ -158,7 +158,7 @@ class AbstractInput extends React.Component {
         )}
       >
         {labelComp}
-        <div>
+        <div style={{width: "100%"}}>
           {componentToWrap}
           {!tooltipError &&
             showError && (
