@@ -168,6 +168,7 @@
 .tg-inlineLabel .pt-label {
   flex-shrink: 6;
   padding-right: 10px;
+  min-width: 150px;
 }
 
 .tg-tooltipError .pt-popover-wrapper {
