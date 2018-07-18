@@ -206,3 +206,8 @@ export const keyboardIcon = ptIconWrapper(
   />,
   510
 );
+
+export const cardDetailsIcon = ptIconWrapper(
+  <path d="M0 1v15h16v-15h-16zM5 15h-4v-2h4v2zM5 12h-4v-2h4v2zM5 9h-4v-2h4v2zM5 6h-4v-2h4v2zM10 15h-4v-2h4v2zM10 12h-4v-2h4v2zM10 9h-4v-2h4v2zM10 6h-4v-2h4v2zM15 15h-4v-2h4v2zM15 12h-4v-2h4v2zM15 9h-4v-2h4v2zM15 6h-4v-2h4v2z" />,
+  16
+);

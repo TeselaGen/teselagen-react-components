@@ -21,6 +21,7 @@ function CustomIconsDemo() {
       <Button icon={customIcons.designIcon} text="designIcon" />
       <Button icon={customIcons.moleculeIcon} text="moleculeIcon" />
       <Button icon={customIcons.keyboardIcon} text="keyboardIcon" />
+      <Button icon={customIcons.cardDetailsIcon} text="cardDetailsIcon" />
     </div>
   );
 }
