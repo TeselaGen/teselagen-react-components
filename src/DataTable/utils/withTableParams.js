@@ -14,6 +14,7 @@ import { withRouter } from "react-router-dom";
 import { branch } from "recompose";
 
 import convertSchema from "./convertSchema";
+import { getRecordsFromIdMap } from "./withSelectedEntities";
 
 /**
  *  Note all these options can be passed at Design Time or at Runtime (like reduxForm())
@@ -101,12 +102,10 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         ? getCurrentParamsFromUrl(history.location) //important to use history location and not ownProps.location because for some reason the location path lags one render behind!!
         : formSelector(state, "reduxFormQueryParams")) || {};
 
-    let selectedEntities;
-    if (withSelectedEntities) {
-      const selectedEntityIdMap =
-        formSelector(state, "reduxFormSelectedEntityIdMap") || {};
-      selectedEntities = map(selectedEntityIdMap, ({ entity }) => entity);
-    }
+    const selectedEntities = withSelectedEntities
+      ? getRecordsFromIdMap(state, formName)
+      : undefined;
+
     const additionalFilterToUse =
       typeof additionalFilter === "function"
         ? additionalFilter.bind(this, ownProps)
@@ -127,11 +126,10 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       // randomVarToForceLocalStorageUpdate: formSelector(state, "localStorageForceUpdate"),
       currentParams,
       selectedEntities,
-      ...(withSelectedEntities && typeof withSelectedEntities === "string"
-        ? {
-            [withSelectedEntities]: selectedEntities
-          }
-        : {}),
+      ...(withSelectedEntities &&
+        typeof withSelectedEntities === "string" && {
+          [withSelectedEntities]: selectedEntities
+        }),
       initialValues: {
         ...initialValues,
         reduxFormSearchInput: currentParams.searchTerm

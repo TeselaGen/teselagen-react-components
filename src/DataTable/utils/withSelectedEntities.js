@@ -1,10 +1,10 @@
 //@flow
 
 import { formValueSelector } from "redux-form";
-import { map } from "lodash";
+import { reduce } from "lodash";
 import { connect } from "react-redux";
 /**
- * 
+ *
  * @param {*string} formName
  * @param {*string} formName
  * @param {*string} formName
@@ -20,13 +20,10 @@ export default function withSelectedEntities(...formNames) {
     //NEW WAY
     return connect(state => {
       return formNames.reduce((acc, formName) => {
-        const selectedEntityIdMap = formValueSelector(formName)(
+        acc[formName + "SelectedEntities"] = getRecordsFromIdMap(
           state,
-          "reduxFormSelectedEntityIdMap" || {}
+          formName
         );
-        acc[formName + "SelectedEntities"] = map(selectedEntityIdMap, item => {
-          return item.entity;
-        });
         return acc;
       }, {});
     });
@@ -38,16 +35,24 @@ export default function withSelectedEntities(...formNames) {
         "Please pass a {formName} option when using withSelectedEntities"
       );
     }
-    const selector = formValueSelector(formName);
-
     return connect(state => {
-      const selectedEntityIdMap =
-        selector(state, "reduxFormSelectedEntityIdMap") || {};
       return {
-        [name || "selectedEntities"]: map(selectedEntityIdMap, item => {
-          return item.entity;
-        })
+        [name || "selectedEntities"]: getRecordsFromIdMap(state, formName)
       };
     });
   }
+}
+
+export function getRecordsFromIdMap(state, formName) {
+  const selector = formValueSelector(formName);
+  const selectedEntityIdMap =
+    selector(state, "reduxFormSelectedEntityIdMap") || {};
+  return reduce(
+    selectedEntityIdMap,
+    (acc, item) => {
+      if (item && item.entity) acc.push(item.entity);
+      return acc;
+    },
+    []
+  );
 }

@@ -638,7 +638,7 @@ class DataTable extends React.Component {
             if (isEntityDisabled(entity)) return;
             const entityId = getIdOrCodeOrIndex(entity, i);
             if (checkboxProps.checked) {
-              delete newIdMap[entityId];
+              newIdMap[entityId] = false;
             } else {
               newIdMap[entityId] = { entity };
             }
@@ -710,13 +710,13 @@ class DataTable extends React.Component {
                   entity: tempEntity
                 };
               } else {
-                delete newIdMap[tempEntityId];
+                newIdMap[tempEntityId] = false
               }
             }
           } else {
             //no shift key
             if (isRowCurrentlyChecked) {
-              delete newIdMap[entityId];
+              newIdMap[entityId] = false
             } else {
               newIdMap[entityId] = { entity };
             }
