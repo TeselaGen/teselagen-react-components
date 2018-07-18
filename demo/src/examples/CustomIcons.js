@@ -20,6 +20,7 @@ function CustomIconsDemo() {
       <Button icon={customIcons.strainIcon} text="strainIcon" />
       <Button icon={customIcons.designIcon} text="designIcon" />
       <Button icon={customIcons.moleculeIcon} text="moleculeIcon" />
+      <Button icon={customIcons.keyboardIcon} text="keyboardIcon" />
     </div>
   );
 }
