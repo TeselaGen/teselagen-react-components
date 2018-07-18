@@ -152,13 +152,17 @@ class AbstractInput extends React.Component {
           className,
           {
             "tg-inlineLabel": inlineLabel,
-            "tg-tooltipError": tooltipError,
-            "tg-no-fill-field": noFillField
+            "tg-tooltipError": tooltipError
           }
         )}
       >
         {labelComp}
-        <div style={{width: "100%"}}>
+        <div
+          style={{ width: "100%" }}
+          className={classNames({
+            "tg-no-fill-field": noFillField
+          })}
+        >
           {componentToWrap}
           {!tooltipError &&
             showError && (
