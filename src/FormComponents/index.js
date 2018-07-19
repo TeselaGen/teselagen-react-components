@@ -40,6 +40,7 @@ function removeUnwantedProps(props) {
   let cleanedProps = { ...props };
   delete cleanedProps.className;
   delete cleanedProps.units;
+  delete cleanedProps.inlineLabel;
   delete cleanedProps.showErrorIfUntouched;
   delete cleanedProps.onChange;
   delete cleanedProps.onFieldSubmit;
