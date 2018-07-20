@@ -33,17 +33,22 @@ class FormComponentsDemo extends React.Component {
                 "do something with the finished file list:",
                 fileList
               );
+
+              this.setState({fileList})
             }}
             S3Params={S3Params}
             name={"uploadfield"}
           />
           <Button
+            disabled={!(this.state.fileList && this.state.fileList.length )}
             onClick={() => {
-              S3Download(
-                Object.assign(S3Params, { file: "folder/demo_file.csv" })
-              )
-                .then(blob => magicDownload(blob, "example.csv"))
-                .catch(error => console.log("file doesn't exist in server"));
+              this.state.fileList.map(({info={}}) => {
+                S3Download(
+                  Object.assign(S3Params, { file: "folder/" + info.fileName })
+                )
+                  .then(blob => magicDownload(blob, "example.csv"))
+                  .catch(error => console.log("file doesn't exist in server"));
+              })
             }}
             text="Download file from S3"
           />
