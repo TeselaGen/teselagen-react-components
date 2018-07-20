@@ -28,7 +28,7 @@ class FormComponentsDemo extends React.Component {
           </h3>
           <FileUploadField
             label="Upload component"
-            onFieldSubmit={function(fileList) {
+            onFieldSubmit={fileList=>{
               console.info(
                 "do something with the finished file list:",
                 fileList
@@ -40,15 +40,23 @@ class FormComponentsDemo extends React.Component {
             name={"uploadfield"}
           />
           <Button
-            disabled={!(this.state.fileList && this.state.fileList.length )}
+            disabled={!(this.state && this.state.fileList && this.state.fileList.length )}
             onClick={() => {
-              this.state.fileList.map(({info={}}) => {
-                S3Download(
-                  Object.assign(S3Params, { file: "folder/" + info.fileName })
-                )
-                  .then(blob => magicDownload(blob, "example.csv"))
-                  .catch(error => console.log("file doesn't exist in server"));
-              })
+              this.state.fileList.map(
+                ({ originalFileName,info = {} }) => {
+                    S3Download(Object.assign(S3Params, {
+                      file: info.fileKey
+                    }))
+                    .then(blob =>
+                      magicDownload(blob, originalFileName)
+                    )
+                    .catch(error =>
+                      console.log(
+                        "file doesn't exist in server"
+                      )
+                    );
+                }
+              );
             }}
             text="Download file from S3"
           />

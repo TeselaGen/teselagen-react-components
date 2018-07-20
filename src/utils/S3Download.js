@@ -8,7 +8,13 @@ const S3Download = request => {
     request.file +
     "?bucket=" +
     (request.bucket || "");
-  return axios.get(url).then(res => res.data);
+  return axios.get(url).then(res => {
+    console.log("Supposde blob");
+    console.log(res);
+    console.log("==");
+    console.log(res.data);
+    return res.data
+  });
 };
 
 export default S3Download;
