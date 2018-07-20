@@ -177,3 +177,14 @@
 .tg-no-fill-field {
   display: table !important;
 }
+
+.item-upload-container {
+  padding: 5px;
+  width: 290px;
+}
+
+.item-upload {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

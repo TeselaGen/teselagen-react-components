@@ -8,6 +8,7 @@ import WithDialog from "./examples/WithDialog";
 import Toastr from "./examples/Toastr";
 import showConfirmationDialogDemo from "./examples/showConfirmationDialogDemo";
 import CustomIcons from "./examples/CustomIcons";
+import S3Uploader from "./examples/S3Uploader";
 import SimpleTable from "./examples/SimpleTable";
 import InfoHelper from "./examples/InfoHelper";
 import Loading from "./examples/Loading";
@@ -16,13 +17,18 @@ import DemoNav from "./DemoNav";
 import DemoHeader from "./DemoHeader";
 import { withTableParams, DataTable, PagingTool } from "../../src";
 import Uploader from "../../src/FormComponents/Uploader";
+import { FileUploadField } from "../../src/FormComponents";
 import J5ReportRecordView from "./examples/J5ReportRecordView";
 import j5ReportRecordViewData from "./data/j5ReportRecordView";
 import * as customIcons from "../../src/customIcons";
+
 import createMenu from "../../src/utils/createMenu";
 import Tree from "./examples/Tree";
 import { bigTreeData, smallTreeData } from "./data/treeData";
 import showConfirmationDialog from "../../src/showConfirmationDialog";
+import S3Download from "../../src/utils/S3Download";
+import magicDownload from "../../lib/DownloadLink/magicDownload";
+
 import "./style.css";
 import React from "react";
 import { render } from "react-dom";
@@ -42,7 +48,8 @@ import {
   Position,
   Intent,
   KeyCombo,
-  Switch
+  Switch,
+  Button
 } from "@blueprintjs/core";
 import renderToggle from "./renderToggle";
 import Chance from "chance";
@@ -308,6 +315,21 @@ const demos = {
     demo: CustomIcons,
     url:
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/CustomIcons.js"
+  },
+  S3Uploader: {
+    scope: {
+      Provider,
+      store,
+      reduxForm,
+      Uploader,
+      FileUploadField,
+      Button,
+      S3Download,
+      magicDownload
+    },
+    demo: S3Uploader,
+    url:
+      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/S3Uploader.js"
   },
   J5ReportRecordView: {
     demo: J5ReportRecordView,
