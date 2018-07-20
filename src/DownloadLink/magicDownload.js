@@ -2,6 +2,7 @@
  * 
  * @param {string} text 
  * @param {string} fileName 
+ * @param {string} type 
  */
 export default function magicDownload(text, fileName, type) {
   let blob = new Blob([text], {
