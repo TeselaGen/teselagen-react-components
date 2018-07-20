@@ -3,9 +3,9 @@
  * @param {string} text 
  * @param {string} fileName 
  */
-export default function magicDownload(text, fileName) {
+export default function magicDownload(text, fileName, type) {
   let blob = new Blob([text], {
-    type: "text/csv;charset=utf8;"
+    type: type || "text/csv;charset=utf8;"
   });
 
   // create hidden link
