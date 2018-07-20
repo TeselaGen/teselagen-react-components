@@ -8,7 +8,7 @@ const mime = require('mime-types')
 
 export default function magicDownload(text, fileName, type) {
   let blob = new Blob([text], {
-    type: type || mime(fileName) || "text/csv;charset=utf8;"
+    type: type || mime.lookup(fileName) || "text/csv;charset=utf8;"
   });
 
   // create hidden link
