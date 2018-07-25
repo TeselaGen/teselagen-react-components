@@ -110,7 +110,7 @@ export default function withQuery(inputFragment, options = {}) {
         }
         let extraOptions = queryOptions || {};
         if (typeof queryOptions === "function") {
-          extraOptions = queryOptions(props);
+          extraOptions = queryOptions(props) || {};
         }
         const {
           variables: extraOptionVariables,
