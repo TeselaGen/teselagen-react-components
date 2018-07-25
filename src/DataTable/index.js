@@ -710,13 +710,13 @@ class DataTable extends React.Component {
                   entity: tempEntity
                 };
               } else {
-                newIdMap[tempEntityId] = false
+                newIdMap[tempEntityId] = false;
               }
             }
           } else {
             //no shift key
             if (isRowCurrentlyChecked) {
-              newIdMap[entityId] = false
+              newIdMap[entityId] = false;
             } else {
               newIdMap[entityId] = { entity };
             }
@@ -955,6 +955,7 @@ class DataTable extends React.Component {
       filterDisabled,
       renderTitleInner,
       filterIsActive = noop,
+      noTitle,
       path
     } = column;
     const disableSorting =
@@ -1049,11 +1050,12 @@ class DataTable extends React.Component {
 
     return (
       <div className={"tg-react-table-column-header"}>
-        {(displayName || startCase(path)) && (
-          <span title={columnTitle} className={"tg-react-table-name"}>
-            {renderTitleInner ? renderTitleInner : columnTitle}
-          </span>
-        )}
+        {(displayName || startCase(path)) &&
+          !noTitle && (
+            <span title={columnTitle} className={"tg-react-table-name"}>
+              {renderTitleInner ? renderTitleInner : columnTitle}
+            </span>
+          )}
         {sortComponent}
         {filterMenu}
       </div>

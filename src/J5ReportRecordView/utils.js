@@ -5,7 +5,8 @@ export function getLinkDialogProps(j5Report) {
     j5OligoSyntheses,
     j5AssemblyPieces,
     j5InputSequences,
-    j5RunConstructs
+    j5RunConstructs,
+    j5DirectSyntheses
     // j5InputParts
   } = j5Report;
   const linkDialogProps = {
@@ -15,6 +16,16 @@ export function getLinkDialogProps(j5Report) {
       },
       items: j5InputSequences,
       sequenceHashes: j5InputSequences.map(({ sequence }) => {
+        return sequence.hash;
+      })
+    },
+
+    directSyntheses: {
+      dialogProps: {
+        title: "Link DNA Syntheses to Materials"
+      },
+      items: j5DirectSyntheses,
+      sequenceHashes: j5DirectSyntheses.map(({ sequence }) => {
         return sequence.hash;
       })
     },
@@ -61,5 +72,5 @@ export function getLinkDialogProps(j5Report) {
       return false;
     });
   });
-  return linkDialogProps
+  return linkDialogProps;
 }

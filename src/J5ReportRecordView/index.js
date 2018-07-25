@@ -492,6 +492,9 @@ class J5ReportRecordView extends Component {
           {/* tnr: this is just the dialog that needs to be on the page. not actually rendering anything */}
           {LinkJ5TableDialog && (
             <Dialog
+              style={{
+                width: 650
+              }}
               {...(currentLink ? currentLink.dialogProps : {})}
               onClose={this.hideLinkModal}
               isOpen={!!linkDialogName}
