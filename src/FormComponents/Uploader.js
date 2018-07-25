@@ -247,7 +247,7 @@ class Uploader extends Component {
           disabledClassName={"tg-dropzone-disabled"}
           accept={acceptToUse}
           {...{
-            onDrop: acceptedFiles => {
+            onDrop: async acceptedFiles => {
               if (fileLimit) {
                 acceptedFiles = acceptedFiles.slice(0, fileLimit);
               }
@@ -257,139 +257,130 @@ class Uploader extends Component {
                   file.id = uniqid();
                 }
               });
-
-              Promise.resolve()
-                .then(() => {
-                  if (readBeforeUpload) {
-                    return Promise.all(
-                      acceptedFiles.map(file => {
-                        return new Promise((resolve, reject) => {
-                          let reader = new FileReader();
-                          reader.readAsText(file, "UTF-8");
-                          reader.onload = evt => {
-                            file.parsedString = evt.target.result;
-                            resolve(file);
-                          };
-                          reader.onerror = err => {
-                            console.error("err:", err);
-                            reject(err);
-                          };
-                        });
-                      })
-                    );
-                  } else {
-                    return acceptedFiles;
-                  }
-                })
-                .then(files => {
-                  fileListToUse = [
-                    ...files.map(file => {
-                      return {
-                        originFileObj: file,
-                        originalFileObj: file,
-                        id: file.id,
-                        lastModified: file.lastModified,
-                        lastModifiedDate: file.lastModifiedDate,
-                        loading: file.loading,
-                        name: file.name,
-                        preview: file.preview,
-                        size: file.size,
-                        type: file.type,
-                        ...(file.parsedString
-                          ? { parsedString: file.parsedString }
-                          : {})
+              if (readBeforeUpload) {
+                acceptedFiles = await Promise.all(
+                  acceptedFiles.map(file => {
+                    return new Promise((resolve, reject) => {
+                      let reader = new FileReader();
+                      reader.readAsText(file, "UTF-8");
+                      reader.onload = evt => {
+                        file.parsedString = evt.target.result;
+                        resolve(file);
                       };
-                    }),
-                    ...fileListToUse
-                  ].slice(0, fileLimit ? fileLimit : undefined);
-
-                  onChange(fileListToUse);
-                  return fileListToUse;
-                })
-                .then(acceptedFiles => {
-                  return beforeUpload
-                    ? beforeUpload(acceptedFiles, onChange)
-                    : { keepGoing: true, acceptedFiles };
-                })
-                .then(({ keepGoing, acceptedFiles }) => {
-                  if (!keepGoing) return;
-                  if (S3Params) {
-                    // this is s3/minio upload
-                    return this.sendFiles(acceptedFiles);
-                  }
-                  if (action) {
-                    if (uploadInBulk) {
-                      //tnr: not yet implemented
-                      /* const config = {
-                        onUploadProgress: function(progressEvent) {
-                          let percentCompleted = Math.round(
-                            progressEvent.loaded * 100 / progressEvent.total
-                          );
-                        }
+                      reader.onerror = err => {
+                        console.error("err:", err);
+                        reject(err);
                       };
+                    });
+                  })
+                );
+              }
 
-                      axios
-                        .post(action, data, config)
+              const cleanedFileList = [
+                ...acceptedFiles.map(file => {
+                  return {
+                    originFileObj: file,
+                    originalFileObj: file,
+                    id: file.id,
+                    lastModified: file.lastModified,
+                    lastModifiedDate: file.lastModifiedDate,
+                    loading: file.loading,
+                    name: file.name,
+                    preview: file.preview,
+                    size: file.size,
+                    type: file.type,
+                    ...(file.parsedString
+                      ? { parsedString: file.parsedString }
+                      : {})
+                  };
+                }),
+                ...fileListToUse
+              ].slice(0, fileLimit ? fileLimit : undefined);
+
+              onChange(cleanedFileList);
+
+              const keepGoing = beforeUpload
+                ? await beforeUpload(cleanedFileList, onChange)
+                : true;
+              if (!keepGoing) return;
+
+              if (S3Params) {
+                // this is s3/minio upload
+                return this.sendFiles(cleanedFileList);
+              }
+              if (action) {
+                if (uploadInBulk) {
+                  //tnr: not yet implemented
+                  /* const config = {
+                    onUploadProgress: function(progressEvent) {
+                      let percentCompleted = Math.round(
+                        progressEvent.loaded * 100 / progressEvent.total
+                      );
+                    }
+                  };
+
+                  axios
+                    .post(action, data, config)
+                    .then(function(res) {
+                      onChange(res.data);
+                    })
+                    .catch(function(err) {
+                    }); */
+                } else {
+                  const responses = [];
+
+                  await Promise.all(
+                    acceptedFiles.map(fileToUpload => {
+                      const data = new FormData();
+                      data.append("file", fileToUpload);
+
+                      return axios
+                        .post(action, data)
                         .then(function(res) {
-                          onChange(res.data);
+                          responses.push(res.data && res.data[0]);
+                          onFileSuccess(res.data[0]).then(() => {
+                            onChange(
+                              (fileListToUse = fileListToUse.map(file => {
+                                const fileToReturn = { ...file };
+                                if (fileToReturn.id === fileToUpload.id) {
+                                  fileToReturn.loading = false;
+                                }
+                                return fileToReturn;
+                              }))
+                            );
+                          });
                         })
                         .catch(function(err) {
-                        }); */
-                    } else {
-                      const responses = [];
-                      Promise.all(
-                        acceptedFiles.map(fileToUpload => {
-                          const data = new FormData();
-                          data.append("file", fileToUpload);
-                          return axios
-                            .post(action, data)
-                            .then(function(res) {
-                              responses.push(res.data && res.data[0]);
-                              onFileSuccess(res.data[0]).then(() => {
-                                onChange(
-                                  (fileListToUse = fileListToUse.map(file => {
-                                    const fileToReturn = { ...file };
-                                    if (fileToReturn.id === fileToUpload.id) {
-                                      fileToReturn.loading = false;
-                                    }
-                                    return fileToReturn;
-                                  }))
-                                );
-                              });
-                            })
-                            .catch(function(err) {
-                              console.error("Error uploading file:", err);
-                              responses.push({
-                                ...fileToUpload,
-                                error: err && err.msg ? err.msg : err
-                              });
-                              onChange(
-                                (fileListToUse = fileListToUse.map(file => {
-                                  const fileToReturn = { ...file };
-                                  if (fileToReturn.id === fileToUpload.id) {
-                                    fileToReturn.loading = false;
-                                    fileToReturn.error = true;
-                                  }
-                                  return fileToReturn;
-                                }))
-                              );
-                            });
-                        })
-                      ).then(() => {
-                        onFieldSubmit(responses);
-                      });
-                    }
-                  } else {
-                    onChange(
-                      fileListToUse.map(function(file) {
-                        return {
-                          ...file,
-                          loading: false
-                        };
-                      })
-                    );
-                  }
-                });
+                          console.error("Error uploading file:", err);
+                          responses.push({
+                            ...fileToUpload,
+                            error: err && err.msg ? err.msg : err
+                          });
+                          onChange(
+                            (fileListToUse = fileListToUse.map(file => {
+                              const fileToReturn = { ...file };
+                              if (fileToReturn.id === fileToUpload.id) {
+                                fileToReturn.loading = false;
+                                fileToReturn.error = true;
+                              }
+                              return fileToReturn;
+                            }))
+                          );
+                        });
+                    })
+                  );
+                  onFieldSubmit(responses);
+                }
+              } else {
+                onChange(
+                  fileListToUse.map(function(file) {
+                    return {
+                      ...file,
+                      loading: false
+                    };
+                  })
+                );
+              }
             }
           }}
           {...dropzoneProps}
@@ -408,7 +399,7 @@ class Uploader extends Component {
               }
               className={"tg-upload-inner"}
             >
-              {innerIcon || <Icon icon="upload" iconSize={30}/>}
+              {innerIcon || <Icon icon="upload" iconSize={30} />}
               {innerText || "Click or drag to upload"}
             </div>
           )}
@@ -465,18 +456,18 @@ class Uploader extends Component {
                     </div>
                     {!loading && (
                       <Icon
-                      iconSize={13}
-                      icon="cross"
-                      className="tg-upload-file-list-item-close"
-                      onClick={() => {
-                        onRemove(file, index, fileList);
-                        onChange(
-                          fileList.filter((file, index2) => {
-                            return index2 !== index;
-                          })
-                        );
-                      }}
-                    />
+                        iconSize={13}
+                        icon="cross"
+                        className="tg-upload-file-list-item-close"
+                        onClick={() => {
+                          onRemove(file, index, fileList);
+                          onChange(
+                            fileList.filter((file, index2) => {
+                              return index2 !== index;
+                            })
+                          );
+                        }}
+                      />
                     )}
                   </div>
                 );
