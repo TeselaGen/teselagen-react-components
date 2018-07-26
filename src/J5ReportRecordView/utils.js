@@ -20,9 +20,9 @@ export function getLinkDialogProps(j5Report) {
       })
     },
 
-    directSyntheses: {
+    dnaSynthesisSequences: {
       dialogProps: {
-        title: "Link DNA Syntheses to Materials"
+        title: "Link DNA Synthesis Sequences to Materials"
       },
       items: j5DirectSyntheses,
       sequenceHashes: j5DirectSyntheses.map(({ sequence }) => {

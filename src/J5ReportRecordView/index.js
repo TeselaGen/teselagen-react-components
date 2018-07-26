@@ -700,7 +700,7 @@ class J5ReportRecordView extends Component {
               LinkJ5TableDialog && (
                 <Button
                   onClick={() => {
-                    this.showLinkModal("dnaSynthesis");
+                    this.showLinkModal("dnaSynthesisSequences");
                   }}
                 >
                   {" "}
