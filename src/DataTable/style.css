@@ -116,6 +116,12 @@
   display: none;
 }
 
+/* Prevent rows from expanding vertically to fill available space */
+.ReactTable.ReactTable .rt-tbody .rt-tr-group,
+.ReactTable.ReactTable .rt-tbody .rt-tr-group .rt-tr {
+  flex: 0 0 auto;
+}
+
 .pt-icon-standard.pt-disabled {
   cursor: not-allowed;
   opacity: 0.7;
