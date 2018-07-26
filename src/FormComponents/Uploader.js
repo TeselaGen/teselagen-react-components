@@ -373,7 +373,7 @@ class Uploader extends Component {
                 }
               } else {
                 onChange(
-                  fileListToUse.map(function(file) {
+                  cleanedFileList.map(function(file) {
                     return {
                       ...file,
                       loading: false
