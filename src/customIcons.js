@@ -196,3 +196,18 @@ export const moleculeIcon = ptIconWrapper(
   />,
   408
 );
+
+export const keyboardIcon = ptIconWrapper(
+  <path
+    d="M459,76.5H51c-28.05,0-51,22.95-51,51v255c0,28.05,22.95,51,51,51h408c28.05,0,51-22.95,51-51v-255
+			C510,99.45,487.05,76.5,459,76.5z M229.5,153h51v51h-51V153z M229.5,229.5h51v51h-51V229.5z M153,153h51v51h-51V153z M153,229.5
+			h51v51h-51V229.5z M127.5,280.5h-51v-51h51V280.5z M127.5,204h-51v-51h51V204z M357,382.5H153v-51h204V382.5z M357,280.5h-51v-51
+			h51V280.5z M357,204h-51v-51h51V204z M433.5,280.5h-51v-51h51V280.5z M433.5,204h-51v-51h51V204z"
+  />,
+  510
+);
+
+export const cardDetailsIcon = ptIconWrapper(
+  <path d="M0 1v15h16v-15h-16zM5 15h-4v-2h4v2zM5 12h-4v-2h4v2zM5 9h-4v-2h4v2zM5 6h-4v-2h4v2zM10 15h-4v-2h4v2zM10 12h-4v-2h4v2zM10 9h-4v-2h4v2zM10 6h-4v-2h4v2zM15 15h-4v-2h4v2zM15 12h-4v-2h4v2zM15 9h-4v-2h4v2zM15 6h-4v-2h4v2z" />,
+  16
+);
