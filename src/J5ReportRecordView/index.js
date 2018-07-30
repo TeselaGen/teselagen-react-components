@@ -24,6 +24,7 @@ import papaparse from "papaparse";
 import magicDownload from "../DownloadLink/magicDownload";
 import exportOligosFields from "./exportOligosFields";
 import getSequenceStringOfJ5InputPart from "./getSequenceStringOfJ5InputPart";
+import J5TableCard from "./J5TableCard";
 import "./style.css";
 
 const sharedTableProps = {
@@ -521,289 +522,141 @@ class J5ReportRecordView extends Component {
             <Button>Export Constructs</Button>
           </div>
         </div>*/}
-          <CollapsibleCard
-            icon={
-              <InfoHelper>
-                Prebuilt constructs are the desired sequences that have already
-                been built and are available in your library.
-              </InfoHelper>
-            }
+          <J5TableCard
+            helperMessage="Prebuilt constructs are the desired sequences that have already
+          been built and are available in your library."
             title="Prebuilt Constructs"
-            initialClosed={!entitiesForAllTables.prebuiltConstructs.length}
-            openTitleElements={[
-              ...(LinkJ5TableDialog
-                ? [
-                    <Button
-                      key="linkConstructs"
-                      onClick={() => {
-                        this.showLinkModal("constructs");
-                      }}
-                    >
-                      {" "}
-                      Link Constructs
-                    </Button>
-                  ]
-                : [])
-            ]}
-          >
-            <DataTable
-              {...sharedTableProps}
-              onDoubleClick={onConstructDoubleClick}
-              schema={this.getSchema("j5RunConstructs")}
-              formName="prebuiltConstructs" //because these tables are currently not connected to table params, we need to manually pass a formName here
-              entities={entitiesForAllTables.prebuiltConstructs}
-            />
-          </CollapsibleCard>
+            entities={entitiesForAllTables.prebuiltConstructs}
+            showLinkModal={() => this.showLinkModal("constructs")}
+            isLinkable={LinkJ5TableDialog}
+            onDoubleClick={onConstructDoubleClick}
+            schema={this.getSchema("j5RunConstructs")}
+            tableProps={sharedTableProps}
+          />
 
-          <CollapsibleCard
-            icon={
-              <InfoHelper>
-                Constructs are the desired sequences to be built in a j5 run.
-              </InfoHelper>
-            }
+          <J5TableCard
+            helperMessage="Constructs are the desired sequences to be built in a j5 run."
             title="Assembled Constructs"
-            initialClosed={!entitiesForAllTables.j5RunConstructs.length}
-            openTitleElements={[
-              ...(LinkJ5TableDialog
-                ? [
-                    <Button
-                      key="linkConstructs"
-                      onClick={() => {
-                        this.showLinkModal("constructs");
-                      }}
-                    >
-                      {" "}
-                      Link Constructs
-                    </Button>
-                  ]
-                : []),
-              ...constructsTitleElements
-            ]}
-          >
-            <DataTable
-              {...sharedTableProps}
-              onDoubleClick={onConstructDoubleClick}
-              schema={this.getSchema("j5RunConstructs")}
-              formName="j5RunConstructs" //because these tables are currently not connected to table params, we need to manually pass a formName here
-              entities={entitiesForAllTables.j5RunConstructs}
-            />
-          </CollapsibleCard>
+            entities={entitiesForAllTables.j5RunConstructs}
+            showLinkModal={() => this.showLinkModal("constructs")}
+            isLinkable={LinkJ5TableDialog}
+            onDoubleClick={onConstructDoubleClick}
+            tableProps={sharedTableProps}
+            schema={this.getSchema("j5RunConstructs")}
+            openTitleElements={constructsTitleElements}
+          />
 
-          <CollapsibleCard
-            title={"Input Sequences"}
-            icon={
-              <InfoHelper>
-                Input Sequences are the sequences that contain the Input Parts
-              </InfoHelper>
+          <J5TableCard
+            helperMessage="Input Sequences are the sequences that contain the Input Parts."
+            title="Input Sequences"
+            entities={entitiesForAllTables.j5InputSequences}
+            showLinkModal={() => this.showLinkModal("inputSequences")}
+            isLinkable={LinkJ5TableDialog}
+            tableProps={sharedTableProps}
+            cellRenderer={
+              getIsLinkedCellRenderer &&
+              getIsLinkedCellRenderer(
+                "sequence.polynucleotideMaterialId",
+                "sequence.hash",
+                "j5InputSequence"
+              )
             }
-            initialClosed={!entitiesForAllTables.j5InputSequences.length}
-            openTitleElements={
-              LinkJ5TableDialog && (
-                <Button
-                  onClick={() => {
-                    this.showLinkModal("inputSequences");
-                  }}
-                >
-                  {" "}
-                  Link Input Sequences
-                </Button>
+            schema={this.getSchema("j5InputSequences")}
+          />
+
+          <J5TableCard
+            helperMessage="Input Parts are the segments of sequence that are being used in
+            a j5 run."
+            title="Input Parts"
+            entities={entitiesForAllTables.j5InputParts}
+            tableProps={sharedTableProps}
+            schema={this.getSchema("j5InputParts")}
+          />
+
+          <J5TableCard
+            helperMessage="This is the list of oligos that need to be directly synthesized."
+            title="Oligo Synthesis"
+            entities={entitiesForAllTables.j5OligoSyntheses}
+            tableProps={sharedTableProps}
+            isLinkable={LinkJ5TableDialog}
+            schema={this.getSchema("j5OligoSyntheses")}
+            showLinkModal={() => this.showLinkModal("oligos")}
+            linkButtonText="Link Oligos"
+            openTitleElements={oligosTitleElements}
+            cellRenderer={
+              getIsLinkedCellRenderer &&
+              getIsLinkedCellRenderer(
+                "oligo.sequence.polynucleotideMaterialId",
+                "oligo.sequence.hash",
+                "oligo"
               )
             }
           >
-            <DataTable
-              {...sharedTableProps}
-              schema={this.getSchema("j5InputSequences")}
-              formName={"j5InputSequences"} //because these tables are currently not connected to table params, we need to manually pass a formName here
-              cellRenderer={
-                getIsLinkedCellRenderer &&
-                getIsLinkedCellRenderer(
-                  "sequence.polynucleotideMaterialId",
-                  "sequence.hash",
-                  "j5InputSequence",
-                  upsertSequence
-                )
-              }
-              entities={entitiesForAllTables.j5InputSequences}
-            />
-          </CollapsibleCard>
-          <CollapsibleCard
-            title="Input Parts"
-            icon={
-              <InfoHelper>
-                Input Parts are the segments of sequence that are being used in
-                a j5 run
-              </InfoHelper>
-            }
-            initialClosed={!entitiesForAllTables.j5InputParts.length}
-          >
-            <DataTable
-              {...sharedTableProps}
-              schema={this.getSchema("j5InputParts")}
-              formName={"j5InputParts"} //because these tables are currently not connected to table params, we need to manually pass a formName here
-              entities={entitiesForAllTables.j5InputParts}
-            />
-          </CollapsibleCard>
-          <CollapsibleCard
-            icon={
-              <InfoHelper>
-                This is the list of oligos that need to be directly synthesized
-              </InfoHelper>
-            }
-            title={"Oligo Synthesis"}
-            initialClosed={!entitiesForAllTables.j5OligoSyntheses.length}
-            openTitleElements={[
-              ...(LinkJ5TableDialog
-                ? [
-                    <Button
-                      key="linkOligosButton"
-                      onClick={() => {
-                        this.showLinkModal("oligos");
-                      }}
-                    >
-                      {" "}
-                      Link Oligos
-                    </Button>
-                  ]
-                : []),
-              ...oligosTitleElements
-            ]}
-          >
-            <DataTable
-              {...sharedTableProps}
-              schema={this.getSchema("j5OligoSyntheses")}
-              formName={"j5OligoSyntheses"} //because these tables are currently not connected to table params, we need to manually pass a formName here
-              cellRenderer={
-                getIsLinkedCellRenderer &&
-                getIsLinkedCellRenderer(
-                  "oligo.sequence.polynucleotideMaterialId",
-                  "oligo.sequence.hash",
-                  "oligo",
-                  upsertSequence
-                )
-              }
-              entities={entitiesForAllTables.j5OligoSyntheses}
-            />
             <div className={Classes.BUTTON_GROUP} style={{ marginTop: 10 }}>
               {this.renderDownloadOligoButton()}
             </div>
-          </CollapsibleCard>
+          </J5TableCard>
 
-          <CollapsibleCard
-            icon={
-              <InfoHelper>
-                This is the list DNA pieces that need to be directly synthesized
-              </InfoHelper>
-            }
+          <J5TableCard
+            helperMessage="This is the list DNA pieces that need to be directly synthesized."
             title="DNA Synthesis"
-            initialClosed={!entitiesForAllTables.j5DirectSyntheses.length}
-            openTitleElements={
-              LinkJ5TableDialog && (
-                <Button
-                  onClick={() => {
-                    this.showLinkModal("dnaSynthesisSequences");
-                  }}
-                >
-                  {" "}
-                  Link DNA Synthesis Pieces
-                </Button>
+            entities={entitiesForAllTables.j5DirectSyntheses}
+            tableProps={sharedTableProps}
+            schema={this.getSchema("j5DirectSyntheses")}
+            isLinkable={LinkJ5TableDialog}
+            showLinkModal={() => this.showLinkModal("dnaSynthesisSequences")}
+            linkButtonText="Link DNA Synthesis Pieces"
+            cellRenderer={
+              getIsLinkedCellRenderer &&
+              getIsLinkedCellRenderer(
+                "oligo.sequence.polynucleotideMaterialId",
+                "oligo.sequence.hash",
+                "oligo"
               )
             }
-          >
-            <DataTable
-              {...sharedTableProps}
-              schema={this.getSchema("j5DirectSyntheses")}
-              formName={"j5DirectSyntheses"} //because these tables are currently not connected to table params, we need to manually pass a formName here
-              cellRenderer={
-                getIsLinkedCellRenderer &&
-                getIsLinkedCellRenderer(
-                  "oligo.sequence.polynucleotideMaterialId",
-                  "oligo.sequence.hash",
-                  "oligo",
-                  upsertSequence
-                )
-              }
-              entities={entitiesForAllTables.j5DirectSyntheses}
-            />
-          </CollapsibleCard>
+          />
 
-          <CollapsibleCard
-            icon={
-              <InfoHelper>
-                These are the PCR reactions that need to be run to generate the
-                assembly pieces.
-              </InfoHelper>
-            }
-            title={"PCR Reactions"}
-            initialClosed={!entitiesForAllTables.j5PcrReactions.length}
-            openTitleElements={pcrReactionsTitleElements}
-          >
-            <DataTable
-              {...sharedTableProps}
-              schema={this.getSchema("j5PcrReactions")}
-              formName={"j5PcrReactions"} //because these tables are currently not connected to table params, we need to manually pass a formName here
-              entities={entitiesForAllTables.j5PcrReactions}
-            />
-          </CollapsibleCard>
+          <J5TableCard
+            helperMessage="These are the PCR reactions that need to be run to generate the
+                assembly pieces."
+            title="PCR Reactions"
+            entities={entitiesForAllTables.j5PcrReactions}
+            tableProps={sharedTableProps}
+            schema={this.getSchema("j5PcrReactions")}
+          />
 
-          <CollapsibleCard
-            icon={
-              <InfoHelper>
-                These are the pieces of DNA that will get put together in a
+          <J5TableCard
+            helperMessage="These are the pieces of DNA that will get put together in a
                 final assembly reaction (Gibson/CPEC/SLIC/Golden-Gate) to give
-                the desired Constructs
-              </InfoHelper>
-            }
+                the desired Constructs."
             title="DNA Pieces to be Assembled"
-            initialClosed={!entitiesForAllTables.j5AssemblyPieces.length}
-            openTitleElements={
-              LinkJ5TableDialog && (
-                <Button
-                  onClick={() => {
-                    this.showLinkModal("dnaPieces");
-                  }}
-                >
-                  {" "}
-                  Link DNA Pieces
-                </Button>
+            entities={entitiesForAllTables.j5AssemblyPieces}
+            isLinkable={LinkJ5TableDialog}
+            showLinkModal={() => this.showLinkModal("dnaPieces")}
+            linkButtonText="Link DNA Pieces"
+            tableProps={sharedTableProps}
+            schema={this.getSchema("j5AssemblyPieces")}
+            cellRenderer={
+              getIsLinkedCellRenderer &&
+              getIsLinkedCellRenderer(
+                "sequence.polynucleotideMaterialId",
+                "sequence.hash",
+                "j5AssemblyPiece",
+                upsertSequence
               )
             }
-          >
-            <DataTable
-              {...sharedTableProps}
-              schema={this.getSchema("j5AssemblyPieces")}
-              formName="j5AssemblyPieces" //because these tables are currently not connected to table params, we need to manually pass a formName here
-              cellRenderer={
-                getIsLinkedCellRenderer &&
-                getIsLinkedCellRenderer(
-                  "sequence.polynucleotideMaterialId",
-                  "sequence.hash",
-                  "j5AssemblyPiece",
-                  upsertSequence
-                )
-              }
-              entities={entitiesForAllTables.j5AssemblyPieces}
-            />
-          </CollapsibleCard>
+          />
 
-          <CollapsibleCard
-            icon={
-              <InfoHelper>
-                This lists which assembly pieces need to be combined to create
-                each construct.
-              </InfoHelper>
-            }
+          <J5TableCard
+            helperMessage="This lists which assembly pieces need to be combined to create
+                each construct."
             title="Combination of Assembly Pieces"
-            initialClosed={!entitiesForAllTables.j5RunConstructs.length}
-          >
-            <DataTable
-              {...sharedTableProps}
-              schema={this.createSchemaForCombinationOfAssemblyPieces(
-                entitiesForAllTables.j5RunConstructs
-              )}
-              formName="combinationOfAssemblyPieces" //because these tables are currently not connected to table params, we need to manually pass a formName here
-              entities={entitiesForAllTables.j5RunConstructs}
-            />
-          </CollapsibleCard>
+            entities={entitiesForAllTables.j5RunConstructs}
+            tableProps={sharedTableProps}
+            schema={this.createSchemaForCombinationOfAssemblyPieces(
+              entitiesForAllTables.j5RunConstructs
+            )}
+          />
 
           {/*<div className="tg-card">
           <div style={tableHeaderDivStyle}>
