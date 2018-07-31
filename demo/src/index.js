@@ -27,7 +27,7 @@ import Tree from "./examples/Tree";
 import { bigTreeData, smallTreeData } from "./data/treeData";
 import showConfirmationDialog from "../../src/showConfirmationDialog";
 import S3Download from "../../src/utils/S3Download";
-import magicDownload from "../../lib/DownloadLink/magicDownload";
+import magicDownload from "../../src/DownloadLink/magicDownload";
 
 import "./style.css";
 import React from "react";
