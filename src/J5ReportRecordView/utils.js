@@ -2,11 +2,11 @@ import { each } from "lodash";
 
 export function getLinkDialogProps(j5Report) {
   const {
-    j5OligoSyntheses,
-    j5AssemblyPieces,
-    j5InputSequences,
-    j5RunConstructs,
-    j5DirectSyntheses
+    j5OligoSyntheses = [],
+    j5AssemblyPieces = [],
+    j5InputSequences = [],
+    j5RunConstructs = [],
+    j5DirectSyntheses = []
     // j5InputParts
   } = j5Report;
   const linkDialogProps = {

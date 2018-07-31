@@ -2,29 +2,16 @@ import React, { Component } from "react";
 // import EditViewHOC from '../../EditViewHOC'
 import { reduxForm } from "redux-form";
 import { Button, Dialog, Classes } from "@blueprintjs/core";
-import {
-  each,
-  get,
-  startCase,
-  times,
-  zip,
-  flatten,
-  noop,
-  flatMap
-} from "lodash";
+import { each, get, startCase, times, zip, flatten, noop } from "lodash";
 import moment from "moment";
-import CollapsibleCard from "../CollapsibleCard";
-import InfoHelper from "../InfoHelper";
 import schemas from "./schemas";
-import DataTable from "../DataTable";
 import Loading from "../Loading";
 import { getLinkDialogProps } from "./utils";
-import { getRangeLength } from "ve-range-utils";
 import papaparse from "papaparse";
 import magicDownload from "../DownloadLink/magicDownload";
 import exportOligosFields from "./exportOligosFields";
-import getSequenceStringOfJ5InputPart from "./getSequenceStringOfJ5InputPart";
 import J5TableCard from "./J5TableCard";
+import processDataForTables from "./processDataForTables";
 import "./style.css";
 
 const sharedTableProps = {
@@ -37,26 +24,6 @@ const sharedTableProps = {
   urlConnected: false
 };
 
-const processInputParts = inputParts =>
-  inputParts.map(inputPart => {
-    const sequencePart = get(inputPart, "sequencePart", {});
-    return {
-      ...inputPart,
-      sequencePart: {
-        ...sequencePart,
-        id: "part_" + sequencePart.id
-      },
-      size: getRangeLength(
-        {
-          start: inputPart.sequencePart.start,
-          end: inputPart.sequencePart.end
-        },
-        get(inputPart, "sequencePart.sequence.size")
-      ),
-      bps: getSequenceStringOfJ5InputPart(inputPart)
-    };
-  });
-
 function getWrappedInParensMatches(s) {
   const matches = [];
   s.replace(/\((.*?)\)/g, function(g0, g1) {
@@ -64,83 +31,6 @@ function getWrappedInParensMatches(s) {
   });
   return matches;
 }
-
-const processJ5DirectSyntheses = j5DirectSynths =>
-  j5DirectSynths.map(j5DirectSynth => {
-    return {
-      ...j5DirectSynth,
-      id: "dna_syn_" + j5DirectSynth.id,
-      bps: get(j5DirectSynth, "sequence.sequenceFragments", [])
-        .map(f => f.fragment)
-        .join("")
-    };
-  });
-
-const processJ5RunConstructs = j5RunConstructs =>
-  j5RunConstructs
-    .filter(j5RunConstruct => !j5RunConstruct.isPrebuilt)
-    .map(j5RunConstruct => ({
-      ...j5RunConstruct,
-      id: "construct_" + j5RunConstruct.id,
-      nextLevelParts: (get(j5RunConstruct, "sequence.sequenceParts") || [])
-        .map(part => part.name)
-        .join(", "),
-      partsContainedNames:
-        get(
-          j5RunConstruct,
-          "j5ConstructAssemblyPieces[0].assemblyPiece.j5AssemblyPieceParts[0].j5InputPart.sequencePart.name"
-        ) &&
-        flatMap(
-          j5RunConstruct.j5ConstructAssemblyPieces,
-          j5ConstructAssemblyPiece =>
-            j5ConstructAssemblyPiece.assemblyPiece.j5AssemblyPieceParts.map(
-              j5InputPart => j5InputPart.j5InputPart.sequencePart.name
-            )
-        ).join(", ")
-    }));
-
-const processPrebuiltConstructs = j5RunConstructs =>
-  j5RunConstructs
-    .filter(j5RunConstruct => j5RunConstruct.isPrebuilt)
-    .map(j5RunConstruct => ({
-      ...j5RunConstruct,
-      id: "construct_" + j5RunConstruct.id,
-      nextLevelParts: (get(j5RunConstruct, "sequence.sequenceParts") || [])
-        .map(part => part.name)
-        .join(", "),
-      partsContainedNames: j5RunConstruct.partNames
-    }));
-
-const getInputPartsFromInputSequences = j5InputSequences =>
-  j5InputSequences
-    .map(({ j5InputParts, sequence }) =>
-      j5InputParts.map(({ sequencePart }) => ({
-        sequencePart: { ...sequencePart, sequence }
-      }))
-    )
-    .reduce((a, b) => a.concat(b), []);
-
-const processJ5AssemblyPieces = j5AssemblyPieces =>
-  j5AssemblyPieces.map(ap => ({
-    ...ap,
-    id: "piece_" + ap.id,
-    bps: get(ap, "sequence.sequenceFragments", [])
-      .map(f => f.fragment)
-      .join("")
-  }));
-
-const processInputSequences = j5InputSequences =>
-  j5InputSequences.map(s => ({
-    ...s,
-    sequence: { ...s.sequence, id: "sequence_" + s.sequence.id }
-  }));
-
-const processJ5PcrReactions = j5PcrReactions =>
-  j5PcrReactions.map(pcr => ({
-    ...pcr,
-    id: "pcr_" + pcr.id
-  }));
-
 class J5ReportRecordView extends Component {
   state = {
     linkDialogName: undefined,
@@ -225,30 +115,37 @@ class J5ReportRecordView extends Component {
     magicDownload(csvString, "j5_Report.csv");
   };
 
-  getEntitiesForAllTables = () => {
-    const { data } = this.props;
-    const {
-      j5PcrReactions,
-      j5OligoSyntheses,
-      j5AssemblyPieces,
-      j5RunConstructs,
-      j5InputSequences,
-      j5DirectSyntheses
-      // j5InputParts
-    } = data.j5Report;
+  // getEntitiesForAllTables = () => {
+  //   const { data } = this.props;
+  //   const {
+  //     j5PcrReactions,
+  //     j5OligoSyntheses,
+  //     j5AssemblyPieces,
+  //     j5RunConstructs,
+  //     j5InputSequences,
+  //     j5DirectSyntheses
+  //     // j5InputParts
+  //   } = data.j5Report;
 
-    const j5InputParts = getInputPartsFromInputSequences(j5InputSequences);
-    return {
-      prebuiltConstructs: processPrebuiltConstructs(j5RunConstructs),
-      j5RunConstructs: processJ5RunConstructs(j5RunConstructs),
-      j5InputSequences: processInputSequences(j5InputSequences),
-      j5InputParts: processInputParts(j5InputParts),
-      j5OligoSyntheses: this.processJ5OligoSynthesis(j5OligoSyntheses),
-      j5DirectSyntheses: processJ5DirectSyntheses(j5DirectSyntheses),
-      j5PcrReactions: processJ5PcrReactions(j5PcrReactions),
-      j5AssemblyPieces: processJ5AssemblyPieces(j5AssemblyPieces)
-    };
-  };
+  //   const j5InputParts =
+  //     j5InputSequences && getInputPartsFromInputSequences(j5InputSequences);
+  //   return {
+  //     prebuiltConstructs:
+  //       j5RunConstructs && processPrebuiltConstructs(j5RunConstructs),
+  //     j5RunConstructs:
+  //       j5RunConstructs && processJ5RunConstructs(j5RunConstructs),
+  //     j5InputSequences:
+  //       j5InputSequences && processInputSequences(j5InputSequences),
+  //     j5InputParts: j5InputParts && processInputParts(j5InputParts),
+  //     j5OligoSyntheses:
+  //       j5OligoSyntheses && this.processJ5OligoSynthesis(j5OligoSyntheses),
+  //     j5DirectSyntheses:
+  //       j5DirectSyntheses && processJ5DirectSyntheses(j5DirectSyntheses),
+  //     j5PcrReactions: j5PcrReactions && processJ5PcrReactions(j5PcrReactions),
+  //     j5AssemblyPieces:
+  //       j5AssemblyPieces && processJ5AssemblyPieces(j5AssemblyPieces)
+  //   };
+  // };
 
   renderDownloadButton = () => {
     // option to override export handler
@@ -442,13 +339,13 @@ class J5ReportRecordView extends Component {
   render() {
     const {
       data,
-      upsertSequence,
       getIsLinkedCellRenderer,
       LinkJ5TableDialog,
       onConstructDoubleClick = noop,
       pcrReactionsTitleElements,
       constructsTitleElements = [],
-      oligosTitleElements = []
+      oligosTitleElements = [],
+      fragmentMap = {}
     } = this.props;
     const { linkDialogName } = this.state;
 
@@ -457,10 +354,8 @@ class J5ReportRecordView extends Component {
     if (!data.j5Report) {
       return <div>No report found!</div>;
     }
+    const j5Report = data.j5Report;
 
-    // JSON.parse(localStorage.getItem('TEMPORARY_j5Run')) || {}
-
-    const entitiesForAllTables = this.getEntitiesForAllTables();
     const linkDialogProps = getLinkDialogProps(data.j5Report);
     const currentLink = linkDialogProps[linkDialogName];
     const linkKeys = Object.keys(linkDialogProps);
@@ -514,19 +409,14 @@ class J5ReportRecordView extends Component {
             </Dialog>
           )}
 
-          {/*<div className="tg-card">
-          <div className={Classes.BUTTON_GROUP}>
-            <Button>Show DNA Assembly Parameters</Button>
-            <Button>Export as CSV</Button>
-            <Button>Export as JSON</Button>
-            <Button>Export Constructs</Button>
-          </div>
-        </div>*/}
           <J5TableCard
+            j5ReportId={j5Report.id}
             helperMessage="Prebuilt constructs are the desired sequences that have already
-          been built and are available in your library."
+               been built and are available in your library."
             title="Prebuilt Constructs"
-            entities={entitiesForAllTables.prebuiltConstructs}
+            processData={processDataForTables.prebuiltConstruct}
+            entities={j5Report.j5RunConstructs}
+            fragment={fragmentMap.j5RunConstruct}
             showLinkModal={() => this.showLinkModal("constructs")}
             isLinkable={LinkJ5TableDialog}
             onDoubleClick={onConstructDoubleClick}
@@ -535,9 +425,12 @@ class J5ReportRecordView extends Component {
           />
 
           <J5TableCard
+            j5ReportId={j5Report.id}
             helperMessage="Constructs are the desired sequences to be built in a j5 run."
             title="Assembled Constructs"
-            entities={entitiesForAllTables.j5RunConstructs}
+            processData={processDataForTables.j5RunConstruct}
+            entities={j5Report.j5RunConstructs}
+            fragment={fragmentMap.j5RunConstruct}
             showLinkModal={() => this.showLinkModal("constructs")}
             isLinkable={LinkJ5TableDialog}
             onDoubleClick={onConstructDoubleClick}
@@ -547,9 +440,12 @@ class J5ReportRecordView extends Component {
           />
 
           <J5TableCard
+            j5ReportId={j5Report.id}
             helperMessage="Input Sequences are the sequences that contain the Input Parts."
             title="Input Sequences"
-            entities={entitiesForAllTables.j5InputSequences}
+            processData={processDataForTables.j5InputSequence}
+            entities={j5Report.j5InputSequences}
+            fragment={fragmentMap.j5InputSequence}
             showLinkModal={() => this.showLinkModal("inputSequences")}
             isLinkable={LinkJ5TableDialog}
             tableProps={sharedTableProps}
@@ -565,18 +461,24 @@ class J5ReportRecordView extends Component {
           />
 
           <J5TableCard
+            j5ReportId={j5Report.id}
             helperMessage="Input Parts are the segments of sequence that are being used in
             a j5 run."
             title="Input Parts"
-            entities={entitiesForAllTables.j5InputParts}
+            processData={processDataForTables.j5InputSequence}
+            entities={j5Report.j5InputSequences}
+            fragment={fragmentMap.j5InputSequence}
             tableProps={sharedTableProps}
             schema={this.getSchema("j5InputParts")}
           />
 
           <J5TableCard
+            j5ReportId={j5Report.id}
             helperMessage="This is the list of oligos that need to be directly synthesized."
             title="Oligo Synthesis"
-            entities={entitiesForAllTables.j5OligoSyntheses}
+            processData={this.processJ5OligoSynthesis}
+            entities={j5Report.j5OligoSyntheses}
+            fragment={fragmentMap.j5OligoSynthesis}
             tableProps={sharedTableProps}
             isLinkable={LinkJ5TableDialog}
             schema={this.getSchema("j5OligoSyntheses")}
@@ -598,11 +500,14 @@ class J5ReportRecordView extends Component {
           </J5TableCard>
 
           <J5TableCard
+            j5ReportId={j5Report.id}
             helperMessage="This is the list DNA pieces that need to be directly synthesized."
             title="DNA Synthesis"
-            entities={entitiesForAllTables.j5DirectSyntheses}
+            processData={processDataForTables.j5DirectSynthesis}
+            entities={j5Report.j5DirectSyntheses}
             tableProps={sharedTableProps}
             schema={this.getSchema("j5DirectSyntheses")}
+            fragment={fragmentMap.j5DirectSynthesis}
             isLinkable={LinkJ5TableDialog}
             showLinkModal={() => this.showLinkModal("dnaSynthesisSequences")}
             linkButtonText="Link DNA Synthesis Pieces"
@@ -617,20 +522,27 @@ class J5ReportRecordView extends Component {
           />
 
           <J5TableCard
+            j5ReportId={j5Report.id}
             helperMessage="These are the PCR reactions that need to be run to generate the
                 assembly pieces."
             title="PCR Reactions"
-            entities={entitiesForAllTables.j5PcrReactions}
+            processData={processDataForTables.j5PcrReaction}
+            entities={j5Report.j5PcrReactions}
             tableProps={sharedTableProps}
+            openTitleElements={pcrReactionsTitleElements}
+            fragment={fragmentMap.j5PcrReaction}
             schema={this.getSchema("j5PcrReactions")}
           />
 
           <J5TableCard
+            j5ReportId={j5Report.id}
             helperMessage="These are the pieces of DNA that will get put together in a
                 final assembly reaction (Gibson/CPEC/SLIC/Golden-Gate) to give
                 the desired Constructs."
             title="DNA Pieces to be Assembled"
-            entities={entitiesForAllTables.j5AssemblyPieces}
+            processData={processDataForTables.j5AssemblyPiece}
+            entities={j5Report.j5AssemblyPieces}
+            fragment={fragmentMap.j5AssemblyPiece}
             isLinkable={LinkJ5TableDialog}
             showLinkModal={() => this.showLinkModal("dnaPieces")}
             linkButtonText="Link DNA Pieces"
@@ -641,21 +553,21 @@ class J5ReportRecordView extends Component {
               getIsLinkedCellRenderer(
                 "sequence.polynucleotideMaterialId",
                 "sequence.hash",
-                "j5AssemblyPiece",
-                upsertSequence
+                "j5AssemblyPiece"
               )
             }
           />
 
           <J5TableCard
+            j5ReportId={j5Report.id}
             helperMessage="This lists which assembly pieces need to be combined to create
                 each construct."
             title="Combination of Assembly Pieces"
-            entities={entitiesForAllTables.j5RunConstructs}
+            processData={processDataForTables.j5RunConstruct}
+            entities={j5Report.j5RunConstructs}
+            fragment={fragmentMap.j5RunConstruct}
             tableProps={sharedTableProps}
-            schema={this.createSchemaForCombinationOfAssemblyPieces(
-              entitiesForAllTables.j5RunConstructs
-            )}
+            createSchema={this.createSchemaForCombinationOfAssemblyPieces}
           />
 
           {/*<div className="tg-card">
