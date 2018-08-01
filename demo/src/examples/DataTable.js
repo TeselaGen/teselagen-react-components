@@ -198,6 +198,7 @@ class DataTableInstance extends React.Component {
       noFooter: false,
       noPadding: false,
       noFullscreenButton: false,
+      hideDisplayOptionsIcon: false,
       withDisplayOptions: true,
       isInfinite: false,
       isSingleSelect: false,
@@ -312,6 +313,7 @@ class DataTableInstance extends React.Component {
           "isViewable",
           "Make sure withCheckboxes is off when using this"
         )}
+        {renderToggle(this, "hideDisplayOptionsIcon")}
         {renderToggle(this, "withDisplayOptions")}
         {renderToggle(this, "withPaging")}
         {renderToggle(this, "withExpandAndCollapseAllButton")}
@@ -425,6 +427,7 @@ class DataTableInstance extends React.Component {
             noHeader={this.state.noHeader}
             noFooter={this.state.noFooter}
             withDisplayOptions={this.state.withDisplayOptions}
+            hideDisplayOptionsIcon={this.state.hideDisplayOptionsIcon}
             isInfinite={this.state.isInfinite}
             isLoading={this.state.isLoading}
             disabled={this.state.disabled}

@@ -47,8 +47,12 @@ export default class DisplayOptions extends React.Component {
       userSpecifiedCompact,
       disabled,
       hasOptionForForcedHidden,
-      showForcedHiddenColumns
+      showForcedHiddenColumns,
+      hideDisplayOptionsIcon
     } = this.props;
+    if (hideDisplayOptionsIcon) {
+      return null //don't show antyhing!
+    }
     const { fields } = schema;
     const fieldGroups = {};
     const mainFields = [];
