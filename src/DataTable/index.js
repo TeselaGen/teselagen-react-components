@@ -280,6 +280,7 @@ class DataTable extends React.Component {
       filters,
       errorParsingUrlString,
       userSpecifiedCompact,
+      hideDisplayOptionsIcon,
       compact,
       compactPaging,
       entityCount,
@@ -523,6 +524,7 @@ class DataTable extends React.Component {
               {withDisplayOptions && (
                 <DisplayOptions
                   disabled={disabled}
+                  hideDisplayOptionsIcon={hideDisplayOptionsIcon}
                   resetDefaultVisibility={resetDefaultVisibilityToUse}
                   updateColumnVisibility={updateColumnVisibilityToUse}
                   updateTableDisplayDensity={updateTableDisplayDensityToUse}
