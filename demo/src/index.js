@@ -7,6 +7,10 @@ import FormComponents from "./examples/FormComponents";
 import WithDialog from "./examples/WithDialog";
 import Toastr from "./examples/Toastr";
 import showConfirmationDialogDemo from "./examples/showConfirmationDialogDemo";
+import showConfirmationDialog from "../../src/showConfirmationDialog";
+import showLoadingMaskDemo from "./examples/showLoadingMaskDemo";
+import showLoadingMask from "../../src/showLoadingMask";
+
 import CustomIcons from "./examples/CustomIcons";
 import S3Uploader from "./examples/S3Uploader";
 import SimpleTable from "./examples/SimpleTable";
@@ -25,7 +29,7 @@ import * as customIcons from "../../src/customIcons";
 import createMenu from "../../src/utils/createMenu";
 import Tree from "./examples/Tree";
 import { bigTreeData, smallTreeData } from "./data/treeData";
-import showConfirmationDialog from "../../src/showConfirmationDialog";
+
 import S3Download from "../../src/utils/S3Download";
 import magicDownload from "../../src/DownloadLink/magicDownload";
 
@@ -308,6 +312,15 @@ const demos = {
     url:
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/Toastr.js"
   },
+  showLoadingMask: {
+    scope: {
+      showLoadingMask,
+      Intent
+    },
+    demo: showLoadingMaskDemo,
+    url:
+      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/Toastr.js"
+  },
   customIcons: {
     scope: {
       customIcons
@@ -350,6 +363,7 @@ const demos = {
   //     "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/FontIconsDemo.js"
   // }
 };
+
 
 const demoPropsSchema = [
   {

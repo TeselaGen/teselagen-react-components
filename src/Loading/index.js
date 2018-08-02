@@ -25,6 +25,7 @@ export default class Loading extends React.Component {
       loading,
       style: userStyle,
       className,
+      containerStyle={},
       children,
       bounce = false,
       withTimeout,
@@ -45,7 +46,8 @@ export default class Loading extends React.Component {
         <div
           className={"tg-loader-container tg-flex justify-center align-center"}
           style={{
-            width: "100%"
+            width: "100%",
+            ...containerStyle
           }}
         >
           <LoaderComp style={style} className={className} />
