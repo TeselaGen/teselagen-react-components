@@ -21,7 +21,6 @@ export default class InfoHelper extends Component {
     const IconToUse = isButton ? Button : Icon;
     const IconInner = (
       <IconToUse
-        title="thomas"
         icon={icon}
         className={className}
         iconSize={size}

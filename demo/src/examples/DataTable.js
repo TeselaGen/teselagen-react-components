@@ -313,7 +313,7 @@ class DataTableInstance extends React.Component {
           "isViewable",
           "Make sure withCheckboxes is off when using this"
         )}
-        {renderToggle(this, "hideDisplayOptionsIcon")}
+        {renderToggle(this, "hideDisplayOptionsIcon", "use this in conjunction with withDisplayOptions=true to have display options but not allow the user to see or edit them")}
         {renderToggle(this, "withDisplayOptions")}
         {renderToggle(this, "withPaging")}
         {renderToggle(this, "withExpandAndCollapseAllButton")}
