@@ -21,6 +21,7 @@ export {
 export { default as withTableParams } from "./DataTable/utils/withTableParams";
 export { default as InfoHelper } from "./InfoHelper";
 export { default as showConfirmationDialog } from "./showConfirmationDialog";
+export { default as showLoadingMask } from "./showLoadingMask";
 export { default as CollapsibleCard } from "./CollapsibleCard";
 export {
   default as ResizableDraggableDialog
