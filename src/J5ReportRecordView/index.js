@@ -46,7 +46,7 @@ class J5ReportRecordView extends Component {
     this.setState({ linkDialogName: name });
   };
 
-  processJ5OligoSynthesis(j5Oligos) {
+  processJ5OligoSynthesis = j5Oligos => {
     const { replaceOligoPartCids = true } = this.props;
     return j5Oligos.map(j5Oligo => {
       const partCids = getWrappedInParensMatches(j5Oligo.name);
@@ -68,15 +68,10 @@ class J5ReportRecordView extends Component {
         id: "oligo_" + j5Oligo.id,
         name,
         firstTargetPart,
-        lastTargetPart,
-        bps: get(j5Oligo, "oligo.sequence.sequenceFragments", [])
-          .map(({ fragment }) => {
-            return fragment;
-          })
-          .join("")
+        lastTargetPart
       };
     });
-  }
+  };
 
   handleExportOligosToCsv = () => {
     const { data } = this.props;
@@ -356,7 +351,7 @@ class J5ReportRecordView extends Component {
     }
     const j5Report = data.j5Report;
 
-    const linkDialogProps = getLinkDialogProps(data.j5Report);
+    const linkDialogProps = getLinkDialogProps(data.j5Report, fragmentMap);
     const currentLink = linkDialogProps[linkDialogName];
     const linkKeys = Object.keys(linkDialogProps);
     let moveToNextTable;
@@ -465,7 +460,7 @@ class J5ReportRecordView extends Component {
             helperMessage="Input Parts are the segments of sequence that are being used in
             a j5 run."
             title="Input Parts"
-            processData={processDataForTables.j5InputSequence}
+            processData={processDataForTables.j5InputPart}
             entities={j5Report.j5InputSequences}
             fragment={fragmentMap.j5InputSequence}
             tableProps={sharedTableProps}

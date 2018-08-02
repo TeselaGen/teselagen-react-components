@@ -1,76 +1,58 @@
-import { each } from "lodash";
+import { isEmpty } from "lodash";
+import pluralize from "pluralize";
 
-export function getLinkDialogProps(j5Report) {
-  const {
-    j5OligoSyntheses = [],
-    j5AssemblyPieces = [],
-    j5InputSequences = [],
-    j5RunConstructs = [],
-    j5DirectSyntheses = []
-    // j5InputParts
-  } = j5Report;
-  const linkDialogProps = {
-    inputSequences: {
-      dialogProps: {
-        title: "Link Input Sequences to Materials"
-      },
-      items: j5InputSequences,
-      sequenceHashes: j5InputSequences.map(({ sequence }) => {
-        return sequence.hash;
-      })
-    },
+// linkable models (keep order)
+const models = [
+  "j5InputSequence",
+  "j5DirectSynthesis",
+  "j5RunConstruct",
+  "j5OligoSynthesis",
+  "j5AssemblyPiece"
+];
 
-    dnaSynthesisSequences: {
-      dialogProps: {
-        title: "Link DNA Synthesis Sequences to Materials"
-      },
-      items: j5DirectSyntheses,
-      sequenceHashes: j5DirectSyntheses.map(({ sequence }) => {
-        return sequence.hash;
-      })
-    },
+const titleMap = {
+  j5OligoSynthesis: "Oligos",
+  j5AssemblyPiece: "DNA Pieces",
+  j5InputSequence: "Input Sequences",
+  j5RunConstruct: "Constructs",
+  j5DirectSynthesis: "DNA Synthesis Sequences"
+};
 
-    constructs: {
-      dialogProps: {
-        title: "Link Constructs to Materials"
-      },
-      items: j5RunConstructs,
-      sequenceHashes: j5RunConstructs.map(({ sequence }) => {
-        return sequence.hash;
-      })
-    },
+const propNameMap = {
+  j5OligoSynthesis: "oligos",
+  j5AssemblyPiece: "dnaPieces",
+  j5InputSequence: "inputSequences",
+  j5RunConstruct: "constructs",
+  j5DirectSynthesis: "dnaSynthesisSequences"
+};
 
-    oligos: {
-      dialogProps: {
-        title: "Link Oligos to Materials"
-      },
-      items: j5OligoSyntheses.map(({ oligo }) => {
-        return oligo;
-      }),
-      sequenceHashes: j5OligoSyntheses.map(({ oligo }) => {
-        return oligo.sequence.hash;
-      })
-    },
+const haveOligos = {
+  j5OligoSynthesis: true
+};
 
-    dnaPieces: {
+export function getLinkDialogProps(j5Report, fragmentMap) {
+  const useFragments = !isEmpty(fragmentMap);
+  const linkDialogProps = models.reduce((acc, model) => {
+    const propName = propNameMap[model];
+    acc[propName] = {
       dialogProps: {
-        title: "Link DNA Pieces to Materials"
-      },
-      items: j5AssemblyPieces,
-      sequenceHashes: j5AssemblyPieces.map(({ sequence }) => {
-        return sequence.hash;
-      })
-    }
-  };
-  each(linkDialogProps, obj => {
-    obj.allLinked = true;
-    obj.items.some(item => {
-      if (item.sequence && !item.sequence.polynucleotideMaterialId) {
-        obj.allLinked = false;
-        return true;
+        title: `Link ${titleMap[model]} to Materials`
       }
-      return false;
-    });
-  });
+    };
+    if (useFragments) {
+      acc[propName].fragment = fragmentMap[model];
+    } else {
+      let items = j5Report[pluralize(model)];
+      if (haveOligos[model]) {
+        items = items.map(item => item.oligo);
+      }
+      acc[propName].items = items;
+      acc[propName].sequenceHashes = items.map(({ sequence }) => sequence.hash);
+      acc[propName].allLinked = !items.some(
+        item => item.sequence && !item.sequence.polynucleotideMaterialId
+      );
+    }
+    return acc;
+  }, {});
   return linkDialogProps;
 }

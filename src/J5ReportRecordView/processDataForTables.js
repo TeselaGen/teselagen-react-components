@@ -1,7 +1,6 @@
 import { getRangeLength } from "ve-range-utils";
 import { get, flatMap } from "lodash";
 import { compose } from "recompose";
-import getSequenceStringOfJ5InputPart from "./getSequenceStringOfJ5InputPart";
 
 const processInputParts = inputParts =>
   inputParts.map(inputPart => {
@@ -18,8 +17,7 @@ const processInputParts = inputParts =>
           end: inputPart.sequencePart.end
         },
         get(inputPart, "sequencePart.sequence.size")
-      ),
-      bps: getSequenceStringOfJ5InputPart(inputPart)
+      )
     };
   });
 
@@ -27,10 +25,7 @@ const processJ5DirectSyntheses = j5DirectSynths =>
   j5DirectSynths.map(j5DirectSynth => {
     return {
       ...j5DirectSynth,
-      id: "dna_syn_" + j5DirectSynth.id,
-      bps: get(j5DirectSynth, "sequence.sequenceFragments", [])
-        .map(f => f.fragment)
-        .join("")
+      id: "dna_syn_" + j5DirectSynth.id
     };
   });
 
@@ -81,10 +76,7 @@ const getInputPartsFromInputSequences = j5InputSequences =>
 const processJ5AssemblyPieces = j5AssemblyPieces =>
   j5AssemblyPieces.map(ap => ({
     ...ap,
-    id: "piece_" + ap.id,
-    bps: get(ap, "sequence.sequenceFragments", [])
-      .map(f => f.fragment)
-      .join("")
+    id: "piece_" + ap.id
   }));
 
 const processInputSequences = j5InputSequences =>
