@@ -4,7 +4,7 @@ import moment from "moment";
 import { camelCase } from "lodash";
 import classNames from "classnames";
 import getMomentFormatter from "../utils/getMomentFormatter";
-import { onEnterOrBlurHelper } from "../utils/handlerHelpers";
+import { onEnterHelper } from "../utils/handlerHelpers";
 import React from "react";
 import type {
   TableDataTypes
@@ -48,6 +48,7 @@ export default class FilterAndSortMenu extends React.Component {
   };
   handleFilterSubmit = () => {
     const { filterValue, selectedFilter } = this.state;
+    const { togglePopover } = this.props;
     const ccSelectedFilter = camelCase(selectedFilter);
     let filterValToUse = filterValue;
     if (ccSelectedFilter === "true" || ccSelectedFilter === "false") {
@@ -65,6 +66,7 @@ export default class FilterAndSortMenu extends React.Component {
         filterValue: filterValToUse
       }
     ]);
+    togglePopover()
   };
   UNSAFE_componentWillMount() {
     if (this.props.currentFilter) {
@@ -110,24 +112,6 @@ export default class FilterAndSortMenu extends React.Component {
 
     return (
       <Menu className={"data-table-header-menu"}>
-        {/*         
-        <div className={"custom-menu-item"}>
-          <span>Filter by condition. {schemaForField.displayName}</span>
-        </div> */}
-        {currentFilter ? (
-          <div
-            onClick={() => {
-              removeSingleFilter(currentFilter.filterOn);
-            }}
-            className={classNames(Classes.POPOVER_DISMISS, "custom-menu-item")}
-          >
-            <Button intent={Intent.DANGER} icon="remove">
-              Clear Filter
-            </Button>
-          </div>
-        ) : (
-          ""
-        )}
         <div className={"custom-menu-item"}>
           <div className={classNames(Classes.SELECT, Classes.FILL)}>
             <select
@@ -164,7 +148,11 @@ export default class FilterAndSortMenu extends React.Component {
             handleFilterSubmit();
           }}
           intent={Intent.SUCCESS}
-          text="OK"
+          text="Filter"
+          secondaryText={"Clear"}
+          secondaryAction={() => {
+            currentFilter && removeSingleFilter(currentFilter.filterOn);
+          }}
         />
       </Menu>
     );
@@ -191,7 +179,7 @@ class FilterInput extends React.Component {
               onChange={function(e) {
                 handleFilterValueChange(e.target.value);
               }}
-              {...onEnterOrBlurHelper(handleFilterSubmit)}
+              {...onEnterHelper(handleFilterSubmit)}
               value={filterValue}
             />
           </div>
@@ -205,7 +193,7 @@ class FilterInput extends React.Component {
               onChange={function(e) {
                 handleFilterValueChange(e.target.value);
               }}
-              {...onEnterOrBlurHelper(handleFilterSubmit)}
+              {...onEnterHelper(handleFilterSubmit)}
               value={filterValue}
               type={"number"}
             />
@@ -220,7 +208,7 @@ class FilterInput extends React.Component {
               onChange={function(e) {
                 handleFilterValueChange([e.target.value, filterValue[1]]);
               }}
-              {...onEnterOrBlurHelper(handleFilterSubmit)}
+              {...onEnterHelper(handleFilterSubmit)}
               value={filterValue && filterValue[0]}
               type={"number"}
             />
@@ -229,7 +217,7 @@ class FilterInput extends React.Component {
               onChange={function(e) {
                 handleFilterValueChange([filterValue[0], e.target.value]);
               }}
-              {...onEnterOrBlurHelper(handleFilterSubmit)}
+              {...onEnterHelper(handleFilterSubmit)}
               value={filterValue && filterValue[1]}
               type={"number"}
             />

@@ -25,6 +25,7 @@ import {
 import classNames from "classnames";
 import scrollIntoView from "dom-scroll-into-view";
 import { SortableElement } from "react-sortable-hoc";
+import {BooleanValue} from "react-values";
 import { getSelectedRowsFromEntities } from "./utils/selection";
 import rowClick, { finalizeSelection } from "./utils/rowClick";
 import ReactTable from "react-table";
@@ -1024,30 +1025,43 @@ class DataTable extends React.Component {
     const FilterMenu = column.FilterMenu || FilterAndSortMenu;
     const filterMenu =
       withFilter && !isActionColumn && !filterDisabled ? (
-        <Popover
-          position="bottom"
-          modifiers={{
-            arrow: false
+        <BooleanValue defaultValue={false}>
+          {({value, toggle, clear}) => {
+            return (
+              <Popover
+                position="bottom"
+                onClose={() => {
+                  clear()
+                }}
+                isOpen={value}
+                modifiers={{
+                  preventOverflow: { enabled: false },
+                  hide: { enabled: false }
+                }}
+              >
+                <Icon
+                  style={{ marginLeft: 5 }}
+                  icon="filter"
+                  onClick={toggle}
+                  className={classNames("tg-filter-menu-button", {
+                    "tg-active-filter": !!filterActiveForColumn
+                  })}
+                />
+                <FilterMenu
+                  addFilters={addFilters}
+                  togglePopover={clear}
+                  removeSingleFilter={removeSingleFilter}
+                  currentFilter={currentFilter}
+                  filterOn={ccDisplayName}
+                  dataType={columnDataType}
+                  schemaForField={column}
+                  currentParams={currentParams}
+                  setNewParams={setNewParams}
+                />
+              </Popover>
+            );
           }}
-        >
-          <Icon
-            style={{ marginLeft: 5 }}
-            icon="filter"
-            className={classNames("tg-filter-menu-button", {
-              "tg-active-filter": !!filterActiveForColumn
-            })}
-          />
-          <FilterMenu
-            addFilters={addFilters}
-            removeSingleFilter={removeSingleFilter}
-            currentFilter={currentFilter}
-            filterOn={ccDisplayName}
-            dataType={columnDataType}
-            schemaForField={column}
-            currentParams={currentParams}
-            setNewParams={setNewParams}
-          />
-        </Popover>
+        </BooleanValue>
       ) : null;
 
     return (

@@ -172,7 +172,7 @@
 }
 
 .tg-sort-arrow-container > * {
-  display: none !important;
+  display: none;
 }
 
 .tg-sort-arrow-container > *:hover {
@@ -368,4 +368,9 @@
 
 .pt-dark .data-table-container.fullscreen {
   background: #293742;
+}
+
+.data-table-container .ReactTable .rt-resizer {
+  width: 10px;
+  right: -5px;
 }
