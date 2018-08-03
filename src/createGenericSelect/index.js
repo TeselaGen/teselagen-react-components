@@ -6,7 +6,6 @@ import { compose } from "react-apollo";
 import { connect } from "react-redux";
 import { branch, withProps } from "recompose";
 import { change, clearFields, reduxForm } from "redux-form";
-import uniqid from "uniqid";
 import { Query } from "react-apollo";
 import DataTable from "../DataTable";
 import withTableParams from "../DataTable/utils/withTableParams";
@@ -16,8 +15,7 @@ import withQuery from "../enhancers/withQuery";
 import adHoc from "../utils/adHoc";
 import DialogFooter from "../DialogFooter";
 import BlueprintError from "../BlueprintError";
-import generateFragmentWithFields from "../utils/generateFragmentWithFields";
-import gql from "graphql-tag";
+import generateQuery from "../utils/generateQuery";
 
 function preventBubble(e) {
   e.stopPropagation();
@@ -327,56 +325,9 @@ const PostSelectTable = branch(
           initialEntities
         } = this.props;
 
-        let fragment = additionalDataFragment;
-        if (Array.isArray(fragment)) {
-          fragment = generateFragmentWithFields(...fragment);
-        }
-        if (typeof fragment === "string" || typeof fragment !== "object") {
-          throw new Error(
-            "Please provide a valid fragment when using withQuery!"
-          );
-        }
-        const name = get(fragment, "definitions[0].typeCondition.name.value");
-        if (!name) {
-          console.error("Bad fragment passed to withQuery!!");
-          // console.error(fragment, options);
-          throw new Error(
-            "No fragment name found in withQuery() call. This is due to passing in a string or something other than a gql fragment to withQuery"
-          );
-        }
-        // const {fragment, extraMutateArgs} = options
-        const fragName = fragment && fragment.definitions[0].name.value;
-        const nameToUse = pluralize(name);
-        const queryNameToUse = nameToUse + "Query";
-        // const pascalNameToUse = pascalCase(nameToUse)
-        let queryInner = `${fragName ? `...${fragName}` : "id"}`;
-        if (true) {
-          queryInner = `results {
-      ${queryInner}
-    }
-    totalResults`;
-        }
-
-        let gqlQuery;
-        if (true) {
-          gqlQuery = gql`
-      query ${queryNameToUse} ($pageSize: Int $sort: [String] $filter: JSON $pageNumber: Int) {
-        ${nameToUse}(pageSize: $pageSize, sort: $sort, filter: $filter, pageNumber: $pageNumber) {
-          ${queryInner}
-        }
-      }
-      ${fragment ? fragment : ``}
-    `;
-        } else {
-          gqlQuery = gql`
-      query ${queryNameToUse} ($${false || "id"}: String!) {
-        ${nameToUse}(${false || "id"}: $${false || "id"}) {
-          ${queryInner}
-        }
-      }
-      ${fragment ? fragment : ``}
-    `;
-        }
+        const gqlQuery = generateQuery(additionalDataFragment, {
+          isPlural: true
+        });
 
         return (
           <Query

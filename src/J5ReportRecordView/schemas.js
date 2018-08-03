@@ -97,8 +97,7 @@ const schemas = {
         path: "oligo.sequence.polynucleotideMaterialId",
         type: "boolean",
         displayName: "Is Linked"
-      },
-      { path: "bps", type: "string", displayName: "Sequence" }
+      }
     ]
   },
   j5AssemblyPieces: {
@@ -159,8 +158,7 @@ const schemas = {
         displayName: "Is Linked"
       },
       { path: "sequence.size", type: "number", displayName: "Length (bp)" },
-      { path: "cost", type: "number", displayName: "Cost (USD)" },
-      { path: "bps", type: "string", displayName: "Sequence" }
+      { path: "cost", type: "number", displayName: "Cost (USD)" }
     ]
   },
   j5InputParts: {

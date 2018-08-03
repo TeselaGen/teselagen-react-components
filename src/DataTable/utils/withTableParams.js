@@ -9,7 +9,7 @@ import {
   getCurrentParamsFromUrl
 } from "./queryParams";
 import compose from "lodash/fp/compose";
-import { map, isFunction } from "lodash";
+import { isFunction } from "lodash";
 import { withRouter } from "react-router-dom";
 import { branch } from "recompose";
 
