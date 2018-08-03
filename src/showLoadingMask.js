@@ -14,6 +14,7 @@ export default function showLoadingMask(opts = {}) {
           <div style={{ width, height }}>
             <Loading
               {...{
+                displayInstantly: true,
                 containerStyle: {
                   opacity: 1,
                   display: "flex",
