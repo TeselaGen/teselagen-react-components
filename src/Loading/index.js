@@ -25,8 +25,9 @@ export default class Loading extends React.Component {
       loading,
       style: userStyle,
       className,
-      containerStyle={},
+      containerStyle = {},
       children,
+      displayInstantly = false,
       bounce = false,
       withTimeout,
       inDialog
@@ -39,7 +40,11 @@ export default class Loading extends React.Component {
     const LoaderComp = bounce || inDialog ? BounceLoader : DNALoader;
 
     if (loading || !children) {
-      if (!longerThan200MS && ((!bounce && !inDialog) || withTimeout)) {
+      if (
+        !displayInstantly &&
+        !longerThan200MS &&
+        ((!bounce && !inDialog) || withTimeout)
+      ) {
         return <div />;
       }
       return (
