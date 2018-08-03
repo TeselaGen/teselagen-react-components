@@ -6,7 +6,6 @@ import { compose } from "react-apollo";
 import { connect } from "react-redux";
 import { branch, withProps } from "recompose";
 import { change, clearFields, reduxForm } from "redux-form";
-import uniqid from "uniqid";
 import { Query } from "react-apollo";
 import DataTable from "../DataTable";
 import withTableParams from "../DataTable/utils/withTableParams";
@@ -16,8 +15,6 @@ import withQuery from "../enhancers/withQuery";
 import adHoc from "../utils/adHoc";
 import DialogFooter from "../DialogFooter";
 import BlueprintError from "../BlueprintError";
-import generateFragmentWithFields from "../utils/generateFragmentWithFields";
-import gql from "graphql-tag";
 import generateQuery from "../utils/generateQuery";
 
 function preventBubble(e) {

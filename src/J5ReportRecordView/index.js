@@ -24,13 +24,6 @@ const sharedTableProps = {
   urlConnected: false
 };
 
-function getWrappedInParensMatches(s) {
-  const matches = [];
-  s.replace(/\((.*?)\)/g, function(g0, g1) {
-    matches.push(g1);
-  });
-  return matches;
-}
 class J5ReportRecordView extends Component {
   state = {
     linkDialogName: undefined,
@@ -46,36 +39,9 @@ class J5ReportRecordView extends Component {
     this.setState({ linkDialogName: name });
   };
 
-  processJ5OligoSynthesis = j5Oligos => {
-    const { replaceOligoPartCids = true } = this.props;
-    return j5Oligos.map(j5Oligo => {
-      const partCids = getWrappedInParensMatches(j5Oligo.name);
-      const firstTargetPart = get(this.state.partCidMap, `${partCids[0]}.name`);
-      const lastTargetPart = get(this.state.partCidMap, `${partCids[1]}.name`);
-
-      let name = j5Oligo.name
-        .replace("oli", "Oligo ")
-        .replace(/_/g, " ")
-        .replace("forward", "Forward")
-        .replace("reverse", "Reverse");
-      if (replaceOligoPartCids) {
-        name = name
-          .replace(partCids[0], firstTargetPart)
-          .replace(partCids[1], lastTargetPart);
-      }
-      return {
-        ...j5Oligo,
-        id: "oligo_" + j5Oligo.id,
-        name,
-        firstTargetPart,
-        lastTargetPart
-      };
-    });
-  };
-
   handleExportOligosToCsv = () => {
     const { data } = this.props;
-    const j5OligoSyntheses = this.processJ5OligoSynthesis(
+    const j5OligoSyntheses = processDataForTables.j5OligoSynthesis(
       data.j5Report.j5OligoSyntheses
     );
     const csvString = papaparse.unparse([
@@ -340,6 +306,7 @@ class J5ReportRecordView extends Component {
       pcrReactionsTitleElements,
       constructsTitleElements = [],
       oligosTitleElements = [],
+      linkDialogWidth = 500,
       fragmentMap = {}
     } = this.props;
     const { linkDialogName } = this.state;
@@ -384,7 +351,7 @@ class J5ReportRecordView extends Component {
           {LinkJ5TableDialog && (
             <Dialog
               style={{
-                width: 650
+                width: linkDialogWidth
               }}
               {...(currentLink ? currentLink.dialogProps : {})}
               onClose={this.hideLinkModal}
@@ -471,7 +438,7 @@ class J5ReportRecordView extends Component {
             j5ReportId={j5Report.id}
             helperMessage="This is the list of oligos that need to be directly synthesized."
             title="Oligo Synthesis"
-            processData={this.processJ5OligoSynthesis}
+            processData={processDataForTables.j5OligoSynthesis}
             entities={j5Report.j5OligoSyntheses}
             fragment={fragmentMap.j5OligoSynthesis}
             tableProps={sharedTableProps}

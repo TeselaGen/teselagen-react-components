@@ -26,7 +26,7 @@ const propNameMap = {
   j5DirectSynthesis: "dnaSynthesisSequences"
 };
 
-const haveOligos = {
+const hasOligos = {
   j5OligoSynthesis: true
 };
 
@@ -37,13 +37,18 @@ export function getLinkDialogProps(j5Report, fragmentMap) {
     acc[propName] = {
       dialogProps: {
         title: `Link ${titleMap[model]} to Materials`
-      }
+      },
+      hasOligos,
+      j5ReportId: j5Report.id,
+      model
     };
     if (useFragments) {
-      acc[propName].fragment = fragmentMap[model];
+      acc[propName].runTimeQueryOptions = {
+        fragment: fragmentMap[model]
+      };
     } else {
       let items = j5Report[pluralize(model)];
-      if (haveOligos[model]) {
+      if (hasOligos[model]) {
         items = items.map(item => item.oligo);
       }
       acc[propName].items = items;

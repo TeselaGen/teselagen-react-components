@@ -46,8 +46,9 @@ export default function withQuery(inputFragment, options = {}) {
     : inputFragment;
 
   const gqlQuery = generateQuery(fragment, options);
-  const name = get(fragment, "definitions[0].typeCondition.name.value");
-  const nameToUse = nameOverride || (isPlural ? pluralize(name) : name);
+  const modelName = get(fragment, "definitions[0].typeCondition.name.value");
+  const nameToUse =
+    nameOverride || (isPlural ? pluralize(modelName) : modelName);
   const queryNameToUse = queryName || nameToUse + "Query";
   if (asQueryObj) {
     return gqlQuery;
@@ -112,6 +113,7 @@ export default function withQuery(inputFragment, options = {}) {
         if (typeof queryOptions === "function") {
           extraOptions = queryOptions(props) || {};
         }
+
         const {
           variables: extraOptionVariables,
           ...otherExtraOptions
@@ -122,6 +124,13 @@ export default function withQuery(inputFragment, options = {}) {
           ...propVariables,
           ...(extraOptionVariables && extraOptionVariables)
         };
+        if (
+          get(variablesToUse, "filter.entity") &&
+          get(variablesToUse, "filter.entity") !== modelName
+        ) {
+          console.error("filter model does not match fragment model!");
+        }
+
         return {
           ...(!isEmpty(variablesToUse) && { variables: variablesToUse }),
           fetchPolicy: fetchPolicy || "network-only",

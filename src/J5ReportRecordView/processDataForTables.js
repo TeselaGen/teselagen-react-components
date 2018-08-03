@@ -91,6 +91,27 @@ const processJ5PcrReactions = j5PcrReactions =>
     id: "pcr_" + pcr.id
   }));
 
+const processJ5OligoSynthesis = j5Oligos =>
+  j5Oligos.map(j5Oligo => {
+    const partNames = getWrappedInParensMatches(j5Oligo.name);
+
+    return {
+      ...j5Oligo,
+      id: "oligo_" + j5Oligo.id,
+      name: j5Oligo.name,
+      firstTargetPart: partNames[0],
+      lastTargetPart: partNames[1]
+    };
+  });
+
+function getWrappedInParensMatches(s) {
+  const matches = [];
+  s.replace(/\((.*?)\)/g, function(g0, g1) {
+    matches.push(g1);
+  });
+  return matches;
+}
+
 export default {
   j5PcrReaction: processJ5PcrReactions,
   j5InputSequence: processInputSequences,
@@ -98,6 +119,7 @@ export default {
     processInputParts,
     getInputPartsFromInputSequences
   ),
+  j5OligoSynthesis: processJ5OligoSynthesis,
   j5AssemblyPiece: processJ5AssemblyPieces,
   j5DirectSynthesis: processJ5DirectSyntheses,
   j5RunConstruct: processJ5RunConstructs,

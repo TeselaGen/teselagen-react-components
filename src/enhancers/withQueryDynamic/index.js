@@ -67,15 +67,14 @@ export default function withQuery(__inputFragment, maybeOptions) {
     } = { ...componentProps, ...options, ...runTimeQueryOptions };
 
     const inputFragment = _inputFragment || _fragment;
-    console.log("inputFragment:", inputFragment);
     const fragment = Array.isArray(inputFragment)
       ? generateFragmentWithFields(...inputFragment)
       : inputFragment;
-    console.log("fragment:", fragment);
 
     const gqlQuery = generateQuery(fragment, mergedOpts);
-    const name = get(fragment, "definitions[0].typeCondition.name.value");
-    const nameToUse = nameOverride || (isPlural ? pluralize(name) : name);
+    const modelName = get(fragment, "definitions[0].typeCondition.name.value");
+    const nameToUse =
+      nameOverride || (isPlural ? pluralize(modelName) : modelName);
     const queryNameToUse = queryName || nameToUse + "Query";
 
     let id;
@@ -106,6 +105,13 @@ export default function withQuery(__inputFragment, maybeOptions) {
       ...propVariables,
       ...(extraOptionVariables && extraOptionVariables)
     };
+
+    if (
+      get(variablesToUse, "filter.entity") &&
+      get(variablesToUse, "filter.entity") !== modelName
+    ) {
+      console.error("filter model does not match fragment model!");
+    }
 
     return (
       <Query
@@ -173,12 +179,17 @@ export default function withQuery(__inputFragment, maybeOptions) {
             return <Loading inDialog={inDialog} bounce={bounce} />;
           }
 
+          const allPropsForComponent = {
+            ...componentProps,
+            ...propsToReturn
+          };
+
           return (
             <Component
               {...{
-                ...componentProps,
-                ...propsToReturn,
-                ...(isFunction(mapQueryProps) && mapQueryProps(propsToReturn))
+                ...allPropsForComponent,
+                ...(isFunction(mapQueryProps) &&
+                  mapQueryProps(allPropsForComponent))
               }}
             />
           );
