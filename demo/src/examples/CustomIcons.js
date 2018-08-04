@@ -23,6 +23,7 @@ function CustomIconsDemo() {
       <Button icon={customIcons.keyboardIcon} text="keyboardIcon" />
       <Button icon={customIcons.cardDetailsIcon} text="cardDetailsIcon" />
       <Button icon={customIcons.driveIcon} text="driveIcon" />
+      <Button icon={customIcons.sharedDriveIcon} text="sharedDriveIcon" />
     </div>
   );
 }
