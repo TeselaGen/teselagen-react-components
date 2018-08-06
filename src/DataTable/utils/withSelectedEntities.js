@@ -56,3 +56,8 @@ export function getRecordsFromIdMap(state, formName) {
     []
   );
 }
+
+export function getSelectedEntities(storeOrState, formName) {
+  const state = storeOrState.getState ? storeOrState.getState() : storeOrState
+  return getRecordsFromIdMap(state, formName)
+}

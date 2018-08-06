@@ -1,7 +1,8 @@
 import "./fontello/css/fontello.css";
 import "./style.css";
 export {
-  default as withSelectedEntities
+  default as withSelectedEntities,
+  getSelectedEntities
 } from "./DataTable/utils/withSelectedEntities";
 export {
   default as DataTable,
