@@ -25,7 +25,7 @@ import {
 import classNames from "classnames";
 import scrollIntoView from "dom-scroll-into-view";
 import { SortableElement } from "react-sortable-hoc";
-import {BooleanValue} from "react-values";
+import { BooleanValue } from "react-values";
 import { getSelectedRowsFromEntities } from "./utils/selection";
 import rowClick, { finalizeSelection } from "./utils/rowClick";
 import ReactTable from "react-table";
@@ -622,9 +622,12 @@ class DataTable extends React.Component {
       checked: false,
       indeterminate: false
     };
-    if (checkedRows.length === entities.length) {
+    const notDisabledEntityCount = entities.reduce((acc, e) => {
+      return isEntityDisabled(e) ? acc : acc + 1;
+    }, 0);
+    if (checkedRows.length === notDisabledEntityCount) {
       //tnr: maybe this will need to change if we want enable select all across pages
-      checkboxProps.checked = true;
+      checkboxProps.checked = notDisabledEntityCount !== 0;
     } else {
       if (checkedRows.length) {
         checkboxProps.indeterminate = true;
@@ -1026,12 +1029,12 @@ class DataTable extends React.Component {
     const filterMenu =
       withFilter && !isActionColumn && !filterDisabled ? (
         <BooleanValue defaultValue={false}>
-          {({value, toggle, clear}) => {
+          {({ value, toggle, clear }) => {
             return (
               <Popover
                 position="bottom"
                 onClose={() => {
-                  clear()
+                  clear();
                 }}
                 isOpen={value}
                 modifiers={{
