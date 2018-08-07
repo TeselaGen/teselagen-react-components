@@ -123,11 +123,7 @@ export function finalizeSelection({ idMap, props }) {
     noSelect
   } = props;
   if (noSelect) return;
-  console.log('noDeselectAll:',noDeselectAll)
-  console.log('idMap:',idMap)
-  console.log('Object.keys(idMap).filter((id) => {return idMap[id]}):',Object.keys(idMap).filter((id) => {return idMap[id]}))
   if (noDeselectAll && Object.keys(idMap).filter((id) => {return idMap[id]}).length===0) {
-    console.log('hiii')
     return
   }
   reduxFormSelectedEntityIdMap.input.onChange(idMap);

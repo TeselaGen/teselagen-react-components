@@ -6,7 +6,7 @@ import ReactDOM from "react-dom";
 import moment from "moment";
 import { arrayMove } from "react-sortable-hoc";
 import copy from "copy-to-clipboard";
-import { camelCase, get, startCase, noop, isEqual } from "lodash";
+import { camelCase, get, startCase, noop, isEqual, cloneDeep } from "lodash";
 import {
   Button,
   Menu,
@@ -582,7 +582,7 @@ class DataTable extends React.Component {
       onContextMenu: e => {
         e.preventDefault();
         if (rowId === undefined || rowDisabled) return;
-        const oldIdMap = reduxFormSelectedEntityIdMap.input.value || {};
+        const oldIdMap = cloneDeep(reduxFormSelectedEntityIdMap.input.value) || {};
         let newIdMap;
         if (withCheckboxes) {
           newIdMap = oldIdMap;
@@ -639,7 +639,8 @@ class DataTable extends React.Component {
         disabled={noSelect || noUserSelect}
         /* eslint-disable react/jsx-no-bind */
         onChange={() => {
-          const newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
+
+          const newIdMap = cloneDeep(reduxFormSelectedEntityIdMap.input.value) || {};
           entities.forEach((entity, i) => {
             if (isEntityDisabled(entity)) return;
             const entityId = getIdOrCodeOrIndex(entity, i);
@@ -676,15 +677,11 @@ class DataTable extends React.Component {
       entities,
       reduxFormSelectedEntityIdMap.input.value
     );
-    console.log('entities:',entities)
-    console.log('reduxFormSelectedEntityIdMap.input.value:',reduxFormSelectedEntityIdMap.input.value)
-    console.log('checkedRows:',checkedRows)
     const { lastCheckedRow } = this.state;
 
     const isSelected = checkedRows.some(rowNum => {
       return rowNum === rowIndex;
     });
-    console.log('isSelected:',isSelected)
     if (rowIndex >= entities.length) {
       return <div />;
     }
@@ -694,7 +691,7 @@ class DataTable extends React.Component {
         disabled={noSelect || noUserSelect || isEntityDisabled(entity)}
         /* eslint-disable react/jsx-no-bind*/
         onChange={e => {
-          let newIdMap = reduxFormSelectedEntityIdMap.input.value || {};
+          let newIdMap = cloneDeep(reduxFormSelectedEntityIdMap.input.value) || {};
           const isRowCurrentlyChecked = checkedRows.indexOf(rowIndex) > -1;
           const entityId = getIdOrCodeOrIndex(entity, rowIndex);
           if (isSingleSelect) {
