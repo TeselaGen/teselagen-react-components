@@ -188,6 +188,7 @@ class DataTableInstance extends React.Component {
       isViewable: true,
       withSearch: true,
       withPaging: true,
+      noDeselectAll: false,
       expandAllByDefault: false,
       withExpandAndCollapseAllButton: false,
       selectAllByDefault: false,
@@ -316,6 +317,7 @@ class DataTableInstance extends React.Component {
         {renderToggle(this, "hideDisplayOptionsIcon", "use this in conjunction with withDisplayOptions=true to have display options but not allow the user to see or edit them")}
         {renderToggle(this, "withDisplayOptions")}
         {renderToggle(this, "withPaging")}
+        {renderToggle(this, "noDeselectAll", "Prevent the table from being fully deselected. Useful when you want at least 1 entity selected")}
         {renderToggle(this, "withExpandAndCollapseAllButton")}
         {renderToggle(this, "expandAllByDefault")}
         {renderToggle(this, "selectAllByDefault")}
@@ -420,6 +422,7 @@ class DataTableInstance extends React.Component {
             expandAllByDefault={this.state.expandAllByDefault}
             selectAllByDefault={this.state.selectAllByDefault}
             withPaging={this.state.withPaging}
+            noDeselectAll={this.state.noDeselectAll}
             withFilter={this.state.withFilter}
             withSort={this.state.withSort}
             noFullscreenButton={this.state.noFullscreenButton}

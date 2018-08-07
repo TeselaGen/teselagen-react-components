@@ -676,11 +676,15 @@ class DataTable extends React.Component {
       entities,
       reduxFormSelectedEntityIdMap.input.value
     );
+    console.log('entities:',entities)
+    console.log('reduxFormSelectedEntityIdMap.input.value:',reduxFormSelectedEntityIdMap.input.value)
+    console.log('checkedRows:',checkedRows)
     const { lastCheckedRow } = this.state;
 
     const isSelected = checkedRows.some(rowNum => {
       return rowNum === rowIndex;
     });
+    console.log('isSelected:',isSelected)
     if (rowIndex >= entities.length) {
       return <div />;
     }
