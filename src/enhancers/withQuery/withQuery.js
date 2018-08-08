@@ -126,6 +126,7 @@ export default function withQuery(inputFragment, options = {}) {
         };
         if (
           get(variablesToUse, "filter.entity") &&
+          get(variablesToUse, "filter.__objectType") === "query" &&
           get(variablesToUse, "filter.entity") !== modelName
         ) {
           console.error("filter model does not match fragment model!");
