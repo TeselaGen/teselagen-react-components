@@ -15,6 +15,7 @@ import { branch } from "recompose";
 
 import convertSchema from "./convertSchema";
 import { getRecordsFromIdMap } from "./withSelectedEntities";
+import pureNoFunc from "../../utils/pureNoFunc";
 
 /**
  *  Note all these options can be passed at Design Time or at Runtime (like reduxForm())
@@ -221,7 +222,8 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       mapStateToProps,
       mapDispatchToProps,
       mergeProps
-    )
+    ),
+    pureNoFunc
   );
   if (Component) {
     return toReturn(Component);
