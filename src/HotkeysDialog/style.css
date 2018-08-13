@@ -1,4 +1,4 @@
-.tg-hotkeys-dialog .pt-tab-list {
+.tg-hotkeys-dialog .bp3-tab-list {
   /* border-top: 1px solid #ddd; */
   display: flex;
   justify-content: center;
@@ -14,7 +14,7 @@
   border-spacing: 0;
 }
 
-.tg-hotkeys-dialog .pt-tab-panel {
+.tg-hotkeys-dialog .bp3-tab-panel {
   margin-top: 5px;
   padding: 10px;
 }

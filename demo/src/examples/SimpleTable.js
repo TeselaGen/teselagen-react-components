@@ -5,7 +5,7 @@ const schema = {
       path: "id",
       type: "action",
       render: () => {
-        return <Button className={"pt-minimal pt-icon-circle"} />;
+        return <Button minimal icon="circle" />;
       }
     }
   ]

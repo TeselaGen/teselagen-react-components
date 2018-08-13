@@ -17,7 +17,7 @@ export default function ResizableDraggableDialog({
     windowHeight = w.innerHeight || e.clientHeight || g.clientHeight;
   return (
     <div
-      className={"tg-pt-dialog-resizable-draggable"}
+      className={"tg-bp3-dialog-resizable-draggable"}
       style={{ top: 0, left: 0, position: "fixed" }}
     >
       <Rnd

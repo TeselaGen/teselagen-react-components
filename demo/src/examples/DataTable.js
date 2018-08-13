@@ -28,7 +28,9 @@ const schema = {
         );
       },
       renderTitleInner: (
-        <span className={"pt-icon-search-around"}> &nbsp; Name</span>
+        <span>
+          <Icon icon="search-around" /> Name
+        </span>
       )
     },
     { path: "createdAt", type: "timestamp", displayName: "Date Created" },
@@ -85,7 +87,7 @@ class DataTableDemo extends React.Component {
     return (
       <ApolloProvider client={client} store={store}>
         <div
-          className={this.state.darkMode ? "pt-dark" : ""}
+          className={this.state.darkMode ? "bp3-dark" : ""}
           style={{ background: this.state.darkMode ? "#293742" : undefined }}
         >
           <Router>
@@ -126,7 +128,7 @@ class DataTableDemo extends React.Component {
                   title="Table inside a dialog"
                   isOpen={this.state.inDialog}
                 >
-                  <div className="pt-dialog-body">
+                  <div className={Classes.DIALOG_BODY}>
                     <ConnectedTable />
                   </div>
                 </Dialog>
@@ -314,10 +316,18 @@ class DataTableInstance extends React.Component {
           "isViewable",
           "Make sure withCheckboxes is off when using this"
         )}
-        {renderToggle(this, "hideDisplayOptionsIcon", "use this in conjunction with withDisplayOptions=true to have display options but not allow the user to see or edit them")}
+        {renderToggle(
+          this,
+          "hideDisplayOptionsIcon",
+          "use this in conjunction with withDisplayOptions=true to have display options but not allow the user to see or edit them"
+        )}
         {renderToggle(this, "withDisplayOptions")}
         {renderToggle(this, "withPaging")}
-        {renderToggle(this, "noDeselectAll", "Prevent the table from being fully deselected. Useful when you want at least 1 entity selected")}
+        {renderToggle(
+          this,
+          "noDeselectAll",
+          "Prevent the table from being fully deselected. Useful when you want at least 1 entity selected"
+        )}
         {renderToggle(this, "withExpandAndCollapseAllButton")}
         {renderToggle(this, "expandAllByDefault")}
         {renderToggle(this, "selectAllByDefault")}
@@ -418,7 +428,9 @@ class DataTableInstance extends React.Component {
             noSelect={this.state.noSelect}
             isSimple={this.state.isSimple}
             withSearch={this.state.withSearch}
-            withExpandAndCollapseAllButton={this.state.withExpandAndCollapseAllButton}
+            withExpandAndCollapseAllButton={
+              this.state.withExpandAndCollapseAllButton
+            }
             expandAllByDefault={this.state.expandAllByDefault}
             selectAllByDefault={this.state.selectAllByDefault}
             withPaging={this.state.withPaging}

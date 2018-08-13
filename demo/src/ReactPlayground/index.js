@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import React from "react";
-import { Button } from "@blueprintjs/core";
+import { Button, Classes } from "@blueprintjs/core";
 import { LiveProvider, LiveEditor, LiveError, LivePreview } from "react-live";
 import * as trc from "../../../src";
 import "./prism.css";
@@ -27,7 +27,8 @@ export default class Playground extends React.Component {
       >
         <div
           className={classNames(
-            "pt-card pt-elevation-2",
+            Classes.CARD,
+            Classes.ELEVATION_2,
             this.props.exampleClassName
           )}
         >

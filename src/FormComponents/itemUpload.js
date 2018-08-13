@@ -18,7 +18,6 @@ const itemUpload = props => {
         <div>
           {!props.saved ? (
             <Tooltip
-              className="pt-icon"
               content={
                 <span>
                   {`Click to
@@ -30,7 +29,8 @@ const itemUpload = props => {
             >
               <Button
                 intent={Intent.DANGER}
-                className="pt-icon-delete pt-minimal"
+                minimal
+                icon="delete"
                 onClick={props.onCancel}
               />
             </Tooltip>
@@ -42,20 +42,12 @@ const itemUpload = props => {
         <div>
           {props.active ? `${props.value}%` : null}
           {props.error ? (
-            <Tooltip
-              className="pt-icon"
-              content={props.error}
-              usePortal={true}
-            >
+            <Tooltip content={props.error} usePortal={true}>
               <Icon icon="error" intent={Intent.DANGER} />
             </Tooltip>
           ) : null}
           {props.saved ? (
-            <Tooltip
-              className="pt-icon"
-              content={"File Saved"}
-              usePortal={true}
-            >
+            <Tooltip content={"File Saved"} usePortal={true}>
               <Icon icon="saved" intent={Intent.SUCCESS} />
             </Tooltip>
           ) : null}

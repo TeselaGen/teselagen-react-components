@@ -1,29 +1,6 @@
 import React, { Component } from "react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import "./style.css";
-import {
-  Popover,
-  Position,
-  Menu,
-  PopoverInteractionKind
-} from "@blueprintjs/core";
-
-// {Object.keys(childLinks).map(function(linkName, index) {
-//   return (
-//     <NavLink
-//       key={index}
-//       to={`/${name}/${linkName}`}
-//       style={{ color: "inherit", textDecoration: "none" }}
-//     >
-//       <div
-//         style={{ borderLeft: index !== 0 && "2px solid grey" }}
-//         className={"pt-popover-dismiss pt-menu-item"}
-//       >
-//         {linkName} demo
-//       </div>
-//     </NavLink>
-//   );
-// })}
 
 class DemoNav extends Component {
   render() {

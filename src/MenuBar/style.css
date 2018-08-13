@@ -15,14 +15,14 @@
   margin: 2px;
 }
 
-.menu-bar .pt-popover {
+.menu-bar .bp3-popover {
   margin-top: -1px !important;
 }
 
-.menu-bar-popover .pt-popover .pt-popover-arrow {
+.menu-bar-popover .bp3-popover .bp3-popover-arrow {
   display: none;
 }
 
-.menu-bar-popover .pt-popover-wrapper {
+.menu-bar-popover .bp3-popover-wrapper {
   width: 100%;
 }

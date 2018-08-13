@@ -104,9 +104,9 @@
 } */
 
 /* dark styles */
-.pt-dark .Select.is-open > .Select-control,
-.pt-dark .Select-control,
-.pt-dark .Select.is-disabled > .Select-control {
+.bp3-dark .Select.is-open > .Select-control,
+.bp3-dark .Select-control,
+.bp3-dark .Select.is-disabled > .Select-control {
   background: rgba(16, 22, 26, 0.3);
   box-shadow: 0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0),
     0 0 0 0 rgba(19, 124, 189, 0), inset 0 0 0 1px rgba(16, 22, 26, 0.3),
@@ -115,63 +115,63 @@
   color: #f5f8fa;
 }
 
-.pt-dark .Select.is-focused:not(.is-open) > .Select-control {
+.bp3-dark .Select.is-focused:not(.is-open) > .Select-control {
   background: rgba(16, 22, 26, 0.3);
   color: #f5f8fa;
 }
 
-.pt-dark .Select-placeholder,
-.pt-dark .Select--single > .Select-control .Select-value {
+.bp3-dark .Select-placeholder,
+.bp3-dark .Select--single > .Select-control .Select-value {
   color: rgb(191, 204, 214, 0.5); /*#bfccd6*/
 }
 
-.pt-dark .Select-control {
+.bp3-dark .Select-control {
   border: none !important;
 }
 
-.pt-dark
+.bp3-dark
   .Select.has-value.Select--single
   > .Select-control
   .Select-value
   .Select-value-label,
-.pt-dark
+.bp3-dark
   .Select.has-value.is-pseudo-focused.Select--single
   > .Select-control
   .Select-value
   .Select-value-label,
-.pt-dark .Select-option.is-selected {
+.bp3-dark .Select-option.is-selected {
   color: #f5f8fa;
 }
 
-.pt-dark .Select-option {
+.bp3-dark .Select-option {
   background: #30404d;
   color: #f5f8fa;
 }
 
-.pt-dark .Select-menu-outer {
+.bp3-dark .Select-menu-outer {
   border: 1px solid #26738cb0;
   background: #202b33;
 }
 
-.pt-dark .Select-option.is-focused {
+.bp3-dark .Select-option.is-focused {
   background: rgba(0, 126, 255, 0.08);
   color: #f5f8fa;
 }
 
-.pt-dark .tg-upload-file-list-item:hover {
+.bp3-dark .tg-upload-file-list-item:hover {
   background: #26738cb0;
 }
 
-.tg-inlineLabel.pt-form-group {
+.tg-inlineLabel.bp3-form-group {
   flex-direction: row;
 }
-.tg-inlineLabel .pt-label {
+.tg-inlineLabel .bp3-label {
   flex-shrink: 6;
   padding-right: 10px;
   min-width: 150px;
 }
 
-.tg-tooltipError .pt-popover-wrapper {
+.tg-tooltipError .bp3-popover-wrapper {
   width: 100%;
 }
 

@@ -53,7 +53,9 @@ import {
   Intent,
   KeyCombo,
   Switch,
-  Button
+  Button,
+  Icon,
+  Classes
 } from "@blueprintjs/core";
 import renderToggle from "./renderToggle";
 import Chance from "chance";
@@ -81,7 +83,9 @@ const demos = {
       withRouter,
       store,
       Chance,
-      times
+      times,
+      Icon,
+      Classes
     },
     url:
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/DataTableDemo.js",
@@ -95,6 +99,9 @@ const demos = {
   },
   InfoHelper: {
     demo: InfoHelper,
+    scope: {
+      Classes
+    },
     props: [
       {
         name: "className",
@@ -285,7 +292,8 @@ const demos = {
       store,
       Switch,
       reduxForm,
-      Uploader
+      Uploader,
+      Classes
     },
     url:
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/FormComponentsDemo.js"
@@ -293,7 +301,8 @@ const demos = {
   withDialog: {
     demo: WithDialog,
     scope: {
-      renderToggle
+      renderToggle,
+      Classes
     },
     url:
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/WithDialog.js"
@@ -363,7 +372,6 @@ const demos = {
   //     "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/FontIconsDemo.js"
   // }
 };
-
 
 const demoPropsSchema = [
   {

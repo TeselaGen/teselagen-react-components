@@ -3,7 +3,7 @@
 @import url(~@blueprintjs/icons/lib/css/blueprint-icons.css);
 @import url(~react-select/dist/react-select.css);
 
-.pt-dark .tg-card {
+.bp3-dark .tg-card {
   background: #394b59 !important;
 }
 

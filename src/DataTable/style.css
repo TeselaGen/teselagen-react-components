@@ -32,7 +32,7 @@
   justify-content: space-between;
 }
 
-.data-table-header-and-buttons .pt-button-group {
+.data-table-header-and-buttons .bp3-button-group {
   overflow: auto;
 }
 
@@ -108,7 +108,7 @@
   border-bottom: 1px solid rgb(233, 233, 233);
 }
 
-.pt-dark .ReactTable.ReactTable .rt-tbody .rt-tr {
+.bp3-dark .ReactTable.ReactTable .rt-tbody .rt-tr {
   border-bottom-color: rgba(16, 22, 26, 0.15);
 }
 
@@ -122,7 +122,7 @@
   flex: 0 0 auto;
 }
 
-.pt-icon-standard.pt-disabled {
+.bp3-icon-standard.bp3-disabled {
   cursor: not-allowed;
   opacity: 0.7;
 }
@@ -150,7 +150,7 @@
 }
 
 .tg-react-table-column-header:hover .tg-filter-menu-button,
-.tg-react-table-column-header .pt-popover-open .tg-filter-menu-button {
+.tg-react-table-column-header .bp3-popover-open .tg-filter-menu-button {
   display: block !important;
 }
 
@@ -171,7 +171,7 @@
   flex-direction: column;
 }
 
-.tg-sort-arrow-container .pt-icon {
+.tg-sort-arrow-container .bp3-icon {
   display: none;
 }
 
@@ -261,8 +261,8 @@
   padding: 0;
 }
 
-.tg-react-table-checkbox-header-container .pt-control,
-.tg-react-table-checkbox-cell-container .pt-control {
+.tg-react-table-checkbox-header-container .bp3-control,
+.tg-react-table-checkbox-cell-container .bp3-control {
   margin-bottom: 0;
   /* there is a weird padding on the blueprint checkbox, so this centers it some */
   padding-left: 18px;
@@ -306,7 +306,7 @@
   border-right: 1px solid #f7f7f7;
 }
 
-.pt-dark .ReactTable .rt-thead .rt-resizable-header {
+.bp3-dark .ReactTable .rt-thead .rt-resizable-header {
   border-right: 1px solid #202b33;
 }
 
@@ -325,36 +325,36 @@
 }
 
 /* dark styles */
-.pt-dark .ReactTable {
+.bp3-dark .ReactTable {
   background: #30404d !important;
   color: #f5f8fa !important;
 }
 
-.pt-dark .ReactTable .rt-thead.-header {
+.bp3-dark .ReactTable .rt-thead.-header {
   background: #202b33 !important;
   color: #f5f8fa !important;
 }
 
-.pt-dark .ReactTable .rt-tbody .rt-td,
-.pt-dark .tg-react-table-name {
+.bp3-dark .ReactTable .rt-tbody .rt-td,
+.bp3-dark .tg-react-table-name {
   color: #f5f8fa !important;
 }
 
-.pt-dark .ReactTable .rt-noData {
+.bp3-dark .ReactTable .rt-noData {
   background: #202b33 !important;
   color: inherit !important;
   z-index: unset;
 }
 
-.pt-dark .ReactTable .-loading {
+.bp3-dark .ReactTable .-loading {
   background: #30404d !important;
 }
 
-.pt-dark .ReactTable .-loading > div {
+.bp3-dark .ReactTable .-loading > div {
   color: #f5f8fa !important;
 }
 
-.pt-dark .ReactTable .rt-tr-group.selected {
+.bp3-dark .ReactTable .rt-tr-group.selected {
   background: #26738cb0 !important;
 }
 
@@ -362,11 +362,11 @@
   background: inherit !important;
 }
 
-.pt-dark .ReactTable .rt-thead .rt-resizable-header:hover {
+.bp3-dark .ReactTable .rt-thead .rt-resizable-header:hover {
   border-right-color: #738694;
 }
 
-.pt-dark .data-table-container.fullscreen {
+.bp3-dark .data-table-container.fullscreen {
   background: #293742;
 }
 

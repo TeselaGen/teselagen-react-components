@@ -21,6 +21,7 @@
     "Intent": false,
     "reduxForm": false,
     "times": false,
-    "withDialog": false
+    "withDialog": false,
+    "Classes": false
   }
 }

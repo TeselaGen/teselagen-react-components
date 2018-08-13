@@ -98,7 +98,7 @@ describe("DataTableDemo", () => {
       input
         .find("input")
         .simulate("change", { target: { value: "search string" } });
-      const button = input.find(".pt-icon-search");
+      const button = input.find(".bp3-icon-search");
       button.simulate("click");
       expect(dataTableInstance.props().tableParams.searchTerm).toEqual(
         "search string"
