@@ -359,10 +359,9 @@ class DataTable extends React.Component {
     ) : (
       undefined
     );
-
-    const selectedRowCount = Object.keys(
-      reduxFormSelectedEntityIdMap.input.value || {}
-    ).length;
+    const idMap = reduxFormSelectedEntityIdMap.input.value || {};
+    const selectedRowCount = Object.keys(idMap).filter(key => idMap[key])
+      .length;
 
     let rowsToShow = doNotShowEmptyRows
       ? Math.min(numRows, entities.length)
@@ -582,7 +581,8 @@ class DataTable extends React.Component {
       onContextMenu: e => {
         e.preventDefault();
         if (rowId === undefined || rowDisabled) return;
-        const oldIdMap = cloneDeep(reduxFormSelectedEntityIdMap.input.value) || {};
+        const oldIdMap =
+          cloneDeep(reduxFormSelectedEntityIdMap.input.value) || {};
         let newIdMap;
         if (withCheckboxes) {
           newIdMap = oldIdMap;
@@ -639,8 +639,8 @@ class DataTable extends React.Component {
         disabled={noSelect || noUserSelect}
         /* eslint-disable react/jsx-no-bind */
         onChange={() => {
-
-          const newIdMap = cloneDeep(reduxFormSelectedEntityIdMap.input.value) || {};
+          const newIdMap =
+            cloneDeep(reduxFormSelectedEntityIdMap.input.value) || {};
           entities.forEach((entity, i) => {
             if (isEntityDisabled(entity)) return;
             const entityId = getIdOrCodeOrIndex(entity, i);
@@ -677,6 +677,7 @@ class DataTable extends React.Component {
       entities,
       reduxFormSelectedEntityIdMap.input.value
     );
+
     const { lastCheckedRow } = this.state;
 
     const isSelected = checkedRows.some(rowNum => {
@@ -691,7 +692,8 @@ class DataTable extends React.Component {
         disabled={noSelect || noUserSelect || isEntityDisabled(entity)}
         /* eslint-disable react/jsx-no-bind*/
         onChange={e => {
-          let newIdMap = cloneDeep(reduxFormSelectedEntityIdMap.input.value) || {};
+          let newIdMap =
+            cloneDeep(reduxFormSelectedEntityIdMap.input.value) || {};
           const isRowCurrentlyChecked = checkedRows.indexOf(rowIndex) > -1;
           const entityId = getIdOrCodeOrIndex(entity, rowIndex);
           if (isSingleSelect) {
