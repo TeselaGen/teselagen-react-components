@@ -466,10 +466,30 @@ const GenericSelectInner = compose(
         selectedEntities,
         isMultiSelect,
         readableName,
-        minSelected
+        minSelected,
+        mustSelect
       } = this.props;
+      let disableButton = !selectedEntities.length;
+      let minSelectMessage;
+      let mustSelectMessage;
+      if (minSelected && selectedEntities.length < minSelected) {
+        minSelectMessage = `Please select at least ${minSelected} ${pluralize(
+          readableName
+        )}`;
+        disableButton = true;
+      }
+      if (mustSelect && selectedEntities.length !== mustSelect) {
+        mustSelectMessage = `Please select ${mustSelect} ${pluralize(
+          readableName
+        )}`;
+        disableButton = true;
+      }
       return (
         <div>
+          <div style={{ marginBottom: 10 }}>
+            {minSelectMessage}
+            {mustSelectMessage}
+          </div>
           <DataTable
             withSearch
             withPaging
@@ -486,11 +506,7 @@ const GenericSelectInner = compose(
           />
           <DialogFooter
             hideModal={hideModal}
-            disabled={
-              minSelected
-                ? selectedEntities.length < minSelected
-                : !selectedEntities.length
-            }
+            disabled={disableButton}
             onClick={this.makeSelection}
             text={
               "Select " +
