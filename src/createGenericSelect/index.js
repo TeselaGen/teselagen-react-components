@@ -465,7 +465,8 @@ const GenericSelectInner = compose(
         hideModal,
         selectedEntities,
         isMultiSelect,
-        readableName
+        readableName,
+        minSelected
       } = this.props;
       return (
         <div>
@@ -485,7 +486,11 @@ const GenericSelectInner = compose(
           />
           <DialogFooter
             hideModal={hideModal}
-            disabled={!selectedEntities.length}
+            disabled={
+              minSelected
+                ? selectedEntities.length < minSelected
+                : !selectedEntities.length
+            }
             onClick={this.makeSelection}
             text={
               "Select " +
