@@ -10,3 +10,34 @@
 .preserve-newline {
   white-space: pre-line;
 }
+
+/* adding back in blueprint v2 default styling to all <h/> elements */
+h1 {
+  line-height: 40px;
+  font-size: 36px;
+}
+
+h2 {
+  line-height: 32px;
+  font-size: 28px;
+}
+
+h3 {
+  line-height: 25px;
+  font-size: 22px;
+}
+
+h4 {
+  line-height: 21px;
+  font-size: 18px;
+}
+
+h5 {
+  line-height: 19px;
+  font-size: 16px;
+}
+
+h6 {
+  line-height: 16px;
+  font-size: 14px;
+}
