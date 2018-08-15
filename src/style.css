@@ -11,6 +11,7 @@
   white-space: pre-line;
 }
 
+/* adding back in blueprint v2 default styling to all <h/> elements */
 h1 {
   line-height: 40px;
   font-size: 36px;
