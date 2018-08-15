@@ -10,3 +10,61 @@
 .preserve-newline {
   white-space: pre-line;
 }
+
+h1 {
+  line-height: 40px;
+  font-size: 36px;
+}
+
+h2 {
+  line-height: 32px;
+  font-size: 28px;
+}
+
+h3 {
+  line-height: 25px;
+  font-size: 22px;
+}
+
+h4 {
+  line-height: 21px;
+  font-size: 18px;
+}
+
+h5 {
+  line-height: 19px;
+  font-size: 16px;
+}
+
+h6 {
+  line-height: 16px;
+  font-size: 14px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+h1.bp3-heading,
+h2.bp3-heading,
+h3.bp3-heading,
+h4.bp3-heading,
+h5.bp3-heading,
+h6.bp3-heading {
+  color: #182026;
+  font-weight: 300;
+  margin: 0 0 10px;
+  padding: 0;
+  line-height: normal;
+}
+
+.bp3-dark h1,
+.bp3-dark h2,
+.bp3-dark h3,
+.bp3-dark h4,
+.bp3-dark h5,
+.bp3-dark h6 {
+  color: #f5f8fa;
+}
