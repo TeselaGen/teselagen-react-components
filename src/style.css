@@ -69,3 +69,9 @@ h6.bp3-heading {
 .bp3-dark h6 {
   color: #f5f8fa;
 }
+
+.bp3-popover-wrapper {
+  display: inline-block;
+  position: relative;
+  vertical-align: top;
+}
