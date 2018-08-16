@@ -119,7 +119,7 @@ class AbstractInput extends React.Component {
     const { touched, error } = meta;
     const showError = (touched || showErrorIfUntouched) && error;
 
-    const componentToWrap = tooltipError ? (
+    let componentToWrap = tooltipError ? (
       <Tooltip
         disabled={!showError}
         intent={Intent.DANGER}
@@ -144,7 +144,17 @@ class AbstractInput extends React.Component {
           {secondaryLabelComp}
         </label>
       );
-
+    if (noFillField) {
+      componentToWrap = (
+        <div
+          className={classNames({
+            "tg-no-fill-field": noFillField
+          })}
+        >
+          {componentToWrap}
+        </div>
+      );
+    }
     return (
       <div
         className={classNames(
@@ -158,12 +168,7 @@ class AbstractInput extends React.Component {
         )}
       >
         {labelComp}
-        <div
-          style={{ width: "100%" }}
-          className={classNames({
-            "tg-no-fill-field": noFillField
-          })}
-        >
+        <div style={{ width: "100%" }}>
           {componentToWrap}
           {!tooltipError &&
             showError && (
