@@ -69,3 +69,14 @@ h6.bp3-heading {
 .bp3-dark h6 {
   color: #f5f8fa;
 }
+
+/* bp3 fix https://github.com/palantir/blueprint/issues/2807 */
+.bp3-popover-wrapper {
+  display: inline-block;
+  position: relative;
+  vertical-align: top;
+}
+/* bp3 fix https://github.com/palantir/blueprint/issues/2807 */
+span.bp3-popover-target {
+  display: block;
+}
