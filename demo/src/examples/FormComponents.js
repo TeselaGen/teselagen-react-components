@@ -332,6 +332,9 @@ const validate = values => {
   if (!values.inputFieldWithTooltipError) {
     errors.inputFieldWithTooltipError = "required";
   }
+  if (!values.reactSelectField) {
+    errors.reactSelectField = "required";
+  }
   if (values.dateInputField > new Date().setDate(new Date().getDate() + 10)) {
     errors.dateInputField = "date too big";
   }

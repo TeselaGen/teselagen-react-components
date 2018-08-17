@@ -21,7 +21,8 @@ import {
   Tooltip,
   Position,
   Switch,
-  Classes
+  Classes,
+  FormGroup
 } from "@blueprintjs/core";
 
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
@@ -107,6 +108,8 @@ class AbstractInput extends React.Component {
       children,
       tooltipProps,
       tooltipError,
+      disabled,
+      intent,
       label,
       inlineLabel,
       secondaryLabel,
@@ -118,7 +121,6 @@ class AbstractInput extends React.Component {
     } = this.props;
     const { touched, error } = meta;
     const showError = (touched || showErrorIfUntouched) && error;
-
     let componentToWrap = tooltipError ? (
       <Tooltip
         disabled={!showError}
@@ -132,18 +134,6 @@ class AbstractInput extends React.Component {
     ) : (
       children
     );
-
-    const secondaryLabelComp = secondaryLabel ? (
-      <span className={Classes.TEXT_MUTED}>{secondaryLabel}</span>
-    ) : null;
-
-    const labelComp = label &&
-      !noOuterLabel && (
-        <label className={Classes.LABEL}>
-          {label}
-          {secondaryLabelComp}
-        </label>
-      );
     if (noFillField) {
       componentToWrap = (
         <div
@@ -156,33 +146,19 @@ class AbstractInput extends React.Component {
       );
     }
     return (
-      <div
-        className={classNames(
-          Classes.FORM_GROUP,
-          getIntentClass(this.props),
-          className,
-          {
-            "tg-inlineLabel": inlineLabel,
-            "tg-tooltipError": tooltipError
-          }
-        )}
+      <FormGroup
+        className={classNames(className, {
+          "tg-tooltipError": tooltipError
+        })}
+        disabled={disabled}
+        helperText={!tooltipError && showError && error}
+        intent={intent}
+        label={!noOuterLabel && label}
+        inline={inlineLabel}
+        labelInfo={secondaryLabel}
       >
-        {labelComp}
-        <div style={{ width: "100%" }}>
-          {componentToWrap}
-          {!tooltipError &&
-            showError && (
-              <div
-                className={classNames(
-                  Classes.FORM_HELPER_TEXT,
-                  "tg-field-error-holder"
-                )}
-              >
-                {error}
-              </div>
-            )}
-        </div>
-      </div>
+        {componentToWrap}
+      </FormGroup>
     );
   }
 }
@@ -590,7 +566,7 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
       intentClass: getIntentClass(props)
     };
     return (
-      <AbstractInput {...{ ...opts, ...props }}>
+      <AbstractInput {...{ ...opts, ...defaultProps }}>
         <ComponentToWrap {...defaultProps} />
       </AbstractInput>
     );

@@ -162,15 +162,6 @@
   background: #26738cb0;
 }
 
-.tg-inlineLabel.bp3-form-group {
-  flex-direction: row;
-}
-.tg-inlineLabel .bp3-label {
-  flex-shrink: 6;
-  padding-right: 10px;
-  min-width: 150px;
-}
-
 .tg-tooltipError .bp3-popover-wrapper {
   width: 100%;
 }
