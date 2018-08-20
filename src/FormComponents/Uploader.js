@@ -455,10 +455,7 @@ class Uploader extends Component {
                       </a>
                     </div>
                     {!loading && (
-                      <Icon
-                        iconSize={13}
-                        icon="cross"
-                        className="tg-upload-file-list-item-close"
+                      <div
                         onClick={() => {
                           onRemove(file, index, fileList);
                           onChange(
@@ -467,7 +464,13 @@ class Uploader extends Component {
                             })
                           );
                         }}
-                      />
+                      >
+                        <Icon
+                          iconSize={16}
+                          icon="cross"
+                          className="tg-upload-file-list-item-close"
+                        />
+                      </div>
                     )}
                   </div>
                 );
