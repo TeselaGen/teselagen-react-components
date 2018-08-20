@@ -13,7 +13,6 @@ import type {
   // Paging,
 } from "../flow_types";
 import {
-  Button,
   Menu,
   Intent,
   MenuDivider,
@@ -66,7 +65,7 @@ export default class FilterAndSortMenu extends React.Component {
         filterValue: filterValToUse
       }
     ]);
-    togglePopover()
+    togglePopover();
   };
   UNSAFE_componentWillMount() {
     if (this.props.currentFilter) {

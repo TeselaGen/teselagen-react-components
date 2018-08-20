@@ -293,7 +293,8 @@ const demos = {
       Switch,
       reduxForm,
       Uploader,
-      Classes
+      Classes,
+      Icon
     },
     url:
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/FormComponentsDemo.js"

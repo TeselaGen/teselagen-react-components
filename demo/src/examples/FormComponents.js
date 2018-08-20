@@ -245,6 +245,17 @@ class FormComponentsDemo extends React.Component {
             inlineLabel={this.state.inlineLabels}
             label="Checkbox"
           />
+          <CheckboxField
+            onFieldSubmit={onFieldSubmit}
+            defaultValue
+            name={"checkboxField2"}
+            inlineLabel={this.state.inlineLabels}
+            label={
+              <div>
+                Label and Icon <Icon icon="tick" />
+              </div>
+            }
+          />
           <SwitchField
             onFieldSubmit={onFieldSubmit}
             defaultValue
