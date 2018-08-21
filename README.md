@@ -5,7 +5,7 @@ Demo: https://teselagen.github.io/teselagen-react-components/
 
 
 [![CircleCI](https://circleci.com/gh/TeselaGen/teselagen-react-components/tree/master.svg?style=shield)](https://circleci.com/gh/TeselaGen/teselagen-react-components/tree/master)
-[![npm package][npm-badge]][npm]
+[![npm version](https://badge.fury.io/js/teselagen-react-components.svg)](https://badge.fury.io/js/teselagen-react-components)
 [![codecov](https://codecov.io/gh/TeselaGen/teselagen-react-components/branch/master/graph/badge.svg)](https://codecov.io/gh/TeselaGen/teselagen-react-components)
 
 <!-- TOC -->
