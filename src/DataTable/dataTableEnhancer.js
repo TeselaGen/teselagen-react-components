@@ -218,7 +218,7 @@ export default compose(
           window.localStorage.setItem(formName, JSON.stringify(tableConfig));
         };
         moveColumnPersist = function({ oldIndex, newIndex }) {
-          //we might already have an array of the fields [path1, path2, ..etc]
+          // we might already have an array of the fields [path1, path2, ..etc]
           const columnOrderings =
             tableConfig.columnOrderings ||
             schemaToUse.fields.map(({ path }) => path); // columnOrderings is [path1, path2, ..etc]
