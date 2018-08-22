@@ -260,5 +260,5 @@ export default compose(
       "reduxFormExpandedEntityIdMap"
     ]
   }),
-  branch((props => !props.alwaysRerender, pureNoFunc)
+  branch(props => !props.alwaysRerender, pureNoFunc)
 );
