@@ -307,7 +307,8 @@ class J5ReportRecordView extends Component {
       constructsTitleElements = [],
       oligosTitleElements = [],
       linkDialogWidth = 500,
-      fragmentMap = {}
+      fragmentMap = {},
+      noPrebuiltConstructs = false
     } = this.props;
     const { linkDialogName } = this.state;
 
@@ -371,20 +372,22 @@ class J5ReportRecordView extends Component {
             </Dialog>
           )}
 
-          <J5TableCard
-            j5ReportId={j5Report.id}
-            helperMessage="Prebuilt constructs are the desired sequences that have already
+          {!noPrebuiltConstructs && (
+            <J5TableCard
+              j5ReportId={j5Report.id}
+              helperMessage="Prebuilt constructs are the desired sequences that have already
                been built and are available in your library."
-            title="Prebuilt Constructs"
-            processData={processDataForTables.prebuiltConstruct}
-            entities={j5Report.j5RunConstructs}
-            fragment={fragmentMap.j5RunConstruct}
-            showLinkModal={() => this.showLinkModal("constructs")}
-            isLinkable={LinkJ5TableDialog}
-            onDoubleClick={onConstructDoubleClick}
-            schema={this.getSchema("j5RunConstructs")}
-            tableProps={sharedTableProps}
-          />
+              title="Prebuilt Constructs"
+              processData={processDataForTables.prebuiltConstruct}
+              entities={j5Report.j5RunConstructs}
+              fragment={fragmentMap.j5RunConstruct}
+              showLinkModal={() => this.showLinkModal("constructs")}
+              isLinkable={LinkJ5TableDialog}
+              onDoubleClick={onConstructDoubleClick}
+              schema={this.getSchema("j5RunConstructs")}
+              tableProps={sharedTableProps}
+            />
+          )}
 
           <J5TableCard
             j5ReportId={j5Report.id}
