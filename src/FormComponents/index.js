@@ -164,13 +164,13 @@ class AbstractInput extends React.Component {
 }
 
 export const renderBlueprintDateInput = props => {
-  const { input, intent, onFieldSubmit, ...rest } = props;
+  const { input, intent, onFieldSubmit, inputProps, ...rest } = props;
   return (
     <DateInput
       {...getMomentFormatter("MM/DD/YYYY")}
       {...removeUnwantedProps(rest)}
       intent={intent}
-      inputProps={{ ...input }}
+      inputProps={inputProps}
       {...input}
       value={input.value ? new Date(input.value) : undefined}
       onChange={function(selectedDate) {
@@ -182,14 +182,14 @@ export const renderBlueprintDateInput = props => {
 };
 
 export const renderBlueprintDateRangeInput = props => {
-  const { input, intent, onFieldSubmit, ...rest } = props;
+  const { input, intent, onFieldSubmit, inputProps, ...rest } = props;
 
   return (
     <DateRangeInput
       {...getMomentFormatter("MM/DD/YYYY")}
       {...removeUnwantedProps(rest)}
       intent={intent}
-      inputProps={{ ...input }}
+      inputProps={inputProps}
       {...input}
       value={
         input.value

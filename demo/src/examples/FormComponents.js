@@ -223,10 +223,6 @@ class FormComponentsDemo extends React.Component {
             label="Date Input"
             onFieldSubmit={onFieldSubmit}
             defaultValue={new Date()}
-            minDate={new Date()}
-            maxDate={
-              new Date(new Date().setFullYear(new Date().getFullYear() + 10))
-            }
           />
           <DateRangeInputField
             name={"dateRangeInputField"}
@@ -251,9 +247,9 @@ class FormComponentsDemo extends React.Component {
             name={"checkboxField2"}
             inlineLabel={this.state.inlineLabels}
             label={
-              <div>
+              <span>
                 Label and Icon <Icon icon="tick" />
-              </div>
+              </span>
             }
           />
           <SwitchField
