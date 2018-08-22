@@ -84,8 +84,10 @@ export default compose(
       runTimeQueryOptions: {
         fragment,
         options: {
-          filter: {
-            j5ReportId
+          variables: {
+            filter: {
+              j5ReportId
+            }
           }
         }
       }
