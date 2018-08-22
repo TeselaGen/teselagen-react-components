@@ -216,6 +216,7 @@ class DataTableInstance extends React.Component {
       withCheckboxes: true,
       numOfEntities: 60,
       selectedIds: undefined,
+      alwaysRerender: false,
       entities: generateFakeRows(defaultNumOfEntities)
     };
     this.changeNumEntities = this.changeNumEntities.bind(this);
