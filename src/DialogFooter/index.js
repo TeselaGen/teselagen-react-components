@@ -1,6 +1,7 @@
 import React from "react";
 import { Intent, Button, Classes } from "@blueprintjs/core";
 import { noop } from "lodash";
+import PropTypes from "prop-types";
 
 function DialogFooter({
   hideModal = noop,
@@ -44,5 +45,26 @@ function DialogFooter({
     </div>
   );
 }
+
+DialogFooter.propTypes = {
+  hideModal: function(props, propName, componentName) {
+    if (!props.secondaryAction && !props.noCancel && !props.hideModal) {
+      return new Error(`hideModal was not passed to ${componentName}`);
+    }
+  },
+  loading: PropTypes.bool,
+  submitting: PropTypes.bool,
+  onClick: PropTypes.func,
+  secondaryAction: PropTypes.func,
+  intent: PropTypes.string,
+  secondaryIntent: PropTypes.string,
+  secondaryText: PropTypes.string,
+  additionalButtons: PropTypes.arrayOf(PropTypes.node),
+  className: PropTypes.string,
+  secondaryClassName: PropTypes.string,
+  text: PropTypes.string,
+  disabled: PropTypes.bool,
+  noCancel: PropTypes.bool
+};
 
 export default DialogFooter;
