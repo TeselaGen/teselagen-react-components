@@ -27,8 +27,8 @@ export default function ResizableDraggableDialog({
           topLeft: true,
           topRight: true
         }}
-        minWidth={300}
-        minHeight={200}
+        minWidth={Math.min(defaultDialogWidth, 300) }
+        minHeight={Math.min(defaultDialogHeight, 200) }
         bounds={"window"}
         default={{
           x: Math.max((windowWidth - defaultDialogWidth) / 2, 0),
