@@ -59,7 +59,10 @@ DialogFooter.propTypes = {
   intent: PropTypes.string,
   secondaryIntent: PropTypes.string,
   secondaryText: PropTypes.string,
-  additionalButtons: PropTypes.arrayOf(PropTypes.node),
+  additionalButtons: PropTypes.oneOfType([
+    PropTypes.node,
+    PropTypes.arrayOf(PropTypes.node)
+  ]),
   className: PropTypes.string,
   secondaryClassName: PropTypes.string,
   text: PropTypes.string,
