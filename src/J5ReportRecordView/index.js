@@ -384,6 +384,7 @@ class J5ReportRecordView extends Component {
               showLinkModal={() => this.showLinkModal("constructs")}
               isLinkable={LinkJ5TableDialog}
               onDoubleClick={onConstructDoubleClick}
+              tableProps={sharedTableProps}
               schema={this.getSchema("j5RunConstructs")}
               tableProps={sharedTableProps}
             />
