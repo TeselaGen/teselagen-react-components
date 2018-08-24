@@ -41,7 +41,7 @@ export default class Minimap extends React.PureComponent {
     })
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.zoom !== this.props.zoom) {
       // Keep middle point stationary when zooming
       const viewport = this.state.viewportEl

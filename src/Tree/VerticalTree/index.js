@@ -172,7 +172,7 @@ export default class VerticalTree extends React.Component {
 
   handleResize = () => this.forceUpdate();
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { zoom } = this.props;
     const { zoom: nextZoom } = nextProps;
     if (zoom !== nextZoom) {
