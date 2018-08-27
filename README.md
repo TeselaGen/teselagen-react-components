@@ -232,7 +232,9 @@ import {
 ## Developing linked to another folder: aka lims/hde
 ```
 //link everything up:
-cd lims/node_modules/react
+
+//LIMS EXAMPLE: 
+cd lims/node_modules/react        //this is so we don't have 2 copies of react being used on the front-end (react will throw errors if so)
 yarn link 
 cd teselagen-react-components
 yarn link
@@ -240,7 +242,8 @@ yarn link react
 cd lims
 yarn link teselagen-react-components
 
-cd hde/client/node_modules/react
+//HDE EXAMPLE: 
+cd hde/client/node_modules/react     //this is so we don't have 2 copies of react being used on the front-end (react will throw errors if so)
 yarn link 
 cd teselagen-react-components
 yarn link
@@ -248,6 +251,7 @@ yarn link react
 cd hde/client
 yarn link teselagen-react-components
 
+//ALWAYS:
 //start the auto rebuild:
 cd teselagen-react-components
 yarn build-watch
