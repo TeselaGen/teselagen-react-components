@@ -80,3 +80,7 @@ h6.bp3-heading {
 span.bp3-popover-target {
   display: block;
 }
+
+.bp3-portal {
+  z-index: 100000;
+}
