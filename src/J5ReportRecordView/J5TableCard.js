@@ -30,7 +30,7 @@ function J5TableCard({
     <CollapsibleCard
       icon={helperMessage && <InfoHelper>{helperMessage}</InfoHelper>}
       title={title}
-      initialClosed={isEmpty(tableParams) && entities && !entities.length}
+      initialClosed={isEmpty(tableParams) && entities && !entities.filter(e => e.isPrebuilt).length}
       openTitleElements={[
         isLinkable && (
           <Button key="linkButton" onClick={() => showLinkModal()}>
