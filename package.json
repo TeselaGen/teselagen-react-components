@@ -1,6 +1,6 @@
 {
   "name": "teselagen-react-components",
-  "version": "23.1.2",
+  "version": "23.1.8",
   "description": "Teselagen React Component Library",
   "main": "lib/index.js",
   "homepage": "http://teselagen.github.io/teselagen-react-components",
@@ -50,6 +50,7 @@
     "pascal-case": "^2.0.1",
     "paths-js": "^0.4.7",
     "pluralize": "^7.0.0",
+    "prop-types": "^15.6.2",
     "query-string": "^5.1.0",
     "react-addons-pure-render-mixin": "^15.6.0",
     "react-dropzone": "^4.2.12",
