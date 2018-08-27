@@ -240,6 +240,14 @@ yarn link react
 cd lims
 yarn link teselagen-react-components
 
+cd hde/client/node_modules/react
+yarn link 
+cd teselagen-react-components
+yarn link
+yarn link react
+cd hde/client
+yarn link teselagen-react-components
+
 //start the auto rebuild:
 cd teselagen-react-components
 yarn build-watch
