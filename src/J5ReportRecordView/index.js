@@ -318,11 +318,6 @@ class J5ReportRecordView extends Component {
       return <div>No report found!</div>;
     }
     const j5Report = data.j5Report;
-    console.log('j5Report.j5RunConstructs[0].isPrebuilt', j5Report.j5RunConstructs[0].isPrebuilt)
-    console.log('j5Report.j5RunConstructs', j5Report.j5RunConstructs)
-    // console.log('processDataPrebuilt',processDataForTables.prebuiltConstruct)
-    // console.log('processData', processDataForTables.j5RunConstruct.j5RunConstructs)
-
     const linkDialogProps = getLinkDialogProps(data.j5Report, fragmentMap);
     const currentLink = linkDialogProps[linkDialogName];
     const linkKeys = Object.keys(linkDialogProps);
