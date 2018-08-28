@@ -318,6 +318,10 @@ class J5ReportRecordView extends Component {
       return <div>No report found!</div>;
     }
     const j5Report = data.j5Report;
+    console.log('j5Report.j5RunConstructs[0].isPrebuilt', j5Report.j5RunConstructs[0].isPrebuilt)
+    console.log('j5Report.j5RunConstructs', j5Report.j5RunConstructs)
+    // console.log('processDataPrebuilt',processDataForTables.prebuiltConstruct)
+    // console.log('processData', processDataForTables.j5RunConstruct.j5RunConstructs)
 
     const linkDialogProps = getLinkDialogProps(data.j5Report, fragmentMap);
     const currentLink = linkDialogProps[linkDialogName];
@@ -379,7 +383,7 @@ class J5ReportRecordView extends Component {
                been built and are available in your library."
               title="Prebuilt Constructs"
               processData={processDataForTables.prebuiltConstruct}
-              entities={j5Report.j5RunConstructs}
+              entities={(j5Report.j5RunConstructs[0].isPrebuilt !== null) ? j5Report.j5RunConstructs : []}
               fragment={fragmentMap.j5RunConstruct}
               showLinkModal={() => this.showLinkModal("constructs")}
               isLinkable={LinkJ5TableDialog}
@@ -394,7 +398,7 @@ class J5ReportRecordView extends Component {
             helperMessage="Constructs are the desired sequences to be built in a j5 run."
             title="Assembled Constructs"
             processData={processDataForTables.j5RunConstruct}
-            entities={j5Report.j5RunConstructs}
+            entities={(j5Report.j5RunConstructs[0].isPrebuilt !== null) ? [] : j5Report.j5RunConstructs}
             fragment={fragmentMap.j5RunConstruct}
             showLinkModal={() => this.showLinkModal("constructs")}
             isLinkable={LinkJ5TableDialog}
@@ -529,7 +533,7 @@ class J5ReportRecordView extends Component {
                 each construct."
             title="Combination of Assembly Pieces"
             processData={processDataForTables.j5RunConstruct}
-            entities={j5Report.j5RunConstructs}
+            entities={(j5Report.j5RunConstructs[0].isPrebuilt !== null) ? [] : j5Report.j5RunConstructs}
             fragment={fragmentMap.j5RunConstruct}
             tableProps={sharedTableProps}
             createSchema={this.createSchemaForCombinationOfAssemblyPieces}

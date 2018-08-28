@@ -26,11 +26,18 @@ function J5TableCard({
   processData = identity
 }) {
   const entities = maybeEntities || tableParams.entities || [];
+  console.log(title)
+  console.log(isEmpty(tableParams) && entities && !entities.length)
+  console.log('tableParams', isEmpty(tableParams))
+  console.log(!entities.length)
+  console.log(entities)
+  console.log(processData(entities))
+  
   return (
     <CollapsibleCard
       icon={helperMessage && <InfoHelper>{helperMessage}</InfoHelper>}
       title={title}
-      initialClosed={isEmpty(tableParams) && entities && !entities.filter(e => e.isPrebuilt).length}
+      initialClosed={isEmpty(tableParams) && entities && !entities.length}
       openTitleElements={[
         isLinkable && (
           <Button key="linkButton" onClick={() => showLinkModal()}>
