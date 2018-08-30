@@ -78,6 +78,10 @@ class DataTableDemo extends React.Component {
       //tnrtodo: this should be set up as an enhancer instead
       formName: "example 1", //this should be a unique name
       schema,
+      defaults: {
+        order: ["isShared"], //default sort specified here!
+        pageSize: 5
+      },
       urlConnected: this.state.urlConnected,
       onlyOneFilter: this.state.onlyOneFilter,
       withSelectedEntities: this.state.withSelectedEntities

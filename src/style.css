@@ -69,6 +69,10 @@ h6.bp3-heading {
 .bp3-dark h6 {
   color: #f5f8fa;
 }
+.bp3-dark textarea {
+  background: #293742;
+  color: #f5f8fa;
+}
 
 /* bp3 fix https://github.com/palantir/blueprint/issues/2807 */
 .bp3-popover-wrapper {
