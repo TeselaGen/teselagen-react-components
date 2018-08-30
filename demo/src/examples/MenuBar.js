@@ -29,6 +29,27 @@ class MenuBarDemo extends React.Component {
       showHotkeys: this.showDialog
     };
 
+    // TODO: update this demo to define commands without first having separate
+    // hotkeys and handlers (done this other way here as a quick patch before
+    // refactoring)
+    const commandDefs = {};
+    for (let cmdId in handlers) {
+      const hk = hotkeys[cmdId] ? getHotkeyProps(hotkeys[cmdId]) : {};
+      commandDefs[cmdId] = {
+        handler: handlers[cmdId],
+        hotkey: hk.combo, // some may be undefined
+        hotkeyProps: hk
+      }
+    }
+
+    // Create commands without any special logic
+    const commands = genericCommandFactory({
+      commandDefs,
+      getArguments: () => [],
+      handleReturn: () => {}
+    });
+
+
     let menu = [
       {
         text: "File",
@@ -78,9 +99,6 @@ class MenuBarDemo extends React.Component {
       }
     ];
 
-    // Enhance menu with hotkeys and handlers, based on each item's `cmd` property
-    this.menu = addMenuHotkeys(addMenuHandlers(menu, handlers), hotkeys);
-
     // Sets will normally be different routes/modules/views of an app, but any
     // arbitrary separation criteria will work
     this.hotkeySets = {
@@ -92,7 +110,13 @@ class MenuBarDemo extends React.Component {
     };
 
     // An existing component may be wrapped, or a new one created, as in this case
-    this.hotkeyEnabler = withHotkeys(hotkeys, handlers)();
+    this.hotkeyEnabler = withHotkeys(
+      getCommandHotkeys(commands), // in this example, equivalent to `hotkeys`,
+      getCommandHotkeyHandlers(commands) // in this example, equivalent to `handlers`
+    )();
+
+    this.menu = menu;
+    this.menuEnhancers = [commandMenuEnhancer(commands)];
 
     this.state = {
       showDialog: false
@@ -117,11 +141,11 @@ class MenuBarDemo extends React.Component {
             border: "1px solid #eee"
           }}
         >
-          <MenuBar menu={this.menu} />
+          <MenuBar menu={this.menu} enhancers={this.menuEnhancers} />
         </div>
         <button
           onClick={e => {
-            createMenu(
+            showContextMenu(
               [
                 { text: "hey" },
                 undefined,
@@ -148,7 +172,7 @@ class MenuBarDemo extends React.Component {
             );
           }}
         >
-          Click to see a menu created using the imperative createMenu(menu,
+          Click to see a menu created using the imperative showContextMenu(menu,
           undefined, event)
         </button>
         <this.hotkeyEnabler />
@@ -170,10 +194,13 @@ class MenuBarDemo extends React.Component {
           <code>tooltip</code>, <code>key</code>, <code>divider</code>,{" "}
           <code>navTo</code>,
           <code>href</code>, <code>target</code> and <code>submenu</code>. You
-          may also use the <code>cmd</code> property in combination with{" "}
-          <code>addMenuHotkeys</code>
-          and <code>addMenuHandlers</code>. Check the <code>createMenu()</code>{" "}
-          util for more details.
+          may also include custom fields and have custom menu enhancers derive
+          other props from them. For example, the <code>cmd</code> property can
+          be used in combination with the <code>commandMenuEnhancer</code> to
+          link menu items with commands, wiring not only the handler, but also
+          the hotkeys, icon, disabled and active states, name, etc.
+          Check the <code>DynamicMenuItem</code> component and
+          <code>commandMenuEnhancer()</code>{" "} util for more details.
         </p>
       </div>
     );

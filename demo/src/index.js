@@ -26,7 +26,6 @@ import J5ReportRecordView from "./examples/J5ReportRecordView";
 import j5ReportRecordViewData from "./data/j5ReportRecordView";
 import * as customIcons from "../../src/customIcons";
 
-import createMenu from "../../src/utils/createMenu";
 import Tree from "./examples/Tree";
 import { bigTreeData, smallTreeData } from "./data/treeData";
 
@@ -62,8 +61,17 @@ import Chance from "chance";
 import times from "lodash/times";
 import client from "./client";
 import { ApolloProvider } from "react-apollo";
-import { addMenuHotkeys, addMenuHandlers } from "../../src/utils/menuUtils";
-import { withHotkeys } from "../../src/utils/hotkeyUtils";
+import {
+  createMenu,
+  showContextMenu,
+  commandMenuEnhancer,
+} from "../../src/utils/menuUtils";
+import {
+  genericCommandFactory,
+  getCommandHotkeys,
+  getCommandHotkeyHandlers
+} from "../../src/utils/commandUtils";
+import { withHotkeys, getHotkeyProps } from "../../src/utils/hotkeyUtils";
 
 FocusStyleManager.onlyShowFocusOnTabs();
 
@@ -207,10 +215,15 @@ const demos = {
   MenuBar: {
     demo: MenuBar,
     scope: {
-      addMenuHotkeys,
-      addMenuHandlers,
       withHotkeys,
-      createMenu
+      getHotkeyProps,
+      createMenu,
+      showContextMenu,
+      commandMenuEnhancer,
+      genericCommandFactory,
+      getCommandHotkeys,
+      getCommandHotkeyHandlers
+
     },
     props: [
       {
