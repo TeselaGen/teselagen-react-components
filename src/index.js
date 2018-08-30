@@ -49,7 +49,6 @@ export * from "./toastr";
 export * from "./flow_types";
 export * from "./utils/handlerHelpers";
 export * from "./customIcons";
-export { default as createMenu } from "./utils/createMenu";
 export {
   default as basicHandleActionsWithFullState
 } from "./utils/basicHandleActionsWithFullState";
@@ -59,5 +58,6 @@ export {
 export { default as pureNoFunc } from "./utils/pureNoFunc";
 export * from "./utils/hotkeyUtils";
 export * from "./utils/menuUtils";
+export * from "./utils/commandUtils";
 
 export { default as Tree } from "./Tree";
