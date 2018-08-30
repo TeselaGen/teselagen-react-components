@@ -1,0 +1,376 @@
+@import url(~react-table/react-table.css);
+
+/* DataTable style.css */
+.custom-menu-item {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-wrap: normal;
+  display: block;
+  border-radius: 2px;
+  padding: 7px;
+  line-height: 16px;
+  color: inherit;
+  user-select: none;
+}
+
+.menu-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.data-table-header-menu {
+  min-width: 210px;
+}
+
+.data-table-search-and-filter {
+  display: flex;
+}
+
+.data-table-header {
+  display: flex;
+  margin-bottom: 20px;
+  justify-content: space-between;
+}
+
+.data-table-header-and-buttons .bp3-button-group {
+  overflow: auto;
+}
+
+.data-table-title {
+  font-size: 1.8em;
+  font-weight: 300;
+  margin-right: 10px;
+}
+
+.data-table-container {
+  padding: 20px;
+  position: relative;
+  /* height: 100%;  tnr: this rule messes up  */
+  /* jpc: restoring rule for now to see if it still causes
+   * problems, and if so, what are those */
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.data-table-container.fullscreen {
+  background: white;
+  position: fixed;
+  z-index: 50;
+  padding: 20px !important;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.data-table-container.no-padding {
+  padding: 0;
+}
+
+.data-table-container.hide-column-header .rt-thead.-header {
+  display: none;
+}
+
+.data-table-title-and-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.datatable-search-input {
+  width: 200px;
+}
+
+.clickable-cell {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.paging-toolbar-container {
+  margin-left: 5px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.paging-page-size {
+  width: 62px;
+}
+
+.ReactTable.ReactTable .rt-tbody .rt-tr-group {
+  border: none;
+}
+
+.ReactTable.ReactTable .rt-tbody .rt-tr {
+  border-bottom: 1px solid rgb(233, 233, 233);
+}
+
+.bp3-dark .ReactTable.ReactTable .rt-tbody .rt-tr {
+  border-bottom-color: rgba(16, 22, 26, 0.15);
+}
+
+.ReactTable.ReactTable .rt-tbody .rt-tr-group .-padRow {
+  display: none;
+}
+
+/* Prevent rows from expanding vertically to fill available space */
+.ReactTable.ReactTable .rt-tbody .rt-tr-group,
+.ReactTable.ReactTable .rt-tbody .rt-tr-group .rt-tr {
+  flex: 0 0 auto;
+}
+
+.bp3-icon-standard.bp3-disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.data-table-search-and-clear-filter-container {
+  display: flex;
+}
+
+.data-table-clear-filters {
+  margin-right: 20px;
+}
+
+.tg-react-table-column-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.tg-react-table-column-header:hover > * {
+  display: inherit !important;
+}
+
+.tg-react-table-column-header:hover .tg-sort-arrow-container > * {
+  display: inherit !important;
+}
+
+.tg-react-table-column-header:hover .tg-filter-menu-button,
+.tg-react-table-column-header .bp3-popover-open .tg-filter-menu-button {
+  display: block !important;
+}
+
+.tg-react-table-name {
+  white-space: nowrap;
+  overflow: hidden;
+  min-width: 0px;
+  padding: 6px;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.tg-sort-arrow-container {
+  margin-left: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+.tg-sort-arrow-container .bp3-icon {
+  display: none;
+}
+
+.tg-sort-arrow-container > *:hover {
+  background: rgba(167, 182, 194, 0.3);
+}
+
+.tg-filter-menu-button {
+  display: none !important;
+  cursor: pointer;
+  color: darkgrey;
+}
+
+.tg-filter-menu-button:hover {
+  color: #5c7080;
+}
+
+.tg-active-filter {
+  color: #106ba3;
+  display: block !important;
+}
+
+.data-table-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.ReactTable {
+  user-select: none;
+  background: white;
+}
+
+.ReactTable .rt-thead.-header {
+  box-shadow: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: #f7f7f7;
+  overflow-x: hidden;
+}
+
+.ReactTable .rt-tbody .rt-td {
+  cursor: pointer;
+  border-right: none;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  padding: 12px 12px;
+}
+
+/* fix padding in custom row expander cell */
+.ReactTable .rt-tbody .rt-expandable {
+  padding: 3px 5px;
+}
+
+/*  //tnr: hopefully this isn't needed because it messes up the row "expander" styling
+.ReactTable .rt-tr-group {
+  flex: initial;
+  min-height: 35px !important;
+} */
+
+.ReactTable .rt-tbody .rt-tr-group {
+  border-bottom-color: rgb(233, 233, 233);
+}
+
+.ReactTable .rt-tr-group.selected {
+  background: lightblue !important;
+}
+
+.dt-isViewable .ReactTable .rt-tr-group.selected .dt-eyeIcon {
+  color: #137cbd;
+  transform: scale(1.2);
+}
+
+.tg-compact-table .rt-tbody .rt-td {
+  padding: 8px 8px;
+  display: flex;
+  align-items: center;
+}
+
+.ReactTable .rt-thead .rt-th.tg-react-table-checkbox-header-container,
+.ReactTable .rt-tbody .rt-td.tg-react-table-checkbox-cell-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.tg-react-table-checkbox-header-container .bp3-control,
+.tg-react-table-checkbox-cell-container .bp3-control {
+  margin-bottom: 0;
+  /* there is a weird padding on the blueprint checkbox, so this centers it some */
+  padding-left: 18px;
+}
+
+.tg-compact-table .rt-tr-group {
+  min-height: 25px !important;
+}
+
+.tg-compact-table .tg-react-table-name {
+  padding: 4px;
+  padding-left: 2px;
+}
+
+.ReactTable .-loading.disabled {
+  cursor: not-allowed;
+}
+
+/* to get the height to resize based on its container:  */
+.ReactTable {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.rt-table {
+  flex: 100000 0 auto;
+}
+
+.-pagination,
+.rt-body {
+  flex: 1 0 auto;
+}
+
+.ReactTable .rt-thead .rt-th,
+.ReactTable .rt-thead .rt-td {
+  border-right: none;
+}
+
+.ReactTable .rt-thead .rt-resizable-header {
+  border-right: 1px solid #f7f7f7;
+}
+
+.bp3-dark .ReactTable .rt-thead .rt-resizable-header {
+  border-right: 1px solid #202b33;
+}
+
+.ReactTable .rt-thead .rt-resizable-header:hover {
+  border-right: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.show-on-hover {
+  color: #fff;
+  font-size: 13px !important;
+}
+
+.hoverable:hover .show-on-hover {
+  display: inline !important;
+  color: #ccc;
+}
+
+/* dark styles */
+.bp3-dark .ReactTable {
+  background: #30404d !important;
+  color: #f5f8fa !important;
+}
+
+.bp3-dark .ReactTable .rt-thead.-header {
+  background: #202b33 !important;
+  color: #f5f8fa !important;
+}
+
+.bp3-dark .ReactTable .rt-tbody .rt-td,
+.bp3-dark .tg-react-table-name {
+  color: #f5f8fa !important;
+}
+
+.bp3-dark .ReactTable .rt-noData {
+  background: #202b33 !important;
+  color: inherit !important;
+  z-index: unset;
+}
+
+.bp3-dark .ReactTable .-loading {
+  background: #30404d !important;
+}
+
+.bp3-dark .ReactTable .-loading > div {
+  color: #f5f8fa !important;
+}
+
+.bp3-dark .ReactTable .rt-tr-group.selected {
+  background: #26738cb0 !important;
+}
+
+.dt-isViewable .ReactTable .rt-tr-group.selected {
+  background: inherit !important;
+}
+
+.bp3-dark .ReactTable .rt-thead .rt-resizable-header:hover {
+  border-right-color: #738694;
+}
+
+.bp3-dark .data-table-container.fullscreen {
+  background: #293742;
+}
+
+.data-table-container .ReactTable .rt-resizer {
+  width: 10px;
+  right: -5px;
+}

@@ -1,0 +1,6 @@
+.icon-handshake-o {
+  *zoom: expression(
+    this.runtimeStyle[ "zoom" ] = "1",
+    this.innerHTML = "&#xf2b5;&nbsp;"
+  );
+}

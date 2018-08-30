@@ -1,0 +1,22 @@
+.vertical-tree-demo-node {
+  height: 50px;
+  width: 70px;
+  border: 2px solid black;
+  line-height: 50px;
+  text-align: center;
+  font-family: "Helvetica Neue For Number", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+#vertical-demo-minimap-parent {
+  position: relative;
+}
+
+#vertical-demo-minimap-viewport {
+  overflow: auto;
+  max-height: 600px;
+  margin-left: 60px;
+}
