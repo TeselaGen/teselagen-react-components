@@ -14,9 +14,10 @@ export default class FillWindow extends React.Component {
     super(props)
     rerenderOnWindowResize(this)
   }
-  componentDidMount(){
-    this.setState({thomas: "realCool"})
-  }
+  // this is left here for posterity. componentDidMount didn't work before commit ee1853a5ae2e6e27b720dd225650cc2154076db5 "fixing rerenderOnWindowResize to bind this keyword correctly"
+  // componentDidMount(){ 
+  //   this.setState({thomas: "realCool"})
+  // }
 
   render () {
     let w = window,
