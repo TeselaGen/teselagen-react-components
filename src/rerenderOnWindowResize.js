@@ -9,12 +9,12 @@ export default function rerenderOnWindowResize(that) {
   const componentWillUnmount = that.componentWillUnmount
   
   that.componentDidMount = (...args)=> {
-    componentDidMount(...args)
+    componentDidMount.bind(that)(...args)
     window.addEventListener("resize", that.updateDimensions);
   }
 
   that.componentWillUnmount = (...args)=> {
-    componentWillUnmount(...args)
+    componentWillUnmount.bind(that)(...args)
     window.removeEventListener("resize", that.updateDimensions);
   }
 } 

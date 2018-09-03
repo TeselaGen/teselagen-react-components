@@ -14,6 +14,10 @@ export default class FillWindow extends React.Component {
     super(props)
     rerenderOnWindowResize(this)
   }
+  componentDidMount(){
+    this.setState({thomas: "realCool"})
+  }
+
   render () {
     let w = window,
       d = document,
