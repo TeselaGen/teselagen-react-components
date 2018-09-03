@@ -28,6 +28,7 @@ export {
   default as ResizableDraggableDialog
 } from "./ResizableDraggableDialog";
 export { default as MenuBar } from "./MenuBar";
+export { default as rerenderOnWindowResize } from "./rerenderOnWindowResize";
 export { default as HotkeysDialog } from "./HotkeysDialog";
 export { default as J5ReportRecordView } from "./J5ReportRecordView";
 export * from "./J5ReportRecordView/utils";

@@ -23,6 +23,7 @@ import { withTableParams, DataTable, PagingTool } from "../../src";
 import Uploader from "../../src/FormComponents/Uploader";
 import { FileUploadField } from "../../src/FormComponents";
 import J5ReportRecordView from "./examples/J5ReportRecordView";
+import FillWindowExample from "./examples/FillWindow";
 import j5ReportRecordViewData from "./data/j5ReportRecordView";
 import * as customIcons from "../../src/customIcons";
 
@@ -31,6 +32,7 @@ import { bigTreeData, smallTreeData } from "./data/treeData";
 
 import S3Download from "../../src/utils/S3Download";
 import magicDownload from "../../src/DownloadLink/magicDownload";
+import FillWindow from "../../src/FillWindow";
 
 import "./style.css";
 import React from "react";
@@ -371,6 +373,12 @@ const demos = {
     demo: J5ReportRecordView,
     scope: {
       data: j5ReportRecordViewData
+    }
+  },
+  FillWindow: {
+    demo: FillWindowExample,
+    scope: {
+      FillWindow
     }
   },
   tree: {

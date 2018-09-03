@@ -1,6 +1,7 @@
-import Rnd from "react-rnd";
+// import Rnd from "react-rnd";
 import React from "react";
 import { Dialog, Classes } from "@blueprintjs/core";
+import Rnd from "./react-rnd";
 import "./style.css";
 
 export default function ResizableDraggableDialog({
@@ -27,15 +28,21 @@ export default function ResizableDraggableDialog({
           topLeft: true,
           topRight: true
         }}
-        minWidth={Math.min(defaultDialogWidth, 300) }
-        minHeight={Math.min(defaultDialogHeight, 200) }
+        maxHeight={windowHeight}
+        maxWidth={windowWidth}
+        // minWidth={Math.min(defaultDialogWidth, 300) }
+        // minHeight={Math.min(defaultDialogHeight, 200) }
         bounds={"window"}
-        default={{
-          x: Math.max((windowWidth - defaultDialogWidth) / 2, 0),
-          y: Math.max((windowHeight - defaultDialogHeight) / 2, 0),
-          width: Math.min(defaultDialogWidth, windowWidth),
-          height: Math.min(defaultDialogHeight, windowHeight)
-        }}
+        // default={{
+        //   x: Math.max((windowWidth - defaultDialogWidth) / 2, 0),
+        //   y: Math.max((windowHeight - defaultDialogHeight) / 2, 0),
+        //   width: Math.min(defaultDialogWidth, windowWidth),
+        //   height: Math.min(defaultDialogHeight, windowHeight)
+        // }}
+        // default={{
+        //   x: "50%",
+        //   y: "50%",
+        // }}
         dragHandleClassName={Classes.DIALOG_HEADER}
         {...RndProps}
       >

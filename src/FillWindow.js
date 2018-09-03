@@ -1,5 +1,5 @@
 import React from "react";
-import { debounce } from "lodash";
+import rerenderOnWindowResize from "./rerenderOnWindowResize";
 
 // use like: 
 // <FillWindow>
@@ -10,16 +10,9 @@ import { debounce } from "lodash";
 
 
 export default class FillWindow extends React.Component {
-  updateDimensions = debounce(() => {
-    if (this.props.disabled) return
-    this.setState({ randomRerenderTrigger: Math.random() });
-  }, 100);
-  
-  componentDidMount() {
-    window.addEventListener("resize", this.updateDimensions);
-  }
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.updateDimensions);
+  constructor(props){
+    super(props)
+    rerenderOnWindowResize(this)
   }
   render () {
     let w = window,

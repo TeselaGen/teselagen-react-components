@@ -2,7 +2,7 @@ function DialogInner() {
   return (
     <div className={Classes.DIALOG_BODY}>
       I am a dialog
-      <div>with a bunch of stuff in it</div>
+      <div style={{width: 450}}>with a bunch of stuff in it</div>
       {[1, 2, 3, 4, 5, 5, 6, 6, 77, 7, 12, 2, 34].map((num, i) => {
         return (
           <div key={i} style={{ height: 40, background: Math.random() }}>
