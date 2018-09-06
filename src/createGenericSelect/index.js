@@ -435,11 +435,12 @@ const GenericSelectInner = compose(
     })
   ),
   adHoc(props => {
-    const { fragment, passedName, queryOptions } = props;
+    const { fragment, passedName, queryOptions, tableParamOptions } = props;
     return [
       withTableParams({
         formName: passedName + "DataTable",
-        withSelectedEntities: true
+        withSelectedEntities: true,
+        ...tableParamOptions
       }),
       withQuery(fragment, { isPlural: true, options: queryOptions })
     ];
