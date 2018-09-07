@@ -269,7 +269,7 @@ yarn build-watch
 
 - `npm whoami` you should be teselagen
 - `npm login` 
-teselagen//ourMasterPass//team@teselagen.com
+teselagen-admin//ourMasterPass//team@teselagen.com
 - git pull
 - npm version patch|minor|major
 - npm publish
