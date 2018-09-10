@@ -1,10 +1,17 @@
-import {debounce} from 'lodash'
+import {throttle} from 'lodash'
+// use like this within a react component: 
+
+// constructor(props){
+//   super(props)
+//   rerenderOnWindowResize(this)
+// }
+
 
 export default function rerenderOnWindowResize(that) {
-  that.updateDimensions = debounce(() => {
+  that.updateDimensions = throttle(() => {
     if (that.props.disabled) return
-    that.setState({ randomRerenderTrigger: Math.random() });
-  }, 100);
+    that.forceUpdate()
+  }, 250);
   const componentDidMount = that.componentDidMount
   const componentWillUnmount = that.componentWillUnmount
   

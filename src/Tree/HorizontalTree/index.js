@@ -157,7 +157,7 @@ export default class HorizontalTree extends React.Component {
     yOffsetPerUnitDepth: PropTypes.number.isRequired
   };
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { zoom } = this.props;
     const { zoom: nextZoom } = nextProps;
     if (zoom !== nextZoom) {

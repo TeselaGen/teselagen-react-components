@@ -1,7 +1,7 @@
 // import Rnd from "react-rnd";
 import React from "react";
 import { Dialog, Classes } from "@blueprintjs/core";
-import Rnd from "./react-rnd";
+import Rnd from "react-rnd";
 import "./style.css";
 
 export default function ResizableDraggableDialog({
