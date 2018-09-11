@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import sortify from "./sortify"; //tnr TODO: export this from json.sortify when https://github.com/ThomasR/JSON.sortify/issues/11 is resolved
+import { SketchPicker } from "react-color";
 import { isNumber, noop } from "lodash";
 import mathExpressionEvaluator from "math-expression-evaluator";
 import deepEqual from "deep-equal";
@@ -541,6 +542,79 @@ export const renderBlueprintRadioGroup = ({
   );
 };
 
+export class RenderReactColorPicker extends React.Component {
+  state = {
+    displayColorPicker: false
+  };
+
+  handleClick = () => {
+    this.setState({ displayColorPicker: !this.state.displayColorPicker });
+  };
+
+  handleClose = () => {
+    this.setState({ displayColorPicker: false });
+  };
+
+  handleChange = color => {
+    const { input, onFieldSubmit } = this.props;
+
+    input.onChange(color.hex);
+    onFieldSubmit(color.hex);
+  };
+
+  render() {
+    const { input, onFieldSubmit, ...rest } = this.props;
+    return (
+      <React.Fragment>
+        <div
+          style={{
+            padding: "5px",
+            background: "#fff",
+            borderRadius: "1px",
+            boxShadow: "0 0 0 1px rgba(0,0,0,.1)",
+            display: "inline-block",
+            cursor: "pointer"
+          }}
+          onClick={this.handleClick}
+        >
+          <div
+            style={{
+              width: "36px",
+              height: "14px",
+              borderRadius: "2px",
+              background: `${input.value}`
+            }}
+          />
+        </div>
+        {this.state.displayColorPicker ? (
+          <div
+            style={{
+              position: "absolute",
+              zIndex: "2"
+            }}
+          >
+            <div
+              style={{
+                position: "fixed",
+                top: "0px",
+                right: "0px",
+                bottom: "0px",
+                left: "0px"
+              }}
+              onClick={this.handleClose}
+            />
+            <SketchPicker
+              color={input.value}
+              onChangeComplete={this.handleChange}
+              {...removeUnwantedProps(rest)}
+            />
+          </div>
+        ) : null}
+      </React.Fragment>
+    );
+  }
+}
+
 function generateField(component, opts) {
   const compWithDefaultVal = withAbstractWrapper(component, opts);
   return function FieldMaker({ name, onFieldSubmit = noop, ...rest }) {
@@ -593,3 +667,4 @@ export const RadioGroupField = generateField(renderBlueprintRadioGroup, {
 });
 export const ReactSelectField = generateField(renderReactSelect);
 export const SelectField = generateField(renderSelect);
+export const ReactColorField = generateField(RenderReactColorPicker);

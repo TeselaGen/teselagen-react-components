@@ -315,6 +315,12 @@ class FormComponentsDemo extends React.Component {
             onFieldSubmit={onFieldSubmit}
             loadOptions={getOptions}
           />
+          <ReactColorField
+            name="reactColorField"
+            inlineLabel={this.state.inlineLabels}
+            label="React Color Field"
+            onFieldSubmit={onFieldSubmit}
+          />
           <Button
             intent={Intent.SUCCESS}
             text="Submit Form"
