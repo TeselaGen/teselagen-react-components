@@ -342,6 +342,7 @@ class J5ReportRecordView extends Component {
           });
         });
     }
+
     return (
       <div className={"j5-report-container"}>
         <div style={{ display: "flex-columns" }}>
@@ -379,7 +380,8 @@ class J5ReportRecordView extends Component {
               title="Prebuilt Constructs"
               processData={processDataForTables.prebuiltConstruct}
               entities={
-                get(j5Report, "j5RunConstructs[0].isPrebuilt") !== null
+                get(j5Report, "j5RunConstructs[0].isPrebuilt") !== null &&
+                !j5Report.j5RunConstructs
                   ? j5Report.j5RunConstructs
                   : []
               }
@@ -398,7 +400,8 @@ class J5ReportRecordView extends Component {
             title="Assembled Constructs"
             processData={processDataForTables.j5RunConstruct}
             entities={
-              j5Report.j5RunConstructs[0].isPrebuilt !== null
+              get(j5Report, "j5RunConstructs[0].isPrebuilt") !== null &&
+              !fragmentMap.j5RunConstruct
                 ? []
                 : j5Report.j5RunConstructs
             }
@@ -537,7 +540,8 @@ class J5ReportRecordView extends Component {
             title="Combination of Assembly Pieces"
             processData={processDataForTables.j5RunConstruct}
             entities={
-              get(j5Report, "j5RunConstructs[0].isPrebuilt") !== null
+              get(j5Report, "j5RunConstructs[0].isPrebuilt") !== null &&
+              !fragmentMap.j5RunConstruct
                 ? []
                 : j5Report.j5RunConstructs
             }
