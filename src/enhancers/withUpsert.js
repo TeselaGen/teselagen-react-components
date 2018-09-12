@@ -20,6 +20,7 @@ import generateFragmentWithFields from "../utils/generateFragmentWithFields";
  * @property {string} idAs - if not using a fragment, you get an id field back as default. But, if the record doesn't have an id field, and instead has a 'code', you can set idAs: 'code'
  * @property {boolean} forceCreate - sometimes the thing you're creating won't have an id field (it might have a code or something else as its primary key). This lets you override the default behavior of updating if no id is found
  * @property {boolean} forceUpdate - sometimes the thing you're updating might have an id field. This lets you override that. This lets you override the default behavior of creating if an id is found
+ * @property {boolean} excludeResults - don't fetch back result entities after update or create
  * @return upsertXXXX function that takes an object or array of objects to upsert. It returns a promise resolving to an array of created/updated outputs
  */
 
@@ -35,6 +36,7 @@ export default function withUpsert(nameOrFragment, options = {}) {
     client,
     refetchQueries,
     showError = true,
+    excludeResults = false,
     ...rest
   } = options;
   let fragment = typeof nameOrFragment === "string" ? null : nameOrFragment;
@@ -49,14 +51,20 @@ export default function withUpsert(nameOrFragment, options = {}) {
   const fragName = fragment && fragment.definitions[0].name.value;
   const pascalCaseName = pascalCase(name);
   const createName = `create${pascalCaseName}`;
+  const resultString = `${
+    !excludeResults
+      ? `results {
+    ${fragName ? `...${fragName}` : idAs || "id"}
+  }`
+      : ""
+  }
+  totalResults`;
   /* eslint-disable */
   const createMutation = gql`
     mutation ${createName}($input: [${createName}Input]) {
       ${createName}(input: $input) {
         createdItemsCursor {
-          results {
-            ${fragName ? `...${fragName}` : idAs || "id"}
-          }
+          ${resultString}
         }
       }
     }
@@ -70,9 +78,7 @@ export default function withUpsert(nameOrFragment, options = {}) {
     mutation ${updateName}($input: [${updateName}Input]) {
       ${updateName}(input: $input) {
         updatedItemsCursor {
-          results {
-            ${fragName ? `...${fragName}` : idAs || "id"}
-          }
+          ${resultString}
         }
       }
     }
@@ -128,10 +134,12 @@ export default function withUpsert(nameOrFragment, options = {}) {
           update
         })
         .then(function(res) {
-          return Promise.resolve(
+          const resultInfo =
             res.data[isUpdate ? updateName : createName][
               isUpdate ? "updatedItemsCursor" : "createdItemsCursor"
-            ].results
+            ];
+          return Promise.resolve(
+            excludeResults ? resultInfo.totalResults : resultInfo.results
           );
         });
     };
@@ -209,11 +217,14 @@ export default function withUpsert(nameOrFragment, options = {}) {
           }
           return (isUpdate ? updateItem : createItem)(values, ...rest)
             .then(function(res) {
-              return Promise.resolve(
+              const returnInfo =
                 res.data[isUpdate ? updateName : createName][
                   isUpdate ? "updatedItemsCursor" : "createdItemsCursor"
-                ].results
-              );
+                ];
+              let results = returnInfo.results;
+              results = [...results];
+              results.totalResults = returnInfo.totalResults;
+              return Promise.resolve(results);
             })
             .catch(e => {
               if (showError) {
