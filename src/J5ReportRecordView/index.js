@@ -378,7 +378,11 @@ class J5ReportRecordView extends Component {
                been built and are available in your library."
               title="Prebuilt Constructs"
               processData={processDataForTables.prebuiltConstruct}
-              entities={(j5Report.j5RunConstructs[0].isPrebuilt !== null) ? j5Report.j5RunConstructs : []}
+              entities={
+                get(j5Report, "j5RunConstructs[0].isPrebuilt") !== null
+                  ? j5Report.j5RunConstructs
+                  : []
+              }
               fragment={fragmentMap.j5RunConstruct}
               showLinkModal={() => this.showLinkModal("constructs")}
               isLinkable={LinkJ5TableDialog}
@@ -393,7 +397,11 @@ class J5ReportRecordView extends Component {
             helperMessage="Constructs are the desired sequences to be built in a j5 run."
             title="Assembled Constructs"
             processData={processDataForTables.j5RunConstruct}
-            entities={(j5Report.j5RunConstructs[0].isPrebuilt !== null) ? [] : j5Report.j5RunConstructs}
+            entities={
+              j5Report.j5RunConstructs[0].isPrebuilt !== null
+                ? []
+                : j5Report.j5RunConstructs
+            }
             fragment={fragmentMap.j5RunConstruct}
             showLinkModal={() => this.showLinkModal("constructs")}
             isLinkable={LinkJ5TableDialog}
@@ -528,7 +536,11 @@ class J5ReportRecordView extends Component {
                 each construct."
             title="Combination of Assembly Pieces"
             processData={processDataForTables.j5RunConstruct}
-            entities={(j5Report.j5RunConstructs[0].isPrebuilt !== null) ? [] : j5Report.j5RunConstructs}
+            entities={
+              get(j5Report, "j5RunConstructs[0].isPrebuilt") !== null
+                ? []
+                : j5Report.j5RunConstructs
+            }
             fragment={fragmentMap.j5RunConstruct}
             tableProps={sharedTableProps}
             createSchema={this.createSchemaForCombinationOfAssemblyPieces}
