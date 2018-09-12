@@ -516,7 +516,7 @@ class DataTable extends React.Component {
                 </div>
               )}
             {showCount &&
-              `${entityCount} ${
+              `${entityCount || 0} ${
                 entityCount === 1 ? "Record" : "Total Records"
               }`}
             <div style={{ display: "flex", flexWrap: "wrap" }}>

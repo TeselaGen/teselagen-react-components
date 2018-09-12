@@ -23,9 +23,16 @@ function J5TableCard({
   children,
   tableParams = {},
   createSchema = noop,
-  processData = identity
+  processData = identity,
+  fragment
 }) {
-  const entities = maybeEntities || tableParams.entities || [];
+  let entities = maybeEntities;
+  // using remote paging
+  if (fragment) {
+    entities = tableParams.entities;
+  }
+  entities = entities || [];
+
   return (
     <CollapsibleCard
       icon={helperMessage && <InfoHelper>{helperMessage}</InfoHelper>}
