@@ -1,13 +1,12 @@
 import React, { Component } from "react";
 import { SortableContainer } from "react-sortable-hoc";
 
-
 function CustomTheadComponent(props) {
   const headerColumns = props.children.props.children;
   return (
     <div className={"rt-thead " + props.className} style={props.style}>
       <div className="rt-tr">
-        {headerColumns.map((column) => {
+        {headerColumns.map(column => {
           // if a column is marked as immovable just return regular column
           if (column.props.immovable === "true") return column;
           // keeps track of hidden columns here so columnIndex might not equal i

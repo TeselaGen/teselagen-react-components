@@ -124,7 +124,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         additionalFilter: additionalFilterToUse
       }),
       formNameFromWithTPCall: formNameFromWithTableParamsCall,
-      // randomVarToForceLocalStorageUpdate: formSelector(state, "localStorageForceUpdate"),
+      randomVarToForceLocalStorageUpdate: formSelector(state, "localStorageForceUpdate"),
       currentParams,
       selectedEntities,
       ...(withSelectedEntities &&
