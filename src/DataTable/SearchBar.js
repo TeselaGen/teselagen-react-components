@@ -1,18 +1,20 @@
 import React from "react";
-import { InputGroup, Button, Classes } from "@blueprintjs/core";
+import { InputGroup, Button, Classes, Spinner } from "@blueprintjs/core";
 import classNames from "classnames";
 import { onEnterHelper } from "../utils/handlerHelpers";
 
 const SearchBar = ({
   reduxFormSearchInput,
   setSearchTerm,
-  maybeSpinner,
+  loading,
   disabled
 }) => {
   return (
     <InputGroup
       disabled={disabled}
-      className={classNames(Classes.ROUND, "datatable-search-input")}
+      loading={loading}
+      type="search"
+      className={classNames("datatable-search-input", Classes.ROUND)}
       placeholder="Search..."
       {...reduxFormSearchInput.input}
       {...onEnterHelper(e => {
@@ -20,9 +22,11 @@ const SearchBar = ({
         setSearchTerm(reduxFormSearchInput.input.value);
       })}
       rightElement={
-        maybeSpinner || (
+        loading ? (
+          <Spinner size="18" />
+        ) : (
           <Button
-            className={Classes.MINIMAL}
+            minimal
             icon="search"
             onClick={() => {
               setSearchTerm(reduxFormSearchInput.input.value);

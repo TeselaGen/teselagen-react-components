@@ -10,9 +10,6 @@ import { camelCase, get, startCase, noop, isEqual, cloneDeep } from "lodash";
 import {
   Button,
   Menu,
-  Spinner,
-  // Popover,
-  // Position,
   MenuItem,
   Classes,
   ContextMenu,
@@ -354,11 +351,6 @@ class DataTable extends React.Component {
       });
     }
     const numRows = isInfinite ? entities.length : pageSize;
-    const maybeSpinner = isLoading ? (
-      <Spinner className={Classes.SMALL} />
-    ) : (
-      undefined
-    );
     const idMap = reduxFormSelectedEntityIdMap.input.value || {};
     const selectedRowCount = Object.keys(idMap).filter(key => idMap[key])
       .length;
@@ -452,7 +444,7 @@ class DataTable extends React.Component {
                   {...{
                     reduxFormSearchInput,
                     setSearchTerm,
-                    maybeSpinner,
+                    loading: isLoading,
                     disabled
                   }}
                 />
