@@ -125,7 +125,7 @@
     "tg-client-query-builder": "^2.6.0"
   },
   "lint-staged": {
-    "src/**/*.js ": [
+    "src/**/*.js": [
       "eslint --fix",
       "prettier --write",
       "yarn test:staged",
