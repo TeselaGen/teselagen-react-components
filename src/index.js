@@ -44,7 +44,7 @@ export { default as tg_modalState } from "./enhancers/withDialog/tg_modalState";
 export {
   default as generateFragmentWithFields
 } from "./utils/generateFragmentWithFields";
-
+export { default as Timeline, TimelineEvent } from "./Timeline";
 export * from "./FormComponents";
 export * from "./toastr";
 export * from "./flow_types";
@@ -60,5 +60,4 @@ export { default as pureNoFunc } from "./utils/pureNoFunc";
 export * from "./utils/hotkeyUtils";
 export * from "./utils/menuUtils";
 export * from "./utils/commandUtils";
-
 export { default as Tree } from "./Tree";

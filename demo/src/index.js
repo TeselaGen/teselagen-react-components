@@ -33,6 +33,9 @@ import { bigTreeData, smallTreeData } from "./data/treeData";
 import S3Download from "../../src/utils/S3Download";
 import magicDownload from "../../src/DownloadLink/magicDownload";
 import FillWindow from "../../src/FillWindow";
+import Timeline from "../../src/Timeline";
+import TimelineEvent from "../../src/Timeline/TimelineEvent";
+import TimelineDemo from "./examples/TimelineDemo";
 
 import "./style.css";
 import React from "react";
@@ -66,7 +69,7 @@ import { ApolloProvider } from "react-apollo";
 import {
   createMenu,
   showContextMenu,
-  commandMenuEnhancer,
+  commandMenuEnhancer
 } from "../../src/utils/menuUtils";
 import {
   genericCommandFactory,
@@ -225,7 +228,6 @@ const demos = {
       genericCommandFactory,
       getCommandHotkeys,
       getCommandHotkeyHandlers
-
     },
     props: [
       {
@@ -386,6 +388,13 @@ const demos = {
     scope: {
       bigTreeData,
       smallTreeData
+    }
+  },
+  Timeline: {
+    demo: TimelineDemo,
+    scope: {
+      Timeline,
+      TimelineEvent
     }
   }
   // fonticons: {
