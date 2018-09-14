@@ -447,6 +447,19 @@ const GenericSelectInner = compose(
   })
 )(
   class GenericSelect extends Component {
+    constructor(props) {
+      super(props);
+
+      const tp = this.props.tableParams;
+      const hasLastEdited = tp.schema.fields.find(
+        f => f.displayName === "Modified"
+      );
+      if (tp.setOrder && hasLastEdited && !this.props.queryOptions) {
+        // By default, sort by modified, descending
+        tp.setOrder("-modified", undefined, false);
+      }
+    }
+
     onDoubleClick = record => {
       const { hideModal, handleSelection, isMultiSelect } = this.props;
       if (isMultiSelect) return;
