@@ -454,7 +454,7 @@ const GenericSelectInner = compose(
       const hasLastEdited = tp.schema.fields.find(
         f => f.displayName === "Modified"
       );
-      if (tp.setOrder && hasLastEdited && !this.props.queryOptions) {
+      if (tp.setOrder && hasLastEdited) {
         // By default, sort by modified, descending
         tp.setOrder("-modified", undefined, false);
       }
