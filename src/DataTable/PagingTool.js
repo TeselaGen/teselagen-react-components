@@ -108,7 +108,10 @@ export class PagingTool extends React.Component {
             onClick={this.onRefresh}
           />
         )}
-        <div className={classNames(Classes.SELECT, Classes.MINIMAL)}>
+        <div
+          title={"Set Page Size"}
+          className={classNames(Classes.SELECT, Classes.MINIMAL)}
+        >
           <select
             className="paging-page-size"
             onChange={this.setPageSize}
@@ -117,7 +120,7 @@ export class PagingTool extends React.Component {
           >
             {[
               <option key="page-size-placeholder" disabled value={"fake"}>
-                Set Page Size
+                Size
               </option>,
               ...pageSizes.map(size => {
                 return (
