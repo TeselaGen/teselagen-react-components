@@ -185,14 +185,6 @@ export default class Minimap extends React.PureComponent {
     this.endMinimapDrag();
   };
 
-  handleMinimapBackgroundMouseLeave = e => {
-    const { relatedTarget } = e;
-    const { minimapViewportRef } = this;
-    const { minimapViewPortDragging } = this.state;
-    if (minimapViewPortDragging && relatedTarget === minimapViewportRef) return;
-    this.endMinimapDrag();
-  };
-
   //////////////////////////////////////////////////
   // Minimap viewport event handlers ///////////////
   //////////////////////////////////////////////////
@@ -223,15 +215,6 @@ export default class Minimap extends React.PureComponent {
   };
 
   handleMinimapViewportMouseUp = () => {
-    this.endMinimapDrag();
-  };
-
-  handleMinimapViewportMouseLeave = e => {
-    const { relatedTarget } = e;
-    const { minimapBackgroundRef } = this;
-    const { minimapViewPortDragging } = this.state;
-    if (minimapViewPortDragging && relatedTarget === minimapBackgroundRef)
-      return;
     this.endMinimapDrag();
   };
 
@@ -302,9 +285,6 @@ export default class Minimap extends React.PureComponent {
               height: treeHeight
             }}
             onMouseDown={this.handleMinimapBackgroundMouseDown}
-            // onMouseMove={this.handleMinimapBackgroundMouseMove}
-            // onMouseUp={this.handleMinimapBackgroundMouseUp}
-            // onMouseLeave={this.handleMinimapBackgroundMouseLeave}
           />
           {children}
           <div
@@ -335,9 +315,6 @@ export default class Minimap extends React.PureComponent {
                   ))
             }}
             onMouseDown={this.handleMinimapViewportMouseDown}
-            // onMouseMove={this.handleMinimapViewportMouseMove}
-            // onMouseUp={this.handleMinimapViewportMouseUp}
-            // onMouseLeave={this.handleMinimapViewportMouseLeave}
           />
         </div>
       </div>,
