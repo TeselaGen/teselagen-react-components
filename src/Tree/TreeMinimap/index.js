@@ -1,199 +1,241 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
+import React from "react";
+import ReactDOM from "react-dom";
 
-import './style.css'
+import "./style.css";
 
 export default class Minimap extends React.PureComponent {
   static defaultProps = {
     zoom: 1
-  }
+  };
 
   state = {
     viewportEl: null,
     minimapViewPortDragging: false
-  }
+  };
 
   setMinimapBackgroundRef = node => {
-    this.minimapBackgroundRef = node
-  }
+    this.minimapBackgroundRef = node;
+  };
 
   setMinimapViewportRef = node => {
-    this.minimapViewportRef = node
-  }
+    this.minimapViewportRef = node;
+  };
 
   handleViewportScroll = () => {
-    this.forceUpdate()
-  }
+    this.forceUpdate();
+  };
 
-  getScaleFromZoom = () => 1 / this.props.zoom
+  getScaleFromZoom = () => 1 / this.props.zoom;
 
   componentDidMount() {
-    const { minimapViewportSelector, minimapParentSelector } = this.props
+    const { minimapViewportSelector, minimapParentSelector } = this.props;
 
-    const viewportEl = document.querySelector(minimapViewportSelector)
-    viewportEl.addEventListener('scroll', this.handleViewportScroll)
+    const viewportEl = document.querySelector(minimapViewportSelector);
+    viewportEl.addEventListener("scroll", this.handleViewportScroll);
+    // attach listeners to the window because we don't want them to be scoped to only the little minimap or else the drag will stop when outside the minimap div!
+    window.addEventListener(
+      "mousemove",
+      this.handleMinimapViewportMouseMove,
+      false
+    );
+    window.addEventListener(
+      "mouseup",
+      this.handleMinimapViewportMouseUp,
+      false
+    );
+    window.addEventListener(
+      "mousemove",
+      this.handleMinimapBackgroundMouseMove,
+      false
+    );
+    window.addEventListener(
+      "mouseup",
+      this.handleMinimapBackgroundMouseUp,
+      false
+    );
 
-    const minimapParentEl = document.querySelector(minimapParentSelector)
+    const minimapParentEl = document.querySelector(minimapParentSelector);
 
     this.setState({
       viewportEl,
       minimapParentEl
-    })
+    });
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.zoom !== this.props.zoom) {
       // Keep middle point stationary when zooming
-      const viewport = this.state.viewportEl
-      const oldZoom = this.props.zoom
-      const newZoom = nextProps.zoom
+      const viewport = this.state.viewportEl;
+      const oldZoom = this.props.zoom;
+      const newZoom = nextProps.zoom;
 
-      const left = viewport.scrollLeft
-      const hw = viewport.clientWidth / 2
-      viewport.scrollLeft = (left + hw) * oldZoom / newZoom - hw
+      const left = viewport.scrollLeft;
+      const hw = viewport.clientWidth / 2;
+      viewport.scrollLeft = ((left + hw) * oldZoom) / newZoom - hw;
 
-      const top = viewport.scrollTop
-      const hh = viewport.clientHeight / 2
-      viewport.scrollTop = (top + hh) * oldZoom / newZoom - hh
+      const top = viewport.scrollTop;
+      const hh = viewport.clientHeight / 2;
+      viewport.scrollTop = ((top + hh) * oldZoom) / newZoom - hh;
     }
   }
 
   componentWillUnmount() {
-    const { viewportEl } = this.state
+    const { viewportEl } = this.state;
+
+    document.body.removeEventListener(
+      "mousemove",
+      this.handleMinimapViewportMouseMove,
+      false
+    );
+    document.body.removeEventListener(
+      "mouseup",
+      this.handleMinimapViewportMouseUp,
+      false
+    );
+    document.body.removeEventListener(
+      "mousemove",
+      this.handleMinimapBackgroundMouseMove,
+      false
+    );
+    document.body.removeEventListener(
+      "mouseup",
+      this.handleMinimapBackgroundMouseUp,
+      false
+    );
 
     if (viewportEl)
-      viewportEl.removeEventListener('scroll', this.handleViewportScroll)
+      viewportEl.removeEventListener("scroll", this.handleViewportScroll);
   }
 
   getScaleFactor = () => {
-    const { rootRef, minimapThickness, isHorizontal } = this.props
-    const { viewportEl } = this.state
-    if (!rootRef || !viewportEl) return null
+    const { rootRef, minimapThickness, isHorizontal } = this.props;
+    const { viewportEl } = this.state;
+    if (!rootRef || !viewportEl) return null;
 
     const {
       height: treeHeight,
       width: treeWidth
-    } = rootRef.getBoundingClientRect()
+    } = rootRef.getBoundingClientRect();
 
     const {
       height: viewportHeight,
       width: viewportWidth
-    } = viewportEl.getBoundingClientRect()
+    } = viewportEl.getBoundingClientRect();
 
-    const zoomScale = this.getScaleFromZoom()
+    const zoomScale = this.getScaleFromZoom();
 
     return isHorizontal
       ? zoomScale *
           Math.min(minimapThickness / treeHeight, viewportWidth / treeWidth)
       : zoomScale *
-          Math.min(minimapThickness / treeWidth, viewportHeight / treeHeight)
-  }
+          Math.min(minimapThickness / treeWidth, viewportHeight / treeHeight);
+  };
 
   minimapBackgroundScrollToPosition = e => {
-    const { minimapBackgroundRef } = this
-    const { viewportEl } = this.state
+    const { minimapBackgroundRef } = this;
+    const { viewportEl } = this.state;
 
     const {
       top: backgroundTop,
       left: backgroundLeft
-    } = minimapBackgroundRef.getBoundingClientRect()
+    } = minimapBackgroundRef.getBoundingClientRect();
 
     const {
       height: viewportHeight,
       width: viewportWidth
-    } = viewportEl.getBoundingClientRect()
+    } = viewportEl.getBoundingClientRect();
 
-    const scaleFactor = this.getScaleFactor()
-    const zoomScale = this.getScaleFromZoom()
+    const scaleFactor = this.getScaleFactor();
+    const zoomScale = this.getScaleFromZoom();
 
     const xOnBackground =
-      (e.pageX - (backgroundLeft + window.scrollX)) * zoomScale / scaleFactor
+      ((e.pageX - (backgroundLeft + window.scrollX)) * zoomScale) / scaleFactor;
     const yOnBackground =
-      (e.pageY - (backgroundTop + window.scrollY)) * zoomScale / scaleFactor
+      ((e.pageY - (backgroundTop + window.scrollY)) * zoomScale) / scaleFactor;
 
-    viewportEl.scrollLeft = xOnBackground - viewportWidth / 2
-    viewportEl.scrollTop = yOnBackground - viewportHeight / 2
-  }
+    viewportEl.scrollLeft = xOnBackground - viewportWidth / 2;
+    viewportEl.scrollTop = yOnBackground - viewportHeight / 2;
+  };
 
   endMinimapDrag = () => {
-    this.setState({ minimapViewPortDragging: false })
-    this.lastMinimapViewportMouseX = null
-    this.lastMinimapViewportMouseY = null
-  }
+    this.setState({ minimapViewPortDragging: false });
+    this.lastMinimapViewportMouseX = null;
+    this.lastMinimapViewportMouseY = null;
+  };
 
   //////////////////////////////////////////////////
   // Minimap background event handlers /////////////
   //////////////////////////////////////////////////
   handleMinimapBackgroundMouseDown = e => {
-    this.setState({ minimapViewPortDragging: true })
-    this.lastMinimapViewportMouseX = e.clientX
-    this.lastMinimapViewportMouseY = e.clientY
-    this.minimapBackgroundScrollToPosition(e)
-  }
+    this.setState({ minimapViewPortDragging: true });
+    this.lastMinimapViewportMouseX = e.clientX;
+    this.lastMinimapViewportMouseY = e.clientY;
+    this.minimapBackgroundScrollToPosition(e);
+  };
 
   handleMinimapBackgroundMouseMove = e => {
-    const { minimapViewPortDragging } = this.state
-    if (!minimapViewPortDragging) return
-    this.minimapBackgroundScrollToPosition(e)
-    this.lastMinimapViewportMouseX = e.clientX
-    this.lastMinimapViewportMouseY = e.clientY
-  }
+    const { minimapViewPortDragging } = this.state;
+    if (!minimapViewPortDragging) return;
+    this.minimapBackgroundScrollToPosition(e);
+    this.lastMinimapViewportMouseX = e.clientX;
+    this.lastMinimapViewportMouseY = e.clientY;
+  };
 
   handleMinimapBackgroundMouseUp = () => {
-    this.endMinimapDrag()
-  }
+    this.endMinimapDrag();
+  };
 
   handleMinimapBackgroundMouseLeave = e => {
-    const { relatedTarget } = e
-    const { minimapViewportRef } = this
-    const { minimapViewPortDragging } = this.state
-    if (minimapViewPortDragging && relatedTarget === minimapViewportRef) return
-    this.endMinimapDrag()
-  }
+    const { relatedTarget } = e;
+    const { minimapViewportRef } = this;
+    const { minimapViewPortDragging } = this.state;
+    if (minimapViewPortDragging && relatedTarget === minimapViewportRef) return;
+    this.endMinimapDrag();
+  };
 
   //////////////////////////////////////////////////
   // Minimap viewport event handlers ///////////////
   //////////////////////////////////////////////////
   handleMinimapViewportMouseDown = e => {
-    this.setState({ minimapViewPortDragging: true })
-    this.lastMinimapViewportMouseX = e.clientX
-    this.lastMinimapViewportMouseY = e.clientY
+    this.setState({ minimapViewPortDragging: true });
+    this.lastMinimapViewportMouseX = e.clientX;
+    this.lastMinimapViewportMouseY = e.clientY;
 
-    e.preventDefault()
-  }
+    e.preventDefault();
+  };
 
   handleMinimapViewportMouseMove = e => {
-    const { zoom } = this.props
-    const { lastMinimapViewportMouseX, lastMinimapViewportMouseY } = this
-    const { viewportEl, minimapViewPortDragging } = this.state
-    if (!minimapViewPortDragging) return
+    const { zoom } = this.props;
+    const { lastMinimapViewportMouseX, lastMinimapViewportMouseY } = this;
+    const { viewportEl, minimapViewPortDragging } = this.state;
+    if (!minimapViewPortDragging) return;
 
-    const deltaX = e.clientX - lastMinimapViewportMouseX
-    const deltaY = e.clientY - lastMinimapViewportMouseY
+    const deltaX = e.clientX - lastMinimapViewportMouseX;
+    const deltaY = e.clientY - lastMinimapViewportMouseY;
 
-    const scaleFactor = this.getScaleFactor()
+    const scaleFactor = this.getScaleFactor();
 
-    viewportEl.scrollTop += deltaY / scaleFactor / zoom
-    viewportEl.scrollLeft += deltaX / scaleFactor / zoom
+    viewportEl.scrollTop += deltaY / scaleFactor / zoom;
+    viewportEl.scrollLeft += deltaX / scaleFactor / zoom;
 
-    this.lastMinimapViewportMouseX = e.clientX
-    this.lastMinimapViewportMouseY = e.clientY
-  }
+    this.lastMinimapViewportMouseX = e.clientX;
+    this.lastMinimapViewportMouseY = e.clientY;
+  };
 
   handleMinimapViewportMouseUp = () => {
-    this.endMinimapDrag()
-  }
+    this.endMinimapDrag();
+  };
 
   handleMinimapViewportMouseLeave = e => {
-    const { relatedTarget } = e
-    const { minimapBackgroundRef } = this
-    const { minimapViewPortDragging } = this.state
+    const { relatedTarget } = e;
+    const { minimapBackgroundRef } = this;
+    const { minimapViewPortDragging } = this.state;
     if (minimapViewPortDragging && relatedTarget === minimapBackgroundRef)
-      return
-    this.endMinimapDrag()
-  }
+      return;
+    this.endMinimapDrag();
+  };
 
-  pxToNumber = s => Number(s.slice(0, -2))
+  pxToNumber = s => Number(s.slice(0, -2));
 
   //////////////////////////////////////////////////
   // Render method /////////////////////////////////
@@ -205,46 +247,46 @@ export default class Minimap extends React.PureComponent {
       isHorizontal,
       minimapThickness,
       zoom
-    } = this.props
-    const { viewportEl, minimapViewPortDragging, minimapParentEl } = this.state
-    if (!viewportEl || !rootRef || !minimapParentEl) return null
+    } = this.props;
+    const { viewportEl, minimapViewPortDragging, minimapParentEl } = this.state;
+    if (!viewportEl || !rootRef || !minimapParentEl) return null;
 
     const {
       height: viewportHeight,
       width: viewportWidth,
       top: viewportTop,
       left: viewportLeft
-    } = viewportEl.getBoundingClientRect()
+    } = viewportEl.getBoundingClientRect();
     let {
       top: treeTop,
       left: treeLeft,
       height: treeHeight,
       width: treeWidth
-    } = rootRef.getBoundingClientRect()
-    treeWidth *= zoom
-    treeHeight *= zoom
+    } = rootRef.getBoundingClientRect();
+    treeWidth *= zoom;
+    treeHeight *= zoom;
 
-    const viewportComputedStyle = getComputedStyle(viewportEl)
+    const viewportComputedStyle = getComputedStyle(viewportEl);
 
-    const scaleFactor = this.getScaleFactor()
+    const scaleFactor = this.getScaleFactor();
     return ReactDOM.createPortal(
       <div
         className="tg-tree-minimap"
         style={{
-          position: 'absolute',
+          position: "absolute",
           top: 0,
           left: 0,
           width: isHorizontal ? scaleFactor * treeWidth : minimapThickness,
           height: isHorizontal ? minimapThickness : scaleFactor * treeHeight,
           // minWidth: 'min-content',
-          overflow: 'hidden'
+          overflow: "hidden"
         }}
       >
         <div
           style={{
             transform: `scale(${scaleFactor})`,
-            transformOrigin: 'top left',
-            overflow: 'hidden',
+            transformOrigin: "top left",
+            overflow: "hidden",
             width: treeWidth,
             height: treeHeight
           }}
@@ -253,28 +295,28 @@ export default class Minimap extends React.PureComponent {
             className="tg-tree-minimap-background"
             ref={this.setMinimapBackgroundRef}
             style={{
-              position: 'absolute',
+              position: "absolute",
               top: 0,
               left: 0,
               width: treeWidth,
               height: treeHeight
             }}
             onMouseDown={this.handleMinimapBackgroundMouseDown}
-            onMouseMove={this.handleMinimapBackgroundMouseMove}
-            onMouseUp={this.handleMinimapBackgroundMouseUp}
-            onMouseLeave={this.handleMinimapBackgroundMouseLeave}
+            // onMouseMove={this.handleMinimapBackgroundMouseMove}
+            // onMouseUp={this.handleMinimapBackgroundMouseUp}
+            // onMouseLeave={this.handleMinimapBackgroundMouseLeave}
           />
           {children}
           <div
             className={
-              'tg-tree-minimap-viewport ' +
+              "tg-tree-minimap-viewport " +
               (minimapViewPortDragging
-                ? 'tg-tree-minimap-viewport-dragging'
-                : '')
+                ? "tg-tree-minimap-viewport-dragging"
+                : "")
             }
             ref={this.setMinimapViewportRef}
             style={{
-              position: 'absolute',
+              position: "absolute",
               width: viewportWidth * zoom,
               height: viewportHeight * zoom,
               top:
@@ -282,24 +324,24 @@ export default class Minimap extends React.PureComponent {
                 (viewportTop -
                   treeTop -
                   this.pxToNumber(
-                    viewportComputedStyle.getPropertyValue('padding-top')
+                    viewportComputedStyle.getPropertyValue("padding-top")
                   )),
               left:
                 zoom *
                 (viewportLeft -
                   treeLeft -
                   this.pxToNumber(
-                    viewportComputedStyle.getPropertyValue('padding-left')
+                    viewportComputedStyle.getPropertyValue("padding-left")
                   ))
             }}
             onMouseDown={this.handleMinimapViewportMouseDown}
-            onMouseMove={this.handleMinimapViewportMouseMove}
-            onMouseUp={this.handleMinimapViewportMouseUp}
-            onMouseLeave={this.handleMinimapViewportMouseLeave}
+            // onMouseMove={this.handleMinimapViewportMouseMove}
+            // onMouseUp={this.handleMinimapViewportMouseUp}
+            // onMouseLeave={this.handleMinimapViewportMouseLeave}
           />
         </div>
       </div>,
       minimapParentEl
-    )
+    );
   }
 }
