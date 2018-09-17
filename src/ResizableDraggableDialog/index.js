@@ -33,13 +33,13 @@ export default function ResizableDraggableDialog({
         // minWidth={Math.min(defaultDialogWidth, 300) }
         // minHeight={Math.min(defaultDialogHeight, 200) }
         bounds={"window"}
-        // default={{
-        //   x: Math.max((windowWidth - defaultDialogWidth) / 2, 0),
-        //   y: Math.max((windowHeight - defaultDialogHeight) / 2, 0),
-        //   width: Math.min(defaultDialogWidth, windowWidth),
-        //   height: Math.min(defaultDialogHeight, windowHeight)
-        // }}
-        // default={{
+        default={{
+          x: Math.max((windowWidth - defaultDialogWidth) / 2, 0),
+          y: Math.max((windowHeight - defaultDialogHeight) / 2, 0),
+          width: Math.min(defaultDialogWidth, windowWidth),
+          height: Math.min(defaultDialogHeight, windowHeight)
+        }}
+        // default={{ //tnrtodo - implement this once strml merges my pr..
         //   x: "50%",
         //   y: "50%",
         // }}
