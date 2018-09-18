@@ -997,7 +997,7 @@ class DataTable extends React.Component {
           <Icon
             title="Sort Z-A (Hold shift to sort multiple columns)"
             icon="chevron-up"
-            color={sortUp ? "#106ba3" : ""}
+            color={sortUp ? "#106ba3" : undefined}
             style={{
               display: sortUp ? "inherit" : undefined
             }}
@@ -1009,7 +1009,7 @@ class DataTable extends React.Component {
           <Icon
             title={"Sort A-Z (Hold shift to sort multiple columns)"}
             icon="chevron-down"
-            color={sortDown ? "#106ba3" : ""}
+            color={sortDown ? "#106ba3" : undefined}
             iconSize={12}
             style={{
               display: sortDown ? "inherit" : undefined
