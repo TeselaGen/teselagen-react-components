@@ -3,9 +3,30 @@
 function Demo() {
   return (
     <div>
-      <Button onClick={() => {
+      There is a one time set up to get the window.toastr object. All you need to do is add 
+      <br></br>
+      <br></br>
+      <code>
+        import "teselagen-react-components"
+      </code>
+      <br></br>
+      <br></br>
+      in a top level file like /src/index and you'll have it
+      <br></br>
+      <br></br>
+      <br></br>
+      <Button intent="success" onClick={() => {
         window.toastr.success("heyy")
-      }} text="show toast" />
+      }} text="show success toast" />
+      <Button intent="primary" onClick={() => {
+        window.toastr.info ("heyy")
+      }} text="show info toast" />
+      <Button intent="warning" onClick={() => {
+        window.toastr.warning("heyy")
+      }} text="show warning toast" />
+      <Button intent="danger" onClick={() => {
+        window.toastr.error("heyy")
+      }} text="show error toast" />
     </div>
   );
 }
