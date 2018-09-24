@@ -481,6 +481,7 @@ const GenericSelectInner = compose(
         isMultiSelect,
         readableName,
         minSelected,
+        additionalTableProps,
         mustSelect
       } = this.props;
       let disableButton = !selectedEntities.length;
@@ -513,6 +514,7 @@ const GenericSelectInner = compose(
             isSingleSelect={!isMultiSelect}
             maxHeight={400}
             {...tableParams}
+            {...additionalTableProps}
             // destroyOnUnmount={false}
             // keepDirtyOnReinitialize
             // enableReinitialize={true}
