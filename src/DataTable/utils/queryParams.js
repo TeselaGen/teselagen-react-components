@@ -550,7 +550,8 @@ export function getQueryParams({
   isInfinite,
   entities,
   isLocalCall,
-  additionalFilter
+  additionalFilter,
+  noOrderError
 }) {
   Object.keys(currentParams).forEach(function(key) {
     if (currentParams[key] === undefined) {
@@ -646,11 +647,12 @@ export function getQueryParams({
             prefix + path
           ];
         } else {
-          console.error(
-            "No schema for field found!",
-            ccDisplayName,
-            schema.fields
-          );
+          !noOrderError &&
+            console.error(
+              "No schema for field found!",
+              ccDisplayName,
+              schema.fields
+            );
         }
       });
     }
@@ -660,8 +662,7 @@ export function getQueryParams({
     const { andFilters, orFilters } = getAndAndOrFilters(allFilters);
     const additionalFilterToUse = additionalFilter(qb, currentParams);
     try {
-      qb
-        .whereAll(getQueries(andFilters, qb, ccFields))
+      qb.whereAll(getQueries(andFilters, qb, ccFields))
         .andWhereAll(additionalFilterToUse)
         .andWhereAny(getQueries(orFilters, qb, ccFields));
     } catch (e) {

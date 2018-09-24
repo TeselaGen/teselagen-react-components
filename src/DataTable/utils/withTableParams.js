@@ -29,6 +29,7 @@ import pureNoFunc from "../../utils/pureNoFunc";
  * @property {boolean} urlConnected - whether the table should connect to/update the URL
  * @property {boolean} withSelectedEntities - whether or not to pass the selected entities
  * @property {object} defaults - tableParam defaults such as pageSize, filter, etc
+ * @property {boolean} noOrderError - won't console an error if an order is not found on schema
  */
 export default function withTableParams(compOrOpts, pTopLevelOpts) {
   let topLevelOptions;
@@ -53,7 +54,8 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       isInfinite,
       isSimple,
       initialValues,
-      additionalFilter = {}
+      additionalFilter = {},
+      noOrderError
     } = mergedOpts;
 
     const schema = getSchema(mergedOpts);
@@ -121,10 +123,14 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         schema: convertSchema(schema),
         isInfinite: isInfinite || isSimple,
         isLocalCall,
-        additionalFilter: additionalFilterToUse
+        additionalFilter: additionalFilterToUse,
+        noOrderError
       }),
       formNameFromWithTPCall: formNameFromWithTableParamsCall,
-      randomVarToForceLocalStorageUpdate: formSelector(state, "localStorageForceUpdate"),
+      randomVarToForceLocalStorageUpdate: formSelector(
+        state,
+        "localStorageForceUpdate"
+      ),
       currentParams,
       selectedEntities,
       ...(withSelectedEntities &&

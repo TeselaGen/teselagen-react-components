@@ -1,5 +1,5 @@
 import { Button, Intent, Tooltip } from "@blueprintjs/core";
-import { get, isEqual, noop } from "lodash";
+import { get, isEqual, noop, pick } from "lodash";
 import pluralize from "pluralize";
 import React, { Component } from "react";
 import { compose } from "react-apollo";
@@ -12,7 +12,6 @@ import withTableParams from "../DataTable/utils/withTableParams";
 import withDialog from "../enhancers/withDialog";
 import withField from "../enhancers/withField";
 import withQuery from "../enhancers/withQuery";
-import adHoc from "../utils/adHoc";
 import DialogFooter from "../DialogFooter";
 import BlueprintError from "../BlueprintError";
 import generateQuery from "../utils/generateQuery";
@@ -433,106 +432,130 @@ const GenericSelectInner = compose(
       enforceFocus: false,
       canOutsideClickClose: false
     })
-  ),
-  adHoc(props => {
-    const { fragment, passedName, queryOptions, tableParamOptions } = props;
-    return [
-      withTableParams({
-        formName: passedName + "DataTable",
-        withSelectedEntities: true,
-        ...tableParamOptions
-      }),
-      withQuery(fragment, { isPlural: true, options: queryOptions })
-    ];
-  })
+  )
 )(
   class GenericSelect extends Component {
     constructor(props) {
       super(props);
+      this.getInnerComponent();
+    }
 
-      const tp = this.props.tableParams;
-      const hasLastEdited = tp.schema.fields.find(
-        f => f.displayName === "Modified"
-      );
-      if (tp.setOrder && hasLastEdited) {
-        // By default, sort by modified, descending
-        tp.setOrder("-modified", undefined, false);
+    UNSAFE_componentWillReceiveProps(newProps) {
+      const propsToPick = [
+        "fragment",
+        "passedName",
+        "queryOptions",
+        "tableParamOptions"
+      ];
+      if (
+        !isEqual(pick(this.props, propsToPick), pick(newProps, propsToPick))
+      ) {
+        this.getInnerComponent();
       }
     }
 
-    onDoubleClick = record => {
-      const { hideModal, handleSelection, isMultiSelect } = this.props;
-      if (isMultiSelect) return;
-      hideModal && hideModal();
-      handleSelection([record]);
-    };
+    getInnerComponent = () => {
+      const {
+        fragment,
+        passedName,
+        queryOptions,
+        tableParamOptions
+      } = this.props;
 
-    makeSelection = () => {
-      const { hideModal, handleSelection, selectedEntities } = this.props;
-      handleSelection(selectedEntities);
-      hideModal();
+      this.innerComponent = compose(
+        withTableParams({
+          formName: passedName + "DataTable",
+          withSelectedEntities: true,
+          noOrderError: true,
+          defaults: {
+            order: ["-modified"]
+          },
+          ...tableParamOptions
+        }),
+        withQuery(fragment, { isPlural: true, options: queryOptions })
+      )(InnerComp);
     };
 
     render() {
-      const {
-        tableParams,
-        hideModal,
-        selectedEntities,
-        isMultiSelect,
-        readableName,
-        minSelected,
-        additionalTableProps,
-        mustSelect
-      } = this.props;
-      let disableButton = !selectedEntities.length;
-      let minSelectMessage;
-      let mustSelectMessage;
-      if (minSelected && selectedEntities.length < minSelected) {
-        minSelectMessage = `Please select at least ${minSelected} ${pluralize(
-          readableName
-        )}`;
-        disableButton = true;
-      }
-      if (mustSelect && selectedEntities.length !== mustSelect) {
-        mustSelectMessage = `Please select ${mustSelect} ${pluralize(
-          readableName
-        )}`;
-        disableButton = true;
-      }
-      return (
-        <div>
-          <div style={{ marginBottom: 10 }}>
-            {minSelectMessage}
-            {mustSelectMessage}
-          </div>
-          <DataTable
-            withSearch
-            withPaging
-            doNotShowEmptyRows
-            onDoubleClick={this.onDoubleClick}
-            withCheckboxes={isMultiSelect}
-            isSingleSelect={!isMultiSelect}
-            maxHeight={400}
-            {...tableParams}
-            {...additionalTableProps}
-            // destroyOnUnmount={false}
-            // keepDirtyOnReinitialize
-            // enableReinitialize={true}
-            // updateUnregisteredFields
-          />
-          <DialogFooter
-            hideModal={hideModal}
-            disabled={disableButton}
-            onClick={this.makeSelection}
-            text={
-              "Select " +
-              (selectedEntities.length > 1
-                ? pluralize(readableName)
-                : readableName)
-            }
-          />
-        </div>
-      );
+      const ComponentToRender = this.innerComponent;
+      return <ComponentToRender {...this.props} />;
     }
   }
 );
+
+class InnerComp extends Component {
+  onDoubleClick = record => {
+    const { hideModal, handleSelection, isMultiSelect } = this.props;
+    if (isMultiSelect) return;
+    hideModal && hideModal();
+    handleSelection([record]);
+  };
+
+  makeSelection = () => {
+    const { hideModal, handleSelection, selectedEntities } = this.props;
+    handleSelection(selectedEntities);
+    hideModal();
+  };
+
+  render() {
+    const {
+      tableParams,
+      hideModal,
+      selectedEntities,
+      isMultiSelect,
+      additionalTableProps,
+      readableName,
+      minSelected,
+      mustSelect
+    } = this.props;
+    let disableButton = !selectedEntities.length;
+    let minSelectMessage;
+    let mustSelectMessage;
+    if (minSelected && selectedEntities.length < minSelected) {
+      minSelectMessage = `Please select at least ${minSelected} ${pluralize(
+        readableName
+      )}`;
+      disableButton = true;
+    }
+    if (mustSelect && selectedEntities.length !== mustSelect) {
+      mustSelectMessage = `Please select ${mustSelect} ${pluralize(
+        readableName
+      )}`;
+      disableButton = true;
+    }
+    return (
+      <div>
+        <div style={{ marginBottom: 10 }}>
+          {minSelectMessage}
+          {mustSelectMessage}
+        </div>
+        <DataTable
+          withSearch
+          withPaging
+          doNotShowEmptyRows
+          onDoubleClick={this.onDoubleClick}
+          withCheckboxes={isMultiSelect}
+          isSingleSelect={!isMultiSelect}
+          maxHeight={400}
+          {...tableParams}
+          {...additionalTableProps}
+          // destroyOnUnmount={false}
+          // keepDirtyOnReinitialize
+          // enableReinitialize={true}
+          // updateUnregisteredFields
+        />
+        <DialogFooter
+          hideModal={hideModal}
+          disabled={disableButton}
+          onClick={this.makeSelection}
+          text={
+            "Select " +
+            (selectedEntities.length > 1
+              ? pluralize(readableName)
+              : readableName)
+          }
+        />
+      </div>
+    );
+  }
+}
