@@ -145,7 +145,6 @@ class FormComponentsDemo extends React.Component {
           }
           <BPSelect
             onChange={onFieldSubmit}
-            // className={Classes.MINIMAL}
             minimal
             value="hey"
             options={["hey", "you", "guys"]}
