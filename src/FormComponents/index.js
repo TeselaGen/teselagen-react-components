@@ -408,6 +408,7 @@ export const renderSelect = props => {
     placeholder,
     onFieldSubmit,
     options,
+    hidePlaceHolder,
     minimal,
     disabled,
     ...rest
@@ -442,7 +443,7 @@ export const renderSelect = props => {
         }}
       >
         {placeholder && (
-          <option value="__placeholder__" disabled hidden>
+          <option value="__placeholder__" disabled hidden={hidePlaceHolder}>
             {placeholder}
           </option>
         )}

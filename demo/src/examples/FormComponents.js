@@ -174,7 +174,7 @@ class FormComponentsDemo extends React.Component {
             name={"selectFieldWithPlaceholderAndInitiallyUnsetDefault"}
             inlineLabel={this.state.inlineLabels}
             defaultValue={defaultSelectValue}
-            placeholder="I'm just hanging out"
+            placeholder="Choose one of the following..."
             label="Select Simple with initially unset defaultValue and a placeholder"
           />
           <Button
