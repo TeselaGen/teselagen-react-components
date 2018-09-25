@@ -145,12 +145,13 @@ class FormComponentsDemo extends React.Component {
           }
           <BPSelect
             onChange={onFieldSubmit}
-            className={Classes.MINIMAL}
+            // className={Classes.MINIMAL}
+            minimal
             value="hey"
             options={["hey", "you", "guys"]}
             name={"inlineselectField"}
             inlineLabel={this.state.inlineLabels}
-            label="Select Simple with inlineLabel = true"
+            label="minimal Select Simple with inlineLabel = true"
           />
           <SelectField
             onFieldSubmit={onFieldSubmit}

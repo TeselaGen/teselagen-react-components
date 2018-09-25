@@ -408,12 +408,20 @@ export const renderSelect = props => {
     placeholder,
     onFieldSubmit,
     options,
+    minimal,
+    disabled,
     ...rest
   } = props;
   return (
-    <div className={classNames(Classes.SELECT, Classes.FILL, className)}>
+    <div
+      className={
+        `${minimal && Classes.MINIMAL} ` +
+        classNames(Classes.SELECT, Classes.FILL, className)
+      }
+    >
       <select
         {...removeUnwantedProps(rest)}
+        className={`${disabled && Classes.DISABLED} `}
         value={
           placeholder && value === ""
             ? "__placeholder__"
