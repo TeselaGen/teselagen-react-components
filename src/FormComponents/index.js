@@ -378,7 +378,7 @@ export const renderReactSelect = props => {
         : valOrVals
           ? valOrVals.value
           : "";
-      if (props.cancelSubmit && !props.cancelSubmit(valToPass)) {
+      if (props.cancelSubmit && props.cancelSubmit(valToPass)) {
         //allow the user to cancel the submit
         return;
       }
@@ -391,7 +391,7 @@ export const renderReactSelect = props => {
             return val.value;
           })
         : valueToUse;
-      if (props.cancelSubmit && !props.cancelSubmit(valToPass)) {
+      if (props.cancelSubmit && props.cancelSubmit(valToPass)) {
         return; //allow the user to cancel the submit
       }
       if (rest.submitOnBlur) {
