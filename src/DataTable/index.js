@@ -378,6 +378,21 @@ class DataTable extends React.Component {
       />
     );
 
+    const showNumSelected = !noSelect && !isSingleSelect && !hideSelectedCount;
+    let selectedAndTotalMessage = "";
+    if (showNumSelected) {
+      selectedAndTotalMessage += `${selectedRowCount} Selected `;
+    }
+    if (showCount && showNumSelected) {
+      selectedAndTotalMessage += `/ `;
+    }
+    if (showCount) {
+      selectedAndTotalMessage += `${entityCount || 0} Total`;
+    }
+    if (selectedAndTotalMessage) {
+      selectedAndTotalMessage = <div>{selectedAndTotalMessage}</div>;
+    }
+
     return (
       <div
         className={classNames(
@@ -493,24 +508,10 @@ class DataTable extends React.Component {
             className={"data-table-footer"}
             style={{
               justifyContent:
-                isSingleSelect || hideSelectedCount
-                  ? "flex-end"
-                  : "space-between"
+                !showNumSelected && !showCount ? "flex-end" : "space-between"
             }}
           >
-            {!noSelect &&
-              !isSingleSelect &&
-              !hideSelectedCount && (
-                <div className={"tg-react-table-selected-count"}>
-                  {`${selectedRowCount} Record${
-                    selectedRowCount === 1 ? "" : "s"
-                  } Selected `}
-                </div>
-              )}
-            {showCount &&
-              `${entityCount || 0} ${
-                entityCount === 1 ? "Record" : "Total Records"
-              }`}
+            {selectedAndTotalMessage}
             <div style={{ display: "flex", flexWrap: "wrap" }}>
               {!noFullscreenButton && toggleFullscreenButton}
               {withDisplayOptions && (
