@@ -53,6 +53,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       defaults,
       isInfinite,
       isSimple,
+      doNotCoercePageSize,
       initialValues,
       additionalFilter = {},
       noOrderError
@@ -116,6 +117,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
     return {
       ...mergedOpts,
       ...getQueryParams({
+        doNotCoercePageSize,
         currentParams,
         entities: ownProps.entities, // for local table
         urlConnected,
@@ -142,6 +144,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         reduxFormSearchInput: currentParams.searchTerm
       }
     };
+    console.log("currentParams:", currentParams);
   };
 
   const mapDispatchToProps = (dispatch, ownProps) => {
