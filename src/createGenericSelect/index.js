@@ -1,12 +1,3 @@
-import { Button, Intent, Tooltip } from "@blueprintjs/core";
-import { get, isEqual, noop, pick } from "lodash";
-import pluralize from "pluralize";
-import React, { Component } from "react";
-import { compose } from "react-apollo";
-import { connect } from "react-redux";
-import { branch, withProps } from "recompose";
-import { change, clearFields, reduxForm } from "redux-form";
-import { Query } from "react-apollo";
 import DataTable from "../DataTable";
 import withTableParams from "../DataTable/utils/withTableParams";
 import withDialog from "../enhancers/withDialog";
@@ -15,6 +6,16 @@ import withQuery from "../enhancers/withQuery";
 import DialogFooter from "../DialogFooter";
 import BlueprintError from "../BlueprintError";
 import generateQuery from "../utils/generateQuery";
+import { Button, Intent, Tooltip } from "@blueprintjs/core";
+import { get, isEqual, map, noop, pick, debounce, keyBy } from "lodash";
+import pluralize from "pluralize";
+import { Query } from "react-apollo";
+import React, { Component } from "react";
+import { compose } from "react-apollo";
+import { connect } from "react-redux";
+import { branch, withProps } from "recompose";
+import { change, clearFields, reduxForm } from "redux-form";
+import ReactSelect from "react-select";
 
 function preventBubble(e) {
   e.stopPropagation();
@@ -31,6 +32,13 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
     //   additionalDataFragment: worklistFragment,
     // }}/>
 
+    // if you want initialValues, simply pass them to the reduxForm wrapped component like:
+    // {
+    //   initialValues: {
+    //     selectedWorklists: [{id: 1, name: "worklist1"}]
+    //   }
+    // }
+
     //options:
     // name - the field name of the redux form Field!
     // schema - the schema for the data table
@@ -43,6 +51,12 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
     // additionalDataFragment - optional fragment for fetching more data based on the initially selected data
     // postSelectDTProps - props passed to the DataTable shown after select. If none are passed the DataTable isn't shown
     // onSelect - optional callback for doing things with the selected data
+    //
+    // ################################   asReactSelect   ################################
+    // idAs="id" - use this to get the react select to use some other property as the "value" aka idAs="code" for code based selects
+    // asReactSelect - optionally make the generic select a simple react-select component instead of the default datatables
+    // reactSelectProps - optionally pass additional props to the react select (https://github.com/JedWatson/react-select/blob/v1.x/README.md)
+    // ** preventing unselect if you don't want a certain option to be unselected ever, you can pass initialValues with a property called clearableValue  entity.clearableValue,
     branch(
       props => props.noForm,
       reduxForm({
@@ -50,7 +64,10 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
         asyncBlurFields: [] //hacky fix for weird redux form asyncValidate error https://github.com/erikras/redux-form/issues/1675
       })
     ),
-    withProps(({ name }) => ({ passedName: name })),
+    withProps(({ name, asReactSelect }) => ({
+      passedName: name,
+      ...(asReactSelect && { noDialog: true })
+    })),
     withProps(
       ({
         fragment,
@@ -166,7 +183,7 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
         this.resetPostSelectSelection();
         if (!additionalDataFragment) {
           onSelect && onSelect(toSelect);
-          this.handleOnChange(toSelect);
+          this.handleOnChange(toSelect || null);
           return;
         }
 
@@ -237,13 +254,14 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
           ...this.props,
           handleSelection: this.handleSelection
         };
+
         return noDialog ? (
-          <div onClick={preventBubble}>
+          <div className="tg-generic-select-container" onClick={preventBubble}>
             <GenericSelectInner {...propsToPass} />
             <div>{touched && error && <BlueprintError error={error} />}</div>
           </div>
         ) : (
-          <div>
+          <div className="tg-generic-select-container">
             <div
               onClick={preventBubble}
               style={{ paddingTop: 10, paddingBottom: 10 }}
@@ -461,12 +479,12 @@ const GenericSelectInner = compose(
         queryOptions,
         tableParamOptions
       } = this.props;
-
       this.innerComponent = compose(
         withTableParams({
           formName: passedName + "DataTable",
           withSelectedEntities: true,
           noOrderError: true,
+          doNotCoercePageSize: true,
           defaults: {
             order: ["-modified"]
           },
@@ -490,11 +508,105 @@ class InnerComp extends Component {
     hideModal && hideModal();
     handleSelection([record]);
   };
-
   makeSelection = () => {
     const { hideModal, handleSelection, selectedEntities } = this.props;
     handleSelection(selectedEntities);
     hideModal();
+  };
+  reactSelectHandleLoadMore = () => {
+    const { setPageSize, currentParams, defaults } = this.props.tableParams;
+    setPageSize((currentParams.pageSize || defaults.pageSize) + 25);
+  };
+  getReactSelectOptions = () => {
+    const { tableParams, input, idAs } = this.props;
+    const { entityCount, schema } = tableParams;
+
+    const entities = map({
+      ...keyBy(tableParams.entities, idAs || "id"),
+      //it is important that we spread these second so that things like clearableValue will work
+      ...keyBy(
+        Array.isArray(input.value) ? input.value : [input.value],
+        idAs || "id"
+      )
+    });
+    if (!entities) return [];
+    const lastItem = [];
+    if (entityCount > entities.length) {
+      lastItem.push({
+        reactSelectHandleLoadMore: this.reactSelectHandleLoadMore,
+        value: "__LOAD_MORE",
+        label: `Only showing ${
+          entities.length
+        } of ${entityCount}. Click to load more`
+      });
+    }
+    return [
+      ...entities.map(entity => {
+        return {
+          clearableValue: entity.clearableValue,
+          value: entity[idAs || "id"],
+          label: (
+            <span style={{ display: "flex", justifyContent: "space-between" }}>
+              {schema.fields.reduce((acc, field, i) => {
+                if (i > 0) {
+                  const label = field.displayName ? (
+                    <span
+                      className="tg-value-hide"
+                      style={{ fontSize: 10, color: "#aaa" }}
+                    >
+                      {field.displayName}:{" "}
+                    </span>
+                  ) : null;
+                  const _val = entity[field.path || field];
+                  const val = field.render
+                    ? field.render(_val, entity, undefined, {
+                        ...this.props,
+                        ...this.props.additionalTableProps
+                      })
+                    : _val;
+
+                  acc.push(
+                    <span
+                      className={i > 1 ? "tg-value-hide" : ""}
+                      key={i}
+                      style={i > 1 ? { fontSize: 10, color: "#aaa" } : {}}
+                    >
+                      {label} {val}
+                    </span>
+                  );
+                }
+                return acc;
+              }, [])}
+            </span>
+          )
+        };
+      }),
+      ...lastItem
+    ];
+  };
+  handleReactSelectSearchDebounced = debounce(val => {
+    this.props.tableParams.setSearchTerm(val);
+  }, 250);
+  handleReactSelectSearch = val => {
+    this.handleReactSelectSearchDebounced(val);
+    return val; //return val for react-select to work properly
+  };
+  handleReactSelectFieldSubmit = valOrVals => {
+    const { handleSelection, input, tableParams, idAs } = this.props;
+    const entitiesById = {
+      ...keyBy(tableParams.entities, idAs || "id"),
+      ...keyBy(input.value, idAs || "id")
+    };
+    if (!valOrVals) {
+      handleSelection([]);
+    } else {
+      const records = (Array.isArray(valOrVals) ? valOrVals : [valOrVals]).map(
+        ({ value }) => {
+          return entitiesById[value];
+        }
+      );
+      handleSelection(records);
+    }
   };
 
   render() {
@@ -506,7 +618,12 @@ class InnerComp extends Component {
       additionalTableProps,
       readableName,
       minSelected,
-      mustSelect
+      mustSelect,
+      reactSelectProps,
+      passedName,
+      input,
+      idAs,
+      asReactSelect
     } = this.props;
     let disableButton = !selectedEntities.length;
     let minSelectMessage;
@@ -522,6 +639,44 @@ class InnerComp extends Component {
         readableName
       )}`;
       disableButton = true;
+    }
+
+    if (asReactSelect) {
+      const value = isMultiSelect
+        ? !input.value || !input.value.length
+          ? ""
+          : input.value.map(entity => {
+              return entity[idAs || "id"];
+            })
+        : !input.value
+          ? ""
+          : input.value[idAs || "id"];
+
+      return (
+        <ReactSelect
+          filterOptions={(options, filter, currentValues) => {
+            // just filter out the selected options (the search will do the rest of the filtering for us)
+            const currentValuesByKey = keyBy(currentValues, "value");
+            return options.filter(({ value }) => {
+              return !currentValuesByKey[value];
+            });
+            // return options
+          }}
+          value={value}
+          isLoading={tableParams.isLoading}
+          onSelectResetsInput={false}
+          multi={isMultiSelect}
+          closeOnSelect={!isMultiSelect}
+          autoBlur={false}
+          closeMenuOnSelect={false}
+          onChange={this.handleReactSelectFieldSubmit}
+          optionComponent={OptionOverrride}
+          options={this.getReactSelectOptions()}
+          onInputChange={this.handleReactSelectSearch}
+          name={passedName}
+          {...reactSelectProps}
+        />
+      );
     }
     return (
       <div>
@@ -555,6 +710,56 @@ class InnerComp extends Component {
               : readableName)
           }
         />
+      </div>
+    );
+  }
+}
+
+class OptionOverrride extends React.Component {
+  node = React.createRef();
+  componentDidMount() {
+    this.node.current.ontouchstart = this.preventPropagation;
+    this.node.current.touchstart = this.preventPropagation;
+    this.node.current.onmousedown = this.handleMouseDown;
+    this.node.current.mousedown = this.handleMouseDown;
+  }
+  preventPropagation = event => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+  handleMouseDown = event => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (this.props.option.value === "__LOAD_MORE") {
+      this.props.option.reactSelectHandleLoadMore &&
+        this.props.option.reactSelectHandleLoadMore();
+      return;
+    }
+    this.props.onSelect(this.props.option, event);
+  };
+  handleMouseEnter = event => {
+    this.props.onFocus(this.props.option, event);
+  };
+  handleMouseMove = event => {
+    if (this.props.isFocused) return;
+    this.props.onFocus(this.props.option, event);
+  };
+  render() {
+    return (
+      <div
+        className={this.props.className}
+        onBlur={this.preventPropagation}
+        onClick={this.preventPropagation}
+        ref={this.node}
+        onMouseUp={this.preventPropagation}
+        onTouchStart={this.preventPropagation}
+        onTouchStartCapture={this.preventPropagation}
+        onMouseDown={this.handleMouseDown}
+        onMouseEnter={this.handleMouseEnter}
+        onMouseMove={this.handleMouseMove}
+        title={this.props.option.title}
+      >
+        {this.props.children}
       </div>
     );
   }
