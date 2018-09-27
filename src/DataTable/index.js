@@ -30,7 +30,6 @@ import PagingTool from "./PagingTool";
 import FilterAndSortMenu from "./FilterAndSortMenu";
 import getIdOrCodeOrIndex from "./utils/getIdOrCodeOrIndex";
 import SearchBar from "./SearchBar";
-import { getSelectedRecordsFromEntities } from "./utils/selection";
 import DisplayOptions from "./DisplayOptions";
 // import withQuery from "../enhancers/withQuery";
 // import withUpsert from "../enhancers/withUpsert";
@@ -47,6 +46,7 @@ import dataTableEnhancer from "./dataTableEnhancer";
 import defaultProps from "./defaultProps";
 import "../toastr";
 import "./style.css";
+import { getRecordsFromIdMap } from "./utils/withSelectedEntities";
 
 class DataTable extends React.Component {
   state = {
@@ -909,10 +909,8 @@ class DataTable extends React.Component {
   };
 
   showContextMenu = (idMap, e) => {
-    const { history, contextMenu, entities, isCopyable } = computePresets(
-      this.props
-    );
-    const selectedRecords = getSelectedRecordsFromEntities(entities, idMap);
+    const { history, contextMenu, isCopyable } = computePresets(this.props);
+    const selectedRecords = getRecordsFromIdMap(idMap);
     const itemsToRender = contextMenu({
       selectedRecords,
       history

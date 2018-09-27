@@ -20,7 +20,7 @@ export default function withSelectedEntities(...formNames) {
     //NEW WAY
     return connect(state => {
       return formNames.reduce((acc, formName) => {
-        acc[formName + "SelectedEntities"] = getRecordsFromIdMap(
+        acc[formName + "SelectedEntities"] = getRecordsFromReduxForm(
           state,
           formName
         );
@@ -37,18 +37,20 @@ export default function withSelectedEntities(...formNames) {
     }
     return connect(state => {
       return {
-        [name || "selectedEntities"]: getRecordsFromIdMap(state, formName)
+        [name || "selectedEntities"]: getRecordsFromReduxForm(state, formName)
       };
     });
   }
 }
 
-export function getRecordsFromIdMap(state, formName) {
+export function getRecordsFromReduxForm(state, formName) {
   const selector = formValueSelector(formName);
-  const selectedEntityIdMap =
-    selector(state, "reduxFormSelectedEntityIdMap") || {};
+  return getRecordsFromIdMap(selector(state, "reduxFormSelectedEntityIdMap"));
+}
+
+export function getRecordsFromIdMap(idMap = {}) {
   return reduce(
-    selectedEntityIdMap,
+    idMap,
     (acc, item) => {
       if (item && item.entity) acc.push(item.entity);
       return acc;
@@ -58,6 +60,6 @@ export function getRecordsFromIdMap(state, formName) {
 }
 
 export function getSelectedEntities(storeOrState, formName) {
-  const state = storeOrState.getState ? storeOrState.getState() : storeOrState
-  return getRecordsFromIdMap(state, formName)
+  const state = storeOrState.getState ? storeOrState.getState() : storeOrState;
+  return getRecordsFromReduxForm(state, formName);
 }

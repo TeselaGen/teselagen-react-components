@@ -1,10 +1,7 @@
 import { isEmpty, forEach, range } from "lodash";
-import {
-  getSelectedRowsFromEntities,
-  getSelectedRecordsFromEntities
-} from "./selection";
+import { getSelectedRowsFromEntities } from "./selection";
 import getIdOrCodeOrIndex from "./getIdOrCodeOrIndex";
-
+import { getRecordsFromIdMap } from "./withSelectedEntities";
 
 export default function rowClick(e, rowInfo, entities, props) {
   const {
@@ -114,7 +111,6 @@ export default function rowClick(e, rowInfo, entities, props) {
 export function finalizeSelection({ idMap, props }) {
   const {
     reduxFormSelectedEntityIdMap,
-    entities,
     onDeselect,
     onSingleRowSelect,
     onMultiRowSelect,
@@ -123,11 +119,16 @@ export function finalizeSelection({ idMap, props }) {
     noSelect
   } = props;
   if (noSelect) return;
-  if (noDeselectAll && Object.keys(idMap).filter((id) => {return idMap[id]}).length===0) {
-    return
+  if (
+    noDeselectAll &&
+    Object.keys(idMap).filter(id => {
+      return idMap[id];
+    }).length === 0
+  ) {
+    return;
   }
   reduxFormSelectedEntityIdMap.input.onChange(idMap);
-  const selectedRecords = getSelectedRecordsFromEntities(entities, idMap);
+  const selectedRecords = getRecordsFromIdMap(idMap);
   onRowSelect(selectedRecords);
 
   selectedRecords.length === 0

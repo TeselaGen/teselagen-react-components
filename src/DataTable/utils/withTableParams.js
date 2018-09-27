@@ -14,7 +14,7 @@ import { withRouter } from "react-router-dom";
 import { branch } from "recompose";
 
 import convertSchema from "./convertSchema";
-import { getRecordsFromIdMap } from "./withSelectedEntities";
+import { getRecordsFromReduxForm } from "./withSelectedEntities";
 import pureNoFunc from "../../utils/pureNoFunc";
 
 /**
@@ -107,7 +107,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         : formSelector(state, "reduxFormQueryParams")) || {};
 
     const selectedEntities = withSelectedEntities
-      ? getRecordsFromIdMap(state, formName)
+      ? getRecordsFromReduxForm(state, formName)
       : undefined;
 
     const additionalFilterToUse =
@@ -144,7 +144,6 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         reduxFormSearchInput: currentParams.searchTerm
       }
     };
-    console.log("currentParams:", currentParams);
   };
 
   const mapDispatchToProps = (dispatch, ownProps) => {
