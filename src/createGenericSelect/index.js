@@ -548,33 +548,31 @@ class InnerComp extends Component {
           label: (
             <span style={{ display: "flex", justifyContent: "space-between" }}>
               {schema.fields.reduce((acc, field, i) => {
-                if (i > 0) {
-                  const label = field.displayName ? (
-                    <span
-                      className="tg-value-hide"
-                      style={{ fontSize: 10, color: "#aaa" }}
-                    >
-                      {field.displayName}:{" "}
-                    </span>
-                  ) : null;
-                  const _val = entity[field.path || field];
-                  const val = field.render
-                    ? field.render(_val, entity, undefined, {
-                        ...this.props,
-                        ...this.props.additionalTableProps
-                      })
-                    : _val;
+                const label = field.displayName ? (
+                  <span
+                    className="tg-value-hide"
+                    style={{ fontSize: 10, color: "#aaa" }}
+                  >
+                    {field.displayName}:{" "}
+                  </span>
+                ) : null;
+                const _val = entity[field.path || field];
+                const val = field.render
+                  ? field.render(_val, entity, undefined, {
+                      ...this.props,
+                      ...this.props.additionalTableProps
+                    })
+                  : _val;
 
-                  acc.push(
-                    <span
-                      className={i > 1 ? "tg-value-hide" : ""}
-                      key={i}
-                      style={i > 1 ? { fontSize: 10, color: "#aaa" } : {}}
-                    >
-                      {label} {val}
-                    </span>
-                  );
-                }
+                acc.push(
+                  <span
+                    className={i > 1 ? "tg-value-hide" : ""}
+                    key={i}
+                    style={i > 1 ? { fontSize: 10, color: "#aaa" } : {}}
+                  >
+                    {label} {val}
+                  </span>
+                );
                 return acc;
               }, [])}
             </span>
