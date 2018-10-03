@@ -551,6 +551,7 @@ export function getQueryParams({
   entities,
   isLocalCall,
   additionalFilter,
+  doNotCoercePageSize,
   noOrderError
 }) {
   Object.keys(currentParams).forEach(function(key) {
@@ -570,7 +571,7 @@ export function getQueryParams({
     page = undefined;
     pageSize = undefined;
   }
-  if (pageSize !== undefined) {
+  if (pageSize !== undefined && !doNotCoercePageSize) {
     //pageSize might come in as an unexpected number so we coerce it to be one of the nums in our pageSizes array
     let closest = clone(pageSizes).sort(
       (a, b) => Math.abs(pageSize - a) - Math.abs(pageSize - b)
