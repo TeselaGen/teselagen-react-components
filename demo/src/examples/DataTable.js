@@ -392,6 +392,7 @@ class DataTableInstance extends React.Component {
             onDoubleClick={function() {
               console.log("double clicked");
             }}
+            topLeftItems={<Button>I'm in topLeftItems</Button>}
             SubComponent={this.state.withSubComponent ? SubComp : null}
             cellRenderer={{
               isShared: value => {

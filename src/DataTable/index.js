@@ -293,6 +293,7 @@ class DataTable extends React.Component {
       isViewable,
       entities,
       children,
+      topLeftItems,
       currentParams,
       hasOptionForForcedHidden,
       showForcedHiddenColumns,
@@ -416,6 +417,7 @@ class DataTable extends React.Component {
                   <span className={"data-table-title"}>{tableName}</span>
                 )}
               {children}
+              {topLeftItems}
             </div>
             {errorParsingUrlString && (
               <Callout icon="error" intent={Intent.WARNING}>
