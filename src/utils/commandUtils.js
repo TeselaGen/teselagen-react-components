@@ -1,6 +1,5 @@
 import { startCase } from "lodash";
 
-
 // Generic factory function to create command objects.
 // TODO add documentation
 export function genericCommandFactory(config) {
@@ -24,6 +23,7 @@ export function genericCommandFactory(config) {
       "hotkeyProps",
       "isDisabled",
       "isActive",
+      "isHidden",
       "inactiveIcon",
       "inactiveName"
     ];
@@ -93,7 +93,8 @@ export function getCommandHotkeyHandlers(commands) {
   const handlers = {};
   Object.keys(commands).forEach(cmdId => {
     if (commands[cmdId].hotkey) {
-      handlers[cmdId] = event => commands[cmdId].execute({ event, viaHotkey: true });
+      handlers[cmdId] = event =>
+        commands[cmdId].execute({ event, viaHotkey: true });
     }
   });
 
