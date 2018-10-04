@@ -11,9 +11,7 @@ import {
 } from "@blueprintjs/core";
 import { startCase, omit } from "lodash";
 
-
 const noop = () => {};
-
 
 // Enhanced MenuItem that supports history-based navigation when passed a
 // `navTo` prop
@@ -28,7 +26,7 @@ export const EnhancedMenuItem = compose(
       willUnmount({ className });
     }
   }),
-  branch(({navTo}) => navTo, withRouter)
+  branch(({ navTo }) => navTo, withRouter)
 )(function({ navTo, staticContext, ...props }) {
   let clickHandler = props.onClick;
   if (navTo) {
@@ -60,7 +58,10 @@ export const tickMenuEnhancer = def => {
 
 // Derives various menu item props based on command objects matched via the `cmd`
 // prop. Derived props include `text`, `icon`, `hotkey`, `onClick` and `disabled`.
-export const commandMenuEnhancer = (commands, config = {}) => (def, context) => {
+export const commandMenuEnhancer = (commands, config = {}) => (
+  def,
+  context
+) => {
   const cmdId = typeof def === "string" ? def : def.cmd;
   let item = typeof def === "string" ? { cmd: def } : { ...def };
 
@@ -70,9 +71,10 @@ export const commandMenuEnhancer = (commands, config = {}) => (def, context) => 
   if (cmdId && commands[cmdId] && def.divider === undefined) {
     const command = commands[cmdId];
 
-    const { isActive, isDisabled } = command;
+    const { isActive, isDisabled, isHidden } = command;
     const toggles = isActive !== undefined;
 
+    item.hidden = fnu(item.hidden, isHidden);
     item.disabled = fnu(item.disabled, isDisabled);
     item.key = item.key || cmdId;
 
@@ -94,12 +96,13 @@ export const commandMenuEnhancer = (commands, config = {}) => (def, context) => 
     }
 
     item.hotkey = item.hotkey || command.hotkey;
-    item.onClick = event => command.execute({
-      event,
-      context,
-      menuItem: item,
-      viaMenu: true
-    });
+    item.onClick = event =>
+      command.execute({
+        event,
+        context,
+        menuItem: item,
+        viaMenu: true
+      });
   } else if (cmdId && !commands[cmdId]) {
     item.text = item.text || startCase(cmdId);
     item.disabled = true;
@@ -122,10 +125,10 @@ export const commandMenuEnhancer = (commands, config = {}) => (def, context) => 
 
 const ident = x => x;
 
-const dividerShorthandEnhancer = def => (
-  (typeof def === "string" && def.startsWith("--"))
-    ? { divider: def.substr(2) } : def
-);
+const dividerShorthandEnhancer = def =>
+  typeof def === "string" && def.startsWith("--")
+    ? { divider: def.substr(2) }
+    : def;
 
 /** A menu item component that adds many features over the standard MenuItem,
  * and allows for dynamic menu structures that are computed efficiently (only
@@ -138,10 +141,10 @@ export const DynamicMenuItem = ({ def, enhancers = [ident], context }) => {
   // safe to call menu creation utils with their own output.
   if (React.isValidElement(def)) return def;
 
-  const item = [
-    dividerShorthandEnhancer,
-    ...enhancers
-  ].reduce((v, f) => f(v, context), def);
+  const item = [dividerShorthandEnhancer, ...enhancers].reduce(
+    (v, f) => f(v, context),
+    def
+  );
   let out;
 
   if (item.divider !== undefined) {
@@ -156,9 +159,11 @@ export const DynamicMenuItem = ({ def, enhancers = [ident], context }) => {
         text={item.text}
       >
         {item.submenu
-          ? item.submenu.filter(ident).map((def, index) => (
-              <DynamicMenuItem {...{ def, enhancers, context }} key={index} />
-            ))
+          ? item.submenu
+              .filter(ident)
+              .map((def, index) => (
+                <DynamicMenuItem {...{ def, enhancers, context }} key={index} />
+              ))
           : undefined}
       </ItemComponent>
     );
@@ -168,7 +173,7 @@ export const DynamicMenuItem = ({ def, enhancers = [ident], context }) => {
     out = <Tooltip content={item.tooltip}>{out}</Tooltip>;
   }
 
-  return out;
+  return item.hidden ? null : out;
 };
 
 // Map the passed item definition(s) to DynamicMenuItem elements
@@ -198,18 +203,38 @@ export const createDynamicBarMenu = (topMenuDef, enhancers, context) => {
 
 // Shorthand for command-based menus
 export const createCommandMenu = (menuDef, commands, config, context) => {
-  return createDynamicMenu(menuDef, [commandMenuEnhancer(commands, config)], context);
+  return createDynamicMenu(
+    menuDef,
+    [commandMenuEnhancer(commands, config)],
+    context
+  );
 };
 
 // Shorthand for command-based bar menus
 export const createCommandBarMenu = (menuDef, commands, config, context) => {
-  return createDynamicBarMenu(menuDef, [commandMenuEnhancer(commands, config)], context);
+  return createDynamicBarMenu(
+    menuDef,
+    [commandMenuEnhancer(commands, config)],
+    context
+  );
 };
 
-export function showCommandContextMenu(menuDef, commands, config, event, onClose, context) {
-  return showContextMenu(menuDef, [commandMenuEnhancer(commands, config)], context, event, onClose);
+export function showCommandContextMenu(
+  menuDef,
+  commands,
+  config,
+  event,
+  onClose,
+  context
+) {
+  return showContextMenu(
+    menuDef,
+    [commandMenuEnhancer(commands, config)],
+    context,
+    event,
+    onClose
+  );
 }
-
 
 /**
  * TODO: update documentation. This is now an alias of createDynamicMenu
@@ -257,8 +282,7 @@ export function showCommandContextMenu(menuDef, commands, config, event, onClose
  * ]);
  *
  */
- export const createMenu = createDynamicMenu;
-
+export const createMenu = createDynamicMenu;
 
 export function showContextMenu(menuDef, enhancers, event, onClose, context) {
   menuDef = filterMenuForCorrectness(menuDef);
