@@ -108,8 +108,29 @@ function orderEntitiesLocal(orderArray, entities, schema) {
 function getAndAndOrFilters(allFilters) {
   const orFilters = [];
   const andFilters = [];
+  const otherOrFilters = [];
   allFilters.forEach(filter => {
-    if (filter.isOrFilter) {
+    if (
+      filter.isOrFilter &&
+      typeof filter.filterValue === "string" &&
+      filter.filterValue.includes(",")
+    ) {
+      // handle comma separated filters by adding more orWheres
+      const allFilterValues = filter.filterValue.split(",");
+      allFilterValues.forEach((filterValue, i) => {
+        const newFilter = {
+          ...filter,
+          filterValue
+        };
+        if (i === 0) {
+          orFilters.push(newFilter);
+        } else {
+          const iMinus = i - 1;
+          if (!otherOrFilters[iMinus]) otherOrFilters[iMinus] = [];
+          otherOrFilters[iMinus].push(newFilter);
+        }
+      });
+    } else if (filter.isOrFilter) {
       orFilters.push(filter);
     } else {
       andFilters.push(filter);
@@ -117,15 +138,19 @@ function getAndAndOrFilters(allFilters) {
   });
   return {
     orFilters,
-    andFilters
+    andFilters,
+    otherOrFilters
   };
 }
 
 function filterEntitiesLocal(filters = [], searchTerm, entities, schema) {
   const allFilters = getAllFilters(filters, searchTerm, schema);
+
   if (allFilters.length) {
     const ccFields = getFieldsMappedByCCDisplayName(schema);
-    const { andFilters, orFilters } = getAndAndOrFilters(allFilters);
+    const { andFilters, orFilters, otherOrFilters } = getAndAndOrFilters(
+      allFilters
+    );
     //filter ands first
     andFilters.forEach(filter => {
       entities = getEntitiesForGivenFilter(entities, filter, ccFields);
@@ -133,7 +158,7 @@ function filterEntitiesLocal(filters = [], searchTerm, entities, schema) {
     //then filter ors
     if (orFilters.length) {
       let orEntities = [];
-      orFilters.forEach(filter => {
+      orFilters.concat(...otherOrFilters).forEach(filter => {
         orEntities = orEntities.concat(
           getEntitiesForGivenFilter(entities, filter, ccFields)
         );
@@ -659,12 +684,19 @@ export function getQueryParams({
 
     let errorParsingUrlString;
     const allFilters = getAllFilters(filters, searchTerm, schema);
-    const { andFilters, orFilters } = getAndAndOrFilters(allFilters);
+    const { andFilters, orFilters, otherOrFilters } = getAndAndOrFilters(
+      allFilters
+    );
     const additionalFilterToUse = additionalFilter(qb, currentParams);
     try {
       qb.whereAll(getQueries(andFilters, qb, ccFields))
         .andWhereAll(additionalFilterToUse)
         .andWhereAny(getQueries(orFilters, qb, ccFields));
+      if (otherOrFilters.length) {
+        otherOrFilters.forEach(orFilters => {
+          qb.orWhereAny(getQueries(orFilters, qb, ccFields));
+        });
+      }
     } catch (e) {
       if (urlConnected) {
         errorParsingUrlString = e;
