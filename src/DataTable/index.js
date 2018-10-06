@@ -893,14 +893,17 @@ class DataTable extends React.Component {
   setManyRowsToCopy = selectedRecords => {
     const { columns } = this.state;
     let allRowsText = [];
-    selectedRecords.forEach(record => {
+    selectedRecords.forEach((record, i) => {
       let textForRow = [];
       columns.forEach(col => {
         let text = get(record, col.path);
         if (col.getClipboardData) {
           text = col.getClipboardData(text, record);
-        } else if (text !== undefined) text = String(text);
-        else text = " ";
+        } else if (col.render) {
+          text = col.render(text, record, i);
+        } else if (text !== undefined) {
+          text = String(text);
+        } else text = " ";
         if (text) {
           textForRow.push(text);
         }
