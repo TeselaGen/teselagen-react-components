@@ -394,6 +394,11 @@ class DataTable extends React.Component {
       selectedAndTotalMessage = <div>{selectedAndTotalMessage}</div>;
     }
 
+    const shouldShowPaging =
+      !isInfinite &&
+      withPaging &&
+      (hidePageSizeWhenPossible ? entityCount > pageSize : true);
+
     return (
       <div
         className={classNames(
@@ -531,11 +536,9 @@ class DataTable extends React.Component {
                   schema={schema}
                 />
               )}
-              {!isInfinite &&
-              withPaging &&
-              (hidePageSizeWhenPossible ? entityCount > pageSize : true) ? (
+              {shouldShowPaging && (
                 <PagingTool {...computePresets(this.props)} />
-              ) : null}
+              )}
             </div>
           </div>
         )}

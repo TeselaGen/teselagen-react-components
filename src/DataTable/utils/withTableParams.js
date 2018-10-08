@@ -53,6 +53,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       defaults,
       isInfinite,
       isSimple,
+      withPaging,
       doNotCoercePageSize,
       initialValues,
       additionalFilter = {},
@@ -123,7 +124,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         urlConnected,
         defaults,
         schema: convertSchema(schema),
-        isInfinite: isInfinite || isSimple,
+        isInfinite: isInfinite || (isSimple && !withPaging),
         isLocalCall,
         additionalFilter: additionalFilterToUse,
         noOrderError
