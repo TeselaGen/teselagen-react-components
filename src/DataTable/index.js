@@ -935,7 +935,6 @@ class DataTable extends React.Component {
                 copy(this.setManyRowsToCopy(selectedRecords));
                 window.toastr.success("Selected rows copied");
               }}
-              icon="clipboard"
               text={"Copy Rows to Clipboard"}
             />
           )}
