@@ -88,3 +88,7 @@ span.bp3-popover-target {
 .bp3-portal {
   z-index: 100000;
 }
+
+.Select {
+  min-width: 150px;
+}
