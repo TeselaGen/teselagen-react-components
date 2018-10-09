@@ -394,6 +394,11 @@ class DataTable extends React.Component {
       selectedAndTotalMessage = <div>{selectedAndTotalMessage}</div>;
     }
 
+    const shouldShowPaging =
+      !isInfinite &&
+      withPaging &&
+      (hidePageSizeWhenPossible ? entityCount > pageSize : true);
+
     return (
       <div
         className={classNames(
@@ -531,11 +536,9 @@ class DataTable extends React.Component {
                   schema={schema}
                 />
               )}
-              {!isInfinite &&
-              withPaging &&
-              (hidePageSizeWhenPossible ? entityCount > pageSize : true) ? (
+              {shouldShowPaging && (
                 <PagingTool {...computePresets(this.props)} />
-              ) : null}
+              )}
             </div>
           </div>
         )}
@@ -893,14 +896,17 @@ class DataTable extends React.Component {
   setManyRowsToCopy = selectedRecords => {
     const { columns } = this.state;
     let allRowsText = [];
-    selectedRecords.forEach(record => {
+    selectedRecords.forEach((record, i) => {
       let textForRow = [];
       columns.forEach(col => {
         let text = get(record, col.path);
         if (col.getClipboardData) {
           text = col.getClipboardData(text, record);
-        } else if (text !== undefined) text = String(text);
-        else text = " ";
+        } else if (col.render) {
+          text = col.render(text, record, i);
+        } else if (text !== undefined) {
+          text = String(text);
+        } else text = " ";
         if (text) {
           textForRow.push(text);
         }

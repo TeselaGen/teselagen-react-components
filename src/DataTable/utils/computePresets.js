@@ -6,11 +6,11 @@ export default function computePresets(props) {
     //isSimplePreset
     toReturn = {
       noHeader: true,
-      noFooter: true,
+      noFooter: !props.withPaging,
       noPadding: true,
       noFullscreenButton: true,
       hidePageSizeWhenPossible: true,
-      isInfinite: true,
+      isInfinite: !props.withPaging,
       hideSelectedCount: true,
       withTitle: false,
       withSearch: false,
