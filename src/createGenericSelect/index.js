@@ -16,6 +16,7 @@ import { connect } from "react-redux";
 import { branch, withProps } from "recompose";
 import { change, clearFields, reduxForm } from "redux-form";
 import ReactSelect from "react-select";
+import moment from "moment";
 
 function preventBubble(e) {
   e.stopPropagation();
@@ -556,13 +557,17 @@ class InnerComp extends Component {
                     {field.displayName}:{" "}
                   </span>
                 ) : null;
-                const _val = entity[field.path || field];
-                const val = field.render
-                  ? field.render(_val, entity, undefined, {
-                      ...this.props,
-                      ...this.props.additionalTableProps
-                    })
-                  : _val;
+                let val = entity[field.path || field];
+                if (field.render) {
+                  val = field.render(val, entity, undefined, {
+                    ...this.props,
+                    ...this.props.additionalTableProps
+                  });
+                } else if (field.type === "timestamp") {
+                  val = val ? moment(val).format("lll") : "";
+                } else if (field.type === "boolean") {
+                  val = val ? "True" : "False";
+                }
 
                 acc.push(
                   <span
