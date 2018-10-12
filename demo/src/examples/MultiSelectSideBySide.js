@@ -20,12 +20,15 @@ class Example extends Component {
     const { items, selectedItems } = this.state;
     return (
       <div>
-
-        Adapted from <a>https://github.com/kenshoo/react-multi-select </a>
-        <br></br>
-        <br></br>
-        <br></br>
-        Change set: <HTMLSelect
+        Adapted from{" "}
+        <a href="https://github.com/kenshoo/react-multi-select">
+          https://github.com/kenshoo/react-multi-select{" "}
+        </a>
+        <br />
+        <br />
+        <br />
+        Change set:{" "}
+        <HTMLSelect
           onChange={e => {
             if (e.target.value === "set1") {
               this.setState({
@@ -49,9 +52,8 @@ class Example extends Component {
           }}
           options={["set1", "set2"]}
         />
-        <br></br>
-        <br></br>
-
+        <br />
+        <br />
         <MultiSelectSideBySide
           items={items}
           selectedItems={selectedItems}
