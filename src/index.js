@@ -1,4 +1,3 @@
-import "./fontello/css/fontello.css";
 import "./style.css";
 export {
   default as withSelectedEntities,
