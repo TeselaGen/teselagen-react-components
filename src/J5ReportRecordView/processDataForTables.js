@@ -38,18 +38,19 @@ const processJ5RunConstructs = j5RunConstructs =>
       nextLevelParts: (get(j5RunConstruct, "sequence.sequenceParts") || [])
         .map(part => part.name)
         .join(", "),
-      partsContainedNames: j5RunConstruct.partNames ||
-        get(
+      partsContainedNames:
+        j5RunConstruct.partNames ||
+        (get(
           j5RunConstruct,
           "j5ConstructAssemblyPieces[0].assemblyPiece.j5AssemblyPieceParts[0].j5InputPart.sequencePart.name"
         ) &&
-        flatMap(
-          j5RunConstruct.j5ConstructAssemblyPieces,
-          j5ConstructAssemblyPiece =>
-            j5ConstructAssemblyPiece.assemblyPiece.j5AssemblyPieceParts.map(
-              j5InputPart => j5InputPart.j5InputPart.sequencePart.name
-            )
-        ).join(", ")
+          flatMap(
+            j5RunConstruct.j5ConstructAssemblyPieces,
+            j5ConstructAssemblyPiece =>
+              j5ConstructAssemblyPiece.assemblyPiece.j5AssemblyPieceParts.map(
+                j5InputPart => j5InputPart.j5InputPart.sequencePart.name
+              )
+          ).join(", "))
     }));
 
 const processPrebuiltConstructs = j5RunConstructs =>

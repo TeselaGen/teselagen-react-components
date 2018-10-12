@@ -83,9 +83,9 @@ const validate = values => {
   return errors;
 };
 
-const formWrapped = reduxForm({
+const FormWrapped = reduxForm({
   form: "demoForm",
   validate
 })(FormComponentsDemo);
 
-render(formWrapped);
+render(FormWrapped);
