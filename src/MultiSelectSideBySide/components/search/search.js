@@ -1,22 +1,21 @@
 import React from "react";
-import Icon from "@material-ui/core/Icon";
-import SearchIcon from "react-icons/lib/md/search";
-import PropTypes from "prop-types";
 
-import styles from "./search.css";
+import PropTypes from "prop-types";
+import { Icon } from "@blueprintjs/core";
+
+import "./search.css";
 
 const Search = ({ searchPlaceholder, searchIcon, onChange }) => {
-  const IconRenderer = searchIcon;
   return (
-    <div className={styles.search}>
+    <div className={"mss-search"}>
       <input
         type="text"
-        className={styles.input}
+        className={"mss-input"}
         placeholder={searchPlaceholder}
         onChange={onChange}
       />
-      <div className={styles.icon}>
-        <IconRenderer />
+      <div className={"mss-icon"}>
+        <Icon icon={searchIcon} />
       </div>
     </div>
   );
@@ -28,19 +27,17 @@ export const SearchWithValue = ({
   value,
   searchIcon
 }) => {
-  const IconRenderer = searchIcon;
-
   return (
-    <div className={styles.search}>
+    <div className={"mss-search"}>
       <input
         value={value}
         type="text"
-        className={styles.input}
+        className={"mss-input"}
         placeholder={searchPlaceholder}
         onChange={onChange}
       />
-      <div className={styles.icon}>
-        <IconRenderer />
+      <div className={"mss-icon"}>
+        <Icon icon={searchIcon} />
       </div>
     </div>
   );
@@ -48,13 +45,13 @@ export const SearchWithValue = ({
 
 Search.propTypes = {
   searchPlaceholder: PropTypes.string,
-  searchIcon: PropTypes.any,
+  searchIcon: PropTypes.string,
   onChange: PropTypes.func
 };
 
 Search.defaultProps = {
   searchPlaceholder: "Search...",
-  searchIcon: SearchIcon
+  searchIcon: "search"
 };
 
 export default Search;

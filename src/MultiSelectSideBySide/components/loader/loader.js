@@ -1,11 +1,12 @@
 import React from "react";
-import CircularProgress from "@material-ui/core/CircularProgress";
 
-import styles from "./loader.css";
+import { Spinner } from "@blueprintjs/core";
+
+import "./loader.css";
 
 const Loader = () => (
-  <div className={styles.loader}>
-    <CircularProgress style={{ width: 100 }} />
+  <div className={"mss-loader"}>
+    <Spinner style={{ width: 100 }} />
   </div>
 );
 

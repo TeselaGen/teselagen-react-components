@@ -1,17 +1,15 @@
 import React from "react";
 import PropTypes from "prop-types";
-import CloseIcon from "react-icons/lib/md/close";
-import IconButton from "@material-ui/core/IconButton";
+
+import { Button } from "@blueprintjs/core";
 import ItemLabel from "./item_label";
 
-import styles from "./selected_item.css";
+import "./selected_item.css";
 
 const SelectedItem = ({ item, height }) => (
-  <div className={styles.selected_item} style={{ height }}>
+  <div className={"mss-selected_item"} style={{ height }}>
     <ItemLabel label={item.label} />
-    <IconButton>
-      <CloseIcon />
-    </IconButton>
+    <Button style={{ marginRight: 10 }} minimal icon="cross" />
   </div>
 );
 

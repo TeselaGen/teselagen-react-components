@@ -1,10 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import styles from "./no_items.css";
+import "./no_items.css";
 
 const NoItems = ({ noItemsMessage }) => (
-  <div className={styles.no_items}>{noItemsMessage}</div>
+  <div className={"mss-no_items"}>{noItemsMessage}</div>
 );
 
 NoItems.propTypes = {

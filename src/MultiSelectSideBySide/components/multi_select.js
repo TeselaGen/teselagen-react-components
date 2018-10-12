@@ -6,7 +6,7 @@ import withMultiSelectState from "./multi_select_state";
 import SourceList from "./source_list";
 import DestinationList from "./destination_list";
 
-import styles from "./multi_select.css";
+import "./multi_select.css";
 import Loader from "./loader/loader";
 
 export class MultiSelect extends PureComponent {
@@ -96,7 +96,7 @@ export class MultiSelect extends PureComponent {
     const LoaderRenderer = loaderRenderer;
     return (
       <div
-        className={classnames(styles.wrapper, wrapperClassName)}
+        className={classnames("mss-wrapper", wrapperClassName)}
         style={{ height }}
       >
         {loading && <LoaderRenderer />}

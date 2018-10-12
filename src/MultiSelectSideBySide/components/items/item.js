@@ -1,10 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
 import classnames from "classnames";
-import Checkbox from "@material-ui/core/Checkbox";
+
+import { Checkbox } from "@blueprintjs/core";
 import ItemLabel from "./item_label";
 
-import styles from "./item.css";
+import "./item.css";
 
 const Item = ({
   item,
@@ -15,16 +16,29 @@ const Item = ({
   indeterminate,
   disabled
 }) => (
+  /* eslint-disable no-useless-computed-key*/
+
   <div
-    className={classnames(styles.item, {
-      [styles.with_border]: withBorder,
-      [styles.selected]: checked,
-      [styles.disabled]: disabled
+    className={classnames("mss-item", {
+      ["mss-with_border"]: withBorder,
+      ["mss-selected"]: checked,
+      ["mss-disabled"]: disabled
     })}
     style={{ height }}
-    onClick={onClick}
+    onClick={e => {
+      if (onClick) {
+        e.stopPropagation();
+        e.preventDefault();
+        onClick(e);
+      }
+    }}
+    /* eslint-enable no-useless-computed-key*/
   >
     <Checkbox
+      style={{
+        marginTop: "10px",
+        marginLeft: "10px"
+      }}
       type="checkbox"
       color="primary"
       checked={checked}

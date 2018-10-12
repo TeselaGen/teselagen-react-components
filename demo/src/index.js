@@ -9,6 +9,8 @@ import Toastr from "./examples/Toastr";
 import showConfirmationDialogDemo from "./examples/showConfirmationDialogDemo";
 import showConfirmationDialog from "../../src/showConfirmationDialog";
 import showLoadingMaskDemo from "./examples/showLoadingMaskDemo";
+import MultiSelectSideBySideDemo from "./examples/MultiSelectSideBySide";
+
 import showLoadingMask from "../../src/showLoadingMask";
 
 import CustomIcons from "./examples/CustomIcons";
@@ -33,12 +35,13 @@ import { bigTreeData, smallTreeData } from "./data/treeData";
 import S3Download from "../../src/utils/S3Download";
 import magicDownload from "../../src/DownloadLink/magicDownload";
 import FillWindow from "../../src/FillWindow";
+import MultiSelectSideBySide from "../../src/MultiSelectSideBySide";
 import Timeline from "../../src/Timeline";
 import TimelineEvent from "../../src/Timeline/TimelineEvent";
 import TimelineDemo from "./examples/TimelineDemo";
 
 import "./style.css";
-import React from "react";
+import React, {Component} from "react";
 import { render } from "react-dom";
 import {
   HashRouter as Router,
@@ -58,6 +61,7 @@ import {
   KeyCombo,
   Switch,
   Button,
+  HTMLSelect,
   Icon,
   Classes
 } from "@blueprintjs/core";
@@ -345,6 +349,16 @@ const demos = {
       Intent
     },
     demo: showLoadingMaskDemo,
+    url:
+      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/Toastr.js"
+  },
+  MultiSelectSideBySide: {
+    scope: {
+      MultiSelectSideBySide,
+      Component,
+      HTMLSelect,
+    },
+    demo: MultiSelectSideBySideDemo,
     url:
       "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/Toastr.js"
   },

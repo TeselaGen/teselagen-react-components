@@ -1,4 +1,4 @@
-.item {
+.mss-item {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -12,24 +12,23 @@
   cursor: pointer;
 }
 
-.item .selected {
+.mss-item .mss-selected {
   background-color: #f7f7f7;
 }
 
-.item:hover {
+.mss-item:hover {
   background-color: #f3f3f3;
 }
 
-.disabled {
+.mss-disabled {
   color: #b4b4b4;
   cursor: default;
 }
 
-.selected {
+.mss-selected {
   background-color: #f7f7f7;
 }
 
-.with_border {
+.mss-with_border {
   border-bottom: 1px solid #dddddd;
 }
-/*# sourceMappingURL=item.css.map */

@@ -12,6 +12,7 @@ export { default as BlueprintError } from "./BlueprintError";
 export { default as DialogFooter } from "./DialogFooter";
 export { default as adHoc } from "./utils/adHoc";
 export { default as DownloadLink } from "./DownloadLink";
+export { default as MultiSelectSideBySide } from "./MultiSelectSideBySide";
 export { default as createGenericSelect } from "./createGenericSelect";
 export { default as magicDownload } from "./DownloadLink/magicDownload";
 

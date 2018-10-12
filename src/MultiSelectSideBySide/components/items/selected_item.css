@@ -1,4 +1,4 @@
-.selected_item {
+.mss-selected_item {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -15,7 +15,7 @@
   cursor: pointer;
 }
 
-.selected_item:hover {
+.mss-selected_item:hover {
   background-color: #f3f3f3;
 }
-/*# sourceMappingURL=selected_item.css.map */
+/* */

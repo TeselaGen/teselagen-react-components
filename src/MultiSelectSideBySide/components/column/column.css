@@ -1,4 +1,4 @@
-.column {
+.mss-column {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -12,7 +12,7 @@
   border-right: 1px solid #dddddd;
 }
 
-.column:last-of-type {
+.mss-column:last-of-type {
   border: 0;
 }
-/*# sourceMappingURL=column.css.map */
+/* */

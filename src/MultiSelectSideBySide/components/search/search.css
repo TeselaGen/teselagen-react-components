@@ -1,4 +1,4 @@
-.search {
+.mss-search {
   height: 45px;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -10,7 +10,7 @@
   border-bottom: 1px solid #dddddd;
 }
 
-.input {
+.mss-input {
   height: 45px;
   padding: 0 12px;
   display: -webkit-box;
@@ -28,12 +28,12 @@
   background: transparent;
 }
 
-.icon {
+.mss-icon {
   font-size: 24px;
 }
 
-.list_filter_container {
+.mss-list_filter_container {
   margin-bottom: 10px;
   position: relative;
 }
-/*# sourceMappingURL=search.css.map */
+/* */

@@ -2,7 +2,7 @@ import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import { List } from "react-virtualized/dist/commonjs/List";
 
-import styles from "./list.css";
+import "./list.css";
 import Item from "../items/item";
 import NoItems from "../items/no_items";
 
@@ -46,11 +46,11 @@ class InnerList extends PureComponent {
     }
   }
 
-  rowRenderer({ index, isScrolling, key, style }) {
+  rowRenderer({ index, /* isScrolling, */ key, style }) {
     const {
       renderer,
       itemHeight,
-      onClick,
+      // onClick,
       items,
       selectedIds,
       disabledItemsTooltip
@@ -63,12 +63,13 @@ class InnerList extends PureComponent {
       <div
         key={key}
         style={style}
-        className={styles.list_item}
+        className={"mss-list_item"}
         onClick={event => this.onClick(event, item.id, disabled)}
         title={disabled ? disabledItemsTooltip : undefined}
       >
         <Renderer
           item={item}
+          onClick={event => this.onClick(event, item.id, disabled)}
           height={itemHeight}
           checked={checked}
           disabled={disabled && !checked}
@@ -88,7 +89,7 @@ class InnerList extends PureComponent {
     return (
       <List
         ref={getlistRef}
-        className={styles.list}
+        className={"mss-list"}
         rowRenderer={this.rowRenderer}
         noRowsRenderer={this.noRowsRenderer}
         width={width - offset}

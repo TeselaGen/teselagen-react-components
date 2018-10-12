@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import styles from "./selection_status.css";
+import "./selection_status.css";
 
 const SelectionStatus = ({
   selected,
@@ -10,13 +10,13 @@ const SelectionStatus = ({
   noneSelectedMessage,
   selectedMessage
 }) => (
-  <div className={styles.selection_status}>
-    <div className={styles.status}>
+  <div className={"mss-selection_status"}>
+    <div className={"mss-status"}>
       {selected.length > 0
         ? `${selected.length} ${selectedMessage}`
         : noneSelectedMessage}
     </div>
-    <div className={styles.clear_all} onClick={clearAll}>
+    <div className={"mss-clear_all"} onClick={clearAll}>
       {selected.length > 0 ? clearAllMessage : ""}
     </div>
   </div>

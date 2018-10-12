@@ -1,4 +1,4 @@
-.list {
+.mss-list {
   outline: none;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -6,7 +6,7 @@
   user-select: none;
 }
 
-.list_item {
+.mss-list_item {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -16,48 +16,48 @@
   flex-direction: column;
 }
 
-.scrollbar::-webkit-scrollbar,
-.list::-webkit-scrollbar {
+.mss-scrollbar::-webkit-scrollbar,
+.mss-list::-webkit-scrollbar {
   width: 15px;
   height: 17px;
 }
 
-.scrollbar::-webkit-scrollbar-thumb,
-.list::-webkit-scrollbar-thumb {
+.mss-scrollbar::-webkit-scrollbar-thumb,
+.mss-list::-webkit-scrollbar-thumb {
   background: #cdcdcd;
   border-color: transparent;
   border-style: solid;
   background-clip: content-box;
 }
 
-.scrollbar::-webkit-scrollbar-thumb:vertical,
-.list::-webkit-scrollbar-thumb:vertical {
+.mss-scrollbar::-webkit-scrollbar-thumb:vertical,
+.mss-list::-webkit-scrollbar-thumb:vertical {
   min-height: 45px;
   border-width: 4px 4px 4px 5px;
 }
 
-.scrollbar::-webkit-scrollbar-thumb:horizontal,
-.list::-webkit-scrollbar-thumb:horizontal {
+.mss-scrollbar::-webkit-scrollbar-thumb:horizontal,
+.mss-list::-webkit-scrollbar-thumb:horizontal {
   min-width: 45px;
   border-width: 5px 4px 6px;
 }
 
-.scrollbar::-webkit-scrollbar-track,
-.list::-webkit-scrollbar-track {
+.mss-scrollbar::-webkit-scrollbar-track,
+.mss-list::-webkit-scrollbar-track {
   background: #ffffff;
 }
 
-.scrollbar::-webkit-scrollbar-track:vertical,
-.list::-webkit-scrollbar-track:vertical {
+.mss-scrollbar::-webkit-scrollbar-track:vertical,
+.mss-list::-webkit-scrollbar-track:vertical {
   border-left: 1px solid #ededed;
   border-right: none;
 }
 
-.scrollbar::-webkit-scrollbar-track:horizontal,
-.list::-webkit-scrollbar-track:horizontal,
-.scrollbar::-webkit-scrollbar-corner,
-.list::-webkit-scrollbar-corner {
+.mss-scrollbar::-webkit-scrollbar-track:horizontal,
+.mss-list::-webkit-scrollbar-track:horizontal,
+.mss-scrollbar::-webkit-scrollbar-corner,
+.mss-list::-webkit-scrollbar-corner {
   border-top: 1px solid #ededed;
   border-bottom: none;
 }
-/*# sourceMappingURL=list.css.map */
+/* */
