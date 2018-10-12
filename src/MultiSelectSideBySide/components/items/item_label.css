@@ -1,0 +1,7 @@
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 14px;
+  white-space: nowrap;
+}
+/*# sourceMappingURL=item_label.css.map */

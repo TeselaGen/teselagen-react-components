@@ -1,0 +1,24 @@
+.selection_status {
+  height: 45px;
+  padding: 0 12px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  border-bottom: 1px solid #dddddd;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+.status {
+  color: #000000;
+}
+
+.clear_all {
+  cursor: pointer;
+  color: #008bbf;
+}
+/*# sourceMappingURL=selection_status.css.map */

@@ -1,0 +1,35 @@
+.item {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.item .selected {
+  background-color: #f7f7f7;
+}
+
+.item:hover {
+  background-color: #f3f3f3;
+}
+
+.disabled {
+  color: #b4b4b4;
+  cursor: default;
+}
+
+.selected {
+  background-color: #f7f7f7;
+}
+
+.with_border {
+  border-bottom: 1px solid #dddddd;
+}
+/*# sourceMappingURL=item.css.map */
