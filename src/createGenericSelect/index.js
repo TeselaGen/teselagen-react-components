@@ -6,7 +6,7 @@ import withQuery from "../enhancers/withQuery";
 import DialogFooter from "../DialogFooter";
 import BlueprintError from "../BlueprintError";
 import generateQuery from "../utils/generateQuery";
-import { Button, Intent, Tooltip } from "@blueprintjs/core";
+import { Button, Intent, Tooltip, FormGroup, Classes } from "@blueprintjs/core";
 import { get, isEqual, map, noop, pick, debounce, keyBy } from "lodash";
 import pluralize from "pluralize";
 import { Query } from "react-apollo";
@@ -496,8 +496,15 @@ const GenericSelectInner = compose(
     };
 
     render() {
+      const { label } = this.props;
       const ComponentToRender = this.innerComponent;
-      return <ComponentToRender {...this.props} />;
+
+      let comp = <ComponentToRender {...this.props} />;
+      if (label) {
+        return <FormGroup label={label}>{comp}</FormGroup>;
+      } else {
+        return comp;
+      }
     }
   }
 );
@@ -525,10 +532,11 @@ class InnerComp extends Component {
     const entities = map({
       ...keyBy(tableParams.entities, idAs || "id"),
       //it is important that we spread these second so that things like clearableValue will work
-      ...keyBy(
-        Array.isArray(input.value) ? input.value : [input.value],
-        idAs || "id"
-      )
+      ...(input.value &&
+        keyBy(
+          Array.isArray(input.value) ? input.value : [input.value],
+          idAs || "id"
+        ))
     });
     if (!entities) return [];
     const lastItem = [];
@@ -536,56 +544,57 @@ class InnerComp extends Component {
       lastItem.push({
         reactSelectHandleLoadMore: this.reactSelectHandleLoadMore,
         value: "__LOAD_MORE",
-        label: `Only showing ${
-          entities.length
-        } of ${entityCount}. Click to load more`
+        label: (
+          <span className={Classes.TEXT_MUTED} style={{ fontStyle: "italic" }}>
+            Showing {entities.length} of {entityCount} (Click to load more)
+          </span>
+        )
       });
     }
-    return [
-      ...entities.map(entity => {
-        return {
-          clearableValue: entity.clearableValue,
-          value: entity[idAs || "id"],
-          label: (
-            <span style={{ display: "flex", justifyContent: "space-between" }}>
-              {schema.fields.reduce((acc, field, i) => {
-                const label = field.displayName ? (
-                  <span
-                    className="tg-value-hide"
-                    style={{ fontSize: 10, color: "#aaa" }}
-                  >
-                    {field.displayName}:{" "}
-                  </span>
-                ) : null;
-                let val = entity[field.path || field];
-                if (field.render) {
-                  val = field.render(val, entity, undefined, {
-                    ...this.props,
-                    ...this.props.additionalTableProps
-                  });
-                } else if (field.type === "timestamp") {
-                  val = val ? moment(val).format("lll") : "";
-                } else if (field.type === "boolean") {
-                  val = val ? "True" : "False";
-                }
 
-                acc.push(
-                  <span
-                    className={i > 1 ? "tg-value-hide" : ""}
-                    key={i}
-                    style={i > 1 ? { fontSize: 10, color: "#aaa" } : {}}
-                  >
-                    {label} {val}
-                  </span>
-                );
-                return acc;
-              }, [])}
-            </span>
-          )
-        };
-      }),
-      ...lastItem
-    ];
+    const entityOptions = entities.map(entity => {
+      return {
+        clearableValue: entity.clearableValue,
+        value: entity[idAs || "id"],
+        label: (
+          <span style={{ display: "flex", justifyContent: "space-between" }}>
+            {schema.fields.reduce((acc, field, i) => {
+              const label = field.displayName ? (
+                <span
+                  className="tg-value-hide"
+                  style={{ fontSize: 10, color: "#aaa" }}
+                >
+                  {field.displayName}:{" "}
+                </span>
+              ) : null;
+              let val = entity[field.path || field];
+              if (field.render) {
+                val = field.render(val, entity, undefined, {
+                  ...this.props,
+                  ...this.props.additionalTableProps
+                });
+              } else if (field.type === "timestamp") {
+                val = val ? moment(val).format("lll") : "";
+              } else if (field.type === "boolean") {
+                val = val ? "True" : "False";
+              }
+
+              acc.push(
+                <span
+                  className={i > 1 ? "tg-value-hide" : ""}
+                  key={i}
+                  style={i > 1 ? { fontSize: 10, color: "#aaa" } : {}}
+                >
+                  {label} {val}
+                </span>
+              );
+              return acc;
+            }, [])}
+          </span>
+        )
+      };
+    });
+    return [...entityOptions, ...lastItem];
   };
   handleReactSelectSearchDebounced = debounce(val => {
     this.props.tableParams.setSearchTerm(val);
