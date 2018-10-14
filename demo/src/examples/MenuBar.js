@@ -82,12 +82,14 @@ class MenuBarDemo extends React.Component {
                 text: "Some command 1",
                 label: "Label",
                 icon: "code",
-                onClick: () => alert("Do something")
+                cmd: "command1",
+                onClick: () => alert("Do something") //this should override the cmd
               },
               {
                 text: "Some command 2",
                 icon: "numerical",
-                onClick: () => alert("Do something else")
+                cmd: "command2",
+                // onClick: () => alert("Do something else")
               }
             ]
           }

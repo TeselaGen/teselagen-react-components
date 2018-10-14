@@ -96,13 +96,15 @@ export const commandMenuEnhancer = (commands, config = {}) => (
     }
 
     item.hotkey = item.hotkey || command.hotkey;
-    item.onClick = event =>
-      command.execute({
-        event,
-        context,
-        menuItem: item,
-        viaMenu: true
-      });
+    if (!item.onClick) {
+      item.onClick = event =>
+        command.execute({
+          event,
+          context,
+          menuItem: item,
+          viaMenu: true
+        });
+    }
   } else if (cmdId && !commands[cmdId]) {
     item.text = item.text || startCase(cmdId);
     item.disabled = true;
