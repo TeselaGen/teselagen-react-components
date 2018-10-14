@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import {Icon} from "@blueprintjs/core";
 import "./style.css";
 
 
@@ -6,7 +7,7 @@ class DemoHeader extends Component {
   render() {
     return (
       <div className="demo-header">
-        <h1>TeselaGen React Components</h1>
+        <a style={{fontSize: 35, color: "white"}} href="https://github.com/TeselaGen/teselagen-react-components">TeselaGen React Components <Icon icon="link"/></a>
       </div>
     );
   }
