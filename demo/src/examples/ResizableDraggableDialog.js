@@ -35,7 +35,6 @@ class Example extends Component {
       })}
     </div>
         </ResizableDraggableDialog>
-        />
       </div>
     );
   }
