@@ -24,6 +24,7 @@ export function genericCommandFactory(config) {
       "isDisabled",
       "isActive",
       "isHidden",
+      "tooltip",
       "inactiveIcon",
       "inactiveName"
     ];

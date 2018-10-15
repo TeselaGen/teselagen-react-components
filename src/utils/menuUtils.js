@@ -76,6 +76,7 @@ export const commandMenuEnhancer = (commands, config = {}) => (
 
     item.hidden = fnu(item.hidden, isHidden);
     item.disabled = fnu(item.disabled, isDisabled);
+
     item.key = item.key || cmdId;
 
     if (toggles) {
@@ -169,6 +170,12 @@ export const DynamicMenuItem = ({ def, enhancers = [ident], context }) => {
           : undefined}
       </ItemComponent>
     );
+  }
+  // if (item.disabled && item.disabledTooltip) {
+  //   item.tooltip = def.disabledTooltip
+  // }
+  if (item.disabled && typeof item.disabled === "string") {
+    item.tooltip = item.disabled;
   }
 
   if (item.tooltip) {
