@@ -118,6 +118,8 @@ function getAndAndOrFilters(allFilters) {
       // handle comma separated filters by adding more orWheres
       const allFilterValues = filter.filterValue.split(",");
       allFilterValues.forEach((filterValue, i) => {
+        filterValue = filterValue.trim();
+        if (!filterValue) return;
         const newFilter = {
           ...filter,
           filterValue
@@ -690,14 +692,14 @@ export function getQueryParams({
     );
     const additionalFilterToUse = additionalFilter(qb, currentParams);
     try {
-      qb.whereAll(getQueries(andFilters, qb, ccFields))
-        .andWhereAll(additionalFilterToUse)
-        .andWhereAny(getQueries(orFilters, qb, ccFields));
-      if (otherOrFilters.length) {
-        otherOrFilters.forEach(orFilters => {
-          qb.orWhereAny(getQueries(orFilters, qb, ccFields));
-        });
-      }
+      const allOrFilters = [getQueries(orFilters, qb, ccFields)];
+      otherOrFilters.forEach(orFilters => {
+        allOrFilters.push(getQueries(orFilters, qb, ccFields));
+      });
+      qb.whereAll(
+        getQueries(andFilters, qb, ccFields),
+        additionalFilterToUse
+      ).andWhereAny(...allOrFilters);
     } catch (e) {
       if (urlConnected) {
         errorParsingUrlString = e;
