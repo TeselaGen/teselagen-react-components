@@ -143,6 +143,17 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
         }
       };
 
+      removeEntityFromSelection = record => {
+        const {
+          input: { onChange, value = [] }
+        } = this.props;
+        onChange(value.filter(r => r.id !== record.id));
+        this.setState({
+          tempValue: null
+        });
+        this.resetPostSelectSelection();
+      };
+
       removeSelection = () => {
         const {
           meta: { form },
@@ -315,6 +326,8 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
                       onSelect,
                       withSelectedTitle,
                       readableName,
+                      removeSelection: this.removeSelection,
+                      removeEntityFromSelection: this.removeEntityFromSelection,
                       postSelectFormName,
                       postSelectDTProps,
                       isMultiSelect,
@@ -413,6 +426,37 @@ const PostSelectTable = branch(
       }
     }
 
+    removeColumn = {
+      width: 50,
+      noEllipsis: true,
+      immovable: true,
+      type: "action",
+      render: (v, record) => {
+        return (
+          <Button
+            small
+            minimal
+            onClick={() => this.removeRecord(record)}
+            icon="trash"
+            intent="danger"
+          />
+        );
+      }
+    };
+
+    removeRecord = record => {
+      const {
+        isMultiSelect,
+        removeSelection,
+        removeEntityFromSelection
+      } = this.props;
+      if (isMultiSelect) {
+        removeEntityFromSelection(record);
+      } else {
+        removeSelection();
+      }
+    };
+
     render() {
       const {
         initialEntities,
@@ -423,6 +467,16 @@ const PostSelectTable = branch(
         postSelectFormName,
         postSelectDTProps
       } = this.props;
+      let schemaToUse = postSelectDTProps.schema || [];
+      if (Array.isArray(schemaToUse)) {
+        schemaToUse = [...schemaToUse, this.removeColumn];
+      } else {
+        schemaToUse = {
+          ...schemaToUse,
+          fields: [...schemaToUse.fields, this.removeColumn]
+        };
+      }
+
       return (
         <div className="postSelectDataTable" style={{ paddingTop: 10 }}>
           {withSelectedTitle && <h6>Selected {readableName}:</h6>}
@@ -431,6 +485,7 @@ const PostSelectTable = branch(
             doNotShowEmptyRows
             maxHeight={400}
             {...postSelectDTProps}
+            schema={schemaToUse}
             // destroyOnUnmount={false}
             // keepDirtyOnReinitialize
             // enableReinitialize={true}
