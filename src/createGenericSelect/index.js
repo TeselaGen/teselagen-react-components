@@ -147,11 +147,16 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
         const {
           input: { onChange, value = [] }
         } = this.props;
-        onChange(value.filter(r => r.id !== record.id));
-        this.setState({
-          tempValue: null
-        });
-        this.resetPostSelectSelection();
+        const newValue = value.filter(r => r.id !== record.id);
+        if (newValue.length) {
+          onChange(newValue);
+          this.setState({
+            tempValue: null
+          });
+          this.resetPostSelectSelection();
+        } else {
+          this.removeSelection();
+        }
       };
 
       removeSelection = () => {
