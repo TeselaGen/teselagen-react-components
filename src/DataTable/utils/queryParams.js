@@ -97,7 +97,10 @@ function orderEntitiesLocal(orderArray, entities, schema) {
           return getValueToFilterOn(o);
         });
       } else {
-        orderFuncs.push(path);
+        orderFuncs.push(r => {
+          const val = get(r, path);
+          return val.toLowerCase ? val.toLowerCase() : val;
+        });
       }
     });
     entities = orderBy(entities, orderFuncs, ascOrDescArray);
