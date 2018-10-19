@@ -579,7 +579,7 @@ class InnerComp extends Component {
   makeSelection = () => {
     const { hideModal, handleSelection, selectedEntities } = this.props;
     handleSelection(selectedEntities);
-    hideModal();
+    hideModal && hideModal();
   };
   reactSelectHandleLoadMore = () => {
     const { setPageSize, currentParams, defaults } = this.props.tableParams;
@@ -627,7 +627,7 @@ class InnerComp extends Component {
                   {field.displayName}:{" "}
                 </span>
               ) : null;
-              let val = entity[field.path || field];
+              let val = get(entity, field.path || field);
               if (field.render) {
                 val = field.render(val, entity, undefined, {
                   ...this.props,
