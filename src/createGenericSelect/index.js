@@ -603,15 +603,17 @@ class InnerComp extends Component {
     ];
     if (!entities) return [];
     const lastItem = [];
-    if (entityCount > tableParams.entities.length) {
+    if (entityCount > (tableParams.entities || []).length) {
       lastItem.push({
         reactSelectHandleLoadMore: this.reactSelectHandleLoadMore,
         value: "__LOAD_MORE",
         label: (
           <span className={Classes.TEXT_MUTED} style={{ fontStyle: "italic" }}>
             Showing {entities.length} of{" "}
-            {entityCount + entities.length - tableParams.entities.length} (Click
-            to load more)
+            {entityCount +
+              entities.length -
+              (tableParams.entities || []).length}{" "}
+            (Click to load more)
           </span>
         )
       });
