@@ -590,7 +590,6 @@ class InnerComp extends Component {
     const { entityCount, schema } = tableParams;
 
     const entities = [
-      ...additionalOptions,
       ...map({
         ...keyBy(tableParams.entities, idAs || "id"),
         //it is important that we spread these second so that things like clearableValue will work
@@ -611,6 +610,7 @@ class InnerComp extends Component {
           <span className={Classes.TEXT_MUTED} style={{ fontStyle: "italic" }}>
             Showing {entities.length} of{" "}
             {entityCount +
+              additionalOptions.length +
               entities.length -
               (tableParams.entities || []).length}{" "}
             (Click to load more)
@@ -661,7 +661,7 @@ class InnerComp extends Component {
         )
       };
     });
-    return [...entityOptions, ...lastItem];
+    return [...additionalOptions, ...entityOptions, ...lastItem];
   };
   handleReactSelectSearchDebounced = debounce(val => {
     this.props.tableParams.setSearchTerm(val);
