@@ -586,27 +586,32 @@ class InnerComp extends Component {
     setPageSize((currentParams.pageSize || defaults.pageSize) + 25);
   };
   getReactSelectOptions = () => {
-    const { tableParams, input, idAs } = this.props;
+    const { tableParams, input, idAs, additionalOptions = [] } = this.props;
     const { entityCount, schema } = tableParams;
 
-    const entities = map({
-      ...keyBy(tableParams.entities, idAs || "id"),
-      //it is important that we spread these second so that things like clearableValue will work
-      ...(input.value &&
-        keyBy(
-          Array.isArray(input.value) ? input.value : [input.value],
-          idAs || "id"
-        ))
-    });
+    const entities = [
+      ...additionalOptions,
+      ...map({
+        ...keyBy(tableParams.entities, idAs || "id"),
+        //it is important that we spread these second so that things like clearableValue will work
+        ...(input.value &&
+          keyBy(
+            Array.isArray(input.value) ? input.value : [input.value],
+            idAs || "id"
+          ))
+      })
+    ];
     if (!entities) return [];
     const lastItem = [];
-    if (entityCount > entities.length) {
+    if (entityCount > tableParams.entities.length) {
       lastItem.push({
         reactSelectHandleLoadMore: this.reactSelectHandleLoadMore,
         value: "__LOAD_MORE",
         label: (
           <span className={Classes.TEXT_MUTED} style={{ fontStyle: "italic" }}>
-            Showing {entities.length} of {entityCount} (Click to load more)
+            Showing {entities.length} of{" "}
+            {entityCount + entities.length - tableParams.entities.length} (Click
+            to load more)
           </span>
         )
       });
