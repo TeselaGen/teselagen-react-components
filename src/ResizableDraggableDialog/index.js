@@ -13,8 +13,8 @@ export default class ResizableDraggableDialog extends React.Component {
     } = this.props;
     const { windowWidth, windowHeight } = this.getWindowWidthAndHeight();
     this.state = {
-      x: Math.max((windowWidth - defaultDialogWidth) / 2, 0),
-      y: Math.max((windowHeight - defaultDialogHeight) / 2, 0)
+      x: Math.round(Math.max((windowWidth - defaultDialogWidth) / 2, 0)),
+      y: Math.round(Math.max((windowHeight - defaultDialogHeight) / 2, 0))
     };
   }
 
