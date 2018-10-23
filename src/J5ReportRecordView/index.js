@@ -180,7 +180,7 @@ class J5ReportRecordView extends Component {
     }
 
     // JSON.parse(localStorage.getItem('TEMPORARY_j5Run')) || {}
-    const { name, assemblyType, dateRan } = data.j5Report;
+    const { name, assemblyType, dateRan, design } = data.j5Report;
 
     return (
       <div className="j5-report-header tg-card">
@@ -193,7 +193,7 @@ class J5ReportRecordView extends Component {
     <InputField name="assemblyType" label="Assembly Type" />
     {Footer}
   </form>*/}
-        <FieldWithLabel label="Design Name" field={name} />
+        <FieldWithLabel label="Design Name" field={design.name} />
         <FieldWithLabel
           label="Assembly Method"
           field={this.getAssemblyMethod()}
