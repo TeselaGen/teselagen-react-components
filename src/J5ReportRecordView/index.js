@@ -193,7 +193,10 @@ class J5ReportRecordView extends Component {
     <InputField name="assemblyType" label="Assembly Type" />
     {Footer}
   </form>*/}
-        <FieldWithLabel label="Design Name" field={design.name} />
+        <FieldWithLabel
+          label="Design Name"
+          field={design && design.name ? design.name : name}
+        />
         <FieldWithLabel
           label="Assembly Method"
           field={this.getAssemblyMethod()}
