@@ -251,8 +251,14 @@ class J5ReportRecordView extends Component {
       return {
         path: `j5ConstructAssemblyPieces[${i}].assemblyPiece.j5AssemblyPieceParts`,
         displayName: `Piece-${i + 1} Parts`,
-        render: v =>
-          v && v.map(p => get(p, "j5InputPart.sequencePart.name")).join(", ")
+        render: v => {
+          if (typeof v === "string") {
+            return v;
+          }
+          return (
+            v && v.map(p => get(p, "j5InputPart.sequencePart.name")).join(", ")
+          );
+        }
       };
     });
     const extraColumns = flatten(
