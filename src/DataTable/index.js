@@ -904,9 +904,9 @@ class DataTable extends React.Component {
         const val = oldFunc(...args);
         let text = val;
         if (column.getClipboardData) {
-          text = column.getClipboardData(text, record);
+          text = column.getClipboardData(row.value, record);
         } else if (column.render) {
-          text = column.render(text, record, row, this.props);
+          text = column.render(row.value, record, row, this.props);
         } else if (text !== undefined) {
           text = String(text);
         } else text = " ";
@@ -943,16 +943,17 @@ class DataTable extends React.Component {
     selectedRecords.forEach((record, i) => {
       let textForRow = [];
       columns.forEach(col => {
-        let text = get(record, col.path);
+        const recordText = get(record, col.path);
+        let text = recordText;
         if (col.type === "timestamp") {
           text = text ? moment(text).format("lll") : "";
         } else if (col.type === "boolean") {
           text = text ? "True" : "False";
         }
         if (col.getClipboardData) {
-          text = col.getClipboardData(text, record);
+          text = col.getClipboardData(recordText, record);
         } else if (col.render) {
-          text = col.render(text, record, i);
+          text = col.render(recordText, record, i);
         } else if (text !== undefined) {
           text = String(text);
         } else text = " ";
