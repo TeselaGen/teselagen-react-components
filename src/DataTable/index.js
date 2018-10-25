@@ -17,7 +17,10 @@ import {
   Icon,
   Popover,
   Intent,
-  Callout
+  Callout,
+  Hotkey,
+  Hotkeys,
+  HotkeysTarget
 } from "@blueprintjs/core";
 import classNames from "classnames";
 import scrollIntoView from "dom-scroll-into-view";
@@ -168,6 +171,24 @@ class DataTable extends React.Component {
     }
 
     this.updateFromProps(computePresets(oldProps), computePresets(this.props));
+  }
+
+  handleCopyHotkey = () => {
+    const { reduxFormSelectedEntityIdMap } = this.props;
+    const idMap = reduxFormSelectedEntityIdMap.input.value;
+    this.copyRows(getRecordsFromIdMap(idMap));
+  };
+
+  renderHotkeys() {
+    return (
+      <Hotkeys>
+        <Hotkey
+          combo="mod + c"
+          label="Copy rows"
+          onKeyDown={this.handleCopyHotkey}
+        />
+      </Hotkeys>
+    );
   }
 
   moveColumn = ({ oldIndex, newIndex }) => {
@@ -907,7 +928,8 @@ class DataTable extends React.Component {
     return columnsToRender;
   };
 
-  setManyRowsToCopy = selectedRecords => {
+  copyRows = selectedRecords => {
+    if (!selectedRecords.length) return;
     const { columns } = this.state;
     let allRowsText = [];
     selectedRecords.forEach((record, i) => {
@@ -932,7 +954,8 @@ class DataTable extends React.Component {
       });
       allRowsText.push(textForRow.join("\t"));
     });
-    return allRowsText.join("\n");
+    copy(allRowsText.join("\n"));
+    window.toastr.success("Selected rows copied");
   };
 
   showContextMenu = (idMap, e) => {
@@ -948,10 +971,7 @@ class DataTable extends React.Component {
       copyMenuItems.push(
         <MenuItem
           key="copySelectedRows"
-          onClick={() => {
-            copy(this.setManyRowsToCopy(selectedRecords));
-            window.toastr.success("Selected rows copied");
-          }}
+          onClick={() => this.copyRows(selectedRecords)}
           icon="clipboard"
           text={"Copy Rows to Clipboard"}
         />
@@ -970,7 +990,7 @@ class DataTable extends React.Component {
               cellWrapper && cellWrapper.getAttribute("data-copy-text");
             if (text) {
               copy(text);
-              window.toastr.success("Selected columns copied");
+              window.toastr.success("Cell copied");
             } else {
               window.toastr.warning("No text to copy.");
             }
@@ -1129,6 +1149,6 @@ class DataTable extends React.Component {
   };
 }
 
-export default dataTableEnhancer(DataTable);
+export default dataTableEnhancer(HotkeysTarget(DataTable));
 const ConnectedPagingTool = dataTableEnhancer(PagingTool);
 export { ConnectedPagingTool };
