@@ -176,7 +176,15 @@ class DataTable extends React.Component {
   handleCopyHotkey = () => {
     const { reduxFormSelectedEntityIdMap } = this.props;
     const idMap = reduxFormSelectedEntityIdMap.input.value;
-    this.copyRows(getRecordsFromIdMap(idMap));
+    this.handleCopyRows(getRecordsFromIdMap(idMap));
+  };
+
+  handleCopyRows = selectedRecords => {
+    const { entities = [] } = computePresets(this.props);
+    const sortedRecords = [...selectedRecords].sort((a, b) => {
+      return entities.indexOf(a) - entities.indexOf(b);
+    });
+    this.finalizeCopy(sortedRecords);
   };
 
   renderHotkeys() {
@@ -928,7 +936,7 @@ class DataTable extends React.Component {
     return columnsToRender;
   };
 
-  copyRows = selectedRecords => {
+  finalizeCopy = selectedRecords => {
     if (!selectedRecords.length) return;
     const { columns } = this.state;
     let allRowsText = [];
@@ -971,7 +979,7 @@ class DataTable extends React.Component {
       copyMenuItems.push(
         <MenuItem
           key="copySelectedRows"
-          onClick={() => this.copyRows(selectedRecords)}
+          onClick={() => this.handleCopyRows(selectedRecords)}
           icon="clipboard"
           text={"Copy Rows to Clipboard"}
         />
