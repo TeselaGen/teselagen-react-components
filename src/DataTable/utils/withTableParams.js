@@ -58,6 +58,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       initialValues,
       additionalFilter = {},
       noOrderError,
+      withDisplayOptions,
       model
     } = mergedOpts;
 
@@ -128,6 +129,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       doNotCoercePageSize,
       additionalFilter,
       noOrderError,
+      withDisplayOptions,
       model,
       schema,
       ...getQueryParams({
