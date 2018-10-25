@@ -702,7 +702,7 @@ export function getQueryParams({
       qb.whereAll(
         getQueries(andFilters, qb, ccFields),
         additionalFilterToUse
-      ).andWhereAny(...allOrFilters);
+      ).orWhereAny(...allOrFilters);
     } catch (e) {
       if (urlConnected) {
         errorParsingUrlString = e;
