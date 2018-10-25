@@ -57,7 +57,8 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       doNotCoercePageSize,
       initialValues,
       additionalFilter = {},
-      noOrderError
+      noOrderError,
+      model
     } = mergedOpts;
 
     const schema = getSchema(mergedOpts);
@@ -115,8 +116,20 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       typeof additionalFilter === "function"
         ? additionalFilter.bind(this, ownProps)
         : () => additionalFilter;
-    return {
-      ...mergedOpts,
+    const mapStateProps = {
+      history,
+      urlConnected,
+      withSelectedEntities,
+      formName,
+      defaults,
+      isInfinite,
+      isSimple,
+      withPaging,
+      doNotCoercePageSize,
+      additionalFilter,
+      noOrderError,
+      model,
+      schema,
       ...getQueryParams({
         doNotCoercePageSize,
         currentParams,
@@ -145,6 +158,8 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         reduxFormSearchInput: currentParams.searchTerm
       }
     };
+    return mapStateProps;
+    // return { ...mergedOpts, ...mapStateProps };
   };
 
   const mapDispatchToProps = (dispatch, ownProps) => {
@@ -197,19 +212,19 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       };
     });
     const { variables, selectedEntities, ...restStateProps } = stateProps;
-    return {
+    const allMergedProps = {
       ...ownProps,
       variables: stateProps.variables,
       selectedEntities: stateProps.selectedEntities,
       tableParams: {
         ...ownProps.tableParams,
         ...restStateProps,
-        ...dispatchProps,
         ...boundDispatchProps,
         form: formName, //this will override the default redux form name
         isTableParamsConnected: true //let the table know not to do local sorting/filtering etc.
       }
     };
+    return allMergedProps;
   }
 
   const toReturn = compose(

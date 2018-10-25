@@ -31,7 +31,6 @@ const hasOligos = {
 };
 
 export function getLinkDialogProps(j5Report, fragmentMap) {
-  const useFragments = !isEmpty(fragmentMap);
   const linkDialogProps = models.reduce((acc, model) => {
     const propName = propNameMap[model];
     acc[propName] = {
@@ -42,7 +41,7 @@ export function getLinkDialogProps(j5Report, fragmentMap) {
       j5ReportId: j5Report.id,
       model
     };
-    if (useFragments) {
+    if (!isEmpty(fragmentMap)) {
       acc[propName].runTimeQueryOptions = {
         fragment: fragmentMap[model]
       };
