@@ -181,8 +181,12 @@ class DataTable extends React.Component {
 
   handleCopyRows = selectedRecords => {
     const { entities = [] } = computePresets(this.props);
+    const idToIndex = entities.reduce((acc, e, i) => {
+      acc[e.id || e.code] = i;
+      return acc;
+    }, {});
     const sortedRecords = [...selectedRecords].sort((a, b) => {
-      return entities.indexOf(a) - entities.indexOf(b);
+      return idToIndex[a.id || a.code] - idToIndex[b.id || b.code];
     });
     this.finalizeCopy(sortedRecords);
   };
