@@ -135,7 +135,7 @@ class MenuBarDemo extends React.Component {
       <div>
         <div
           style={{
-            backgroundColor: "#f8f8f8",
+            // backgroundColor: "#f8f8f8",
             height: "300px",
             border: "1px solid #eee"
           }}

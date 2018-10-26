@@ -18,4 +18,9 @@
 .mss-selected_item:hover {
   background-color: #f3f3f3;
 }
+
+.bp3-dark .mss-selected_item:hover {
+  background-color: #40566b;
+}
+
 /* */

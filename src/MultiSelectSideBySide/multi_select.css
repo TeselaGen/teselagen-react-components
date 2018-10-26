@@ -7,9 +7,12 @@
   -ms-flex-direction: row;
   flex-direction: row;
   position: relative;
-  background: #ffffff;
+  /* background: #ffffff; */
   border: 1px solid #dddddd;
   color: #666666;
   overflow: hidden;
+}
+.bp3-dark .mss-wrapper {
+  color: white;
 }
 /* */
