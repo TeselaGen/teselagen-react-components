@@ -95,10 +95,7 @@ class DataTableDemo extends React.Component {
 
     return (
       <ApolloProvider client={client} store={store}>
-        <div
-          className={this.state.darkMode ? "bp3-dark" : ""}
-          style={{ background: this.state.darkMode ? "#293742" : undefined }}
-        >
+        <div>
           <Router>
             <div>
               <h3>Demo specific options:</h3>
@@ -112,7 +109,6 @@ class DataTableDemo extends React.Component {
                   " isInfinite to see something actually show up with it"
               )}
               {renderToggle(this, "inDialog", "Render the table in a dialog")}
-              {renderToggle(this, "darkMode", "Render the table in dark theme")}
               <h3>withTableParams options:</h3>
               <br />
               {renderToggle(

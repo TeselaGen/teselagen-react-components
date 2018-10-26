@@ -247,7 +247,14 @@ class Uploader extends Component {
           disabledClassName={"tg-dropzone-disabled"}
           accept={acceptToUse}
           {...{
-            onDrop: async acceptedFiles => {
+            onDrop: async (acceptedFiles, rejectedFiles) => {
+              if (rejectedFiles.length) {
+                const fileNames = rejectedFiles.map(f => f.name);
+                window.toastr &&
+                  window.toastr
+                    .warning(`This uploader accepts ${acceptToUse}. These files were rejected because they \
+                do not have the proper extension: ${fileNames.join(", ")}`);
+              }
               if (fileLimit) {
                 acceptedFiles = acceptedFiles.slice(0, fileLimit);
               }

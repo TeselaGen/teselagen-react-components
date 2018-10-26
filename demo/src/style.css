@@ -3,10 +3,22 @@ body {
   padding: 0;
 }
 
+body.bp3-dark {
+  background-color: #293742;
+}
+
 h1,
 h4,
 h6 {
   font-weight: 400;
+}
+
+.tg-dark-theme-button .bp3-icon {
+  color: #ebf1f5 !important;
+}
+
+.bp3-dark .tg-dark-theme-button .bp3-icon {
+  color: #ffc940 !important;
 }
 
 .toggle-button-holder {
