@@ -581,6 +581,7 @@ export function getQueryParams({
   entities,
   isLocalCall,
   additionalFilter,
+  additionalOrFilter,
   doNotCoercePageSize,
   noOrderError
 }) {
@@ -694,11 +695,13 @@ export function getQueryParams({
       allFilters
     );
     const additionalFilterToUse = additionalFilter(qb, currentParams);
+    const additionalOrFilterToUse = additionalOrFilter(qb, currentParams);
     try {
       const allOrFilters = [getQueries(orFilters, qb, ccFields)];
       otherOrFilters.forEach(orFilters => {
         allOrFilters.push(getQueries(orFilters, qb, ccFields));
       });
+      allOrFilters.push(additionalOrFilterToUse);
       qb.whereAll(
         getQueries(andFilters, qb, ccFields),
         additionalFilterToUse

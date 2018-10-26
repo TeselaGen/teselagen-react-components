@@ -57,6 +57,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       doNotCoercePageSize,
       initialValues,
       additionalFilter = {},
+      additionalOrFilter = {},
       noOrderError,
       withDisplayOptions,
       model
@@ -117,6 +118,10 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       typeof additionalFilter === "function"
         ? additionalFilter.bind(this, ownProps)
         : () => additionalFilter;
+    const additionalOrFilterToUse =
+      typeof additionalOrFilter === "function"
+        ? additionalOrFilter.bind(this, ownProps)
+        : () => additionalOrFilter;
     const mapStateProps = {
       history,
       urlConnected,
@@ -128,6 +133,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       withPaging,
       doNotCoercePageSize,
       additionalFilter,
+      additionalOrFilter,
       noOrderError,
       withDisplayOptions,
       model,
@@ -142,6 +148,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         isInfinite: isInfinite || (isSimple && !withPaging),
         isLocalCall,
         additionalFilter: additionalFilterToUse,
+        additionalOrFilter: additionalOrFilterToUse,
         noOrderError
       }),
       formNameFromWithTPCall: formNameFromWithTableParamsCall,
