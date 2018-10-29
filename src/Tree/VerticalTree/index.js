@@ -36,7 +36,7 @@ export default class VerticalTree extends React.Component {
     cardIdKey: "id",
     childrenKey: "children",
     colorCodes: defaultColorCodes,
-    connectorThickness: 20,
+    connectorThickness: 10,
     horizontalLeaves: false,
     colorByDepth: true,
     includeMinimap: false,
