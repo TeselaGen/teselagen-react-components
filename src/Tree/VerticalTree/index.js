@@ -4,6 +4,7 @@ import ReactResizeDetector from "react-resize-detector";
 import PropTypes from "prop-types";
 import Minimap from "../TreeMinimap";
 import blackOrWhiteContrastsMore from "../blackOrWhiteContrastsMore";
+import { Tooltip } from "@blueprintjs/core";
 
 import "./style.css";
 
@@ -35,7 +36,7 @@ export default class VerticalTree extends React.Component {
     cardIdKey: "id",
     childrenKey: "children",
     colorCodes: defaultColorCodes,
-    connectorThickness: 10,
+    connectorThickness: 20,
     horizontalLeaves: false,
     colorByDepth: true,
     includeMinimap: false,
@@ -264,18 +265,28 @@ export default class VerticalTree extends React.Component {
                   <div
                     style={{
                       position: "absolute",
-                      bottom: -connectorThickness,
-                      width: connectorThickness,
-                      height: connectorThickness,
+                      bottom: -connectorThickness + "px",
+                      left: -connectorThickness * 0.4 + "px",
+                      width: connectorThickness * 2 + "px",
+                      height: connectorThickness * 2 + "px",
+                      borderRadius: connectorThickness + "px",
+                      paddingTop: connectorThickness * 0.6 + "px",
                       backgroundColor: connectorColor,
                       color: blackOrWhiteContrastsMore(connectorColor),
                       textAlign: "center",
                       lineHeight: connectorThickness + "px",
-                      fontSize: connectorThickness + "px"
+                      fontSize: connectorThickness * 1.2 + "px",
+                      boxShadow: "0 0 1px #0006 inset"
                     }}
                     onClick={this.handleExpanderClick(node)}
                   >
-                    {collapsedNodes[nodeId] ? "►" : "▼"}
+                    <Tooltip
+                      content={
+                        collapsedNodes[nodeId] ? "Expand node" : "Collapse node"
+                      }
+                    >
+                      <span>{collapsedNodes[nodeId] ? "►" : "▼"}</span>
+                    </Tooltip>
                   </div>
                 </div>
               )}

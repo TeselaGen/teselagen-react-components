@@ -2,6 +2,7 @@ import React from "react";
 import { get, pick } from "lodash";
 import ReactResizeDetector from "react-resize-detector";
 import PropTypes from "prop-types";
+import { Tooltip } from "@blueprintjs/core";
 
 import blackOrWhiteContrastsMore from "../blackOrWhiteContrastsMore";
 import Minimap from "../TreeMinimap";
@@ -216,20 +217,25 @@ export default class HorizontalTree extends React.Component {
           <div
             style={{
               position: "absolute",
-              bottom: isCollapsed ? connectorThickness : null,
-              right: -connectorThickness / 2,
-              width: connectorThickness,
-              height: connectorThickness,
+              right: -connectorThickness * 1.2 + "px",
+              width: connectorThickness * 2.4 + "px",
+              height: connectorThickness * 2.4 + "px",
+              bottom: -connectorThickness * 0.7 + "px",
               backgroundColor: connectorColor,
               color: blackOrWhiteContrastsMore(connectorColor),
               textAlign: "center",
               lineHeight: connectorThickness * 0.8 + "px",
-              fontSize: connectorThickness * 1.5 + "px",
-              fontWeight: 900
+              fontSize: connectorThickness * 2.4 + "px",
+              fontWeight: 400,
+              paddingTop: connectorThickness * 0.6 + "px",
+              borderRadius: connectorThickness * 1.2 + "px",
+              boxShadow: "0 0 1px #0006 inset"
             }}
             onClick={this.handleExpanderClick(node)}
           >
-            {isCollapsed ? "+" : "-"}
+            <Tooltip content={isCollapsed ? "Expand node" : "Collapse node"}>
+              <span>{isCollapsed ? "+" : "-"}</span>
+            </Tooltip>
           </div>
         </div>
       )
