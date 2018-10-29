@@ -35,7 +35,16 @@ const entities = [
 ];
 
 function SimpleTable() {
-  return <DataTable isSimple entities={entities} schema={schema} />;
+  return (
+    <DataTable
+      formName="simpleTable"
+      isSimple
+      entities={entities}
+      schema={schema}
+    >
+      <div>hey</div>
+    </DataTable>
+  );
 }
 
 render(<SimpleTable />);

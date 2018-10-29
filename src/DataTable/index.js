@@ -402,7 +402,7 @@ class DataTable extends React.Component {
       return acc;
     }, {});
     const showHeader = (withTitle || withSearch || children) && !noHeader;
-
+    console.log("children:", children);
     const toggleFullscreenButton = (
       <Button
         icon="fullscreen"
