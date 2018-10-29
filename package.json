@@ -17,7 +17,6 @@
     "build-watch": "nodemon --watch src --exec \"rm .babelrc; yarn build\" ",
     "clean": "nwb clean-module && npm clean-demo",
     "start": "nwb serve-react-demo --port 3333",
-    "precommit": "lint-staged",
     "prepare": "in-publish && npm run build || not-in-publish",
     "postpublish": "yarn deploy",
     "predeploy": "yarn buildWithDemo",
@@ -103,11 +102,11 @@
     "gh-pages": "^2.0.1",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.8.0",
-    "husky": "^0.14.3",
+    "husky": "^1.1.2",
     "identity-obj-proxy": "^3.0.0",
     "in-publish": "^2.0.0",
     "jest": "^23.6.0",
-    "lint-staged": "^7.2.2",
+    "lint-staged": "^8.0.2",
     "nwb": "^0.23.0",
     "prettier": "^1.14.3",
     "raw-loader": "^0.5.1",
@@ -125,6 +124,11 @@
     "redux-thunk": "*",
     "sinon": "^4.4.9",
     "tg-client-query-builder": "^2.6.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   },
   "lint-staged": {
     "src/**/*.js": [
