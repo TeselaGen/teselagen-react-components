@@ -163,6 +163,14 @@
   "repository": "https://github.com/TeselaGen/teselagen-react-components",
   "keywords": [
     "react-component",
-    "teselagen"
+    "teselagen",
+    "blueprintjs",
+    "multi-select",
+    "side-by-side",
+    "menu-bar",
+    "timeline",
+    "tree",
+    "confirmation-dialog",
+    "resizable-dialog"
   ]
 }
