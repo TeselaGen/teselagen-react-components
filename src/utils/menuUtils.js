@@ -76,6 +76,7 @@ export const commandMenuEnhancer = (commands, config = {}) => (
 
     item.hidden = fnu(item.hidden, isHidden);
     item.disabled = fnu(item.disabled, isDisabled);
+
     item.key = item.key || cmdId;
 
     if (toggles) {
@@ -96,13 +97,15 @@ export const commandMenuEnhancer = (commands, config = {}) => (
     }
 
     item.hotkey = item.hotkey || command.hotkey;
-    item.onClick = event =>
-      command.execute({
-        event,
-        context,
-        menuItem: item,
-        viaMenu: true
-      });
+    if (!item.onClick) {
+      item.onClick = event =>
+        command.execute({
+          event,
+          context,
+          menuItem: item,
+          viaMenu: true
+        });
+    }
   } else if (cmdId && !commands[cmdId]) {
     item.text = item.text || startCase(cmdId);
     item.disabled = true;
@@ -167,6 +170,12 @@ export const DynamicMenuItem = ({ def, enhancers = [ident], context }) => {
           : undefined}
       </ItemComponent>
     );
+  }
+  // if (item.disabled && item.disabledTooltip) {
+  //   item.tooltip = def.disabledTooltip
+  // }
+  if (item.disabled && typeof item.disabled === "string") {
+    item.tooltip = item.disabled;
   }
 
   if (item.tooltip) {

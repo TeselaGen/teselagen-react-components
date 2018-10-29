@@ -15,7 +15,6 @@ import {
   InputGroup,
   NumericInput,
   Intent,
-  Radio,
   RadioGroup,
   Checkbox,
   EditableText,
@@ -342,14 +341,7 @@ export const renderReactSelect = props => {
     onFieldSubmit,
     ...rest
   } = props;
-  const optsToUse =
-    options &&
-    options.map(function(opt) {
-      if (typeof opt === "string") {
-        return { label: opt, value: opt };
-      } else if (isNumber(opt)) return { label: opt.toString(), value: opt };
-      return opt;
-    });
+  const optsToUse = getOptions(options);
   const valueToUse = //here we're coercing json values into an object with {label,value} because react-select does not seem to recognize the json value directly
     !Array.isArray(value) && typeof value === "object"
       ? optsToUse.find(obj => {
@@ -538,6 +530,7 @@ export const renderBlueprintRadioGroup = ({
   onFieldSubmit,
   ...rest
 }) => {
+  const optionsToUse = getOptions(options);
   return (
     <RadioGroup
       {...input}
@@ -548,13 +541,8 @@ export const renderBlueprintRadioGroup = ({
         input.onChange(e, val, ...args);
         onFieldSubmit(e.target ? e.target.value : val);
       }}
-    >
-      {options.map(function({ label, value, disabled }, index) {
-        return (
-          <Radio key={index} value={value} label={label} disabled={disabled} />
-        );
-      })}
-    </RadioGroup>
+      options={optionsToUse}
+    />
   );
 };
 
@@ -684,3 +672,15 @@ export const RadioGroupField = generateField(renderBlueprintRadioGroup, {
 export const ReactSelectField = generateField(renderReactSelect);
 export const SelectField = generateField(renderSelect);
 export const ReactColorField = generateField(RenderReactColorPicker);
+
+function getOptions(options) {
+  return (
+    options &&
+    options.map(function(opt) {
+      if (typeof opt === "string") {
+        return { label: opt, value: opt };
+      } else if (isNumber(opt)) return { label: opt.toString(), value: opt };
+      return opt;
+    })
+  );
+}

@@ -1,0 +1,26 @@
+.mss-selected_item {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  padding: 0 0 0 12px;
+  margin-right: -4px;
+  -webkit-transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.mss-selected_item:hover {
+  background-color: #f3f3f3;
+}
+
+.bp3-dark .mss-selected_item:hover {
+  background-color: #40566b;
+}
+
+/* */

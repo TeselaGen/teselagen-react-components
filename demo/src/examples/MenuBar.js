@@ -4,43 +4,36 @@ class MenuBarDemo extends React.Component {
     this.showDialog = this.showDialog.bind(this);
     this.hideDialog = this.hideDialog.bind(this);
 
-    // This can be (re)used for hotkey processing, decorating bar or context
-    // menus, and populating the hotkeys dialog
-    const hotkeys = {
-      newFile: { combo: "mod+ctrl+n", preventDefault: true }, // object syntax
-      openFile: ["mod+o", undefined, { preventDefault: true }], // no preventDefault: will also trigger browser's open
-      quit: ["mod+ctrl+q", "Quit App", { preventDefault: true }], // custom label
-      cut: ["mod+x"], // array shorthand
-      copy: "mod+c", // string shorthand
-      paste: "mod+v"
-    };
-
     // This can be (re)used for hotkey handling, top menu clicks, context menu
     // clicks, etc.
-    const handlers = {
-      newFile: () => alert('Triggered "New File"'),
-      openFile: () => alert('Triggered "Open File"'),
-      quit: () => alert('Triggered "Quit"'),
-      cut: () => alert('Triggered "Cut"'),
-      copy: () => alert('Triggered "Copy"'),
-      paste: () => alert('Triggered "Paste"'),
-      command1: () => alert('Triggered "Command One"'),
-      command2: () => alert('Triggered "Command Two"'),
-      showHotkeys: this.showDialog
+    const commandDefs = {
+      newFile: {
+        preventDefault: true,
+        hotkey: "mod+n",
+        handler: () => alert('Triggered "New File"')
+      },
+      openFile: {
+        isDisabled: () => {
+          return "yep I'm disabled";
+        },
+        preventDefault: true,
+        hotkey: "mod+n",
+        handler: () => alert('Triggered "Open File"')
+      },
+      quit: { hotkey: "mod+n", handler: () => alert('Triggered "Quit"') },
+      cut: { hotkey: "mod+n", handler: () => alert('Triggered "Cut"') },
+      copy: { hotkey: "mod+n", handler: () => alert('Triggered "Copy"') },
+      paste: { hotkey: "mod+n", handler: () => alert('Triggered "Paste"') },
+      command1: {
+        hotkey: "mod+n",
+        handler: () => alert('Triggered "Command One"')
+      },
+      command2: {
+        hotkey: "mod+n",
+        handler: () => alert('Triggered "Command Two"')
+      },
+      showHotkeys: { hotkey: "mod+n", handler: this.showDialog }
     };
-
-    // TODO: update this demo to define commands without first having separate
-    // hotkeys and handlers (done this other way here as a quick patch before
-    // refactoring)
-    const commandDefs = {};
-    for (let cmdId in handlers) {
-      const hk = hotkeys[cmdId] ? getHotkeyProps(hotkeys[cmdId]) : {};
-      commandDefs[cmdId] = {
-        handler: handlers[cmdId],
-        hotkey: hk.combo, // some may be undefined
-        hotkeyProps: hk
-      }
-    }
 
     // Create commands without any special logic
     const commands = genericCommandFactory({
@@ -48,7 +41,6 @@ class MenuBarDemo extends React.Component {
       getArguments: () => [],
       handleReturn: () => {}
     });
-
 
     let menu = [
       {
@@ -71,7 +63,12 @@ class MenuBarDemo extends React.Component {
         text: "Edit",
         submenu: [
           { icon: "cut", cmd: "cut" }, // no text props here
-          { icon: "duplicate", disabled: true, cmd: "copy" },
+          {
+            icon: "duplicate",
+            disabled:
+              "Hey I'm a tooltip created by passing a string to disabled:''",
+            cmd: "copy"
+          },
           { icon: "clipboard", cmd: "paste" },
           { divider: "" },
           {
@@ -82,12 +79,14 @@ class MenuBarDemo extends React.Component {
                 text: "Some command 1",
                 label: "Label",
                 icon: "code",
-                onClick: () => alert("Do something")
+                cmd: "command1",
+                onClick: () => alert("Do something") //this should override the cmd
               },
               {
                 text: "Some command 2",
                 icon: "numerical",
-                onClick: () => alert("Do something else")
+                cmd: "command2"
+                // onClick: () => alert("Do something else")
               }
             ]
           }
@@ -102,7 +101,7 @@ class MenuBarDemo extends React.Component {
     // Sets will normally be different routes/modules/views of an app, but any
     // arbitrary separation criteria will work
     this.hotkeySets = {
-      "File Menu": hotkeys,
+      // "File Menu": reduce(commandDefs, (acc, ) => {}, {}),
       "Other Section": {
         something: "alt+shift+s",
         somethingElse: "alt+shift+e"
@@ -136,7 +135,7 @@ class MenuBarDemo extends React.Component {
       <div>
         <div
           style={{
-            backgroundColor: "#f8f8f8",
+            // backgroundColor: "#f8f8f8",
             height: "300px",
             border: "1px solid #eee"
           }}
@@ -167,7 +166,7 @@ class MenuBarDemo extends React.Component {
               undefined,
               e,
               () => {
-                console.log('closin')
+                console.log("closin");
               }
             );
           }}
@@ -188,19 +187,17 @@ class MenuBarDemo extends React.Component {
           <code>submenu</code> properties. Each <code>submenu</code> is itself
           an array of item descriptor objects or <code>MenuItem</code> elements.
           Item descriptors may contain several properties, namely{" "}
-          <code>text</code>,
-          <code>icon</code>, <code>label</code>, <code>hotkey</code>,{" "}
-          <code>onClick</code>,
-          <code>tooltip</code>, <code>key</code>, <code>divider</code>,{" "}
-          <code>navTo</code>,
+          <code>text</code>,<code>icon</code>, <code>label</code>,{" "}
+          <code>hotkey</code>, <code>onClick</code>,<code>tooltip</code>,{" "}
+          <code>key</code>, <code>divider</code>, <code>navTo</code>,
           <code>href</code>, <code>target</code> and <code>submenu</code>. You
           may also include custom fields and have custom menu enhancers derive
           other props from them. For example, the <code>cmd</code> property can
           be used in combination with the <code>commandMenuEnhancer</code> to
           link menu items with commands, wiring not only the handler, but also
-          the hotkeys, icon, disabled and active states, name, etc.
-          Check the <code>DynamicMenuItem</code> component and
-          <code>commandMenuEnhancer()</code>{" "} util for more details.
+          the hotkeys, icon, disabled and active states, name, etc. Check the{" "}
+          <code>DynamicMenuItem</code> component and
+          <code>commandMenuEnhancer()</code> util for more details.
         </p>
       </div>
     );

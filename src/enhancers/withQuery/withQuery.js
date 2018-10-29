@@ -89,26 +89,15 @@ export default function withQuery(inputFragment, options = {}) {
     graphql(gqlQuery, {
       //default options
       options: props => {
+        const variables = getVariables(props, queryOptions, {
+          ...options,
+          queryNameToUse
+        });
         const {
-          variables: propVariables,
           fetchPolicy,
           pollInterval,
           notifyOnNetworkStatusChange
         } = props;
-        let id;
-        if (getIdFromParams) {
-          id = parseInt(get(props, "match.params.id"), 10);
-          if (!id) {
-            console.error(
-              "There needs to be an id passed here to ",
-              queryNameToUse,
-              "but none was found"
-            );
-            /* eslint-disable */
-            debugger;
-            /* eslint-enable */
-          }
-        }
         let extraOptions = queryOptions || {};
         if (typeof queryOptions === "function") {
           extraOptions = queryOptions(props) || {};
@@ -118,22 +107,16 @@ export default function withQuery(inputFragment, options = {}) {
           variables: extraOptionVariables,
           ...otherExtraOptions
         } = extraOptions;
-        const variablesToUse = {
-          ...(!!id && { id }),
-          ...variables,
-          ...propVariables,
-          ...(extraOptionVariables && extraOptionVariables)
-        };
         if (
-          get(variablesToUse, "filter.entity") &&
-          get(variablesToUse, "filter.__objectType") === "query" &&
-          get(variablesToUse, "filter.entity") !== modelName
+          get(variables, "filter.entity") &&
+          get(variables, "filter.__objectType") === "query" &&
+          get(variables, "filter.entity") !== modelName
         ) {
           console.error("filter model does not match fragment model!");
         }
 
         return {
-          ...(!isEmpty(variablesToUse) && { variables: variablesToUse }),
+          ...(!isEmpty(variables) && { variables }),
           fetchPolicy: fetchPolicy || "network-only",
           ssr: false,
           pollInterval,
@@ -158,6 +141,11 @@ export default function withQuery(inputFragment, options = {}) {
           ["loading" + upperFirst(nameToUse)]: data.loading
         };
 
+        const variables = getVariables(ownProps, queryOptions, {
+          ...options,
+          queryNameToUse
+        });
+
         const propsToReturn = {
           ...(tableParams && !tableParams.entities && !tableParams.isLoading
             ? {
@@ -167,6 +155,7 @@ export default function withQuery(inputFragment, options = {}) {
                   entities: results,
                   entityCount: totalResults,
                   onRefresh: data.refetch,
+                  variables,
                   fragment
                 }
               }
@@ -227,4 +216,37 @@ export default function withQuery(inputFragment, options = {}) {
       };
     }
   );
+}
+
+function getVariables(ownProps, queryOptions, options) {
+  const { variables: propVariables } = ownProps;
+  const { getIdFromParams, queryNameToUse, variables } = options;
+  let id;
+  if (getIdFromParams) {
+    id = parseInt(get(ownProps, "match.params.id"), 10);
+    if (!id) {
+      console.error(
+        "There needs to be an id passed here to ",
+        queryNameToUse,
+        "but none was found"
+      );
+      /* eslint-disable */
+      debugger;
+      /* eslint-enable */
+      // to prevent crash
+      id = -1;
+    }
+  }
+  let extraOptions = queryOptions || {};
+  if (typeof queryOptions === "function") {
+    extraOptions = queryOptions(ownProps) || {};
+  }
+
+  const { variables: extraOptionVariables } = extraOptions;
+  return {
+    ...(getIdFromParams && { id }),
+    ...variables,
+    ...propVariables,
+    ...(extraOptionVariables && extraOptionVariables)
+  };
 }

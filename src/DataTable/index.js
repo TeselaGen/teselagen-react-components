@@ -17,7 +17,10 @@ import {
   Icon,
   Popover,
   Intent,
-  Callout
+  Callout,
+  Hotkey,
+  Hotkeys,
+  HotkeysTarget
 } from "@blueprintjs/core";
 import classNames from "classnames";
 import scrollIntoView from "dom-scroll-into-view";
@@ -168,6 +171,36 @@ class DataTable extends React.Component {
     }
 
     this.updateFromProps(computePresets(oldProps), computePresets(this.props));
+  }
+
+  handleCopyHotkey = () => {
+    const { reduxFormSelectedEntityIdMap } = this.props;
+    const idMap = reduxFormSelectedEntityIdMap.input.value;
+    this.handleCopyRows(getRecordsFromIdMap(idMap));
+  };
+
+  handleCopyRows = selectedRecords => {
+    const { entities = [] } = computePresets(this.props);
+    const idToIndex = entities.reduce((acc, e, i) => {
+      acc[e.id || e.code] = i;
+      return acc;
+    }, {});
+    const sortedRecords = [...selectedRecords].sort((a, b) => {
+      return idToIndex[a.id || a.code] - idToIndex[b.id || b.code];
+    });
+    this.finalizeCopy(sortedRecords);
+  };
+
+  renderHotkeys() {
+    return (
+      <Hotkeys>
+        <Hotkey
+          combo="mod + c"
+          label="Copy rows"
+          onKeyDown={this.handleCopyHotkey}
+        />
+      </Hotkeys>
+    );
   }
 
   moveColumn = ({ oldIndex, newIndex }) => {
@@ -868,9 +901,21 @@ class DataTable extends React.Component {
         tableColumn.Cell = props => props.value;
       }
       const oldFunc = tableColumn.Cell;
+
       tableColumn.Cell = (...args) => {
-        //wrap the original tableColumn.Cell function in another div in order to add a title attribute
+        const [row] = args;
+        const record = row.original;
         const val = oldFunc(...args);
+        let text = val;
+        if (column.getClipboardData) {
+          text = column.getClipboardData(row.value, record);
+        } else if (column.render) {
+          text = column.render(row.value, record, row, this.props);
+        } else if (text !== undefined) {
+          text = String(text);
+        } else text = " ";
+
+        //wrap the original tableColumn.Cell function in another div in order to add a title attribute
         let title = typeof val !== "string" ? args[0].value : val;
         if (title) title = String(title);
         if (getCellHoverText) title = getCellHoverText(...args);
@@ -881,6 +926,8 @@ class DataTable extends React.Component {
                 ? {}
                 : { textOverflow: "ellipsis", overflow: "hidden" }
             }
+            className="tg-cell-wrapper"
+            data-copy-text={text}
             title={title || undefined}
           >
             {val}
@@ -893,17 +940,24 @@ class DataTable extends React.Component {
     return columnsToRender;
   };
 
-  setManyRowsToCopy = selectedRecords => {
+  finalizeCopy = selectedRecords => {
+    if (!selectedRecords.length) return;
     const { columns } = this.state;
     let allRowsText = [];
     selectedRecords.forEach((record, i) => {
       let textForRow = [];
       columns.forEach(col => {
-        let text = get(record, col.path);
+        const recordText = get(record, col.path);
+        let text = recordText;
+        if (col.type === "timestamp") {
+          text = text ? moment(text).format("lll") : "";
+        } else if (col.type === "boolean") {
+          text = text ? "True" : "False";
+        }
         if (col.getClipboardData) {
-          text = col.getClipboardData(text, record);
+          text = col.getClipboardData(recordText, record);
         } else if (col.render) {
-          text = col.render(text, record, i);
+          text = col.render(recordText, record, i);
         } else if (text !== undefined) {
           text = String(text);
         } else text = " ";
@@ -913,7 +967,8 @@ class DataTable extends React.Component {
       });
       allRowsText.push(textForRow.join("\t"));
     });
-    return allRowsText.join("\n");
+    copy(allRowsText.join("\n"));
+    window.toastr.success("Selected rows copied");
   };
 
   showContextMenu = (idMap, e) => {
@@ -924,20 +979,44 @@ class DataTable extends React.Component {
       history
     });
     if (!itemsToRender && !isCopyable) return null;
+    const copyMenuItems = [];
+    if (isCopyable && selectedRecords.length > 0) {
+      copyMenuItems.push(
+        <MenuItem
+          key="copySelectedRows"
+          onClick={() => this.handleCopyRows(selectedRecords)}
+          icon="clipboard"
+          text={"Copy Rows to Clipboard"}
+        />
+      );
+    }
+    e.persist();
+    if (isCopyable) {
+      copyMenuItems.push(
+        <MenuItem
+          key="copySelectedCells"
+          onClick={() => {
+            const cellWrapper =
+              e.target.querySelector(".tg-cell-wrapper") ||
+              e.target.closest(".tg-cell-wrapper");
+            const text =
+              cellWrapper && cellWrapper.getAttribute("data-copy-text");
+            if (text) {
+              copy(text);
+              window.toastr.success("Cell copied");
+            } else {
+              window.toastr.warning("No text to copy.");
+            }
+          }}
+          icon="clipboard"
+          text={"Copy Cell to Clipboard"}
+        />
+      );
+    }
     const menu = (
       <Menu>
         {itemsToRender}
-        {isCopyable &&
-          selectedRecords.length > 0 && (
-            <MenuItem
-              key="copySelectedRows"
-              onClick={() => {
-                copy(this.setManyRowsToCopy(selectedRecords));
-                window.toastr.success("Selected rows copied");
-              }}
-              text={"Copy Rows to Clipboard"}
-            />
-          )}
+        {copyMenuItems}
       </Menu>
     );
     ContextMenu.show(menu, { left: e.clientX, top: e.clientY });
@@ -1083,6 +1162,6 @@ class DataTable extends React.Component {
   };
 }
 
-export default dataTableEnhancer(DataTable);
+export default dataTableEnhancer(HotkeysTarget(DataTable));
 const ConnectedPagingTool = dataTableEnhancer(PagingTool);
 export { ConnectedPagingTool };

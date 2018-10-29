@@ -6,7 +6,7 @@ import withQuery from "../enhancers/withQuery";
 import DialogFooter from "../DialogFooter";
 import BlueprintError from "../BlueprintError";
 import generateQuery from "../utils/generateQuery";
-import { Button, Intent, Tooltip } from "@blueprintjs/core";
+import { Button, Intent, Tooltip, FormGroup, Classes } from "@blueprintjs/core";
 import { get, isEqual, map, noop, pick, debounce, keyBy } from "lodash";
 import pluralize from "pluralize";
 import { Query } from "react-apollo";
@@ -16,6 +16,7 @@ import { connect } from "react-redux";
 import { branch, withProps } from "recompose";
 import { change, clearFields, reduxForm } from "redux-form";
 import ReactSelect from "react-select";
+import moment from "moment";
 
 function preventBubble(e) {
   e.stopPropagation();
@@ -139,6 +140,22 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
             "reduxFormSelectedEntityIdMap",
             {}
           );
+        }
+      };
+
+      removeEntityFromSelection = record => {
+        const {
+          input: { onChange, value = [] }
+        } = this.props;
+        const newValue = value.filter(r => r.id !== record.id);
+        if (newValue.length) {
+          onChange(newValue);
+          this.setState({
+            tempValue: null
+          });
+          this.resetPostSelectSelection();
+        } else {
+          this.removeSelection();
         }
       };
 
@@ -314,6 +331,8 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
                       onSelect,
                       withSelectedTitle,
                       readableName,
+                      removeSelection: this.removeSelection,
+                      removeEntityFromSelection: this.removeEntityFromSelection,
                       postSelectFormName,
                       postSelectDTProps,
                       isMultiSelect,
@@ -412,6 +431,37 @@ const PostSelectTable = branch(
       }
     }
 
+    removeColumn = {
+      width: 50,
+      noEllipsis: true,
+      immovable: true,
+      type: "action",
+      render: (v, record) => {
+        return (
+          <Button
+            small
+            minimal
+            onClick={() => this.removeRecord(record)}
+            icon="trash"
+            intent="danger"
+          />
+        );
+      }
+    };
+
+    removeRecord = record => {
+      const {
+        isMultiSelect,
+        removeSelection,
+        removeEntityFromSelection
+      } = this.props;
+      if (isMultiSelect) {
+        removeEntityFromSelection(record);
+      } else {
+        removeSelection();
+      }
+    };
+
     render() {
       const {
         initialEntities,
@@ -422,6 +472,16 @@ const PostSelectTable = branch(
         postSelectFormName,
         postSelectDTProps
       } = this.props;
+      let schemaToUse = postSelectDTProps.schema || [];
+      if (Array.isArray(schemaToUse)) {
+        schemaToUse = [...schemaToUse, this.removeColumn];
+      } else {
+        schemaToUse = {
+          ...schemaToUse,
+          fields: [...schemaToUse.fields, this.removeColumn]
+        };
+      }
+
       return (
         <div className="postSelectDataTable" style={{ paddingTop: 10 }}>
           {withSelectedTitle && <h6>Selected {readableName}:</h6>}
@@ -430,6 +490,7 @@ const PostSelectTable = branch(
             doNotShowEmptyRows
             maxHeight={400}
             {...postSelectDTProps}
+            schema={schemaToUse}
             // destroyOnUnmount={false}
             // keepDirtyOnReinitialize
             // enableReinitialize={true}
@@ -495,8 +556,15 @@ const GenericSelectInner = compose(
     };
 
     render() {
+      const { label } = this.props;
       const ComponentToRender = this.innerComponent;
-      return <ComponentToRender {...this.props} />;
+
+      let comp = <ComponentToRender {...this.props} />;
+      if (label) {
+        return <FormGroup label={label}>{comp}</FormGroup>;
+      } else {
+        return comp;
+      }
     }
   }
 );
@@ -511,76 +579,89 @@ class InnerComp extends Component {
   makeSelection = () => {
     const { hideModal, handleSelection, selectedEntities } = this.props;
     handleSelection(selectedEntities);
-    hideModal();
+    hideModal && hideModal();
   };
   reactSelectHandleLoadMore = () => {
     const { setPageSize, currentParams, defaults } = this.props.tableParams;
     setPageSize((currentParams.pageSize || defaults.pageSize) + 25);
   };
   getReactSelectOptions = () => {
-    const { tableParams, input, idAs } = this.props;
+    const { tableParams, input, idAs, additionalOptions = [] } = this.props;
     const { entityCount, schema } = tableParams;
 
-    const entities = map({
-      ...keyBy(tableParams.entities, idAs || "id"),
-      //it is important that we spread these second so that things like clearableValue will work
-      ...keyBy(
-        Array.isArray(input.value) ? input.value : [input.value],
-        idAs || "id"
-      )
-    });
+    const entities = [
+      ...map({
+        ...keyBy(tableParams.entities, idAs || "id"),
+        //it is important that we spread these second so that things like clearableValue will work
+        ...(input.value &&
+          keyBy(
+            Array.isArray(input.value) ? input.value : [input.value],
+            idAs || "id"
+          ))
+      })
+    ];
     if (!entities) return [];
     const lastItem = [];
-    if (entityCount > entities.length) {
+    if (entityCount > (tableParams.entities || []).length) {
       lastItem.push({
         reactSelectHandleLoadMore: this.reactSelectHandleLoadMore,
         value: "__LOAD_MORE",
-        label: `Only showing ${
-          entities.length
-        } of ${entityCount}. Click to load more`
+        label: (
+          <span className={Classes.TEXT_MUTED} style={{ fontStyle: "italic" }}>
+            Showing {entities.length} of{" "}
+            {entityCount +
+              additionalOptions.length +
+              entities.length -
+              (tableParams.entities || []).length}{" "}
+            (Click to load more)
+          </span>
+        )
       });
     }
-    return [
-      ...entities.map(entity => {
-        return {
-          clearableValue: entity.clearableValue,
-          value: entity[idAs || "id"],
-          label: (
-            <span style={{ display: "flex", justifyContent: "space-between" }}>
-              {schema.fields.reduce((acc, field, i) => {
-                const label = field.displayName ? (
-                  <span
-                    className="tg-value-hide"
-                    style={{ fontSize: 10, color: "#aaa" }}
-                  >
-                    {field.displayName}:{" "}
-                  </span>
-                ) : null;
-                const _val = entity[field.path || field];
-                const val = field.render
-                  ? field.render(_val, entity, undefined, {
-                      ...this.props,
-                      ...this.props.additionalTableProps
-                    })
-                  : _val;
 
-                acc.push(
-                  <span
-                    className={i > 1 ? "tg-value-hide" : ""}
-                    key={i}
-                    style={i > 1 ? { fontSize: 10, color: "#aaa" } : {}}
-                  >
-                    {label} {val}
-                  </span>
-                );
-                return acc;
-              }, [])}
-            </span>
-          )
-        };
-      }),
-      ...lastItem
-    ];
+    const entityOptions = entities.map(entity => {
+      return {
+        clearableValue: entity.clearableValue,
+        value: entity[idAs || "id"],
+        label: (
+          <span style={{ display: "flex", justifyContent: "space-between" }}>
+            {schema.fields.reduce((acc, field, i) => {
+              const label = field.displayName ? (
+                <span
+                  className="tg-value-hide"
+                  style={{ fontSize: 10, color: "#aaa" }}
+                >
+                  {field.displayName}:{" "}
+                </span>
+              ) : null;
+              let val = get(entity, field.path || field);
+              if (field.render) {
+                val = field.render(val, entity, undefined, {
+                  ...this.props,
+                  ...this.props.additionalTableProps
+                });
+              } else if (field.type === "timestamp") {
+                val = val ? moment(val).format("lll") : "";
+              } else if (field.type === "boolean") {
+                val = val ? "True" : "False";
+              }
+
+              acc.push(
+                <span
+                  className={i > 1 ? "tg-value-hide" : ""}
+                  key={i}
+                  style={i > 1 ? { fontSize: 10, color: "#aaa" } : {}}
+                >
+                  {label} {val}
+                </span>
+              );
+              return acc;
+            }, [])}
+          </span>
+        )
+      };
+    });
+    return [...additionalOptions, ...entityOptions, ...lastItem];
   };
   handleReactSelectSearchDebounced = debounce(val => {
     this.props.tableParams.setSearchTerm(val);

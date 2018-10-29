@@ -9,6 +9,11 @@ import Toastr from "./examples/Toastr";
 import showConfirmationDialogDemo from "./examples/showConfirmationDialogDemo";
 import showConfirmationDialog from "../../src/showConfirmationDialog";
 import showLoadingMaskDemo from "./examples/showLoadingMaskDemo";
+import MultiSelectSideBySideDemo from "./examples/MultiSelectSideBySide";
+import MultiSelectSideBySide from "../../src/MultiSelectSideBySide";
+import ResizableDraggableDialogDemo from "./examples/ResizableDraggableDialog";
+import ResizableDraggableDialog from "../../src/ResizableDraggableDialog";
+
 import showLoadingMask from "../../src/showLoadingMask";
 
 import CustomIcons from "./examples/CustomIcons";
@@ -38,7 +43,7 @@ import TimelineEvent from "../../src/Timeline/TimelineEvent";
 import TimelineDemo from "./examples/TimelineDemo";
 
 import "./style.css";
-import React from "react";
+import React, {Component} from "react";
 import { render } from "react-dom";
 import {
   HashRouter as Router,
@@ -58,6 +63,7 @@ import {
   KeyCombo,
   Switch,
   Button,
+  HTMLSelect,
   Icon,
   Classes
 } from "@blueprintjs/core";
@@ -100,13 +106,9 @@ const demos = {
       Icon,
       Classes
     },
-    url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/DataTableDemo.js",
     childLinks: {
       SimpleTable: {
         demo: SimpleTable,
-        url:
-          "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/DataTableDemo/SimpleTableDemo.js"
       }
     }
   },
@@ -150,8 +152,6 @@ const demos = {
         description: "Override the default info icon."
       }
     ],
-    url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/InfoHelperDemo.js"
   },
   CollapsibleCard: {
     demo: CollapsibleCard,
@@ -187,8 +187,6 @@ const demos = {
         description: "Content of the card when open"
       }
     ],
-    url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/CollapsibleCardDemo.js"
   },
   "Hotkeys and HotkeysDialog": {
     demo: HotkeysDialog,
@@ -214,8 +212,6 @@ const demos = {
         type: "function"
       }
     ],
-    url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/HotkeysDialog.js"
   },
   MenuBar: {
     demo: MenuBar,
@@ -237,8 +233,6 @@ const demos = {
         type: "Array"
       }
     ],
-    url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/MenuBar.js"
   },
   Loading: {
     demo: Loading,
@@ -275,8 +269,6 @@ const demos = {
         description: "Sets a min-height of 200 and sets bounce to true"
       }
     ],
-    url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/LoadingDemo.js"
   },
   DownloadLink: {
     demo: DownloadLink,
@@ -297,8 +289,6 @@ const demos = {
         description: "A function that will return the contents to be downloaded"
       }
     ],
-    url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/DownloadLinkDemo.js"
   },
   FormComponents: {
     demo: FormComponents,
@@ -313,8 +303,6 @@ const demos = {
       Classes,
       Icon
     },
-    url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/FormComponentsDemo.js"
   },
   withDialog: {
     demo: WithDialog,
@@ -322,13 +310,9 @@ const demos = {
       renderToggle,
       Classes
     },
-    url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/WithDialog.js"
   },
   toastr: {
     demo: Toastr,
-    url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/Toastr.js"
   },
   showConfirmationDialog: {
     scope: {
@@ -336,8 +320,6 @@ const demos = {
       Intent
     },
     demo: showConfirmationDialogDemo,
-    url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/Toastr.js"
   },
   showLoadingMask: {
     scope: {
@@ -345,16 +327,29 @@ const demos = {
       Intent
     },
     demo: showLoadingMaskDemo,
-    url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/Toastr.js"
+  },
+  MultiSelectSideBySide: {
+    scope: {
+      MultiSelectSideBySide,
+      Component,
+      HTMLSelect,
+    },
+    demo: MultiSelectSideBySideDemo,
+  },
+  ResizableDraggableDialog: {
+    scope: {
+      ResizableDraggableDialog,
+      Component,
+      Classes
+      // HTMLSelect,
+    },
+    demo: ResizableDraggableDialogDemo,
   },
   customIcons: {
     scope: {
       customIcons
     },
     demo: CustomIcons,
-    url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/CustomIcons.js"
   },
   S3Uploader: {
     scope: {
@@ -368,8 +363,6 @@ const demos = {
       magicDownload
     },
     demo: S3Uploader,
-    url:
-      "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/examples/S3Uploader.js"
   },
   J5ReportRecordView: {
     demo: J5ReportRecordView,
@@ -399,8 +392,6 @@ const demos = {
   }
   // fonticons: {
   //   demo: FontIconsDemo,
-  //   url:
-  //     "https://github.com/TeselaGen/teselagen-react-components/blob/master/demo/src/FontIconsDemo.js"
   // }
 };
 
@@ -424,7 +415,7 @@ const demoPropsSchema = [
 ];
 
 function DemoComponentWrapper(
-  { demo: Demo, scope, url, props = [] },
+  { demo: Demo, scope, props = [] },
   demoTitle
 ) {
   return () => {
@@ -461,8 +452,8 @@ function DemoComponentWrapper(
           }}
         >
           <h4>{demoTitle}</h4>
-          <a href={url} target="_blank">
-            Demo Source
+          <a href={"https://github.com/TeselaGen/teselagen-react-components/tree/master/src"} target="_blank">
+            Component Source
           </a>
         </div>
         {component}

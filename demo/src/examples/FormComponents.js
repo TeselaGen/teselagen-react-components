@@ -237,17 +237,18 @@ class FormComponentsDemo extends React.Component {
           <CheckboxField
             onFieldSubmit={onFieldSubmit}
             defaultValue
-            name={"checkboxField"}
+            name={"CheckboxField"}
             inlineLabel={this.state.inlineLabels}
-            label="Checkbox"
+            label="CheckboxField"
           />
           <CheckboxField
             onFieldSubmit={onFieldSubmit}
             defaultValue
-            name={"checkboxField2"}
+            name={"CheckboxField 2"}
             inlineLabel={this.state.inlineLabels}
             label={
               <span>
+             CheckboxField  
                 Label and Icon <Icon icon="tick" />
               </span>
             }
@@ -255,7 +256,7 @@ class FormComponentsDemo extends React.Component {
           <SwitchField
             onFieldSubmit={onFieldSubmit}
             defaultValue
-            name={"switchField"}
+            name={"SwitchField"}
             inlineLabel={this.state.inlineLabels}
             label="I'm a SwitchField"
           />
@@ -263,20 +264,20 @@ class FormComponentsDemo extends React.Component {
             name={"textAreaField"}
             inlineLabel={this.state.inlineLabels}
             onFieldSubmit={onFieldSubmit}
-            label="Textarea"
+            label="TextareaField"
             placeholder="Enter notes..."
           />
           <EditableTextField
             name={"editableTextField"}
             inlineLabel={this.state.inlineLabels}
             onFieldSubmit={onFieldSubmit}
-            label="Editable Text"
+            label="EditableTextField"
             placeholder="Enter new text..."
           />
           <ReactSelectField
             name="reactSelectField"
             inlineLabel={this.state.inlineLabels}
-            label="Collaborators"
+            label="ReactSelectField Collaborators"
             onFieldSubmit={onFieldSubmit}
             options={[
               {
@@ -292,7 +293,7 @@ class FormComponentsDemo extends React.Component {
           <ReactSelectField
             name="reactSelectFieldMulti"
             inlineLabel={this.state.inlineLabels}
-            label="Collaborators Multi"
+            label="ReactSelectField Collaborators Multi"
             onFieldSubmit={onFieldSubmit}
             multi
             options={[
@@ -310,7 +311,7 @@ class FormComponentsDemo extends React.Component {
             async
             name="reactSelectFieldMultiAsync"
             inlineLabel={this.state.inlineLabels}
-            label="React Select AsyncCollaborators"
+            label="ReactSelectField AsyncCollaborators"
             multi
             onFieldSubmit={onFieldSubmit}
             loadOptions={getOptions}
@@ -318,7 +319,7 @@ class FormComponentsDemo extends React.Component {
           <ReactColorField
             name="reactColorField"
             inlineLabel={this.state.inlineLabels}
-            label="React Color Field"
+            label="ReactColorField"
             onFieldSubmit={onFieldSubmit}
           />
           <Button

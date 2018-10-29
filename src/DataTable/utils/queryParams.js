@@ -97,7 +97,10 @@ function orderEntitiesLocal(orderArray, entities, schema) {
           return getValueToFilterOn(o);
         });
       } else {
-        orderFuncs.push(path);
+        orderFuncs.push(r => {
+          const val = get(r, path);
+          return val.toLowerCase ? val.toLowerCase() : val;
+        });
       }
     });
     entities = orderBy(entities, orderFuncs, ascOrDescArray);
@@ -118,6 +121,8 @@ function getAndAndOrFilters(allFilters) {
       // handle comma separated filters by adding more orWheres
       const allFilterValues = filter.filterValue.split(",");
       allFilterValues.forEach((filterValue, i) => {
+        filterValue = filterValue.trim();
+        if (!filterValue) return;
         const newFilter = {
           ...filter,
           filterValue
@@ -576,6 +581,7 @@ export function getQueryParams({
   entities,
   isLocalCall,
   additionalFilter,
+  additionalOrFilter,
   doNotCoercePageSize,
   noOrderError
 }) {
@@ -689,15 +695,17 @@ export function getQueryParams({
       allFilters
     );
     const additionalFilterToUse = additionalFilter(qb, currentParams);
+    const additionalOrFilterToUse = additionalOrFilter(qb, currentParams);
     try {
-      qb.whereAll(getQueries(andFilters, qb, ccFields))
-        .andWhereAll(additionalFilterToUse)
-        .andWhereAny(getQueries(orFilters, qb, ccFields));
-      if (otherOrFilters.length) {
-        otherOrFilters.forEach(orFilters => {
-          qb.orWhereAny(getQueries(orFilters, qb, ccFields));
-        });
-      }
+      const allOrFilters = [getQueries(orFilters, qb, ccFields)];
+      otherOrFilters.forEach(orFilters => {
+        allOrFilters.push(getQueries(orFilters, qb, ccFields));
+      });
+      allOrFilters.push(additionalOrFilterToUse);
+      qb.whereAll(
+        getQueries(andFilters, qb, ccFields),
+        additionalFilterToUse
+      ).andWhereAny(...allOrFilters);
     } catch (e) {
       if (urlConnected) {
         errorParsingUrlString = e;

@@ -1,0 +1,18 @@
+.mss-wrapper {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  position: relative;
+  /* background: #ffffff; */
+  border: 1px solid #dddddd;
+  color: #666666;
+  overflow: hidden;
+}
+.bp3-dark .mss-wrapper {
+  color: white;
+}
+/* */

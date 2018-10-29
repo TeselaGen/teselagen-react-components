@@ -57,9 +57,14 @@ class DataTableDemo extends React.Component {
       urlConnected: true,
       onlyOneFilter: false,
       inDialog: false,
-      withSelectedEntities: false
+      withSelectedEntities: false,
+      ...JSON.parse(localStorage.tableWrapperState || "{}")
     };
     this.closeDialog = this.closeDialog.bind(this);
+  }
+
+  componentDidUpdate() {
+    localStorage.tableWrapperState = JSON.stringify(this.state);
   }
 
   UNSAFE_componentWillMount() {
@@ -90,10 +95,7 @@ class DataTableDemo extends React.Component {
 
     return (
       <ApolloProvider client={client} store={store}>
-        <div
-          className={this.state.darkMode ? "bp3-dark" : ""}
-          style={{ background: this.state.darkMode ? "#293742" : undefined }}
-        >
+        <div>
           <Router>
             <div>
               <h3>Demo specific options:</h3>
@@ -107,7 +109,6 @@ class DataTableDemo extends React.Component {
                   " isInfinite to see something actually show up with it"
               )}
               {renderToggle(this, "inDialog", "Render the table in a dialog")}
-              {renderToggle(this, "darkMode", "Render the table in dark theme")}
               <h3>withTableParams options:</h3>
               <br />
               {renderToggle(
@@ -221,11 +222,16 @@ class DataTableInstance extends React.Component {
       numOfEntities: 60,
       selectedIds: undefined,
       alwaysRerender: false,
-      entities: generateFakeRows(defaultNumOfEntities)
+      entities: generateFakeRows(defaultNumOfEntities),
+      ...JSON.parse(localStorage.tableState || "{}")
     };
     this.changeNumEntities = this.changeNumEntities.bind(this);
     this.changeSelectedRecords = this.changeSelectedRecords.bind(this);
     this.onRefresh = this.onRefresh.bind(this);
+  }
+
+  componentDidUpdate() {
+    localStorage.tableState = JSON.stringify(this.state);
   }
 
   changeNumEntities(e) {

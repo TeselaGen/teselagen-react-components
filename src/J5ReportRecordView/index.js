@@ -180,7 +180,7 @@ class J5ReportRecordView extends Component {
     }
 
     // JSON.parse(localStorage.getItem('TEMPORARY_j5Run')) || {}
-    const { name, assemblyType, dateRan } = data.j5Report;
+    const { name, assemblyType, dateRan, design } = data.j5Report;
 
     return (
       <div className="j5-report-header tg-card">
@@ -193,7 +193,10 @@ class J5ReportRecordView extends Component {
     <InputField name="assemblyType" label="Assembly Type" />
     {Footer}
   </form>*/}
-        <FieldWithLabel label="Design Name" field={name} />
+        <FieldWithLabel
+          label="Design Name"
+          field={design && design.name ? design.name : name}
+        />
         <FieldWithLabel
           label="Assembly Method"
           field={this.getAssemblyMethod()}
@@ -248,8 +251,14 @@ class J5ReportRecordView extends Component {
       return {
         path: `j5ConstructAssemblyPieces[${i}].assemblyPiece.j5AssemblyPieceParts`,
         displayName: `Piece-${i + 1} Parts`,
-        render: v =>
-          v && v.map(p => get(p, "j5InputPart.sequencePart.name")).join(", ")
+        render: v => {
+          if (typeof v === "string") {
+            return v;
+          }
+          return (
+            v && v.map(p => get(p, "j5InputPart.sequencePart.name")).join(", ")
+          );
+        }
       };
     });
     const extraColumns = flatten(

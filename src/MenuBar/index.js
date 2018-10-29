@@ -33,13 +33,13 @@ export default class MenuBar extends React.Component {
     const { className, style, menu, enhancers, extraContent } = this.props;
     const { isOpen, openIndex } = this.state;
     return (
-      <div className={"menu-bar " + className} style={style}>
+      <div className={"tg-menu-bar " + className} style={style}>
         {menu.map((topLevelItem, i) => {
           const button = (
             <Button
               key={i}
               minimal
-              className="menu-bar-item"
+              className="tg-menu-bar-item"
               onClick={topLevelItem.onClick}
               onMouseOver={
                 topLevelItem.submenu ? this.handleMouseOver(i) : noop
@@ -54,11 +54,15 @@ export default class MenuBar extends React.Component {
             <Popover
               key={i}
               minimal
-              portalClassName="menu-bar-popover"
+              portalClassName="tg-menu-bar-popover"
               position={Position.BOTTOM_LEFT}
               isOpen={isOpen && i === openIndex}
               onInteraction={this.handleInteraction(i)}
-              content={<Menu>{createDynamicMenu(topLevelItem.submenu, enhancers)}</Menu>}
+              content={
+                <Menu>
+                  {createDynamicMenu(topLevelItem.submenu, enhancers)}
+                </Menu>
+              }
               transitionDuration={0}
               style={{
                 transition: "none"

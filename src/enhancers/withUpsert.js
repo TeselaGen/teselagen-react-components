@@ -113,7 +113,7 @@ export default function withUpsert(nameOrFragment, options = {}) {
       return console.error(
         "You need to pass the apollo client to withUpsert if using as a function"
       );
-    return function upsert(valueOrValues, { update } = {}) {
+    return function upsert(valueOrValues, options) {
       const values = Array.isArray(valueOrValues)
         ? valueOrValues
         : [valueOrValues];
@@ -131,7 +131,8 @@ export default function withUpsert(nameOrFragment, options = {}) {
           variables: {
             input: values
           },
-          update
+          ...rest,
+          ...options
         })
         .then(function(res) {
           const resultInfo =
