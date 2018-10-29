@@ -60,6 +60,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       additionalOrFilter = {},
       noOrderError,
       withDisplayOptions,
+      cellRenderer,
       model
     } = mergedOpts;
 
@@ -136,6 +137,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       additionalOrFilter,
       noOrderError,
       withDisplayOptions,
+      cellRenderer,
       model,
       schema,
       ...getQueryParams({
