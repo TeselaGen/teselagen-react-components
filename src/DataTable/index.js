@@ -26,9 +26,11 @@ import classNames from "classnames";
 import scrollIntoView from "dom-scroll-into-view";
 import { SortableElement } from "react-sortable-hoc";
 import { BooleanValue } from "react-values";
+import ReactTable from "react-table";
+import { withProps, branch } from "recompose";
+import InfoHelper from "../InfoHelper";
 import { getSelectedRowsFromEntities } from "./utils/selection";
 import rowClick, { finalizeSelection } from "./utils/rowClick";
-import ReactTable from "react-table";
 import PagingTool from "./PagingTool";
 import FilterAndSortMenu from "./FilterAndSortMenu";
 import getIdOrCodeOrIndex from "./utils/getIdOrCodeOrIndex";
@@ -41,9 +43,7 @@ import DisplayOptions from "./DisplayOptions";
 // import withDelete from "../enhancers/withDelete";
 // import fieldOptionFragment from "./utils/fieldOptionFragment";
 import DisabledLoadingComponent from "./DisabledLoadingComponent";
-import InfoHelper from "../InfoHelper";
 import SortableColumns from "./SortableColumns";
-import { withProps, branch } from "recompose";
 import computePresets from "./utils/computePresets";
 import dataTableEnhancer from "./dataTableEnhancer";
 import defaultProps from "./defaultProps";
@@ -402,7 +402,6 @@ class DataTable extends React.Component {
       return acc;
     }, {});
     const showHeader = (withTitle || withSearch || children) && !noHeader;
-    console.log("children:", children);
     const toggleFullscreenButton = (
       <Button
         icon="fullscreen"
@@ -448,11 +447,11 @@ class DataTable extends React.Component {
         )}
       >
         {showHeader && (
-          <div className={"data-table-header"}>
-            <div className={"data-table-title-and-buttons"}>
+          <div className="data-table-header">
+            <div className="data-table-title-and-buttons">
               {tableName &&
                 withTitle && (
-                  <span className={"data-table-title"}>{tableName}</span>
+                  <span className="data-table-title">{tableName}</span>
                 )}
               {children}
               {topLeftItems}
@@ -468,7 +467,7 @@ class DataTable extends React.Component {
                     return (
                       <div
                         key={displayName || startCase(path)}
-                        className={"tg-filter-on-non-displayed-field"}
+                        className="tg-filter-on-non-displayed-field"
                       >
                         <Icon icon="filter" />
                         <span>
@@ -482,15 +481,15 @@ class DataTable extends React.Component {
                 )
               : ""}
             {withSearch && (
-              <div className={"data-table-search-and-clear-filter-container"}>
+              <div className="data-table-search-and-clear-filter-container">
                 {hasFilters ? (
                   <Button
                     disabled={disabled}
-                    className={"data-table-clear-filters"}
+                    className="data-table-clear-filters"
                     onClick={() => {
                       clearFilters(additionalFilterKeys);
                     }}
-                    text={"Clear filters"}
+                    text="Clear filters"
                   />
                 ) : (
                   ""
@@ -545,7 +544,7 @@ class DataTable extends React.Component {
         />
         {!noFooter && (
           <div
-            className={"data-table-footer"}
+            className="data-table-footer"
             style={{
               justifyContent:
                 !showNumSelected && !showCount ? "flex-end" : "space-between"
@@ -986,7 +985,7 @@ class DataTable extends React.Component {
           key="copySelectedRows"
           onClick={() => this.handleCopyRows(selectedRecords)}
           icon="clipboard"
-          text={"Copy Rows to Clipboard"}
+          text="Copy Rows to Clipboard"
         />
       );
     }
@@ -1009,7 +1008,7 @@ class DataTable extends React.Component {
             }
           }}
           icon="clipboard"
-          text={"Copy Cell to Clipboard"}
+          text="Copy Cell to Clipboard"
         />
       );
     }
@@ -1078,7 +1077,7 @@ class DataTable extends React.Component {
     const sortUp = ordering && !sortDown;
     const sortComponent =
       withSort && !disableSorting && !isActionColumn ? (
-        <div className={"tg-sort-arrow-container"}>
+        <div className="tg-sort-arrow-container">
           <Icon
             title="Sort Z-A (Hold shift to sort multiple columns)"
             icon="chevron-up"
@@ -1092,7 +1091,7 @@ class DataTable extends React.Component {
             }}
           />
           <Icon
-            title={"Sort A-Z (Hold shift to sort multiple columns)"}
+            title="Sort A-Z (Hold shift to sort multiple columns)"
             icon="chevron-down"
             color={sortDown ? "#106ba3" : undefined}
             iconSize={12}
@@ -1148,10 +1147,10 @@ class DataTable extends React.Component {
       ) : null;
 
     return (
-      <div className={"tg-react-table-column-header"}>
+      <div className="tg-react-table-column-header">
         {(displayName || startCase(path)) &&
           !noTitle && (
-            <span title={columnTitle} className={"tg-react-table-name"}>
+            <span title={columnTitle} className="tg-react-table-name">
               {renderTitleInner ? renderTitleInner : columnTitle}
             </span>
           )}

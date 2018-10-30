@@ -132,7 +132,7 @@
   },
   "lint-staged": {
     "src/**/*.js": [
-      "eslint --fix",
+      "eslint --rule 'import/order: 1' --rule 'react/jsx-curly-brace-presence: 1' --fix --max-warnings=0",
       "prettier --write",
       "yarn test:staged",
       "git add"
