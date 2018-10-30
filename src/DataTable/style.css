@@ -129,10 +129,11 @@
 
 .data-table-search-and-clear-filter-container {
   display: flex;
+  align-items: center;
 }
 
 .data-table-clear-filters {
-  margin-right: 20px;
+  margin-right: 10px;
 }
 
 .tg-react-table-column-header {

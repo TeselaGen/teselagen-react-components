@@ -20,7 +20,8 @@ import {
   Callout,
   Hotkey,
   Hotkeys,
-  HotkeysTarget
+  HotkeysTarget,
+  Tooltip
 } from "@blueprintjs/core";
 import classNames from "classnames";
 import scrollIntoView from "dom-scroll-into-view";
@@ -483,14 +484,18 @@ class DataTable extends React.Component {
             {withSearch && (
               <div className="data-table-search-and-clear-filter-container">
                 {hasFilters ? (
-                  <Button
-                    disabled={disabled}
-                    className="data-table-clear-filters"
-                    onClick={() => {
-                      clearFilters(additionalFilterKeys);
-                    }}
-                    text="Clear filters"
-                  />
+                  <Tooltip content="Clear Filters">
+                    <Button
+                      minimal
+                      intent="danger"
+                      icon="filter-remove"
+                      disabled={disabled}
+                      className="data-table-clear-filters"
+                      onClick={() => {
+                        clearFilters(additionalFilterKeys);
+                      }}
+                    />
+                  </Tooltip>
                 ) : (
                   ""
                 )}
