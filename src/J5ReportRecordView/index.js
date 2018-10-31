@@ -4,11 +4,11 @@ import { reduxForm } from "redux-form";
 import { Button, Dialog, Classes } from "@blueprintjs/core";
 import { each, get, startCase, times, zip, flatten, noop } from "lodash";
 import moment from "moment";
-import schemas from "./schemas";
-import Loading from "../Loading";
-import { getLinkDialogProps } from "./utils";
 import papaparse from "papaparse";
+import Loading from "../Loading";
 import magicDownload from "../DownloadLink/magicDownload";
+import schemas from "./schemas";
+import { getLinkDialogProps } from "./utils";
 import exportOligosFields from "./exportOligosFields";
 import J5TableCard from "./J5TableCard";
 import processDataForTables from "./processDataForTables";
@@ -317,6 +317,7 @@ class J5ReportRecordView extends Component {
       oligosTitleElements = [],
       linkDialogWidth = 500,
       fragmentMap = {},
+      linkFragmentMap,
       noPrebuiltConstructs = false
     } = this.props;
     const { linkDialogName } = this.state;
@@ -327,7 +328,10 @@ class J5ReportRecordView extends Component {
       return <div>No report found!</div>;
     }
     const j5Report = data.j5Report;
-    const linkDialogProps = getLinkDialogProps(data.j5Report, fragmentMap);
+    const linkDialogProps = getLinkDialogProps(
+      data.j5Report,
+      linkFragmentMap || fragmentMap
+    );
     const currentLink = linkDialogProps[linkDialogName];
     const linkKeys = Object.keys(linkDialogProps);
     let moveToNextTable;
@@ -353,7 +357,7 @@ class J5ReportRecordView extends Component {
     }
 
     return (
-      <div className={"j5-report-container"}>
+      <div className="j5-report-container">
         <div style={{ display: "flex-columns" }}>
           {this.renderHeader()}
 
