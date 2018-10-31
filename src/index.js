@@ -15,6 +15,7 @@ export { default as DownloadLink } from "./DownloadLink";
 export { default as MultiSelectSideBySide } from "./MultiSelectSideBySide";
 export { default as createGenericSelect } from "./createGenericSelect";
 export { default as magicDownload } from "./DownloadLink/magicDownload";
+export { default as IntentText } from "./IntentText";
 
 export {
   default as routeDoubleClick
