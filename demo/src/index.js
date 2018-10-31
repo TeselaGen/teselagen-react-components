@@ -41,9 +41,11 @@ import FillWindow from "../../src/FillWindow";
 import Timeline from "../../src/Timeline";
 import TimelineEvent from "../../src/Timeline/TimelineEvent";
 import TimelineDemo from "./examples/TimelineDemo";
+import IntentTextDemo from "./examples/IntentText";
+import IntentText from "../../src/IntentText";
 
 import "./style.css";
-import React, {Component} from "react";
+import React, { Component } from "react";
 import { render } from "react-dom";
 import {
   HashRouter as Router,
@@ -108,7 +110,7 @@ const demos = {
     },
     childLinks: {
       SimpleTable: {
-        demo: SimpleTable,
+        demo: SimpleTable
       }
     }
   },
@@ -151,7 +153,7 @@ const demos = {
         type: "string",
         description: "Override the default info icon."
       }
-    ],
+    ]
   },
   CollapsibleCard: {
     demo: CollapsibleCard,
@@ -186,7 +188,7 @@ const demos = {
         type: "React Element",
         description: "Content of the card when open"
       }
-    ],
+    ]
   },
   "Hotkeys and HotkeysDialog": {
     demo: HotkeysDialog,
@@ -211,7 +213,7 @@ const demos = {
           "Callback to run when the user attempts to close the dialog",
         type: "function"
       }
-    ],
+    ]
   },
   MenuBar: {
     demo: MenuBar,
@@ -232,7 +234,7 @@ const demos = {
           "Menu structure. Array of objects with `text` and `submenu` properties.",
         type: "Array"
       }
-    ],
+    ]
   },
   Loading: {
     demo: Loading,
@@ -268,7 +270,7 @@ const demos = {
         type: "boolean",
         description: "Sets a min-height of 200 and sets bounce to true"
       }
-    ],
+    ]
   },
   DownloadLink: {
     demo: DownloadLink,
@@ -288,7 +290,7 @@ const demos = {
         type: "function",
         description: "A function that will return the contents to be downloaded"
       }
-    ],
+    ]
   },
   FormComponents: {
     demo: FormComponents,
@@ -302,39 +304,39 @@ const demos = {
       Uploader,
       Classes,
       Icon
-    },
+    }
   },
   withDialog: {
     demo: WithDialog,
     scope: {
       renderToggle,
       Classes
-    },
+    }
   },
   toastr: {
-    demo: Toastr,
+    demo: Toastr
   },
   showConfirmationDialog: {
     scope: {
       showConfirmationDialog,
       Intent
     },
-    demo: showConfirmationDialogDemo,
+    demo: showConfirmationDialogDemo
   },
   showLoadingMask: {
     scope: {
       showLoadingMask,
       Intent
     },
-    demo: showLoadingMaskDemo,
+    demo: showLoadingMaskDemo
   },
   MultiSelectSideBySide: {
     scope: {
       MultiSelectSideBySide,
       Component,
-      HTMLSelect,
+      HTMLSelect
     },
-    demo: MultiSelectSideBySideDemo,
+    demo: MultiSelectSideBySideDemo
   },
   ResizableDraggableDialog: {
     scope: {
@@ -343,13 +345,13 @@ const demos = {
       Classes
       // HTMLSelect,
     },
-    demo: ResizableDraggableDialogDemo,
+    demo: ResizableDraggableDialogDemo
   },
   customIcons: {
     scope: {
       customIcons
     },
-    demo: CustomIcons,
+    demo: CustomIcons
   },
   S3Uploader: {
     scope: {
@@ -362,7 +364,7 @@ const demos = {
       S3Download,
       magicDownload
     },
-    demo: S3Uploader,
+    demo: S3Uploader
   },
   J5ReportRecordView: {
     demo: J5ReportRecordView,
@@ -389,6 +391,12 @@ const demos = {
       Timeline,
       TimelineEvent
     }
+  },
+  IntentText: {
+    demo: IntentTextDemo,
+    scop: {
+      IntentText
+    }
   }
   // fonticons: {
   //   demo: FontIconsDemo,
@@ -414,10 +422,7 @@ const demoPropsSchema = [
   }
 ];
 
-function DemoComponentWrapper(
-  { demo: Demo, scope, props = [] },
-  demoTitle
-) {
+function DemoComponentWrapper({ demo: Demo, scope, props = [] }, demoTitle) {
   return () => {
     const component = (
       <div>
@@ -452,7 +457,12 @@ function DemoComponentWrapper(
           }}
         >
           <h4>{demoTitle}</h4>
-          <a href={"https://github.com/TeselaGen/teselagen-react-components/tree/master/src"} target="_blank">
+          <a
+            href={
+              "https://github.com/TeselaGen/teselagen-react-components/tree/master/src"
+            }
+            target="_blank"
+          >
             Component Source
           </a>
         </div>
