@@ -736,8 +736,16 @@ function getQueries(filters, qb, ccFields) {
       return acc;
     }
     const { selectedFilter, filterValue, filterOn } = filter;
-    const subFilter = getSubFilter(qb, selectedFilter, filterValue);
     const fieldSchema = ccFields[filterOn];
+    let filterValueToUse = filterValue;
+    if (fieldSchema && fieldSchema.normalizeFilter) {
+      filterValueToUse = fieldSchema.normalizeFilter(
+        filterValue,
+        selectedFilter,
+        filterOn
+      );
+    }
+    const subFilter = getSubFilter(qb, selectedFilter, filterValueToUse);
     if (fieldSchema) {
       const { path, reference } = fieldSchema;
       if (reference) {
