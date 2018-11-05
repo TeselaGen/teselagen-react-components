@@ -1,5 +1,4 @@
 import classNames from "classnames";
-import sortify from "./sortify"; //tnr TODO: export this from json.sortify when https://github.com/ThomasR/JSON.sortify/issues/11 is resolved
 import { SketchPicker } from "react-color";
 import { isNumber, noop } from "lodash";
 import mathExpressionEvaluator from "math-expression-evaluator";
@@ -7,8 +6,6 @@ import deepEqual from "deep-equal";
 import React from "react";
 import { Field } from "redux-form";
 import Select from "react-select";
-import Uploader from "./Uploader";
-import getMomentFormatter from "../utils/getMomentFormatter";
 
 import "./style.css";
 import {
@@ -26,6 +23,9 @@ import {
 } from "@blueprintjs/core";
 
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
+import getMomentFormatter from "../utils/getMomentFormatter";
+import Uploader from "./Uploader";
+import sortify from "./sortify"; //tnr TODO: export this from json.sortify when https://github.com/ThomasR/JSON.sortify/issues/11 is resolved
 
 function getIntent({ showErrorIfUntouched, meta: { touched, error } }) {
   return (touched || showErrorIfUntouched) && error ? Intent.DANGER : undefined;
@@ -116,6 +116,7 @@ class AbstractInput extends React.Component {
       className,
       showErrorIfUntouched,
       meta,
+      containerStyle,
       noOuterLabel,
       noFillField
     } = this.props;
@@ -156,6 +157,7 @@ class AbstractInput extends React.Component {
         label={!noOuterLabel && label}
         inline={inlineLabel}
         labelInfo={secondaryLabel}
+        style={containerStyle}
       >
         {componentToWrap}
       </FormGroup>
