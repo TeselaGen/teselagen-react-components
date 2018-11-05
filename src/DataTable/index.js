@@ -1166,6 +1166,11 @@ class DataTable extends React.Component {
   };
 }
 
+// const CompToExport =  dataTableEnhancer(HotkeysTarget(DataTable));
+// // CompToExport.selectRecords = (form, value) => {
+// //   return change(form, "reduxFormSelectedEntityIdMap", value)
+// // }
+// export default CompToExport
 export default dataTableEnhancer(HotkeysTarget(DataTable));
 const ConnectedPagingTool = dataTableEnhancer(PagingTool);
 export { ConnectedPagingTool };

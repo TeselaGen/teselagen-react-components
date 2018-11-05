@@ -1,6 +1,14 @@
 //@flow
 import { change, formValueSelector } from "redux-form";
 import { connect } from "react-redux";
+import compose from "lodash/fp/compose";
+import { isFunction, keyBy } from "lodash";
+import { withRouter } from "react-router-dom";
+import { branch } from "recompose";
+
+import pureNoFunc from "../../utils/pureNoFunc";
+import convertSchema from "./convertSchema";
+import { getRecordsFromReduxForm } from "./withSelectedEntities";
 import {
   makeDataTableHandlers,
   getQueryParams,
@@ -8,14 +16,6 @@ import {
   getMergedOpts,
   getCurrentParamsFromUrl
 } from "./queryParams";
-import compose from "lodash/fp/compose";
-import { isFunction } from "lodash";
-import { withRouter } from "react-router-dom";
-import { branch } from "recompose";
-
-import convertSchema from "./convertSchema";
-import { getRecordsFromReduxForm } from "./withSelectedEntities";
-import pureNoFunc from "../../utils/pureNoFunc";
 
 /**
  *  Note all these options can be passed at Design Time or at Runtime (like reduxForm())
@@ -190,6 +190,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         dispatch(change(formName, "reduxFormSearchInput", ""));
       });
     }
+
     let setNewParams;
     if (urlConnected) {
       setNewParams = function(newParams) {
@@ -201,12 +202,15 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         dispatch(change(formName, "reduxFormQueryParams", newParams));
       };
     }
-    return makeDataTableHandlers({
-      setNewParams,
-      resetSearch,
-      defaults,
-      onlyOneFilter
-    });
+    return {
+      bindThese: makeDataTableHandlers({
+        setNewParams,
+        resetSearch,
+        defaults,
+        onlyOneFilter
+      }),
+      dispatch
+    };
   };
 
   function mergeProps(stateProps, dispatchProps, ownProps) {
@@ -216,25 +220,49 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
     const { currentParams, formName } = stateProps;
     let boundDispatchProps = {};
     //bind currentParams to actions
-    Object.keys(dispatchProps).forEach(function(key) {
-      const action = dispatchProps[key];
+    Object.keys(dispatchProps.bindThese).forEach(function(key) {
+      const action = dispatchProps.bindThese[key];
       boundDispatchProps[key] = function(...args) {
         action(...args, currentParams);
       };
     });
     const { variables, selectedEntities, ...restStateProps } = stateProps;
+
+    function selectRecords(ids, keepOldEntities) {
+      setTimeout(function() {
+        const { entities } = tableParams;
+        const entitiesById = keyBy(entities, "id");
+        const newIdMap = {
+          ...(keepOldEntities && selectedEntities)
+        };
+        ids.forEach(id => {
+          const entity = entitiesById[id];
+          newIdMap[id] = {
+            entity
+          };
+        });
+        dispatchProps.dispatch(
+          change(formName, "reduxFormSelectedEntityIdMap", newIdMap)
+        );
+      });
+    }
+
+    const tableParams = {
+      ...ownProps.tableParams,
+      ...restStateProps,
+      ...boundDispatchProps,
+      selectRecords,
+      form: formName, //this will override the default redux form name
+      isTableParamsConnected: true //let the table know not to do local sorting/filtering etc.
+    };
+
     const allMergedProps = {
       ...ownProps,
       variables: stateProps.variables,
       selectedEntities: stateProps.selectedEntities,
-      tableParams: {
-        ...ownProps.tableParams,
-        ...restStateProps,
-        ...boundDispatchProps,
-        form: formName, //this will override the default redux form name
-        isTableParamsConnected: true //let the table know not to do local sorting/filtering etc.
-      }
+      tableParams
     };
+
     return allMergedProps;
   }
 
