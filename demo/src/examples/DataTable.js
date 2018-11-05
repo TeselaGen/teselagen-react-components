@@ -367,8 +367,9 @@ class DataTableInstance extends React.Component {
         <Button onClick={() => {
           tableParams.selectRecords([1,2,3])
         }}>
-          Select ids 1, 2, 3
+          Select ids 1, 2, 3 (uses tableParams.selectRecords(id) method)
         </Button>
+        <br></br>
         {selectedEntities && (
           <div>
             The following records are selected (pass withSelectedEntities: true
