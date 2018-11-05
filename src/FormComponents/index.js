@@ -44,6 +44,7 @@ function removeUnwantedProps(props) {
   delete cleanedProps.inlineLabel;
   delete cleanedProps.showErrorIfUntouched;
   delete cleanedProps.onChange;
+  delete cleanedProps.containerStyle;
   delete cleanedProps.onFieldSubmit;
   delete cleanedProps.onBlur;
   delete cleanedProps.intent;
