@@ -63,3 +63,13 @@ export * from "./utils/menuUtils";
 export * from "./utils/commandUtils";
 export { default as generateQuery } from "./utils/generateQuery";
 export { default as Tree } from "./Tree";
+
+export {
+  default as modelNameToLink,
+  setModelLinkMap
+} from "./utils/modelNameToLink";
+export {
+  default as modelNameToReadableName,
+  setModelUppercaseMap,
+  setModelLowercaseMap
+} from "./utils/modelNameToReadableName";

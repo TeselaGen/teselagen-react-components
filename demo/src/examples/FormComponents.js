@@ -94,6 +94,7 @@ class FormComponentsDemo extends React.Component {
             defaultValue={"Default Value Here!"}
             placeholder="Enter input..."
             onFieldSubmit={onFieldSubmit}
+            containerStyle={{background: "black", height: 200}}
           />
           <InputField
             name={"inputFieldWithTooltipError"}
