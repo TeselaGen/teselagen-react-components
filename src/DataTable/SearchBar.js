@@ -11,6 +11,7 @@ const SearchBar = ({
 }) => {
   return (
     <InputGroup
+      autoFocus
       disabled={disabled}
       loading={loading}
       type="search"
