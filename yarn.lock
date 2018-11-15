@@ -10994,10 +10994,10 @@ text-table@^0.2.0, text-table@~0.2.0:
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
 
-tg-client-query-builder@^2.6.0:
-  version "2.12.1"
-  resolved "https://registry.yarnpkg.com/tg-client-query-builder/-/tg-client-query-builder-2.12.1.tgz#7e90083b231860f3e746277b48c195f02d9f0e6d"
-  integrity sha512-Us/gIfRAWHRO/K2x7tNobriOnVmLQBa66VklU7JMg08r4aPq0bVzRcVxvSo3TnQ/xFkB8zi4L6vU5PBoxcUtew==
+tg-client-query-builder@^2.12.2:
+  version "2.12.2"
+  resolved "https://registry.yarnpkg.com/tg-client-query-builder/-/tg-client-query-builder-2.12.2.tgz#81f211103c87b36d1287cbee57d949a99d965754"
+  integrity sha512-eUc3n3yOIPIMqBUgYcwlqABxbI9E60xgkIhc0QxFgy09YT++jOnKQvA+9OmK/45Zula1CH1UEARyHkM/bbkXUQ==
   dependencies:
     lodash "^4.17.4"
 

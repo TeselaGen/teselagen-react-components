@@ -99,7 +99,7 @@ function orderEntitiesLocal(orderArray, entities, schema) {
       } else {
         orderFuncs.push(r => {
           const val = get(r, path);
-          return val.toLowerCase ? val.toLowerCase() : val;
+          return val && val.toLowerCase ? val.toLowerCase() : val;
         });
       }
     });

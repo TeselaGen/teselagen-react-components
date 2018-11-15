@@ -122,7 +122,7 @@
     "redux-form": "^7.4.2",
     "redux-thunk": "*",
     "sinon": "^4.4.9",
-    "tg-client-query-builder": "^2.6.0",
+    "tg-client-query-builder": "^2.12.2",
     "ve-range-utils": "^2.5.0"
   },
   "husky": {

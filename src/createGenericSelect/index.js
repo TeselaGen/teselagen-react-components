@@ -1,11 +1,3 @@
-import DataTable from "../DataTable";
-import withTableParams from "../DataTable/utils/withTableParams";
-import withDialog from "../enhancers/withDialog";
-import withField from "../enhancers/withField";
-import withQuery from "../enhancers/withQuery";
-import DialogFooter from "../DialogFooter";
-import BlueprintError from "../BlueprintError";
-import generateQuery from "../utils/generateQuery";
 import { Button, Intent, Tooltip, FormGroup, Classes } from "@blueprintjs/core";
 import { get, isEqual, map, noop, pick, debounce, keyBy } from "lodash";
 import pluralize from "pluralize";
@@ -17,6 +9,14 @@ import { branch, withProps } from "recompose";
 import { change, clearFields, reduxForm } from "redux-form";
 import ReactSelect from "react-select";
 import moment from "moment";
+import generateQuery from "../utils/generateQuery";
+import BlueprintError from "../BlueprintError";
+import DialogFooter from "../DialogFooter";
+import withQuery from "../enhancers/withQuery";
+import withField from "../enhancers/withField";
+import withDialog from "../enhancers/withDialog";
+import withTableParams from "../DataTable/utils/withTableParams";
+import DataTable from "../DataTable";
 
 function preventBubble(e) {
   e.stopPropagation();
@@ -337,7 +337,8 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
                       postSelectDTProps,
                       isMultiSelect,
                       resetSelection: this.resetPostSelectSelection,
-                      changeGenericSelectValue: this.handleOnChange
+                      changeGenericSelectValue: this.handleOnChange,
+                      buttonProps
                     }}
                   />
                 )}
@@ -470,16 +471,21 @@ const PostSelectTable = branch(
         loading,
         entities,
         postSelectFormName,
-        postSelectDTProps
+        postSelectDTProps,
+        noRemoveButton,
+        buttonProps = {}
       } = this.props;
+
       let schemaToUse = postSelectDTProps.schema || [];
-      if (Array.isArray(schemaToUse)) {
-        schemaToUse = [...schemaToUse, this.removeColumn];
-      } else {
-        schemaToUse = {
-          ...schemaToUse,
-          fields: [...schemaToUse.fields, this.removeColumn]
-        };
+      if (!noRemoveButton && !buttonProps.disabled) {
+        if (Array.isArray(schemaToUse)) {
+          schemaToUse = [...schemaToUse, this.removeColumn];
+        } else {
+          schemaToUse = {
+            ...schemaToUse,
+            fields: [...schemaToUse.fields, this.removeColumn]
+          };
+        }
       }
 
       return (
