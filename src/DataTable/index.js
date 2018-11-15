@@ -1043,6 +1043,7 @@ class DataTable extends React.Component {
       displayName,
       sortDisabled,
       filterDisabled,
+      columnFilterDisabled,
       renderTitleInner,
       filterIsActive = noop,
       noTitle,
@@ -1111,7 +1112,10 @@ class DataTable extends React.Component {
       ) : null;
     const FilterMenu = column.FilterMenu || FilterAndSortMenu;
     const filterMenu =
-      withFilter && !isActionColumn && !filterDisabled ? (
+      withFilter &&
+      !isActionColumn &&
+      !filterDisabled &&
+      !columnFilterDisabled ? (
         <BooleanValue defaultValue={false}>
           {({ value, toggle, clear }) => {
             return (

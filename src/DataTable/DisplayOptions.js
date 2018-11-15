@@ -51,13 +51,14 @@ export default class DisplayOptions extends React.Component {
       hideDisplayOptionsIcon
     } = this.props;
     if (hideDisplayOptionsIcon) {
-      return null //don't show antyhing!
+      return null; //don't show antyhing!
     }
     const { fields } = schema;
     const fieldGroups = {};
     const mainFields = [];
 
     fields.forEach(field => {
+      if (field.hideInMenu) return;
       if (!field.fieldGroup) return mainFields.push(field);
       if (!fieldGroups[field.fieldGroup]) fieldGroups[field.fieldGroup] = [];
       fieldGroups[field.fieldGroup].push(field);
@@ -179,7 +180,7 @@ export default class DisplayOptions extends React.Component {
               >
                 <Button
                   onClick={resetDefaultVisibility}
-                  title={"Display Options"}
+                  title="Display Options"
                   minimal
                 >
                   Reset
@@ -193,7 +194,7 @@ export default class DisplayOptions extends React.Component {
           onClick={this.openPopover}
           disabled={disabled}
           minimal
-          icon={"cog"}
+          icon="cog"
         />
       </Popover>
     );
