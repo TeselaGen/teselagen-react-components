@@ -38,7 +38,7 @@ function J5TableCard({
     <CollapsibleCard
       icon={helperMessage && <InfoHelper>{helperMessage}</InfoHelper>}
       title={title}
-      key={title + filteredEntities.length} // force remount on data arrival
+      key={title + (filteredEntities.length > 0 ? "_nonempty" : '')} // force remount on data arrival
       initialClosed={!filteredEntities.length}
       openTitleElements={[
         isLinkable && (
