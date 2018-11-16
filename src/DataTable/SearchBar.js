@@ -7,6 +7,7 @@ const SearchBar = ({
   reduxFormSearchInput,
   setSearchTerm,
   loading,
+  searchMenuButton,
   disabled
 }) => {
   return (
@@ -26,13 +27,15 @@ const SearchBar = ({
         loading ? (
           <Spinner size="18" />
         ) : (
-          <Button
-            minimal
-            icon="search"
-            onClick={() => {
-              setSearchTerm(reduxFormSearchInput.input.value);
-            }}
-          />
+          searchMenuButton || (
+            <Button
+              minimal
+              icon="search"
+              onClick={() => {
+                setSearchTerm(reduxFormSearchInput.input.value);
+              }}
+            />
+          )
         )
       }
     />

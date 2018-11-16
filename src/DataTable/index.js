@@ -331,6 +331,7 @@ class DataTable extends React.Component {
       currentParams,
       hasOptionForForcedHidden,
       showForcedHiddenColumns,
+      searchMenuButton,
       setShowForcedHidden
     } = computePresets(this.props);
     let updateColumnVisibilityToUse = updateColumnVisibility;
@@ -504,6 +505,7 @@ class DataTable extends React.Component {
                     reduxFormSearchInput,
                     setSearchTerm,
                     loading: isLoading,
+                    searchMenuButton,
                     disabled
                   }}
                 />
