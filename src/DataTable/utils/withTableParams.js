@@ -185,9 +185,10 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       defaults,
       onlyOneFilter
     } = mergedOpts;
-    function resetSearch() {
+
+    function updateSearch(val) {
       setTimeout(function() {
-        dispatch(change(formName, "reduxFormSearchInput", ""));
+        dispatch(change(formName, "reduxFormSearchInput", val || ""));
       });
     }
 
@@ -205,7 +206,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
     return {
       bindThese: makeDataTableHandlers({
         setNewParams,
-        resetSearch,
+        updateSearch,
         defaults,
         onlyOneFilter
       }),

@@ -14,7 +14,7 @@ export default {
   disabled: false,
   noSelect: false,
   noUserSelect: false,
-  maxHeight: 800,
+  maxHeight: 600,
   isSimple: false,
   reduxFormSearchInput: {},
   reduxFormSelectedEntityIdMap: {},
