@@ -11,7 +11,7 @@ export default function computePresets(props) {
       noFooter: !props.withPaging,
       noPadding: true,
       noFullscreenButton: true,
-      hidePageSizeWhenPossible: true,
+      hidePageSizeWhenPossible: !props.withPaging,
       isInfinite: !props.withPaging,
       hideSelectedCount: true,
       withTitle: false,
