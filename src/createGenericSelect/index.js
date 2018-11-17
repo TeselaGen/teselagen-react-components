@@ -442,7 +442,10 @@ const PostSelectTable = branch(
           <Button
             small
             minimal
-            onClick={() => this.removeRecord(record)}
+            onClick={e => {
+              e.stopPropagation();
+              this.removeRecord(record);
+            }}
             icon="trash"
             intent="danger"
           />
