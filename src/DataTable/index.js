@@ -910,16 +910,8 @@ class DataTable extends React.Component {
 
       tableColumn.Cell = (...args) => {
         const [row] = args;
-        const record = row.original;
         const val = oldFunc(...args);
-        let text = val;
-        if (column.getClipboardData) {
-          text = column.getClipboardData(row.value, record);
-        } else if (column.render) {
-          text = column.render(row.value, record, row, this.props);
-        } else if (text !== undefined) {
-          text = String(text);
-        } else text = " ";
+        const text = this.getCopyTextForCell(val, row, column);
 
         //wrap the original tableColumn.Cell function in another div in order to add a title attribute
         let title = typeof val !== "string" ? args[0].value : val;
@@ -946,6 +938,19 @@ class DataTable extends React.Component {
     return columnsToRender;
   };
 
+  getCopyTextForCell = (val, row, column) => {
+    let text = val;
+    const record = row.original;
+    if (column.getClipboardData) {
+      text = column.getClipboardData(row.value, record);
+    } else if (column.render) {
+      text = column.render(row.value, record, row, this.props);
+    } else if (text) {
+      text = String(text);
+    } else text = " ";
+    return text;
+  };
+
   finalizeCopy = selectedRecords => {
     if (!selectedRecords.length) return;
     const { columns } = this.state;
@@ -960,13 +965,11 @@ class DataTable extends React.Component {
         } else if (col.type === "boolean") {
           text = text ? "True" : "False";
         }
-        if (col.getClipboardData) {
-          text = col.getClipboardData(recordText, record);
-        } else if (col.render) {
-          text = col.render(recordText, record, i);
-        } else if (text !== undefined) {
-          text = String(text);
-        } else text = " ";
+        text = this.getCopyTextForCell(
+          text,
+          { original: record, index: i },
+          col
+        );
         if (text) {
           textForRow.push(text);
         }

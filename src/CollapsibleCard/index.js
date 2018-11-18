@@ -11,9 +11,9 @@ type Props = {
   initialClosed: boolean
 };
 
-type State = {
-  open: boolean
-};
+// type State = {
+//   open: boolean
+// };
 
 export default class CollapsibleCard extends Component {
   state = {
@@ -32,13 +32,24 @@ export default class CollapsibleCard extends Component {
   }
 
   toggleCardInfo = () => {
-    this.setState({
-      open: !this.state.open
-    });
+    if (this.props.toggle) this.props.toggle();
+    else {
+      this.setState({
+        open: !this.state.open
+      });
+    }
+  };
+
+  getIsOpen = () => {
+    if (this.props.isOpen !== undefined) {
+      return this.props.isOpen;
+    } else {
+      return this.state.open;
+    }
   };
 
   render() {
-    const { open }: State = this.state;
+    const open = this.getIsOpen();
     const {
       title,
       icon,
