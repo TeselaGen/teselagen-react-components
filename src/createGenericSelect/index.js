@@ -21,8 +21,8 @@ import DataTable from "../DataTable";
 function preventBubble(e) {
   e.stopPropagation();
 }
-//
-export default ({ modelNameToReadableName, withQueryAsFn }) => {
+
+export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
   return compose(
     // useage example:
     // <GenericSelect {...{
@@ -207,16 +207,23 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
         this.setState({
           fetchingData: true
         });
-        const queryFilter = {
+        const queryVariables = {
           filter: {
             id: isMultiSelect ? records.map(({ id }) => id) : records[0].id
           }
         };
         if (!postSelectDTProps) {
           try {
-            const records = await withQueryAsFn(additionalDataFragment, {
-              isPlural: true
-            })(queryFilter);
+            let records;
+            if (safeQuery) {
+              records = await safeQuery(additionalDataFragment, {
+                variables: queryVariables
+              });
+            } else {
+              records = await withQueryAsFn(additionalDataFragment, {
+                isPlural: true
+              })(queryVariables);
+            }
             const toSelect = isMultiSelect ? records : records[0];
             onSelect && onSelect(toSelect);
             this.handleOnChange(toSelect);
