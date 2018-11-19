@@ -947,7 +947,7 @@ class DataTable extends React.Component {
       text = column.render(row.value, record, row, this.props);
     } else if (text) {
       text = String(text);
-    } else text = " ";
+    }
     return text;
   };
 
@@ -970,13 +970,19 @@ class DataTable extends React.Component {
           { original: record, index: i },
           col
         );
-        if (text) {
-          textForRow.push(text);
-        }
+        text = text || "\t";
+        textForRow.push(text);
       });
       allRowsText.push(textForRow.join("\t"));
     });
-    copy(allRowsText.join("\n"));
+    const copyString = allRowsText.join("\n");
+    const copyHandler = e => {
+      e.preventDefault();
+      e.clipboardData.setData("text/plain", copyString);
+    };
+    document.addEventListener("copy", copyHandler);
+    copy(copyString);
+    document.removeEventListener("copy", copyHandler);
     window.toastr.success("Selected rows copied");
   };
 
