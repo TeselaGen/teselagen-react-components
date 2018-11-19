@@ -1,4 +1,5 @@
 import React from "react";
+import { pickBy, startsWith } from "lodash";
 import "./style.css";
 import { Popover, Position, Menu, Button } from "@blueprintjs/core";
 import { createDynamicMenu } from "../utils/menuUtils";
@@ -35,8 +36,12 @@ export default class MenuBar extends React.Component {
     return (
       <div className={"tg-menu-bar " + className} style={style}>
         {menu.map((topLevelItem, i) => {
+          const dataKeys = pickBy(topLevelItem, function(value, key) {
+            return startsWith(key, "data-");
+          });
           const button = (
             <Button
+              {...dataKeys} //spread all data-* attributes
               key={i}
               minimal
               className="tg-menu-bar-item"
