@@ -1,5 +1,9 @@
 import "./style.css";
 export {
+  getCurrentParamsFromUrl,
+  setCurrentParamsOnUrl
+} from "./DataTable/utils/queryParams";
+export {
   default as withSelectedEntities,
   getSelectedEntities
 } from "./DataTable/utils/withSelectedEntities";
