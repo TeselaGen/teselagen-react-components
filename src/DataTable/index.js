@@ -1138,7 +1138,8 @@ class DataTable extends React.Component {
                 isOpen={value}
                 modifiers={{
                   preventOverflow: { enabled: false },
-                  hide: { enabled: false }
+                  hide: { enabled: false },
+                  flip: { enabled: false }
                 }}
               >
                 <Icon
