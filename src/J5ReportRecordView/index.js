@@ -318,7 +318,8 @@ class J5ReportRecordView extends Component {
       linkDialogWidth = 500,
       fragmentMap = {},
       linkFragmentMap,
-      noPrebuiltConstructs = false
+      noPrebuiltConstructs = false,
+      dataTableProps: passedDataTableProps
     } = this.props;
     const { linkDialogName } = this.state;
 
@@ -354,6 +355,13 @@ class J5ReportRecordView extends Component {
             linkDialogName: prevKey
           });
         });
+    }
+    let dataTableProps = sharedTableProps;
+    if (passedDataTableProps) {
+      dataTableProps = {
+        ...sharedTableProps,
+        ...passedDataTableProps
+      };
     }
 
     return (
@@ -403,7 +411,7 @@ class J5ReportRecordView extends Component {
               isLinkable={LinkJ5TableDialog}
               onDoubleClick={onConstructDoubleClick}
               schema={this.getSchema("j5RunConstructs")}
-              tableProps={sharedTableProps}
+              tableProps={dataTableProps}
             />
           )}
 
@@ -422,7 +430,7 @@ class J5ReportRecordView extends Component {
             showLinkModal={() => this.showLinkModal("constructs")}
             isLinkable={LinkJ5TableDialog}
             onDoubleClick={onConstructDoubleClick}
-            tableProps={sharedTableProps}
+            tableProps={dataTableProps}
             schema={this.getSchema("j5RunConstructs")}
             openTitleElements={constructsTitleElements}
           />
@@ -436,7 +444,7 @@ class J5ReportRecordView extends Component {
             fragment={fragmentMap.j5InputSequence}
             showLinkModal={() => this.showLinkModal("inputSequences")}
             isLinkable={LinkJ5TableDialog}
-            tableProps={sharedTableProps}
+            tableProps={dataTableProps}
             cellRenderer={
               getIsLinkedCellRenderer &&
               getIsLinkedCellRenderer(
@@ -456,7 +464,7 @@ class J5ReportRecordView extends Component {
             processData={processDataForTables.j5InputPart}
             entities={j5Report.j5InputSequences}
             fragment={fragmentMap.j5InputSequence}
-            tableProps={sharedTableProps}
+            tableProps={dataTableProps}
             schema={this.getSchema("j5InputParts")}
           />
 
@@ -467,7 +475,7 @@ class J5ReportRecordView extends Component {
             processData={processDataForTables.j5OligoSynthesis}
             entities={j5Report.j5OligoSyntheses}
             fragment={fragmentMap.j5OligoSynthesis}
-            tableProps={sharedTableProps}
+            tableProps={dataTableProps}
             isLinkable={LinkJ5TableDialog}
             schema={this.getSchema("j5OligoSyntheses")}
             showLinkModal={() => this.showLinkModal("oligos")}
@@ -493,7 +501,7 @@ class J5ReportRecordView extends Component {
             title="Synthon Sequences"
             processData={processDataForTables.j5DirectSynthesis}
             entities={j5Report.j5DirectSyntheses}
-            tableProps={sharedTableProps}
+            tableProps={dataTableProps}
             schema={this.getSchema("j5DirectSyntheses")}
             fragment={fragmentMap.j5DirectSynthesis}
             isLinkable={LinkJ5TableDialog}
@@ -516,7 +524,7 @@ class J5ReportRecordView extends Component {
             title="PCRs"
             processData={processDataForTables.j5PcrReaction}
             entities={j5Report.j5PcrReactions}
-            tableProps={sharedTableProps}
+            tableProps={dataTableProps}
             openTitleElements={pcrReactionsTitleElements}
             fragment={fragmentMap.j5PcrReaction}
             schema={this.getSchema("j5PcrReactions")}
@@ -534,7 +542,7 @@ class J5ReportRecordView extends Component {
             isLinkable={LinkJ5TableDialog}
             showLinkModal={() => this.showLinkModal("dnaPieces")}
             linkButtonText="Link DNA Pieces"
-            tableProps={sharedTableProps}
+            tableProps={dataTableProps}
             schema={this.getSchema("j5AssemblyPieces")}
             cellRenderer={
               getIsLinkedCellRenderer &&
@@ -559,7 +567,7 @@ class J5ReportRecordView extends Component {
                 : j5Report.j5RunConstructs
             }
             fragment={fragmentMap.j5RunConstruct}
-            tableProps={sharedTableProps}
+            tableProps={dataTableProps}
             createSchema={this.createSchemaForCombinationOfAssemblyPieces}
           />
 
