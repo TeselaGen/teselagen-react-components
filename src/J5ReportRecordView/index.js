@@ -463,7 +463,7 @@ class J5ReportRecordView extends Component {
           <J5TableCard
             j5ReportId={j5Report.id}
             helperMessage="This is the list of oligos that need to be directly synthesized."
-            title="Oligo Synthesis"
+            title="Assembly Oligos"
             processData={processDataForTables.j5OligoSynthesis}
             entities={j5Report.j5OligoSyntheses}
             fragment={fragmentMap.j5OligoSynthesis}
@@ -490,7 +490,7 @@ class J5ReportRecordView extends Component {
           <J5TableCard
             j5ReportId={j5Report.id}
             helperMessage="This is the list DNA pieces that need to be directly synthesized."
-            title="DNA Synthesis"
+            title="Synthon Sequences"
             processData={processDataForTables.j5DirectSynthesis}
             entities={j5Report.j5DirectSyntheses}
             tableProps={sharedTableProps}
@@ -513,7 +513,7 @@ class J5ReportRecordView extends Component {
             j5ReportId={j5Report.id}
             helperMessage="These are the PCR reactions that need to be run to generate the
                 assembly pieces."
-            title="PCR Reactions"
+            title="PCRs"
             processData={processDataForTables.j5PcrReaction}
             entities={j5Report.j5PcrReactions}
             tableProps={sharedTableProps}
@@ -527,7 +527,7 @@ class J5ReportRecordView extends Component {
             helperMessage="These are the pieces of DNA that will get put together in a
                 final assembly reaction (Gibson/CPEC/SLIC/Golden-Gate) to give
                 the desired Constructs."
-            title="DNA Pieces to be Assembled"
+            title="Assembly Pieces"
             processData={processDataForTables.j5AssemblyPiece}
             entities={j5Report.j5AssemblyPieces}
             fragment={fragmentMap.j5AssemblyPiece}
@@ -550,7 +550,7 @@ class J5ReportRecordView extends Component {
             j5ReportId={j5Report.id}
             helperMessage="This lists which assembly pieces need to be combined to create
                 each construct."
-            title="Combination of Assembly Pieces"
+            title="Assemblies"
             processData={processDataForTables.j5RunConstruct}
             entities={
               get(j5Report, "j5RunConstructs[0].isPrebuilt") !== null &&
