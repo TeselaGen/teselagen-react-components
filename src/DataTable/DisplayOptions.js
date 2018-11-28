@@ -68,8 +68,8 @@ export default class DisplayOptions extends React.Component {
 
     const getFieldCheckbox = (field, i) => {
       const { displayName, isHidden, isForcedHidden, path } = field;
-      if (!isHidden) numVisible++;
       if (isForcedHidden) return;
+      if (!isHidden) numVisible++;
       return (
         <Checkbox
           key={path || i}
