@@ -3,6 +3,7 @@ import pascalCase from "pascal-case";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { camelCase } from "lodash";
+import { withHandlers, compose } from "recompose";
 import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
 import generateFragmentWithFields from "../utils/generateFragmentWithFields";
 
@@ -79,40 +80,42 @@ export default function(nameOrFragment, options = {}) {
     };
   }
 
-  return graphql(deleteByIdsMutation, {
-    props: ({ mutate }) => {
-      function deleteMutation(...args) {
-        const { input, idArray, update } = prepareArgs(args);
+  const deleteHelper = props => (...args) => {
+    const { input, idArray, update } = prepareArgs(args);
 
-        return mutate({
-          variables: {
-            input
-          },
-          update: update || invalidateQueriesOfTypes([pluralRecordType]),
-          refetchQueries,
-          ...getExtraMutateArgs(...args)
-        })
-          .then(afterDeleteFunction({ idArray, recordType, name }))
-          .catch(e => {
-            if (showError) {
-              window.toastr.error(`Error deleting ${recordType}`);
-              console.error(`withDelete ${recordType} Error:`, e);
-            }
-            throw e; //rethrow the error so it can be caught again if need be
-          });
-      }
-      const toReturn = {
-        deleteEntities: deleteMutation,
-        [camelCase("delete_" + recordType)]: deleteMutation
-      };
-      if (mutationName) {
-        toReturn[mutationName] = deleteMutation;
-      }
-      return toReturn;
-    },
+    return props
+      .mutate({
+        variables: {
+          input
+        },
+        update: update || invalidateQueriesOfTypes([pluralRecordType]),
+        refetchQueries,
+        ...getExtraMutateArgs(...args)
+      })
+      .then(afterDeleteFunction({ idArray, recordType, name }))
+      .catch(e => {
+        if (showError) {
+          window.toastr.error(`Error deleting ${recordType}`);
+          console.error(`withDelete ${recordType} Error:`, e);
+        }
+        throw e; //rethrow the error so it can be caught again if need be
+      });
+  };
 
-    ...rest
-  });
+  const handlers = {
+    deleteEntities: deleteHelper,
+    [camelCase("delete_" + recordType)]: deleteHelper
+  };
+  if (mutationName) {
+    handlers[mutationName] = deleteHelper;
+  }
+
+  return compose(
+    graphql(deleteByIdsMutation, {
+      ...rest
+    }),
+    withHandlers(handlers)
+  );
 }
 
 function prepareArgs(args) {
