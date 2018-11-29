@@ -1,8 +1,8 @@
 import { graphql } from "react-apollo";
-import { connect } from "react-redux";
 import compose from "lodash/fp/compose";
 import gql from "graphql-tag";
 import pascalCase from "pascal-case";
+import { withHandlers } from "recompose";
 import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
 import generateFragmentWithFields from "../utils/generateFragmentWithFields";
 
@@ -187,59 +187,54 @@ export default function withUpsert(nameOrFragment, options = {}) {
       },
       ...rest
     }),
-    connect((state, ownProps) => {
-      const { createItem, updateItem, apolloOptions = {} } = ownProps;
-      const {
-        forceCreate = topLevelForceCreate,
-        forceUpdate = topLevelForceUpdate
-      } = apolloOptions;
-
-      return {
-        createItem: undefined, //set these to undefined so people won't be tempted to use them
-        updateItem: undefined,
-        [mutationName || `upsert${pascalCaseName}`]: (
-          valueOrValues,
-          ...rest
-        ) => {
-          //the upsertXXX function is the only thing we should be calling
-          const values = Array.isArray(valueOrValues)
-            ? valueOrValues
-            : [valueOrValues];
-          if (!values[0])
-            throw new Error(
-              "You have to pass at least 1 thing to create or update!"
-            );
-          let isUpdate = !!(values[0].id || values[0].code);
-          if (forceCreate) {
-            isUpdate = false;
-          }
-          if (forceUpdate) {
-            isUpdate = true;
-          }
-          return (isUpdate ? updateItem : createItem)(values, ...rest)
-            .then(function(res) {
-              const returnInfo =
-                res.data[isUpdate ? updateName : createName][
-                  isUpdate ? "updatedItemsCursor" : "createdItemsCursor"
-                ];
-              let results = returnInfo.results;
-              results = [...results];
-              results.totalResults = returnInfo.totalResults;
-              return Promise.resolve(results);
-            })
-            .catch(e => {
-              if (showError) {
-                window.toastr.error(
-                  `Error ${
-                    isUpdate ? "updating" : "creating"
-                  } ${pascalCaseName}`
-                );
-                console.error(`withUpsert ${pascalCaseName} Error:`, e);
-              }
-              throw e; //rethrow the error so it can be caught again if need be
-            });
+    withHandlers({
+      createItem: undefined,
+      updateItem: undefined,
+      [mutationName || `upsert${pascalCaseName}`]: ownProps => (
+        valueOrValues,
+        ...rest
+      ) => {
+        const { createItem, updateItem, apolloOptions = {} } = ownProps;
+        const {
+          forceCreate = topLevelForceCreate,
+          forceUpdate = topLevelForceUpdate
+        } = apolloOptions;
+        //the upsertXXX function is the only thing we should be calling
+        const values = Array.isArray(valueOrValues)
+          ? valueOrValues
+          : [valueOrValues];
+        if (!values[0])
+          throw new Error(
+            "You have to pass at least 1 thing to create or update!"
+          );
+        let isUpdate = !!(values[0].id || values[0].code);
+        if (forceCreate) {
+          isUpdate = false;
         }
-      };
+        if (forceUpdate) {
+          isUpdate = true;
+        }
+        return (isUpdate ? updateItem : createItem)(values, ...rest)
+          .then(function(res) {
+            const returnInfo =
+              res.data[isUpdate ? updateName : createName][
+                isUpdate ? "updatedItemsCursor" : "createdItemsCursor"
+              ];
+            let results = returnInfo.results;
+            results = [...results];
+            results.totalResults = returnInfo.totalResults;
+            return Promise.resolve(results);
+          })
+          .catch(e => {
+            if (showError) {
+              window.toastr.error(
+                `Error ${isUpdate ? "updating" : "creating"} ${pascalCaseName}`
+              );
+              console.error(`withUpsert ${pascalCaseName} Error:`, e);
+            }
+            throw e; //rethrow the error so it can be caught again if need be
+          });
+      }
     })
   );
 }

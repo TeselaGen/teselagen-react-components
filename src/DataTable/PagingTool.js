@@ -2,11 +2,11 @@
 import React from "react";
 import { withProps, withHandlers, compose } from "recompose";
 import classNames from "classnames";
-import type { Paging } from "../flow_types";
 import { noop, get } from "lodash";
 import { Button, Classes } from "@blueprintjs/core";
-import { pageSizes } from "./utils/queryParams";
+import type { Paging } from "../flow_types";
 import { onEnterOrBlurHelper } from "../utils/handlerHelpers";
+import { pageSizes } from "./utils/queryParams";
 
 export class PagingTool extends React.Component {
   static defaultProps = {
@@ -99,7 +99,7 @@ export class PagingTool extends React.Component {
     const lastPage = Math.ceil(total / pageSize);
 
     return (
-      <div className={"paging-toolbar-container"}>
+      <div className="paging-toolbar-container">
         {onRefresh && (
           <Button
             minimal
@@ -109,7 +109,7 @@ export class PagingTool extends React.Component {
           />
         )}
         <div
-          title={"Set Page Size"}
+          title="Set Page Size"
           className={classNames(Classes.SELECT, Classes.MINIMAL)}
         >
           <select
@@ -119,7 +119,7 @@ export class PagingTool extends React.Component {
             value={pageSize}
           >
             {[
-              <option key="page-size-placeholder" disabled value={"fake"}>
+              <option key="page-size-placeholder" disabled value="fake">
                 Size
               </option>,
               ...pageSizes.map(size => {
@@ -193,10 +193,10 @@ const ConnectedPagingTool = compose(
     };
   }),
   withHandlers({
-    onPageChange: ({ entities, reduxFormSelectedEntityIdMap }) => () => {
+    onPageChange: ({ entities, change }) => () => {
       const record = get(entities, "[0]");
       if (!record || (!record.id && record.id !== 0 && !record.code)) {
-        reduxFormSelectedEntityIdMap.input.onChange({});
+        change("reduxFormSelectedEntityIdMap", {});
       }
     }
   })

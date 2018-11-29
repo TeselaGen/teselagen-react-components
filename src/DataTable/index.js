@@ -74,7 +74,8 @@ class DataTable extends React.Component {
       expandAllByDefault,
       selectAllByDefault,
       reduxFormSelectedEntityIdMap,
-      reduxFormExpandedEntityIdMap
+      reduxFormExpandedEntityIdMap,
+      change
     } = newProps;
 
     //handle programatic filter adding
@@ -105,21 +106,21 @@ class DataTable extends React.Component {
       )
     ) {
       if (selectAllByDefault) {
-        reduxFormSelectedEntityIdMap.input.onChange({
+        change("reduxFormSelectedEntityIdMap", {
           ...entities.reduce((acc, entity) => {
             acc[entity.id] = { entity };
             return acc;
           }, {}),
-          ...(reduxFormSelectedEntityIdMap.input.value || {})
+          ...(reduxFormSelectedEntityIdMap || {})
         });
       }
       if (expandAllByDefault) {
-        reduxFormExpandedEntityIdMap.input.onChange({
+        change("reduxFormExpandedEntityIdMap", {
           ...entities.reduce((acc, e) => {
             acc[e.id] = true;
             return acc;
           }, {}),
-          ...(reduxFormExpandedEntityIdMap.input.value || {})
+          ...(reduxFormExpandedEntityIdMap || {})
         });
       }
     }
@@ -172,12 +173,17 @@ class DataTable extends React.Component {
     }
 
     this.updateFromProps(computePresets(oldProps), computePresets(this.props));
+
+    // comment in to test what is causing re-render
+    // Object.entries(this.props).forEach(
+    //   ([key, val]) =>
+    //     oldProps[key] !== val && console.log(`Prop '${key}' changed`)
+    // );
   }
 
   handleCopyHotkey = () => {
     const { reduxFormSelectedEntityIdMap } = this.props;
-    const idMap = reduxFormSelectedEntityIdMap.input.value;
-    this.handleCopyRows(getRecordsFromIdMap(idMap));
+    this.handleCopyRows(getRecordsFromIdMap(reduxFormSelectedEntityIdMap));
   };
 
   handleCopyRows = selectedRecords => {
@@ -233,15 +239,15 @@ class DataTable extends React.Component {
     const {
       withDisplayOptions,
       moveColumnPersist,
-      localStorageForceUpdate,
-      syncDisplayOptionsToDb
+      syncDisplayOptionsToDb,
+      change
     } = computePresets(this.props);
     let moveColumnPersistToUse = moveColumnPersist;
     if (moveColumnPersist && withDisplayOptions && !syncDisplayOptionsToDb) {
       //little hack to make localstorage changes get reflected in UI (we force an update to get the enhancers to run again :)
       moveColumnPersistToUse = (...args) => {
         moveColumnPersist(...args);
-        localStorageForceUpdate.input.onChange(Math.random());
+        change("localStorageForceUpdate", Math.random());
       };
     }
     return (
@@ -298,7 +304,7 @@ class DataTable extends React.Component {
       resizePersist,
       updateColumnVisibility,
       updateTableDisplayDensity,
-      localStorageForceUpdate,
+      change,
       syncDisplayOptionsToDb,
       resetDefaultVisibility,
       maxHeight,
@@ -341,15 +347,15 @@ class DataTable extends React.Component {
       //little hack to make localstorage changes get reflected in UI (we force an update to get the enhancers to run again :)
       updateColumnVisibilityToUse = (...args) => {
         updateColumnVisibility(...args);
-        localStorageForceUpdate.input.onChange(Math.random());
+        change("localStorageForceUpdate", Math.random());
       };
       updateTableDisplayDensityToUse = (...args) => {
         updateTableDisplayDensity(...args);
-        localStorageForceUpdate.input.onChange(Math.random());
+        change("localStorageForceUpdate", Math.random());
       };
       resetDefaultVisibilityToUse = (...args) => {
         resetDefaultVisibility(...args);
-        localStorageForceUpdate.input.onChange(Math.random());
+        change("localStorageForceUpdate", Math.random());
       };
     }
     let compactClassName = "";
@@ -387,7 +393,7 @@ class DataTable extends React.Component {
       });
     }
     const numRows = isInfinite ? entities.length : pageSize;
-    const idMap = reduxFormSelectedEntityIdMap.input.value || {};
+    const idMap = reduxFormSelectedEntityIdMap || {};
     const selectedRowCount = Object.keys(idMap).filter(key => idMap[key])
       .length;
 
@@ -400,7 +406,7 @@ class DataTable extends React.Component {
 
     const expandedRows = entities.reduce((acc, row, index) => {
       const rowId = getIdOrCodeOrIndex(row, index);
-      acc[index] = reduxFormExpandedEntityIdMap.input.value[rowId];
+      acc[index] = reduxFormExpandedEntityIdMap[rowId];
       return acc;
     }, {});
     const showHeader = (withTitle || withSearch || children) && !noHeader;
@@ -593,20 +599,21 @@ class DataTable extends React.Component {
       onDoubleClick,
       history,
       entities,
-      isEntityDisabled
+      isEntityDisabled,
+      change
     } = computePresets(this.props);
     if (!rowInfo) return {};
     const entity = rowInfo.original;
     const rowId = getIdOrCodeOrIndex(entity, rowInfo.index);
-    const rowSelected = reduxFormSelectedEntityIdMap.input.value[rowId];
-    const isExpanded = reduxFormExpandedEntityIdMap.input.value[rowId];
+    const rowSelected = reduxFormSelectedEntityIdMap[rowId];
+    const isExpanded = reduxFormExpandedEntityIdMap[rowId];
     const rowDisabled = isEntityDisabled(entity);
     return {
       onClick: e => {
         // if checkboxes are activated or row expander is clicked don't select row
         if (e.target.matches(".tg-expander, .tg-expander *")) {
-          reduxFormExpandedEntityIdMap.input.onChange({
-            ...reduxFormExpandedEntityIdMap.input.value,
+          change("reduxFormExpandedEntityIdMap", {
+            ...reduxFormExpandedEntityIdMap,
             [rowId]: !isExpanded
           });
           return;
@@ -618,8 +625,7 @@ class DataTable extends React.Component {
       onContextMenu: e => {
         e.preventDefault();
         if (rowId === undefined || rowDisabled) return;
-        const oldIdMap =
-          cloneDeep(reduxFormSelectedEntityIdMap.input.value) || {};
+        const oldIdMap = cloneDeep(reduxFormSelectedEntityIdMap) || {};
         let newIdMap;
         if (withCheckboxes) {
           newIdMap = oldIdMap;
@@ -653,7 +659,7 @@ class DataTable extends React.Component {
     } = computePresets(this.props);
     const checkedRows = getSelectedRowsFromEntities(
       entities,
-      reduxFormSelectedEntityIdMap.input.value
+      reduxFormSelectedEntityIdMap
     );
     const checkboxProps = {
       checked: false,
@@ -676,8 +682,7 @@ class DataTable extends React.Component {
         disabled={noSelect || noUserSelect}
         /* eslint-disable react/jsx-no-bind */
         onChange={() => {
-          const newIdMap =
-            cloneDeep(reduxFormSelectedEntityIdMap.input.value) || {};
+          const newIdMap = cloneDeep(reduxFormSelectedEntityIdMap) || {};
           entities.forEach((entity, i) => {
             if (isEntityDisabled(entity)) return;
             const entityId = getIdOrCodeOrIndex(entity, i);
@@ -712,7 +717,7 @@ class DataTable extends React.Component {
     } = computePresets(this.props);
     const checkedRows = getSelectedRowsFromEntities(
       entities,
-      reduxFormSelectedEntityIdMap.input.value
+      reduxFormSelectedEntityIdMap
     );
 
     const { lastCheckedRow } = this.state;
@@ -729,8 +734,7 @@ class DataTable extends React.Component {
         disabled={noSelect || noUserSelect || isEntityDisabled(entity)}
         /* eslint-disable react/jsx-no-bind*/
         onChange={e => {
-          let newIdMap =
-            cloneDeep(reduxFormSelectedEntityIdMap.input.value) || {};
+          let newIdMap = cloneDeep(reduxFormSelectedEntityIdMap) || {};
           const isRowCurrentlyChecked = checkedRows.indexOf(rowIndex) > -1;
           const entityId = getIdOrCodeOrIndex(entity, rowIndex);
           if (isSingleSelect) {
@@ -788,7 +792,8 @@ class DataTable extends React.Component {
       entities,
       getCellHoverText,
       withExpandAndCollapseAllButton,
-      reduxFormExpandedEntityIdMap
+      reduxFormExpandedEntityIdMap,
+      change
     } = computePresets(this.props);
     const { columns } = this.state;
     if (!columns.length) {
@@ -801,9 +806,8 @@ class DataTable extends React.Component {
               ...(withExpandAndCollapseAllButton && {
                 Header: () => {
                   const showCollapseAll =
-                    Object.values(
-                      reduxFormExpandedEntityIdMap.input.value
-                    ).filter(i => i).length === entities.length;
+                    Object.values(reduxFormExpandedEntityIdMap).filter(i => i)
+                      .length === entities.length;
                   return (
                     <InfoHelper
                       content={showCollapseAll ? "Collapse All" : "Expand All"}
@@ -816,8 +820,9 @@ class DataTable extends React.Component {
                       }}
                       onClick={() => {
                         showCollapseAll
-                          ? reduxFormExpandedEntityIdMap.input.onChange({})
-                          : reduxFormExpandedEntityIdMap.input.onChange(
+                          ? change("reduxFormExpandedEntityIdMap", {})
+                          : change(
+                              "reduxFormExpandedEntityIdMap",
                               entities.reduce((acc, e) => {
                                 acc[e.id] = true;
                                 return acc;
