@@ -257,7 +257,7 @@ function getSubFilter(
       ? filterValue.toString()
       : filterValue;
     return qb
-      ? qb.contains(filterValueToUse) //filter using qb (aka we're backend connected)
+      ? qb.contains(filterValueToUse.replace(/_/g, "\\_")) //filter using qb (aka we're backend connected)
       : fieldVal => {
           //filter using plain old javascript (aka we've got a local table that isn't backend connected)
           if (!fieldVal || !fieldVal.toLowerCase) return false;
@@ -372,7 +372,7 @@ function stringifyFilters(newParams) {
     filters = newParams.filters.reduce(
       (acc, { filterOn, selectedFilter, filterValue }, index) => {
         acc +=
-          (index > 0 ? "___" : "") +
+          (index > 0 ? "::" : "") +
           `${filterOn}__${camelCase(selectedFilter)}__${safeStringify(
             Array.isArray(filterValue) ? filterValue.join(".") : filterValue
           )}`;
@@ -400,7 +400,7 @@ function parseFilters(newParams) {
     order: newParams.order && newParams.order.split("___"),
     filters:
       newParams.filters &&
-      newParams.filters.split("___").map(filter => {
+      newParams.filters.split("::").map(filter => {
         const splitFilter = filter.split("__");
         return {
           filterOn: splitFilter[0],
