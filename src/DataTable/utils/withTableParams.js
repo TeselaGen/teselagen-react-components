@@ -138,6 +138,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       noOrderError,
       withDisplayOptions,
       cellRenderer,
+      isLocalCall,
       model,
       schema,
       ...getQueryParams({
