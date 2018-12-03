@@ -374,9 +374,6 @@ export default class VerticalTree extends React.Component {
       >
         {nodes.map((node, i) => {
           const nodeId = get(node, cardIdKey);
-          const connectorColor = colorByDepth
-            ? colorCodes[(depth + 1) % colorCodes.length]
-            : colorCodes[i % colorCodes.length];
 
           return (
             <div key={nodeId} style={{ marginLeft: connectorThickness }}>
@@ -385,7 +382,6 @@ export default class VerticalTree extends React.Component {
                   style={{
                     position: "absolute",
                     left: -connectorThickness,
-                    borderLeft: `${connectorThickness}px solid ${connectorColor}`,
                     height: "100%"
                   }}
                 />
