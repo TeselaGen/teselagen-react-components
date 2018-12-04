@@ -2,9 +2,9 @@ import React from "react";
 import { get, pick } from "lodash";
 import ReactResizeDetector from "react-resize-detector";
 import PropTypes from "prop-types";
+import { Tooltip } from "@blueprintjs/core";
 import Minimap from "../TreeMinimap";
 import blackOrWhiteContrastsMore from "../blackOrWhiteContrastsMore";
-import { Tooltip } from "@blueprintjs/core";
 
 import "./style.css";
 
@@ -353,13 +353,13 @@ export default class VerticalTree extends React.Component {
     );
   };
 
-  renderHorizontalLeaves = (nodes, isMinimap, depth, colorCodes) => {
+  renderHorizontalLeaves = (nodes, isMinimap, depth /*, colorCodes*/) => {
     const {
       renderNode,
       renderMinimapNode,
       cardIdKey,
-      connectorThickness,
-      colorByDepth
+      connectorThickness
+      /*colorByDepth*/
     } = this.props;
     const actuallyRenderNode = (isMinimap && renderMinimapNode) || renderNode;
 
@@ -372,7 +372,7 @@ export default class VerticalTree extends React.Component {
           transformOrigin: "0 0"
         }}
       >
-        {nodes.map((node, i) => {
+        {nodes.map(node => {
           const nodeId = get(node, cardIdKey);
 
           return (
