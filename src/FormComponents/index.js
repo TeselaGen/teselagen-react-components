@@ -676,7 +676,7 @@ export const RadioGroupField = generateField(renderBlueprintRadioGroup, {
   noFillField: true
 });
 export const ReactSelectField = generateField(renderReactSelect);
-export const SelectField = generateField();
+export const SelectField = generateField(renderSelect);
 export const ReactColorField = generateField(RenderReactColorPicker);
 
 function getOptions(options) {
