@@ -617,6 +617,8 @@ class DataTable extends React.Component {
             [rowId]: !isExpanded
           });
           return;
+        } else if (withCheckboxes) {
+          return;
         }
         rowClick(e, rowInfo, entities, computePresets(this.props));
       },
