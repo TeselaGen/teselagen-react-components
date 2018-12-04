@@ -319,7 +319,8 @@ class J5ReportRecordView extends Component {
       fragmentMap = {},
       linkFragmentMap,
       noPrebuiltConstructs = false,
-      dataTableProps: passedDataTableProps
+      dataTableProps: passedDataTableProps,
+      synthonSequenceTitleElements = []
     } = this.props;
     const { linkDialogName } = this.state;
 
@@ -372,9 +373,7 @@ class J5ReportRecordView extends Component {
           {/* tnr: this is just the dialog that needs to be on the page. not actually rendering anything */}
           {LinkJ5TableDialog && (
             <Dialog
-              style={{
-                width: linkDialogWidth
-              }}
+              style={{ width: linkDialogWidth }}
               {...(currentLink ? currentLink.dialogProps : {})}
               onClose={this.hideLinkModal}
               isOpen={!!linkDialogName}
@@ -507,6 +506,7 @@ class J5ReportRecordView extends Component {
             isLinkable={LinkJ5TableDialog}
             showLinkModal={() => this.showLinkModal("dnaSynthesisSequences")}
             linkButtonText="Link DNA Synthesis Pieces"
+            openTitleElements={synthonSequenceTitleElements}
             cellRenderer={
               getIsLinkedCellRenderer &&
               getIsLinkedCellRenderer(
