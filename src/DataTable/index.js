@@ -617,8 +617,6 @@ class DataTable extends React.Component {
             [rowId]: !isExpanded
           });
           return;
-        } else if (withCheckboxes) {
-          return;
         }
         rowClick(e, rowInfo, entities, computePresets(this.props));
       },
@@ -771,7 +769,6 @@ class DataTable extends React.Component {
               newIdMap[entityId] = { entity };
             }
           }
-
           finalizeSelection({
             idMap: newIdMap,
             props: computePresets(this.props)
@@ -799,84 +796,80 @@ class DataTable extends React.Component {
     if (!columns.length) {
       return columns;
     }
-    const columnsToRender = [
-      ...(SubComponent
-        ? [
-            {
-              ...(withExpandAndCollapseAllButton && {
-                Header: () => {
-                  const showCollapseAll =
-                    Object.values(reduxFormExpandedEntityIdMap).filter(i => i)
-                      .length === entities.length;
-                  return (
-                    <InfoHelper
-                      content={showCollapseAll ? "Collapse All" : "Expand All"}
-                      isButton
-                      popoverProps={{
-                        modifiers: {
-                          preventOverflow: { enabled: false },
-                          hide: { enabled: false }
-                        }
-                      }}
-                      onClick={() => {
-                        showCollapseAll
-                          ? change("reduxFormExpandedEntityIdMap", {})
-                          : change(
-                              "reduxFormExpandedEntityIdMap",
-                              entities.reduce((acc, e) => {
-                                acc[e.id] = true;
-                                return acc;
-                              }, {})
-                            );
-                      }}
-                      className={classNames(
-                        "tg-expander-all",
-                        Classes.MINIMAL,
-                        Classes.SMALL
-                      )}
-                      icon={showCollapseAll ? "chevron-down" : "chevron-right"}
-                    />
-                  );
-                }
-              }),
-              expander: true,
-              Expander: ({ isExpanded }) => {
-                return (
-                  <Button
-                    className={classNames(
-                      "tg-expander",
-                      Classes.MINIMAL,
-                      Classes.SMALL
-                    )}
-                    icon={isExpanded ? "chevron-down" : "chevron-right"}
-                  />
-                );
-              }
-            }
-          ]
-        : []),
-      ...(withCheckboxes
-        ? [
-            {
-              Header: this.renderCheckboxHeader,
-              Cell: this.renderCheckboxCell,
-              width: 35,
-              resizable: false,
-              getHeaderProps: () => {
-                return {
-                  className: "tg-react-table-checkbox-header-container",
-                  immovable: "true"
-                };
-              },
-              getProps: () => {
-                return {
-                  className: "tg-react-table-checkbox-cell-container"
-                };
-              }
-            }
-          ]
-        : [])
-    ];
+    const columnsToRender = [];
+    if (SubComponent) {
+      columnsToRender.push({
+        ...(withExpandAndCollapseAllButton && {
+          Header: () => {
+            const showCollapseAll =
+              Object.values(reduxFormExpandedEntityIdMap).filter(i => i)
+                .length === entities.length;
+            return (
+              <InfoHelper
+                content={showCollapseAll ? "Collapse All" : "Expand All"}
+                isButton
+                popoverProps={{
+                  modifiers: {
+                    preventOverflow: { enabled: false },
+                    hide: { enabled: false }
+                  }
+                }}
+                onClick={() => {
+                  showCollapseAll
+                    ? change("reduxFormExpandedEntityIdMap", {})
+                    : change(
+                        "reduxFormExpandedEntityIdMap",
+                        entities.reduce((acc, e) => {
+                          acc[e.id] = true;
+                          return acc;
+                        }, {})
+                      );
+                }}
+                className={classNames(
+                  "tg-expander-all",
+                  Classes.MINIMAL,
+                  Classes.SMALL
+                )}
+                icon={showCollapseAll ? "chevron-down" : "chevron-right"}
+              />
+            );
+          }
+        }),
+        expander: true,
+        Expander: ({ isExpanded }) => {
+          return (
+            <Button
+              className={classNames(
+                "tg-expander",
+                Classes.MINIMAL,
+                Classes.SMALL
+              )}
+              icon={isExpanded ? "chevron-down" : "chevron-right"}
+            />
+          );
+        }
+      });
+    }
+
+    if (withCheckboxes) {
+      columnsToRender.push({
+        Header: this.renderCheckboxHeader,
+        Cell: this.renderCheckboxCell,
+        width: 35,
+        resizable: false,
+        getHeaderProps: () => {
+          return {
+            className: "tg-react-table-checkbox-header-container",
+            immovable: "true"
+          };
+        },
+        getProps: () => {
+          return {
+            className: "tg-react-table-checkbox-cell-container"
+          };
+        }
+      });
+    }
     columns.forEach(column => {
       const tableColumn = {
         ...column,

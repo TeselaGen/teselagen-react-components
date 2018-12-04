@@ -239,6 +239,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         };
         ids.forEach(id => {
           const entity = entitiesById[id];
+          if (!entity) return;
           newIdMap[id] = {
             entity
           };

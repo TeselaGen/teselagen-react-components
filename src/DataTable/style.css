@@ -269,6 +269,11 @@
   padding-left: 18px;
 }
 
+.tg-react-table-checkbox-header-container .bp3-control-indicator,
+.tg-react-table-checkbox-cell-container .bp3-control-indicator {
+  margin-left: -10px !important;
+}
+
 /* .tg-compact-table .rt-tr-group {
   min-height: 25px !important;
 } */
