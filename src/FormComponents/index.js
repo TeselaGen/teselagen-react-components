@@ -119,6 +119,7 @@ class AbstractInput extends React.Component {
       meta,
       containerStyle,
       noOuterLabel,
+      dataTestAttr,
       noFillField
     } = this.props;
     const { touched, error } = meta;
@@ -149,9 +150,10 @@ class AbstractInput extends React.Component {
     }
     return (
       <FormGroup
-        className={classNames(className, {
+        className={classNames(className, dataTestAttr, {
           "tg-tooltipError": tooltipError
         })}
+        // data-test={}
         disabled={disabled}
         helperText={!tooltipError && showError && error}
         intent={intent}
@@ -622,8 +624,8 @@ export class RenderReactColorPicker extends React.Component {
   }
 }
 
-function generateField(component, opts) {
-  const compWithDefaultVal = withAbstractWrapper(component, opts);
+function generateField(dataTestAttr, component, opts) {
+  const compWithDefaultVal = withAbstractWrapper(dataTestAttr, component, opts);
   return function FieldMaker({ name, onFieldSubmit = noop, ...rest }) {
     // function onFieldSubmit(e,val) {
     //   _onFieldSubmit && _onFieldSubmit(e.target ? e.target.value : val)
@@ -639,7 +641,11 @@ function generateField(component, opts) {
   };
 }
 
-export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
+export const withAbstractWrapper = (
+  dataTestAttr,
+  ComponentToWrap,
+  opts = {}
+) => {
   return props => {
     let defaultProps = {
       ...props,
@@ -647,34 +653,70 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
       intentClass: getIntentClass(props)
     };
     return (
-      <AbstractInput {...{ ...opts, ...defaultProps }}>
+      <AbstractInput {...{ ...opts, ...defaultProps, dataTestAttr }}>
         <ComponentToWrap {...defaultProps} />
       </AbstractInput>
     );
   };
 };
 
-export const InputField = generateField(renderBlueprintInput);
-export const FileUploadField = generateField(renderFileUpload);
-export const DateInputField = generateField(renderBlueprintDateInput);
-export const DateRangeInputField = generateField(renderBlueprintDateRangeInput);
-export const CheckboxField = generateField(renderBlueprintCheckbox, {
-  noOuterLabel: true,
-  noFillField: true
-});
-export const SwitchField = generateField(renderBlueprintSwitch, {
-  noOuterLabel: true,
-  noFillField: true
-});
-export const TextareaField = generateField(renderBlueprintTextarea);
-export const EditableTextField = generateField(renderBlueprintEditableText);
-export const NumericInputField = generateField(renderBlueprintNumericInput);
-export const RadioGroupField = generateField(renderBlueprintRadioGroup, {
-  noFillField: true
-});
-export const ReactSelectField = generateField(renderReactSelect);
-export const SelectField = generateField(renderSelect);
-export const ReactColorField = generateField(RenderReactColorPicker);
+export const InputField = generateField("tg-test-input", renderBlueprintInput);
+export const FileUploadField = generateField(
+  "tg-test-file-upload",
+  renderFileUpload
+);
+export const DateInputField = generateField(
+  "tg-test-date-input",
+  renderBlueprintDateInput
+);
+export const DateRangeInputField = generateField(
+  "tg-test-date-range-input",
+  renderBlueprintDateRangeInput
+);
+export const CheckboxField = generateField(
+  "tg-test-checkbox",
+  renderBlueprintCheckbox,
+  {
+    noOuterLabel: true,
+    noFillField: true
+  }
+);
+export const SwitchField = generateField(
+  "tg-test-switch",
+  renderBlueprintSwitch,
+  {
+    noOuterLabel: true,
+    noFillField: true
+  }
+);
+export const TextareaField = generateField(
+  "tg-test-textarea",
+  renderBlueprintTextarea
+);
+export const EditableTextField = generateField(
+  "tg-test-editable-text",
+  renderBlueprintEditableText
+);
+export const NumericInputField = generateField(
+  "tg-test-numeric-input",
+  renderBlueprintNumericInput
+);
+export const RadioGroupField = generateField(
+  "tg-test-radio-group",
+  renderBlueprintRadioGroup,
+  {
+    noFillField: true
+  }
+);
+export const ReactSelectField = generateField(
+  "tg-test-react-select",
+  renderReactSelect
+);
+export const SelectField = generateField("tg-test-select", renderSelect);
+export const ReactColorField = generateField(
+  "tg-test-react-color-picker",
+  RenderReactColorPicker
+);
 
 function getOptions(options) {
   return (
