@@ -9,7 +9,8 @@ export default function rowClick(e, rowInfo, entities, props) {
     isSingleSelect,
     noSelect,
     onRowClick,
-    isEntityDisabled
+    isEntityDisabled,
+    withCheckboxes
   } = props;
   const entity = rowInfo.original;
   onRowClick(e, entity, rowInfo);
@@ -17,7 +18,7 @@ export default function rowClick(e, rowInfo, entities, props) {
   const rowId = getIdOrCodeOrIndex(entity, rowInfo.index);
   if (rowId === undefined) return;
 
-  const ctrl = e.metaKey || e.ctrlKey;
+  const ctrl = e.metaKey || e.ctrlKey || (withCheckboxes && !e.shiftKey);
   const oldIdMap = reduxFormSelectedEntityIdMap || {};
   const rowSelected = oldIdMap[rowId];
   let newIdMap = {

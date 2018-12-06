@@ -617,7 +617,9 @@ class DataTable extends React.Component {
             [rowId]: !isExpanded
           });
           return;
-        } else if (withCheckboxes) {
+        } else if (
+          e.target.closest(".tg-react-table-checkbox-cell-container")
+        ) {
           return;
         }
         rowClick(e, rowInfo, entities, computePresets(this.props));

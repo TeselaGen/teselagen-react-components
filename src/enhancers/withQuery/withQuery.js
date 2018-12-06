@@ -230,9 +230,7 @@ function getVariables(ownProps, queryOptions, options) {
         queryNameToUse,
         "but none was found"
       );
-      /* eslint-disable */
-      debugger;
-      /* eslint-enable */
+      debugger; // eslint-disable-line
       // to prevent crash
       id = -1;
     }

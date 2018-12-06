@@ -26,6 +26,10 @@
   display: flex;
 }
 
+.datatable-search-input.bp3-form-group {
+  margin-bottom: 0;
+}
+
 .data-table-header {
   display: flex;
   margin-bottom: 20px;

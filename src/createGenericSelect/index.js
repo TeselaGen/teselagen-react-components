@@ -765,7 +765,7 @@ class InnerComp extends Component {
           autoBlur={false}
           closeMenuOnSelect={false}
           onChange={this.handleReactSelectFieldSubmit}
-          optionComponent={OptionOverrride}
+          optionComponent={OptionOverride}
           options={this.getReactSelectOptions()}
           onInputChange={this.handleReactSelectSearch}
           name={passedName}
@@ -810,7 +810,7 @@ class InnerComp extends Component {
   }
 }
 
-class OptionOverrride extends React.Component {
+class OptionOverride extends React.Component {
   node = React.createRef();
   componentDidMount() {
     this.node.current.ontouchstart = this.preventPropagation;
