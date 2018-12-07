@@ -67,6 +67,9 @@ export * from "./utils/menuUtils";
 export * from "./utils/commandUtils";
 export { default as generateQuery } from "./utils/generateQuery";
 export { default as Tree } from "./Tree";
+export {
+  default as AsyncValidateFieldSpinner
+} from "./AsyncValidateFieldSpinner";
 
 export {
   default as modelNameToLink,
