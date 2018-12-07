@@ -1,6 +1,5 @@
 import { chunk, get } from "lodash";
 import modelNameToReadableName from "../utils/modelNameToReadableName";
-import showProgressToast from "../utils/showProgressToast";
 import withQuery from "./withQuery/withQuery";
 import withDelete from "./withDelete";
 import withUpsert from "./withUpsert";
@@ -56,7 +55,12 @@ export default function getApolloMethods(client) {
    * return them together
    */
   async function safeQuery(fragment, passedOptions = {}) {
-    const { nameOverride, pageSize = 50, ...maybeOptions } = passedOptions;
+    const {
+      nameOverride,
+      pageSize = 50,
+      showToast,
+      ...maybeOptions
+    } = passedOptions;
     // not plural
     if (
       get(maybeOptions, "variables.id") ||
@@ -103,14 +107,14 @@ export default function getApolloMethods(client) {
       const pageOfItems = await query(fragment, options);
       items = items.concat(pageOfItems);
       totalResults = pageOfItems.totalResults;
-      if (totalResults > 100) {
+      if (showToast && totalResults > 100) {
         const readableName =
           nameOverride ||
           modelNameToReadableName(get(items, "[0].__typename"), {
             plural: true
           });
         const toastMessage = `Loading ${readableName}:`;
-        clearToast = showProgressToast(
+        clearToast = showToast(
           nameOverride ? `Loading ${nameOverride}` : toastMessage,
           items.length / totalResults,
           clearToast && clearToast.key
@@ -124,6 +128,12 @@ export default function getApolloMethods(client) {
       }, 1500);
     }
     return items;
+  }
+
+  function makeSafeQueryWithToast(showToast) {
+    return (fragment, passedOptions = {}) => {
+      return safeQuery(fragment, { ...passedOptions, showToast });
+    };
   }
 
   const deleteFn = (fragment, options, idOrIdsToDelete) => {
@@ -152,6 +162,7 @@ export default function getApolloMethods(client) {
     safeUpsert,
     query,
     safeQuery,
+    makeSafeQueryWithToast,
     delete: deleteFn,
     safeDelete
   };
