@@ -148,7 +148,7 @@ export default function getApolloMethods(client) {
       asFunction: true,
       client,
       ...optionsToUse
-    })(idOrIdsToDeleteToUse);
+    })(idOrIdsToDeleteToUse, options);
   };
 
   async function safeDelete(...args) {
