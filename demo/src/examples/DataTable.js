@@ -364,12 +364,7 @@ class DataTableInstance extends React.Component {
           "maxHeight",
           "By default every table has a max height of 800px. Setting this true changes it to 200px"
         )}
-        <Button onClick={() => {
-          tableParams.selectRecords([1,2,3])
-        }}>
-          Select ids 1, 2, 3 (uses tableParams.selectRecords(id) method)
-        </Button>
-        <br></br>
+        <br />
         {selectedEntities && (
           <div>
             The following records are selected (pass withSelectedEntities: true

@@ -2,7 +2,7 @@
 import { change, formValueSelector } from "redux-form";
 import { connect } from "react-redux";
 import compose from "lodash/fp/compose";
-import { isFunction, keyBy } from "lodash";
+import { isFunction } from "lodash";
 import { withRouter } from "react-router-dom";
 import { branch } from "recompose";
 
@@ -230,31 +230,15 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
     });
     const { variables, selectedEntities, ...restStateProps } = stateProps;
 
-    function selectRecords(ids, keepOldEntities) {
-      setTimeout(function() {
-        const { entities } = tableParams;
-        const entitiesById = keyBy(entities, "id");
-        const newIdMap = {
-          ...(keepOldEntities && selectedEntities)
-        };
-        ids.forEach(id => {
-          const entity = entitiesById[id];
-          if (!entity) return;
-          newIdMap[id] = {
-            entity
-          };
-        });
-        dispatchProps.dispatch(
-          change(formName, "reduxFormSelectedEntityIdMap", newIdMap)
-        );
-      });
-    }
+    const changeFormValue = (...args) =>
+      dispatchProps.dispatch(change(formName, ...args));
 
     const tableParams = {
+      changeFormValue,
+      selectedEntities,
       ...ownProps.tableParams,
       ...restStateProps,
       ...boundDispatchProps,
-      selectRecords,
       form: formName, //this will override the default redux form name
       isTableParamsConnected: true //let the table know not to do local sorting/filtering etc.
     };

@@ -1,9 +1,10 @@
 import { graphql } from "react-apollo";
-import { get, upperFirst, camelCase, isEmpty } from "lodash";
+import { get, upperFirst, camelCase, isEmpty, keyBy } from "lodash";
 import React from "react";
 import deepEqual from "deep-equal";
 import compose from "lodash/fp/compose";
 import pluralize from "pluralize";
+import { withHandlers, branch } from "recompose";
 import generateQuery from "../../utils/generateQuery";
 import generateFragmentWithFields from "../../utils/generateFragmentWithFields";
 
@@ -85,6 +86,28 @@ export default function withQuery(inputFragment, options = {}) {
     };
   }
 
+  const tableParamHandlers = {
+    selectTableRecords: props => (ids, keepOldEntities) => {
+      const {
+        tableParams: { entities, selectedEntities, changeFormValue }
+      } = props;
+      setTimeout(function() {
+        const entitiesById = keyBy(entities, "id");
+        const newIdMap = {
+          ...(keepOldEntities && selectedEntities)
+        };
+        ids.forEach(id => {
+          const entity = entitiesById[id];
+          if (!entity) return;
+          newIdMap[id] = {
+            entity
+          };
+        });
+        changeFormValue("reduxFormSelectedEntityIdMap", newIdMap);
+      });
+    }
+  };
+
   return compose(
     graphql(gqlQuery, {
       //default options
@@ -146,20 +169,23 @@ export default function withQuery(inputFragment, options = {}) {
           queryNameToUse
         });
 
+        let newTableParams;
+        if (tableParams && !tableParams.entities && !tableParams.isLoading) {
+          const entities = results;
+
+          newTableParams = {
+            ...tableParams,
+            isLoading: data.loading,
+            entities,
+            entityCount: totalResults,
+            onRefresh: data.refetch,
+            variables,
+            fragment
+          };
+        }
+
         const propsToReturn = {
-          ...(tableParams && !tableParams.entities && !tableParams.isLoading
-            ? {
-                tableParams: {
-                  ...tableParams,
-                  isLoading: data.loading,
-                  entities: results,
-                  entityCount: totalResults,
-                  onRefresh: data.refetch,
-                  variables,
-                  fragment
-                }
-              }
-            : {}),
+          ...(newTableParams && { tableParams: newTableParams }),
           data: newData,
           [queryNameToUse]: newData,
           [nameToUse]: results,
@@ -186,6 +212,7 @@ export default function withQuery(inputFragment, options = {}) {
       },
       ...rest //overwrite defaults here
     }),
+    branch(props => props.tableParams, withHandlers(tableParamHandlers)),
     function WithLoadingHOC(WrappedComponent) {
       return class WithLoadingComp extends React.Component {
         UNSAFE_componentWillReceiveProps(nextProps) {
