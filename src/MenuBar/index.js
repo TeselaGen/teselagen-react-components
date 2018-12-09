@@ -57,6 +57,7 @@ export default class MenuBar extends React.Component {
             button
           ) : (
             <Popover
+              autoFocus={false}
               key={i}
               minimal
               portalClassName="tg-menu-bar-popover"
