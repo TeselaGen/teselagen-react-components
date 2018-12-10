@@ -19,7 +19,8 @@ import {
   Position,
   Switch,
   Classes,
-  FormGroup
+  FormGroup,
+  Button
 } from "@blueprintjs/core";
 
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
@@ -281,40 +282,109 @@ export const renderFileUpload = props => {
   );
 };
 
-export const renderBlueprintTextarea = props => {
-  const {
-    input,
-    intentClass,
-    inputClassName,
-    onFieldSubmit,
-    onKeyDown = noop,
-    ...rest
-  } = props;
-  return (
-    <textarea
-      {...removeUnwantedProps(rest)}
-      className={classNames(
-        intentClass,
-        inputClassName,
-        Classes.INPUT,
-        Classes.FILL
-      )}
-      {...input}
-      onBlur={function(e, val) {
-        if (rest.readOnly) return;
-        input.onBlur(e, val);
-        onFieldSubmit(e.target ? e.target.value : val, { blur: true }, e);
-      }}
-      onKeyDown={function(...args) {
-        const e = args[0];
-        onKeyDown(...args);
-        if (e.keyCode === 13 && (e.metaKey || e.ctrlKey)) {
-          onFieldSubmit(e.target.value, { cmdEnter: true }, e);
-        }
-      }}
-    />
-  );
-};
+export class renderBlueprintTextarea extends React.Component {
+  state = {
+    value: null,
+    isOpen: false
+  };
+  allowEdit = () => {
+    this.setState({ isOpen: true });
+  };
+  stopEdit = () => {
+    this.setState({ isOpen: false });
+    this.setState({ value: null });
+  };
+  updateVal = e => {
+    this.setState({ value: e.target.value });
+  };
+  handleValSubmit = () => {
+    this.props.input.onChange(this.state.value);
+    this.props.onFieldSubmit(this.state.value, { cmdEnter: true });
+
+    this.stopEdit();
+  };
+  onKeyDown = (...args) => {
+    const e = args[0];
+    (this.props.onKeyDown || noop)(...args);
+    if (e.keyCode === 13 && (e.metaKey || e.ctrlKey)) {
+      this.props.onFieldSubmit(e.target.value, { cmdEnter: true }, e);
+      this.props.input.onChange(e);
+      this.stopEdit();
+    }
+  };
+  render() {
+    const {
+      input,
+      intentClass,
+      inputClassName,
+      onFieldSubmit,
+      clickToEdit,
+      onKeyDown,
+      ...rest
+    } = this.props;
+    if (clickToEdit) {
+      const isDisabled = clickToEdit && !this.state.isOpen;
+
+      return (
+        <React.Fragment>
+          <textarea
+            disabled={isDisabled}
+            {...removeUnwantedProps(rest)}
+            className={classNames(
+              intentClass,
+              inputClassName,
+              Classes.INPUT,
+              Classes.FILL
+            )}
+            value={this.state.value === null ? input.value : this.state.value}
+            onChange={this.updateVal}
+            onKeyDown={this.onKeyDown}
+          />
+          {clickToEdit &&
+            (this.state.isOpen ? (
+              //show okay/cancel buttons
+              <div>
+                <Button onClick={this.stopEdit} intent="danger">
+                  Cancel
+                </Button>
+                <Button onClick={this.handleValSubmit} intent="success">
+                  Ok
+                </Button>
+              </div>
+            ) : (
+              //show click to edit button
+              <Button onClick={this.allowEdit}>Edit</Button>
+            ))}
+        </React.Fragment>
+      );
+    } else {
+      return (
+        <textarea
+          {...removeUnwantedProps(rest)}
+          className={classNames(
+            intentClass,
+            inputClassName,
+            Classes.INPUT,
+            Classes.FILL
+          )}
+          {...input}
+          onBlur={function(e, val) {
+            if (rest.readOnly) return;
+            input.onBlur(e, val);
+            onFieldSubmit(e.target ? e.target.value : val, { blur: true }, e);
+          }}
+          onKeyDown={function(...args) {
+            const e = args[0];
+            onKeyDown(...args);
+            if (e.keyCode === 13 && (e.metaKey || e.ctrlKey)) {
+              onFieldSubmit(e.target.value, { cmdEnter: true }, e);
+            }
+          }}
+        />
+      );
+    }
+  }
+}
 
 // class ClickToEditWrapper extends React.Component {
 //   state = { isEditing: false };
