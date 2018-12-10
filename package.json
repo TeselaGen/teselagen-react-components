@@ -23,7 +23,7 @@
     "deploy": "gh-pages -d demo/dist",
     "fontopen": "make fontopen",
     "fontsave": "make fontsave",
-    "yarn c": "yarn cypress open",
+    "c": "yarn cypress open",
     "test": "yarn cypress run"
   },
   "dependencies": {
