@@ -1,1 +1,1 @@
-export { default as withQueryDynamic } from "./withQuery";
+export default from "./withQuery";
