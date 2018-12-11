@@ -2,13 +2,17 @@ describe('formComponents', () => {
   beforeEach(() => {
     cy.visit("#/FormComponents")
   })
-  it.only(`TextAreaField should have an option "clickToEdit" to not be immediately editable
+  it.only(`TextAreaField can be edited like normal`, ()=> {
+   cy.get('.tg-test-text-area-field textarea').type('test text')
+      
+  })
+
+  it(`TextAreaField should have an option "clickToEdit" to not be immediately editable
   - edit disabled before
   - click edit allows edit
   - click cancel cancels edit and discards edits 
   - cmd + enter enters 
   - clicking okay enters
-
   `, ()=> {
    cy.get('.tg-test-text-area-field-with-click-to-edit textarea').should("be.disabled")
 
