@@ -94,7 +94,7 @@ class FormComponentsDemo extends React.Component {
             defaultValue={"Default Value Here!"}
             placeholder="Enter input..."
             onFieldSubmit={onFieldSubmit}
-            containerStyle={{background: "black", height: 200}}
+            containerStyle={{ background: "black", height: 200 }}
           />
           <InputField
             name={"inputFieldWithTooltipError"}
@@ -249,8 +249,7 @@ class FormComponentsDemo extends React.Component {
             inlineLabel={this.state.inlineLabels}
             label={
               <span>
-             CheckboxField  
-                Label and Icon <Icon icon="tick" />
+                CheckboxField Label and Icon <Icon icon="tick" />
               </span>
             }
           />
@@ -269,7 +268,7 @@ class FormComponentsDemo extends React.Component {
             placeholder="Enter notes..."
           />
           <TextareaField
-          clickToEdit
+            clickToEdit
             name={"textAreaFieldWithClickToEdit"}
             inlineLabel={this.state.inlineLabels}
             onFieldSubmit={onFieldSubmit}

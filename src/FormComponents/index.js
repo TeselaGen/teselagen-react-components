@@ -319,7 +319,6 @@ export class renderBlueprintTextarea extends React.Component {
       inputClassName,
       onFieldSubmit,
       clickToEdit,
-      onKeyDown,
       ...rest
     } = this.props;
     if (clickToEdit) {
@@ -375,7 +374,7 @@ export class renderBlueprintTextarea extends React.Component {
           }}
           onKeyDown={function(...args) {
             const e = args[0];
-            onKeyDown(...args);
+            (this.props.onKeyDown || noop)(...args);
             if (e.keyCode === 13 && (e.metaKey || e.ctrlKey)) {
               onFieldSubmit(e.target.value, { cmdEnter: true }, e);
             }

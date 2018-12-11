@@ -45,6 +45,12 @@
   font-weight: 300;
   margin-right: 10px;
 }
+.data-table-header {
+  min-height: 30px;
+}
+.data-table-footer {
+  min-height: 18px;
+}
 
 .data-table-container {
   padding: 20px;
