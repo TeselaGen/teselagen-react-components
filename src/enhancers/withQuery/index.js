@@ -75,6 +75,7 @@ export default function withQuery(__inputFragment, maybeOptions) {
       fragment: _fragment,
       showError = true,
       options: queryOptions,
+      skip: skipQueryFn,
       ...rest
     } = mergedOpts;
 
@@ -113,18 +114,32 @@ export default function withQuery(__inputFragment, maybeOptions) {
         /* eslint-enable */
       }
     }
-    let extraOptions = queryOptions || {};
-    if (typeof queryOptions === "function") {
-      extraOptions = queryOptions(props) || {};
+
+    let shouldSkipQuery = false;
+    if (skipQueryFn) {
+      shouldSkipQuery = skipQueryFn(componentProps);
     }
+
+    let extraOptions = queryOptions || {};
+    if (!shouldSkipQuery) {
+      if (typeof queryOptions === "function") {
+        extraOptions = queryOptions(props) || {};
+      }
+    }
+
     const {
       variables: extraOptionVariables,
       ...otherExtraOptions
     } = extraOptions;
-    const variablesToUse = getVariables(props, propVariables, queryOptions, {
-      ...options,
-      queryNameToUse
-    });
+    const variablesToUse = getVariables(
+      props,
+      propVariables,
+      extraOptionVariables,
+      {
+        ...options,
+        queryNameToUse
+      }
+    );
 
     if (
       get(variablesToUse, "filter.entity") &&
@@ -143,6 +158,7 @@ export default function withQuery(__inputFragment, maybeOptions) {
           ssr: false,
           pollInterval,
           notifyOnNetworkStatusChange,
+          skip: shouldSkipQuery,
           ...otherExtraOptions,
           ...rest //overwrite defaults here
         }}
@@ -235,7 +251,7 @@ function getMergedOpts(topLevelOptions, runTimeQueryOptions) {
   return { ...topLevelOptions, ...runTimeQueryOptions };
 }
 
-function getVariables(ownProps, propVariables, queryOptions, options) {
+function getVariables(ownProps, propVariables, extraOptionVariables, options) {
   const { getIdFromParams, queryNameToUse, variables } = options;
   let id;
   if (getIdFromParams) {
@@ -251,12 +267,7 @@ function getVariables(ownProps, propVariables, queryOptions, options) {
       id = -1;
     }
   }
-  let extraOptions = queryOptions || {};
-  if (typeof queryOptions === "function") {
-    extraOptions = queryOptions(ownProps) || {};
-  }
 
-  const { variables: extraOptionVariables } = extraOptions;
   return {
     ...(getIdFromParams && { id }),
     ...variables,
