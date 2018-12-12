@@ -328,7 +328,9 @@ function getAsFnOrQueryHelper(fragment, options) {
   } = options;
 
   const gqlQuery = generateQuery(fragment, options);
-  const modelName = get(fragment, "definitions[0].typeCondition.name.value");
+  const modelName = Array.isArray(fragment)
+    ? fragment[0]
+    : get(fragment, "definitions[0].typeCondition.name.value");
   const nameToUse =
     nameOverride || (isPlural ? pluralize(modelName) : modelName);
 
