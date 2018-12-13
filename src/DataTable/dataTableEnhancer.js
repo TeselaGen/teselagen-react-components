@@ -12,7 +12,7 @@ import { withProps, withState, branch } from "recompose";
 import withTableParams from "../DataTable/utils/withTableParams";
 import convertSchema from "../DataTable/utils/convertSchema";
 import viewColumn from "../DataTable/viewColumn";
-import pureNoFunc from "../../lib/utils/pureNoFunc";
+import pureNoFunc from "../utils/pureNoFunc";
 
 export default compose(
   //connect to withTableParams here in the dataTable component so that, in the case that the table is not manually connected,
