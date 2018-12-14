@@ -10,15 +10,24 @@ const BottomToaster = Toaster.create({
   position: Position.BOTTOM
 });
 
+let counter = 5000;
 const generateToast = intent => (message, options) => {
   options = options || {};
   const toastToUse = options.bottom ? BottomToaster : TopToaster;
-
+  let updatedTimeout;
+  if (options.updateTimeout) {
+    //generate a slightly different than default timeout to make the update stay on the page for a full 5 seconds
+    if (counter > 5500) {
+      updatedTimeout = --counter;
+    } else {
+      updatedTimeout = ++counter;
+    }
+  }
   const uniqKey = toastToUse.show(
     {
       intent,
       message,
-      timeout: options.timeout,
+      timeout: options.timeout || updatedTimeout,
       action: options.action,
       icon: options.icon
     },
@@ -36,6 +45,7 @@ function preventDuplicates(func) {
   return (message, options = {}) => {
     const clearToast = func(message, options);
     // no duplicate check for toasts with updates
+
     if (!options.key) {
       if (!options.key && previousToasts[message]) {
         previousToasts[message](); //clear it!
