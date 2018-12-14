@@ -465,7 +465,13 @@ class DataTable extends React.Component {
               {topLeftItems}
             </div>
             {errorParsingUrlString && (
-              <Callout icon="error" intent={Intent.WARNING}>
+              <Callout
+                icon="error"
+                style={{
+                  width: "unset"
+                }}
+                intent={Intent.WARNING}
+              >
                 Error parsing URL
               </Callout>
             )}

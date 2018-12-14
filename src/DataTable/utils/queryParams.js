@@ -230,9 +230,14 @@ function getFiltersFromSearchTerm(searchTerm, schema) {
 function getSubFilter(
   qb, //if no qb is passed, it means we are filtering locally and want to get a function back that can be used in an array filter
   selectedFilter,
-  filterValue
+  _filterValue
 ) {
   const ccSelectedFilter = camelCase(selectedFilter);
+  const filterValue =
+    _filterValue && _filterValue.toString
+      ? _filterValue.toString()
+      : _filterValue;
+
   const filterValLower =
     filterValue && filterValue.toLowerCase && filterValue.toLowerCase();
 
