@@ -121,10 +121,8 @@ export default function withQuery(__inputFragment, maybeOptions) {
     }
 
     let extraOptions = queryOptions || {};
-    if (!shouldSkipQuery) {
-      if (typeof queryOptions === "function") {
-        extraOptions = queryOptions(props) || {};
-      }
+    if (typeof queryOptions === "function") {
+      extraOptions = queryOptions(props) || {};
     }
 
     const {
@@ -164,72 +162,80 @@ export default function withQuery(__inputFragment, maybeOptions) {
         }}
       >
         {({ data: _data, ...queryProps }) => {
-          const data = {
-            ..._data,
-            ...queryProps
-          };
+          let allPropsForComponent = componentProps,
+            newData;
+          if (!shouldSkipQuery) {
+            const data = {
+              ..._data,
+              ...queryProps
+            };
 
-          const results = get(data, nameToUse + (isPlural ? ".results" : ""));
-          const { tableParams } = componentProps;
-          const totalResults = isPlural
-            ? get(data, nameToUse + ".totalResults", 0)
-            : results && 1;
+            const results = get(data, nameToUse + (isPlural ? ".results" : ""));
+            const { tableParams } = componentProps;
+            const totalResults = isPlural
+              ? get(data, nameToUse + ".totalResults", 0)
+              : results && 1;
 
-          const newData = {
-            ...data,
-            totalResults,
-            //adding these for consistency with withItemsQuery
-            entities: results,
-            entityCount: totalResults,
-            ["error" + upperFirst(nameToUse)]: data.error,
-            ["loading" + upperFirst(nameToUse)]: data.loading
-          };
-
-          data.loading = data.loading || data.networkStatus === 4;
-
-          let newTableParams;
-          if (tableParams && !tableParams.entities && !tableParams.isLoading) {
-            const entities = results;
-
-            newTableParams = {
-              ...tableParams,
-              isLoading: data.loading,
-              entities,
+            newData = {
+              ...data,
+              totalResults,
+              //adding these for consistency with withItemsQuery
+              entities: results,
               entityCount: totalResults,
-              onRefresh: data.refetch,
-              variables: variablesToUse,
-              fragment
+              ["error" + upperFirst(nameToUse)]: data.error,
+              ["loading" + upperFirst(nameToUse)]: data.loading
             };
-          }
 
-          const propsToReturn = {
-            ...(newTableParams && { tableParams: newTableParams }),
-            data: newData,
-            [queryNameToUse]: newData,
-            [nameToUse]: results,
-            [nameToUse + "Error"]: data.error,
-            [nameToUse + "Loading"]: data.loading,
-            [nameToUse + "Count"]: totalResults,
-            [camelCase("refetch_" + nameToUse)]: data.refetch,
-            fragment,
-            gqlQuery
-          };
+            data.loading = data.loading || data.networkStatus === 4;
 
-          if (data.loading && showLoading) {
-            const bounce = inDialog || showLoading === "bounce";
-            return <LoadingComp inDialog={inDialog} bounce={bounce} />;
-          }
+            let newTableParams;
+            if (
+              tableParams &&
+              !tableParams.entities &&
+              !tableParams.isLoading
+            ) {
+              const entities = results;
 
-          let allPropsForComponent = {
-            ...componentProps,
-            ...propsToReturn
-          };
+              newTableParams = {
+                ...tableParams,
+                isLoading: data.loading,
+                entities,
+                entityCount: totalResults,
+                onRefresh: data.refetch,
+                variables: variablesToUse,
+                fragment
+              };
+            }
 
-          if (isFunction(mapQueryProps)) {
+            const propsToReturn = {
+              ...(newTableParams && { tableParams: newTableParams }),
+              data: newData,
+              [queryNameToUse]: newData,
+              [nameToUse]: results,
+              [nameToUse + "Error"]: data.error,
+              [nameToUse + "Loading"]: data.loading,
+              [nameToUse + "Count"]: totalResults,
+              [camelCase("refetch_" + nameToUse)]: data.refetch,
+              fragment,
+              gqlQuery
+            };
+
+            if (data.loading && showLoading) {
+              const bounce = inDialog || showLoading === "bounce";
+              return <LoadingComp inDialog={inDialog} bounce={bounce} />;
+            }
+
             allPropsForComponent = {
-              ...allPropsForComponent,
-              ...mapQueryProps(allPropsForComponent)
+              ...componentProps,
+              ...propsToReturn
             };
+
+            if (isFunction(mapQueryProps)) {
+              allPropsForComponent = {
+                ...allPropsForComponent,
+                ...mapQueryProps(allPropsForComponent)
+              };
+            }
           }
 
           return (

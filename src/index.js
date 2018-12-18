@@ -39,7 +39,7 @@ export { default as J5ReportRecordView } from "./J5ReportRecordView";
 export * from "./J5ReportRecordView/utils";
 export { default as withDelete } from "./enhancers/withDelete";
 export { default as withUpsert } from "./enhancers/withUpsert";
-export { default as withQuery } from "./enhancers/withQuery";
+export { default as withQuery } from "./enhancers/withQuery.old";
 export { default as withQueryDynamic } from "./enhancers/withQueryDynamic";
 export { default as getApolloMethods } from "./enhancers/getApolloMethods";
 export { default as withFields } from "./enhancers/withFields";
