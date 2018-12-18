@@ -120,11 +120,14 @@ export default function withQuery(__inputFragment, maybeOptions) {
       shouldSkipQuery = skipQueryFn(componentProps);
     }
 
+    // bail early and just return Component
+    if (shouldSkipQuery) {
+      return <Component {...componentProps} />;
+    }
+
     let extraOptions = queryOptions || {};
-    if (!shouldSkipQuery) {
-      if (typeof queryOptions === "function") {
-        extraOptions = queryOptions(props) || {};
-      }
+    if (typeof queryOptions === "function") {
+      extraOptions = queryOptions(props) || {};
     }
 
     const {
