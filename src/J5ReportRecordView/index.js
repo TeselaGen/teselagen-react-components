@@ -266,12 +266,12 @@ class J5ReportRecordView extends Component {
     );
     return {
       fields: [
+        { path: "name", type: "string", displayName: "Construct Name" },
         {
           path: "id",
           type: "string",
           displayName: "Assembly ID"
         },
-        { path: "name", type: "string", displayName: "Construct Name" },
         {
           type: "string",
           displayName: "Assembly Method",
