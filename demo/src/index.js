@@ -86,6 +86,9 @@ import {
 } from "../../src/utils/commandUtils";
 import { withHotkeys, getHotkeyProps } from "../../src/utils/hotkeyUtils";
 
+// const { whyDidYouUpdate } = require("why-did-you-update");
+// whyDidYouUpdate(React);
+
 FocusStyleManager.onlyShowFocusOnTabs();
 
 const demos = {

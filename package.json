@@ -119,7 +119,8 @@
     "redux-thunk": "*",
     "sinon": "^4.4.9",
     "tg-client-query-builder": "^2.12.2",
-    "ve-range-utils": "^2.5.0"
+    "ve-range-utils": "^2.5.0",
+    "why-did-you-update": "^1.0.6"
   },
   "husky": {
     "hooks": {
