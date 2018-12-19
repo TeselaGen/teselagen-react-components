@@ -230,20 +230,20 @@ function getFiltersFromSearchTerm(searchTerm, schema) {
 function getSubFilter(
   qb, //if no qb is passed, it means we are filtering locally and want to get a function back that can be used in an array filter
   selectedFilter,
-  _filterValue
+  filterValue
 ) {
   const ccSelectedFilter = camelCase(selectedFilter);
-  const filterValue =
-    _filterValue && _filterValue.toString
-      ? _filterValue.toString()
-      : _filterValue;
-
+  let stringFilterValue =
+    filterValue && filterValue.toString ? filterValue.toString() : filterValue;
+  stringFilterValue = stringFilterValue || "";
   const filterValLower =
-    filterValue && filterValue.toLowerCase && filterValue.toLowerCase();
-
+    stringFilterValue.toLowerCase && stringFilterValue.toLowerCase();
+  const arrayFilterValue = Array.isArray(filterValue)
+    ? filterValue
+    : stringFilterValue.split(".");
   if (ccSelectedFilter === "startsWith") {
     return qb
-      ? qb.startsWith(filterValue) //filter using qb (aka we're backend connected)
+      ? qb.startsWith(stringFilterValue) //filter using qb (aka we're backend connected)
       : fieldVal => {
           //filter using plain old javascript (aka we've got a local table that isn't backend connected)
           if (!fieldVal || !fieldVal.toLowerCase) return false;
@@ -251,18 +251,15 @@ function getSubFilter(
         };
   } else if (ccSelectedFilter === "endsWith") {
     return qb
-      ? qb.endsWith(filterValue) //filter using qb (aka we're backend connected)
+      ? qb.endsWith(stringFilterValue) //filter using qb (aka we're backend connected)
       : fieldVal => {
           //filter using plain old javascript (aka we've got a local table that isn't backend connected)
           if (!fieldVal || !fieldVal.toLowerCase) return false;
           return endsWith(fieldVal.toLowerCase(), filterValLower);
         };
   } else if (ccSelectedFilter === "contains") {
-    const filterValueToUse = filterValue.toString
-      ? filterValue.toString()
-      : filterValue;
     return qb
-      ? qb.contains(filterValueToUse.replace(/_/g, "\\_")) //filter using qb (aka we're backend connected)
+      ? qb.contains(stringFilterValue.replace(/_/g, "\\_")) //filter using qb (aka we're backend connected)
       : fieldVal => {
           //filter using plain old javascript (aka we've got a local table that isn't backend connected)
           if (!fieldVal || !fieldVal.toLowerCase) return false;
@@ -272,15 +269,13 @@ function getSubFilter(
           );
         };
   } else if (ccSelectedFilter === "inList") {
-    const filterValueToUse =
-      filterValue && filterValue.split && filterValue.split(".");
     return qb
-      ? qb.inList(filterValueToUse) //filter using qb (aka we're backend connected)
+      ? qb.inList(arrayFilterValue) //filter using qb (aka we're backend connected)
       : fieldVal => {
           //filter using plain old javascript (aka we've got a local table that isn't backend connected)
           if (!fieldVal || !fieldVal.toLowerCase) return false;
           return (
-            filterValueToUse
+            arrayFilterValue
               .map(val => val && val.toLowerCase())
               .indexOf(fieldVal.toLowerCase()) > -1
           );
@@ -306,15 +301,13 @@ function getSubFilter(
           return !fieldVal;
         };
   } else if (ccSelectedFilter === "isBetween") {
-    const filterValueToUse =
-      filterValue && filterValue.split && filterValue.split(".");
     return qb
-      ? qb.between(new Date(filterValueToUse[0]), new Date(filterValueToUse[1]))
+      ? qb.between(new Date(arrayFilterValue[0]), new Date(arrayFilterValue[1]))
       : fieldVal => {
           return (
-            moment(filterValueToUse[0]).valueOf() <=
+            moment(arrayFilterValue[0]).valueOf() <=
               moment(fieldVal).valueOf() &&
-            moment(fieldVal).valueOf() <= moment(filterValueToUse[1]).valueOf()
+            moment(fieldVal).valueOf() <= moment(arrayFilterValue[1]).valueOf()
           );
         };
   } else if (ccSelectedFilter === "isBefore") {
