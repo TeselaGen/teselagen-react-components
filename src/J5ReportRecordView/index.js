@@ -171,7 +171,12 @@ class J5ReportRecordView extends Component {
   }
 
   renderHeader = () => {
-    const { data, additionalHeaderItems = "", LinkJ5TableDialog } = this.props;
+    const {
+      data,
+      additionalHeaderItems = "",
+      LinkJ5TableDialog,
+      LinkJ5ReportButton
+    } = this.props;
 
     if (data.loading) return <Loading loading />;
 
@@ -226,10 +231,14 @@ class J5ReportRecordView extends Component {
         <div className={Classes.BUTTON_GROUP} style={{ marginTop: 10 }}>
           {this.renderDownloadButton()}
           {additionalHeaderItems}
-          {LinkJ5TableDialog && (
-            <Button onClick={this.linkInputSequences}>
-              Link j5 Assembly Report Data to Materials
-            </Button>
+          {LinkJ5TableDialog &&
+            !LinkJ5ReportButton && (
+              <Button onClick={this.linkInputSequences}>
+                Link j5 Assembly Report Data to Materials
+              </Button>
+            )}
+          {LinkJ5ReportButton && (
+            <LinkJ5ReportButton j5Report={data.j5Report} />
           )}
         </div>
       </div>
@@ -311,6 +320,7 @@ class J5ReportRecordView extends Component {
       data,
       getIsLinkedCellRenderer,
       LinkJ5TableDialog,
+      LinkJ5ReportButton,
       onConstructDoubleClick = noop,
       pcrReactionsTitleElements,
       constructsTitleElements = [],
@@ -322,6 +332,7 @@ class J5ReportRecordView extends Component {
       dataTableProps: passedDataTableProps,
       synthonSequenceTitleElements = []
     } = this.props;
+
     const { linkDialogName } = this.state;
 
     if (data.loading) return <Loading loading />;
@@ -330,6 +341,7 @@ class J5ReportRecordView extends Component {
       return <div>No report found!</div>;
     }
     const j5Report = data.j5Report;
+    const isLinkable = LinkJ5TableDialog || LinkJ5ReportButton;
     const linkDialogProps = getLinkDialogProps(
       data.j5Report,
       linkFragmentMap || fragmentMap
@@ -407,7 +419,7 @@ class J5ReportRecordView extends Component {
               }
               fragment={fragmentMap.j5RunConstruct}
               showLinkModal={() => this.showLinkModal("constructs")}
-              isLinkable={LinkJ5TableDialog}
+              isLinkable={isLinkable}
               onDoubleClick={onConstructDoubleClick}
               schema={this.getSchema("j5RunConstructs")}
               tableProps={dataTableProps}
@@ -427,7 +439,7 @@ class J5ReportRecordView extends Component {
             }
             fragment={fragmentMap.j5RunConstruct}
             showLinkModal={() => this.showLinkModal("constructs")}
-            isLinkable={LinkJ5TableDialog}
+            isLinkable={isLinkable}
             onDoubleClick={onConstructDoubleClick}
             tableProps={dataTableProps}
             schema={this.getSchema("j5RunConstructs")}
@@ -442,7 +454,7 @@ class J5ReportRecordView extends Component {
             entities={j5Report.j5InputSequences}
             fragment={fragmentMap.j5InputSequence}
             showLinkModal={() => this.showLinkModal("inputSequences")}
-            isLinkable={LinkJ5TableDialog}
+            isLinkable={isLinkable}
             tableProps={dataTableProps}
             cellRenderer={
               getIsLinkedCellRenderer &&
@@ -475,7 +487,7 @@ class J5ReportRecordView extends Component {
             entities={j5Report.j5OligoSyntheses}
             fragment={fragmentMap.j5OligoSynthesis}
             tableProps={dataTableProps}
-            isLinkable={LinkJ5TableDialog}
+            isLinkable={isLinkable}
             schema={this.getSchema("j5OligoSyntheses")}
             showLinkModal={() => this.showLinkModal("oligos")}
             linkButtonText="Link Oligos"
@@ -503,7 +515,7 @@ class J5ReportRecordView extends Component {
             tableProps={dataTableProps}
             schema={this.getSchema("j5DirectSyntheses")}
             fragment={fragmentMap.j5DirectSynthesis}
-            isLinkable={LinkJ5TableDialog}
+            isLinkable={isLinkable}
             showLinkModal={() => this.showLinkModal("dnaSynthesisSequences")}
             linkButtonText="Link DNA Synthesis Pieces"
             openTitleElements={synthonSequenceTitleElements}
@@ -539,7 +551,7 @@ class J5ReportRecordView extends Component {
             processData={processDataForTables.j5AssemblyPiece}
             entities={j5Report.j5AssemblyPieces}
             fragment={fragmentMap.j5AssemblyPiece}
-            isLinkable={LinkJ5TableDialog}
+            isLinkable={isLinkable}
             showLinkModal={() => this.showLinkModal("dnaPieces")}
             linkButtonText="Link DNA Pieces"
             tableProps={dataTableProps}
