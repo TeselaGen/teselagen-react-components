@@ -1176,7 +1176,10 @@ class DataTable extends React.Component {
       ) : null;
 
     return (
-      <div className="tg-react-table-column-header">
+      <div
+        data-test={displayName || startCase(path)}
+        className="tg-react-table-column-header"
+      >
         {(displayName || startCase(path)) &&
           !noTitle && (
             <span title={columnTitle} className="tg-react-table-name">
