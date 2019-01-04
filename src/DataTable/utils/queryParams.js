@@ -719,6 +719,11 @@ export function getQueryParams({
     }
 
     graphqlQueryParams.filter = qb.toJSON();
+
+    // in case entries that have the same value in the column being sorted on
+    // fall back to id as a secondary sort to make sure ordering happens correctly
+    graphqlQueryParams.sort.push("id");
+
     return {
       ...toReturn,
       //the query params will get passed directly to as variables to the graphql query

@@ -189,3 +189,7 @@
 .bp3-form-group.bp3-inline .bp3-form-content {
   flex: 1;
 }
+
+.bp3-dark input {
+  color: #f5f8fa;
+}

@@ -1,6 +1,6 @@
 {
   "name": "teselagen-react-components",
-  "version": "24.3.28",
+  "version": "24.3.31",
   "description": "Teselagen React Component Library",
   "main": "lib/index.js",
   "homepage": "http://teselagen.github.io/teselagen-react-components",
@@ -111,7 +111,7 @@
     "react-live": "^1.11.0",
     "react-redux": "^5.0.7",
     "react-router-dom": "^4.3.1",
-    "react-select": "^1.2.1",
+    "react-select": "1.2.0",
     "react-table": "^6.8.0",
     "react-test-renderer": "^16.5.0",
     "react-transition-group": "^2.4.0",
