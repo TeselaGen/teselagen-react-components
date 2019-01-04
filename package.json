@@ -128,6 +128,11 @@
     }
   },
   "lint-staged": {
+    "cypress/**/*.js": [
+      "eslint --rule 'react/jsx-curly-brace-presence: 1' --fix --max-warnings=0",
+      "prettier --write",
+      "git add"
+    ],
     "src/**/*.js": [
       "eslint --rule 'import/order: 1' --rule 'react/jsx-curly-brace-presence: 1' --fix --max-warnings=0",
       "prettier --write",

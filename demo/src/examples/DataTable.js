@@ -11,6 +11,9 @@ const schema = {
     },
     { path: "hungerLevel", type: "string" },
     { path: "type", type: "lookup", displayName: "Special Type" },
+    { path: "checkboxData", type: "boolean", displayName: "Checkbox Field", render: () => {
+      return <Checkbox></Checkbox>
+    } },
     { path: "isShared", type: "boolean", displayName: "Is Shared?" },
     {
       path: "name",
