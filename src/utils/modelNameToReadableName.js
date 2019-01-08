@@ -17,14 +17,14 @@ export default function modelNameToReadableName(
   { upperCase, sanitize, plural } = {}
 ) {
   let modelNameToUse = modelName;
-  if (sanitize) {
-    modelNameToUse = sanitize(modelName);
-  }
   if (upperCase) {
     modelNameToUse =
       upperModelNameMap[modelNameToUse] || startCase(modelNameToUse);
   } else {
     modelNameToUse = modelNameMap[modelNameToUse] || lowerCase(modelNameToUse);
+  }
+  if (sanitize) {
+    modelNameToUse = sanitize(modelNameToUse);
   }
   if (plural) modelNameToUse = pluralize(modelNameToUse);
   if (modelName === "j5Report") modelNameToUse += " (j5)";
