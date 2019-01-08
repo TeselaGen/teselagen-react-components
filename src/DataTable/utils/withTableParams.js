@@ -28,6 +28,7 @@ import {
  * @property {Object | Function} schema - The data table schema or a function returning it. The function wll be called with props as the argument.
  * @property {boolean} urlConnected - whether the table should connect to/update the URL
  * @property {boolean} withSelectedEntities - whether or not to pass the selected entities
+ * @property {boolean} isCodeModel - whether the model is keyed by code instead of id in the db
  * @property {object} defaults - tableParam defaults such as pageSize, filter, etc
  * @property {boolean} noOrderError - won't console an error if an order is not found on schema
  */
@@ -61,7 +62,8 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       noOrderError,
       withDisplayOptions,
       cellRenderer,
-      model
+      model,
+      isCodeModel
     } = mergedOpts;
 
     const schema = getSchema(mergedOpts);
@@ -152,7 +154,8 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         isLocalCall,
         additionalFilter: additionalFilterToUse,
         additionalOrFilter: additionalOrFilterToUse,
-        noOrderError
+        noOrderError,
+        isCodeModel
       }),
       formNameFromWithTPCall: formNameFromWithTableParamsCall,
       randomVarToForceLocalStorageUpdate: formSelector(
