@@ -319,7 +319,7 @@
 }
 
 .ReactTable .rt-thead .rt-resizable-header {
-  border-right: 1px solid #f7f7f7;
+  border-right: 1px solid #e1e8ed;
 }
 
 .bp3-dark .ReactTable .rt-thead .rt-resizable-header {
@@ -327,7 +327,7 @@
 }
 
 .ReactTable .rt-thead .rt-resizable-header:hover {
-  border-right: 1px solid rgba(0, 0, 0, 0.05);
+  border-right: 1px solid #ced9e0;
 }
 
 .show-on-hover {
