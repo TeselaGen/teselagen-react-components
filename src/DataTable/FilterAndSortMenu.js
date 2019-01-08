@@ -158,6 +158,15 @@ export default class FilterAndSortMenu extends React.Component {
   }
 }
 
+const dateMinMaxHelpers = {
+  minDate: moment()
+    .subtract(25, "years")
+    .toDate(),
+  maxDate: moment()
+    .add(25, "years")
+    .toDate()
+};
+
 class FilterInput extends React.Component {
   render() {
     const {
@@ -229,8 +238,7 @@ class FilterInput extends React.Component {
             <DateInput
               value={filterValue ? moment(filterValue).toDate() : undefined}
               {...getMomentFormatter("MM/DD/YYYY")}
-              minDate={moment(0).toDate()}
-              maxDate={moment(9999999999999).toDate()}
+              {...dateMinMaxHelpers}
               onChange={selectedDates => {
                 handleFilterValueChange(selectedDates);
               }}
@@ -239,8 +247,13 @@ class FilterInput extends React.Component {
         );
         break;
       case "dateRange":
-        const filterValueToUse =
-          filterValue && filterValue.split && filterValue.split(".");
+        let filterValueToUse;
+        if (Array.isArray(filterValue)) {
+          filterValueToUse = filterValue;
+        } else {
+          filterValueToUse =
+            filterValue && filterValue.split && filterValue.split(".");
+        }
         inputGroup = (
           <div className="custom-menu-item">
             <DateRangeInput
@@ -258,12 +271,7 @@ class FilterInput extends React.Component {
                 parseDate: str => new Date(Date.parse(str)),
                 placeholder: "JS Date"
               }}
-              minDate={moment()
-                .subtract(25, "years")
-                .toDate()}
-              maxDate={moment()
-                .add(25, "years")
-                .toDate()}
+              {...dateMinMaxHelpers}
               onChange={selectedDates => {
                 if (selectedDates[0] && selectedDates[1]) {
                   handleFilterValueChange(selectedDates);
