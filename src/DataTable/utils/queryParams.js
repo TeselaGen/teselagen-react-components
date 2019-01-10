@@ -582,7 +582,8 @@ export function getQueryParams({
   additionalFilter,
   additionalOrFilter,
   doNotCoercePageSize,
-  noOrderError
+  noOrderError,
+  isCodeModel
 }) {
   Object.keys(currentParams).forEach(function(key) {
     if (currentParams[key] === undefined) {
@@ -722,7 +723,7 @@ export function getQueryParams({
 
     // in case entries that have the same value in the column being sorted on
     // fall back to id as a secondary sort to make sure ordering happens correctly
-    graphqlQueryParams.sort.push("id");
+    graphqlQueryParams.sort.push(isCodeModel ? "code" : "id");
 
     return {
       ...toReturn,
