@@ -89,7 +89,9 @@ export const withHotkeys = (hotkeys, handlers, options = {}) => Component => {
                 {...props}
                 key={id}
                 global={props.global !== false}
-                onKeyDown={handlers[id]}
+                onKeyDown={function(e) {
+                  return handlers[id].call(this, e, props)
+                }}
               />
             );
           })}
