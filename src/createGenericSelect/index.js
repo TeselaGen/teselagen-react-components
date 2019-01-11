@@ -640,7 +640,13 @@ class InnerComp extends Component {
         clearableValue: entity.clearableValue,
         value: entity[idAs || "id"],
         label: (
-          <span style={{ display: "flex", justifyContent: "space-between" }}>
+          <span
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}
+          >
             {schema.fields.reduce((acc, field, i) => {
               const label = field.displayName ? (
                 <span
@@ -662,12 +668,15 @@ class InnerComp extends Component {
                 val = val ? "True" : "False";
               }
 
+              let style;
+              if (i > 0) {
+                style = {
+                  marginLeft: 8,
+                  fontSize: 8
+                };
+              }
               acc.push(
-                <span
-                  className={i > 1 ? "tg-value-hide" : ""}
-                  key={i}
-                  style={i > 1 ? { fontSize: 10, color: "#aaa" } : {}}
-                >
+                <span key={i} style={style}>
                   {label} {val}
                 </span>
               );
