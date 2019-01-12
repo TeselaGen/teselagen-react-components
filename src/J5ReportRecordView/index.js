@@ -185,7 +185,7 @@ class J5ReportRecordView extends Component {
     }
 
     // JSON.parse(localStorage.getItem('TEMPORARY_j5Run')) || {}
-    const { name, assemblyType, dateRan, design } = data.j5Report;
+    const { name, assemblyType, createdAt, dateRan, design } = data.j5Report;
 
     return (
       <div className="j5-report-header tg-card">
@@ -209,7 +209,7 @@ class J5ReportRecordView extends Component {
         <FieldWithLabel label="Assembly Type" field={assemblyType} />
         <FieldWithLabel
           label="Date Ran"
-          field={moment(dateRan).format("lll")}
+          field={moment(dateRan || createdAt).format("lll")} //fallback to createdAt if dateRan isn't provided (dateRan is derived from the imported j5report)
         />
         {/* tnr: add these in when they are available in lims/hde */}
         {/* <div>
