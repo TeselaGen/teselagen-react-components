@@ -4000,6 +4000,13 @@ eslint-module-utils@^2.2.0:
     debug "^2.6.8"
     pkg-dir "^1.0.0"
 
+eslint-plugin-cypress@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-cypress/-/eslint-plugin-cypress-2.2.0.tgz#31f23bec82eb4078711b374af66af3daa9fdbd2e"
+  integrity sha512-Xk1DMXPfnSChpNhQPw8E9lfRUse9nSyPccxMbKlOuwCmTm2fhyNQWfulDr9DDgUL1Xetdub5lnYQkKniHjNbYw==
+  dependencies:
+    globals "^11.0.1"
+
 eslint-plugin-flowtype@^2.50.0:
   version "2.50.3"
   resolved "https://registry.yarnpkg.com/eslint-plugin-flowtype/-/eslint-plugin-flowtype-2.50.3.tgz#61379d6dce1d010370acd6681740fd913d68175f"
@@ -4035,6 +4042,11 @@ eslint-plugin-jsx-a11y@5.1.1:
     damerau-levenshtein "^1.0.0"
     emoji-regex "^6.1.0"
     jsx-ast-utils "^1.4.0"
+
+eslint-plugin-no-only-tests@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-no-only-tests/-/eslint-plugin-no-only-tests-2.1.0.tgz#9050450bace6abbc457de894116141936fec68e7"
+  integrity sha512-T02dNNDj7sKJNvH7YLKqgv4+BDupxKG4OgadF0AecDHrYTb9hlosxqCgZbFKt28C7Ueof6ziCtEh6rnPvN4YYA==
 
 eslint-plugin-react@^7.11.1:
   version "7.11.1"

@@ -10,10 +10,15 @@ const schema = {
       displayName: "Not Displayed"
     },
     { path: "hungerLevel", type: "string" },
-    { path: "type", type: "lookup", displayName: "Special Type" },
-    { path: "checkboxData", type: "boolean", displayName: "Checkbox Field", render: () => {
-      return <Checkbox></Checkbox>
-    } },
+    { path: "type.special", type: "lookup", displayName: "Special Type" },
+    {
+      path: "checkboxData",
+      type: "boolean",
+      displayName: "Checkbox Field",
+      render: () => {
+        return <Checkbox />;
+      }
+    },
     { path: "isShared", type: "boolean", displayName: "Is Shared?" },
     {
       path: "name",
@@ -176,7 +181,9 @@ const generateFakeRows = num => {
           name: chance.pickone(["pending", "added", "confirmed"])
         }
       },
-      type: "denicolaType",
+      type: {
+        special: "denicolaType"
+      },
       addedBy: chance.name(),
       updatedAt: chance.date(),
       createdAt: chance.date()
