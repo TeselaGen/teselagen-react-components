@@ -932,7 +932,7 @@ class DataTable extends React.Component {
                 ? {}
                 : { textOverflow: "ellipsis", overflow: "hidden" }
             }
-            data-test={column.path}
+            data-test={"tgCell_" + column.path}
             className="tg-cell-wrapper"
             data-copy-text={text}
             title={title || undefined}

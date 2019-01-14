@@ -16,7 +16,7 @@ describe("formComponents", () => {
     cy.get(".data-table-clear-filters").should("not.exist");
   });
   it(`it can select a cell via a data-test attribute`, () => {
-    cy.get(`[data-test="type.special"]`)
+    cy.get(`[data-test="tgCell_type.special"]`)
       .eq(3)
       .should("be.visible");
   });
