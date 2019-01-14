@@ -17,7 +17,7 @@ describe("formComponents", () => {
   });
   it(`it can select a cell via a data-test attribute`, () => {
     cy.get(`[data-test="tgCell_type.special"]`)
-      .eq(3)
+      .eq(3) //get the third cell just for kicks
       .should("be.visible");
   });
 });
