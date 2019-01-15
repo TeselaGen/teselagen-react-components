@@ -234,12 +234,13 @@ class DataTable extends React.Component {
       return acc;
     }, {});
 
+    //index 0 of the table is the column titles
+    //must add 1 to rowNum
     const rowNumbersToCopy = selectedRecords
-      .map(rec => idToIndex[rec.id || rec.code])
+      .map(rec => idToIndex[rec.id || rec.code] + 1)
       .sort();
 
     if (!rowNumbersToCopy.length) return;
-
     const allRowEls = e.target
       .closest(".ReactTable")
       .querySelectorAll(".rt-tr");
@@ -1071,7 +1072,7 @@ class DataTable extends React.Component {
             const cellWrapper =
               e.target.querySelector(".tg-cell-wrapper") ||
               e.target.closest(".tg-cell-wrapper");
-            const text = this.getCellText(cellWrapper);
+            const text = this.getCellCopyText(cellWrapper);
             this.handleCopyHelper(text, "Cell copied");
           }}
           icon="clipboard"
