@@ -239,10 +239,12 @@ class DataTable extends React.Component {
       .sort();
 
     if (!rowNumbersToCopy.length) return;
-    //TODOCOPY this one needs some work
-    const allRowEls = e.target.closest(".ReactTable").querySelectorAll(".rt-tr");
+
+    const allRowEls = e.target
+      .closest(".ReactTable")
+      .querySelectorAll(".rt-tr");
     const rowEls = rowNumbersToCopy.map(i => allRowEls[i]);
-    
+
     //get row elements and call this.handleCopyRow for each const rowEls = this.getRowEls(rowNumbersToCopy)
     const textToCopy = map(rowEls, rowEl => this.getRowCopyText(rowEl)).join(
       "\n"
@@ -999,10 +1001,7 @@ class DataTable extends React.Component {
     return columnsToRender;
   };
 
-  getCopyTextForCell = (val, row, column) => { 
-
-    //TODOCOPY maybe add a way to handle arrays more gracefully here 
-
+  getCopyTextForCell = (val, row, column) => {
     // TODOCOPY we need a way to potentially omit certain columns from being added as a \t element (talk to taoh about this)
 
     let text = val;

@@ -2,17 +2,36 @@ describe("formComponents", () => {
   beforeEach(() => {
     cy.visit("#/DataTable");
   });
-  it.only(`it can copy a single row, selected rows, or cells to the clipboard`, () => {
-    cy.get(`[data-test="tgCell_type.special"]`).first().trigger("contextmenu")
-    cy.contains("Copy Selected Rows to Clipboard").click()
-
-    //TODOCOPY: add tests for the 3 cases, 
-    //  - copying a single row (selected or not) 
-    // - copying multiple selected rows 
-    // - copying a single cell 
+  it(`it can copy a single row, selected rows, or cells to the clipboard`, () => {
+    //  - copying a single row (selected or not)
+    // cy.get(`[data-test="tgCell_type.special"]`)
+    //   .first()
+    //   .click();
+    // cy.get(`[data-test="tgCell_type.special"]`)
+    //   .first()
+    //   .trigger("contextmenu");
+    // cy.contains("Copy Row to Clipboard").click();
+    // // - copying a single cell
+    // cy.get(`[data-test="tgCell_type.special"]`)
+    //   .first()
+    //   .click();
+    // cy.get(`[data-test="tgCell_type.special"]`)
+    //   .first()
+    //   .trigger("contextmenu");
+    // cy.contains("Copy Cell to Clipboard").click();
+    // // - copying multiple selected rows
+    // cy.get(`[data-test="tgCell_type.special"]`)
+    //   .first()
+    //   .click();
+    // cy.get(`[data-test="tgCell_type.special"]`)
+    //   .eq(1)
+    //   .click();
+    // cy.get(`[data-test="tgCell_type.special"]`)
+    //   .first()
+    //   .trigger("contextmenu");
+    // cy.contains("Copy Selected Rows to Clipboard").click();
     // make sure certain columns that shouldn't be copyable are not copied (different than copyable columns that are simply empty)
-    cy.contains("Copy Selected Rows to Clipboard").click()
-
+    // cy.contains("Copy Selected Rows to Clipboard").click()
   });
   it(`it can click the tg filter menu and type some stuff`, () => {
     cy.get(`[data-test="Hunger Level"]`)
