@@ -6,7 +6,15 @@ import ReactDOM from "react-dom";
 import moment from "moment";
 import { arrayMove } from "react-sortable-hoc";
 import copy from "copy-to-clipboard";
-import { camelCase, get, startCase, noop, isEqual, cloneDeep } from "lodash";
+import {
+  map,
+  toString,
+  camelCase,
+  startCase,
+  noop,
+  isEqual,
+  cloneDeep
+} from "lodash";
 import {
   Button,
   Menu,
@@ -183,19 +191,63 @@ class DataTable extends React.Component {
 
   handleCopyHotkey = () => {
     const { reduxFormSelectedEntityIdMap } = this.props;
-    this.handleCopyRows(getRecordsFromIdMap(reduxFormSelectedEntityIdMap));
+    this.handleCopySelectedRows(
+      getRecordsFromIdMap(reduxFormSelectedEntityIdMap)
+    );
   };
 
-  handleCopyRows = selectedRecords => {
+  getCellCopyText = cellWrapper => {
+    const text = cellWrapper && cellWrapper.getAttribute("data-copy-text");
+    return text || "";
+  };
+
+  handleCopyRow = rowEl => {
+    //takes in a row element
+    const text = this.getRowCopyText(rowEl);
+    this.handleCopyHelper(text, "Row Copied");
+  };
+
+  getRowCopyText = rowEl => {
+    //takes in a row element
+    return map(rowEl.children, cellEl => {
+      const cellChild = cellEl.querySelector(`[data-copy-text]`);
+      if (!cellChild) return;
+      return this.getCellCopyText(cellChild);
+    }).join("\t");
+  };
+
+  handleCopyHelper = (stringToCopy, message) => {
+    const copyHandler = e => {
+      e.preventDefault();
+      e.clipboardData.setData("text/plain", stringToCopy);
+    };
+    document.addEventListener("copy", copyHandler);
+    copy(stringToCopy);
+    document.removeEventListener("copy", copyHandler);
+    window.toastr.success(message);
+  };
+
+  handleCopySelectedRows = (selectedRecords, e) => {
     const { entities = [] } = computePresets(this.props);
     const idToIndex = entities.reduce((acc, e, i) => {
       acc[e.id || e.code] = i;
       return acc;
     }, {});
-    const sortedRecords = [...selectedRecords].sort((a, b) => {
-      return idToIndex[a.id || a.code] - idToIndex[b.id || b.code];
-    });
-    this.finalizeCopy(sortedRecords);
+
+    const rowNumbersToCopy = selectedRecords
+      .map(rec => idToIndex[rec.id || rec.code])
+      .sort();
+
+    if (!rowNumbersToCopy.length) return;
+    //TODOCOPY this one needs some work
+    const allRowEls = e.target.closest(".ReactTable").querySelectorAll(".rt-tr");
+    const rowEls = rowNumbersToCopy.map(i => allRowEls[i]);
+    
+    //get row elements and call this.handleCopyRow for each const rowEls = this.getRowEls(rowNumbersToCopy)
+    const textToCopy = map(rowEls, rowEl => this.getRowCopyText(rowEl)).join(
+      "\n"
+    );
+    this.handleCopyHelper(textToCopy, "Selected rows copied");
   };
 
   renderHotkeys() {
@@ -947,7 +999,12 @@ class DataTable extends React.Component {
     return columnsToRender;
   };
 
-  getCopyTextForCell = (val, row, column) => {
+  getCopyTextForCell = (val, row, column) => { 
+
+    //TODOCOPY maybe add a way to handle arrays more gracefully here 
+
+    // TODOCOPY we need a way to potentially omit certain columns from being added as a \t element (talk to taoh about this)
+
     let text = val;
     const record = row.original;
     if (column.getClipboardData) {
@@ -957,42 +1014,9 @@ class DataTable extends React.Component {
     } else if (text) {
       text = String(text);
     }
-    return text;
-  };
-
-  finalizeCopy = selectedRecords => {
-    if (!selectedRecords.length) return;
-    const { columns } = this.state;
-    let allRowsText = [];
-    selectedRecords.forEach((record, i) => {
-      let textForRow = [];
-      columns.forEach(col => {
-        const recordText = get(record, col.path);
-        let text = recordText;
-        if (col.type === "timestamp") {
-          text = text ? moment(text).format("lll") : "";
-        } else if (col.type === "boolean") {
-          text = text ? "True" : "False";
-        }
-        text = this.getCopyTextForCell(
-          text,
-          { original: record, index: i },
-          col
-        );
-        text = text || "\t";
-        textForRow.push(text);
-      });
-      allRowsText.push(textForRow.join("\t"));
-    });
-    const copyString = allRowsText.join("\n");
-    const copyHandler = e => {
-      e.preventDefault();
-      e.clipboardData.setData("text/plain", copyString);
-    };
-    document.addEventListener("copy", copyHandler);
-    copy(copyString);
-    document.removeEventListener("copy", copyHandler);
-    window.toastr.success("Selected rows copied");
+    const stringText = toString(text);
+    if (stringText === "[object Object]") return "";
+    return stringText;
   };
 
   showContextMenu = (idMap, e) => {
@@ -1004,13 +1028,36 @@ class DataTable extends React.Component {
     });
     if (!itemsToRender && !isCopyable) return null;
     const copyMenuItems = [];
-    if (isCopyable && selectedRecords.length > 0) {
+    if (
+      isCopyable &&
+      (selectedRecords.length === 0 || selectedRecords.length === 1)
+    ) {
       copyMenuItems.push(
         <MenuItem
           key="copySelectedRows"
-          onClick={() => this.handleCopyRows(selectedRecords)}
+          onClick={() => {
+            const cell =
+              e.target.querySelector(".tg-cell-wrapper") ||
+              e.target.closest(".tg-cell-wrapper");
+            const row = cell.closest(".rt-tr");
+            this.handleCopyRow(row);
+            // loop through each cell in the row
+          }}
           icon="clipboard"
-          text="Copy Rows to Clipboard"
+          text="Copy Row to Clipboard"
+        />
+      );
+    }
+    if (isCopyable && selectedRecords.length > 1) {
+      copyMenuItems.push(
+        <MenuItem
+          key="copySelectedRows"
+          onClick={() => {
+            this.handleCopySelectedRows(selectedRecords, e);
+            // loop through each cell in the row
+          }}
+          icon="clipboard"
+          text="Copy Selected Rows to Clipboard"
         />
       );
     }
@@ -1018,13 +1065,14 @@ class DataTable extends React.Component {
     if (isCopyable) {
       copyMenuItems.push(
         <MenuItem
-          key="copySelectedCells"
+          key="copyCell"
           onClick={() => {
+            //TODOCOPY: we need to make sure that the cell copy is being used by the row copy.. right now we have 2 different things going on
+            //do we need to be able to copy hidden cells? It seems like it should just copy what's on the page..?
             const cellWrapper =
               e.target.querySelector(".tg-cell-wrapper") ||
               e.target.closest(".tg-cell-wrapper");
-            const text =
-              cellWrapper && cellWrapper.getAttribute("data-copy-text");
+            const text = this.getCellText(cellWrapper);
             if (text) {
               copy(text);
               window.toastr.success("Cell copied");

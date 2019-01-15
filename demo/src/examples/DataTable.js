@@ -197,9 +197,10 @@ class DataTableInstance extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+
       additionalFilters: false,
       isSimple: false,
-      isCopyable: false,
+      isCopyable: true,
       noSelect: false,
       withTitle: true,
       isViewable: true,
@@ -407,7 +408,7 @@ class DataTableInstance extends React.Component {
             entities={entitiesToPass}
             entityCount={entities.length}
             onDoubleClick={function() {
-              console.log("double clicked");
+              console.info("double clicked");
             }}
             topLeftItems={<Button>I'm in topLeftItems</Button>}
             SubComponent={this.state.withSubComponent ? SubComp : null}
@@ -432,14 +433,14 @@ class DataTableInstance extends React.Component {
                   <MenuItem
                     key="menuItem1"
                     onClick={function() {
-                      console.log("I got clicked!");
+                      console.info("I got clicked!");
                     }}
                     text={"Menu text here"}
                   />,
                   <MenuItem
                     key="menuItem2"
                     onClick={function() {
-                      console.log("I also got clicked!");
+                      console.info("I also got clicked!");
                     }}
                     text={"Some more"}
                   />
