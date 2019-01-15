@@ -222,7 +222,7 @@ class DataTable extends React.Component {
       e.clipboardData.setData("text/plain", stringToCopy);
     };
     document.addEventListener("copy", copyHandler);
-    copy(stringToCopy);
+    !window.Cypress && copy(stringToCopy); //only fire the copy event if not in a cypress test
     document.removeEventListener("copy", copyHandler);
     window.toastr.success(message);
   };
@@ -1072,12 +1072,7 @@ class DataTable extends React.Component {
               e.target.querySelector(".tg-cell-wrapper") ||
               e.target.closest(".tg-cell-wrapper");
             const text = this.getCellText(cellWrapper);
-            if (text) {
-              copy(text);
-              window.toastr.success("Cell copied");
-            } else {
-              window.toastr.warning("No text to copy.");
-            }
+            this.handleCopyHelper(text, "Cell copied");
           }}
           icon="clipboard"
           text="Copy Cell to Clipboard"
