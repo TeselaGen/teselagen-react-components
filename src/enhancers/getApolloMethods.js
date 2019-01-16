@@ -158,12 +158,12 @@ export default function getApolloMethods(client) {
   }
 
   return {
-    upsert,
+    upsert: safeUpsert,
     safeUpsert,
-    query,
+    query: safeQuery,
     safeQuery,
     makeSafeQueryWithToast,
-    delete: deleteFn,
+    delete: safeDelete,
     safeDelete
   };
 }
