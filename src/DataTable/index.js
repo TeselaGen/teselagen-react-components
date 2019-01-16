@@ -37,8 +37,6 @@ import FilterAndSortMenu from "./FilterAndSortMenu";
 import getIdOrCodeOrIndex from "./utils/getIdOrCodeOrIndex";
 import SearchBar from "./SearchBar";
 import DisplayOptions from "./DisplayOptions";
-// import withQuery from "../enhancers/withQuery";
-// import withUpsert from "../enhancers/withUpsert";
 // import tableConfigurationFragment from "./utils/tableConfigurationFragment";
 // import currentUserFragment from "./utils/currentUserFragment";
 // import withDelete from "../enhancers/withDelete";
