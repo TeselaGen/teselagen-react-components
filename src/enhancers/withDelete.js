@@ -8,7 +8,7 @@ import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
 import generateFragmentWithFields from "../utils/generateFragmentWithFields";
 
 /**
- * withUpsert 
+ * withDelete 
  * @param {string | gql fragment} nameOrFragment supply either a name or a top-level fragment
  * @param {options} 
  * @typedef {object} options

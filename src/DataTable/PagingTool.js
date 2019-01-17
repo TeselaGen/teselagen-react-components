@@ -7,6 +7,7 @@ import { Button, Classes } from "@blueprintjs/core";
 import type { Paging } from "../flow_types";
 import { onEnterOrBlurHelper } from "../utils/handlerHelpers";
 import { pageSizes } from "./utils/queryParams";
+import getIdOrCodeOrIndex from "./utils/getIdOrCodeOrIndex";
 
 export class PagingTool extends React.Component {
   static defaultProps = {
@@ -195,7 +196,7 @@ const ConnectedPagingTool = compose(
   withHandlers({
     onPageChange: ({ entities, change }) => () => {
       const record = get(entities, "[0]");
-      if (!record || (!record.id && record.id !== 0 && !record.code)) {
+      if (!record || !getIdOrCodeOrIndex(record)) {
         change("reduxFormSelectedEntityIdMap", {});
       }
     }

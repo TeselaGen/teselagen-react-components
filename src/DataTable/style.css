@@ -75,6 +75,10 @@
   height: 100vh;
 }
 
+.data-table-container.fullscreen .ReactTable {
+  max-height: 100% !important;
+}
+
 .data-table-container.no-padding {
   padding: 0;
 }

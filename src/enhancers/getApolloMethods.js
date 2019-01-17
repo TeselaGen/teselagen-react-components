@@ -1,6 +1,6 @@
 import { chunk, get } from "lodash";
 import modelNameToReadableName from "../utils/modelNameToReadableName";
-import withQuery from "./withQuery";
+import withQuery from "./withQuery.old/withQuery";
 import withDelete from "./withDelete";
 import withUpsert from "./withUpsert";
 
@@ -158,12 +158,12 @@ export default function getApolloMethods(client) {
   }
 
   return {
-    upsert,
+    upsert: safeUpsert,
     safeUpsert,
-    query,
+    query: safeQuery,
     safeQuery,
     makeSafeQueryWithToast,
-    delete: deleteFn,
+    delete: safeDelete,
     safeDelete
   };
 }
