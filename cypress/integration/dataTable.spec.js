@@ -28,6 +28,20 @@ describe("formComponents", () => {
     cy.contains("Copy Selected Rows to Clipboard").click();
     cy.contains("Selected rows copied");
   });
+  it(`doesn't break when selecting items across pages and copying`, () => {
+    cy.get(`[data-test="tgCell_type.special"]`)
+      .first()
+      .click();
+    cy.get(".data-table-footer .paging-arrow-right").click();
+    cy.get(`[data-test="tgCell_type.special"]`)
+      .first()
+      .click();
+    cy.get(`[data-test="tgCell_type.special"]`)
+      .first()
+      .trigger("contextmenu");
+    cy.contains("Copy Row to Clipboard").click();
+    cy.contains("Row Copied");
+  });
   it(`it can click the tg filter menu and type some stuff`, () => {
     cy.get(`[data-test="Hunger Level"]`)
       .find(".tg-filter-menu-button")
