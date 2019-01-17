@@ -3,8 +3,9 @@
   "version": "24.3.44",
   "description": "Teselagen React Component Library",
   "main": "lib/index.js",
+  "types": "./index.d.ts",
   "homepage": "http://teselagen.github.io/teselagen-react-components",
-  "//module": "es/index.js",
+  "module": "es/index.js",
   "files": [
     "css",
     "es",
@@ -106,6 +107,7 @@
     "lint-staged": "^8.0.4",
     "nwb": "^0.23.0",
     "prettier": "^1.14.3",
+    "prettier-tslint": "^0.4.2",
     "raw-loader": "^0.5.1",
     "react": "^16.6.3",
     "react-apollo": "^2.1.11",
@@ -121,6 +123,7 @@
     "redux-thunk": "*",
     "sinon": "^4.4.9",
     "tg-client-query-builder": "^2.12.2",
+    "typescript": "^3.2.2",
     "ve-range-utils": "^2.5.0",
     "why-did-you-update": "^1.0.6"
   },
