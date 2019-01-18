@@ -29,7 +29,7 @@ class WithDialogDemo extends React.Component {
     );
     return (
       <div>
-        {renderToggle(this, "isDraggable", "Make dialog draggable and resizable")}
+        {renderToggle({that: this, type: "isDraggable", description: "Make dialog draggable and resizable"})}
         <WithDialog>
           <Button text="Show Dialog" />
         </WithDialog>

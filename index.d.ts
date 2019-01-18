@@ -63,7 +63,6 @@ export function withUpsert(
   options: WithUpsertOptions
 ): string;
 
-
 /**
  * Note all these options can be passed at Design Time or at Runtime (like reduxForm())
  */
@@ -98,6 +97,35 @@ interface WithTableParamsOptions {
   noOrderError: boolean;
 }
 export function withTableParams(options: WithTableParamsOptions): string;
+
+/**
+ * some text here
+ */
+type ToastrFunc = (message: "string", options: ToastrFuncOptions);
+interface ToastrFuncOptions {
+  /**
+   * defaults to false, set this only if you're also using a key option and you want to
+   * have the timeout be refreshed
+   */
+  updateTimeout: boolean;
+  /**
+   * use a unique key to update the toastr
+   */
+  key: string;
+}
+interface ToastrOptions {
+  success: ToastrFunc;
+  error: ToastrFunc;
+  warning: ToastrFunc;
+  info: ToastrFunc;
+  default: ToastrFunc;
+}
+
+declare global {
+  interface Window {
+    toastr: ToastrOptions;
+  }
+}
 
 // export function myOtherMethod(a: number): number;
 

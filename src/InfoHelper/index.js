@@ -1,6 +1,6 @@
 //@flow
 import React, { Component } from "react";
-import { Popover, Button, Tooltip, Icon, Classes } from "@blueprintjs/core";
+import { Popover, Button, Tooltip, Icon } from "@blueprintjs/core";
 
 export default class InfoHelper extends Component {
   render() {
@@ -14,6 +14,7 @@ export default class InfoHelper extends Component {
       size,
       popoverProps = {},
       disabled,
+      noPopoverSizing,
       displayToSide,
       style,
       ...rest
@@ -29,6 +30,12 @@ export default class InfoHelper extends Component {
       />
     );
     let toReturn;
+    const toolTipOrPopoverProps = {
+      disabled: disabled,
+      popoverClassName: !noPopoverSizing && " bp3-popover-content-sizing",
+      content: content || children,
+      ...popoverProps
+    };
     if (displayToSide) {
       toReturn = (
         <React.Fragment>
@@ -41,8 +48,7 @@ export default class InfoHelper extends Component {
     } else if (isPopover) {
       toReturn = (
         <Popover
-          disabled={disabled}
-          popoverClassName={Classes.DARK}
+          {...toolTipOrPopoverProps}
           target={
             <Button
               style={{ borderRadius: 15, borderWidth: 5 }}
@@ -51,24 +57,15 @@ export default class InfoHelper extends Component {
               icon={icon}
             />
           }
-          content={<div style={{ padding: 5 }}>{content || children}</div>}
-          {...popoverProps}
         />
       );
     } else {
-      toReturn = (
-        <Tooltip
-          disabled={disabled}
-          target={IconInner}
-          content={content || children}
-          {...popoverProps}
-        />
-      );
+      toReturn = <Tooltip {...toolTipOrPopoverProps} target={IconInner} />;
     }
     return (
       <div
         style={{ display: "flex", ...style }}
-        className={"info-helper-wrapper"}
+        className="info-helper-wrapper"
       >
         {toReturn}
       </div>

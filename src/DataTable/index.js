@@ -202,11 +202,13 @@ class DataTable extends React.Component {
   handleCopyRow = rowEl => {
     //takes in a row element
     const text = this.getRowCopyText(rowEl);
+    if (!text) return;
     this.handleCopyHelper(text, "Row Copied");
   };
 
   getRowCopyText = rowEl => {
     //takes in a row element
+    if (!rowEl) return;
     return map(rowEl.children, cellEl => {
       const cellChild = cellEl.querySelector(`[data-copy-text]`);
       if (!cellChild) return;
@@ -245,9 +247,10 @@ class DataTable extends React.Component {
     const rowEls = rowNumbersToCopy.map(i => allRowEls[i]);
 
     //get row elements and call this.handleCopyRow for each const rowEls = this.getRowEls(rowNumbersToCopy)
-    const textToCopy = map(rowEls, rowEl => this.getRowCopyText(rowEl)).join(
-      "\n"
-    );
+    const textToCopy = map(rowEls, rowEl => this.getRowCopyText(rowEl))
+      .filter(text => text)
+      .join("\n");
+    if (!textToCopy) return window.toastr.warning("No text to copy");
     this.handleCopyHelper(textToCopy, "Selected rows copied");
   };
 

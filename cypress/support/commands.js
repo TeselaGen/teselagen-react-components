@@ -23,3 +23,12 @@
 //
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+Cypress.Commands.add("tgToggle", (type, onOrOff = true) => {
+  /* eslint-disable no-unexpected-multiline*/
+
+  return cy
+    .get(`[data-test="${type}"]`)
+    [onOrOff ? "check" : "uncheck"]({ force: true });
+  /* eslint-enable no-unexpected-multiline*/
+});
