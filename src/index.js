@@ -65,6 +65,7 @@ export { default as pureNoFunc } from "./utils/pureNoFunc";
 export * from "./utils/hotkeyUtils";
 export * from "./utils/menuUtils";
 export * from "./utils/commandUtils";
+export * from "./utils/commandControls";
 export { default as generateQuery } from "./utils/generateQuery";
 export { default as Tree } from "./Tree";
 export {
