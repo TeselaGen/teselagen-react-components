@@ -20,15 +20,14 @@ export default class InfoHelper extends Component {
       ...rest
     }: Props = this.props;
     const IconToUse = isButton ? Button : Icon;
-    const IconInner = (
-      <IconToUse
-        icon={icon}
-        className={className}
-        iconSize={size}
-        disabled={disabled}
-        {...rest}
-      />
-    );
+    const iconProps = {
+      icon,
+      className,
+      disabled
+    };
+    if (!isButton) iconProps.iconSize = size;
+
+    const IconInner = <IconToUse {...iconProps} {...rest} />;
     let toReturn;
     const toolTipOrPopoverProps = {
       disabled: disabled,
