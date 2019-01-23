@@ -1,7 +1,7 @@
 //@flow
 import React, { Component } from "react";
 import { Alert, Intent } from "@blueprintjs/core";
-import {renderOnDoc} from "../utils/renderOnDoc";
+import { renderOnDoc } from "../utils/renderOnDoc";
 
 // usage
 // const doAction = await showConfirmationDialog({
@@ -29,6 +29,7 @@ class AlertWrapper extends Component {
       handleClose,
       text = "customize like --  {text: 'your text here'} ",
       resolve,
+      content = null,
       cancelButtonText = "Cancel",
       intent = Intent.PRIMARY,
       ...rest
@@ -47,9 +48,9 @@ class AlertWrapper extends Component {
         onConfirm={() => doClose(true)}
         {...rest}
       >
+        {content}
         <p style={{ marginBottom: 10 }}>{text}</p>
       </Alert>
     );
   }
 }
-
