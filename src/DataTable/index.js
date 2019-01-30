@@ -594,8 +594,19 @@ class DataTable extends React.Component {
           sortable={false}
           loading={isLoading || disabled}
           defaultResized={resized}
-          onResizedChange={newResized => {
-            resizePersist(newResized);
+          onResizedChange={(newResized = []) => {
+            const resizedToUse = newResized.map(column => {
+              // have a min width of 50 so that columns don't disappear
+              if (column.value < 50) {
+                return {
+                  ...column,
+                  value: 50
+                };
+              } else {
+                return column;
+              }
+            });
+            resizePersist(resizedToUse);
           }}
           getTbodyProps={() => ({
             id: tableId
