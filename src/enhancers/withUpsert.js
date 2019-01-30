@@ -227,9 +227,12 @@ export default function withUpsert(nameOrFragment, options = {}) {
           })
           .catch(e => {
             if (showError) {
-              window.toastr.error(
-                `Error ${isUpdate ? "updating" : "creating"} ${pascalCaseName}`
-              );
+              window.toastr &&
+                window.toastr.error(
+                  `Error ${
+                    isUpdate ? "updating" : "creating"
+                  } ${pascalCaseName}`
+                );
               console.error(`withUpsert ${pascalCaseName} Error:`, e);
             }
             throw e; //rethrow the error so it can be caught again if need be

@@ -96,12 +96,30 @@ interface WithTableParamsOptions {
    */
   noOrderError: boolean;
 }
-export function withTableParams(options: WithTableParamsOptions): string;
 
 /**
- * some text here
+ * Withs table params
+ * @param options
+ * @example
+ * withTableParams({formName: "mySequenceTable"})
  */
-type ToastrFunc = (message: "string", options: ToastrFuncOptions);
+export type withTableParams = (options: WithTableParamsOptions) => void;
+
+interface ToastrFunc {
+  /**
+   * Fire a little toastr notification
+   *
+   * @example
+   *    // they all work similarly
+   *
+   *    window.toastr.warning("Error")
+   *    you can also chain them using a unique key
+   *    window.toastr.info("Sequence Saving", {key: "seqSave"})
+   *    window.toastr.success("Sequence Saved!", {key: "seqSave"})
+   */
+  (message: string, options: ToastrFuncOptions): void;
+}
+
 interface ToastrFuncOptions {
   /**
    * defaults to false, set this only if you're also using a key option and you want to
@@ -113,17 +131,16 @@ interface ToastrFuncOptions {
    */
   key: string;
 }
-interface ToastrOptions {
-  success: ToastrFunc;
-  error: ToastrFunc;
-  warning: ToastrFunc;
-  info: ToastrFunc;
-  default: ToastrFunc;
-}
 
 declare global {
   interface Window {
-    toastr: ToastrOptions;
+    toastr: {
+      success: ToastrFunc;
+      error: ToastrFunc;
+      warning: ToastrFunc;
+      info: ToastrFunc;
+      default: ToastrFunc;
+    };
   }
 }
 
@@ -148,6 +165,7 @@ declare global {
 //      *~   subProp.foo();
 //      *~ or
 //      *~   import * as yourMod from 'yourModule';
+import { withTableParams } from "./index";
 //      *~   yourMod.subProp.foo();
 //      */
 //   export function foo(): void;

@@ -1,3 +1,5 @@
+// seems like this file wasn't working and was actually stopping type 
+// completions from showing up in this package itself
 {
   "compilerOptions": {
       "module": "es2015",
@@ -14,6 +16,7 @@
       ],
       "types": [],
       "noEmit": true,
+      "allowJs": true,
       "forceConsistentCasingInFileNames": true
   },
   "files": [
