@@ -67,7 +67,7 @@ describe("formComponents", () => {
       .first()
       .trigger("contextmenu");
     cy.contains("Copy Selected Rows to Clipboard").click();
-    cy.contains("Selected Rows Copied");
+    cy.contains("Selected rows copied");
   });
   it(`it can click the tg filter menu and type some stuff`, () => {
     cy.get(`[data-test="Hunger Level"]`)
