@@ -12,6 +12,18 @@ class MenuBarDemo extends React.Component {
         hotkey: "mod+n",
         handler: () => alert('Triggered "New File"')
       },
+      fakeCmd1: {
+        handler: () => alert("Triggering Fake Cmd"),
+        name: () => {
+          return "Fake Cmd";
+        }
+      },
+      fakeCmd2: {
+        handler: () => alert("Triggering Fake Cmd 2"),
+        name: () => {
+          return "Fake Cmd 2";
+        }
+      },
       openFile: {
         isDisabled: () => {
           return "yep I'm disabled";
@@ -41,6 +53,7 @@ class MenuBarDemo extends React.Component {
       getArguments: () => [],
       handleReturn: () => {}
     });
+    this.commands = commands;
 
     let menu = [
       {
@@ -55,6 +68,9 @@ class MenuBarDemo extends React.Component {
           { text: "Open...", icon: "document", cmd: "openFile" },
           { divider: "" },
           { cmd: "showHotkeys" },
+          {
+            cmd: "fakeCmd1"
+          },
           { divider: "" },
           { icon: "log-out", cmd: "quit" } // no text prop here
         ]
@@ -174,6 +190,11 @@ class MenuBarDemo extends React.Component {
           Click to see a menu created using the imperative showContextMenu(menu,
           undefined, event)
         </button>
+        <h3>Examples of using CmdCheckbox, CmdSwitch, CmdDiv, CmdButton</h3>
+        <CmdCheckbox cmd={this.commands.fakeCmd1} />
+        <CmdSwitch cmd={this.commands.fakeCmd1} />
+        <CmdDiv cmd={this.commands.fakeCmd2} />
+        <CmdButton cmd={this.commands.fakeCmd2} />
         <this.hotkeyEnabler />
         <HotkeysDialog
           hotkeySets={this.hotkeySets}

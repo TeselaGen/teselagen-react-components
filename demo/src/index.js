@@ -43,6 +43,12 @@ import TimelineEvent from "../../src/Timeline/TimelineEvent";
 import TimelineDemo from "./examples/TimelineDemo";
 import IntentTextDemo from "./examples/IntentText";
 import IntentText from "../../src/IntentText";
+import {
+  CmdButton,
+  CmdCheckbox,
+  CmdDiv,
+  CmdSwitch
+} from "../../src/utils/commandControls";
 
 import "./style.css";
 import React, { Component } from "react";
@@ -226,6 +232,10 @@ const demos = {
       withHotkeys,
       getHotkeyProps,
       createMenu,
+      CmdButton,
+      CmdCheckbox,
+      CmdDiv,
+      CmdSwitch,
       showContextMenu,
       commandMenuEnhancer,
       genericCommandFactory,
