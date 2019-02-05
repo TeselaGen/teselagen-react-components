@@ -992,6 +992,7 @@ class DataTable extends React.Component {
         let title = typeof val !== "string" ? args[0].value : val;
         if (title) title = String(title);
         if (getCellHoverText) title = getCellHoverText(...args);
+        if (column.getTitleAttr) title = column.getTitleAttr(...args);
         return (
           <div
             style={
