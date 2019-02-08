@@ -144,6 +144,8 @@ export default function withQuery(inputFragment, options = {}) {
           ssr: false,
           pollInterval,
           notifyOnNetworkStatusChange,
+          // This will refetch queries whose data has been messed up by other cache updates. https://github.com/apollographql/react-apollo/pull/2003
+          partialRefetch: true,
           ...otherExtraOptions
         };
       },
