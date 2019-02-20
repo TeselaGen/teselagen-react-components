@@ -119,6 +119,7 @@ export default function withUpsert(nameOrFragment, options = {}) {
       const values = Array.isArray(valueOrValues)
         ? valueOrValues
         : [valueOrValues];
+      if (!valueOrValues || !values.length) return [];
       let isUpdate = !!(values[0].id || values[0].code);
       if (topLevelForceCreate) {
         isUpdate = false;
@@ -212,7 +213,7 @@ export default function withUpsert(nameOrFragment, options = {}) {
     withHandlers({
       createItem: undefined,
       updateItem: undefined,
-      [mutationName || `upsert${pascalCaseName}`]: ownProps => (
+      [mutationName || `upsert${pascalCaseName}`]: async ownProps => (
         valueOrValues,
         ...rest
       ) => {
@@ -225,10 +226,7 @@ export default function withUpsert(nameOrFragment, options = {}) {
         const values = Array.isArray(valueOrValues)
           ? valueOrValues
           : [valueOrValues];
-        if (!values[0])
-          throw new Error(
-            "You have to pass at least 1 thing to create or update!"
-          );
+        if (!valueOrValues || !values.length) return [];
         let isUpdate = !!(values[0].id || values[0].code);
         if (forceCreate) {
           isUpdate = false;
