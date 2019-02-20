@@ -1,4 +1,4 @@
-import { chunk, get } from "lodash";
+import { get } from "lodash";
 import modelNameToReadableName from "../utils/modelNameToReadableName";
 import withQuery from "./withQuery.old/withQuery";
 import withDelete from "./withDelete";
@@ -20,30 +20,31 @@ export default function getApolloMethods(client) {
     })(valueOrValuesToUse);
   };
 
-  /**
-   * If `upsert` is called with an empty array for the values,
-   * it will throw an error. This function factory can preclude
-   * the need to make sure the values being upserted aren't empty.
-   *
-   * secondly, if trying to upsert more than 50 items it will split
-   * them into groups and upsert 50 at a time.
-   */
-  async function safeUpsert(...args) {
-    const values = args.pop();
-    if (Array.isArray(values) && !values.length) return [];
-    else {
-      if (values.length > 50) {
-        const groupedVals = chunk(values, 50);
-        let toReturn = [];
-        for (const valGroup of groupedVals) {
-          toReturn = toReturn.concat(await upsert(...args, valGroup));
-        }
-        return toReturn;
-      } else {
-        return await upsert(...args, values);
-      }
-    }
-  }
+  // /**
+  // DEPRECATED: all functionality has been added to withUpsert
+  //  * If `upsert` is called with an empty array for the values,
+  //  * it will throw an error. This function factory can preclude
+  //  * the need to make sure the values being upserted aren't empty.
+  //  *
+  //  * secondly, if trying to upsert more than 50 items it will split
+  //  * them into groups and upsert 50 at a time.
+  //  */
+  // async function safeUpsert(...args) {
+  //   const values = args.pop();
+  //   if (Array.isArray(values) && !values.length) return [];
+  //   else {
+  //     if (values.length > SAFE_UPSERT_PAGE_SIZE) {
+  //       const groupedVals = chunk(values, SAFE_UPSERT_PAGE_SIZE);
+  //       let toReturn = [];
+  //       for (const valGroup of groupedVals) {
+  //         toReturn = toReturn.concat(await upsert(...args, valGroup));
+  //       }
+  //       return toReturn;
+  //     } else {
+  //       return await upsert(...args, values);
+  //     }
+  //   }
+  // }
 
   const query = (fragment, options) => {
     return withQuery(fragment, { asFunction: true, client, ...options })();
@@ -158,8 +159,8 @@ export default function getApolloMethods(client) {
   }
 
   return {
-    upsert: safeUpsert,
-    safeUpsert,
+    upsert,
+    safeUpsert: upsert,
     query: safeQuery,
     safeQuery,
     makeSafeQueryWithToast,

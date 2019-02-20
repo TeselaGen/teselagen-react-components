@@ -1,10 +1,12 @@
 import { graphql } from "react-apollo";
 import compose from "lodash/fp/compose";
+import { chunk } from "lodash";
 import gql from "graphql-tag";
 import pascalCase from "pascal-case";
 import { withHandlers } from "recompose";
 import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
 import generateFragmentWithFields from "../utils/generateFragmentWithFields";
+import { SAFE_UPSERT_PAGE_SIZE } from "../constants";
 
 /**
  * withUpsert
@@ -113,10 +115,11 @@ export default function withUpsert(nameOrFragment, options = {}) {
       return console.error(
         "You need to pass the apollo client to withUpsert if using as a function"
       );
-    return function upsert(valueOrValues, options) {
+    return async function upsert(valueOrValues, options) {
       const values = Array.isArray(valueOrValues)
         ? valueOrValues
         : [valueOrValues];
+      if (!valueOrValues || !values.length) return [];
       let isUpdate = !!(values[0].id || values[0].code);
       if (topLevelForceCreate) {
         isUpdate = false;
@@ -124,25 +127,45 @@ export default function withUpsert(nameOrFragment, options = {}) {
       if (topLevelForceUpdate) {
         isUpdate = true;
       }
-      return client
-        .mutate({
+      const upsertFn = values => {
+        return client.mutate({
           mutation: isUpdate ? updateMutation : createMutation,
-          name: "createDataFile",
           variables: {
             input: values
           },
           ...rest,
           ...options
-        })
-        .then(function(res) {
-          const resultInfo =
-            res.data[isUpdate ? updateName : createName][
-              isUpdate ? "updatedItemsCursor" : "createdItemsCursor"
-            ];
-          return Promise.resolve(
-            excludeResults ? resultInfo.totalResults : resultInfo.results
-          );
         });
+      };
+
+      const results = await getSafeUpsertResults(
+        upsertFn,
+        values,
+        createName,
+        updateName
+      );
+      return excludeResults ? results.totalResults : results;
+
+      // DEPRECATED
+      // return client
+      //   .mutate({
+      //     mutation: isUpdate ? updateMutation : createMutation,
+      //     name: "createDataFile",
+      //     variables: {
+      //       input: values
+      //     },
+      //     ...rest,
+      //     ...options
+      //   })
+      //   .then(function(res) {
+      //     const resultInfo =
+      //       res.data[isUpdate ? updateName : createName][
+      //         isUpdate ? "updatedItemsCursor" : "createdItemsCursor"
+      //       ];
+      //     return Promise.resolve(
+      //       excludeResults ? resultInfo.totalResults : resultInfo.results
+      //     );
+      //   });
     };
   }
 
@@ -190,7 +213,7 @@ export default function withUpsert(nameOrFragment, options = {}) {
     withHandlers({
       createItem: undefined,
       updateItem: undefined,
-      [mutationName || `upsert${pascalCaseName}`]: ownProps => (
+      [mutationName || `upsert${pascalCaseName}`]: async ownProps => (
         valueOrValues,
         ...rest
       ) => {
@@ -203,10 +226,7 @@ export default function withUpsert(nameOrFragment, options = {}) {
         const values = Array.isArray(valueOrValues)
           ? valueOrValues
           : [valueOrValues];
-        if (!values[0])
-          throw new Error(
-            "You have to pass at least 1 thing to create or update!"
-          );
+        if (!valueOrValues || !values.length) return [];
         let isUpdate = !!(values[0].id || values[0].code);
         if (forceCreate) {
           isUpdate = false;
@@ -214,30 +234,79 @@ export default function withUpsert(nameOrFragment, options = {}) {
         if (forceUpdate) {
           isUpdate = true;
         }
-        return (isUpdate ? updateItem : createItem)(values, ...rest)
-          .then(function(res) {
-            const returnInfo =
-              res.data[isUpdate ? updateName : createName][
-                isUpdate ? "updatedItemsCursor" : "createdItemsCursor"
-              ];
-            let results = returnInfo.results;
-            results = [...results];
-            results.totalResults = returnInfo.totalResults;
-            return Promise.resolve(results);
-          })
-          .catch(e => {
-            if (showError) {
-              window.toastr &&
-                window.toastr.error(
-                  `Error ${
-                    isUpdate ? "updating" : "creating"
-                  } ${pascalCaseName}`
-                );
-              console.error(`withUpsert ${pascalCaseName} Error:`, e);
-            }
-            throw e; //rethrow the error so it can be caught again if need be
-          });
+        const upsertFn = isUpdate ? updateItem : createItem;
+        try {
+          return getSafeUpsertResults(
+            upsertFn,
+            values,
+            createName,
+            updateName,
+            rest
+          );
+        } catch (e) {
+          if (showError) {
+            window.toastr &&
+              window.toastr.error(
+                `Error ${isUpdate ? "updating" : "creating"} ${pascalCaseName}`
+              );
+            console.error(`withUpsert ${pascalCaseName} Error:`, e);
+          }
+          throw e; //rethrow the error so it can be caught again if need be
+        }
+        // DEPRECATED
+        // return (isUpdate ? updateItem : createItem)(values, ...rest)
+        //   .then(function(res) {
+        //     const returnInfo =
+        //       res.data[isUpdate ? updateName : createName][
+        //         isUpdate ? "updatedItemsCursor" : "createdItemsCursor"
+        //       ];
+        //     let results = returnInfo.results;
+        //     results = [...results];
+        //     results.totalResults = returnInfo.totalResults;
+        //     return Promise.resolve(results);
+        //   })
+        //   .catch(e => {
+        //     if (showError) {
+        //       window.toastr &&
+        //         window.toastr.error(
+        //           `Error ${
+        //             isUpdate ? "updating" : "creating"
+        //           } ${pascalCaseName}`
+        //         );
+        //       console.error(`withUpsert ${pascalCaseName} Error:`, e);
+        //     }
+        //     throw e; //rethrow the error so it can be caught again if need be
+        //   });
       }
     })
   );
+}
+
+async function getSafeUpsertResults(
+  upsertFn,
+  values,
+  createName,
+  updateName,
+  userOptions
+) {
+  let isUpdate = !!(values[0].id || values[0].code);
+
+  let results = [];
+  const addToResults = res => {
+    const returnInfo =
+      res.data[isUpdate ? updateName : createName][
+        isUpdate ? "updatedItemsCursor" : "createdItemsCursor"
+      ];
+    results = results.concat(returnInfo.results);
+    results.totalResults = returnInfo.totalResults;
+  };
+  if (values.length > SAFE_UPSERT_PAGE_SIZE) {
+    const groupedVals = chunk(values, SAFE_UPSERT_PAGE_SIZE);
+    for (const valGroup of groupedVals) {
+      addToResults(await upsertFn(valGroup, ...userOptions));
+    }
+  } else {
+    addToResults(await upsertFn(values, ...userOptions));
+  }
+  return results;
 }
