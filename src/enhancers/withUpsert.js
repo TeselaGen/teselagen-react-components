@@ -1,10 +1,12 @@
 import { graphql } from "react-apollo";
 import compose from "lodash/fp/compose";
+import { chunk } from "lodash";
 import gql from "graphql-tag";
 import pascalCase from "pascal-case";
 import { withHandlers } from "recompose";
 import invalidateQueriesOfTypes from "../utils/invalidateQueriesOfTypes";
 import generateFragmentWithFields from "../utils/generateFragmentWithFields";
+import { SAFE_UPSERT_PAGE_SIZE } from "../constants";
 
 /**
  * withUpsert
@@ -190,7 +192,7 @@ export default function withUpsert(nameOrFragment, options = {}) {
     withHandlers({
       createItem: undefined,
       updateItem: undefined,
-      [mutationName || `upsert${pascalCaseName}`]: ownProps => (
+      [mutationName || `upsert${pascalCaseName}`]: ownProps => async (
         valueOrValues,
         ...rest
       ) => {
@@ -214,29 +216,60 @@ export default function withUpsert(nameOrFragment, options = {}) {
         if (forceUpdate) {
           isUpdate = true;
         }
-        return (isUpdate ? updateItem : createItem)(values, ...rest)
-          .then(function(res) {
-            const returnInfo =
-              res.data[isUpdate ? updateName : createName][
-                isUpdate ? "updatedItemsCursor" : "createdItemsCursor"
-              ];
-            let results = returnInfo.results;
-            results = [...results];
-            results.totalResults = returnInfo.totalResults;
-            return Promise.resolve(results);
-          })
-          .catch(e => {
-            if (showError) {
-              window.toastr &&
-                window.toastr.error(
-                  `Error ${
-                    isUpdate ? "updating" : "creating"
-                  } ${pascalCaseName}`
-                );
-              console.error(`withUpsert ${pascalCaseName} Error:`, e);
+        const upsertFn = isUpdate ? updateItem : createItem;
+        let results = [];
+        const addToResults = res => {
+          const returnInfo =
+            res.data[isUpdate ? updateName : createName][
+              isUpdate ? "updatedItemsCursor" : "createdItemsCursor"
+            ];
+          results = results.concat(returnInfo.results);
+          results.totalResults = returnInfo.totalResults;
+        };
+        try {
+          if (values.length > SAFE_UPSERT_PAGE_SIZE) {
+            const groupedVals = chunk(values, SAFE_UPSERT_PAGE_SIZE);
+            for (const valGroup of groupedVals) {
+              addToResults(await upsertFn(valGroup, ...rest));
             }
-            throw e; //rethrow the error so it can be caught again if need be
-          });
+          } else {
+            addToResults(await upsertFn(values, ...rest));
+          }
+          return results;
+        } catch (e) {
+          if (showError) {
+            window.toastr &&
+              window.toastr.error(
+                `Error ${isUpdate ? "updating" : "creating"} ${pascalCaseName}`
+              );
+            console.error(`withUpsert ${pascalCaseName} Error:`, e);
+          }
+          throw e; //rethrow the error so it can be caught again if need be
+        }
+        // DEPRECATED
+        // return (isUpdate ? updateItem : createItem)(values, ...rest)
+        //   .then(function(res) {
+        //     const returnInfo =
+        //       res.data[isUpdate ? updateName : createName][
+        //         isUpdate ? "updatedItemsCursor" : "createdItemsCursor"
+        //       ];
+        //     let results = returnInfo.results;
+        //     results = [...results];
+        //     results.totalResults = returnInfo.totalResults;
+        //     return Promise.resolve(results);
+        //   })
+        //   .catch(e => {
+        //     if (showError) {
+        //       window.toastr &&
+        //         window.toastr.error(
+        //           `Error ${
+        //             isUpdate ? "updating" : "creating"
+        //           } ${pascalCaseName}`
+        //         );
+        //       console.error(`withUpsert ${pascalCaseName} Error:`, e);
+        //     }
+        //     throw e; //rethrow the error so it can be caught again if need be
+        //   });
       }
     })
   );

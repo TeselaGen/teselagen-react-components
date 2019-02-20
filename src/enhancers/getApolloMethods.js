@@ -1,5 +1,6 @@
 import { chunk, get } from "lodash";
 import modelNameToReadableName from "../utils/modelNameToReadableName";
+import { SAFE_UPSERT_PAGE_SIZE } from "../constants";
 import withQuery from "./withQuery.old/withQuery";
 import withDelete from "./withDelete";
 import withUpsert from "./withUpsert";
@@ -32,8 +33,8 @@ export default function getApolloMethods(client) {
     const values = args.pop();
     if (Array.isArray(values) && !values.length) return [];
     else {
-      if (values.length > 50) {
-        const groupedVals = chunk(values, 50);
+      if (values.length > SAFE_UPSERT_PAGE_SIZE) {
+        const groupedVals = chunk(values, SAFE_UPSERT_PAGE_SIZE);
         let toReturn = [];
         for (const valGroup of groupedVals) {
           toReturn = toReturn.concat(await upsert(...args, valGroup));
