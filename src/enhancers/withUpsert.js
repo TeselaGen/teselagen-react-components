@@ -115,7 +115,7 @@ export default function withUpsert(nameOrFragment, options = {}) {
       return console.error(
         "You need to pass the apollo client to withUpsert if using as a function"
       );
-    return function upsert(valueOrValues, options) {
+    return async function upsert(valueOrValues, options) {
       const values = Array.isArray(valueOrValues)
         ? valueOrValues
         : [valueOrValues];
@@ -126,25 +126,45 @@ export default function withUpsert(nameOrFragment, options = {}) {
       if (topLevelForceUpdate) {
         isUpdate = true;
       }
-      return client
-        .mutate({
+      const upsertFn = values => {
+        return client.mutate({
           mutation: isUpdate ? updateMutation : createMutation,
-          name: "createDataFile",
           variables: {
             input: values
           },
           ...rest,
           ...options
-        })
-        .then(function(res) {
-          const resultInfo =
-            res.data[isUpdate ? updateName : createName][
-              isUpdate ? "updatedItemsCursor" : "createdItemsCursor"
-            ];
-          return Promise.resolve(
-            excludeResults ? resultInfo.totalResults : resultInfo.results
-          );
         });
+      };
+
+      const results = await getSafeUpsertResults(
+        upsertFn,
+        values,
+        createName,
+        updateName
+      );
+      return excludeResults ? results.totalResults : results;
+
+      // DEPRECATED
+      // return client
+      //   .mutate({
+      //     mutation: isUpdate ? updateMutation : createMutation,
+      //     name: "createDataFile",
+      //     variables: {
+      //       input: values
+      //     },
+      //     ...rest,
+      //     ...options
+      //   })
+      //   .then(function(res) {
+      //     const resultInfo =
+      //       res.data[isUpdate ? updateName : createName][
+      //         isUpdate ? "updatedItemsCursor" : "createdItemsCursor"
+      //       ];
+      //     return Promise.resolve(
+      //       excludeResults ? resultInfo.totalResults : resultInfo.results
+      //     );
+      //   });
     };
   }
 
@@ -192,7 +212,7 @@ export default function withUpsert(nameOrFragment, options = {}) {
     withHandlers({
       createItem: undefined,
       updateItem: undefined,
-      [mutationName || `upsert${pascalCaseName}`]: ownProps => async (
+      [mutationName || `upsert${pascalCaseName}`]: ownProps => (
         valueOrValues,
         ...rest
       ) => {
@@ -217,25 +237,14 @@ export default function withUpsert(nameOrFragment, options = {}) {
           isUpdate = true;
         }
         const upsertFn = isUpdate ? updateItem : createItem;
-        let results = [];
-        const addToResults = res => {
-          const returnInfo =
-            res.data[isUpdate ? updateName : createName][
-              isUpdate ? "updatedItemsCursor" : "createdItemsCursor"
-            ];
-          results = results.concat(returnInfo.results);
-          results.totalResults = returnInfo.totalResults;
-        };
         try {
-          if (values.length > SAFE_UPSERT_PAGE_SIZE) {
-            const groupedVals = chunk(values, SAFE_UPSERT_PAGE_SIZE);
-            for (const valGroup of groupedVals) {
-              addToResults(await upsertFn(valGroup, ...rest));
-            }
-          } else {
-            addToResults(await upsertFn(values, ...rest));
-          }
-          return results;
+          return getSafeUpsertResults(
+            upsertFn,
+            values,
+            createName,
+            updateName,
+            rest
+          );
         } catch (e) {
           if (showError) {
             window.toastr &&
@@ -273,4 +282,33 @@ export default function withUpsert(nameOrFragment, options = {}) {
       }
     })
   );
+}
+
+async function getSafeUpsertResults(
+  upsertFn,
+  values,
+  createName,
+  updateName,
+  userOptions
+) {
+  let isUpdate = !!(values[0].id || values[0].code);
+
+  let results = [];
+  const addToResults = res => {
+    const returnInfo =
+      res.data[isUpdate ? updateName : createName][
+        isUpdate ? "updatedItemsCursor" : "createdItemsCursor"
+      ];
+    results = results.concat(returnInfo.results);
+    results.totalResults = returnInfo.totalResults;
+  };
+  if (values.length > SAFE_UPSERT_PAGE_SIZE) {
+    const groupedVals = chunk(values, SAFE_UPSERT_PAGE_SIZE);
+    for (const valGroup of groupedVals) {
+      addToResults(await upsertFn(valGroup, ...userOptions));
+    }
+  } else {
+    addToResults(await upsertFn(values, ...userOptions));
+  }
+  return results;
 }
