@@ -5,8 +5,11 @@ import { Button, Dialog, Classes } from "@blueprintjs/core";
 import { each, get, startCase, times, zip, flatten, noop } from "lodash";
 import moment from "moment";
 import papaparse from "papaparse";
+import { ApolloConsumer } from "react-apollo";
 import Loading from "../Loading";
 import magicDownload from "../DownloadLink/magicDownload";
+import showProgressToast from "../utils/showProgressToast";
+import getApolloMethods from "../enhancers/getApolloMethods";
 import schemas from "./schemas";
 import { getLinkDialogProps } from "./utils";
 import exportOligosFields from "./exportOligosFields";
@@ -27,7 +30,8 @@ const sharedTableProps = {
 class J5ReportRecordView extends Component {
   state = {
     linkDialogName: undefined,
-    partCidMap: {}
+    partCidMap: {},
+    loadingExportOligos: false
   };
   showLinkModal = name => {
     this.setState({ linkDialogName: name });
@@ -39,11 +43,34 @@ class J5ReportRecordView extends Component {
     this.setState({ linkDialogName: name });
   };
 
-  handleExportOligosToCsv = () => {
-    const { data } = this.props;
-    const j5OligoSyntheses = processDataForTables.j5OligoSynthesis(
-      data.j5Report.j5OligoSyntheses
-    );
+  handleExportOligosToCsv = async apolloClient => {
+    const { data, fragmentMap } = this.props;
+    let oligos;
+    if (fragmentMap) {
+      this.setState({
+        loadingExportOligos: true
+      });
+      try {
+        const { makeSafeQueryWithToast } = getApolloMethods(apolloClient);
+        const safeQuery = makeSafeQueryWithToast(showProgressToast);
+        oligos = await safeQuery(fragmentMap.j5OligoSynthesis, {
+          variables: {
+            filter: {
+              j5ReportId: data.j5Report.id
+            }
+          }
+        });
+      } catch (error) {
+        console.error("error:", error);
+        window.toastr.error("Error exporting oligos.");
+      }
+      this.setState({
+        loadingExportOligos: false
+      });
+    } else {
+      oligos = data.j5Report.j5OligoSyntheses;
+    }
+    const j5OligoSyntheses = processDataForTables.j5OligoSynthesis(oligos);
     const csvString = papaparse.unparse([
       ["OligoSynthesis"],
       exportOligosFields.map(field => field.displayName),
@@ -122,11 +149,19 @@ class J5ReportRecordView extends Component {
     // option to override export handler
     const { onExportOligosAsCsvClick } = this.props;
     return (
-      <Button
-        onClick={onExportOligosAsCsvClick || this.handleExportOligosToCsv}
-      >
-        Export as CSV
-      </Button>
+      <ApolloConsumer>
+        {client => {
+          const clickFn = () => this.handleExportOligosToCsv(client);
+          return (
+            <Button
+              loading={this.state.loadingExportOligos}
+              onClick={onExportOligosAsCsvClick || clickFn}
+            >
+              Export as CSV
+            </Button>
+          );
+        }}
+      </ApolloConsumer>
     );
   };
 
