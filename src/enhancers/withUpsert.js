@@ -213,7 +213,7 @@ export default function withUpsert(nameOrFragment, options = {}) {
     withHandlers({
       createItem: undefined,
       updateItem: undefined,
-      [mutationName || `upsert${pascalCaseName}`]: async ownProps => (
+      [mutationName || `upsert${pascalCaseName}`]: ownProps => (
         valueOrValues,
         ...rest
       ) => {
