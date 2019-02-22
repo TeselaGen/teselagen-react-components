@@ -138,13 +138,13 @@ export default function withUpsert(nameOrFragment, options = {}) {
         });
       };
 
-      const results = await getSafeUpsertResults(
+      const results = await getSafeUpsertResults({
         upsertFn,
         values,
         createName,
         updateName,
         isUpdate
-      );
+      });
       return excludeResults ? results.totalResults : results;
 
       // DEPRECATED
@@ -237,14 +237,14 @@ export default function withUpsert(nameOrFragment, options = {}) {
         }
         const upsertFn = isUpdate ? updateItem : createItem;
         try {
-          return getSafeUpsertResults(
+          return getSafeUpsertResults({
             upsertFn,
             values,
             createName,
             updateName,
-            rest,
+            userOptions: rest,
             isUpdate
-          );
+          });
         } catch (e) {
           if (showError) {
             window.toastr &&
@@ -284,14 +284,14 @@ export default function withUpsert(nameOrFragment, options = {}) {
   );
 }
 
-async function getSafeUpsertResults(
+async function getSafeUpsertResults({
   upsertFn,
   values,
   createName,
   updateName,
   userOptions,
   isUpdate
-) {
+}) {
   let results = [];
   const addToResults = res => {
     const returnInfo =
