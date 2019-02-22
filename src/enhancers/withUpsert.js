@@ -142,7 +142,8 @@ export default function withUpsert(nameOrFragment, options = {}) {
         upsertFn,
         values,
         createName,
-        updateName
+        updateName,
+        isUpdate
       );
       return excludeResults ? results.totalResults : results;
 
@@ -241,7 +242,8 @@ export default function withUpsert(nameOrFragment, options = {}) {
             values,
             createName,
             updateName,
-            rest
+            rest,
+            isUpdate
           );
         } catch (e) {
           if (showError) {
@@ -287,10 +289,9 @@ async function getSafeUpsertResults(
   values,
   createName,
   updateName,
-  userOptions
+  userOptions,
+  isUpdate
 ) {
-  let isUpdate = !!(values[0].id || values[0].code);
-
   let results = [];
   const addToResults = res => {
     const returnInfo =
