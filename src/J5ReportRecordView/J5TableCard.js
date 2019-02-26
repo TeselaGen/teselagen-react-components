@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@blueprintjs/core";
-import { camelCase, noop, get, identity, isEmpty } from "lodash";
+import { camelCase, noop, get, identity } from "lodash";
 import { compose, withProps, branch } from "recompose";
 import CollapsibleCard from "../CollapsibleCard";
 import InfoHelper from "../InfoHelper";
@@ -38,7 +38,7 @@ function J5TableCard({
     <CollapsibleCard
       icon={helperMessage && <InfoHelper>{helperMessage}</InfoHelper>}
       title={title}
-      key={title + (filteredEntities.length > 0 ? "_nonempty" : '')} // force remount on data arrival
+      key={title + (filteredEntities.length > 0 ? "_nonempty" : "")} // force remount on data arrival
       initialClosed={!filteredEntities.length}
       openTitleElements={[
         isLinkable && (
@@ -58,6 +58,7 @@ function J5TableCard({
         entities={filteredEntities}
         // schema is weird because we are sometimes generating schema off of the entities
         schema={createSchema(entities) || tableParams.schema || schema}
+        entityCount={filteredEntities.length}
       />
       {children}
     </CollapsibleCard>
@@ -106,10 +107,7 @@ export default compose(
     props => props.runTimeQueryOptions,
     compose(
       withTableParams({
-        urlConnected: false,
-        defaults: {
-          pageSize: 5
-        }
+        urlConnected: false
       }),
       withQueryDynamic({
         isPlural: true
