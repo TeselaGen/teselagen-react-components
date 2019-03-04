@@ -213,6 +213,13 @@
   dependencies:
     array-from "^2.1.1"
 
+"@teselagen/apollo-methods@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@teselagen/apollo-methods/-/apollo-methods-1.0.1.tgz#4d8820887273d541c030364ad96725cd5c40bb7c"
+  integrity sha512-4248+9YMOqwX2UynWCzaOgIkBBY0QU7SKns8df9DexXr7kN5Ja3Ejnc0PW7f/yk72ljjfd34BaKha6jiqvO2EQ==
+  dependencies:
+    pascal-case "^2.0.1"
+
 "@types/async@2.0.50":
   version "2.0.50"
   resolved "https://registry.yarnpkg.com/@types/async/-/async-2.0.50.tgz#117540e026d64e1846093abbd5adc7e27fda7bcb"
@@ -8876,11 +8883,6 @@ path-type@^3.0.0:
   integrity sha512-T2ZUsdZFHgA3u4e5PfPbjd7HDDpxPnQb5jN0SrDsjNSuVXHJqtwTnWqG0B1jZrgmJ/7lj1EmVIByWt1gxGkWvg==
   dependencies:
     pify "^3.0.0"
-
-paths-js@^0.4.7:
-  version "0.4.7"
-  resolved "https://registry.yarnpkg.com/paths-js/-/paths-js-0.4.7.tgz#2e1d4e4a5a8e57e15c16bd29051d3f8be237e194"
-  integrity sha512-a6pYqToBgB/V7YUHHviYdRq41IcijUjY9XJ1NKu2COrR5eLhrx+HPZ/VL6vC3vyg3z4T6K00wsVMAqTzSR3ppg==
 
 pbkdf2@^3.0.3:
   version "3.0.17"

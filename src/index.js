@@ -1,4 +1,12 @@
+import {
+  withDelete,
+  withUpsert,
+  getApolloMethods
+} from "@teselagen/apollo-methods";
 import "./style.css";
+
+export { withDelete, withUpsert, getApolloMethods };
+export { default as withQuery } from "./enhancers/withQuery.old";
 export {
   getCurrentParamsFromUrl,
   setCurrentParamsOnUrl
@@ -20,7 +28,6 @@ export { default as MultiSelectSideBySide } from "./MultiSelectSideBySide";
 export { default as createGenericSelect } from "./createGenericSelect";
 export { default as magicDownload } from "./DownloadLink/magicDownload";
 export { default as IntentText } from "./IntentText";
-
 export {
   default as routeDoubleClick
 } from "./DataTable/utils/routeDoubleClick";
@@ -37,11 +44,7 @@ export { default as rerenderOnWindowResize } from "./rerenderOnWindowResize";
 export { default as HotkeysDialog } from "./HotkeysDialog";
 export { default as J5ReportRecordView } from "./J5ReportRecordView";
 export * from "./J5ReportRecordView/utils";
-export { default as withDelete } from "./enhancers/withDelete";
-export { default as withUpsert } from "./enhancers/withUpsert";
-export { default as withQuery } from "./enhancers/withQuery.old";
 export { default as withQueryDynamic } from "./enhancers/withQueryDynamic";
-export { default as getApolloMethods } from "./enhancers/getApolloMethods";
 export { default as withFields } from "./enhancers/withFields";
 export { default as withField } from "./enhancers/withField";
 export { default as withDialog } from "./enhancers/withDialog";

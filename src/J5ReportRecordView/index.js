@@ -2,6 +2,7 @@ import React, { Component } from "react";
 // import EditViewHOC from '../../EditViewHOC'
 import { reduxForm } from "redux-form";
 import { Button, Dialog, Classes } from "@blueprintjs/core";
+import { getApolloMethods } from "@teselagen/apollo-methods";
 import { each, get, startCase, times, zip, flatten, noop } from "lodash";
 import moment from "moment";
 import papaparse from "papaparse";
@@ -9,7 +10,6 @@ import { ApolloConsumer } from "react-apollo";
 import Loading from "../Loading";
 import magicDownload from "../DownloadLink/magicDownload";
 import showProgressToast from "../utils/showProgressToast";
-import getApolloMethods from "../enhancers/getApolloMethods";
 import schemas from "./schemas";
 import { getLinkDialogProps } from "./utils";
 import exportOligosFields from "./exportOligosFields";
