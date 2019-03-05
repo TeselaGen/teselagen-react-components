@@ -93,28 +93,19 @@ const processJ5PcrReactions = j5PcrReactions =>
   }));
 
 const processJ5OligoSynthesis = j5Oligos =>
-  j5Oligos
-    .filter(j5Oligo => {
-      // remove the j5 oligos that link to a top or bottom annealed oligo
-      return !(
-        j5Oligo.oligo &&
-        (j5Oligo.oligo.j5AnnealedOligosTopOligos.length ||
-          j5Oligo.oligo.j5AnnealedOligosBottomOligos.length)
-      );
-    })
-    .map(j5Oligo => {
-      // todo this shouldn't rely on the oligo name to parse the target parts
-      // if someone uses output naming templates for oligos then this will not work
-      const partNames = getWrappedInParensMatches(j5Oligo.name);
+  j5Oligos.map(j5Oligo => {
+    // todo this shouldn't rely on the oligo name to parse the target parts
+    // if someone uses output naming templates for oligos then this will not work
+    const partNames = getWrappedInParensMatches(j5Oligo.name);
 
-      return {
-        ...j5Oligo,
-        id: "oligo_" + j5Oligo.id,
-        name: j5Oligo.name,
-        firstTargetPart: partNames[0],
-        lastTargetPart: partNames[1]
-      };
-    });
+    return {
+      ...j5Oligo,
+      id: "oligo_" + j5Oligo.id,
+      name: j5Oligo.name,
+      firstTargetPart: partNames[0],
+      lastTargetPart: partNames[1]
+    };
+  });
 
 const processJ5AnnealedOligo = j5Oligos => {
   return j5Oligos
