@@ -100,6 +100,34 @@ const schemas = {
       }
     ]
   },
+  j5AnnealedOligos: {
+    fields: [
+      { path: "id", type: "string", displayName: "Oligo ID" },
+      { path: "name", type: "string", displayName: "Oligo Name" },
+      {
+        path: "targetPart",
+        type: "string",
+        displayName: "Target Part"
+      },
+      { path: "tm", type: "number", displayName: "Tm (°C)" },
+      { path: "tm3Prime", type: "number", displayName: "Tm 3' Only (°C)" },
+      {
+        path: "oligo.sequence.size",
+        type: "number",
+        displayName: "Length (bp)"
+      },
+      {
+        path: "cost",
+        type: "number",
+        displayName: "Cost (USD)"
+      },
+      {
+        path: "oligo.sequence.polynucleotideMaterialId",
+        type: "boolean",
+        displayName: "Is Linked"
+      }
+    ]
+  },
   j5AssemblyPieces: {
     fields: [
       { path: "id", type: "string", displayName: "Piece ID" },
