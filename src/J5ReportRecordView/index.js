@@ -543,6 +543,33 @@ class J5ReportRecordView extends Component {
 
           <J5TableCard
             j5ReportId={j5Report.id}
+            helperMessage="This is the list of annealed oligos."
+            title="Annealed Oligos"
+            processData={processDataForTables.j5AnnealedOligo}
+            entities={j5Report.j5OligoSyntheses}
+            fragment={fragmentMap.j5OligoSynthesis}
+            tableProps={dataTableProps}
+            isLinkable={isLinkable}
+            schema={this.getSchema("j5AnnealedOligos")}
+            showLinkModal={() => this.showLinkModal("oligos")}
+            linkButtonText="Link Oligos"
+            openTitleElements={oligosTitleElements}
+            cellRenderer={
+              getIsLinkedCellRenderer &&
+              getIsLinkedCellRenderer(
+                "oligo.sequence.polynucleotideMaterialId",
+                "oligo.sequence.hash",
+                "oligo"
+              )
+            }
+          >
+            <div className={Classes.BUTTON_GROUP} style={{ marginTop: 10 }}>
+              {this.renderDownloadOligoButton()}
+            </div>
+          </J5TableCard>
+
+          <J5TableCard
+            j5ReportId={j5Report.id}
             helperMessage="This is the list DNA pieces that need to be directly synthesized."
             title="Synthon Sequences"
             processData={processDataForTables.j5DirectSynthesis}
