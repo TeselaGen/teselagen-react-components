@@ -553,7 +553,6 @@ class J5ReportRecordView extends Component {
             schema={this.getSchema("j5AnnealedOligos")}
             showLinkModal={() => this.showLinkModal("oligos")}
             linkButtonText="Link Oligos"
-            openTitleElements={oligosTitleElements}
             cellRenderer={
               getIsLinkedCellRenderer &&
               getIsLinkedCellRenderer(
@@ -562,11 +561,7 @@ class J5ReportRecordView extends Component {
                 "oligo"
               )
             }
-          >
-            <div className={Classes.BUTTON_GROUP} style={{ marginTop: 10 }}>
-              {this.renderDownloadOligoButton()}
-            </div>
-          </J5TableCard>
+          />
 
           <J5TableCard
             j5ReportId={j5Report.id}
