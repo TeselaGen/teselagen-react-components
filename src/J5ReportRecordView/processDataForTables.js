@@ -109,12 +109,14 @@ const processJ5OligoSynthesis = j5Oligos =>
 
 const processJ5AnnealedOligo = j5Oligos => {
   return j5Oligos
-    .filter(j5Oligo => {
+    .filter(({ oligo }) => {
       // only keep the j5 oligos that link to a top or bottom annealed oligo
       return (
-        j5Oligo.oligo &&
-        (j5Oligo.oligo.j5AnnealedOligosTopOligos.length ||
-          j5Oligo.oligo.j5AnnealedOligosBottomOligos.length)
+        oligo &&
+        oligo.j5AnnealedOligosTopOligos &&
+        oligo.j5AnnealedOligosBottomOligos &&
+        (oligo.j5AnnealedOligosTopOligos.length ||
+          oligo.j5AnnealedOligosBottomOligos.length)
       );
     })
     .map(j5Oligo => {
