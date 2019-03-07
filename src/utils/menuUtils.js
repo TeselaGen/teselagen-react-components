@@ -293,13 +293,24 @@ export function showCommandContextMenu(
  */
 export const createMenu = createDynamicMenu;
 
-export function showContextMenu(menuDef, enhancers, event, onClose, context) {
+export function showContextMenu(
+  menuDef,
+  enhancers,
+  event,
+  onClose,
+  context,
+  menuComp = Menu
+) {
   menuDef = filterMenuForCorrectness(menuDef);
   if (!menuDef) return;
 
+  const MenuComponent = menuComp;
+
   // Render a context menu at the passed event's position
   ContextMenu.show(
-    <Menu>{createDynamicMenu(menuDef, enhancers, context)}</Menu>,
+    <MenuComponent>
+      {createDynamicMenu(menuDef, enhancers, context)}
+    </MenuComponent>,
     { left: event.clientX, top: event.clientY },
     onClose
   );
