@@ -58,7 +58,6 @@ function J5TableCard({
         entities={filteredEntities}
         // schema is weird because we are sometimes generating schema off of the entities
         schema={createSchema(entities) || tableParams.schema || schema}
-        entityCount={filteredEntities.length}
       />
       {children}
     </CollapsibleCard>
