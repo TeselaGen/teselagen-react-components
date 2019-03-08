@@ -39,6 +39,14 @@ export default class MenuBar extends React.Component {
           const dataKeys = pickBy(topLevelItem, function(value, key) {
             return startsWith(key, "data-");
           });
+
+          // Support enhancers for top level items too
+          topLevelItem = enhancers.reduce((v, f) => f(v), topLevelItem);
+
+          if (topLevelItem.hidden) {
+            return null;
+          }
+
           const button = (
             <Button
               {...dataKeys} //spread all data-* attributes
@@ -46,6 +54,7 @@ export default class MenuBar extends React.Component {
               minimal
               className="tg-menu-bar-item"
               onClick={topLevelItem.onClick}
+              disabled={topLevelItem.disabled}
               onMouseOver={
                 topLevelItem.submenu ? this.handleMouseOver(i) : noop
               }
