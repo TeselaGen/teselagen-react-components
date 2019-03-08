@@ -80,7 +80,7 @@ export function getCommandHotkeys(commandsOrDefs) {
 }
 
 // Extract handler functions from the given commands, returning a mapping of
-// command ids to handlers
+// command ids to handlers (directly - no checks added).
 export function getCommandHandlers(commands) {
   const handlers = {};
   Object.keys(commands).forEach(cmdId => {
@@ -90,12 +90,17 @@ export function getCommandHandlers(commands) {
   return handlers;
 }
 
+// Get hotkey handler functions for the given commands, returning a mapping of
+// command ids to hotkey handlers.
 export function getCommandHotkeyHandlers(commands) {
   const handlers = {};
   Object.keys(commands).forEach(cmdId => {
     if (commands[cmdId].hotkey) {
-      handlers[cmdId] = event =>
-        commands[cmdId].execute({ event, viaHotkey: true });
+      handlers[cmdId] = event => {
+        if (!commands[cmdId].isDisabled && !commands[cmdId].isHidden) {
+          commands[cmdId].execute({ event, viaHotkey: true });
+        }
+      };
     }
   });
 
