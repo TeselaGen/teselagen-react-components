@@ -28,7 +28,7 @@
     "test": "yarn cypress run"
   },
   "dependencies": {
-    "@teselagen/apollo-methods": "^1.0.8",
+    "@teselagen/apollo-methods": "^1.0.9",
     "classnames": "^2.2.6",
     "copy-to-clipboard": "^3.0.8",
     "cross-env": "^5.2.0",

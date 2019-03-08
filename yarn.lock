@@ -220,10 +220,10 @@
   dependencies:
     array-from "^2.1.1"
 
-"@teselagen/apollo-methods@^1.0.8":
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/@teselagen/apollo-methods/-/apollo-methods-1.0.8.tgz#4d398110eb02b409447c57d38461c2655263a5b0"
-  integrity sha512-e+j1jRQceJTeEwZgZkB/GjkXBmO0fBgniYLD0M2jKlnl67Gjn0xhCwXfFUgMvFuEyEFldZRAAUutQvzopFTrlQ==
+"@teselagen/apollo-methods@^1.0.9":
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@teselagen/apollo-methods/-/apollo-methods-1.0.9.tgz#e2b824d7a9a40f9505a275edd4e5e6c300ea4653"
+  integrity sha512-9HXuThV4fV7bhtC/fgAyWISwe9e94JboAWdT+dxwU4dHb79ci1+ry78GZQgqOJljwkiEcF+SPy5PybKzrvAmwA==
   dependencies:
     pascal-case "^2.0.1"
 
