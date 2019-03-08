@@ -5,6 +5,7 @@ import { Query } from "react-apollo";
 import React, { Component } from "react";
 import { compose } from "react-apollo";
 import { connect } from "react-redux";
+import { withQuery } from "@teselagen/apollo-methods";
 import { branch, withProps } from "recompose";
 import { change, clearFields, reduxForm } from "redux-form";
 import ReactSelect from "react-select";
@@ -12,7 +13,6 @@ import moment from "moment";
 import generateQuery from "../utils/generateQuery";
 import BlueprintError from "../BlueprintError";
 import DialogFooter from "../DialogFooter";
-import withQuery from "../enhancers/withQuery";
 import withField from "../enhancers/withField";
 import withDialog from "../enhancers/withDialog";
 import withTableParams from "../DataTable/utils/withTableParams";
@@ -301,31 +301,29 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
                         getButtonText
                           ? getButtonText(value)
                           : value
-                            ? "Change " + readableName
-                            : `Select ${readableName}`
+                          ? "Change " + readableName
+                          : `Select ${readableName}`
                       }
                       {...buttonProps}
                       loading={fetchingData || buttonProps.loading}
                     />
                   )}
                 </GenericSelectInner>
-                {value &&
-                  !noRemoveButton &&
-                  !noForm && (
-                    <Tooltip
+                {value && !noRemoveButton && !noForm && (
+                  <Tooltip
+                    disabled={buttonProps.disabled}
+                    content={"Clear " + readableName}
+                  >
+                    <Button
+                      minimal
+                      style={{ marginLeft: 4 }}
+                      intent={Intent.DANGER}
                       disabled={buttonProps.disabled}
-                      content={"Clear " + readableName}
-                    >
-                      <Button
-                        minimal
-                        style={{ marginLeft: 4 }}
-                        intent={Intent.DANGER}
-                        disabled={buttonProps.disabled}
-                        onClick={this.removeSelection}
-                        icon="trash"
-                      />
-                    </Tooltip>
-                  )}
+                      onClick={this.removeSelection}
+                      icon="trash"
+                    />
+                  </Tooltip>
+                )}
               </div>
               {postSelectDTProps &&
                 postSelectDataTableValue &&
@@ -753,8 +751,8 @@ class InnerComp extends Component {
               return entity[idAs || "id"];
             })
         : !input.value
-          ? ""
-          : input.value[idAs || "id"];
+        ? ""
+        : input.value[idAs || "id"];
 
       return (
         <ReactSelect
