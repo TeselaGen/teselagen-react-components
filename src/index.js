@@ -1,12 +1,12 @@
 import {
+  withQuery,
   withDelete,
   withUpsert,
   getApolloMethods
 } from "@teselagen/apollo-methods";
 import "./style.css";
 
-export { withDelete, withUpsert, getApolloMethods };
-export { default as withQuery } from "./enhancers/withQuery.old";
+export { withDelete, withUpsert, withQuery, getApolloMethods };
 export {
   getCurrentParamsFromUrl,
   setCurrentParamsOnUrl
