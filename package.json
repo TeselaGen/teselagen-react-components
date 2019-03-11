@@ -28,7 +28,6 @@
     "test": "yarn cypress run"
   },
   "dependencies": {
-    "@teselagen/apollo-methods": "^1.0.9",
     "classnames": "^2.2.6",
     "copy-to-clipboard": "^3.0.8",
     "cross-env": "^5.2.0",
@@ -61,6 +60,7 @@
     "uniqid": "^4.1.1"
   },
   "peerDependencies": {
+    "@teselagen/apollo-methods": "*",
     "@blueprintjs/core": "^3",
     "@blueprintjs/datetime": "^3",
     "apollo-cache-invalidation": "^0.0.3",
