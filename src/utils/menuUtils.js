@@ -39,7 +39,15 @@ export const EnhancedMenuItem = compose(
       if (props.onClick) props.onClick(e);
     };
   }
-  return <MenuItem {...props} onClick={clickHandler} />;
+  return (
+    <MenuItem
+      popoverProps={{
+        autoFocus: false
+      }}
+      {...props}
+      onClick={clickHandler}
+    />
+  );
 });
 
 // First Non-Undefined
@@ -78,11 +86,12 @@ export const commandMenuEnhancer = (commands, config = {}) => (
     item.disabled = fnu(item.disabled, isDisabled);
 
     item.key = item.key || cmdId;
+    item.submenu = item.submenu || command.submenu;
 
     if (toggles) {
       if (useTicks) {
         item.text = item.text || command.shortName || command.name;
-        item.checked = isActive;
+        item.checked = item.checked || isActive;
       } else {
         item.text =
           item.text ||
@@ -308,7 +317,7 @@ export function showContextMenu(
 
   // Render a context menu at the passed event's position
   ContextMenu.show(
-    <MenuComponent>
+    <MenuComponent autoFocus={false}>
       {createDynamicMenu(menuDef, enhancers, context)}
     </MenuComponent>,
     { left: event.clientX, top: event.clientY },

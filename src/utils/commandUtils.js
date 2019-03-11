@@ -10,7 +10,8 @@ export function genericCommandFactory(config) {
     command.execute = (...execArgs) => {
       config.handleReturn(
         cmdId,
-        def.handler.apply(command, config.getArguments(cmdId, execArgs))
+        def.handler &&
+          def.handler.apply(command, config.getArguments(cmdId, execArgs))
       );
     };
 
@@ -22,6 +23,7 @@ export function genericCommandFactory(config) {
       "hotkey",
       "hotkeyProps",
       "isDisabled",
+      "submenu",
       "isActive",
       "isHidden",
       "tooltip",
