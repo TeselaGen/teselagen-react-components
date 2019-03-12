@@ -60,9 +60,9 @@
     "uniqid": "^4.1.1"
   },
   "peerDependencies": {
-    "@teselagen/apollo-methods": "*",
     "@blueprintjs/core": "^3",
     "@blueprintjs/datetime": "^3",
+    "@teselagen/apollo-methods": "*",
     "apollo-cache-invalidation": "^0.0.3",
     "react-apollo": "^2.0.4",
     "react-redux": "^5.0.4",
@@ -76,6 +76,7 @@
   "devDependencies": {
     "@blueprintjs/core": "^3.14.1",
     "@blueprintjs/datetime": "^3.7.2",
+    "@teselagen/apollo-methods": "^1.0.9",
     "apollo-boost": "^0.1.15",
     "apollo-cache-invalidation": "^0.0.3",
     "axios": "^0.18.0",
