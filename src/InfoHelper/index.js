@@ -54,19 +54,7 @@ export default class InfoHelper extends Component {
         </React.Fragment>
       );
     } else if (isPopover) {
-      toReturn = (
-        <Popover
-          {...toolTipOrPopoverProps}
-          target={
-            <Button
-              style={{ borderRadius: 15, borderWidth: 5 }}
-              minimal
-              className={className}
-              icon={icon}
-            />
-          }
-        />
-      );
+      toReturn = <Popover {...toolTipOrPopoverProps} target={IconInner} />;
     } else {
       toReturn = <Tooltip {...toolTipOrPopoverProps} target={IconInner} />;
     }
