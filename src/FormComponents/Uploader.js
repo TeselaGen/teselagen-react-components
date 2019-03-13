@@ -6,9 +6,9 @@ import Dropzone from "react-dropzone";
 import uniqid from "uniqid";
 import classnames from "classnames";
 import { some, forEach, map, every, compact, findIndex, merge } from "lodash";
-import ItemUpload from "./itemUpload";
-import S3Upload from "../utils/S3upload";
 import uuid from "uuid/v4";
+import S3Upload from "../utils/S3upload";
+import ItemUpload from "./itemUpload";
 
 function noop() {}
 // wink wink
@@ -195,8 +195,8 @@ class Uploader extends Component {
         error={error}
         saved={saved}
         onClick={file => {
-          console.log("Try download file");
-          console.log(file);
+          console.info("Try download file");
+          console.info(file);
         }}
         onCancel={
           isActive
@@ -224,7 +224,7 @@ class Uploader extends Component {
       fileListItemRenderer, // handle rendering the file list items yourself (receive filelist and context) :)
       onFileSuccess = emptyPromise, //called each time a file is finished and before the file.loading gets set to false, needs to return a promise!
       onFieldSubmit = noop, //called when all files have successfully uploaded
-      fileFinished = noop,
+      // fileFinished = noop,
       onRemove = noop, //called when a file has been selected to be removed
       onChange = noop, //this is almost always getting passed by redux-form, no need to pass this handler manually
       onFileClick, // called when a file link in the filelist is clicked
@@ -241,10 +241,10 @@ class Uploader extends Component {
         <Dropzone
           className={"tg-dropzone " + className}
           multiple={fileLimit !== 1}
-          activeClassName={"tg-dropzone-active"}
-          rejectClassName={"tg-dropzone-reject"}
-          acceptClassName={"tg-dropzone-accept"}
-          disabledClassName={"tg-dropzone-disabled"}
+          activeClassName="tg-dropzone-active"
+          rejectClassName="tg-dropzone-reject"
+          acceptClassName="tg-dropzone-accept"
+          disabledClassName="tg-dropzone-disabled"
           accept={acceptToUse}
           {...{
             onDrop: async (acceptedFiles, rejectedFiles) => {
@@ -283,7 +283,7 @@ class Uploader extends Component {
                 );
               }
 
-              const cleanedFileList = [
+              let cleanedFileList = [
                 ...acceptedFiles.map(file => {
                   return {
                     originFileObj: file,
@@ -346,15 +346,14 @@ class Uploader extends Component {
                         .then(function(res) {
                           responses.push(res.data && res.data[0]);
                           onFileSuccess(res.data[0]).then(() => {
-                            onChange(
-                              (fileListToUse = fileListToUse.map(file => {
-                                const fileToReturn = { ...file };
-                                if (fileToReturn.id === fileToUpload.id) {
-                                  fileToReturn.loading = false;
-                                }
-                                return fileToReturn;
-                              }))
-                            );
+                            cleanedFileList = cleanedFileList.map(file => {
+                              const fileToReturn = { ...file, ...res.data[0] };
+                              if (fileToReturn.id === fileToUpload.id) {
+                                fileToReturn.loading = false;
+                              }
+                              return fileToReturn;
+                            });
+                            onChange(cleanedFileList);
                           });
                         })
                         .catch(function(err) {
@@ -363,16 +362,15 @@ class Uploader extends Component {
                             ...fileToUpload,
                             error: err && err.msg ? err.msg : err
                           });
-                          onChange(
-                            (fileListToUse = fileListToUse.map(file => {
-                              const fileToReturn = { ...file };
-                              if (fileToReturn.id === fileToUpload.id) {
-                                fileToReturn.loading = false;
-                                fileToReturn.error = true;
-                              }
-                              return fileToReturn;
-                            }))
-                          );
+                          cleanedFileList = cleanedFileList.map(file => {
+                            const fileToReturn = { ...file };
+                            if (fileToReturn.id === fileToUpload.id) {
+                              fileToReturn.loading = false;
+                              fileToReturn.error = true;
+                            }
+                            return fileToReturn;
+                          });
+                          onChange(cleanedFileList);
                         });
                     })
                   );
@@ -404,86 +402,84 @@ class Uploader extends Component {
                   ? "Accepts only the following file types: " + acceptToUse
                   : "Accepts any file input"
               }
-              className={"tg-upload-inner"}
+              className="tg-upload-inner"
             >
               {innerIcon || <Icon icon="upload" iconSize={30} />}
               {innerText || "Click or drag to upload"}
             </div>
           )}
         </Dropzone>
-        {fileList &&
-          showUploadList &&
-          !!fileList.length && (
-            <div
-              className={
-                overflowList ? "tg-upload-file-list-item-overflow" : null
+        {fileList && showUploadList && !!fileList.length && (
+          <div
+            className={
+              overflowList ? "tg-upload-file-list-item-overflow" : null
+            }
+          >
+            {fileList.map((file, index) => {
+              const {
+                loading,
+                error,
+                name,
+                originalName,
+                url,
+                downloadName
+              } = file;
+              let icon;
+              if (loading) {
+                icon = "repeat";
+              } else if (error) {
+                icon = "error";
+              } else {
+                icon = "saved";
               }
-            >
-              {fileList.map((file, index) => {
-                const {
-                  loading,
-                  error,
-                  name,
-                  originalName,
-                  url,
-                  downloadName
-                } = file;
-                let icon;
-                if (loading) {
-                  icon = "repeat";
-                } else if (error) {
-                  icon = "error";
-                } else {
-                  icon = "saved";
-                }
-                return fileListItemRenderer ? (
-                  fileListItemRenderer(file, self)
-                ) : S3Params ? (
-                  this.itemListRender(file, self)
-                ) : (
-                  <div key={index} className={"tg-upload-file-list-item"}>
-                    <div>
-                      <Icon
-                        className={classnames({
-                          "tg-spin": loading
-                        })}
-                        icon={icon}
-                      />
-                      <a
-                        name={name || originalName}
-                        {...(url && !onFileClick ? { href: url } : {})}
-                        /* eslint-disable react/jsx-no-bind*/
-                        onClick={() => onFileClick && onFileClick(file)}
-                        /* eslint-enable react/jsx-no-bind*/
-                        {...(downloadName ? { download: downloadName } : {})}
-                      >
-                        {" "}
-                        {name || originalName}{" "}
-                      </a>
-                    </div>
-                    {!loading && (
-                      <div
-                        onClick={() => {
-                          onRemove(file, index, fileList);
-                          onChange(
-                            fileList.filter((file, index2) => {
-                              return index2 !== index;
-                            })
-                          );
-                        }}
-                      >
-                        <Icon
-                          iconSize={16}
-                          icon="cross"
-                          className="tg-upload-file-list-item-close"
-                        />
-                      </div>
-                    )}
+              return fileListItemRenderer ? (
+                fileListItemRenderer(file, self)
+              ) : S3Params ? (
+                this.itemListRender(file, self)
+              ) : (
+                <div key={index} className="tg-upload-file-list-item">
+                  <div>
+                    <Icon
+                      className={classnames({
+                        "tg-spin": loading
+                      })}
+                      icon={icon}
+                    />
+                    <a
+                      name={name || originalName}
+                      {...(url && !onFileClick ? { href: url } : {})}
+                      /* eslint-disable react/jsx-no-bind*/
+                      onClick={() => onFileClick && onFileClick(file)}
+                      /* eslint-enable react/jsx-no-bind*/
+                      {...(downloadName ? { download: downloadName } : {})}
+                    >
+                      {" "}
+                      {name || originalName}{" "}
+                    </a>
                   </div>
-                );
-              })}
-            </div>
-          )}
+                  {!loading && (
+                    <div
+                      onClick={() => {
+                        onRemove(file, index, fileList);
+                        onChange(
+                          fileList.filter((file, index2) => {
+                            return index2 !== index;
+                          })
+                        );
+                      }}
+                    >
+                      <Icon
+                        iconSize={16}
+                        icon="cross"
+                        className="tg-upload-file-list-item-close"
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     );
   }
