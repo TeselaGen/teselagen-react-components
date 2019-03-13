@@ -33,6 +33,15 @@ export default class InfoHelper extends Component {
       disabled: disabled,
       popoverClassName: !noPopoverSizing && " bp3-popover-content-sizing",
       content: content || children,
+      modifiers: {
+        preventOverflow: { enabled: false },
+        hide: {
+          enabled: false
+        },
+        flip: {
+          boundariesElement: "viewport"
+        }
+      },
       ...popoverProps
     };
     if (displayToSide) {
