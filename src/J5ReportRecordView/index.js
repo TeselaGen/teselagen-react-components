@@ -208,9 +208,10 @@ class J5ReportRecordView extends Component {
   renderHeader = () => {
     const {
       data,
-      additionalHeaderItems = "",
+      additionalHeaderButtons,
       LinkJ5TableDialog,
-      LinkJ5ReportButton
+      LinkJ5ReportButton,
+      additionalHeaderComponent
     } = this.props;
 
     if (data.loading) return <Loading loading />;
@@ -246,6 +247,7 @@ class J5ReportRecordView extends Component {
           label="Date Ran"
           field={moment(dateRan || createdAt).format("lll")} //fallback to createdAt if dateRan isn't provided (dateRan is derived from the imported j5report)
         />
+        {additionalHeaderComponent}
         {/* tnr: add these in when they are available in lims/hde */}
         {/* <div>
       <span className="j5-report-fieldname">User Name:</span>{" "}
@@ -265,13 +267,12 @@ class J5ReportRecordView extends Component {
     </div> */}
         <div className={Classes.BUTTON_GROUP} style={{ marginTop: 10 }}>
           {this.renderDownloadButton()}
-          {additionalHeaderItems}
-          {LinkJ5TableDialog &&
-            !LinkJ5ReportButton && (
-              <Button onClick={this.linkInputSequences}>
-                Link j5 Assembly Report Data to Materials
-              </Button>
-            )}
+          {additionalHeaderButtons}
+          {LinkJ5TableDialog && !LinkJ5ReportButton && (
+            <Button onClick={this.linkInputSequences}>
+              Link j5 Assembly Report Data to Materials
+            </Button>
+          )}
           {LinkJ5ReportButton && (
             <LinkJ5ReportButton j5Report={data.j5Report} />
           )}

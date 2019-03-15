@@ -7,7 +7,7 @@ class DemoHeader extends Component {
   constructor(props) {
     super(props);
     const darkTheme = localStorage.getItem("darkTheme");
-    document.body.classList.toggle(Classes.DARK, darkTheme);
+    document.body.classList.toggle(Classes.DARK, darkTheme === "true");
     this.state = {
       darkTheme
     };
