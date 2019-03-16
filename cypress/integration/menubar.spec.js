@@ -5,6 +5,13 @@ describe("MenuBar", () => {
   it(`menubar can be searched!`, () => {
     //
     cy.contains(".bp3-button-text", "Help").click();
+    // it should only show the first 10 items by default
+    cy.focused().type("c");
+    cy.get(".tg-menu-search-suggestions .bp3-menu-item").should(
+      "have.length.lte",
+      10
+    );
+
     cy.focused().type("hel");
     cy.contains("File > ReactText");
 

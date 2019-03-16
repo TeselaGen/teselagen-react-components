@@ -5,6 +5,8 @@ import {
   startsWith,
   flatMap,
   isArray,
+  take,
+  filter,
   isString
 } from "lodash";
 import { Suggest } from "@blueprintjs/select";
@@ -53,9 +55,12 @@ export default class MenuBar extends React.Component {
                 autoFocus
                 closeOnSelect
                 items={this.allMenuItems}
-                itemPredicate={filterMenuItem}
+                itemListPredicate={filterMenuItems}
                 itemDisabled={i => i.disabled}
-                popoverProps={{ minimal: true }}
+                popoverProps={{
+                  minimal: true,
+                  className: "tg-menu-search-suggestions"
+                }}
                 resetOnSelect
                 resetOnClose
                 inputProps={{
@@ -172,18 +177,21 @@ function getAllMenuTextsAndHandlers(menu, enhancers, context, path = []) {
 
 const isDivider = item => item.divider !== undefined;
 
-const filterMenuItem = (searchVal, { text, onClick, hideFromMenuSearch }) => {
-  if (!text || !onClick || !searchVal || hideFromMenuSearch) return false;
-  //fix this to use some smart regex
-  let _text = text;
-  if (!text.toLowerCase) {
-    if (text.props) {
-      _text = getStringFromReactComponent(text);
-    } else {
-      return false;
+const filterMenuItems = (searchVal, items) => {
+  const newItems = filter(items, ({ text, onClick, hideFromMenuSearch }) => {
+    if (!text || !onClick || !searchVal || hideFromMenuSearch) return false;
+    //fix this to use some smart regex
+    let _text = text;
+    if (!text.toLowerCase) {
+      if (text.props) {
+        _text = getStringFromReactComponent(text);
+      } else {
+        return false;
+      }
     }
-  }
-  return _text.toLowerCase().indexOf(searchVal.toLowerCase()) > -1;
+    return _text.toLowerCase().indexOf(searchVal.toLowerCase()) > -1;
+  });
+  return take(newItems, 10);
 };
 
 function getStringFromReactComponent(comp) {

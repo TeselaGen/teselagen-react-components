@@ -109,7 +109,8 @@ class MenuBarDemo extends React.Component {
           { divider: "" },
           { cmd: "showHotkeys" },
           {
-            cmd: "fakeCmd1"
+            cmd: "fakeCmd1",
+            submenu: ["fakeCmd1","fakeCmd1","fakeCmd1"]
           },
           { divider: "" },
           { icon: "log-out", cmd: "quit" } // no text prop here
