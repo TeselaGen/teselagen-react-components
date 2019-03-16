@@ -80,7 +80,7 @@ class MenuBarDemo extends React.Component {
             cmd: "newFile"
           },
           {
-            text: <span>ReactText</span>,
+            text: <span>ReactText {9}</span>,
             onClick: () => {
               window.toastr.success("Fired ReactText!");
             },

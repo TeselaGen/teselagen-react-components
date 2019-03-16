@@ -1,5 +1,12 @@
 import React from "react";
-import { pickBy, startsWith, flatMap, isArray, isString } from "lodash";
+import {
+  pickBy,
+  isNumber,
+  startsWith,
+  flatMap,
+  isArray,
+  isString
+} from "lodash";
 import { Suggest } from "@blueprintjs/select";
 import "./style.css";
 import { Popover, Position, Menu, MenuItem, Button } from "@blueprintjs/core";
@@ -181,8 +188,8 @@ const filterMenuItem = (searchVal, { text, onClick, hideFromMenuSearch }) => {
 
 function getStringFromReactComponent(comp) {
   if (!comp) return "";
-  if (isString(comp)) return comp;
-  const { children } = comp.props;
+  if (isString(comp) || isNumber(comp)) return comp;
+  const { children } = comp.props || {};
   if (!children) return "";
   if (isArray(children))
     return flatMap(children, getStringFromReactComponent).join("");
