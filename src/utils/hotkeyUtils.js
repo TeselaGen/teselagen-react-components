@@ -9,12 +9,12 @@ export function comboToLabel(def, useSymbols = true) {
 
   if (useSymbols) {
     let parts = combo.replace("++", "+plus").split("+");
-    parts = parts.map(p => symbols[p] || startCase(p));
+    parts = parts.map(p => symbols[p] || startCase(p) || p);
     return parts.join("");
   } else {
     return combo
       .split("+")
-      .map(startCase)
+      .map(p => startCase(p) || p)
       .join(" + ")
       .replace("Mod", isMac ? "Cmd" : "Ctrl")
       .replace("Alt", isMac ? "Option" : "Alt");
@@ -111,6 +111,7 @@ const isMac = navigator.userAgent.includes("Mac OS X");
 // TODO maybe avoid using symbols by default when not on Mac?
 // Anyway, alternative 'Key + Key' description is provided as well
 const symbols = {
+  cmd: "⌘",
   meta: "⌘",
   ctrl: "⌃",
   alt: "⌥",

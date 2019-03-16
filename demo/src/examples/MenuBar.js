@@ -62,7 +62,9 @@ class MenuBarDemo extends React.Component {
     };
 
     // Create commands without any special logic
+    /* eslint-disable no-undef*/ 
     const commands = genericCommandFactory({
+    /* eslint-enable no-undef*/ 
       commandDefs,
       getArguments: () => [],
       handleReturn: () => {}
@@ -105,12 +107,17 @@ class MenuBarDemo extends React.Component {
             ),
             onClick: () => {}
           },
+          {
+            shouldDismissPopover: false,
+            text: "Don't Dismiss",
+            onClick: () => {}
+          },
           { text: "Open...", icon: "document", cmd: "openFile" },
           { divider: "" },
           { cmd: "showHotkeys" },
           {
             cmd: "fakeCmd1",
-            submenu: ["fakeCmd1","fakeCmd1","fakeCmd1"]
+            submenu: ["fakeCmd1", "fakeCmd1", "fakeCmd1"]
           },
           { divider: "" },
           { icon: "log-out", cmd: "quit" } // no text prop here
@@ -164,7 +171,8 @@ class MenuBarDemo extends React.Component {
       {
         text: "Help",
         submenu: [
-          { isMenuSearch: true },
+          { isMenuSearch: true }, //this will only work in a top level item submenu
+          "--",
           {
             text: "About",
             hideFromMenuSearch: true,
@@ -192,7 +200,7 @@ class MenuBarDemo extends React.Component {
         somethingElse: "alt+shift+e"
       }
     };
-
+    /* eslint-disable no-undef*/ 
     // An existing component may be wrapped, or a new one created, as in this case
     this.hotkeyEnabler = withHotkeys(
       getCommandHotkeys(commands), // in this example, equivalent to `hotkeys`,
@@ -201,6 +209,7 @@ class MenuBarDemo extends React.Component {
 
     this.menu = menu;
     this.menuEnhancers = [commandMenuEnhancer(commands)];
+    /* eslint-enable no-undef*/ 
 
     this.state = {
       showDialog: false
@@ -225,11 +234,17 @@ class MenuBarDemo extends React.Component {
             border: "1px solid #eee"
           }}
         >
-          <MenuBar menu={this.menu} enhancers={this.menuEnhancers} />
+          <MenuBar
+            menu={this.menu}
+            enhancers={this.menuEnhancers}
+            menuSearchHotkey="alt+/"
+          />
         </div>
         <button
           onClick={e => {
+            /* eslint-disable no-undef*/ 
             showContextMenu(
+            /* eslint-enable no-undef*/ 
               [
                 { text: "hey" },
                 undefined,

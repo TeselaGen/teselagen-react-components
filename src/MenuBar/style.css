@@ -32,3 +32,6 @@ li.bp3-menu-divider:first-child,
 li.bp3-menu-divider:last-child {
   display: none;
 }
+.tg_search_highlight {
+  font-weight: bold;
+}

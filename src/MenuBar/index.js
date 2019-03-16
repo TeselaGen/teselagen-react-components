@@ -6,14 +6,26 @@ import {
   flatMap,
   isArray,
   take,
-  filter,
+  set,
   isString
 } from "lodash";
 import { Suggest } from "@blueprintjs/select";
+import Fuse from "fuse.js";
 import "./style.css";
-import { Popover, Position, Menu, MenuItem, Button } from "@blueprintjs/core";
+import {
+  Popover,
+  Position,
+  Menu,
+  Button,
+  Hotkeys,
+  HotkeysTarget,
+  Hotkey,
+  MenuItem
+} from "@blueprintjs/core";
 import { createDynamicMenu } from "../utils/menuUtils";
+import { comboToLabel } from "../utils/hotkeyUtils";
 
+@HotkeysTarget
 export default class MenuBar extends React.Component {
   static defaultProps = {
     className: "",
@@ -44,37 +56,38 @@ export default class MenuBar extends React.Component {
     const { menu, enhancers, context } = this.props;
     return getAllMenuTextsAndHandlers(menu, enhancers, context);
   }
-  addHelpItemIfNecessary = menu => {
+  addHelpItemIfNecessary = (menu, i) => {
     return menu.map(item => {
       if (item.isMenuSearch) {
+        this.menuSearchIndex = i;
         return {
           shouldDismissPopover: false,
           text: (
             <div>
               <Suggest
                 autoFocus
-                closeOnSelect
+                closeOnSelect={false}
                 items={this.allMenuItems}
                 itemListPredicate={filterMenuItems}
                 itemDisabled={i => i.disabled}
                 popoverProps={{
                   minimal: true,
-                  className: "tg-menu-search-suggestions"
+                  popoverClassName: "tg-menu-search-suggestions"
                 }}
-                resetOnSelect
-                resetOnClose
+                resetOnSelect={false}
+                resetOnClose={false}
                 inputProps={{
                   autoFocus: true,
-                  placeholder: "Search The Menus..."
+                  placeholder: `Search... (${comboToLabel(
+                    this.props.menuSearchHotkey || menuSearchHotkey,
+                    false
+                  )})`
                 }}
                 initialContent={null}
-                onItemSelect={item => {
-                  this.setState({ isOpen: false });
-                  !item.disabled && item.onClick();
-                }}
+                onItemSelect={this.handleItemClickOrSelect(item)}
                 inputValueRenderer={i => i.text}
                 noResults={<div>No Results...</div>}
-                itemRenderer={itemRenderer}
+                itemRenderer={this.itemRenderer}
               />
             </div>
           )
@@ -85,13 +98,67 @@ export default class MenuBar extends React.Component {
     });
   };
 
+  itemRenderer = (i, b) => {
+    return (
+      <MenuItem
+        {...{
+          ...i,
+          icon: undefined,
+          text: i.isSimpleText ? i.justText || i.text : i.text,
+          label: i.path.length && (
+            <span style={{ fontSize: 8 }}>
+              {flatMap(i.path, (el, i2) => {
+                if (i2 === 0) return el;
+                return [" > ", el];
+              })}
+            </span>
+          ),
+          onClick: this.handleItemClickOrSelect(i),
+          active: b.modifiers.active,
+          // shouldDismissPopover: true,
+          key: b.index
+        }}
+      />
+    );
+  };
+
+  handleItemClickOrSelect = __i => _i => {
+    const i = _i || __i;
+    if (!i.onClick) return;
+    !i.disabled && i.onClick();
+    if (i.shouldDismissPopover !== false) {
+      this.setState({ isOpen: false });
+    }
+  };
+  renderHotkeys() {
+    if (!isNumber(this.menuSearchIndex)) return null;
+    return (
+      <Hotkeys>
+        <Hotkey
+          global={true}
+          combo={this.props.menuSearchHotkey || menuSearchHotkey}
+          label="Search the menu"
+          preventDefault
+          stopPropagation
+          onKeyDown={this.focusSearchMenu}
+        />
+      </Hotkeys>
+    );
+  }
+  focusSearchMenu = () => {
+    this.setState({
+      isOpen: true,
+      openIndex: this.menuSearchIndex
+    });
+  };
+
   render() {
     const { className, style, menu, enhancers, extraContent } = this.props;
     const { isOpen, openIndex } = this.state;
 
     return (
       <div className={"tg-menu-bar " + className} style={style}>
-        {this.addHelpItemIfNecessary(menu).map((topLevelItem, i) => {
+        {menu.map((topLevelItem, i) => {
           const dataKeys = pickBy(topLevelItem, function(value, key) {
             return startsWith(key, "data-");
           });
@@ -132,7 +199,7 @@ export default class MenuBar extends React.Component {
               content={
                 <Menu>
                   {createDynamicMenu(
-                    this.addHelpItemIfNecessary(topLevelItem.submenu),
+                    this.addHelpItemIfNecessary(topLevelItem.submenu, i),
                     enhancers
                   )}
                 </Menu>
@@ -158,18 +225,18 @@ function noop() {}
 function getAllMenuTextsAndHandlers(menu, enhancers, context, path = []) {
   if (!menu) return [];
   return flatMap(menu, item => {
-    const _item = [...enhancers].reduce((v, f) => f(v, context), item);
-    if (isDivider(_item)) {
+    const enhancedItem = [...enhancers].reduce((v, f) => f(v, context), item);
+    if (isDivider(enhancedItem)) {
       return [];
     }
     return [
       {
-        ..._item,
+        ...enhancedItem,
         path
       },
-      ...getAllMenuTextsAndHandlers(_item.submenu, enhancers, context, [
+      ...getAllMenuTextsAndHandlers(enhancedItem.submenu, enhancers, context, [
         ...path,
-        item.text
+        enhancedItem.text
       ])
     ];
   });
@@ -177,21 +244,39 @@ function getAllMenuTextsAndHandlers(menu, enhancers, context, path = []) {
 
 const isDivider = item => item.divider !== undefined;
 
+const options = {
+  shouldSort: true,
+  includeScore: true,
+  includeMatches: true,
+  threshold: 0.7,
+  location: 0,
+  distance: 500,
+  maxPatternLength: 32,
+  minMatchCharLength: 1,
+  keys: ["justText"]
+};
+
 const filterMenuItems = (searchVal, items) => {
-  const newItems = filter(items, ({ text, onClick, hideFromMenuSearch }) => {
-    if (!text || !onClick || !searchVal || hideFromMenuSearch) return false;
+  const newItems = flatMap(items, item => {
+    const { text, onClick, hideFromMenuSearch } = item;
+    if (!text || !onClick || !searchVal || hideFromMenuSearch) return [];
     //fix this to use some smart regex
-    let _text = text;
+    let justText = text;
+    let isSimpleText = true;
     if (!text.toLowerCase) {
       if (text.props) {
-        _text = getStringFromReactComponent(text);
+        isSimpleText = false;
+        justText = getStringFromReactComponent(text);
       } else {
-        return false;
+        return [];
       }
     }
-    return _text.toLowerCase().indexOf(searchVal.toLowerCase()) > -1;
+    return { ...item, justText, isSimpleText };
+    // return _text.toLowerCase().indexOf(searchVal.toLowerCase()) > -1;
   });
-  return take(newItems, 10);
+  const fuse = new Fuse(newItems, options); // "list" is the item array
+  const result = highlight(fuse.search(searchVal));
+  return take(result, 10);
 };
 
 function getStringFromReactComponent(comp) {
@@ -208,26 +293,54 @@ function getStringFromReactComponent(comp) {
   }
 }
 
-const itemRenderer = (i, b) => {
-  return (
-    <MenuItem
-      {...i}
-      icon={undefined}
-      text={i.text}
-      label={
-        i.path.length && (
-          <span style={{ fontSize: 8 }}>
-            {flatMap(i.path, (el, i2) => {
-              if (i2 === 0) return el;
-              return [" > ", el];
-            })}
-          </span>
-        )
-      }
-      onClick={b.handleClick}
-      active={b.modifiers.active}
-      shouldDismissPopover
-      key={b.index}
-    />
-  );
+const menuSearchHotkey = "alt+/";
+
+const highlight = (
+  fuseSearchResult: any,
+  highlightClassName: string = "tg_search_highlight"
+) => {
+  const generateHighlightedText = (
+    inputText: string,
+    regions: number[] = []
+  ) => {
+    let content = [];
+    let nextUnhighlightedRegionStartingIndex = 0;
+
+    regions.forEach(region => {
+      const lastRegionNextIndex = region[1] + 1;
+
+      content = [
+        ...content,
+        inputText.substring(nextUnhighlightedRegionStartingIndex, region[0]),
+        <span key={lastRegionNextIndex} className={highlightClassName}>
+          {inputText.substring(region[0], lastRegionNextIndex)}
+        </span>
+      ];
+
+      nextUnhighlightedRegionStartingIndex = lastRegionNextIndex;
+    });
+
+    content = [
+      ...content,
+      inputText.substring(nextUnhighlightedRegionStartingIndex)
+    ];
+
+    return content;
+  };
+
+  return fuseSearchResult
+    .filter(({ matches }: any) => matches && matches.length)
+    .map(({ item, matches }: any) => {
+      const highlightedItem = { ...item };
+
+      matches.forEach((match: any) => {
+        set(
+          highlightedItem,
+          match.key,
+          generateHighlightedText(match.value, match.indices)
+        );
+      });
+
+      return highlightedItem;
+    });
 };
