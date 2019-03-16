@@ -1,6 +1,6 @@
 <FillWindow>
   {size => {
-    console.log("size:", size);
+    console.info("size:", size);
     return (
       <div>
         window size: height: {size.height}

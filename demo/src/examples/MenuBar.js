@@ -7,6 +7,20 @@ class MenuBarDemo extends React.Component {
     // This can be (re)used for hotkey handling, top menu clicks, context menu
     // clicks, etc.
     const commandDefs = {
+      cmdSubmenu: {
+        preventDefault: true,
+        hotkey: "mod+n",
+        text: "cmdSubmenu",
+        submenu: props => {
+          return [
+            {
+              text: "yay I'm a dynamic submenu",
+              onClick: () => {}
+            }
+          ];
+        },
+        handler: () => alert('Triggered "New File"')
+      },
       newFile: {
         preventDefault: true,
         hotkey: "mod+n",
@@ -65,6 +79,32 @@ class MenuBarDemo extends React.Component {
             tooltip: "May use tooltips",
             cmd: "newFile"
           },
+          {
+            text: <span>ReactText</span>,
+            onClick: () => {
+              window.toastr.success("Fired ReactText!");
+            },
+            submenu: [
+              {
+                text: "hello!!",
+                onClick: () => {
+                  window.toastr.success("hello!");
+                }
+              },
+              "cmdSubmenu"
+            ]
+          },
+          "cmdSubmenu",
+          {
+            shouldDismissPopover: false,
+            text: (
+              <span>
+                Long React El Text <input /> <span> Text</span>{" "}
+                <span>Other Text </span>
+              </span>
+            ),
+            onClick: () => {}
+          },
           { text: "Open...", icon: "document", cmd: "openFile" },
           { divider: "" },
           { cmd: "showHotkeys" },
@@ -92,6 +132,14 @@ class MenuBarDemo extends React.Component {
             submenu: [
               // no hotkeys or commands used here
               {
+                text: "Not a command",
+                label: "Label",
+                icon: "code",
+                onClick: () => {
+                  console.info("h");
+                }
+              },
+              {
                 text: "Some command 1",
                 label: "Label",
                 icon: "code",
@@ -111,7 +159,11 @@ class MenuBarDemo extends React.Component {
       {
         text: "No Submenu",
         onClick: () => alert("This triggers an action directly")
-      }
+      },
+      {
+        text: "Help",
+        submenu: [{ isMenuSearch: true }]
+      },
     ];
 
     // Sets will normally be different routes/modules/views of an app, but any
@@ -170,10 +222,10 @@ class MenuBarDemo extends React.Component {
                     {
                       text: "yup",
                       willUnmount: () => {
-                        console.log("hellllo");
+                        console.info("hellllo");
                       },
                       didMount: ({ className }) => {
-                        console.log("yaaa");
+                        console.info("yaaa");
                       }
                     }
                   ]
@@ -182,7 +234,7 @@ class MenuBarDemo extends React.Component {
               undefined,
               e,
               () => {
-                console.log("closin");
+                console.info("closin");
               }
             );
           }}

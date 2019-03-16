@@ -12,7 +12,7 @@ import { renderOnDoc } from "../utils/renderOnDoc";
 //     cancelButtonText: "Nope",
 //     canEscapeKeyCancel: true //this is false by default
 // });
-// console.log("doAction:", doAction);
+// console.info("doAction:", doAction);
 //returns a promise that resolves with true or false depending on if the user cancels or not!
 export default function showConfirmationDialog(opts) {
   return new Promise(resolve => {

@@ -1,7 +1,8 @@
 import React from "react";
-import { pickBy, startsWith } from "lodash";
+import { pickBy, startsWith, flatMap, isArray, isString } from "lodash";
+import { Suggest } from "@blueprintjs/select";
 import "./style.css";
-import { Popover, Position, Menu, Button } from "@blueprintjs/core";
+import { Popover, Position, Menu, MenuItem, Button } from "@blueprintjs/core";
 import { createDynamicMenu } from "../utils/menuUtils";
 
 export default class MenuBar extends React.Component {
@@ -10,7 +11,7 @@ export default class MenuBar extends React.Component {
     style: {}
   };
 
-  state = { isOpen: false, openIndex: null };
+  state = { searchVal: "", isOpen: false, openIndex: null };
 
   handleInteraction = index => newOpenState => {
     if (!newOpenState && index !== this.state.openIndex) {
@@ -30,12 +31,55 @@ export default class MenuBar extends React.Component {
     }
   };
 
+  get allMenuItems() {
+    const { menu, enhancers, context } = this.props;
+    return getAllMenuTextsAndHandlers(menu, enhancers, context);
+  }
+  addHelpItemIfNecessary = menu => {
+    return menu.map(item => {
+      if (item.isMenuSearch) {
+        return {
+          shouldDismissPopover: false,
+          text: (
+            <div>
+              <Suggest
+                autoFocus
+                closeOnSelect
+                items={this.allMenuItems}
+                itemPredicate={filterMenuItem}
+                itemDisabled={i => i.disabled}
+                popoverProps={{ minimal: true }}
+                resetOnSelect
+                resetOnClose
+                inputProps={{
+                  autoFocus: true,
+                  placeholder: "Search The Menus..."
+                }}
+                initialContent={null}
+                onItemSelect={item => {
+                  this.setState({ isOpen: false });
+                  !item.disabled && item.onClick();
+                }}
+                inputValueRenderer={i => i.text}
+                noResults={<div>No Results...</div>}
+                itemRenderer={itemRenderer}
+              />
+            </div>
+          )
+        };
+      } else {
+        return item;
+      }
+    });
+  };
+
   render() {
     const { className, style, menu, enhancers, extraContent } = this.props;
     const { isOpen, openIndex } = this.state;
+
     return (
       <div className={"tg-menu-bar " + className} style={style}>
-        {menu.map((topLevelItem, i) => {
+        {this.addHelpItemIfNecessary(menu).map((topLevelItem, i) => {
           const dataKeys = pickBy(topLevelItem, function(value, key) {
             return startsWith(key, "data-");
           });
@@ -75,7 +119,10 @@ export default class MenuBar extends React.Component {
               onInteraction={this.handleInteraction(i)}
               content={
                 <Menu>
-                  {createDynamicMenu(topLevelItem.submenu, enhancers)}
+                  {createDynamicMenu(
+                    this.addHelpItemIfNecessary(topLevelItem.submenu),
+                    enhancers
+                  )}
                 </Menu>
               }
               transitionDuration={0}
@@ -95,3 +142,77 @@ export default class MenuBar extends React.Component {
 }
 
 function noop() {}
+
+function getAllMenuTextsAndHandlers(menu, enhancers, context, path = []) {
+  if (!menu) return [];
+  return flatMap(menu, item => {
+    const _item = [...enhancers].reduce((v, f) => f(v, context), item);
+    if (isDivider(_item)) {
+      return [];
+    }
+    return [
+      {
+        ..._item,
+        path
+      },
+      ...getAllMenuTextsAndHandlers(_item.submenu, enhancers, context, [
+        ...path,
+        item.text
+      ])
+    ];
+  });
+}
+
+const isDivider = item => item.divider !== undefined;
+
+const filterMenuItem = (searchVal, { text, onClick }) => {
+  if (!text || !onClick || !searchVal) return false;
+  //fix this to use some smart regex
+  let _text = text;
+  if (!text.toLowerCase) {
+    if (text.props) {
+      _text = getStringFromReactComponent(text);
+    } else {
+      return false;
+    }
+  }
+  return _text.toLowerCase().indexOf(searchVal.toLowerCase()) > -1;
+};
+
+function getStringFromReactComponent(comp) {
+  if (!comp) return "";
+  if (isString(comp)) return comp;
+  const { children } = comp.props;
+  if (!children) return "";
+  if (isArray(children))
+    return flatMap(children, getStringFromReactComponent).join("");
+  if (isString(children)) return children;
+
+  if (children.props) {
+    return getStringFromReactComponent(children.props);
+  }
+}
+
+const itemRenderer = (i, b) => {
+  return (
+    <MenuItem
+      {...i}
+      icon={undefined}
+      text={i.text}
+      label={
+        i.path.length && (
+          <span style={{ fontSize: 8 }}>
+            {flatMap(i.path, (el, i2) => {
+              if (i2 === 0) return el;
+              return [" > ", el];
+            })}
+          </span>
+        )
+      }
+      onClick={b.handleClick}
+      active={b.modifiers.active}
+      shouldDismissPopover
+      key={b.index}
+    />
+  );
+};

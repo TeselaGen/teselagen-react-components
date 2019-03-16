@@ -51,7 +51,7 @@ class FormComponentsDemo extends React.Component {
                       magicDownload(blob, originalFileName)
                     )
                     .catch(error =>
-                      console.log(
+                      console.info(
                         "file doesn't exist in server"
                       )
                     );

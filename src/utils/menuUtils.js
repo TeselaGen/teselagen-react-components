@@ -288,10 +288,10 @@ export function showCommandContextMenu(
  * Usage example:
  *
  * const menu = createMenu([
- *   { text: 'Item One', icon: 'add', onClick: () => console.log('Clicked 1') },
- *   { text: 'Item One', onClick: () => console.log('Clicked 2') },
+ *   { text: 'Item One', icon: 'add', onClick: () => console.info('Clicked 1') },
+ *   { text: 'Item One', onClick: () => console.info('Clicked 2') },
  *   { divider: '' },
- *   { text: 'Item Three', icon: 'numerical', onClick: () => console.log('Clicked 3') },
+ *   { text: 'Item Three', icon: 'numerical', onClick: () => console.info('Clicked 3') },
  *   { divider: '' },
  *   { text: 'Submenus', submenu: [
  *     { text: 'Sub One' },
@@ -323,8 +323,8 @@ export function showContextMenu(
     { left: event.clientX, top: event.clientY },
     onClose
   );
-  event.stopPropagation();
-  event.preventDefault();
+  event.stopPropagation && event.stopPropagation();
+  event.preventDefault && event.preventDefault();
 }
 
 function filterMenuForCorrectness(menuDef) {

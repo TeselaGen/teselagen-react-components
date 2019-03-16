@@ -183,7 +183,7 @@ class DataTable extends React.Component {
     // comment in to test what is causing re-render
     // Object.entries(this.props).forEach(
     //   ([key, val]) =>
-    //     oldProps[key] !== val && console.log(`Prop '${key}' changed`)
+    //     oldProps[key] !== val && console.info(`Prop '${key}' changed`)
     // );
   }
 
@@ -513,10 +513,9 @@ class DataTable extends React.Component {
         {showHeader && (
           <div className="data-table-header">
             <div className="data-table-title-and-buttons">
-              {tableName &&
-                withTitle && (
-                  <span className="data-table-title">{tableName}</span>
-                )}
+              {tableName && withTitle && (
+                <span className="data-table-title">{tableName}</span>
+              )}
               {children}
               {topLeftItems}
             </div>
@@ -1237,12 +1236,11 @@ class DataTable extends React.Component {
         data-test={displayName || startCase(path)}
         className="tg-react-table-column-header"
       >
-        {(displayName || startCase(path)) &&
-          !noTitle && (
-            <span title={columnTitle} className="tg-react-table-name">
-              {renderTitleInner ? renderTitleInner : columnTitle}
-            </span>
-          )}
+        {(displayName || startCase(path)) && !noTitle && (
+          <span title={columnTitle} className="tg-react-table-name">
+            {renderTitleInner ? renderTitleInner : columnTitle}
+          </span>
+        )}
         {sortComponent}
         {filterMenu}
       </div>
