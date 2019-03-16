@@ -165,8 +165,8 @@ function getAllMenuTextsAndHandlers(menu, enhancers, context, path = []) {
 
 const isDivider = item => item.divider !== undefined;
 
-const filterMenuItem = (searchVal, { text, onClick }) => {
-  if (!text || !onClick || !searchVal) return false;
+const filterMenuItem = (searchVal, { text, onClick, hideFromMenuSearch }) => {
+  if (!text || !onClick || !searchVal || hideFromMenuSearch) return false;
   //fix this to use some smart regex
   let _text = text;
   if (!text.toLowerCase) {

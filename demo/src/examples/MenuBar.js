@@ -162,8 +162,24 @@ class MenuBarDemo extends React.Component {
       },
       {
         text: "Help",
-        submenu: [{ isMenuSearch: true }]
-      },
+        submenu: [
+          { isMenuSearch: true },
+          {
+            text: "About",
+            hideFromMenuSearch: true,
+            onClick: () => {
+              window.toastr.success("About clicked");
+            }
+          },
+          {
+            text: "App Info",
+            hideFromMenuSearch: true,
+            onClick: () => {
+              window.toastr.success("App Info clicked");
+            }
+          }
+        ]
+      }
     ];
 
     // Sets will normally be different routes/modules/views of an app, but any
