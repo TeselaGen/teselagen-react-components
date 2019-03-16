@@ -29,6 +29,7 @@ describe("MenuBar", () => {
     //it should be able to click the
     cy.focused().type("{selectall}Don't Dismiss");
     cy.contains(".bp3-menu-item", "Don't Dismiss").click();
+    cy.contains(".bp3-toast", "This menu's not going away any time soon");
     cy.get("@mainInput").focus();
 
     cy.focused().type("{selectall}React");

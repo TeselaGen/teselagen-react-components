@@ -110,7 +110,9 @@ class MenuBarDemo extends React.Component {
           {
             shouldDismissPopover: false,
             text: "Don't Dismiss",
-            onClick: () => {}
+            onClick: () => {
+              window.toastr.success("This menu's not going away any time soon")
+            }
           },
           { text: "Open...", icon: "document", cmd: "openFile" },
           { divider: "" },

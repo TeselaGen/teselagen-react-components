@@ -128,6 +128,11 @@ export default class MenuBar extends React.Component {
     !i.disabled && i.onClick();
     if (i.shouldDismissPopover !== false) {
       this.setState({ isOpen: false });
+    } else {
+      if (_i && _i.stopPropagation) {
+        _i.stopPropagation();
+        _i.preventDefault();
+      }
     }
   };
   renderHotkeys() {
