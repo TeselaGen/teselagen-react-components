@@ -84,7 +84,7 @@ export default class MenuBar extends React.Component {
                   )})`
                 }}
                 initialContent={null}
-                onItemSelect={this.handleItemClickOrSelect(item)}
+                onItemSelect={this.handleItemClickOrSelect()}
                 inputValueRenderer={i => i.text}
                 noResults={<div>No Results...</div>}
                 itemRenderer={this.itemRenderer}
@@ -101,9 +101,10 @@ export default class MenuBar extends React.Component {
   itemRenderer = (i, b) => {
     return (
       <MenuItem
+        key={b.index}
         {...{
-          ...i,
-          icon: undefined,
+          // ...i,
+          icon: i.icon,
           text: i.isSimpleText ? i.justText || i.text : i.text,
           label: i.path.length && (
             <span style={{ fontSize: 8 }}>
@@ -114,16 +115,15 @@ export default class MenuBar extends React.Component {
             </span>
           ),
           onClick: this.handleItemClickOrSelect(i),
-          active: b.modifiers.active,
+          active: b.modifiers.active
           // shouldDismissPopover: true,
-          key: b.index
         }}
       />
     );
   };
 
   handleItemClickOrSelect = __i => _i => {
-    const i = _i || __i;
+    const i = __i || _i;
     if (!i.onClick) return;
     !i.disabled && i.onClick();
     if (i.shouldDismissPopover !== false) {

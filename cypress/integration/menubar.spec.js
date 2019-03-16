@@ -31,7 +31,12 @@ describe("MenuBar", () => {
     cy.contains(".bp3-menu-item", "Don't Dismiss").click();
     cy.get("@mainInput").focus();
 
+    cy.focused().type("{selectall}React");
+    cy.contains(".bp3-menu-item", "ReactText 9").click();
+    cy.contains(".bp3-toast", "Fired ReactText!");
+
     //it can get the File > ReactText path correctly
+    cy.contains(".bp3-button-text", "Help").click();
     cy.focused().type("{selectall}hel");
     cy.contains(".bp3-menu-item", "File > ReactText");
 

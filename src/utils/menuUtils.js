@@ -165,7 +165,7 @@ export const DynamicMenuItem = ({ def, enhancers = [ident], context }) => {
     const ItemComponent = item.component || EnhancedMenuItem;
     out = (
       <ItemComponent
-        {...omit(item, ["submenu", "hotkey"])}
+        {...omit(item, ["submenu", "hotkey", "hideFromMenuSearch"])}
         icon={item.icon || item.iconName}
         labelElement={item.hotkey && <KeyCombo minimal combo={item.hotkey} />}
         text={item.text}
