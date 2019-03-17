@@ -3,7 +3,7 @@ describe("MenuBar", () => {
     cy.visit("#/MenuBar");
   });
   it(`menubar can be opened via hotkey by default!`, () => {
-    cy.get("body").type("{alt}/");
+    cy.get("body").type("{meta}/");
     cy.focused().type("c");
     cy.get(".tg-menu-search-suggestions").should("exist");
   });
@@ -11,19 +11,30 @@ describe("MenuBar", () => {
     //
     cy.contains(".bp3-button-text", "Help").click();
 
+    // sub menus should be accessible on hover!
+    cy.focused().type("other");
+    cy.contains(".tg-menu-search-suggestions .bp3-menu-item", "Other").trigger(
+      "mouseover"
+    );
+    cy.contains(".bp3-menu-item", "XXXXX").click();
+
+    cy.contains(".bp3-button-text", "Help").click();
+
     // it should only show the first 10 items by default
     cy.focused().type("c");
+    cy.focused().as("mainInput");
+
     cy.get(".tg-menu-search-suggestions .bp3-menu-item").should(
       "have.length",
       10
     );
-    cy.focused().as("mainInput");
 
     //it should be able to type into a suggestion that is has an input as part of it
     cy.focused().type("{selectall}React");
     cy.contains(".tg-menu-search-suggestions .bp3-menu-item", "Long React")
       .find("input")
       .type("ha");
+
     cy.get("@mainInput").focus();
 
     //it should be able to click the

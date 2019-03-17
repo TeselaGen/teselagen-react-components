@@ -16,6 +16,7 @@ export function comboToLabel(def, useSymbols = true) {
       .split("+")
       .map(p => startCase(p) || p)
       .join(" + ")
+      .replace("Meta", isMac ? "Cmd" : "Ctrl")
       .replace("Mod", isMac ? "Cmd" : "Ctrl")
       .replace("Alt", isMac ? "Option" : "Alt");
   }

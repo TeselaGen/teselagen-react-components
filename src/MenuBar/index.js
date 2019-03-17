@@ -19,10 +19,9 @@ import {
   Button,
   Hotkeys,
   HotkeysTarget,
-  Hotkey,
-  MenuItem
+  Hotkey
 } from "@blueprintjs/core";
-import { createDynamicMenu } from "../utils/menuUtils";
+import { createDynamicMenu, DynamicMenuItem } from "../utils/menuUtils";
 import { comboToLabel } from "../utils/hotkeyUtils";
 
 @HotkeysTarget
@@ -57,15 +56,16 @@ export default class MenuBar extends React.Component {
     return getAllMenuTextsAndHandlers(menu, enhancers, context);
   }
   addHelpItemIfNecessary = (menu, i) => {
-    return menu.map(item => {
+    return menu.map((item, innerIndex) => {
       if (item.isMenuSearch) {
-        this.menuSearchIndex = i;
+        const isTopLevelSearch = !isNumber(i);
+        this.isTopLevelSearch = isTopLevelSearch;
+        this.menuSearchIndex = isTopLevelSearch ? innerIndex : i;
         return {
           shouldDismissPopover: false,
           text: (
             <div>
               <Suggest
-                autoFocus
                 closeOnSelect={false}
                 items={this.allMenuItems}
                 itemListPredicate={filterMenuItems}
@@ -77,10 +77,17 @@ export default class MenuBar extends React.Component {
                 resetOnSelect={false}
                 resetOnClose={false}
                 inputProps={{
-                  autoFocus: true,
+                  inputRef: n => {
+                    if (n) {
+                      this.searchInput = n;
+                    }
+                  },
+                  // small: isTopLevelSearch,
+                  autoFocus: !isTopLevelSearch,
                   placeholder: `Search... (${comboToLabel(
                     this.props.menuSearchHotkey || menuSearchHotkey,
                     false
+                    // isTopLevelSearch
                   )})`
                 }}
                 initialContent={null}
@@ -99,28 +106,56 @@ export default class MenuBar extends React.Component {
   };
 
   itemRenderer = (i, b) => {
+    // if (i.submenu.length === 3) debugger;
     return (
-      <MenuItem
+      <DynamicMenuItem
         key={b.index}
         {...{
-          // ...i,
-          icon: i.icon,
-          text: i.isSimpleText ? i.justText || i.text : i.text,
-          label: i.path.length && (
-            <span style={{ fontSize: 8 }}>
-              {flatMap(i.path, (el, i2) => {
-                if (i2 === 0) return el;
-                return [" > ", el];
-              })}
-            </span>
-          ),
-          onClick: this.handleItemClickOrSelect(i),
-          active: b.modifiers.active
-          // shouldDismissPopover: true,
+          doNotEnhanceTopLevelItem: true,
+          enhancers: this.props.enhancers,
+          def: {
+            submenu: i.submenu,
+            icon: i.icon,
+            text: i.isSimpleText ? i.justText || i.text : i.text,
+            label: i.path.length && (
+              <span style={{ fontSize: 8 }}>
+                {flatMap(i.path, (el, i2) => {
+                  if (i2 === 0) return el;
+                  return [" > ", el];
+                })}
+              </span>
+            ),
+            onClick: this.handleItemClickOrSelect(i),
+            active: b.modifiers.active
+            // shouldDismissPopover: true,
+          }
         }}
       />
     );
   };
+  // itemRenderer = (i, b) => {
+  //   return (
+  //     <MenuItem
+  //       key={b.index}
+  //       {...{
+  //         // ...i,
+  //         icon: i.icon,
+  //         text: i.isSimpleText ? i.justText || i.text : i.text,
+  //         label: i.path.length && (
+  //           <span style={{ fontSize: 8 }}>
+  //             {flatMap(i.path, (el, i2) => {
+  //               if (i2 === 0) return el;
+  //               return [" > ", el];
+  //             })}
+  //           </span>
+  //         ),
+  //         onClick: this.handleItemClickOrSelect(i),
+  //         active: b.modifiers.active
+  //         // shouldDismissPopover: true,
+  //       }}
+  //     />
+  //   );
+  // };
 
   handleItemClickOrSelect = __i => _i => {
     const i = __i || _i;
@@ -151,10 +186,14 @@ export default class MenuBar extends React.Component {
     );
   }
   focusSearchMenu = () => {
-    this.setState({
-      isOpen: true,
-      openIndex: this.menuSearchIndex
-    });
+    if (this.isTopLevelSearch) {
+      this.searchInput && this.searchInput.focus();
+    } else {
+      this.setState({
+        isOpen: true,
+        openIndex: this.menuSearchIndex
+      });
+    }
   };
 
   render() {
@@ -163,7 +202,7 @@ export default class MenuBar extends React.Component {
 
     return (
       <div className={"tg-menu-bar " + className} style={style}>
-        {menu.map((topLevelItem, i) => {
+        {this.addHelpItemIfNecessary(menu).map((topLevelItem, i) => {
           const dataKeys = pickBy(topLevelItem, function(value, key) {
             return startsWith(key, "data-");
           });
@@ -263,8 +302,12 @@ const options = {
 
 const filterMenuItems = (searchVal, items) => {
   const newItems = flatMap(items, item => {
-    const { text, onClick, hideFromMenuSearch } = item;
-    if (!text || !onClick || !searchVal || hideFromMenuSearch) return [];
+    const { text, onClick, hideFromMenuSearch, showInSearchMenu } = item;
+    if (
+      !showInSearchMenu &&
+      (!text || !onClick || !searchVal || hideFromMenuSearch)
+    )
+      return [];
     //fix this to use some smart regex
     let justText = text;
     let isSimpleText = true;
@@ -298,7 +341,7 @@ function getStringFromReactComponent(comp) {
   }
 }
 
-const menuSearchHotkey = "alt+/";
+const menuSearchHotkey = "meta+/";
 
 const highlight = (
   fuseSearchResult: any,

@@ -139,6 +139,7 @@ class MenuBarDemo extends React.Component {
           { divider: "" },
           {
             text: "Other",
+            showInSearchMenu: true, //you can also just define an onClick handler and it will show up as well!
             submenu: [
               // no hotkeys or commands used here
               {
@@ -147,6 +148,12 @@ class MenuBarDemo extends React.Component {
                 icon: "code",
                 onClick: () => {
                   console.info("h");
+                }
+              },
+              {
+                text: "XXXXX",
+                onClick: () => {
+                  window.toastr.success("XXXXX");
                 }
               },
               {
@@ -190,7 +197,8 @@ class MenuBarDemo extends React.Component {
             }
           }
         ]
-      }
+      },
+      // { isMenuSearch: true },
     ];
 
     // Sets will normally be different routes/modules/views of an app, but any
@@ -239,7 +247,7 @@ class MenuBarDemo extends React.Component {
           <MenuBar
             menu={this.menu}
             enhancers={this.menuEnhancers}
-            menuSearchHotkey="alt+/"
+            // menuSearchHotkey="alt+/"
           />
         </div>
         <button

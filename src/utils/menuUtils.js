@@ -147,16 +147,21 @@ const dividerShorthandEnhancer = def =>
  * visible sections are computed and rendered).
  * TODO: document and add examples
  */
-export const DynamicMenuItem = ({ def, enhancers = [ident], context }) => {
+export const DynamicMenuItem = ({
+  def,
+  enhancers = [ident],
+  context,
+  doNotEnhanceTopLevelItem
+}) => {
   // If passed an element instead of a menu item definition, return it.
   // This allows mixing menu item elements and menu item defs, and makes it
   // safe to call menu creation utils with their own output.
   if (React.isValidElement(def)) return def;
 
-  const item = [dividerShorthandEnhancer, ...enhancers].reduce(
-    (v, f) => f(v, context),
-    def
-  );
+  const item = [
+    dividerShorthandEnhancer,
+    ...(doNotEnhanceTopLevelItem ? [ident] : enhancers)
+  ].reduce((v, f) => f(v, context), def);
   let out;
 
   if (item.divider !== undefined) {
