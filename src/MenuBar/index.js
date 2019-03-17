@@ -57,46 +57,48 @@ export default class MenuBar extends React.Component {
   }
   addHelpItemIfNecessary = (menu, i) => {
     return menu.map((item, innerIndex) => {
-      if (item.isMenuSearch) {
+      const { isMenuSearch, inputProps, ...rest } = item;
+      if (isMenuSearch) {
         const isTopLevelSearch = !isNumber(i);
         this.isTopLevelSearch = isTopLevelSearch;
         this.menuSearchIndex = isTopLevelSearch ? innerIndex : i;
         return {
           shouldDismissPopover: false,
           text: (
-            <div>
-              <Suggest
-                closeOnSelect={false}
-                items={this.allMenuItems}
-                itemListPredicate={filterMenuItems}
-                itemDisabled={i => i.disabled}
-                popoverProps={{
-                  minimal: true,
-                  popoverClassName: "tg-menu-search-suggestions"
-                }}
-                resetOnSelect={false}
-                resetOnClose={false}
-                inputProps={{
-                  inputRef: n => {
-                    if (n) {
-                      this.searchInput = n;
-                    }
-                  },
-                  // small: isTopLevelSearch,
-                  autoFocus: !isTopLevelSearch,
-                  placeholder: `Search... (${comboToLabel(
-                    this.props.menuSearchHotkey || menuSearchHotkey,
-                    false
-                    // isTopLevelSearch
-                  )})`
-                }}
-                initialContent={null}
-                onItemSelect={this.handleItemClickOrSelect()}
-                inputValueRenderer={i => i.text}
-                noResults={<div>No Results...</div>}
-                itemRenderer={this.itemRenderer}
-              />
-            </div>
+            <Suggest
+              closeOnSelect={false}
+              items={this.allMenuItems}
+              itemListPredicate={filterMenuItems}
+              itemDisabled={i => i.disabled}
+              popoverProps={{
+                minimal: true,
+                popoverClassName: "tg-menu-search-suggestions"
+              }}
+              resetOnSelect={false}
+              resetOnClose={false}
+              inputProps={{
+                style: { minWidth: 195 },
+                inputRef: n => {
+                  if (n) {
+                    this.searchInput = n;
+                  }
+                },
+                // small: isTopLevelSearch,
+                autoFocus: !isTopLevelSearch,
+                placeholder: `Search the menus (${comboToLabel(
+                  this.props.menuSearchHotkey || menuSearchHotkey,
+                  false
+                  // isTopLevelSearch
+                ).replace(/\s/g, "")})`,
+                ...inputProps
+              }}
+              initialContent={null}
+              onItemSelect={this.handleItemClickOrSelect()}
+              inputValueRenderer={i => i.text}
+              noResults={<div>No Results...</div>}
+              itemRenderer={this.itemRenderer}
+              {...rest}
+            />
           )
         };
       } else {
