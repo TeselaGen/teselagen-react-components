@@ -176,24 +176,35 @@ export default class MenuBar extends React.Component {
     return (
       <Hotkeys>
         <Hotkey
+          allowInInput
           global={true}
           combo={this.props.menuSearchHotkey || menuSearchHotkey}
           label="Search the menu"
           preventDefault
           stopPropagation
-          onKeyDown={this.focusSearchMenu}
+          onKeyDown={this.toggleFocusSearchMenu}
         />
       </Hotkeys>
     );
   }
-  focusSearchMenu = () => {
-    if (this.isTopLevelSearch) {
-      this.searchInput && this.searchInput.focus();
-    } else {
+  toggleFocusSearchMenu = () => {
+    //toggle off
+    if (this.searchInput && document.activeElement === this.searchInput) {
+      this.searchInput.blur();
       this.setState({
-        isOpen: true,
+        isOpen: false,
         openIndex: this.menuSearchIndex
       });
+    } else {
+      //toggle on
+      if (this.isTopLevelSearch) {
+        this.searchInput && this.searchInput.focus();
+      } else {
+        this.setState({
+          isOpen: true,
+          openIndex: this.menuSearchIndex
+        });
+      }
     }
   };
 

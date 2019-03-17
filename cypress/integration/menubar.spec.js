@@ -2,10 +2,12 @@ describe("MenuBar", () => {
   beforeEach(() => {
     cy.visit("#/MenuBar");
   });
-  it(`menubar can be opened via hotkey by default!`, () => {
+  it(`menubar can be opened/closed via hotkey by default!`, () => {
     cy.get("body").type("{meta}/");
     cy.focused().type("c");
     cy.get(".tg-menu-search-suggestions").should("exist");
+    cy.focused().type("{meta}/");
+    cy.get(".tg-menu-search-suggestions").should("not.exist");
   });
   it(`menubar can be searched!`, () => {
     //

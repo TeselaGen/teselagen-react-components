@@ -26,6 +26,9 @@
 .tg-menu-bar-popover .bp3-popover-wrapper {
   width: 100%;
 }
+.tg-menu-search-suggestions .bp3-popover-wrapper {
+  width: 100%;
+}
 
 li.bp3-menu-divider + li.bp3-menu-divider,
 li.bp3-menu-divider:first-child,
