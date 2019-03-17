@@ -24,10 +24,10 @@
 }
 
 .tg-menu-bar-popover .bp3-popover-wrapper {
-  width: 100%;
+  display: inline;
 }
 .tg-menu-search-suggestions .bp3-popover-wrapper {
-  width: 100%;
+  display: inline;
 }
 
 li.bp3-menu-divider + li.bp3-menu-divider,
