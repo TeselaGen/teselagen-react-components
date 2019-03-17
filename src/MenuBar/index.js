@@ -116,6 +116,7 @@ export default class MenuBar extends React.Component {
           def: {
             submenu: i.submenu,
             icon: i.icon,
+            disabled: i.disabled,
             text: i.isSimpleText ? i.justText || i.text : i.text,
             label: i.path.length && (
               <span style={{ fontSize: 8 }}>

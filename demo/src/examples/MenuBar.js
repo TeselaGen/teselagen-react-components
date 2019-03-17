@@ -135,6 +135,7 @@ class MenuBarDemo extends React.Component {
               "Hey I'm a tooltip created by passing a string to disabled:''",
             cmd: "copy"
           },
+          { text: "I'm disabled", disabled: true,  onClick: () => {} },
           { icon: "clipboard", cmd: "paste" },
           { divider: "" },
           {

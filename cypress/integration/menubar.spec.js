@@ -11,8 +11,14 @@ describe("MenuBar", () => {
     //
     cy.contains(".bp3-button-text", "Help").click();
 
+    // sub menus should appear as disabled if they are!
+    cy.focused().type("disabled");
+    cy.contains(
+      ".tg-menu-search-suggestions .bp3-menu-item.bp3-disabled",
+      "I'm disabled"
+    ).should("exist");
     // sub menus should be accessible on hover!
-    cy.focused().type("other");
+    cy.focused().type("{selectall}other");
     cy.contains(".tg-menu-search-suggestions .bp3-menu-item", "Other").trigger(
       "mouseover"
     );
