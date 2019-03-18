@@ -34,7 +34,6 @@
     "deep-equal": "^1.0.1",
     "dom-scroll-into-view": "^1.2.1",
     "file-saver": "^1.3.8",
-    "fuse.js": "^3.4.4",
     "fuzzysearch": "^1.0.3",
     "json.sortify": "^2.2.2",
     "lodash": "^4.17.11",

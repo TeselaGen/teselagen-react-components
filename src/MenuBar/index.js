@@ -10,7 +10,6 @@ import {
   isString
 } from "lodash";
 import { Suggest } from "@blueprintjs/select";
-// import Fuse from "fuse.js";
 import fuzzysearch from "fuzzysearch";
 import "./style.css";
 import {
