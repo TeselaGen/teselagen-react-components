@@ -65,8 +65,9 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
         asyncBlurFields: [] //hacky fix for weird redux form asyncValidate error https://github.com/erikras/redux-form/issues/1675
       })
     ),
-    withProps(({ name, asReactSelect }) => ({
+    withProps(({ name, asReactSelect, idAs }) => ({
       passedName: name,
+      isCodeModel: idAs === "code",
       ...(asReactSelect && { noDialog: true })
     })),
     withProps(
@@ -552,7 +553,8 @@ const GenericSelectInner = compose(
         fragment,
         passedName,
         queryOptions,
-        tableParamOptions
+        tableParamOptions,
+        isCodeModel
       } = this.props;
       this.innerComponent = compose(
         withTableParams({
@@ -565,7 +567,11 @@ const GenericSelectInner = compose(
           },
           ...tableParamOptions
         }),
-        withQuery(fragment, { isPlural: true, options: queryOptions })
+        withQuery(fragment, {
+          isPlural: true,
+          options: queryOptions,
+          isCodeModel
+        })
       )(InnerComp);
     };
 
