@@ -6,11 +6,12 @@ import {
   flatMap,
   isArray,
   take,
-  set,
+  flatten,
   isString
 } from "lodash";
 import { Suggest } from "@blueprintjs/select";
-import Fuse from "fuse.js";
+// import Fuse from "fuse.js";
+import fuzzysearch from "fuzzysearch";
 import "./style.css";
 import {
   Popover,
@@ -302,18 +303,6 @@ function getAllMenuTextsAndHandlers(menu, enhancers, context, path = []) {
 
 const isDivider = item => item.divider !== undefined;
 
-const options = {
-  shouldSort: true,
-  includeScore: true,
-  includeMatches: true,
-  threshold: 0.7,
-  location: 0,
-  distance: 500,
-  maxPatternLength: 32,
-  minMatchCharLength: 1,
-  keys: ["justText"]
-};
-
 const filterMenuItems = (searchVal, items) => {
   const newItems = flatMap(items, item => {
     const { text, onClick, hideFromMenuSearch, showInSearchMenu } = item;
@@ -333,12 +322,24 @@ const filterMenuItems = (searchVal, items) => {
         return [];
       }
     }
-    return { ...item, justText, isSimpleText };
-    // return _text.toLowerCase().indexOf(searchVal.toLowerCase()) > -1;
-  });
-  const fuse = new Fuse(newItems, options); // "list" is the item array
-  const result = highlight(fuse.search(searchVal));
-  return take(result, 10);
+
+    if (
+      fuzzysearch(searchVal.toLowerCase(), justText && justText.toLowerCase())
+    ) {
+      return {
+        ...item,
+        justText,
+        isSimpleText
+      };
+    } else {
+      return [];
+    }
+  }).sort((a, b) => a.justText.length > b.justText.length);
+
+  return take(newItems, 10).map(i => ({
+    ...i,
+    justText: highlight(searchVal, i.justText)
+  }));
 };
 
 function getStringFromReactComponent(comp) {
@@ -357,52 +358,33 @@ function getStringFromReactComponent(comp) {
 
 const menuSearchHotkey = "meta+/";
 
-const highlight = (
-  fuseSearchResult: any,
-  highlightClassName: string = "tg_search_highlight"
-) => {
-  const generateHighlightedText = (
-    inputText: string,
-    regions: number[] = []
-  ) => {
-    let content = [];
-    let nextUnhighlightedRegionStartingIndex = 0;
+function highlight(query, text, opts) {
+  opts = opts || { tag: <strong /> };
 
-    regions.forEach(region => {
-      const lastRegionNextIndex = region[1] + 1;
+  if (query.length === 0) {
+    return text;
+  }
 
-      content = [
-        ...content,
-        inputText.substring(nextUnhighlightedRegionStartingIndex, region[0]),
-        <span key={lastRegionNextIndex} className={highlightClassName}>
-          {inputText.substring(region[0], lastRegionNextIndex)}
-        </span>
-      ];
+  const offset = text.toLowerCase().indexOf(query[0].toLowerCase());
+  if (offset === -1) return null;
 
-      nextUnhighlightedRegionStartingIndex = lastRegionNextIndex;
-    });
+  let last = 0;
+  for (let i = 1; i < query.length; i++) {
+    if (text[offset + i] !== query[i]) {
+      break;
+    }
 
-    content = [
-      ...content,
-      inputText.substring(nextUnhighlightedRegionStartingIndex)
-    ];
+    last = i;
+  }
 
-    return content;
-  };
+  const before = text.slice(0, offset);
+  const match = <strong>{text.slice(offset, offset + last + 1)}</strong>;
 
-  return fuseSearchResult
-    .filter(({ matches }: any) => matches && matches.length)
-    .map(({ item, matches }: any) => {
-      const highlightedItem = { ...item };
+  const after = highlight(
+    query.slice(last + 1),
+    text.slice(offset + last + 1),
+    opts
+  );
 
-      matches.forEach((match: any) => {
-        set(
-          highlightedItem,
-          match.key,
-          generateHighlightedText(match.value, match.indices)
-        );
-      });
-
-      return highlightedItem;
-    });
-};
+  return flatten([before, match, after]);
+}
