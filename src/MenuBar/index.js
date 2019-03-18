@@ -333,7 +333,7 @@ const filterMenuItems = (searchVal, items) => {
     } else {
       return [];
     }
-  }).sort((a, b) => a.justText.length > b.justText.length);
+  }).sort((a, b) => a.justText.length - b.justText.length);
 
   return take(newItems, 10).map(i => ({
     ...i,
