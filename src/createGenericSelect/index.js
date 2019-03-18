@@ -193,12 +193,16 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
         const {
           additionalDataFragment,
           readableName,
+          asReactSelect,
           onSelect,
           isMultiSelect,
           postSelectDTProps
         } = this.props;
         const toSelect = isMultiSelect ? records : records[0];
         this.resetPostSelectSelection();
+        if (asReactSelect && !records.length) {
+          return this.removeSelection();
+        }
         if (!additionalDataFragment) {
           onSelect && onSelect(toSelect);
           this.handleOnChange(toSelect || null);
