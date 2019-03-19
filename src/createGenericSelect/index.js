@@ -196,7 +196,8 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
           asReactSelect,
           onSelect,
           isMultiSelect,
-          postSelectDTProps
+          postSelectDTProps,
+          isCodeModel
         } = this.props;
         const toSelect = isMultiSelect ? records : records[0];
         this.resetPostSelectSelection();
@@ -214,7 +215,11 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
         });
         const queryVariables = {
           filter: {
-            id: isMultiSelect ? records.map(({ id }) => id) : records[0].id
+            [isCodeModel ? "code" : "id"]: isMultiSelect
+              ? records.map(({ id, code }) => (isCodeModel ? code : id))
+              : isCodeModel
+              ? records[0].code
+              : records[0].id
           }
         };
         if (!postSelectDTProps) {
