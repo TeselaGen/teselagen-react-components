@@ -26,6 +26,9 @@ export default function modelNameToReadableName(
   if (sanitize) {
     modelNameToUse = sanitize(modelNameToUse);
   }
+  if (/^j 5/i.test(modelNameToUse)) {
+    modelNameToUse = modelNameToUse.replace(/^j 5/i, "j5");
+  }
   if (plural) modelNameToUse = pluralize(modelNameToUse);
   if (modelName === "j5Report") modelNameToUse += " (j5)";
   return modelNameToUse;
