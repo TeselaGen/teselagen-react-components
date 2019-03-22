@@ -287,6 +287,7 @@ function getAllMenuTextsAndHandlers(menu, enhancers, context, path = []) {
     if (isDivider(enhancedItem)) {
       return [];
     }
+    if (enhancedItem && enhancedItem.hidden) return [];
     return [
       {
         ...enhancedItem,
@@ -304,10 +305,16 @@ const isDivider = item => item.divider !== undefined;
 
 const filterMenuItems = (searchVal, items) => {
   const newItems = flatMap(items, item => {
-    const { text, onClick, hideFromMenuSearch, showInSearchMenu } = item;
+    const {
+      text,
+      onClick,
+      hidden,
+      hideFromMenuSearch,
+      showInSearchMenu
+    } = item;
     if (
       !showInSearchMenu &&
-      (!text || !onClick || !searchVal || hideFromMenuSearch)
+      (!text || !onClick || !searchVal || hideFromMenuSearch || hidden)
     )
       return [];
     //fix this to use some smart regex
