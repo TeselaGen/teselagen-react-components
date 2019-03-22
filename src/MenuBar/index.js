@@ -62,6 +62,7 @@ export default class MenuBar extends React.Component {
         const isTopLevelSearch = !isNumber(i);
         this.isTopLevelSearch = isTopLevelSearch;
         this.menuSearchIndex = isTopLevelSearch ? innerIndex : i;
+
         return {
           shouldDismissPopover: false,
           text: (
@@ -77,18 +78,20 @@ export default class MenuBar extends React.Component {
               resetOnSelect={false}
               resetOnClose={false}
               inputProps={{
-                style: { minWidth: 195 },
                 inputRef: n => {
                   if (n) {
                     this.searchInput = n;
+                    n.setAttribute &&
+                      n.setAttribute(
+                        "size",
+                        n.getAttribute("placeholder").length
+                      );
                   }
                 },
-                // small: isTopLevelSearch,
                 autoFocus: !isTopLevelSearch,
                 placeholder: `Search the menus (${comboToLabel(
                   this.props.menuSearchHotkey || menuSearchHotkey,
                   false
-                  // isTopLevelSearch
                 ).replace(/\s/g, "")})`,
                 ...inputProps
               }}
@@ -174,18 +177,21 @@ export default class MenuBar extends React.Component {
     }
   };
   renderHotkeys() {
-    if (!isNumber(this.menuSearchIndex)) return null;
     return (
       <Hotkeys>
-        <Hotkey
-          allowInInput
-          global={true}
-          combo={this.props.menuSearchHotkey || menuSearchHotkey}
-          label="Search the menu"
-          preventDefault
-          stopPropagation
-          onKeyDown={this.toggleFocusSearchMenu}
-        />
+        {isNumber(this.menuSearchIndex) && (
+          <Hotkey
+            allowInInput
+            global={true}
+            combo={
+              (this.props && this.props.menuSearchHotkey) || menuSearchHotkey
+            }
+            label="Search the menu"
+            preventDefault
+            stopPropagation
+            onKeyDown={this.toggleFocusSearchMenu}
+          />
+        )}
       </Hotkeys>
     );
   }

@@ -142,6 +142,14 @@ const dividerShorthandEnhancer = def =>
     ? { divider: def.substr(2) }
     : def;
 
+// filter out unwanted attributes here! we won't want these to show up on the dom element or react will give nasty warnings
+const unwantedAttrs = [
+  "submenu",
+  "hotkey",
+  "showInSearchMenu",
+  "hideFromMenuSearch"
+];
+
 /** A menu item component that adds many features over the standard MenuItem,
  * and allows for dynamic menu structures that are computed efficiently (only
  * visible sections are computed and rendered).
@@ -170,7 +178,8 @@ export const DynamicMenuItem = ({
     const ItemComponent = item.component || EnhancedMenuItem;
     out = (
       <ItemComponent
-        {...omit(item, ["submenu", "hotkey", "hideFromMenuSearch"])}
+        // filter out unwanted attributes here!
+        {...omit(item, unwantedAttrs)}
         icon={item.icon || item.iconName}
         labelElement={item.hotkey && <KeyCombo minimal combo={item.hotkey} />}
         text={item.text}
