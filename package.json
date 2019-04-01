@@ -18,7 +18,7 @@
     "//build-watch": "nodemon --watch src --exec \"rm .babelrc; yarn build\" ",
     "clean": "nwb clean-module && npm clean-demo",
     "start": "nwb serve-react-demo --port 3333",
-    "prepare": "in-publish && npm run build || not-in-publish",
+    "prepublishOnly": "yarn build",
     "postpublish": "yarn deploy",
     "predeploy": "yarn buildWithDemo",
     "deploy": "gh-pages -m 'auto commit [ci skip]' -d demo/dist",

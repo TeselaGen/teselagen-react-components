@@ -710,10 +710,17 @@ class InnerComp extends Component {
   };
   handleReactSelectFieldSubmit = valOrVals => {
     const { handleSelection, input, tableParams, idAs } = this.props;
-    const entitiesById = {
-      ...keyBy(tableParams.entities, idAs || "id"),
-      ...keyBy(input.value, idAs || "id")
-    };
+    let entitiesById = keyBy(tableParams.entities, idAs || "id");
+    if (input.value) {
+      if (Array.isArray(input.value)) {
+        entitiesById = {
+          ...entitiesById,
+          ...keyBy(input.value, idAs || "id")
+        };
+      } else {
+        entitiesById[input.value[idAs || "id"]] = input.value;
+      }
+    }
     if (!valOrVals) {
       handleSelection([]);
     } else {
