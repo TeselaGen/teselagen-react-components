@@ -23,12 +23,13 @@
   display: none;
 }
 
-.tg-menu-bar-popover .bp3-popover-wrapper {
+/* removing the display inline styling because they broke menu positioning: https://github.com/TeselaGen/lims/issues/2563 */
+/* .tg-menu-bar-popover .bp3-popover-wrapper {
   display: inline;
 }
 .tg-menu-search-suggestions .bp3-popover-wrapper {
   display: inline;
-}
+} */
 
 li.bp3-menu-divider + li.bp3-menu-divider,
 li.bp3-menu-divider:first-child,

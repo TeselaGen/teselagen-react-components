@@ -120,11 +120,11 @@ class MenuBarDemo extends React.Component {
           {
             cmd: "fakeCmd1",
             submenu: ["fakeCmd1", "fakeCmd1", "fakeCmd1",
-            {text: "YYY", onClick: () => {}},
-            {text: "Y", onClick: () => {}},
-            {text: "YYYY", onClick: () => {}},
-            {text: "YY", onClick: () => {}},
-            {text: "YYYYY", onClick: () => {}},
+            {disabled: true, text: "YYY", onClick: () => {}},
+            {disabled: true, text: "Y", onClick: () => {}},
+            {disabled: true, text: "YYYY", onClick: () => {}},
+            {disabled: true, text: "YY", onClick: () => {}},
+            {disabled: true, text: "YYYYY", onClick: () => {}},
           ]
           },
           { divider: "" },
