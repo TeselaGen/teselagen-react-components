@@ -265,6 +265,9 @@ class FilterInput extends React.Component {
                     ]
                   : undefined
               }
+              popoverProps={{
+                captureDismiss: true
+              }}
               {...{
                 formatDate: date =>
                   date == null ? "" : date.toLocaleDateString(),
