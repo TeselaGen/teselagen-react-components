@@ -164,21 +164,43 @@ class DataTable extends React.Component {
 
   componentDidMount() {
     this.updateFromProps({}, computePresets(this.props));
+    const table = ReactDOM.findDOMNode(this.table);
+    let theads = table.getElementsByClassName("rt-thead");
+    let tbody = table.getElementsByClassName("rt-tbody")[0];
+
+    tbody.addEventListener("scroll", () => {
+      for (let i = 0; i < theads.length; i++) {
+        theads.item(i).scrollLeft = tbody.scrollLeft;
+      }
+    });
   }
 
   componentDidUpdate(oldProps) {
     const table = ReactDOM.findDOMNode(this.table);
-    const tableBody = table.querySelector(".rt-tbody");
-    const headerNode = table.querySelector(".rt-thead.-header");
-    if (headerNode) headerNode.style.overflowY = "inherit";
-    if (tableBody && tableBody.scrollHeight > tableBody.clientHeight) {
-      if (headerNode) {
-        headerNode.style.overflowY = "scroll";
-        headerNode.style.overflowX = "hidden";
-      }
-    }
+    // const tableBody = table.querySelector(".rt-tbody");
+    // const headerNode = table.querySelector(".rt-thead.-header");
+    // if (headerNode) headerNode.style.overflowY = "inherit";
+    // if (tableBody && tableBody.scrollHeight > tableBody.clientHeight) {
+    //   if (headerNode) {
+    //     headerNode.style.overflowY = "scroll";
+    //     headerNode.style.overflowX = "hidden";
+    //   }
+    // }
 
     this.updateFromProps(computePresets(oldProps), computePresets(this.props));
+
+    let theads = table.getElementsByClassName("rt-thead");
+    let tbody = table.getElementsByClassName("rt-tbody")[0];
+
+    if (tbody.scrollHeight > tbody.clientHeight) {
+      for (let i = 0; i < theads.length; i++) {
+        theads.item(i).classList.add("vertical-scrollbar-present");
+      }
+    } else {
+      for (let i = 0; i < theads.length; i++) {
+        theads.item(i).classList.remove("vertical-scrollbar-present");
+      }
+    }
 
     // comment in to test what is causing re-render
     // Object.entries(this.props).forEach(

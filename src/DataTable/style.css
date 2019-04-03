@@ -223,16 +223,18 @@
 
 .ReactTable {
   user-select: none;
-  background: white;
+  background: #f7f7f7;
 }
 
 .ReactTable .rt-thead.-header {
   box-shadow: none;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  background: #f7f7f7;
+  /* background: #f7f7f7; */
   overflow-x: hidden;
 }
-
+.ReactTable .rt-tbody {
+  background: white;
+}
 .ReactTable .rt-tbody .rt-td {
   cursor: pointer;
   border-right: none;
@@ -355,12 +357,16 @@
 
 /* dark styles */
 .bp3-dark .ReactTable {
-  background: #30404d !important;
+  background: #182026 !important;
   color: #f5f8fa !important;
+  border-color: #293742;
+}
+/* dark styles */
+.bp3-dark .ReactTable .rt-tbody {
+  background: #30404d !important;
 }
 
 .bp3-dark .ReactTable .rt-thead.-header {
-  background: #182026 !important;
   color: #f5f8fa !important;
 }
 
@@ -401,4 +407,23 @@
 .data-table-container .ReactTable .rt-resizer {
   width: 10px;
   right: -5px;
+}
+
+.rt-table {
+  overflow: hidden !important;
+}
+
+.rt-tbody {
+  min-width: 0px !important;
+}
+.rt-thead {
+  min-width: 0px !important;
+  overflow: hidden !important;
+}
+
+.rt-tr-group {
+  min-width: 0px !important;
+}
+.vertical-scrollbar-present {
+  width: calc(100% - 15px) !important;
 }
