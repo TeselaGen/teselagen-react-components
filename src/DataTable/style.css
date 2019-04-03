@@ -269,8 +269,12 @@
   transform: scale(1.2);
 }
 
-.tg-compact-table .rt-tbody .rt-td {
+.ReactTable .rt-tbody .rt-td {
   padding: 8px 8px;
+}
+
+.tg-compact-table .rt-tbody .rt-td {
+  padding: 4px 4px;
   display: flex;
   align-items: center;
 }
