@@ -92,3 +92,9 @@ span.bp3-popover-target {
 .Select {
   min-width: 170px;
 }
+
+/* override the default blueprint input focus to instead rely on an inset box shadow. This resolves any issues with overflow:hidden cutting off input box shadows */
+.bp3-dark .bp3-input:focus,
+.bp3-input:focus {
+  box-shadow: inset 0 0 3px 1px #137cbd;
+}
