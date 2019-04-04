@@ -407,31 +407,54 @@ export const renderBlueprintEditableText = props => {
   );
 };
 
+const reactSelectCreatableOptionClassName = "Select-create-option-placeholder";
 export const renderReactSelect = props => {
   // spreading input not working, grab the values needed instead
   const {
     async,
+    creatable,
     input: { value, onChange },
     hideValue,
     options,
     onFieldSubmit,
     ...rest
   } = props;
-  const optsToUse = getOptions(options);
-  const valueToUse = //here we're coercing json values into an object with {label,value} because react-select does not seem to recognize the json value directly
-    !Array.isArray(value) && typeof value === "object"
-      ? optsToUse.find(obj => {
-          return deepEqual(obj.value, value);
-        })
-      : Array.isArray(value)
-        ? value.map(val => {
-            return optsToUse
-              ? optsToUse.find(obj => {
-                  return deepEqual(obj.value, val);
-                })
-              : val;
-          })
-        : value;
+
+  let optionsPassed = options;
+
+  const optsToUse = getOptions(optionsPassed);
+  let valueToUse;
+
+  if (!Array.isArray(value) && typeof value === "object") {
+    if (value.userCreated) {
+      valueToUse = {
+        label: value.value,
+        value
+      };
+    } else {
+      valueToUse = optsToUse.find(obj => {
+        return deepEqual(obj.value, value);
+      });
+    }
+  } else if (Array.isArray(value)) {
+    valueToUse = value.map(val => {
+      if (val.userCreated) {
+        return {
+          label: val.value,
+          value: val
+        };
+      }
+      if (optsToUse) {
+        return optsToUse.find(obj => {
+          return deepEqual(obj.value, val);
+        });
+      } else {
+        return val;
+      }
+    });
+  } else {
+    valueToUse = value;
+  }
 
   const propsToUse = {
     ...removeUnwantedProps(rest),
@@ -439,13 +462,29 @@ export const renderReactSelect = props => {
     value: valueToUse,
     closeOnSelect: !rest.multi,
     onChange(valOrVals, ...rest2) {
-      const valToPass = Array.isArray(valOrVals)
-        ? valOrVals.map(function(val) {
-            return val.value;
-          })
-        : valOrVals
-          ? valOrVals.value
-          : "";
+      let valToPass;
+      if (Array.isArray(valOrVals)) {
+        valToPass = valOrVals.map(function(val) {
+          if (val.className === reactSelectCreatableOptionClassName) {
+            return {
+              userCreated: true,
+              value: val.value
+            };
+          }
+          return val.value;
+        });
+      } else if (valOrVals) {
+        if (valOrVals.className === reactSelectCreatableOptionClassName) {
+          valToPass = {
+            userCreated: true,
+            value: valOrVals.value
+          };
+        } else {
+          valToPass = valOrVals.value;
+        }
+      } else {
+        valToPass = "";
+      }
       if (props.cancelSubmit && props.cancelSubmit(valToPass)) {
         //allow the user to cancel the submit
         return;
@@ -455,9 +494,11 @@ export const renderReactSelect = props => {
     },
     onBlur() {
       const valToPass = Array.isArray(valueToUse)
-        ? valueToUse.filter(val => !!val).map(function(val) {
-            return val.value;
-          })
+        ? valueToUse
+            .filter(val => !!val)
+            .map(function(val) {
+              return val.value;
+            })
         : valueToUse;
       if (props.cancelSubmit && props.cancelSubmit(valToPass)) {
         return; //allow the user to cancel the submit
@@ -467,7 +508,13 @@ export const renderReactSelect = props => {
       }
     }
   };
-  return async ? <Select.Async {...propsToUse} /> : <Select {...propsToUse} />;
+  if (async) {
+    return <Select.Async {...propsToUse} />;
+  } else if (creatable) {
+    return <Select.Creatable {...propsToUse} />;
+  } else {
+    return <Select {...propsToUse} />;
+  }
 };
 
 export const BPSelect = ({ value, onChange, ...rest }) => {
@@ -502,8 +549,8 @@ export const renderSelect = props => {
           placeholder && value === ""
             ? "__placeholder__"
             : typeof value !== "string"
-              ? sortify(value) //deterministically sort and stringify the object/number coming in because select fields only support string values
-              : value
+            ? sortify(value) //deterministically sort and stringify the object/number coming in because select fields only support string values
+            : value
         }
         {...(hideValue ? { value: "" } : {})}
         onChange={function(e) {
