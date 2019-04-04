@@ -411,27 +411,33 @@ export const renderReactSelect = props => {
   // spreading input not working, grab the values needed instead
   const {
     async,
+    creatable,
     input: { value, onChange },
     hideValue,
     options,
     onFieldSubmit,
     ...rest
   } = props;
-  const optsToUse = getOptions(options);
-  const valueToUse = //here we're coercing json values into an object with {label,value} because react-select does not seem to recognize the json value directly
-    !Array.isArray(value) && typeof value === "object"
-      ? optsToUse.find(obj => {
-          return deepEqual(obj.value, value);
-        })
-      : Array.isArray(value)
-        ? value.map(val => {
-            return optsToUse
-              ? optsToUse.find(obj => {
-                  return deepEqual(obj.value, val);
-                })
-              : val;
+
+  let optionsPassed = options;
+
+  const optsToUse = getOptions(optionsPassed);
+  let valueToUse;
+  if (!Array.isArray(value) && typeof value === "object") {
+    valueToUse = optsToUse.find(obj => {
+      return deepEqual(obj.value, value);
+    });
+  } else if (Array.isArray(value)) {
+    valueToUse = value.map(val => {
+      return optsToUse
+        ? optsToUse.find(obj => {
+            return deepEqual(obj.value, val);
           })
-        : value;
+        : val;
+    });
+  } else {
+    valueToUse = value;
+  }
 
   const propsToUse = {
     ...removeUnwantedProps(rest),
@@ -444,8 +450,8 @@ export const renderReactSelect = props => {
             return val.value;
           })
         : valOrVals
-          ? valOrVals.value
-          : "";
+        ? valOrVals.value
+        : "";
       if (props.cancelSubmit && props.cancelSubmit(valToPass)) {
         //allow the user to cancel the submit
         return;
@@ -455,9 +461,11 @@ export const renderReactSelect = props => {
     },
     onBlur() {
       const valToPass = Array.isArray(valueToUse)
-        ? valueToUse.filter(val => !!val).map(function(val) {
-            return val.value;
-          })
+        ? valueToUse
+            .filter(val => !!val)
+            .map(function(val) {
+              return val.value;
+            })
         : valueToUse;
       if (props.cancelSubmit && props.cancelSubmit(valToPass)) {
         return; //allow the user to cancel the submit
@@ -467,7 +475,13 @@ export const renderReactSelect = props => {
       }
     }
   };
-  return async ? <Select.Async {...propsToUse} /> : <Select {...propsToUse} />;
+  if (async) {
+    return <Select.Async {...propsToUse} />;
+  } else if (creatable) {
+    return <Select.Creatable {...propsToUse} />;
+  } else {
+    return <Select {...propsToUse} />;
+  }
 };
 
 export const BPSelect = ({ value, onChange, ...rest }) => {
@@ -502,8 +516,8 @@ export const renderSelect = props => {
           placeholder && value === ""
             ? "__placeholder__"
             : typeof value !== "string"
-              ? sortify(value) //deterministically sort and stringify the object/number coming in because select fields only support string values
-              : value
+            ? sortify(value) //deterministically sort and stringify the object/number coming in because select fields only support string values
+            : value
         }
         {...(hideValue ? { value: "" } : {})}
         onChange={function(e) {
