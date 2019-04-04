@@ -329,6 +329,23 @@ class FormComponentsDemo extends React.Component {
             name="reactSelectFieldCreatable"
             inlineLabel={this.state.inlineLabels}
             label="ReactSelectField Creatable"
+            onFieldSubmit={onFieldSubmit}
+            options={[
+              {
+                label: "Rodrigo Pavez",
+                value: { name: "Rodrigo Pavez", id: "123" }
+              },
+              { label: "Ximena Morales", value: "Ximena Morales" },
+              { label: "Kyle Craft", value: "Kyle Craft" },
+              { label: "Sam Denicola", value: "Sam Denicola" },
+              { label: "Tom Ogasawara", value: "Tom Ogasawara" }
+            ]}
+          />
+          <ReactSelectField
+            creatable
+            name="reactSelectFieldCreatableMulti"
+            inlineLabel={this.state.inlineLabels}
+            label="ReactSelectField Creatable Multi"
             multi
             onFieldSubmit={onFieldSubmit}
             options={[

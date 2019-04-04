@@ -407,6 +407,7 @@ export const renderBlueprintEditableText = props => {
   );
 };
 
+const reactSelectCreatableOptionClassName = "Select-create-option-placeholder";
 export const renderReactSelect = props => {
   // spreading input not working, grab the values needed instead
   const {
@@ -423,17 +424,33 @@ export const renderReactSelect = props => {
 
   const optsToUse = getOptions(optionsPassed);
   let valueToUse;
+
   if (!Array.isArray(value) && typeof value === "object") {
-    valueToUse = optsToUse.find(obj => {
-      return deepEqual(obj.value, value);
-    });
+    if (value.userCreated) {
+      valueToUse = {
+        label: value.value,
+        value
+      };
+    } else {
+      valueToUse = optsToUse.find(obj => {
+        return deepEqual(obj.value, value);
+      });
+    }
   } else if (Array.isArray(value)) {
     valueToUse = value.map(val => {
-      return optsToUse
-        ? optsToUse.find(obj => {
-            return deepEqual(obj.value, val);
-          })
-        : val;
+      if (val.userCreated) {
+        return {
+          label: val.value,
+          value: val
+        };
+      }
+      if (optsToUse) {
+        return optsToUse.find(obj => {
+          return deepEqual(obj.value, val);
+        });
+      } else {
+        return val;
+      }
     });
   } else {
     valueToUse = value;
@@ -445,13 +462,29 @@ export const renderReactSelect = props => {
     value: valueToUse,
     closeOnSelect: !rest.multi,
     onChange(valOrVals, ...rest2) {
-      const valToPass = Array.isArray(valOrVals)
-        ? valOrVals.map(function(val) {
-            return val.value;
-          })
-        : valOrVals
-        ? valOrVals.value
-        : "";
+      let valToPass;
+      if (Array.isArray(valOrVals)) {
+        valToPass = valOrVals.map(function(val) {
+          if (val.className === reactSelectCreatableOptionClassName) {
+            return {
+              userCreated: true,
+              value: val.value
+            };
+          }
+          return val.value;
+        });
+      } else if (valOrVals) {
+        if (valOrVals.className === reactSelectCreatableOptionClassName) {
+          valToPass = {
+            userCreated: true,
+            value: valOrVals.value
+          };
+        } else {
+          valToPass = valOrVals.value;
+        }
+      } else {
+        valToPass = "";
+      }
       if (props.cancelSubmit && props.cancelSubmit(valToPass)) {
         //allow the user to cancel the submit
         return;
