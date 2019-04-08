@@ -14,6 +14,7 @@ import schemas from "./schemas";
 import { getLinkDialogProps } from "./utils";
 import exportOligosFields from "./exportOligosFields";
 import J5TableCard from "./J5TableCard";
+import RecordInfoTable from "./RecordInfoTable";
 import processDataForTables from "./processDataForTables";
 import "./style.css";
 
@@ -223,6 +224,15 @@ class J5ReportRecordView extends Component {
     // JSON.parse(localStorage.getItem('TEMPORARY_j5Run')) || {}
     const { name, assemblyType, createdAt, dateRan, design } = data.j5Report;
 
+    const infoFields = [
+      [
+        ["Design Name", design && design.name ? design.name : name],
+        ["Assembly Method", this.getAssemblyMethod()],
+        ["Assembly Type", assemblyType],
+        ["Date Ran", moment(dateRan || createdAt).format("lll")] //fallback to createdAt if dateRan isn't provided (dateRan is derived from the imported j5report)
+      ]
+    ];
+
     return (
       <div className="j5-report-header tg-card">
         {/*{Title}
@@ -234,19 +244,7 @@ class J5ReportRecordView extends Component {
     <InputField name="assemblyType" label="Assembly Type" />
     {Footer}
   </form>*/}
-        <FieldWithLabel
-          label="Design Name"
-          field={design && design.name ? design.name : name}
-        />
-        <FieldWithLabel
-          label="Assembly Method"
-          field={this.getAssemblyMethod()}
-        />
-        <FieldWithLabel label="Assembly Type" field={assemblyType} />
-        <FieldWithLabel
-          label="Date Ran"
-          field={moment(dateRan || createdAt).format("lll")} //fallback to createdAt if dateRan isn't provided (dateRan is derived from the imported j5report)
-        />
+        <RecordInfoTable sections={infoFields} />
         {additionalHeaderComponent}
         {/* tnr: add these in when they are available in lims/hde */}
         {/* <div>
@@ -669,12 +667,3 @@ class J5ReportRecordView extends Component {
 export default reduxForm({
   form: "j5Report" // a unique name for this form
 })(J5ReportRecordView);
-
-function FieldWithLabel({ label, field }) {
-  return (
-    <div>
-      <span className="j5-report-fieldname">{label}: </span>
-      {field}
-    </div>
-  );
-}
