@@ -331,7 +331,9 @@ export function showContextMenu(
 
   // Render a context menu at the passed event's position
   ContextMenu.show(
-    <MenuComponent autoFocus={false}>
+    <MenuComponent
+      /* popoverProps={{transitionDuration: 1}} */ autoFocus={false}
+    >
       {createDynamicMenu(menuDef, enhancers, context)}
     </MenuComponent>,
     { left: event.clientX, top: event.clientY },

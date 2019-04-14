@@ -54,6 +54,7 @@ class FormComponentsDemo extends React.Component {
             name={"radioGroup"}
             inlineLabel={this.state.inlineLabels}
             label={"Radio Group Input"}
+            tooltipInfo="hello hello I'm tooltipInfo"
             defaultValue={"true"}
             onFieldSubmit={onFieldSubmit}
             options={[

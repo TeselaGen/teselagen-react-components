@@ -24,6 +24,7 @@ import {
 } from "@blueprintjs/core";
 
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
+import InfoHelper from "../InfoHelper";
 import getMomentFormatter from "../utils/getMomentFormatter";
 import Uploader from "./Uploader";
 import sortify from "./sortify"; //tnr TODO: export this from json.sortify when https://github.com/ThomasR/JSON.sortify/issues/11 is resolved
@@ -112,6 +113,7 @@ class AbstractInput extends React.Component {
       tooltipError,
       disabled,
       intent,
+      tooltipInfo,
       label,
       inlineLabel,
       secondaryLabel,
@@ -159,7 +161,21 @@ class AbstractInput extends React.Component {
         disabled={disabled}
         helperText={!tooltipError && showError && error}
         intent={intent}
-        label={!noOuterLabel && label}
+        label={
+          !noOuterLabel &&
+          (tooltipInfo ? (
+            <div style={{ display: "flex" }}>
+              {label}{" "}
+              <InfoHelper
+                style={{ marginLeft: "5px", marginTop: "-6px" }}
+                size={12}
+                content={tooltipInfo}
+              />
+            </div>
+          ) : (
+            label
+          ))
+        }
         inline={inlineLabel}
         labelInfo={secondaryLabel}
         style={containerStyle}
