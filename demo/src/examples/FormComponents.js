@@ -71,6 +71,7 @@ class FormComponentsDemo extends React.Component {
           <NumericInputField
             secondaryLabel="(optional)"
             name={"numericInput"}
+            tooltipInfo="hello hello I'm tooltipInfo"
             inlineLabel={this.state.inlineLabels}
             label="Numeric Input"
             placeholder="0"
@@ -78,6 +79,7 @@ class FormComponentsDemo extends React.Component {
           />
           <FileUploadField
             label="Upload component"
+            tooltipInfo="hello hello I'm tooltipInfo"
             onFieldSubmit={function(fileList) {
               console.info(
                 "do something with the finished file list:",
@@ -109,6 +111,7 @@ class FormComponentsDemo extends React.Component {
             placeholder="Enter input..."
           />
           <SelectField
+            tooltipInfo="hello hello I'm tooltipInfo"
             onFieldSubmit={onFieldSubmit}
             options={["hey", "you", "guys"]}
             name={"selectField"}
