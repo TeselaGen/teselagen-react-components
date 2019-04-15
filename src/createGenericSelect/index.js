@@ -709,8 +709,17 @@ class InnerComp extends Component {
     return val; //return val for react-select to work properly
   };
   handleReactSelectFieldSubmit = valOrVals => {
-    const { handleSelection, input, tableParams, idAs } = this.props;
-    let entitiesById = keyBy(tableParams.entities, idAs || "id");
+    const {
+      handleSelection,
+      input,
+      tableParams,
+      additionalOptions,
+      idAs
+    } = this.props;
+    let entitiesById = keyBy(
+      [...tableParams.entities, ...additionalOptions],
+      idAs || "id"
+    );
     if (input.value) {
       if (Array.isArray(input.value)) {
         entitiesById = {
@@ -775,7 +784,6 @@ class InnerComp extends Component {
         : !input.value
         ? ""
         : input.value[idAs || "id"];
-
       return (
         <ReactSelect
           filterOptions={(options, filter, currentValues) => {

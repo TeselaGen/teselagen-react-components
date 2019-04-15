@@ -25,4 +25,4 @@ jobs:
           key: v1-deps-{{ .Branch }}-{{ checksum "package.json" }}
           paths:
             - ~/.cache  ## cache both yarn and Cypress!
-      - run: $(yarn bin)/cypress run --record --key a301639c-a98c-4286-b139-0fd863fc7e6b
+      - run: $(yarn bin)/cypress run --record --key 1ced39be-1a3a-4fd8-b2d5-a88951d9b766
