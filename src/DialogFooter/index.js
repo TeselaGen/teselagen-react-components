@@ -2,12 +2,15 @@ import React from "react";
 import { Intent, Button, Classes } from "@blueprintjs/core";
 import { noop } from "lodash";
 import PropTypes from "prop-types";
+import BlueprintError from "../BlueprintError";
+import "./style.css";
 
 function DialogFooter({
   hideModal = noop,
   loading,
   submitting,
   onClick = noop,
+  error,
   secondaryAction,
   intent = Intent.PRIMARY,
   secondaryIntent,
@@ -42,6 +45,11 @@ function DialogFooter({
           loading={loading || submitting}
         />
       </div>
+      {error && (
+        <div className="tg-dialog-footer-error">
+          <BlueprintError error={error} />
+        </div>
+      )}
     </div>
   );
 }
