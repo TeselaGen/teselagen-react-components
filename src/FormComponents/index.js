@@ -28,6 +28,7 @@ import InfoHelper from "../InfoHelper";
 import getMomentFormatter from "../utils/getMomentFormatter";
 import Uploader from "./Uploader";
 import sortify from "./sortify"; //tnr TODO: export this from json.sortify when https://github.com/ThomasR/JSON.sortify/issues/11 is resolved
+import { fieldRequired } from "./utils";
 
 function getIntent({ showErrorIfUntouched, meta: { touched, error } }) {
   return (touched || showErrorIfUntouched) && error ? Intent.DANGER : undefined;
@@ -760,7 +761,12 @@ export class RenderReactColorPicker extends React.Component {
 
 function generateField(component, opts) {
   const compWithDefaultVal = withAbstractWrapper(component, opts);
-  return function FieldMaker({ name, onFieldSubmit = noop, ...rest }) {
+  return function FieldMaker({
+    name,
+    isRequired,
+    onFieldSubmit = noop,
+    ...rest
+  }) {
     // function onFieldSubmit(e,val) {
     //   _onFieldSubmit && _onFieldSubmit(e.target ? e.target.value : val)
     // }
@@ -769,6 +775,7 @@ function generateField(component, opts) {
         onFieldSubmit={onFieldSubmit}
         name={name}
         component={compWithDefaultVal}
+        {...(isRequired ? { validate: fieldRequired } : {})}
         {...rest}
       />
     );

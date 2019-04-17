@@ -265,6 +265,7 @@ class FormComponentsDemo extends React.Component {
             label="I'm a SwitchField"
           />
           <TextareaField
+          isRequired
             name={"textAreaField"}
             inlineLabel={this.state.inlineLabels}
             onFieldSubmit={onFieldSubmit}
