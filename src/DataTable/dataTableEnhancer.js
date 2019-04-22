@@ -132,8 +132,8 @@ export default compose(
               return field.render
                 ? !field.render(val, e)
                 : cellRenderer[field.path]
-                  ? !cellRenderer[field.path](val, e)
-                  : !val;
+                ? !cellRenderer[field.path](val, e)
+                : !val;
             });
           }
           if (noValsForField) {
@@ -154,13 +154,24 @@ export default compose(
       };
 
       if (columnOrderings) {
-        schemaToUse.fields = schemaToUse.fields.sort(
-          ({ path: path1 }, { path: path2 }) => {
+        const fieldsWithOrders = [];
+        const fieldsWithoutOrder = [];
+        // if a new field has been added since the orderings were set then we want
+        // it to be at the end instead of the beginning
+        schemaToUse.fields.forEach(field => {
+          if (columnOrderings.indexOf(field.path) > -1) {
+            fieldsWithOrders.push(field);
+          } else {
+            fieldsWithoutOrder.push(field);
+          }
+        });
+        schemaToUse.fields = fieldsWithOrders
+          .sort(({ path: path1 }, { path: path2 }) => {
             return (
               columnOrderings.indexOf(path1) - columnOrderings.indexOf(path2)
             );
-          }
-        );
+          })
+          .concat(fieldsWithoutOrder);
       }
 
       if (syncDisplayOptionsToDb) {
