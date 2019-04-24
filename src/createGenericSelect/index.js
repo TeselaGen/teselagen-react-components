@@ -667,21 +667,17 @@ class InnerComp extends Component {
     setPageSize((currentParams.pageSize || defaults.pageSize) + 25);
   };
   getReactSelectOptions = () => {
-    const {
-      tableParams,
-      /* input, */ idAs,
-      additionalOptions = []
-    } = this.props;
+    const { tableParams, input, idAs, additionalOptions = [] } = this.props;
     const { entityCount, schema } = tableParams;
     const entities = [
       ...map({
-        ...keyBy(tableParams.entities, idAs || "id")
+        ...keyBy(tableParams.entities, idAs || "id"),
         //it is important that we spread these second so that things like clearableValue will work
-        // ...(input.value &&
-        //   keyBy(
-        //     Array.isArray(input.value) ? input.value : [input.value],
-        //     idAs || "id"
-        //   ))
+        ...(input.value &&
+          keyBy(
+            Array.isArray(input.value) ? input.value : [input.value],
+            idAs || "id"
+          ))
       })
     ];
     if (!entities) return [];
