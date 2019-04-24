@@ -1,4 +1,4 @@
-import { Button, Intent, Tooltip, FormGroup, Classes } from "@blueprintjs/core";
+import { Button, Intent, Tooltip, Classes } from "@blueprintjs/core";
 import { get, isEqual, map, noop, pick, debounce, keyBy } from "lodash";
 import pluralize from "pluralize";
 import { Query } from "react-apollo";
@@ -17,6 +17,7 @@ import withField from "../enhancers/withField";
 import withDialog from "../enhancers/withDialog";
 import withTableParams from "../DataTable/utils/withTableParams";
 import DataTable from "../DataTable";
+import { withAbstractWrapper } from "../FormComponents";
 
 function preventBubble(e) {
   e.stopPropagation();
@@ -278,9 +279,13 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
           additionalDataFragment,
           buttonProps = {},
           isMultiSelect,
+          handlersObj,
           onSelect,
           noForm
         } = this.props;
+        if (handlersObj) {
+          handlersObj.removeSelection = this.removeSelection;
+        }
         const postSelectValueToUse = tempValue || value;
         let postSelectDataTableValue = postSelectValueToUse;
         if (
@@ -300,7 +305,6 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
         return noDialog ? (
           <div className="tg-generic-select-container" onClick={preventBubble}>
             <GenericSelectInner {...propsToPass} />
-            <div>{touched && error && <BlueprintError error={error} />}</div>
           </div>
         ) : (
           <div className="tg-generic-select-container">
@@ -551,6 +555,25 @@ const GenericSelectInner = compose(
       this.getInnerComponent();
     }
 
+    // UNSAFE_componentWillMount() {
+    //   const {
+    //     meta: { dispatch, form },
+    //     defaultValue,
+    //     enableReinitialize,
+    //     input: { name, value }
+    //   } = this.props;
+    //   ((value !== false && !value) || enableReinitialize) &&
+    //     defaultValue !== undefined &&
+    //     dispatch({
+    //       type: "@@redux-form/CHANGE",
+    //       meta: {
+    //         form,
+    //         field: name
+    //       },
+    //       payload: defaultValue
+    //     });
+    // }
+
     UNSAFE_componentWillReceiveProps(newProps) {
       const propsToPick = [
         "fragment",
@@ -563,6 +586,27 @@ const GenericSelectInner = compose(
       ) {
         this.getInnerComponent();
       }
+
+      // const { defaultValue: oldDefaultValue, enableReinitialize } = this.props;
+      // const {
+      //   meta: { dispatch, form },
+      //   defaultValue,
+      //   input: { name, value }
+      // } = newProps;
+
+      // if (
+      //   ((value !== false && !value) || enableReinitialize) &&
+      //   !deepEqual(defaultValue, oldDefaultValue)
+      // ) {
+      //   dispatch({
+      //     type: "@@redux-form/CHANGE",
+      //     meta: {
+      //       form,
+      //       field: name
+      //     },
+      //     payload: defaultValue
+      //   });
+      // }
     }
 
     getInnerComponent = () => {
@@ -589,19 +633,19 @@ const GenericSelectInner = compose(
           options: queryOptions,
           isCodeModel
         })
-      )(InnerComp);
+      )(withAbstractWrapper(InnerComp));
     };
 
     render() {
-      const { label } = this.props;
+      // const { label } = this.props;
       const ComponentToRender = this.innerComponent;
 
-      let comp = <ComponentToRender {...this.props} />;
-      if (label) {
-        return <FormGroup label={label}>{comp}</FormGroup>;
-      } else {
-        return comp;
-      }
+      return <ComponentToRender {...this.props} />;
+      // if (label) {
+      //   return <FormGroup label={label}>{comp}</FormGroup>;
+      // } else {
+      //   return comp;
+      // }
     }
   }
 );
@@ -772,11 +816,11 @@ class InnerComp extends Component {
       passedName,
       input,
       idAs,
-      refetchObj,
+      handlersObj,
       asReactSelect
     } = this.props;
-    if (refetchObj) {
-      refetchObj.refetch = tableParams.onRefresh;
+    if (handlersObj) {
+      handlersObj.refetch = tableParams.onRefresh;
     }
     let disableButton = !selectedEntities.length;
     let minSelectMessage;
