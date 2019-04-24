@@ -1,5 +1,5 @@
 import { Button, Intent, Tooltip, Classes } from "@blueprintjs/core";
-import { get, isEqual, map, noop, pick, debounce, keyBy } from "lodash";
+import { get, isEqual, noop, pick, debounce, keyBy } from "lodash";
 import pluralize from "pluralize";
 import { Query } from "react-apollo";
 import React, { Component } from "react";
@@ -669,18 +669,23 @@ class InnerComp extends Component {
   getReactSelectOptions = () => {
     const { tableParams, input, idAs, additionalOptions = [] } = this.props;
     const { entityCount, schema } = tableParams;
+
+    const inputIds = [];
+    const inputEntities = [];
+    if (input.value) {
+      (Array.isArray(input.value) ? input.value : [input.value]).forEach(e => {
+        inputIds.push(e[idAs || "id"]);
+        inputEntities.push(e);
+      });
+    }
+
     const entities = [
-      ...map({
-        ...keyBy(tableParams.entities, idAs || "id"),
-        //it is important that we spread these second so that things like clearableValue will work
-        ...(input.value &&
-          keyBy(
-            Array.isArray(input.value) ? input.value : [input.value],
-            idAs || "id"
-          ))
-      })
+      ...(tableParams.entities || []).filter(
+        e => !inputIds.includes(e[idAs || "id"])
+      ),
+      ...inputEntities
     ];
-    if (!entities) return [];
+    if (!entities.length) return [];
     const lastItem = [];
     if (entityCount > (tableParams.entities || []).length) {
       lastItem.push({
