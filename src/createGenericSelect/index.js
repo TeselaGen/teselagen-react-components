@@ -77,6 +77,7 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
         isMultiSelect,
         schema,
         dialogProps,
+        postSelectDTProps,
         passedName
       }) => {
         const modelName = Array.isArray(fragment)
@@ -91,7 +92,9 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
         return {
           readableName,
           modelName,
-          postSelectFormName: passedName + "PostSelect",
+          ...(postSelectDTProps && {
+            postSelectFormName: passedName + "PostSelect"
+          }),
           schema: !schema.model
             ? {
                 model: modelName,
@@ -164,10 +167,15 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
         const {
           meta: { form },
           input: { name },
-          clearFields,
+          changeFieldValue,
+          setNullOnClear,
           onClear = noop
         } = this.props;
-        clearFields(form, true, true, name);
+        //because clearFields doesn't work if there is an initialValue passed
+        //for the genericSelect field, we allow users to specifically changeFieldValue to null
+        setNullOnClear
+          ? changeFieldValue(form, name, null)
+          : clearFields(form, false, false, name);
         onClear();
         this.setState({
           tempValue: null
@@ -615,18 +623,21 @@ class InnerComp extends Component {
     setPageSize((currentParams.pageSize || defaults.pageSize) + 25);
   };
   getReactSelectOptions = () => {
-    const { tableParams, input, idAs, additionalOptions = [] } = this.props;
+    const {
+      tableParams,
+      /* input, */ idAs,
+      additionalOptions = []
+    } = this.props;
     const { entityCount, schema } = tableParams;
-
     const entities = [
       ...map({
-        ...keyBy(tableParams.entities, idAs || "id"),
+        ...keyBy(tableParams.entities, idAs || "id")
         //it is important that we spread these second so that things like clearableValue will work
-        ...(input.value &&
-          keyBy(
-            Array.isArray(input.value) ? input.value : [input.value],
-            idAs || "id"
-          ))
+        // ...(input.value &&
+        //   keyBy(
+        //     Array.isArray(input.value) ? input.value : [input.value],
+        //     idAs || "id"
+        //   ))
       })
     ];
     if (!entities) return [];
@@ -730,15 +741,20 @@ class InnerComp extends Component {
         entitiesById[input.value[idAs || "id"]] = input.value;
       }
     }
-    if (!valOrVals) {
-      handleSelection([]);
-    } else {
-      const records = (Array.isArray(valOrVals) ? valOrVals : [valOrVals]).map(
-        ({ value }) => {
+    try {
+      if (!valOrVals) {
+        handleSelection([]);
+      } else {
+        const records = (Array.isArray(valOrVals)
+          ? valOrVals
+          : [valOrVals]
+        ).map(({ value }) => {
           return entitiesById[value];
-        }
-      );
-      handleSelection(records);
+        });
+        handleSelection(records);
+      }
+    } catch (error) {
+      console.error(`errror:`, error);
     }
   };
 
@@ -756,8 +772,12 @@ class InnerComp extends Component {
       passedName,
       input,
       idAs,
+      refetchObj,
       asReactSelect
     } = this.props;
+    if (refetchObj) {
+      refetchObj.refetch = tableParams.onRefresh;
+    }
     let disableButton = !selectedEntities.length;
     let minSelectMessage;
     let mustSelectMessage;
@@ -784,6 +804,7 @@ class InnerComp extends Component {
         : !input.value
         ? ""
         : input.value[idAs || "id"];
+
       return (
         <ReactSelect
           filterOptions={(options, filter, currentValues) => {
