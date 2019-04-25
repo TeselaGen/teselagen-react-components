@@ -6,7 +6,6 @@ import Dropzone from "react-dropzone";
 import uniqid from "uniqid";
 import classnames from "classnames";
 import { some, forEach, map, every, compact, findIndex, merge } from "lodash";
-import uuid from "uuid/v4";
 import S3Upload from "../utils/S3upload";
 import ItemUpload from "./itemUpload";
 
@@ -97,7 +96,7 @@ class Uploader extends Component {
   sendFiles = async files => {
     const up = this.state.uploading;
     files.forEach(file => {
-      const f = new File([file.originFileObj], uuid(), {
+      const f = new File([file.originFileObj], uniqid(), {
         type: file.originFileObj.type,
         id: file.id
       });

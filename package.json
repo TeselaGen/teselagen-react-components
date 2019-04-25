@@ -73,7 +73,11 @@
     "react-table": "^6",
     "redux-form": "^7.3.0",
     "tg-client-query-builder": "^2.6.0",
-    "ve-range-utils": "^2.5.0"
+    "ve-range-utils": "^2.5.0",
+    "axios": "*",
+    "graphql-tag": "*",
+    "react": "*",
+    "react-dom": "*"
   },
   "devDependencies": {
     "@blueprintjs/core": "^3.15.0",
