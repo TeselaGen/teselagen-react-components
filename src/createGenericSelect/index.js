@@ -170,6 +170,7 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
           input: { name },
           changeFieldValue,
           setNullOnClear,
+          clearFields,
           onClear = noop
         } = this.props;
         //because clearFields doesn't work if there is an initialValue passed
