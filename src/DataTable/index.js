@@ -518,6 +518,18 @@ class DataTable extends React.Component {
       withPaging &&
       (hidePageSizeWhenPossible ? entityCount > pageSize : true);
 
+    let SubComponentToUse;
+    if (SubComponent) {
+      SubComponentToUse = row => {
+        let shouldShow = true;
+        if (shouldShowSubComponent) {
+          shouldShow = shouldShowSubComponent(row.original);
+        }
+        if (shouldShow) {
+          return <SubComponent row={row} />;
+        }
+      };
+    }
     return (
       <div
         className={classNames(
@@ -647,15 +659,7 @@ class DataTable extends React.Component {
             minHeight: 150,
             ...style
           }}
-          SubComponent={row => {
-            let shouldShow = true;
-            if (shouldShowSubComponent) {
-              shouldShow = shouldShowSubComponent(row.original);
-            }
-            if (shouldShow) {
-              return <SubComponent row={row} />;
-            }
-          }}
+          SubComponent={SubComponentToUse}
           {...ReactTableProps}
         />
         {!noFooter && (
