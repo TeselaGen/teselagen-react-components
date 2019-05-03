@@ -653,7 +653,7 @@ const GenericSelectInner = compose(
           options: queryOptions,
           isCodeModel
         })
-      )(withAbstractWrapper(InnerComp));
+      )(InnerComp);
     };
 
     render() {
