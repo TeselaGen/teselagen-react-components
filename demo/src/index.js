@@ -42,6 +42,7 @@ import Timeline from "../../src/Timeline";
 import TimelineEvent from "../../src/Timeline/TimelineEvent";
 import TimelineDemo from "./examples/TimelineDemo";
 import IntentTextDemo from "./examples/IntentText";
+import ScrollToTopDemo from "./examples/ScrollToTop";
 import IntentText from "../../src/IntentText";
 import {
   CmdButton,
@@ -49,6 +50,7 @@ import {
   CmdDiv,
   CmdSwitch
 } from "../../src/utils/commandControls";
+import ScrollToTop from "../../src/ScrollToTop";
 
 import "./style.css";
 import React, { Component } from "react";
@@ -409,8 +411,14 @@ const demos = {
   },
   IntentText: {
     demo: IntentTextDemo,
-    scop: {
+    scope: {
       IntentText
+    }
+  },
+  ScrollToTop: {
+    demo: ScrollToTopDemo,
+    scope: {
+      ScrollToTop
     }
   }
   // fonticons: {
