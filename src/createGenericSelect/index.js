@@ -11,7 +11,6 @@ import { change, clearFields, reduxForm } from "redux-form";
 import ReactSelect from "react-select";
 import moment from "moment";
 import generateQuery from "../utils/generateQuery";
-import BlueprintError from "../BlueprintError";
 import DialogFooter from "../DialogFooter";
 import withField from "../enhancers/withField";
 import withDialog from "../enhancers/withDialog";
@@ -272,7 +271,6 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
         const { fetchingData, tempValue } = this.state;
         const {
           input: { value },
-          meta: { error, touched },
           readableName,
           noDialog,
           postSelectFormName,
@@ -376,7 +374,6 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
                   />
                 )}
             </div>
-            <div>{touched && error && <BlueprintError error={error} />}</div>
           </div>
         );
       }
@@ -657,15 +654,9 @@ const GenericSelectInner = compose(
     };
 
     render() {
-      // const { label } = this.props;
       const ComponentToRender = this.innerComponent;
 
       return <ComponentToRender {...this.props} />;
-      // if (label) {
-      //   return <FormGroup label={label}>{comp}</FormGroup>;
-      // } else {
-      //   return comp;
-      // }
     }
   }
 );
