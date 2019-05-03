@@ -300,7 +300,8 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
         /* eslint-enable no-debugger*/
         const propsToPass = {
           ...this.props,
-          handleSelection: this.handleSelection
+          handleSelection: this.handleSelection,
+          currentValue: value
         };
 
         return noDialog ? (
@@ -548,7 +549,21 @@ const GenericSelectInner = compose(
       enforceFocus: false,
       canOutsideClickClose: false
     })
-  )
+  ),
+  withProps(props => {
+    const { currentValue, asReactSelect } = props;
+    if (!asReactSelect && Array.isArray(currentValue) && currentValue.length) {
+      // preserve old selection in table
+      return {
+        initialValues: {
+          reduxFormSelectedEntityIdMap: currentValue.reduce((acc, entity) => {
+            acc[entity.id] = { entity };
+            return acc;
+          }, {})
+        }
+      };
+    }
+  })
 )(
   class GenericSelect extends Component {
     constructor(props) {
