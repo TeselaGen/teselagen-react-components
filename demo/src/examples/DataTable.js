@@ -509,6 +509,7 @@ class DataTableInstance extends React.Component {
             onDoubleClick={function() {
               console.info("double clicked");
             }}
+            shouldShowSubComponent={r => r.id !== 1}
             topLeftItems={<Button>I'm in topLeftItems</Button>}
             SubComponent={this.state.withSubComponent ? SubComp : null}
             cellRenderer={{

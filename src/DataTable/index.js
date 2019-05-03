@@ -404,6 +404,7 @@ class DataTable extends React.Component {
       isSingleSelect,
       noSelect,
       SubComponent,
+      shouldShowSubComponent,
       ReactTableProps = {},
       hideSelectedCount,
       hideColumnHeader,
@@ -646,7 +647,15 @@ class DataTable extends React.Component {
             minHeight: 150,
             ...style
           }}
-          SubComponent={SubComponent}
+          SubComponent={row => {
+            let shouldShow = true;
+            if (shouldShowSubComponent) {
+              shouldShow = shouldShowSubComponent(row.original);
+            }
+            if (shouldShow) {
+              return <SubComponent row={row} />;
+            }
+          }}
           {...ReactTableProps}
         />
         {!noFooter && (
@@ -884,6 +893,7 @@ class DataTable extends React.Component {
       cellRenderer,
       withCheckboxes,
       SubComponent,
+      shouldShowSubComponent,
       entities,
       getCellHoverText,
       withExpandAndCollapseAllButton,
@@ -934,7 +944,12 @@ class DataTable extends React.Component {
           }
         }),
         expander: true,
-        Expander: ({ isExpanded }) => {
+        Expander: ({ isExpanded, original: record }) => {
+          let shouldShow = true;
+          if (shouldShowSubComponent) {
+            shouldShow = shouldShowSubComponent(record);
+          }
+          if (!shouldShow) return null;
           return (
             <Button
               className={classNames(
