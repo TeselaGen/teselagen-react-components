@@ -290,6 +290,7 @@
 .tg-react-table-checkbox-header-container .bp3-control,
 .tg-react-table-checkbox-cell-container .bp3-control {
   margin-bottom: 0;
+  margin-top: 0;
   /* there is a weird padding on the blueprint checkbox, so this centers it some */
   padding-left: 18px;
 }
