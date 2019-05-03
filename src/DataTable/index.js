@@ -526,7 +526,7 @@ class DataTable extends React.Component {
           shouldShow = shouldShowSubComponent(row.original);
         }
         if (shouldShow) {
-          return <SubComponent row={row} />;
+          return SubComponent(row);
         }
       };
     }
