@@ -92,6 +92,9 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
           });
         return {
           readableName,
+          containerStyle: {
+            width: "100%"
+          },
           modelName,
           ...(postSelectDTProps && {
             postSelectFormName: passedName + "PostSelect"
@@ -118,7 +121,8 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
           clearFields: (...args) => dispatch(clearFields(...args))
         };
       }
-    )
+    ),
+    withAbstractWrapper
   )(
     class GenericSelectOuter extends React.Component {
       state = {
