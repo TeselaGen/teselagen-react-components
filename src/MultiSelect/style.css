@@ -1,0 +1,20 @@
+/* .tg-multi-select-wrapper {
+  display: flex;
+} */
+.tg-multi-select-wrapper {
+  min-width: 170px;
+}
+.bp3-multi-select-popover .bp3-menu {
+  max-width: 400px;
+  max-height: 300px;
+  overflow: auto;
+}
+/* .tg-multi-select-wrapper>.bp3-popover-target {
+  min-width: 170px;
+  display: flex;
+  width: 100%;
+}
+.tg-multi-select-wrapper>.bp3-popover-target>div {
+  display: flex;
+  width: 100%;
+} */

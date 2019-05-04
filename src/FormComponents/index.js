@@ -5,7 +5,6 @@ import mathExpressionEvaluator from "math-expression-evaluator";
 import deepEqual from "deep-equal";
 import React from "react";
 import { Field } from "redux-form";
-import Select from "react-select";
 
 import "./style.css";
 import {
@@ -24,6 +23,7 @@ import {
 } from "@blueprintjs/core";
 
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
+import MultiSelect from "../MultiSelect";
 import InfoHelper from "../InfoHelper";
 import getMomentFormatter from "../utils/getMomentFormatter";
 import Uploader from "./Uploader";
@@ -58,6 +58,7 @@ function removeUnwantedProps(props) {
   delete cleanedProps.tabIndex;
   delete cleanedProps.secondaryLabel;
   delete cleanedProps.tooltipError;
+  delete cleanedProps.tooltipInfo;
   delete cleanedProps.tooltipProps;
   if (cleanedProps.inputClassName) {
     cleanedProps.className = cleanedProps.inputClassName;
@@ -477,7 +478,7 @@ export const renderReactSelect = props => {
     ...removeUnwantedProps(rest),
     options: optsToUse,
     value: valueToUse,
-    closeOnSelect: !rest.multi,
+    // closeOnSelect: !rest.multi,
     onChange(valOrVals, ...rest2) {
       let valToPass;
       if (Array.isArray(valOrVals)) {
@@ -526,11 +527,11 @@ export const renderReactSelect = props => {
     }
   };
   if (async) {
-    return <Select.Async {...propsToUse} />;
+    return <MultiSelect {...propsToUse} />;
   } else if (creatable) {
-    return <Select.Creatable {...propsToUse} />;
+    return <MultiSelect {...propsToUse} />;
   } else {
-    return <Select {...propsToUse} />;
+    return <MultiSelect {...propsToUse} />;
   }
 };
 

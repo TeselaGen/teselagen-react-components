@@ -19,6 +19,7 @@ import showLoadingMask from "../../src/showLoadingMask";
 import CustomIcons from "./examples/CustomIcons";
 import S3Uploader from "./examples/S3Uploader";
 import SimpleTable from "./examples/SimpleTable";
+import MultiSelect from "./examples/MultiSelect";
 import InfoHelper from "./examples/InfoHelper";
 import Loading from "./examples/Loading";
 import DownloadLink from "./examples/DownloadLink";
@@ -166,6 +167,20 @@ const demos = {
         type: "string",
         description: "Override the default info icon."
       }
+    ]
+  },
+  MultiSelect: {
+    demo: MultiSelect,
+    scope: {
+      Classes
+    },
+    props: [
+      {
+        name: "className",
+        description:
+          "The CSS class name passed to the Button (if Popover) or Tooltip",
+        type: "string"
+      },
     ]
   },
   CollapsibleCard: {
@@ -485,6 +500,7 @@ function DemoComponentWrapper({ demo: Demo, scope, props = [] }, demoTitle) {
               "https://github.com/TeselaGen/teselagen-react-components/tree/master/src"
             }
             target="_blank"
+            rel="noopener noreferrer"
           >
             Component Source
           </a>
