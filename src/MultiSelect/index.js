@@ -15,7 +15,7 @@ class ReactSelect extends React.Component {
       <div
         onClick={handleClick}
         key={index}
-        className={classnames("tg-multi-select-option bp3-menu-item", {
+        className={classnames("tg-select-option bp3-menu-item", {
           "bp3-active": modifiers.active,
           "bp3-disabled": modifiers.disabled
         })}
@@ -141,7 +141,7 @@ class ReactSelect extends React.Component {
         resetOnSelect
         popoverProps={{
           minimal: true,
-          className: "tg-multi-select-wrapper",
+          className: "tg-select",
           wrapperTagName: "div",
           usePortal: false,
           onInteraction: this.onInteraction,
