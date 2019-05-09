@@ -108,9 +108,11 @@ class TgSelect extends React.Component {
       value,
       tagInputProps,
       inputProps,
+      placeholder = "Select...",
       isLoading,
       ...rest
     } = this.props;
+
     const Comp = multi ? MultiSelect : Suggest;
     const rightElement = isLoading ? (
       <Button loading minimal />
@@ -162,7 +164,7 @@ class TgSelect extends React.Component {
                 : [],
               tagRenderer: this.tagRenderer,
               tagInputProps: {
-                placeholder: "Select...",
+                placeholder,
                 tagProps: getTagProps,
                 onRemove: this.handleTagRemove,
                 rightElement: rightElement,
@@ -172,7 +174,7 @@ class TgSelect extends React.Component {
           : {
               selectedItem: value,
               inputProps: {
-                placeholder: "Select...",
+                placeholder,
                 rightElement: rightElement,
                 ...inputProps //spread additional input props here
               }
