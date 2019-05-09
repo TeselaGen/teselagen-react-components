@@ -6,7 +6,7 @@ import fuzzysearch from "fuzzysearch";
 import classnames from "classnames";
 import "./style.css";
 
-class ReactSelect extends React.Component {
+class TgSelect extends React.Component {
   state = {
     isOpen: false
   };
@@ -178,11 +178,11 @@ class ReactSelect extends React.Component {
               }
             })}
         isLoading={isLoading}
-        // onQueryChange={this.handleReactSelectSearch}
+        // onQueryChange={this.handleTgSelectSearch}
         {...rest}
         // name={passedName}
       />
     );
   }
 }
-export default ReactSelect;
+export default TgSelect;

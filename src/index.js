@@ -20,7 +20,7 @@ export {
   ConnectedPagingTool as PagingTool
 } from "./DataTable";
 export { default as Loading } from "./Loading";
-export { default as MultiSelect } from "./MultiSelect";
+export { default as TgSelect } from "./TgSelect";
 export { default as BlueprintError } from "./BlueprintError";
 export { default as DialogFooter } from "./DialogFooter";
 export { default as adHoc } from "./utils/adHoc";

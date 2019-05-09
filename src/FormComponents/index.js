@@ -23,7 +23,7 @@ import {
 } from "@blueprintjs/core";
 
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
-import MultiSelect from "../MultiSelect";
+import TgSelect from "../TgSelect";
 import InfoHelper from "../InfoHelper";
 import getMomentFormatter from "../utils/getMomentFormatter";
 import Uploader from "./Uploader";
@@ -527,11 +527,11 @@ export const renderReactSelect = props => {
     }
   };
   if (async) {
-    return <MultiSelect {...propsToUse} />;
+    return <TgSelect {...propsToUse} />;
   } else if (creatable) {
-    return <MultiSelect {...propsToUse} />;
+    return <TgSelect {...propsToUse} />;
   } else {
-    return <MultiSelect {...propsToUse} />;
+    return <TgSelect {...propsToUse} />;
   }
 };
 
