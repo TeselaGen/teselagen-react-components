@@ -630,6 +630,7 @@ export const renderBlueprintNumericInput = props => {
     intent,
     inputClassName,
     onFieldSubmit,
+    onAnyNumberChange,
     ...rest
   } = props;
   function handleBlurOrButtonClick(stringVal) {
@@ -653,6 +654,8 @@ export const renderBlueprintNumericInput = props => {
       onValueChange={(numericVal, stringVal) => {
         // needed for redux form to change value
         input.onChange(stringVal);
+        //tnr: use this handler if you want to listen to all value changes!
+        onAnyNumberChange && onAnyNumberChange(numericVal);
       }}
       onButtonClick={function(numericVal, stringVal) {
         handleBlurOrButtonClick(stringVal);
