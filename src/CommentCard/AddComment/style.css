@@ -1,0 +1,14 @@
+/* Copyright (C) 2018 TeselaGen Biotechnology, Inc. */
+
+.add-comment-form {
+  width: 100%;
+}
+
+.add-comment-form .pt-form-group {
+  margin-bottom: 5px;
+  width: 100%;
+}
+
+.add-comment-form.reply .pt-form-group {
+  width: 80%;
+}

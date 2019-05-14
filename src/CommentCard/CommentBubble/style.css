@@ -1,0 +1,106 @@
+/* Copyright (C) 2018 TeselaGen Biotechnology, Inc. */
+
+.comment-bubble-container {
+  /*background: #dbf5ff;*/
+  /*border-radius: 10px;*/
+  /*margin-bottom: 10px;*/
+  padding: 5px 0;
+  display: flex;
+  flex-direction: row;
+  position: relative;
+}
+
+.comment-avatar {
+  margin-right: 10px;
+}
+
+.comment-bubble-username {
+  font-weight: bold;
+  color: #006cab;
+  max-width: 150px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/*.comment-bubble-container.reply .comment-bubble-username {
+  max-width: 70px;
+}
+*/
+.comment-bubble-date {
+  font-style: italic;
+  font-size: 10px;
+  margin-left: 5px;
+}
+
+.comment-bubble-container .comment-edit-menu {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+}
+
+.comment-edit-menu.bp3-menu {
+  min-width: 70px;
+}
+
+.comment-edit-menu .bp3-button {
+  border-radius: 50%;
+}
+
+.comment-bubble-container .bp3-icon {
+  cursor: pointer;
+  display: none;
+}
+
+/* show on hover or when menu is open */
+.comment-bubble-container:hover .bp3-icon,
+.comment-bubble-container .comment-edit-menu .bp3-popover-open .bp3-icon {
+  display: inline;
+}
+
+.comment-bubble-reply-button {
+  font-size: 10px;
+  cursor: pointer;
+  display: inline;
+}
+
+.comment-bubble-reply-button:hover {
+  color: #006cab;
+}
+
+.comment-edit-form {
+  width: 80%;
+}
+
+.comment-edit-form .bp3-form-group {
+  margin-bottom: 5px;
+}
+
+.comment-edit-form textarea {
+  resize: none;
+}
+
+.comment-button-container {
+  display: flex;
+  justify-content: flex-end;
+  overflow: hidden;
+}
+
+.comment-button-container button {
+  margin-right: 10px;
+}
+
+.comment-bubble-container.reply textarea {
+  resize: none;
+  width: 100%;
+}
+
+.comment-bubble-header {
+  display: flex;
+  align-items: baseline;
+}
+
+.comment-bubble-message {
+  font-size: 13px;
+  overflow: hidden;
+  overflow-wrap: break-word;
+}
