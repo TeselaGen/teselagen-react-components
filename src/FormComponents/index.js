@@ -425,7 +425,6 @@ export const renderBlueprintEditableText = props => {
   );
 };
 
-const reactSelectCreatableOptionClassName = "Select-create-option-placeholder";
 export const renderReactSelect = props => {
   // spreading input not working, grab the values needed instead
   const {
@@ -483,20 +482,14 @@ export const renderReactSelect = props => {
       let valToPass;
       if (Array.isArray(valOrVals)) {
         valToPass = valOrVals.map(function(val) {
-          if (val.className === reactSelectCreatableOptionClassName) {
-            return {
-              userCreated: true,
-              value: val.value
-            };
+          if (val.userCreated) {
+            return val;
           }
           return val.value;
         });
       } else if (valOrVals) {
-        if (valOrVals.className === reactSelectCreatableOptionClassName) {
-          valToPass = {
-            userCreated: true,
-            value: valOrVals.value
-          };
+        if (valOrVals.userCreated) {
+          valToPass = valOrVals;
         } else {
           valToPass = valOrVals.value;
         }
@@ -640,6 +633,10 @@ export const renderBlueprintNumericInput = props => {
       input.onBlur(num);
       onFieldSubmit(num);
     } catch (e) {
+      console.error(
+        "TRC: Error occurring when setting evaluated numeric input field:",
+        e
+      );
       input.onBlur("");
       onFieldSubmit("");
     }

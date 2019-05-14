@@ -334,6 +334,7 @@ const demos = {
       Switch,
       reduxForm,
       Uploader,
+      renderToggle,
       Classes,
       Icon
     }
@@ -351,14 +352,16 @@ const demos = {
   showConfirmationDialog: {
     scope: {
       showConfirmationDialog,
-      Intent
+      Intent,
+      renderToggle,
     },
     demo: showConfirmationDialogDemo
   },
   showLoadingMask: {
     scope: {
       showLoadingMask,
-      Intent
+      Intent,
+      renderToggle,
     },
     demo: showLoadingMaskDemo
   },
@@ -366,6 +369,7 @@ const demos = {
     scope: {
       MultiSelectSideBySide,
       Component,
+      renderToggle,
       HTMLSelect
     },
     demo: MultiSelectSideBySideDemo
@@ -373,6 +377,7 @@ const demos = {
   ResizableDraggableDialog: {
     scope: {
       ResizableDraggableDialog,
+      renderToggle,
       Component,
       Classes
       // HTMLSelect,
@@ -381,12 +386,14 @@ const demos = {
   },
   customIcons: {
     scope: {
+      renderToggle,
       customIcons
     },
     demo: CustomIcons
   },
   S3Uploader: {
     scope: {
+      renderToggle,
       Provider,
       store,
       reduxForm,
@@ -401,18 +408,21 @@ const demos = {
   J5ReportRecordView: {
     demo: J5ReportRecordView,
     scope: {
+      renderToggle,
       data: j5ReportRecordViewData
     }
   },
   FillWindow: {
     demo: FillWindowExample,
     scope: {
+      renderToggle,
       FillWindow
     }
   },
   tree: {
     demo: Tree,
     scope: {
+      renderToggle,
       bigTreeData,
       smallTreeData
     }
@@ -420,6 +430,7 @@ const demos = {
   Timeline: {
     demo: TimelineDemo,
     scope: {
+      renderToggle,
       Timeline,
       TimelineEvent
     }
@@ -427,12 +438,14 @@ const demos = {
   IntentText: {
     demo: IntentTextDemo,
     scope: {
+      renderToggle,
       IntentText
     }
   },
   ScrollToTop: {
     demo: ScrollToTopDemo,
     scope: {
+      renderToggle,
       ScrollToTop
     }
   }

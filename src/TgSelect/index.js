@@ -1,5 +1,5 @@
 import { MultiSelect, Suggest } from "@blueprintjs/select";
-import { /* MenuItem, */ Button } from "@blueprintjs/core";
+import { /* MenuItem, */ Button, MenuItem } from "@blueprintjs/core";
 import React from "react";
 import { filter, isEqual } from "lodash";
 import fuzzysearch from "fuzzysearch";
@@ -106,13 +106,13 @@ class TgSelect extends React.Component {
       multi,
       options,
       value,
+      createable,
       tagInputProps,
       inputProps,
       placeholder = "Select...",
       isLoading,
       ...rest
     } = this.props;
-
     const Comp = multi ? MultiSelect : Suggest;
     const rightElement = isLoading ? (
       <Button loading minimal />
@@ -123,23 +123,39 @@ class TgSelect extends React.Component {
         ) : (
           value
         )) ? (
-          <Button icon="cross" minimal onClick={this.handleClear} />
+          <Button
+            lassName="tg-select-clear-all"
+            icon="cross"
+            minimal
+            onClick={this.handleClear}
+          />
         ) : (
           undefined
         )}
-        <Button minimal icon={this.state.isOpen ? "caret-up" : "caret-down"} />
+        <Button
+          className="tg-select-toggle"
+          minimal
+          icon={this.state.isOpen ? "caret-up" : "caret-down"}
+        />
       </span>
     );
+    const maybeCreateNewItemFromQuery = createable
+      ? createNewOption
+      : undefined;
+    const maybeCreateNewItemRenderer = createable
+      ? renderCreateNewOption
+      : null;
 
     const getTagProps = () => ({
       intent: "primary",
-      minimal: true
+      minimal: true,
+      className: "tg-select-value"
     });
     return (
       <Comp
         closeOnSelect={!multi}
         items={options || []}
-        itemDisabled={i => i.disabled}
+        itemDisabled={itemDisabled}
         resetOnSelect
         popoverProps={{
           minimal: true,
@@ -151,8 +167,9 @@ class TgSelect extends React.Component {
         }}
         resetOnClose
         onItemSelect={this.handleItemSelect}
-        inputValueRenderer={i => i.label || i}
-        noResults={<div>No Results...</div>}
+        createNewItemFromQuery={maybeCreateNewItemFromQuery}
+        createNewItemRenderer={maybeCreateNewItemRenderer}
+        noResults={noResults}
         itemRenderer={this.itemRenderer}
         itemPredicate={this.itemPredicate}
         {...(multi
@@ -172,7 +189,9 @@ class TgSelect extends React.Component {
               }
             }
           : {
-              selectedItem: value,
+              inputValueRenderer,
+              selectedItem:
+                options.find(opt => opt && opt.value === value) || value,
               inputProps: {
                 placeholder,
                 rightElement: rightElement,
@@ -188,3 +207,25 @@ class TgSelect extends React.Component {
   }
 }
 export default TgSelect;
+
+const inputValueRenderer = i => i.label || i;
+const itemDisabled = i => i.disabled;
+const noResults = <div>No Results...</div>;
+
+export const renderCreateNewOption = (query, active, handleClick) => (
+  <MenuItem
+    icon="add"
+    text={`Create "${query}"`}
+    active={active}
+    onClick={handleClick}
+    shouldDismissPopover={false}
+  />
+);
+
+export function createNewOption(newValString) {
+  return {
+    userCreated: true,
+    label: newValString,
+    value: newValString
+  };
+}

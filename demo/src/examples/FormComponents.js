@@ -287,11 +287,18 @@ class FormComponentsDemo extends React.Component {
             label="EditableTextField"
             placeholder="Enter new text..."
           />
+
+{renderToggle({
+                that: this,
+                label: "createable",
+                type: "reactSelectFieldCreateable",
+              })}
           <ReactSelectField
             name="reactSelectField"
             inlineLabel={this.state.inlineLabels}
             label="ReactSelectField Collaborators"
             onFieldSubmit={onFieldSubmit}
+            createable={this.state.reactSelectFieldCreateable}
             options={[
               {
                 label: "Rodrigo Pavez",
@@ -303,11 +310,13 @@ class FormComponentsDemo extends React.Component {
               { label: "Tom Ogasawara", value: "Tom Ogasawara" }
             ]}
           />
+          
           <ReactSelectField
             name="reactSelectFieldMulti"
             inlineLabel={this.state.inlineLabels}
             label="ReactSelectField Collaborators Multi"
             onFieldSubmit={onFieldSubmit}
+            createable={this.state.reactSelectFieldCreateable}
             multi
             options={[
               {
