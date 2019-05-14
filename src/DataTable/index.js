@@ -568,6 +568,10 @@ class DataTable extends React.Component {
             {filtersOnNonDisplayedFields.length
               ? filtersOnNonDisplayedFields.map(
                   ({ displayName, path, selectedFilter, filterValue }) => {
+                    let filterValToDisplay = filterValue;
+                    if (Array.isArray(filterValue)) {
+                      filterValToDisplay = filterValue.toString();
+                    }
                     return (
                       <div
                         key={displayName || startCase(path)}
@@ -577,7 +581,7 @@ class DataTable extends React.Component {
                         <span>
                           {" "}
                           {displayName || startCase(path)} {selectedFilter}{" "}
-                          {filterValue}{" "}
+                          {filterValToDisplay}{" "}
                         </span>
                       </div>
                     );
