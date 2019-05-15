@@ -1,4 +1,4 @@
-import { MultiSelect, Suggest } from "@blueprintjs/select";
+import { MultiSelect /* Suggest */ } from "@blueprintjs/select";
 import { /* MenuItem, */ Button, MenuItem } from "@blueprintjs/core";
 import React from "react";
 import { filter, isEqual } from "lodash";
@@ -8,7 +8,8 @@ import "./style.css";
 
 class TgSelect extends React.Component {
   state = {
-    isOpen: false
+    isOpen: false,
+    query: ""
   };
   itemRenderer = (i, { index, handleClick, modifiers }) => {
     return (
@@ -22,16 +23,12 @@ class TgSelect extends React.Component {
       >
         {i.label}
       </div>
-      // <MenuItem
-      //   active={modifiers.active}
-      //   disabled={modifiers.disabled}
-      //   onClick={handleClick}
-      //   key={index}
-      //   text={i.label}
-      // />
     );
   };
   tagRenderer = i => {
+    if (!this.props.multi && this.state.query) {
+      return null;
+    }
     return i.label;
   };
 
@@ -48,6 +45,7 @@ class TgSelect extends React.Component {
       return onChange([...filteredVals, item]);
     } else {
       this.setState({ isOpen: false });
+      this.tagInput && this.tagInput.blur();
       return onChange(item);
     }
   };
@@ -66,6 +64,7 @@ class TgSelect extends React.Component {
 
   handleClear = e => {
     const { onChange } = this.props;
+    this.setState({ query: "" });
     onChange([]);
     this.setState({ isOpen: false });
     e.stopPropagation();
@@ -91,14 +90,23 @@ class TgSelect extends React.Component {
             ""
     );
   };
+  onQueryChange = query => {
+    this.setState({
+      query
+    });
+  };
   onInteraction = (nextOpenState, e) => {
     e && e.persist();
     if (this.justRemovedId && nextOpenState) {
+      //hack to stop the popover from popping up again
       clearTimeout(this.justRemovedId);
       this.justRemovedId = null;
       return;
     }
-    this.setState({ isOpen: nextOpenState });
+    this.setState({
+      isOpen: nextOpenState,
+      ...(!nextOpenState && { query: "" })
+    });
   };
 
   render() {
@@ -113,7 +121,7 @@ class TgSelect extends React.Component {
       isLoading,
       ...rest
     } = this.props;
-    const Comp = multi ? MultiSelect : Suggest;
+    // const Comp = multi ? MultiSelect : Suggest;
     const rightElement = isLoading ? (
       <Button loading minimal />
     ) : (
@@ -124,7 +132,7 @@ class TgSelect extends React.Component {
           value
         )) ? (
           <Button
-            lassName="tg-select-clear-all"
+            className="tg-select-clear-all"
             icon="cross"
             minimal
             onClick={this.handleClear}
@@ -146,20 +154,18 @@ class TgSelect extends React.Component {
       ? renderCreateNewOption
       : null;
 
-    const getTagProps = () => ({
-      intent: "primary",
-      minimal: true,
-      className: "tg-select-value"
-    });
     return (
-      <Comp
+      <MultiSelect
         closeOnSelect={!multi}
         items={options || []}
         itemDisabled={itemDisabled}
         resetOnSelect
+        query={this.state.query}
         popoverProps={{
           minimal: true,
-          className: "tg-select",
+          className: classnames("tg-select", {
+            "tg-single-select": !multi
+          }),
           wrapperTagName: "div",
           usePortal: false,
           onInteraction: this.onInteraction,
@@ -170,45 +176,46 @@ class TgSelect extends React.Component {
         createNewItemFromQuery={maybeCreateNewItemFromQuery}
         createNewItemRenderer={maybeCreateNewItemRenderer}
         noResults={noResults}
+        onQueryChange={this.onQueryChange}
         itemRenderer={this.itemRenderer}
         itemPredicate={this.itemPredicate}
-        {...(multi
-          ? {
-              selectedItems: value
-                ? Array.isArray(value)
-                  ? value
-                  : [value]
-                : [],
-              tagRenderer: this.tagRenderer,
-              tagInputProps: {
-                placeholder,
-                tagProps: getTagProps,
-                onRemove: this.handleTagRemove,
-                rightElement: rightElement,
-                ...tagInputProps //spread additional tag input props here
-              }
-            }
-          : {
-              inputValueRenderer,
-              selectedItem:
-                options.find(opt => opt && opt.value === value) || value,
-              inputProps: {
-                placeholder,
-                rightElement: rightElement,
-                ...inputProps //spread additional input props here
-              }
-            })}
+        {...{
+          selectedItems: multi
+            ? value
+              ? Array.isArray(value)
+                ? value
+                : [value]
+              : []
+            : [options.find(opt => opt && opt.value === value) || value],
+          tagRenderer: this.tagRenderer,
+          tagInputProps: {
+            inputRef: n => {
+              if (n) this.tagInput = n;
+            },
+            placeholder,
+            tagProps: {
+              intent: "primary",
+              minimal: true,
+              className: "tg-select-value",
+              ...(!multi && { onRemove: null })
+            },
+            onRemove: this.handleTagRemove,
+            rightElement: rightElement,
+
+            ...tagInputProps //spread additional tag input props here
+          }
+        }}
         isLoading={isLoading}
-        // onQueryChange={this.handleTgSelectSearch}
         {...rest}
-        // name={passedName}
       />
     );
   }
 }
 export default TgSelect;
 
-const inputValueRenderer = i => i.label || i;
+// const inputValueRenderer = i => {
+//   console.log(`i.label:`,i.label)
+//   return i.label || i};
 const itemDisabled = i => i.disabled;
 const noResults = <div>No Results...</div>;
 

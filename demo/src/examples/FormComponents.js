@@ -265,7 +265,7 @@ class FormComponentsDemo extends React.Component {
             label="I'm a SwitchField"
           />
           <TextareaField
-          isRequired
+            isRequired
             name={"textAreaField"}
             inlineLabel={this.state.inlineLabels}
             onFieldSubmit={onFieldSubmit}
@@ -287,12 +287,11 @@ class FormComponentsDemo extends React.Component {
             label="EditableTextField"
             placeholder="Enter new text..."
           />
-
-{renderToggle({
-                that: this,
-                label: "createable",
-                type: "reactSelectFieldCreateable",
-              })}
+          {renderToggle({
+            that: this,
+            label: "createable",
+            type: "reactSelectFieldCreateable"
+          })}
           <ReactSelectField
             name="reactSelectField"
             inlineLabel={this.state.inlineLabels}
@@ -307,10 +306,42 @@ class FormComponentsDemo extends React.Component {
               { label: "Ximena Morales", value: "Ximena Morales" },
               { label: "Kyle Craft", value: "Kyle Craft" },
               { label: "Sam Denicola", value: "Sam Denicola" },
-              { label: "Tom Ogasawara", value: "Tom Ogasawara" }
+              { label: "Tom Ogasawara Og Og Og", value: "Tom Ogasawara" }
             ]}
           />
-          
+          <ReactSelectField
+            name="reactSelectFieldCustomLabel"
+            inlineLabel={this.state.inlineLabels}
+            label="ReactSelectField Custom Label"
+            onFieldSubmit={onFieldSubmit}
+            createable={this.state.reactSelectFieldCreateable}
+            options={["hah", "yah", "nope", "yep"].map((type, i) => {
+              return {
+                value: type,
+                label: (
+                  <div
+                    key={i}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginRight: 10
+                    }}
+                  >
+                  <Icon icon="chat"></Icon>
+                    <div
+                      style={{
+                        // background: featureColors[type], add back in if we want colors. import from vesequtils
+                        height: 15,
+                        width: 15,
+                        marginRight: 5
+                      }}
+                    />
+                    {type}
+                  </div>
+                )
+              };
+            })}
+          />
           <ReactSelectField
             name="reactSelectFieldMulti"
             inlineLabel={this.state.inlineLabels}
@@ -1517,10 +1548,9 @@ class FormComponentsDemo extends React.Component {
               { label: "Tom Ogasawara", value: "Tom Ogasawara" },
               { label: "Tom Ogasawara", value: "Tom Ogasawara" },
               { label: "Tom Ogasawara", value: "Tom Ogasawara" },
-              { label: "Tom Ogasawara", value: "Tom Ogasawara" },
+              { label: "Tom Ogasawara", value: "Tom Ogasawara" }
             ]}
           />
-          
           <ReactColorField
             name="reactColorField"
             inlineLabel={this.state.inlineLabels}
