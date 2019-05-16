@@ -32,7 +32,7 @@ describe("formComponents", () => {
       .click();
     cy.get("@inputWrapper")
       .find(".tg-select-option")
-      .should("not.exist");
+      .should("not.exist", { timeout: 10000 });
     cy.get("@inputWrapper")
       .contains(".bp3-tag", "Kyle Craft")
       .should("exist")
