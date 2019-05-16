@@ -8,12 +8,12 @@ describe("formComponents", () => {
       .as("inputWrapper")
       .contains("Kyle Craft")
       .click();
-    cy.get("@inputWrapper").find(`input[value="Kyle Craft"]`);
+    cy.get("@inputWrapper").contains(`.bp3-tag`, "Kyle Craft");
     cy.get("@inputWrapper")
       .find(".bp3-icon-cross")
       .click();
     cy.get("@inputWrapper")
-      .find(`input[value="Kyle Craft"]`)
+      .contains(`.bp3-tag`, "Kyle Craft")
       .should("not.exist");
   });
   it(`ReactSelectField multi can add a tag and remove it by hitting the single remove button and not have the 
