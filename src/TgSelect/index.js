@@ -12,6 +12,7 @@ class TgSelect extends React.Component {
     query: ""
   };
   itemRenderer = (i, { index, handleClick, modifiers }) => {
+    const { optionRenderer } = this.props;
     return (
       <div
         onClick={handleClick}
@@ -21,7 +22,7 @@ class TgSelect extends React.Component {
           "bp3-disabled": modifiers.disabled
         })}
       >
-        {i.label}
+        {optionRenderer ? optionRenderer(i) : i.label}
       </div>
     );
   };
@@ -115,7 +116,10 @@ class TgSelect extends React.Component {
       options,
       value,
       createable,
+      optionRenderer, //pull this one out here so it doesn't get passsed along
       tagInputProps,
+      noResultsText,
+      noResults = noResultsDefault,
       inputProps,
       placeholder = "Select...",
       isLoading,
@@ -175,7 +179,7 @@ class TgSelect extends React.Component {
         onItemSelect={this.handleItemSelect}
         createNewItemFromQuery={maybeCreateNewItemFromQuery}
         createNewItemRenderer={maybeCreateNewItemRenderer}
-        noResults={noResults}
+        noResults={noResultsText || noResults}
         onQueryChange={this.onQueryChange}
         itemRenderer={this.itemRenderer}
         itemPredicate={this.itemPredicate}
@@ -217,7 +221,7 @@ export default TgSelect;
 //   console.log(`i.label:`,i.label)
 //   return i.label || i};
 const itemDisabled = i => i.disabled;
-const noResults = <div>No Results...</div>;
+const noResultsDefault = <div>No Results...</div>;
 
 export const renderCreateNewOption = (query, active, handleClick) => (
   <MenuItem
