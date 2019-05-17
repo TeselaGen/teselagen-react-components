@@ -91,22 +91,20 @@ class CommentWithReplies extends Component {
             <Icon icon={`chevron-${showingMore ? "up" : "down"}`} />
           </div>
         )}
-        {repliesToShow.map(({ reply }: { reply: Object }) => {
-          return (
-            <CommentBubble
-              isReply
-              parentId={comment.id}
-              record={record}
-              startReply={() => startReply(reply.id)}
-              cancelReply={cancelReply}
-              isReplying={reply.id === isReplying}
-              refetch={refetch}
-              key={reply.id}
-              currentUser={currentUser}
-              comment={reply}
-            />
-          );
-        })}
+        {repliesToShow.map(({ reply }) => (
+          <CommentBubble
+            isReply
+            parentId={comment.id}
+            record={record}
+            startReply={() => startReply(reply.id)}
+            cancelReply={cancelReply}
+            isReplying={reply.id === isReplying}
+            refetch={refetch}
+            key={reply.id}
+            currentUser={currentUser}
+            comment={reply}
+          />
+        ))}
       </div>
     );
   }

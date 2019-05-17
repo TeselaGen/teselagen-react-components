@@ -12,8 +12,8 @@ import {
   Button,
   Classes
 } from "@blueprintjs/core";
-import { TextareaField } from "../../FormComponents";
 import { reduxForm } from "redux-form";
+import { TextareaField } from "../../FormComponents";
 import AvatarIcon from "../../AvatarIcon";
 import AddCommentReplyContainer from "../AddCommentReplyContainer";
 export const COMMENT_REPLY_MARGIN_LEFT = 42;
@@ -99,18 +99,21 @@ class Comment extends Component {
     return (
       <React.Fragment>
         <div
-          className={"comment-bubble-container" + (isReply ? " reply" : "")}
+          className={
+            "comment-bubble-container fade-out " + (isReply ? " reply" : "")
+          }
           style={{
             marginLeft: isReply ? COMMENT_REPLY_MARGIN_LEFT : 0
           }}
         >
-          {user.id === currentUser.userId && !isEditing && (
-            <div className="comment-edit-menu">
-              <Popover content={commentMenu} position={Position.LEFT}>
-                <Button className={Classes.MINIMAL} icon="more" />
-              </Popover>
-            </div>
-          )}
+          {(user.id === currentUser.userId || user.id === currentUser.id) &&
+            !isEditing && (
+              <div className="comment-edit-menu">
+                <Popover content={commentMenu} position={Position.LEFT}>
+                  <Button className={Classes.MINIMAL} icon="more" />
+                </Popover>
+              </div>
+            )}
           <div className="comment-avatar">
             <AvatarIcon
               size={isReply ? 28 : 36}

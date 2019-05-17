@@ -1,12 +1,14 @@
 /* Copyright (C) 2018 TeselaGen Biotechnology, Inc. */
 
 import React, { Component } from "react";
-import CommentWithReplies from "./CommentWithReplies";
-import commentFragment from "./commentFragment";
-import AddComment from "./AddComment";
+import { compose } from "redux";
 import CollapsibleCard from "../CollapsibleCard";
 import withQuery from "../enhancers/withQuery";
 import Loading from "../Loading";
+import CommentWithReplies from "./CommentWithReplies";
+import commentFragment from "./commentFragment";
+import AddComment from "./AddComment";
+import "./style.css";
 
 class CommentCard extends Component {
   constructor(props) {
@@ -16,7 +18,7 @@ class CommentCard extends Component {
     };
   }
 
-  startReply = (commentId: number) => {
+  startReply = commentId => {
     this.setState({
       isReplying: commentId
     });
@@ -53,19 +55,21 @@ class CommentCard extends Component {
         >
           <Loading inDialog loading={commentsLoading} withTimeout>
             {comments.length === 0 && "No comments yet. Add one!"}
-            {comments.map((comment: CommentType) => (
-              <CommentWithReplies
-                key={comment.id}
-                {...{
-                  comment,
-                  currentUser,
-                  startReply: this.startReply,
-                  cancelReply: this.cancelReply,
-                  isReplying: this.state.isReplying,
-                  refetch,
-                  record
-                }}
-              />
+            {comments.map(comment => (
+              <div key={comment.id} className="comment-with-replies-container">
+                <CommentWithReplies
+                  key={comment.id}
+                  {...{
+                    comment,
+                    currentUser,
+                    startReply: this.startReply,
+                    cancelReply: this.cancelReply,
+                    isReplying: this.state.isReplying,
+                    refetch,
+                    record
+                  }}
+                />
+              </div>
             ))}
           </Loading>
         </div>
@@ -97,17 +101,19 @@ class CommentCard extends Component {
   }
 }
 
-export default withQuery(commentFragment, {
-  isPlural: true,
-  skip: props => !props.joinTableName,
-  options: props => {
-    const { record, joinTableName } = props;
-    return {
-      variables: {
-        filter: {
-          [`${joinTableName}.${record.__typename + "Id"}`]: record.id
+export default compose(
+  withQuery(commentFragment, {
+    isPlural: true,
+    skip: props => !props.joinTableName,
+    options: props => {
+      const { record, joinTableName } = props;
+      return {
+        variables: {
+          filter: {
+            [`${joinTableName}.${record.__typename + "Id"}`]: record.id
+          }
         }
-      }
-    };
-  }
-})(CommentCard);
+      };
+    }
+  })
+)(CommentCard);

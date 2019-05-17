@@ -6,11 +6,10 @@ import { Button, Intent, Classes } from "@blueprintjs/core";
 import scrollIntoView from "dom-scroll-into-view";
 import classNames from "classnames";
 import { compose } from "redux";
-import AvatarIcon from "../../AvatarIcon";
-import { validateRequiredFieldsGenerator } from "../utils";
-import { TextareaField } from "../../FormComponents";
-import commentFragment from "../commentFragment";
 import { withUpsert } from "@teselagen/apollo-methods";
+import AvatarIcon from "../../AvatarIcon";
+import { TextareaField } from "../../FormComponents";
+import { validateRequiredFieldsGenerator } from "../utils";
 import "./style.css";
 
 export class AddComment extends Component {
@@ -36,10 +35,14 @@ export class AddComment extends Component {
       record: { id, __typename } = {},
       commentId,
       cancelReply,
-      upsertComment
+      upsertComment,
+      currentUser
     } = this.props;
 
     const data = { ...formData };
+
+    data.userId = currentUser.user ? currentUser.user.id : currentUser.id;
+
     if (commentId) {
       data.commentReply = {
         commentId
@@ -51,7 +54,7 @@ export class AddComment extends Component {
     }
 
     try {
-      await upsertComment(commentFragment, data);
+      await upsertComment(data);
       await refetch();
       reset();
       cancelReply && cancelReply();
@@ -67,7 +70,7 @@ export class AddComment extends Component {
 
   render() {
     const {
-      currentUser: { user },
+      currentUser,
       handleSubmit,
       label,
       placeholder,
@@ -86,7 +89,7 @@ export class AddComment extends Component {
               <AvatarIcon
                 size={isReplyForm ? 28 : 36}
                 style={{ border: "2px solid white" }}
-                user={user}
+                user={currentUser}
               />
             </div>
           )}

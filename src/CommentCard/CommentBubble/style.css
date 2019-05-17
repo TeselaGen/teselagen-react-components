@@ -1,10 +1,8 @@
 /* Copyright (C) 2018 TeselaGen Biotechnology, Inc. */
 
 .comment-bubble-container {
-  /*background: #dbf5ff;*/
-  /*border-radius: 10px;*/
-  /*margin-bottom: 10px;*/
-  padding: 5px 0;
+  border-radius: 2px;
+  padding: 5px 5px;
   display: flex;
   flex-direction: row;
   position: relative;
@@ -103,4 +101,21 @@
   font-size: 13px;
   overflow: hidden;
   overflow-wrap: break-word;
+}
+
+.comment-bubble-container.fade-out {
+  opacity: 1;
+  animation-name: fadeInOpacity;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in;
+  animation-duration: 2s;
+}
+
+@keyframes fadeInOpacity {
+  0% {
+    background-color: gray;
+  }
+  100% {
+    background-color: transparent;
+  }
 }
