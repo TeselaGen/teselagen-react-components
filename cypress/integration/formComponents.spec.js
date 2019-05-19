@@ -16,6 +16,15 @@ describe("formComponents", () => {
       .contains(`.bp3-tag`, "Kyle Craft")
       .should("not.exist");
   });
+  it(`ReactSelectField can be closed with an esc`, () => {
+    cy.get(".tg-test-react-select-field-multi .tg-select input")
+      .type("k")
+      .as("input");
+
+    cy.get(".tg-select-option").should("exist");
+    cy.get("@input").type("{esc}");
+    cy.get(".tg-select-option").should("not.exist");
+  });
   it(`ReactSelectField multi can add a tag and remove it by hitting the single remove button and not have the 
   menu pop up again`, () => {
     cy.get(".tg-test-react-select-field-multi .tg-select")

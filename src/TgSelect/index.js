@@ -1,5 +1,5 @@
-import { MultiSelect /* Suggest */ } from "@blueprintjs/select";
-import { /* MenuItem, */ Button, MenuItem } from "@blueprintjs/core";
+import { MultiSelect } from "@blueprintjs/select";
+import { Keys, Button, MenuItem } from "@blueprintjs/core";
 import React from "react";
 import { filter, isEqual } from "lodash";
 import fuzzysearch from "fuzzysearch";
@@ -14,7 +14,7 @@ class TgSelect extends React.Component {
   itemRenderer = (i, { index, handleClick, modifiers }) => {
     const { optionRenderer } = this.props;
     return (
-      <div
+      <div //we specifically don't use a BP MenuItem component here because the menu item is too slow when 100s are loaded and will cause the component to lag
         onClick={handleClick}
         key={index}
         className={classnames("tg-select-option bp3-menu-item", {
@@ -46,7 +46,7 @@ class TgSelect extends React.Component {
       return onChange([...filteredVals, item]);
     } else {
       this.setState({ isOpen: false });
-      this.tagInput && this.tagInput.blur();
+      this.input && this.input.blur();
       return onChange(item);
     }
   };
@@ -54,22 +54,16 @@ class TgSelect extends React.Component {
   handleTagRemove = (string, index) => {
     const { onChange, value } = this.props;
     const filteredVals = filter(value, (obj, i) => !isEqual(i, index));
-
-    //hack to stop the popover from popping up again:
-    this.justRemovedId = setTimeout(() => {
-      this.justRemovedId = null;
-    }, 100);
-
     return onChange(filteredVals);
   };
 
   handleClear = e => {
+    e.stopPropagation();
+    e.preventDefault();
     const { onChange } = this.props;
     this.setState({ query: "" });
     onChange([]);
     this.setState({ isOpen: false });
-    e.stopPropagation();
-    e.preventDefault();
   };
 
   itemPredicate = (queryString, item) => {
@@ -96,18 +90,14 @@ class TgSelect extends React.Component {
       query
     });
   };
-  onInteraction = (nextOpenState, e) => {
-    e && e.persist();
-    if (this.justRemovedId && nextOpenState) {
-      //hack to stop the popover from popping up again
-      clearTimeout(this.justRemovedId);
-      this.justRemovedId = null;
-      return;
+  onInteraction = () => {
+    if (this.input != null && this.input !== document.activeElement) {
+      // the input is no longer focused so we can close the popover
+      this.setState({ isOpen: false, query: "" });
+    } else if (!this.props.openOnKeyDown) {
+      // open the popover when focusing the tag input
+      this.setState({ isOpen: true });
     }
-    this.setState({
-      isOpen: nextOpenState,
-      ...(!nextOpenState && { query: "" })
-    });
   };
 
   render() {
@@ -125,7 +115,6 @@ class TgSelect extends React.Component {
       isLoading,
       ...rest
     } = this.props;
-    // const Comp = multi ? MultiSelect : Suggest;
     const rightElement = isLoading ? (
       <Button loading minimal />
     ) : (
@@ -145,6 +134,13 @@ class TgSelect extends React.Component {
           undefined
         )}
         <Button
+          onClick={e => {
+            if (this.state.isOpen) {
+              e.stopPropagation();
+
+              this.setState({ isOpen: false });
+            }
+          }}
           className="tg-select-toggle"
           minimal
           icon={this.state.isOpen ? "caret-up" : "caret-down"}
@@ -172,8 +168,28 @@ class TgSelect extends React.Component {
           }),
           wrapperTagName: "div",
           usePortal: false,
+          canEscapeKeyClose: true,
           onInteraction: this.onInteraction,
           isOpen: this.state.isOpen
+        }}
+        onKeyDown={e => {
+          const { which } = e;
+          if (which === Keys.ESCAPE || which === Keys.TAB) {
+            // By default the escape key will not trigger a blur on the
+            // input element. It must be done explicitly.
+            if (this.input != null) {
+              this.input.blur();
+            }
+            this.setState({ isOpen: false });
+          } else if (
+            !(
+              which === Keys.BACKSPACE ||
+              which === Keys.ARROW_LEFT ||
+              which === Keys.ARROW_RIGHT
+            )
+          ) {
+            this.setState({ isOpen: true });
+          }
         }}
         resetOnClose
         onItemSelect={this.handleItemSelect}
@@ -194,7 +210,7 @@ class TgSelect extends React.Component {
           tagRenderer: this.tagRenderer,
           tagInputProps: {
             inputRef: n => {
-              if (n) this.tagInput = n;
+              if (n) this.input = n;
             },
             placeholder,
             tagProps: {
@@ -217,9 +233,6 @@ class TgSelect extends React.Component {
 }
 export default TgSelect;
 
-// const inputValueRenderer = i => {
-//   console.log(`i.label:`,i.label)
-//   return i.label || i};
 const itemDisabled = i => i.disabled;
 const noResultsDefault = <div>No Results...</div>;
 
