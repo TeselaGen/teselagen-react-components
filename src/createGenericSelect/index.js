@@ -172,15 +172,12 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
           meta: { form },
           input: { name },
           changeFieldValue,
-          setNullOnClear,
-          clearFields,
+
+          // setNullOnClear,
+          // clearFields,
           onClear = noop
         } = this.props;
-        //because clearFields doesn't work if there is an initialValue passed
-        //for the genericSelect field, we allow users to specifically changeFieldValue to null
-        setNullOnClear
-          ? changeFieldValue(form, name, null)
-          : clearFields(form, false, false, name);
+        changeFieldValue(form, name, null);
         onClear();
         this.setState({
           tempValue: null
@@ -762,7 +759,7 @@ class InnerComp extends Component {
       }
     }
     try {
-      if (!valOrVals) {
+      if (!valOrVals || valOrVals.length === 0) {
         handleSelection([]);
       } else {
         const records = (Array.isArray(valOrVals)
