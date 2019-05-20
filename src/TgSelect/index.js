@@ -51,9 +51,14 @@ class TgSelect extends React.Component {
     }
   };
 
-  handleTagRemove = (string, index) => {
+  handleTagRemove = (e, tagProps) => {
     const { onChange, value } = this.props;
-    const filteredVals = filter(value, (obj, i) => !isEqual(i, index));
+    const filteredVals = filter(
+      value,
+      (obj, i) => !isEqual(i, tagProps["data-tag-index"])
+    );
+    e.stopPropagation();
+    // this.setState()
     return onChange(filteredVals);
   };
 
@@ -217,9 +222,18 @@ class TgSelect extends React.Component {
               intent: "primary",
               minimal: true,
               className: "tg-select-value",
-              ...(!multi && { onRemove: null })
+              onRemove: multi
+                ? this.handleTagRemove
+                : //  (e, tagProps) => {
+                  //   console.log(`tagProps:`,tagProps)
+                  //   e.persist()
+                  //   console.log(`e:`, e)
+                  //   e.stopPropagation()
+                  // }
+                  null
+              // ...(multi ? {onRemove} { onRemove: null } )
             },
-            onRemove: this.handleTagRemove,
+            // onRemove: this.handleTagRemove,
             rightElement: rightElement,
 
             ...tagInputProps //spread additional tag input props here
