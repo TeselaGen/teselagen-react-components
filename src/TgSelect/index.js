@@ -11,6 +11,11 @@ class TgSelect extends React.Component {
     isOpen: false,
     query: ""
   };
+  static defaultProps = {
+    onChange: () => {},
+    options: [],
+    value: undefined
+  };
   itemRenderer = (i, { index, handleClick, modifiers }) => {
     const { optionRenderer } = this.props;
     return (
@@ -27,7 +32,7 @@ class TgSelect extends React.Component {
     );
   };
   tagRenderer = i => {
-    if (!this.props.multi && this.state.query) {
+    if (!i || (!this.props.multi && this.state.query)) {
       return null;
     }
     return i.label;

@@ -19,7 +19,7 @@ import showLoadingMask from "../../src/showLoadingMask";
 import CustomIcons from "./examples/CustomIcons";
 import S3Uploader from "./examples/S3Uploader";
 import SimpleTable from "./examples/SimpleTable";
-import MultiSelect from "./examples/MultiSelect";
+import TgSelectDemo from "./examples/TgSelect";
 import InfoHelper from "./examples/InfoHelper";
 import Loading from "./examples/Loading";
 import DownloadLink from "./examples/DownloadLink";
@@ -39,6 +39,7 @@ import { bigTreeData, smallTreeData } from "./data/treeData";
 import S3Download from "../../src/utils/S3Download";
 import magicDownload from "../../src/DownloadLink/magicDownload";
 import FillWindow from "../../src/FillWindow";
+import TgSelect from "../../src/TgSelect";
 import Timeline from "../../src/Timeline";
 import TimelineEvent from "../../src/Timeline/TimelineEvent";
 import TimelineDemo from "./examples/TimelineDemo";
@@ -169,10 +170,12 @@ const demos = {
       }
     ]
   },
-  MultiSelect: {
-    demo: MultiSelect,
+  TgSelect: {
+    demo: TgSelectDemo,
     scope: {
-      Classes
+      Classes,
+      TgSelect,
+      renderToggle,
     },
     props: [
       {
