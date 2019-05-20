@@ -4,6 +4,9 @@
 .tg-select input {
   font-size: 14px;
 }
+.tg-select-option {
+  max-width: 400px;
+}
 .tg-single-select input {
   position: absolute;
   top: 5px;

@@ -19,13 +19,13 @@ import showLoadingMask from "../../src/showLoadingMask";
 import CustomIcons from "./examples/CustomIcons";
 import S3Uploader from "./examples/S3Uploader";
 import SimpleTable from "./examples/SimpleTable";
-import TgSelectDemo from "./examples/TgSelect";
+import TgSelectDemo from "./examples/TgSelectDemo";
 import InfoHelper from "./examples/InfoHelper";
 import Loading from "./examples/Loading";
 import DownloadLink from "./examples/DownloadLink";
 import DemoNav from "./DemoNav";
 import DemoHeader from "./DemoHeader";
-import { withTableParams, DataTable, PagingTool } from "../../src";
+import { withTableParams, DataTable, PagingTool, createGenericSelect, modelNameToReadableName } from "../../src";
 import Uploader from "../../src/FormComponents/Uploader";
 import { FileUploadField } from "../../src/FormComponents";
 import J5ReportRecordView from "./examples/J5ReportRecordView";
@@ -53,6 +53,7 @@ import {
   CmdSwitch
 } from "../../src/utils/commandControls";
 import ScrollToTop from "../../src/ScrollToTop";
+import GenericSelectDemo from "./examples/GenericSelectDemo";
 
 import "./style.css";
 import React, { Component } from "react";
@@ -176,6 +177,27 @@ const demos = {
       Classes,
       TgSelect,
       renderToggle,
+    },
+    props: [
+      {
+        name: "className",
+        description:
+          "The CSS class name passed to the Button (if Popover) or Tooltip",
+        type: "string"
+      },
+    ]
+  },
+  GenericSelect: {
+    demo: GenericSelectDemo,
+    scope: {
+      Classes,
+      modelNameToReadableName,
+      createGenericSelect,
+      renderToggle,
+      reduxForm,
+      ApolloProvider,
+client,
+store,
     },
     props: [
       {

@@ -20,12 +20,15 @@ class TgSelect extends React.Component {
     const { optionRenderer } = this.props;
     return (
       <div //we specifically don't use a BP MenuItem component here because the menu item is too slow when 100s are loaded and will cause the component to lag
-        onClick={handleClick}
+        onClick={i.onClick || handleClick}
         key={index}
-        className={classnames("tg-select-option bp3-menu-item", {
-          "bp3-active": modifiers.active,
-          "bp3-disabled": modifiers.disabled
-        })}
+        className={classnames(
+          "tg-select-option bp3-menu-item bp3-fill bp3-text-overflow-ellipsis",
+          {
+            "bp3-active": modifiers.active,
+            "bp3-disabled": modifiers.disabled
+          }
+        )}
       >
         {optionRenderer ? optionRenderer(i) : i.label}
       </div>
@@ -42,13 +45,7 @@ class TgSelect extends React.Component {
     const { onChange, value, multi } = this.props;
     if (multi) {
       const valArray = value ? (Array.isArray(value) ? value : [value]) : [];
-      const filteredVals = filter(
-        value,
-        obj => !isEqual(obj.value, item.value)
-      );
-      if (filteredVals.length !== valArray.length)
-        return onChange(filteredVals);
-      return onChange([...filteredVals, item]);
+      return onChange([...valArray, item]);
     } else {
       this.setState({ isOpen: false });
       this.input && this.input.blur();
@@ -63,7 +60,6 @@ class TgSelect extends React.Component {
       (obj, i) => !isEqual(i, tagProps["data-tag-index"])
     );
     e.stopPropagation();
-    // this.setState()
     return onChange(filteredVals);
   };
 
@@ -96,9 +92,11 @@ class TgSelect extends React.Component {
     );
   };
   onQueryChange = query => {
+    const { onInputChange = () => {} } = this.props;
     this.setState({
       query
     });
+    onInputChange(query);
   };
   onInteraction = () => {
     if (this.input != null && this.input !== document.activeElement) {
@@ -163,6 +161,16 @@ class TgSelect extends React.Component {
     const maybeCreateNewItemRenderer = createable
       ? renderCreateNewOption
       : null;
+    const selectedItems = (Array.isArray(value)
+      ? value
+      : value
+      ? [value]
+      : []
+    ).map(value => {
+      return options.find(
+        opt => opt && opt.value === ((value && value.value) || value)
+      );
+    });
 
     return (
       <MultiSelect
@@ -210,13 +218,7 @@ class TgSelect extends React.Component {
         itemRenderer={this.itemRenderer}
         itemPredicate={this.itemPredicate}
         {...{
-          selectedItems: multi
-            ? value
-              ? Array.isArray(value)
-                ? value
-                : [value]
-              : []
-            : [options.find(opt => opt && opt.value === value) || value],
+          selectedItems,
           tagRenderer: this.tagRenderer,
           tagInputProps: {
             inputRef: n => {
@@ -227,18 +229,8 @@ class TgSelect extends React.Component {
               intent: "primary",
               minimal: true,
               className: "tg-select-value",
-              onRemove: multi
-                ? this.handleTagRemove
-                : //  (e, tagProps) => {
-                  //   console.log(`tagProps:`,tagProps)
-                  //   e.persist()
-                  //   console.log(`e:`, e)
-                  //   e.stopPropagation()
-                  // }
-                  null
-              // ...(multi ? {onRemove} { onRemove: null } )
+              onRemove: multi ? this.handleTagRemove : null
             },
-            // onRemove: this.handleTagRemove,
             rightElement: rightElement,
 
             ...tagInputProps //spread additional tag input props here
