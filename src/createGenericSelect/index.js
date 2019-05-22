@@ -887,6 +887,13 @@ class InnerComp extends Component {
         />
       );
     }
+
+    let enhancedChildren;
+    // the enhanced children will get overwritten if passing children to additionalTableProps
+    if (additionalTableProps && additionalTableProps.enhancedChildren) {
+      enhancedChildren = additionalTableProps.enhancedChildren({ tableParams });
+    }
+
     return (
       <div>
         <div style={{ marginBottom: 10 }}>
@@ -902,6 +909,7 @@ class InnerComp extends Component {
           isSingleSelect={!isMultiSelect}
           maxHeight={400}
           {...tableParams}
+          children={enhancedChildren}
           {...additionalTableProps}
           // destroyOnUnmount={false}
           // keepDirtyOnReinitialize
