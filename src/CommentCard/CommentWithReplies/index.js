@@ -1,11 +1,11 @@
 /* Copyright (C) 2018 TeselaGen Biotechnology, Inc. */
 
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import { Icon } from "@blueprintjs/core";
 import CommentBubble from "../CommentBubbleContainer";
 import "./style.css";
 
-export class CommentReply extends Component {
+export class CommentReply extends PureComponent {
   startCommentReply = () => {
     const { reply, startReply } = this.props;
 
@@ -40,7 +40,7 @@ export class CommentReply extends Component {
   }
 }
 
-class CommentWithReplies extends Component {
+class CommentWithReplies extends PureComponent {
   state = {
     showingMore: false
   };

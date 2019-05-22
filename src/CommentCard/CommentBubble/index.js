@@ -1,6 +1,6 @@
 /* Copyright (C) 2018 TeselaGen Biotechnology, Inc. */
 
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import "./style.css";
 import moment from "moment";
 import {
@@ -18,7 +18,7 @@ import AvatarIcon from "../../AvatarIcon";
 import AddCommentReplyContainer from "../AddCommentReplyContainer";
 export const COMMENT_REPLY_MARGIN_LEFT = 42;
 
-class Comment extends Component {
+class Comment extends PureComponent {
   state = {
     isEditing: false
   };

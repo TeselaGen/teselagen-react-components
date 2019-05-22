@@ -1,6 +1,6 @@
 /* Copyright (C) 2018 TeselaGen Biotechnology, Inc. */
 
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import { compose } from "redux";
 import CollapsibleCard from "../CollapsibleCard";
 import withQuery from "../enhancers/withQuery";
@@ -10,7 +10,7 @@ import commentFragment from "./commentFragment";
 import AddComment from "./AddComment";
 import "./style.css";
 
-class CommentCard extends Component {
+class CommentCard extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
