@@ -199,6 +199,8 @@ class TgSelect extends React.Component {
               this.input.blur();
             }
             this.setState({ isOpen: false });
+            e.preventDefault();
+            e.stopPropagation(); //this prevents dialog's it is in from closing
           } else if (
             !(
               which === Keys.BACKSPACE ||
