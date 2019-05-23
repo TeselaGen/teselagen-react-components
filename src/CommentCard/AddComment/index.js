@@ -1,6 +1,6 @@
 /* Copyright (C) 2018 TeselaGen Biotechnology, Inc. */
 
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import { reduxForm } from "redux-form";
 import { Button, Intent, Classes } from "@blueprintjs/core";
 import scrollIntoView from "dom-scroll-into-view";
@@ -12,7 +12,7 @@ import { TextareaField } from "../../FormComponents";
 import { validateRequiredFieldsGenerator } from "../utils";
 import "./style.css";
 
-export class AddComment extends Component {
+export class AddComment extends PureComponent {
   componentDidMount() {
     if (this.props.isReplyForm) {
       // scroll so the form is showing fully
