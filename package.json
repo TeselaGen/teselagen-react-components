@@ -7,10 +7,9 @@
   "homepage": "http://teselagen.github.io/teselagen-react-components",
   "module": "es/index.js",
   "files": [
-    "css",
     "es",
     "lib",
-    "umd"
+    "index.d.ts"
   ],
   "scripts": {
     "build": "nwb build-react-component --copy-files --no-demo",
