@@ -94,6 +94,7 @@ export class AddComment extends PureComponent {
             </div>
           )}
           <TextareaField
+            data-test={`tg-${isReplyForm ? "reply" : "comment"}-message`}
             name="message"
             label={label}
             placeholder={placeholder}
@@ -111,7 +112,7 @@ export class AddComment extends PureComponent {
             />
           )}
           <Button
-            data-test="tg-add-a-comment"
+            data-test={`tg-submit-${isReplyForm ? "reply" : "comment"}`}
             style={{ marginRight: isReplyForm ? 15 : 0 }}
             className={Classes.SMALL + " " + Classes.MINIMAL}
             intent={Intent.SUCCESS}

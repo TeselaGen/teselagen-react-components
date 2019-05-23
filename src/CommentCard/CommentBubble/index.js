@@ -45,7 +45,11 @@ class Comment extends PureComponent {
 
     return (
       <form className="comment-edit-form">
-        <TextareaField name="message" defaultValue={comment.message} />
+        <TextareaField
+          data-test="tg-edit-message"
+          name="message"
+          defaultValue={comment.message}
+        />
         <div className="comment-button-container">
           <Button
             intent={Intent.DANGER}
@@ -54,6 +58,7 @@ class Comment extends PureComponent {
             onClick={this.toggleEditor}
           />
           <Button
+            data-test="tg-save-comment"
             intent={Intent.SUCCESS}
             text="Save"
             className={Classes.SMALL + " " + Classes.MINIMAL}
@@ -91,8 +96,16 @@ class Comment extends PureComponent {
 
     const commentMenu = (
       <Menu className="comment-edit-menu">
-        <MenuItem text="Edit" onClick={this.toggleEditor} />
-        <MenuItem text="Delete" onClick={this.handleDelete} />
+        <MenuItem
+          data-test={`${isReply ? "reply" : "comment"}-menu-item-edit`}
+          text="Edit"
+          onClick={this.toggleEditor}
+        />
+        <MenuItem
+          data-test={`${isReply ? "reply" : "comment"}-menu-item-delete`}
+          text="Delete"
+          onClick={this.handleDelete}
+        />
       </Menu>
     );
 
@@ -108,7 +121,10 @@ class Comment extends PureComponent {
         >
           {(user.id === currentUser.userId || user.id === currentUser.id) &&
             !isEditing && (
-              <div className="comment-edit-menu">
+              <div
+                data-test={`${isReply ? "reply" : "comment"}-edit-menu`}
+                className="comment-edit-menu"
+              >
                 <Popover content={commentMenu} position={Position.LEFT}>
                   <Button className={Classes.MINIMAL} icon="more" />
                 </Popover>
@@ -125,15 +141,37 @@ class Comment extends PureComponent {
             this.renderEditor()
           ) : (
             <div style={{ width: "90%" }}>
-              <div className="comment-bubble-header">
-                <div className="comment-bubble-username">{user.username}</div>
-                <div className="comment-bubble-date">
+              <div
+                data-test={`${isReply ? "reply" : "comment"}-bubble-header`}
+                className="comment-bubble-header"
+              >
+                <div
+                  data-test={`${isReply ? "reply" : "comment"}-bubble-username`}
+                  className="comment-bubble-username"
+                >
+                  {user.username}
+                </div>
+                <div
+                  data-test={`${isReply ? "reply" : "comment"}-bubble-date`}
+                  className="comment-bubble-date"
+                >
                   {moment(createdAt).fromNow()}
                   {createdAt !== updatedAt && ` (edited)`}
                 </div>
               </div>
-              <div className="comment-bubble-message">{message}</div>
-              <div className="comment-bubble-reply-button" onClick={startReply}>
+              <div
+                data-test={`${isReply ? "reply" : "comment"}-bubble-message`}
+                className="comment-bubble-message"
+              >
+                {message}
+              </div>
+              <div
+                data-test={`${
+                  isReply ? "reply" : "comment"
+                }-bubble-reply-button`}
+                className="comment-bubble-reply-button"
+                onClick={startReply}
+              >
                 Reply
               </div>
             </div>
