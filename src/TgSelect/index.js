@@ -167,11 +167,12 @@ class TgSelect extends React.Component {
       ? [value]
       : []
     ).map(value => {
+      if (value && value.label) return value; //if the value has a label, just use that
+      //if not, look for an existing option to use that value
       return options.find(
         opt => opt && opt.value === ((value && value.value) || value)
       );
     });
-
     return (
       <MultiSelect
         closeOnSelect={!multi}
