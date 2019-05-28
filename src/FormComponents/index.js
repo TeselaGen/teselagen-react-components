@@ -262,11 +262,7 @@ export const renderBlueprintCheckbox = props => {
       label={label}
       onChange={function(e, val) {
         input.onChange(e, val);
-        let valToUse = val;
-        if (e.target) {
-          valToUse = e.target.value !== "false";
-        }
-        onFieldSubmit(valToUse);
+        onFieldSubmit(e.target ? e.target.checked : val);
       }}
     />
   );
@@ -282,7 +278,7 @@ export const renderBlueprintSwitch = props => {
       label={label}
       onChange={function(e, val) {
         input.onChange(e, val);
-        onFieldSubmit(e.target ? e.target.value : val);
+        onFieldSubmit(e.target ? e.target.checked : val);
       }}
     />
   );
@@ -624,6 +620,7 @@ export const renderBlueprintNumericInput = props => {
     intent,
     inputClassName,
     onFieldSubmit,
+    onAnyNumberChange,
     ...rest
   } = props;
   function handleBlurOrButtonClick(stringVal) {
@@ -651,6 +648,8 @@ export const renderBlueprintNumericInput = props => {
       onValueChange={(numericVal, stringVal) => {
         // needed for redux form to change value
         input.onChange(stringVal);
+        //tnr: use this handler if you want to listen to all value changes!
+        onAnyNumberChange && onAnyNumberChange(numericVal);
       }}
       onButtonClick={function(numericVal, stringVal) {
         handleBlurOrButtonClick(stringVal);

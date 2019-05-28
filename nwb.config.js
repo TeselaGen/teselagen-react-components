@@ -1,15 +1,14 @@
-const path = require('path')
+const path = require("path");
 
 module.exports = {
   type: "react-component",
   npm: {
-    esModules: true,
     umd: false
   },
   webpack: {
     uglify: false,
     aliases: {
-       // **** You can comment one or more of these in to override an npm module with a local module. *****
+      // **** You can comment one or more of these in to override an npm module with a local module. *****
       // **** Just be sure to comment them back out before committing! *****
       // "ve-range-utils":
       //   console.log("comment me back out!") ||
@@ -37,7 +36,6 @@ module.exports = {
       react: path.resolve(__dirname, "node_modules/react")
     },
     extra: {
-      
       devtool: "source-map",
       module: {
         rules: [{ test: /demo\/src\/examples\//, loader: "raw-loader" }]
