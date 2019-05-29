@@ -296,6 +296,7 @@ class FormComponentsDemo extends React.Component {
             name="reactSelectField"
             inlineLabel={this.state.inlineLabels}
             label="ReactSelectField Collaborators"
+            placeholder="This has a long placeholder, wow, I hope it fits"
             onFieldSubmit={onFieldSubmit}
             createable={this.state.reactSelectFieldCreateable}
             options={[

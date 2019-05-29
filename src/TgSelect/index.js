@@ -3,7 +3,7 @@ import { Keys, Button, MenuItem } from "@blueprintjs/core";
 import React from "react";
 import { filter, isEqual } from "lodash";
 import fuzzysearch from "fuzzysearch";
-import classnames from "classnames";
+import classNames from "classnames";
 import "./style.css";
 
 class TgSelect extends React.Component {
@@ -22,7 +22,7 @@ class TgSelect extends React.Component {
       <div //we specifically don't use a BP MenuItem component here because the menu item is too slow when 100s are loaded and will cause the component to lag
         onClick={i.onClick || handleClick}
         key={index}
-        className={classnames(
+        className={classNames(
           "tg-select-option bp3-menu-item bp3-fill bp3-text-overflow-ellipsis",
           {
             "bp3-active": modifiers.active,
@@ -182,7 +182,7 @@ class TgSelect extends React.Component {
         query={this.state.query}
         popoverProps={{
           minimal: true,
-          className: classnames("tg-select", {
+          className: classNames("tg-select", {
             "tg-single-select": !multi
           }),
           wrapperTagName: "div",

@@ -1,4 +1,5 @@
 .tg-select {
+  width: 100%;
   min-width: 170px;
 }
 .tg-select input {
@@ -7,6 +8,12 @@
 .tg-select-option {
   max-width: 400px;
 }
+/* Fix cutoff placeholder */
+.tg-select .bp3-input-ghost {
+  width: 80%;
+  text-overflow: ellipsis;
+}
+
 .tg-single-select input {
   position: absolute;
   top: 5px;
