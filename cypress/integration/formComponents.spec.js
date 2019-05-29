@@ -66,6 +66,23 @@ describe("formComponents", () => {
       .contains(".bp3-tag", "Kyle Craft")
       .should("not.exist");
   });
+  it(`ReactSelectField multi all keyboard shortcuts work as expected`, () => {
+    cy.get(".tg-test-react-select-field-multi .tg-select input")
+      .as("inputWrapper")
+      .type("Kyle Craft{enter}");
+    cy.get("@inputWrapper")
+      .parent()
+      .contains(".bp3-tag", "Kyle Craft");
+    cy.get("@inputWrapper").type("{backspace}");
+    cy.get("@inputWrapper")
+      .parent()
+      .contains(".bp3-tag", "Kyle Craft")
+      .should("not.exist");
+
+    // cy.get("@inputWrapper")
+    //   .contains(".bp3-tag", "Kyle Craft")
+    //   .should("not.exist");
+  });
   it(`isRequired can be passed to any field to make it required!`, () => {
     cy.contains(".bp3-button", "Submit Form").click();
     cy.contains(".tg-test-text-area-field", "This field is required.");

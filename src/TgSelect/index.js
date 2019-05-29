@@ -189,6 +189,12 @@ class TgSelect extends React.Component {
         }}
         onKeyDown={e => {
           const { which } = e;
+          if (which === Keys.ENTER) {
+            // console.log('enter hit!')
+            e.preventDefault();
+
+            e.stopPropagation(); //this prevents dialog's it is in from closing
+          }
           if (which === Keys.ESCAPE || which === Keys.TAB) {
             // By default the escape key will not trigger a blur on the
             // input element. It must be done explicitly.
