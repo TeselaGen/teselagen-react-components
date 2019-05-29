@@ -44,7 +44,7 @@ class TgSelect extends React.Component {
   handleItemSelect = item => {
     const { onChange, value, multi } = this.props;
     if (multi) {
-      const valArray = value ? (Array.isArray(value) ? value : [value]) : [];
+      const valArray = getValueArray(value);
       return onChange([...valArray, item]);
     } else {
       this.setState({ isOpen: false });
@@ -76,7 +76,8 @@ class TgSelect extends React.Component {
     const { label } = item;
     const { value, multi } = this.props;
     if (multi) {
-      const valArray = value ? (Array.isArray(value) ? value : [value]) : [];
+      const valArray = getValueArray(value);
+
       const filteredVals = filter(
         value,
         obj => !isEqual(obj.value, item.value)
@@ -161,12 +162,7 @@ class TgSelect extends React.Component {
     const maybeCreateNewItemRenderer = createable
       ? renderCreateNewOption
       : null;
-    const selectedItems = (Array.isArray(value)
-      ? value
-      : value
-      ? [value]
-      : []
-    ).map(value => {
+    const selectedItems = getValueArray(value).map(value => {
       if (value && value.label) return value; //if the value has a label, just use that
       //if not, look for an existing option to use that value
       return options.find(
@@ -266,4 +262,8 @@ export function createNewOption(newValString) {
     label: newValString,
     value: newValString
   };
+}
+
+function getValueArray(value) {
+  return value || value === 0 ? (Array.isArray(value) ? value : [value]) : [];
 }

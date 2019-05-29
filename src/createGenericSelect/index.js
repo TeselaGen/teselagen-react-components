@@ -172,12 +172,13 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
           meta: { form },
           input: { name },
           changeFieldValue,
-
+          isMultiSelect,
           // setNullOnClear,
           // clearFields,
           onClear = noop
         } = this.props;
-        changeFieldValue(form, name, null);
+        const newVal = isMultiSelect ? [] : null;
+        changeFieldValue(form, name, newVal);
         onClear();
         this.setState({
           tempValue: null
