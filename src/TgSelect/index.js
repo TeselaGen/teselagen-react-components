@@ -9,6 +9,7 @@ import "./style.css";
 class TgSelect extends React.Component {
   state = {
     isOpen: false,
+    activeItem: null,
     query: ""
   };
   static defaultProps = {
@@ -43,6 +44,7 @@ class TgSelect extends React.Component {
 
   handleItemSelect = item => {
     const { onChange, value, multi } = this.props;
+    this.setState({ activeItem: null });
     if (multi) {
       const valArray = getValueArray(value);
       return onChange([...valArray, item]);
@@ -60,6 +62,12 @@ class TgSelect extends React.Component {
       (obj, i) => !isEqual(i, tagProps["data-tag-index"])
     );
     e.stopPropagation();
+    return onChange(filteredVals);
+  };
+  handleTagInputRemove = (val, index) => {
+    const { onChange, value } = this.props;
+    const filteredVals = filter(value, (obj, i) => !isEqual(i, index));
+    // e.stopPropagation();
     return onChange(filteredVals);
   };
 
@@ -98,6 +106,13 @@ class TgSelect extends React.Component {
       query
     });
     onInputChange(query);
+  };
+  handleActiveItemChange = item => {
+    // const { onInputChange = () => {} } = this.props;
+    this.setState({
+      activeItem: item
+    });
+    // onInputChange(query);
   };
   onInteraction = () => {
     if (this.input != null && this.input !== document.activeElement) {
@@ -171,8 +186,13 @@ class TgSelect extends React.Component {
     });
     return (
       <MultiSelect
+        onActiveItemChange={this.handleActiveItemChange}
         closeOnSelect={!multi}
         items={options || []}
+        activeItem={
+          this.state.activeItem ||
+          (options && options.filter(opt => !selectedItems.includes(opt))[0])
+        }
         itemDisabled={itemDisabled}
         resetOnSelect
         query={this.state.query}
@@ -190,7 +210,6 @@ class TgSelect extends React.Component {
         onKeyDown={e => {
           const { which } = e;
           if (which === Keys.ENTER) {
-            // console.log('enter hit!')
             e.preventDefault();
 
             e.stopPropagation(); //this prevents dialog's it is in from closing
@@ -236,6 +255,7 @@ class TgSelect extends React.Component {
               className: "tg-select-value",
               onRemove: multi ? this.handleTagRemove : null
             },
+            onRemove: multi ? this.handleTagInputRemove : null,
             rightElement: rightElement,
 
             ...tagInputProps //spread additional tag input props here

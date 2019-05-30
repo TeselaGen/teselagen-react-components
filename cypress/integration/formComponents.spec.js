@@ -66,18 +66,50 @@ describe("formComponents", () => {
       .contains(".bp3-tag", "Kyle Craft")
       .should("not.exist");
   });
-  it(`ReactSelectField multi all keyboard shortcuts work as expected`, () => {
+  it(`ReactSelectField multi delete keyboard shortcut works as expected`, () => {
     cy.get(".tg-test-react-select-field-multi .tg-select input")
       .as("inputWrapper")
       .type("Kyle Craft{enter}");
     cy.get("@inputWrapper")
       .parent()
       .contains(".bp3-tag", "Kyle Craft");
-    cy.get("@inputWrapper").type("{backspace}");
+    cy.get("@inputWrapper").type("{backspace}{backspace}");
     cy.get("@inputWrapper")
       .parent()
       .contains(".bp3-tag", "Kyle Craft")
       .should("not.exist");
+    cy.get(".tg-test-react-select-field-multi .tg-select-option").should(
+      "exist"
+    );
+    cy.get("@inputWrapper").type("{enter}");
+    cy.get("@inputWrapper")
+      .parent()
+      .contains(".bp3-tag", "Rodrigo Pavez");
+
+    // cy.get("@inputWrapper")
+    //   .contains(".bp3-tag", "Kyle Craft")
+    //   .should("not.exist");
+  });
+  it(`ReactSelectField multi multiple enter keyboard shortcuts work as expected`, () => {
+    cy.get(".tg-test-react-select-field-multi .tg-select input")
+      .as("inputWrapper")
+      .type("{enter}{enter}");
+    cy.get("@inputWrapper")
+      .parent()
+      .contains(".bp3-tag", "Rodrigo Pavez");
+    cy.get("@inputWrapper")
+      .parent()
+      .contains(".bp3-tag", "Ximena Morales");
+    // cy.get("@inputWrapper").type("{backspace}{backspace}");
+    // cy.get("@inputWrapper")
+    //   .parent()
+    //   .contains(".bp3-tag", "Kyle Craft")
+    //   .should("not.exist");
+    //   cy.get(".tg-test-react-select-field-multi .tg-select-option").should("exist")
+    //   cy.get("@inputWrapper").type("{enter}");
+    //   cy.get("@inputWrapper")
+    //   .parent()
+    //   .contains(".bp3-tag", "Rodrigo Pavez");
 
     // cy.get("@inputWrapper")
     //   .contains(".bp3-tag", "Kyle Craft")
