@@ -62,7 +62,8 @@ class TgSelect extends React.Component {
       (obj, i) => !isEqual(i, tagProps["data-tag-index"])
     );
     e.stopPropagation();
-    return onChange(filteredVals);
+    onChange(filteredVals);
+    this.input.focus();
   };
   handleTagInputRemove = (val, index) => {
     const { onChange, value } = this.props;
@@ -78,6 +79,7 @@ class TgSelect extends React.Component {
     this.setState({ query: "" });
     onChange([]);
     this.setState({ isOpen: false });
+    this.input.focus();
   };
 
   itemPredicate = (queryString, item) => {
@@ -137,6 +139,7 @@ class TgSelect extends React.Component {
       inputProps,
       placeholder = "Select...",
       isLoading,
+      onBlur,
       ...rest
     } = this.props;
     const rightElement = isLoading ? (
@@ -257,8 +260,11 @@ class TgSelect extends React.Component {
             },
             onRemove: multi ? this.handleTagInputRemove : null,
             rightElement: rightElement,
-
-            ...tagInputProps //spread additional tag input props here
+            ...tagInputProps, //spread additional tag input props here
+            inputProps: {
+              onBlur,
+              ...(tagInputProps && tagInputProps.inputProps)
+            }
           }
         }}
         isLoading={isLoading}
