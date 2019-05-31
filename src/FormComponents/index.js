@@ -145,13 +145,7 @@ class AbstractInput extends React.Component {
     const testClassName = "tg-test-" + kebabCase(input.name);
     if (noFillField) {
       componentToWrap = (
-        <div
-          className={classNames(testClassName, {
-            "tg-no-fill-field": noFillField
-          })}
-        >
-          {componentToWrap}
-        </div>
+        <div className="tg-no-fill-field">{componentToWrap}</div>
       );
     }
     return (
