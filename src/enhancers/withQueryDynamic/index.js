@@ -308,7 +308,9 @@ class ComponentHelper extends React.Component {
       }
     } = this.props;
     setTimeout(function() {
-      const entitiesById = keyBy(entities, "id");
+      const key = get(entities, "[0].code") ? "code" : "id";
+
+      const entitiesById = keyBy(entities, key);
       const newIdMap = {
         ...(keepOldEntities && selectedEntities)
       };
