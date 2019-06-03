@@ -304,6 +304,10 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
           currentValue: value
         };
 
+        let hasValue = !!value;
+        // need to account for case where value = [] which is empty
+        if (Array.isArray(value) && !value.length) hasValue = false;
+
         return noDialog ? (
           <div className="tg-generic-select-container" onClick={preventBubble}>
             <GenericSelectInner {...propsToPass} />
@@ -320,11 +324,11 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
                     getButton(value, propsToPass, this.state)
                   ) : (
                     <Button
-                      intent={value ? Intent.NONE : Intent.PRIMARY}
+                      intent={hasValue ? Intent.NONE : Intent.PRIMARY}
                       text={
                         getButtonText
                           ? getButtonText(value)
-                          : value
+                          : hasValue
                           ? "Change " + readableName
                           : `Select ${readableName}`
                       }
@@ -333,7 +337,7 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
                     />
                   )}
                 </GenericSelectInner>
-                {value && !noRemoveButton && !noForm && (
+                {hasValue && !noRemoveButton && !noForm && (
                   <Tooltip
                     disabled={buttonProps.disabled}
                     content={"Clear " + readableName}

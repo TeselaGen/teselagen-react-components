@@ -44,7 +44,7 @@ class AlertWrapper extends Component {
         isOpen={this.state.isOpen}
         intent={intent}
         cancelButtonText={cancelButtonText}
-        onCancel={() => doClose(false)}
+        onCancel={cancelButtonText ? () => doClose(false) : undefined}
         onConfirm={() => doClose(true)}
         {...rest}
       >
