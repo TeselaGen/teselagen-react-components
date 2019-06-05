@@ -78,6 +78,7 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
         schema,
         dialogProps,
         postSelectDTProps,
+        noFill,
         passedName
       }) => {
         const modelName = Array.isArray(fragment)
@@ -91,9 +92,11 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
           });
         return {
           readableName,
-          containerStyle: {
-            width: "100%"
-          },
+          ...(!noFill && {
+            containerStyle: {
+              width: "100%"
+            }
+          }),
           modelName,
           ...(postSelectDTProps && {
             postSelectFormName: passedName + "PostSelect"
