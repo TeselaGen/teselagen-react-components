@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@blueprintjs/core";
-import { camelCase, noop, get, identity, isEmpty } from "lodash";
+import { camelCase, noop, get, identity } from "lodash";
 import { compose, withProps, branch } from "recompose";
 import CollapsibleCard from "../CollapsibleCard";
 import InfoHelper from "../InfoHelper";
@@ -32,12 +32,14 @@ function J5TableCard({
     entities = tableParams.entities;
   }
   entities = entities || [];
+  const filteredEntities = processData(entities);
 
   return (
     <CollapsibleCard
       icon={helperMessage && <InfoHelper>{helperMessage}</InfoHelper>}
       title={title}
-      initialClosed={isEmpty(tableParams) && entities && !entities.length}
+      key={title + (filteredEntities.length > 0 ? "_nonempty" : "")} // force remount on data arrival
+      initialClosed={!filteredEntities.length}
       openTitleElements={[
         isLinkable && (
           <Button key="linkButton" onClick={() => showLinkModal()}>
@@ -53,7 +55,7 @@ function J5TableCard({
         formName={camelCase(title)} //because these tables are currently not connected to table params, we need to manually pass a formName here
         cellRenderer={cellRenderer}
         {...tableParams}
-        entities={processData(entities)}
+        entities={filteredEntities}
         // schema is weird because we are sometimes generating schema off of the entities
         schema={createSchema(entities) || tableParams.schema || schema}
       />
@@ -104,10 +106,7 @@ export default compose(
     props => props.runTimeQueryOptions,
     compose(
       withTableParams({
-        urlConnected: false,
-        defaults: {
-          pageSize: 5
-        }
+        urlConnected: false
       }),
       withQueryDynamic({
         isPlural: true

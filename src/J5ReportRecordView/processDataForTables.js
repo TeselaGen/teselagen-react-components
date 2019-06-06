@@ -94,6 +94,8 @@ const processJ5PcrReactions = j5PcrReactions =>
 
 const processJ5OligoSynthesis = j5Oligos =>
   j5Oligos.map(j5Oligo => {
+    // todo this shouldn't rely on the oligo name to parse the target parts
+    // if someone uses output naming templates for oligos then this will not work
     const partNames = getWrappedInParensMatches(j5Oligo.name);
 
     return {
@@ -104,6 +106,39 @@ const processJ5OligoSynthesis = j5Oligos =>
       lastTargetPart: partNames[1]
     };
   });
+
+const processJ5AnnealedOligo = j5Oligos => {
+  return j5Oligos
+    .filter(({ oligo }) => {
+      // only keep the j5 oligos that link to a top or bottom annealed oligo
+      return (
+        oligo &&
+        oligo.j5AnnealedOligosTopOligos &&
+        oligo.j5AnnealedOligosBottomOligos &&
+        (oligo.j5AnnealedOligosTopOligos.length ||
+          oligo.j5AnnealedOligosBottomOligos.length)
+      );
+    })
+    .map(j5Oligo => {
+      let targetPart = "";
+      try {
+        targetPart = j5Oligo.oligo.j5AnnealedOligosTopOligos.length
+          ? j5Oligo.oligo.j5AnnealedOligosTopOligos[0].sequence.j5AssemblyPiece
+              .j5AssemblyPieceParts[0].j5InputPart.part.name
+          : j5Oligo.oligo.j5AnnealedOligosBottomOligos[0].sequence
+              .j5AssemblyPiece.j5AssemblyPieceParts[0].j5InputPart.part.name;
+      } catch (e) {
+        targetPart = "not found";
+      }
+
+      return {
+        ...j5Oligo,
+        id: "oligo_" + j5Oligo.id,
+        name: j5Oligo.name,
+        targetPart
+      };
+    });
+};
 
 function getWrappedInParensMatches(s) {
   const matches = [];
@@ -121,6 +156,7 @@ export default {
     getInputPartsFromInputSequences
   ),
   j5OligoSynthesis: processJ5OligoSynthesis,
+  j5AnnealedOligo: processJ5AnnealedOligo,
   j5AssemblyPiece: processJ5AssemblyPieces,
   j5DirectSynthesis: processJ5DirectSyntheses,
   j5RunConstruct: processJ5RunConstructs,

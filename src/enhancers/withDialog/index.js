@@ -85,6 +85,8 @@ export default function withDialog(topLevelDialogProps) {
                 }}
                 title={title}
                 isOpen={isOpen}
+                canEscapeKeyClose={false}
+                canOutsideClickClose={false}
                 {...extraDialogProps}
               >
                 <WrappedComponent

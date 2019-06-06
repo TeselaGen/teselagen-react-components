@@ -1,6 +1,6 @@
 //@flow
 import React, { Component } from "react";
-import { Popover, Button, Tooltip, Icon, Classes } from "@blueprintjs/core";
+import { Popover, Button, Tooltip, Icon } from "@blueprintjs/core";
 
 export default class InfoHelper extends Component {
   render() {
@@ -14,21 +14,36 @@ export default class InfoHelper extends Component {
       size,
       popoverProps = {},
       disabled,
+      noPopoverSizing,
       displayToSide,
       style,
       ...rest
     }: Props = this.props;
     const IconToUse = isButton ? Button : Icon;
-    const IconInner = (
-      <IconToUse
-        icon={icon}
-        className={className}
-        iconSize={size}
-        disabled={disabled}
-        {...rest}
-      />
-    );
+    const iconProps = {
+      icon,
+      className,
+      disabled
+    };
+    if (!isButton) iconProps.iconSize = size;
+
+    const IconInner = <IconToUse {...iconProps} {...rest} />;
     let toReturn;
+    const toolTipOrPopoverProps = {
+      disabled: disabled,
+      popoverClassName: !noPopoverSizing && " bp3-popover-content-sizing",
+      content: content || children,
+      modifiers: {
+        preventOverflow: { enabled: false },
+        hide: {
+          enabled: false
+        },
+        flip: {
+          boundariesElement: "viewport"
+        }
+      },
+      ...popoverProps
+    };
     if (displayToSide) {
       toReturn = (
         <React.Fragment>
@@ -39,36 +54,14 @@ export default class InfoHelper extends Component {
         </React.Fragment>
       );
     } else if (isPopover) {
-      toReturn = (
-        <Popover
-          disabled={disabled}
-          popoverClassName={Classes.DARK}
-          target={
-            <Button
-              style={{ borderRadius: 15, borderWidth: 5 }}
-              minimal
-              className={className}
-              icon={icon}
-            />
-          }
-          content={<div style={{ padding: 5 }}>{content || children}</div>}
-          {...popoverProps}
-        />
-      );
+      toReturn = <Popover {...toolTipOrPopoverProps} target={IconInner} />;
     } else {
-      toReturn = (
-        <Tooltip
-          disabled={disabled}
-          target={IconInner}
-          content={content || children}
-          {...popoverProps}
-        />
-      );
+      toReturn = <Tooltip {...toolTipOrPopoverProps} target={IconInner} />;
     }
     return (
       <div
         style={{ display: "flex", ...style }}
-        className={"info-helper-wrapper"}
+        className="info-helper-wrapper"
       >
         {toReturn}
       </div>

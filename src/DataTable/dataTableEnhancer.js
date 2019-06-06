@@ -4,16 +4,15 @@
  * @property {boolean} isPlural Are we searching for 1 thing or many?
  * @property {string} queryName What the props come back on ( by default = modelName + 'Query')
  */
-import withTableParams from "../DataTable/utils/withTableParams";
-import { reduxForm } from "redux-form";
+import { reduxForm, formValues } from "redux-form";
 import { compose } from "redux";
 import { arrayMove } from "react-sortable-hoc";
 import { toArray, keyBy, get } from "lodash";
-import withFields from "../enhancers/withFields";
 import { withProps, withState, branch } from "recompose";
-import pureNoFunc from "../utils/pureNoFunc";
+import withTableParams from "../DataTable/utils/withTableParams";
 import convertSchema from "../DataTable/utils/convertSchema";
 import viewColumn from "../DataTable/viewColumn";
+import pureNoFunc from "../utils/pureNoFunc";
 
 export default compose(
   //connect to withTableParams here in the dataTable component so that, in the case that the table is not manually connected,
@@ -133,8 +132,8 @@ export default compose(
               return field.render
                 ? !field.render(val, e)
                 : cellRenderer[field.path]
-                  ? !cellRenderer[field.path](val, e)
-                  : !val;
+                ? !cellRenderer[field.path](val, e)
+                : !val;
             });
           }
           if (noValsForField) {
@@ -155,13 +154,24 @@ export default compose(
       };
 
       if (columnOrderings) {
-        schemaToUse.fields = schemaToUse.fields.sort(
-          ({ path: path1 }, { path: path2 }) => {
+        const fieldsWithOrders = [];
+        const fieldsWithoutOrder = [];
+        // if a new field has been added since the orderings were set then we want
+        // it to be at the end instead of the beginning
+        schemaToUse.fields.forEach(field => {
+          if (columnOrderings.indexOf(field.path) > -1) {
+            fieldsWithOrders.push(field);
+          } else {
+            fieldsWithoutOrder.push(field);
+          }
+        });
+        schemaToUse.fields = fieldsWithOrders
+          .sort(({ path: path1 }, { path: path2 }) => {
             return (
               columnOrderings.indexOf(path1) - columnOrderings.indexOf(path2)
             );
-          }
-        );
+          })
+          .concat(fieldsWithoutOrder);
       }
 
       if (syncDisplayOptionsToDb) {
@@ -251,14 +261,21 @@ export default compose(
     };
   }),
   reduxForm({}), //the formName is passed via withTableParams and is often user overridden
-  withFields({
-    names: [
-      "localStorageForceUpdate",
-      "reduxFormQueryParams",
-      "reduxFormSearchInput",
-      "reduxFormSelectedEntityIdMap",
-      "reduxFormExpandedEntityIdMap"
-    ]
-  }),
+  formValues(
+    "localStorageForceUpdate",
+    "reduxFormQueryParams",
+    "reduxFormSearchInput",
+    "reduxFormSelectedEntityIdMap",
+    "reduxFormExpandedEntityIdMap"
+  ),
+  // withFields({
+  //   names: [
+  //     "localStorageForceUpdate",
+  //     "reduxFormQueryParams",
+  //     "reduxFormSearchInput",
+  //     "reduxFormSelectedEntityIdMap",
+  //     "reduxFormExpandedEntityIdMap"
+  //   ]
+  // }),
   branch(props => !props.alwaysRerender, pureNoFunc)
 );

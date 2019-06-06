@@ -2,15 +2,19 @@ import React, { Component } from "react";
 // import EditViewHOC from '../../EditViewHOC'
 import { reduxForm } from "redux-form";
 import { Button, Dialog, Classes } from "@blueprintjs/core";
+import { getApolloMethods } from "@teselagen/apollo-methods";
 import { each, get, startCase, times, zip, flatten, noop } from "lodash";
 import moment from "moment";
-import schemas from "./schemas";
-import Loading from "../Loading";
-import { getLinkDialogProps } from "./utils";
 import papaparse from "papaparse";
+import { ApolloConsumer } from "react-apollo";
+import Loading from "../Loading";
 import magicDownload from "../DownloadLink/magicDownload";
+import showProgressToast from "../utils/showProgressToast";
+import schemas from "./schemas";
+import { getLinkDialogProps } from "./utils";
 import exportOligosFields from "./exportOligosFields";
 import J5TableCard from "./J5TableCard";
+import RecordInfoTable from "./RecordInfoTable";
 import processDataForTables from "./processDataForTables";
 import "./style.css";
 
@@ -27,7 +31,8 @@ const sharedTableProps = {
 class J5ReportRecordView extends Component {
   state = {
     linkDialogName: undefined,
-    partCidMap: {}
+    partCidMap: {},
+    loadingExportOligos: false
   };
   showLinkModal = name => {
     this.setState({ linkDialogName: name });
@@ -39,11 +44,34 @@ class J5ReportRecordView extends Component {
     this.setState({ linkDialogName: name });
   };
 
-  handleExportOligosToCsv = () => {
-    const { data } = this.props;
-    const j5OligoSyntheses = processDataForTables.j5OligoSynthesis(
-      data.j5Report.j5OligoSyntheses
-    );
+  handleExportOligosToCsv = async apolloClient => {
+    const { data, fragmentMap } = this.props;
+    let oligos;
+    if (fragmentMap) {
+      this.setState({
+        loadingExportOligos: true
+      });
+      try {
+        const { makeSafeQueryWithToast } = getApolloMethods(apolloClient);
+        const safeQuery = makeSafeQueryWithToast(showProgressToast);
+        oligos = await safeQuery(fragmentMap.j5OligoSynthesis, {
+          variables: {
+            filter: {
+              j5ReportId: data.j5Report.id
+            }
+          }
+        });
+      } catch (error) {
+        console.error("error:", error);
+        window.toastr.error("Error exporting oligos.");
+      }
+      this.setState({
+        loadingExportOligos: false
+      });
+    } else {
+      oligos = data.j5Report.j5OligoSyntheses;
+    }
+    const j5OligoSyntheses = processDataForTables.j5OligoSynthesis(oligos);
     const csvString = papaparse.unparse([
       ["OligoSynthesis"],
       exportOligosFields.map(field => field.displayName),
@@ -122,11 +150,19 @@ class J5ReportRecordView extends Component {
     // option to override export handler
     const { onExportOligosAsCsvClick } = this.props;
     return (
-      <Button
-        onClick={onExportOligosAsCsvClick || this.handleExportOligosToCsv}
-      >
-        Export as CSV
-      </Button>
+      <ApolloConsumer>
+        {client => {
+          const clickFn = () => this.handleExportOligosToCsv(client);
+          return (
+            <Button
+              loading={this.state.loadingExportOligos}
+              onClick={onExportOligosAsCsvClick || clickFn}
+            >
+              Export as CSV
+            </Button>
+          );
+        }}
+      </ApolloConsumer>
     );
   };
 
@@ -171,7 +207,13 @@ class J5ReportRecordView extends Component {
   }
 
   renderHeader = () => {
-    const { data, additionalHeaderItems = "", LinkJ5TableDialog } = this.props;
+    const {
+      data,
+      additionalHeaderButtons,
+      LinkJ5TableDialog,
+      LinkJ5ReportButton,
+      additionalHeaderComponent
+    } = this.props;
 
     if (data.loading) return <Loading loading />;
 
@@ -180,7 +222,16 @@ class J5ReportRecordView extends Component {
     }
 
     // JSON.parse(localStorage.getItem('TEMPORARY_j5Run')) || {}
-    const { name, assemblyType, dateRan } = data.j5Report;
+    const { name, assemblyType, createdAt, dateRan, design } = data.j5Report;
+
+    const infoFields = [
+      [
+        ["Design Name", design && design.name ? design.name : name],
+        ["Assembly Method", this.getAssemblyMethod()],
+        ["Assembly Type", assemblyType],
+        ["Date Ran", moment(dateRan || createdAt).format("lll")] //fallback to createdAt if dateRan isn't provided (dateRan is derived from the imported j5report)
+      ]
+    ];
 
     return (
       <div className="j5-report-header tg-card">
@@ -193,16 +244,8 @@ class J5ReportRecordView extends Component {
     <InputField name="assemblyType" label="Assembly Type" />
     {Footer}
   </form>*/}
-        <FieldWithLabel label="Design Name" field={name} />
-        <FieldWithLabel
-          label="Assembly Method"
-          field={this.getAssemblyMethod()}
-        />
-        <FieldWithLabel label="Assembly Type" field={assemblyType} />
-        <FieldWithLabel
-          label="Date Ran"
-          field={moment(dateRan).format("lll")}
-        />
+        <RecordInfoTable sections={infoFields} />
+        {additionalHeaderComponent}
         {/* tnr: add these in when they are available in lims/hde */}
         {/* <div>
       <span className="j5-report-fieldname">User Name:</span>{" "}
@@ -222,11 +265,14 @@ class J5ReportRecordView extends Component {
     </div> */}
         <div className={Classes.BUTTON_GROUP} style={{ marginTop: 10 }}>
           {this.renderDownloadButton()}
-          {additionalHeaderItems}
-          {LinkJ5TableDialog && (
+          {additionalHeaderButtons}
+          {LinkJ5TableDialog && !LinkJ5ReportButton && (
             <Button onClick={this.linkInputSequences}>
               Link j5 Assembly Report Data to Materials
             </Button>
+          )}
+          {LinkJ5ReportButton && (
+            <LinkJ5ReportButton j5Report={data.j5Report} />
           )}
         </div>
       </div>
@@ -248,8 +294,14 @@ class J5ReportRecordView extends Component {
       return {
         path: `j5ConstructAssemblyPieces[${i}].assemblyPiece.j5AssemblyPieceParts`,
         displayName: `Piece-${i + 1} Parts`,
-        render: v =>
-          v && v.map(p => get(p, "j5InputPart.sequencePart.name")).join(", ")
+        render: v => {
+          if (typeof v === "string") {
+            return v;
+          }
+          return (
+            v && v.map(p => get(p, "j5InputPart.sequencePart.name")).join(", ")
+          );
+        }
       };
     });
     const extraColumns = flatten(
@@ -257,12 +309,12 @@ class J5ReportRecordView extends Component {
     );
     return {
       fields: [
+        { path: "name", type: "string", displayName: "Construct Name" },
         {
           path: "id",
           type: "string",
           displayName: "Assembly ID"
         },
-        { path: "name", type: "string", displayName: "Construct Name" },
         {
           type: "string",
           displayName: "Assembly Method",
@@ -302,14 +354,19 @@ class J5ReportRecordView extends Component {
       data,
       getIsLinkedCellRenderer,
       LinkJ5TableDialog,
+      LinkJ5ReportButton,
       onConstructDoubleClick = noop,
       pcrReactionsTitleElements,
       constructsTitleElements = [],
       oligosTitleElements = [],
       linkDialogWidth = 500,
       fragmentMap = {},
-      noPrebuiltConstructs = false
+      linkFragmentMap,
+      noPrebuiltConstructs = false,
+      dataTableProps: passedDataTableProps,
+      synthonSequenceTitleElements = []
     } = this.props;
+
     const { linkDialogName } = this.state;
 
     if (data.loading) return <Loading loading />;
@@ -318,7 +375,11 @@ class J5ReportRecordView extends Component {
       return <div>No report found!</div>;
     }
     const j5Report = data.j5Report;
-    const linkDialogProps = getLinkDialogProps(data.j5Report, fragmentMap);
+    const isLinkable = LinkJ5TableDialog || LinkJ5ReportButton;
+    const linkDialogProps = getLinkDialogProps(
+      data.j5Report,
+      linkFragmentMap || fragmentMap
+    );
     const currentLink = linkDialogProps[linkDialogName];
     const linkKeys = Object.keys(linkDialogProps);
     let moveToNextTable;
@@ -342,18 +403,23 @@ class J5ReportRecordView extends Component {
           });
         });
     }
+    let dataTableProps = sharedTableProps;
+    if (passedDataTableProps) {
+      dataTableProps = {
+        ...sharedTableProps,
+        ...passedDataTableProps
+      };
+    }
 
     return (
-      <div className={"j5-report-container"}>
+      <div className="j5-report-container">
         <div style={{ display: "flex-columns" }}>
           {this.renderHeader()}
 
           {/* tnr: this is just the dialog that needs to be on the page. not actually rendering anything */}
           {LinkJ5TableDialog && (
             <Dialog
-              style={{
-                width: linkDialogWidth
-              }}
+              style={{ width: linkDialogWidth }}
               {...(currentLink ? currentLink.dialogProps : {})}
               onClose={this.hideLinkModal}
               isOpen={!!linkDialogName}
@@ -387,10 +453,10 @@ class J5ReportRecordView extends Component {
               }
               fragment={fragmentMap.j5RunConstruct}
               showLinkModal={() => this.showLinkModal("constructs")}
-              isLinkable={LinkJ5TableDialog}
+              isLinkable={isLinkable}
               onDoubleClick={onConstructDoubleClick}
               schema={this.getSchema("j5RunConstructs")}
-              tableProps={sharedTableProps}
+              tableProps={dataTableProps}
             />
           )}
 
@@ -407,9 +473,9 @@ class J5ReportRecordView extends Component {
             }
             fragment={fragmentMap.j5RunConstruct}
             showLinkModal={() => this.showLinkModal("constructs")}
-            isLinkable={LinkJ5TableDialog}
+            isLinkable={isLinkable}
             onDoubleClick={onConstructDoubleClick}
-            tableProps={sharedTableProps}
+            tableProps={dataTableProps}
             schema={this.getSchema("j5RunConstructs")}
             openTitleElements={constructsTitleElements}
           />
@@ -422,8 +488,8 @@ class J5ReportRecordView extends Component {
             entities={j5Report.j5InputSequences}
             fragment={fragmentMap.j5InputSequence}
             showLinkModal={() => this.showLinkModal("inputSequences")}
-            isLinkable={LinkJ5TableDialog}
-            tableProps={sharedTableProps}
+            isLinkable={isLinkable}
+            tableProps={dataTableProps}
             cellRenderer={
               getIsLinkedCellRenderer &&
               getIsLinkedCellRenderer(
@@ -443,19 +509,19 @@ class J5ReportRecordView extends Component {
             processData={processDataForTables.j5InputPart}
             entities={j5Report.j5InputSequences}
             fragment={fragmentMap.j5InputSequence}
-            tableProps={sharedTableProps}
+            tableProps={dataTableProps}
             schema={this.getSchema("j5InputParts")}
           />
 
           <J5TableCard
             j5ReportId={j5Report.id}
             helperMessage="This is the list of oligos that need to be directly synthesized."
-            title="Oligo Synthesis"
+            title="Assembly Oligos"
             processData={processDataForTables.j5OligoSynthesis}
             entities={j5Report.j5OligoSyntheses}
             fragment={fragmentMap.j5OligoSynthesis}
-            tableProps={sharedTableProps}
-            isLinkable={LinkJ5TableDialog}
+            tableProps={dataTableProps}
+            isLinkable={isLinkable}
             schema={this.getSchema("j5OligoSyntheses")}
             showLinkModal={() => this.showLinkModal("oligos")}
             linkButtonText="Link Oligos"
@@ -476,16 +542,39 @@ class J5ReportRecordView extends Component {
 
           <J5TableCard
             j5ReportId={j5Report.id}
+            helperMessage="This is the list of annealed oligos."
+            title="Annealed Oligos"
+            processData={processDataForTables.j5AnnealedOligo}
+            entities={j5Report.j5OligoSyntheses}
+            fragment={fragmentMap.j5OligoSynthesis}
+            tableProps={dataTableProps}
+            isLinkable={isLinkable}
+            schema={this.getSchema("j5AnnealedOligos")}
+            showLinkModal={() => this.showLinkModal("oligos")}
+            linkButtonText="Link Oligos"
+            cellRenderer={
+              getIsLinkedCellRenderer &&
+              getIsLinkedCellRenderer(
+                "oligo.sequence.polynucleotideMaterialId",
+                "oligo.sequence.hash",
+                "oligo"
+              )
+            }
+          />
+
+          <J5TableCard
+            j5ReportId={j5Report.id}
             helperMessage="This is the list DNA pieces that need to be directly synthesized."
-            title="DNA Synthesis"
+            title="Synthon Sequences"
             processData={processDataForTables.j5DirectSynthesis}
             entities={j5Report.j5DirectSyntheses}
-            tableProps={sharedTableProps}
+            tableProps={dataTableProps}
             schema={this.getSchema("j5DirectSyntheses")}
             fragment={fragmentMap.j5DirectSynthesis}
-            isLinkable={LinkJ5TableDialog}
+            isLinkable={isLinkable}
             showLinkModal={() => this.showLinkModal("dnaSynthesisSequences")}
             linkButtonText="Link DNA Synthesis Pieces"
+            openTitleElements={synthonSequenceTitleElements}
             cellRenderer={
               getIsLinkedCellRenderer &&
               getIsLinkedCellRenderer(
@@ -500,10 +589,10 @@ class J5ReportRecordView extends Component {
             j5ReportId={j5Report.id}
             helperMessage="These are the PCR reactions that need to be run to generate the
                 assembly pieces."
-            title="PCR Reactions"
+            title="PCRs"
             processData={processDataForTables.j5PcrReaction}
             entities={j5Report.j5PcrReactions}
-            tableProps={sharedTableProps}
+            tableProps={dataTableProps}
             openTitleElements={pcrReactionsTitleElements}
             fragment={fragmentMap.j5PcrReaction}
             schema={this.getSchema("j5PcrReactions")}
@@ -514,14 +603,14 @@ class J5ReportRecordView extends Component {
             helperMessage="These are the pieces of DNA that will get put together in a
                 final assembly reaction (Gibson/CPEC/SLIC/Golden-Gate) to give
                 the desired Constructs."
-            title="DNA Pieces to be Assembled"
+            title="Assembly Pieces"
             processData={processDataForTables.j5AssemblyPiece}
             entities={j5Report.j5AssemblyPieces}
             fragment={fragmentMap.j5AssemblyPiece}
-            isLinkable={LinkJ5TableDialog}
+            isLinkable={isLinkable}
             showLinkModal={() => this.showLinkModal("dnaPieces")}
             linkButtonText="Link DNA Pieces"
-            tableProps={sharedTableProps}
+            tableProps={dataTableProps}
             schema={this.getSchema("j5AssemblyPieces")}
             cellRenderer={
               getIsLinkedCellRenderer &&
@@ -537,7 +626,7 @@ class J5ReportRecordView extends Component {
             j5ReportId={j5Report.id}
             helperMessage="This lists which assembly pieces need to be combined to create
                 each construct."
-            title="Combination of Assembly Pieces"
+            title="Assemblies"
             processData={processDataForTables.j5RunConstruct}
             entities={
               get(j5Report, "j5RunConstructs[0].isPrebuilt") !== null &&
@@ -546,7 +635,7 @@ class J5ReportRecordView extends Component {
                 : j5Report.j5RunConstructs
             }
             fragment={fragmentMap.j5RunConstruct}
-            tableProps={sharedTableProps}
+            tableProps={dataTableProps}
             createSchema={this.createSchemaForCombinationOfAssemblyPieces}
           />
 
@@ -578,12 +667,3 @@ class J5ReportRecordView extends Component {
 export default reduxForm({
   form: "j5Report" // a unique name for this form
 })(J5ReportRecordView);
-
-function FieldWithLabel({ label, field }) {
-  return (
-    <div>
-      <span className="j5-report-fieldname">{label}: </span>
-      {field}
-    </div>
-  );
-}

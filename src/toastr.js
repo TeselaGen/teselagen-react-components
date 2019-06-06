@@ -10,33 +10,53 @@ const BottomToaster = Toaster.create({
   position: Position.BOTTOM
 });
 
+let counter = 5000;
 const generateToast = intent => (message, options) => {
   options = options || {};
   const toastToUse = options.bottom ? BottomToaster : TopToaster;
-
-  const uniqKey = toastToUse.show({
-    intent,
-    message,
-    action: options.action,
-    icon: options.icon
-  });
-  return function clear() {
+  let updatedTimeout;
+  if (options.updateTimeout) {
+    //generate a slightly different than default timeout to make the update stay on the page for a full 5 seconds
+    if (counter > 5500) {
+      updatedTimeout = --counter;
+    } else {
+      updatedTimeout = ++counter;
+    }
+  }
+  const uniqKey = toastToUse.show(
+    {
+      intent,
+      message,
+      timeout: options.timeout || updatedTimeout,
+      action: options.action,
+      icon: options.icon
+    },
+    options.key
+  );
+  function clear() {
     toastToUse.dismiss(uniqKey);
-  };
+  }
+  clear.key = uniqKey;
+  return clear;
 };
 
 function preventDuplicates(func) {
   const previousToasts = {};
   return (message, options = {}) => {
-    if (previousToasts[message]) {
-      previousToasts[message](); //clear it!
-    }
-
-    setTimeout(() => {
-      delete previousToasts[message];
-    }, options.timeout || 5000);
     const clearToast = func(message, options);
-    previousToasts[message] = clearToast;
+    // no duplicate check for toasts with updates
+
+    if (!options.key) {
+      if (!options.key && previousToasts[message]) {
+        previousToasts[message](); //clear it!
+      }
+
+      setTimeout(() => {
+        delete previousToasts[message];
+      }, options.timeout || 5000);
+
+      previousToasts[message] = clearToast;
+    }
     return clearToast;
   };
 }

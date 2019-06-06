@@ -1,28 +1,28 @@
-import DataTable from "../DataTable";
-import withTableParams from "../DataTable/utils/withTableParams";
-import withDialog from "../enhancers/withDialog";
-import withField from "../enhancers/withField";
-import withQuery from "../enhancers/withQuery";
-import DialogFooter from "../DialogFooter";
-import BlueprintError from "../BlueprintError";
-import generateQuery from "../utils/generateQuery";
-import { Button, Intent, Tooltip, FormGroup, Classes } from "@blueprintjs/core";
-import { get, isEqual, map, noop, pick, debounce, keyBy } from "lodash";
+import { Button, Intent, Tooltip, Classes } from "@blueprintjs/core";
+import { get, isEqual, noop, pick, debounce, keyBy } from "lodash";
 import pluralize from "pluralize";
 import { Query } from "react-apollo";
 import React, { Component } from "react";
 import { compose } from "react-apollo";
 import { connect } from "react-redux";
+import { withQuery } from "@teselagen/apollo-methods";
 import { branch, withProps } from "recompose";
 import { change, clearFields, reduxForm } from "redux-form";
 import ReactSelect from "react-select";
 import moment from "moment";
+import generateQuery from "../utils/generateQuery";
+import DialogFooter from "../DialogFooter";
+import withField from "../enhancers/withField";
+import withDialog from "../enhancers/withDialog";
+import withTableParams from "../DataTable/utils/withTableParams";
+import DataTable from "../DataTable";
+import { withAbstractWrapper } from "../FormComponents";
 
 function preventBubble(e) {
   e.stopPropagation();
 }
-//
-export default ({ modelNameToReadableName, withQueryAsFn }) => {
+
+export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
   return compose(
     // useage example:
     // <GenericSelect {...{
@@ -65,8 +65,9 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
         asyncBlurFields: [] //hacky fix for weird redux form asyncValidate error https://github.com/erikras/redux-form/issues/1675
       })
     ),
-    withProps(({ name, asReactSelect }) => ({
+    withProps(({ name, asReactSelect, idAs }) => ({
       passedName: name,
+      isCodeModel: idAs === "code",
       ...(asReactSelect && { noDialog: true })
     })),
     withProps(
@@ -76,6 +77,7 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
         isMultiSelect,
         schema,
         dialogProps,
+        postSelectDTProps,
         passedName
       }) => {
         const modelName = Array.isArray(fragment)
@@ -89,8 +91,13 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
           });
         return {
           readableName,
+          containerStyle: {
+            width: "100%"
+          },
           modelName,
-          postSelectFormName: passedName + "PostSelect",
+          ...(postSelectDTProps && {
+            postSelectFormName: passedName + "PostSelect"
+          }),
           schema: !schema.model
             ? {
                 model: modelName,
@@ -113,7 +120,8 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
           clearFields: (...args) => dispatch(clearFields(...args))
         };
       }
-    )
+    ),
+    withAbstractWrapper
   )(
     class GenericSelectOuter extends React.Component {
       state = {
@@ -163,10 +171,16 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
         const {
           meta: { form },
           input: { name },
+          changeFieldValue,
+          setNullOnClear,
           clearFields,
           onClear = noop
         } = this.props;
-        clearFields(form, true, true, name);
+        //because clearFields doesn't work if there is an initialValue passed
+        //for the genericSelect field, we allow users to specifically changeFieldValue to null
+        setNullOnClear
+          ? changeFieldValue(form, name, null)
+          : clearFields(form, false, false, name);
         onClear();
         this.setState({
           tempValue: null
@@ -192,12 +206,17 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
         const {
           additionalDataFragment,
           readableName,
+          asReactSelect,
           onSelect,
           isMultiSelect,
-          postSelectDTProps
+          postSelectDTProps,
+          isCodeModel
         } = this.props;
         const toSelect = isMultiSelect ? records : records[0];
         this.resetPostSelectSelection();
+        if (asReactSelect && !records.length) {
+          return this.removeSelection();
+        }
         if (!additionalDataFragment) {
           onSelect && onSelect(toSelect);
           this.handleOnChange(toSelect || null);
@@ -207,16 +226,27 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
         this.setState({
           fetchingData: true
         });
-        const queryFilter = {
+        const queryVariables = {
           filter: {
-            id: isMultiSelect ? records.map(({ id }) => id) : records[0].id
+            [isCodeModel ? "code" : "id"]: isMultiSelect
+              ? records.map(({ id, code }) => (isCodeModel ? code : id))
+              : isCodeModel
+              ? records[0].code
+              : records[0].id
           }
         };
         if (!postSelectDTProps) {
           try {
-            const records = await withQueryAsFn(additionalDataFragment, {
-              isPlural: true
-            })(queryFilter);
+            let records;
+            if (safeQuery) {
+              records = await safeQuery(additionalDataFragment, {
+                variables: queryVariables
+              });
+            } else {
+              records = await withQueryAsFn(additionalDataFragment, {
+                isPlural: true
+              })(queryVariables);
+            }
             const toSelect = isMultiSelect ? records : records[0];
             onSelect && onSelect(toSelect);
             this.handleOnChange(toSelect);
@@ -241,7 +271,6 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
         const { fetchingData, tempValue } = this.state;
         const {
           input: { value },
-          meta: { error, touched },
           readableName,
           noDialog,
           postSelectFormName,
@@ -253,9 +282,13 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
           additionalDataFragment,
           buttonProps = {},
           isMultiSelect,
+          handlersObj,
           onSelect,
           noForm
         } = this.props;
+        if (handlersObj) {
+          handlersObj.removeSelection = this.removeSelection;
+        }
         const postSelectValueToUse = tempValue || value;
         let postSelectDataTableValue = postSelectValueToUse;
         if (
@@ -269,13 +302,13 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
         /* eslint-enable no-debugger*/
         const propsToPass = {
           ...this.props,
-          handleSelection: this.handleSelection
+          handleSelection: this.handleSelection,
+          currentValue: value
         };
 
         return noDialog ? (
           <div className="tg-generic-select-container" onClick={preventBubble}>
             <GenericSelectInner {...propsToPass} />
-            <div>{touched && error && <BlueprintError error={error} />}</div>
           </div>
         ) : (
           <div className="tg-generic-select-container">
@@ -294,31 +327,29 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
                         getButtonText
                           ? getButtonText(value)
                           : value
-                            ? "Change " + readableName
-                            : `Select ${readableName}`
+                          ? "Change " + readableName
+                          : `Select ${readableName}`
                       }
                       {...buttonProps}
                       loading={fetchingData || buttonProps.loading}
                     />
                   )}
                 </GenericSelectInner>
-                {value &&
-                  !noRemoveButton &&
-                  !noForm && (
-                    <Tooltip
+                {value && !noRemoveButton && !noForm && (
+                  <Tooltip
+                    disabled={buttonProps.disabled}
+                    content={"Clear " + readableName}
+                  >
+                    <Button
+                      minimal
+                      style={{ marginLeft: 4 }}
+                      intent={Intent.DANGER}
                       disabled={buttonProps.disabled}
-                      content={"Clear " + readableName}
-                    >
-                      <Button
-                        minimal
-                        style={{ marginLeft: 4 }}
-                        intent={Intent.DANGER}
-                        disabled={buttonProps.disabled}
-                        onClick={this.removeSelection}
-                        icon="trash"
-                      />
-                    </Tooltip>
-                  )}
+                      onClick={this.removeSelection}
+                      icon="trash"
+                    />
+                  </Tooltip>
+                )}
               </div>
               {postSelectDTProps &&
                 postSelectDataTableValue &&
@@ -337,12 +368,12 @@ export default ({ modelNameToReadableName, withQueryAsFn }) => {
                       postSelectDTProps,
                       isMultiSelect,
                       resetSelection: this.resetPostSelectSelection,
-                      changeGenericSelectValue: this.handleOnChange
+                      changeGenericSelectValue: this.handleOnChange,
+                      buttonProps
                     }}
                   />
                 )}
             </div>
-            <div>{touched && error && <BlueprintError error={error} />}</div>
           </div>
         );
       }
@@ -441,7 +472,10 @@ const PostSelectTable = branch(
           <Button
             small
             minimal
-            onClick={() => this.removeRecord(record)}
+            onClick={e => {
+              e.stopPropagation();
+              this.removeRecord(record);
+            }}
             icon="trash"
             intent="danger"
           />
@@ -470,16 +504,21 @@ const PostSelectTable = branch(
         loading,
         entities,
         postSelectFormName,
-        postSelectDTProps
+        postSelectDTProps,
+        noRemoveButton,
+        buttonProps = {}
       } = this.props;
+
       let schemaToUse = postSelectDTProps.schema || [];
-      if (Array.isArray(schemaToUse)) {
-        schemaToUse = [...schemaToUse, this.removeColumn];
-      } else {
-        schemaToUse = {
-          ...schemaToUse,
-          fields: [...schemaToUse.fields, this.removeColumn]
-        };
+      if (!noRemoveButton && !buttonProps.disabled) {
+        if (Array.isArray(schemaToUse)) {
+          schemaToUse = [...schemaToUse, this.removeColumn];
+        } else {
+          schemaToUse = {
+            ...schemaToUse,
+            fields: [...schemaToUse.fields, this.removeColumn]
+          };
+        }
       }
 
       return (
@@ -511,13 +550,46 @@ const GenericSelectInner = compose(
       enforceFocus: false,
       canOutsideClickClose: false
     })
-  )
+  ),
+  withProps(props => {
+    const { currentValue, asReactSelect } = props;
+    if (!asReactSelect && Array.isArray(currentValue) && currentValue.length) {
+      // preserve old selection in table
+      return {
+        initialValues: {
+          reduxFormSelectedEntityIdMap: currentValue.reduce((acc, entity) => {
+            acc[entity.id] = { entity };
+            return acc;
+          }, {})
+        }
+      };
+    }
+  })
 )(
   class GenericSelect extends Component {
     constructor(props) {
       super(props);
       this.getInnerComponent();
     }
+
+    // UNSAFE_componentWillMount() {
+    //   const {
+    //     meta: { dispatch, form },
+    //     defaultValue,
+    //     enableReinitialize,
+    //     input: { name, value }
+    //   } = this.props;
+    //   ((value !== false && !value) || enableReinitialize) &&
+    //     defaultValue !== undefined &&
+    //     dispatch({
+    //       type: "@@redux-form/CHANGE",
+    //       meta: {
+    //         form,
+    //         field: name
+    //       },
+    //       payload: defaultValue
+    //     });
+    // }
 
     UNSAFE_componentWillReceiveProps(newProps) {
       const propsToPick = [
@@ -531,6 +603,27 @@ const GenericSelectInner = compose(
       ) {
         this.getInnerComponent();
       }
+
+      // const { defaultValue: oldDefaultValue, enableReinitialize } = this.props;
+      // const {
+      //   meta: { dispatch, form },
+      //   defaultValue,
+      //   input: { name, value }
+      // } = newProps;
+
+      // if (
+      //   ((value !== false && !value) || enableReinitialize) &&
+      //   !deepEqual(defaultValue, oldDefaultValue)
+      // ) {
+      //   dispatch({
+      //     type: "@@redux-form/CHANGE",
+      //     meta: {
+      //       form,
+      //       field: name
+      //     },
+      //     payload: defaultValue
+      //   });
+      // }
     }
 
     getInnerComponent = () => {
@@ -538,7 +631,8 @@ const GenericSelectInner = compose(
         fragment,
         passedName,
         queryOptions,
-        tableParamOptions
+        tableParamOptions,
+        isCodeModel
       } = this.props;
       this.innerComponent = compose(
         withTableParams({
@@ -551,20 +645,18 @@ const GenericSelectInner = compose(
           },
           ...tableParamOptions
         }),
-        withQuery(fragment, { isPlural: true, options: queryOptions })
+        withQuery(fragment, {
+          isPlural: true,
+          options: queryOptions,
+          isCodeModel
+        })
       )(InnerComp);
     };
 
     render() {
-      const { label } = this.props;
       const ComponentToRender = this.innerComponent;
 
-      let comp = <ComponentToRender {...this.props} />;
-      if (label) {
-        return <FormGroup label={label}>{comp}</FormGroup>;
-      } else {
-        return comp;
-      }
+      return <ComponentToRender {...this.props} />;
     }
   }
 );
@@ -589,18 +681,22 @@ class InnerComp extends Component {
     const { tableParams, input, idAs, additionalOptions = [] } = this.props;
     const { entityCount, schema } = tableParams;
 
+    const inputIds = [];
+    const inputEntities = [];
+    if (input.value) {
+      (Array.isArray(input.value) ? input.value : [input.value]).forEach(e => {
+        inputIds.push(e[idAs || "id"]);
+        inputEntities.push(e);
+      });
+    }
+
     const entities = [
-      ...map({
-        ...keyBy(tableParams.entities, idAs || "id"),
-        //it is important that we spread these second so that things like clearableValue will work
-        ...(input.value &&
-          keyBy(
-            Array.isArray(input.value) ? input.value : [input.value],
-            idAs || "id"
-          ))
-      })
+      ...(tableParams.entities || []).filter(
+        e => !inputIds.includes(e[idAs || "id"])
+      ),
+      ...inputEntities
     ];
-    if (!entities) return [];
+    if (!entities.length) return [];
     const lastItem = [];
     if (entityCount > (tableParams.entities || []).length) {
       lastItem.push({
@@ -624,7 +720,13 @@ class InnerComp extends Component {
         clearableValue: entity.clearableValue,
         value: entity[idAs || "id"],
         label: (
-          <span style={{ display: "flex", justifyContent: "space-between" }}>
+          <span
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}
+          >
             {schema.fields.reduce((acc, field, i) => {
               const label = field.displayName ? (
                 <span
@@ -646,12 +748,15 @@ class InnerComp extends Component {
                 val = val ? "True" : "False";
               }
 
+              let style;
+              if (i > 0) {
+                style = {
+                  marginLeft: 8,
+                  fontSize: 8
+                };
+              }
               acc.push(
-                <span
-                  className={i > 1 ? "tg-value-hide" : ""}
-                  key={i}
-                  style={i > 1 ? { fontSize: 10, color: "#aaa" } : {}}
-                >
+                <span key={i} style={style}>
                   {label} {val}
                 </span>
               );
@@ -671,20 +776,41 @@ class InnerComp extends Component {
     return val; //return val for react-select to work properly
   };
   handleReactSelectFieldSubmit = valOrVals => {
-    const { handleSelection, input, tableParams, idAs } = this.props;
-    const entitiesById = {
-      ...keyBy(tableParams.entities, idAs || "id"),
-      ...keyBy(input.value, idAs || "id")
-    };
-    if (!valOrVals) {
-      handleSelection([]);
-    } else {
-      const records = (Array.isArray(valOrVals) ? valOrVals : [valOrVals]).map(
-        ({ value }) => {
+    const {
+      handleSelection,
+      input,
+      tableParams,
+      additionalOptions,
+      idAs
+    } = this.props;
+    let entitiesById = keyBy(
+      [...tableParams.entities, ...additionalOptions],
+      idAs || "id"
+    );
+    if (input.value) {
+      if (Array.isArray(input.value)) {
+        entitiesById = {
+          ...entitiesById,
+          ...keyBy(input.value, idAs || "id")
+        };
+      } else {
+        entitiesById[input.value[idAs || "id"]] = input.value;
+      }
+    }
+    try {
+      if (!valOrVals) {
+        handleSelection([]);
+      } else {
+        const records = (Array.isArray(valOrVals)
+          ? valOrVals
+          : [valOrVals]
+        ).map(({ value }) => {
           return entitiesById[value];
-        }
-      );
-      handleSelection(records);
+        });
+        handleSelection(records);
+      }
+    } catch (error) {
+      console.error(`errror:`, error);
     }
   };
 
@@ -702,8 +828,12 @@ class InnerComp extends Component {
       passedName,
       input,
       idAs,
+      handlersObj,
       asReactSelect
     } = this.props;
+    if (handlersObj) {
+      handlersObj.refetch = tableParams.onRefresh;
+    }
     let disableButton = !selectedEntities.length;
     let minSelectMessage;
     let mustSelectMessage;
@@ -728,8 +858,8 @@ class InnerComp extends Component {
               return entity[idAs || "id"];
             })
         : !input.value
-          ? ""
-          : input.value[idAs || "id"];
+        ? ""
+        : input.value[idAs || "id"];
 
       return (
         <ReactSelect
@@ -749,7 +879,7 @@ class InnerComp extends Component {
           autoBlur={false}
           closeMenuOnSelect={false}
           onChange={this.handleReactSelectFieldSubmit}
-          optionComponent={OptionOverrride}
+          optionComponent={OptionOverride}
           options={this.getReactSelectOptions()}
           onInputChange={this.handleReactSelectSearch}
           name={passedName}
@@ -757,6 +887,13 @@ class InnerComp extends Component {
         />
       );
     }
+
+    let enhancedChildren;
+    // the enhanced children will get overwritten if passing children to additionalTableProps
+    if (additionalTableProps && additionalTableProps.enhancedChildren) {
+      enhancedChildren = additionalTableProps.enhancedChildren({ tableParams });
+    }
+
     return (
       <div>
         <div style={{ marginBottom: 10 }}>
@@ -772,6 +909,7 @@ class InnerComp extends Component {
           isSingleSelect={!isMultiSelect}
           maxHeight={400}
           {...tableParams}
+          children={enhancedChildren}
           {...additionalTableProps}
           // destroyOnUnmount={false}
           // keepDirtyOnReinitialize
@@ -794,7 +932,7 @@ class InnerComp extends Component {
   }
 }
 
-class OptionOverrride extends React.Component {
+class OptionOverride extends React.Component {
   node = React.createRef();
   componentDidMount() {
     this.node.current.ontouchstart = this.preventPropagation;

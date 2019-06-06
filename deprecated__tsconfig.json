@@ -1,0 +1,25 @@
+// seems like this file wasn't working and was actually stopping type 
+// completions from showing up in this package itself
+{
+  "compilerOptions": {
+      "module": "es2015",
+      "lib": [
+          "es6"
+      ],
+      "noImplicitAny": true,
+      "noImplicitThis": true,
+      "strictNullChecks": true,
+      "strictFunctionTypes": false,
+      "baseUrl": "./",
+      "typeRoots": [
+          "./"
+      ],
+      "types": [],
+      "noEmit": true,
+      "allowJs": true,
+      "forceConsistentCasingInFileNames": true
+  },
+  "files": [
+      "index.d.ts"
+  ]
+}

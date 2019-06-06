@@ -13,12 +13,7 @@
   justify-content: space-between;
 }
 
-.mss-status {
-  color: #000000;
-}
-
 .mss-clear_all {
   cursor: pointer;
   color: #008bbf;
 }
-/* */

@@ -8,7 +8,6 @@
 
 .tg-hotkeys-dialog table {
   table-layout: fixed;
-  background-color: white;
   margin: 0 5px 5px;
   width: calc(100% - 10px);
   border-spacing: 0;
@@ -33,6 +32,9 @@
 
 .tg-hotkeys-dialog tr:nth-child(2n) td {
   background-color: #f8f8f8;
+}
+.bp3-dark .tg-hotkeys-dialog tr:nth-child(2n) td {
+  background-color: #3e4b6d;
 }
 
 .tg-hotkeys-dialog td,

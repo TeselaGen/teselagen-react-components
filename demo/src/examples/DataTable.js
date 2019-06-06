@@ -10,7 +10,15 @@ const schema = {
       displayName: "Not Displayed"
     },
     { path: "hungerLevel", type: "string" },
-    { path: "type", type: "lookup", displayName: "Special Type" },
+    { path: "type.special", type: "lookup", displayName: "Special Type" },
+    {
+      path: "checkboxData",
+      type: "boolean",
+      displayName: "Checkbox Field",
+      render: () => {
+        return <Checkbox />;
+      }
+    },
     { path: "isShared", type: "boolean", displayName: "Is Shared?" },
     {
       path: "name",
@@ -57,9 +65,14 @@ class DataTableDemo extends React.Component {
       urlConnected: true,
       onlyOneFilter: false,
       inDialog: false,
-      withSelectedEntities: false
+      withSelectedEntities: false,
+      ...JSON.parse(localStorage.tableWrapperState || "{}")
     };
     this.closeDialog = this.closeDialog.bind(this);
+  }
+
+  componentDidUpdate() {
+    localStorage.tableWrapperState = JSON.stringify(this.state);
   }
 
   UNSAFE_componentWillMount() {
@@ -90,41 +103,49 @@ class DataTableDemo extends React.Component {
 
     return (
       <ApolloProvider client={client} store={store}>
-        <div
-          className={this.state.darkMode ? "bp3-dark" : ""}
-          style={{ background: this.state.darkMode ? "#293742" : undefined }}
-        >
+        <div>
           <Router>
             <div>
               <h3>Demo specific options:</h3>
               <br />
-              {renderToggle(
-                this,
-                "renderUnconnectedTable",
-                "Render the table without the withTableParams wrapper." +
+              {renderToggle({
+                that: this,
+
+                type: "renderUnconnectedTable",
+                description:
+                  "Render the table without the withTableParams wrapper." +
                   " It's just a simple disconnected react component. You'll" +
                   " need to handle paging/sort/filters yourself. Try hitting" +
                   " isInfinite to see something actually show up with it"
-              )}
-              {renderToggle(this, "inDialog", "Render the table in a dialog")}
-              {renderToggle(this, "darkMode", "Render the table in dark theme")}
+              })}
+              {renderToggle({
+                that: this,
+                type: "inDialog",
+                description: "Render the table in a dialog"
+              })}
               <h3>withTableParams options:</h3>
               <br />
-              {renderToggle(
-                this,
-                "urlConnected",
-                "Turn off urlConnected if you don't want the url to be updated by the table"
-              )}
-              {renderToggle(
-                this,
-                "onlyOneFilter",
-                "Setting this true makes the table only keep 1 filter/search term in memory instead of allowing multiple"
-              )}
-              {renderToggle(
-                this,
-                "withSelectedEntities",
-                "Setting this true makes the table pass the selectedEntities"
-              )}
+              {renderToggle({
+                that: this,
+
+                type: "urlConnected",
+                description:
+                  "Turn off urlConnected if you don't want the url to be updated by the table"
+              })}
+              {renderToggle({
+                that: this,
+
+                type: "onlyOneFilter",
+                description:
+                  "Setting this true makes the table only keep 1 filter/search term in memory instead of allowing multiple"
+              })}
+              {renderToggle({
+                that: this,
+
+                type: "withSelectedEntities",
+                description:
+                  "Setting this true makes the table pass the selectedEntities"
+              })}
               <br />
               {this.state.inDialog ? (
                 <Dialog
@@ -172,7 +193,9 @@ const generateFakeRows = num => {
           name: chance.pickone(["pending", "added", "confirmed"])
         }
       },
-      type: "denicolaType",
+      type: {
+        special: "denicolaType"
+      },
       addedBy: chance.name(),
       updatedAt: chance.date(),
       createdAt: chance.date()
@@ -188,7 +211,7 @@ class DataTableInstance extends React.Component {
     this.state = {
       additionalFilters: false,
       isSimple: false,
-      isCopyable: false,
+      isCopyable: true,
       noSelect: false,
       withTitle: true,
       isViewable: true,
@@ -221,11 +244,16 @@ class DataTableInstance extends React.Component {
       numOfEntities: 60,
       selectedIds: undefined,
       alwaysRerender: false,
-      entities: generateFakeRows(defaultNumOfEntities)
+      entities: generateFakeRows(defaultNumOfEntities),
+      ...JSON.parse(localStorage.tableState || "{}")
     };
     this.changeNumEntities = this.changeNumEntities.bind(this);
     this.changeSelectedRecords = this.changeSelectedRecords.bind(this);
     this.onRefresh = this.onRefresh.bind(this);
+  }
+
+  componentDidUpdate() {
+    localStorage.tableState = JSON.stringify(this.state);
   }
 
   changeNumEntities(e) {
@@ -274,11 +302,13 @@ class DataTableInstance extends React.Component {
       <div>
         <h3>Table Level Options</h3>
         <br />
-        {renderToggle(
-          this,
-          "additionalFilters",
-          "Filters can be added by passing an additionalFilters prop. You can even filter on non-displayed fields"
-        )}
+        {renderToggle({
+          that: this,
+
+          type: "additionalFilters",
+          description:
+            "Filters can be added by passing an additionalFilters prop. You can even filter on non-displayed fields"
+        })}
         Set number of entities:{" "}
         <input
           type="number"
@@ -288,10 +318,11 @@ class DataTableInstance extends React.Component {
         <br />
         Select records by ids (a single number or numbers separated by ","):{" "}
         <input onChange={this.changeSelectedRecords} />
-        {renderToggle(
-          this,
-          "isSimple",
-          ` This sets: 
+        {renderToggle({
+          that: this,
+
+          type: "isSimple",
+          description: ` This sets: 
         noHeader: true,
         noFooter: true,
         noFullscreenButton: true,
@@ -311,53 +342,139 @@ class DataTableInstance extends React.Component {
         individually overridable (which 
           is why nothing changes when this is toggled here)
         `
-        )}
-        {renderToggle(this, "withTitle")}
-        {renderToggle(this, "noSelect")}
-        {renderToggle(this, "withSubComponent")}
-        {renderToggle(this, "withSearch")}
-        {renderToggle(
-          this,
-          "isViewable",
-          "Make sure withCheckboxes is off when using this"
-        )}
-        {renderToggle(
-          this,
-          "hideDisplayOptionsIcon",
-          "use this in conjunction with withDisplayOptions=true to have display options but not allow the user to see or edit them"
-        )}
-        {renderToggle(this, "withDisplayOptions")}
-        {renderToggle(this, "withPaging")}
-        {renderToggle(
-          this,
-          "noDeselectAll",
-          "Prevent the table from being fully deselected. Useful when you want at least 1 entity selected"
-        )}
-        {renderToggle(this, "withExpandAndCollapseAllButton")}
-        {renderToggle(this, "expandAllByDefault")}
-        {renderToggle(this, "selectAllByDefault")}
-        {renderToggle(this, "withFilter")}
-        {renderToggle(this, "withSort")}
-        {renderToggle(this, "noHeader")}
-        {renderToggle(this, "noFooter")}
-        {renderToggle(this, "noFullscreenButton")}
-        {renderToggle(this, "noPadding")}
-        {renderToggle(this, "isInfinite")}
-        {renderToggle(this, "isLoading")}
-        {renderToggle(this, "disabled")}
-        {renderToggle(this, "hidePageSizeWhenPossible")}
-        {renderToggle(this, "doNotShowEmptyRows")}
-        {renderToggle(this, "withCheckboxes")}
-        {renderToggle(this, "isSingleSelect")}
-        {renderToggle(this, "hideSelectedCount")}
-        {renderToggle(this, "showCount")}
-        {renderToggle(this, "compact")}
-        {renderToggle(this, "isCopyable")}
-        {renderToggle(
-          this,
-          "maxHeight",
-          "By default every table has a max height of 800px. Setting this true changes it to 200px"
-        )}
+        })}
+        {renderToggle({
+          that: this,
+          type: "withTitle"
+        })}
+        {renderToggle({
+          that: this,
+          type: "noSelect"
+        })}
+        {renderToggle({
+          that: this,
+          type: "withSubComponent"
+        })}
+        {renderToggle({
+          that: this,
+          type: "withSearch"
+        })}
+        {renderToggle({
+          that: this,
+
+          type: "isViewable",
+          description: "Make sure withCheckboxes is off when using this"
+        })}
+        {renderToggle({
+          that: this,
+
+          type: "hideDisplayOptionsIcon",
+          description:
+            "use this in conjunction with withDisplayOptions=true to have display options but not allow the user to see or edit them"
+        })}
+        {renderToggle({
+          that: this,
+          type: "withDisplayOptions"
+        })}
+        {renderToggle({
+          that: this,
+          type: "withPaging"
+        })}
+        {renderToggle({
+          that: this,
+
+          type: "noDeselectAll",
+          description:
+            "Prevent the table from being fully deselected. Useful when you want at least 1 entity selected"
+        })}
+        {renderToggle({
+          that: this,
+          type: "withExpandAndCollapseAllButton"
+        })}
+        {renderToggle({
+          that: this,
+          type: "expandAllByDefault"
+        })}
+        {renderToggle({
+          that: this,
+          type: "selectAllByDefault"
+        })}
+        {renderToggle({
+          that: this,
+          type: "withFilter"
+        })}
+        {renderToggle({
+          that: this,
+          type: "withSort"
+        })}
+        {renderToggle({
+          that: this,
+          type: "noHeader"
+        })}
+        {renderToggle({
+          that: this,
+          type: "noFooter"
+        })}
+        {renderToggle({
+          that: this,
+          type: "noFullscreenButton"
+        })}
+        {renderToggle({
+          that: this,
+          type: "noPadding"
+        })}
+        {renderToggle({
+          that: this,
+          type: "isInfinite"
+        })}
+        {renderToggle({
+          that: this,
+          type: "isLoading"
+        })}
+        {renderToggle({
+          that: this,
+          type: "disabled"
+        })}
+        {renderToggle({
+          that: this,
+          type: "hidePageSizeWhenPossible"
+        })}
+        {renderToggle({
+          that: this,
+          type: "doNotShowEmptyRows"
+        })}
+        {renderToggle({
+          that: this,
+          type: "withCheckboxes"
+        })}
+        {renderToggle({
+          that: this,
+          type: "isSingleSelect"
+        })}
+        {renderToggle({
+          that: this,
+          type: "hideSelectedCount"
+        })}
+        {renderToggle({
+          that: this,
+          type: "showCount"
+        })}
+        {renderToggle({
+          that: this,
+          type: "compact"
+        })}
+        {renderToggle({
+          that: this,
+          type: "isCopyable"
+        })}
+        {renderToggle({
+          that: this,
+
+          type: "maxHeight",
+          description:
+            "By default every table has a max height of 800px. Setting this true changes it to 200px"
+        })}
+        <br />
         {selectedEntities && (
           <div>
             The following records are selected (pass withSelectedEntities: true
@@ -390,8 +507,9 @@ class DataTableInstance extends React.Component {
             entities={entitiesToPass}
             entityCount={entities.length}
             onDoubleClick={function() {
-              console.log("double clicked");
+              console.info("double clicked");
             }}
+            shouldShowSubComponent={r => r.id !== 1}
             topLeftItems={<Button>I'm in topLeftItems</Button>}
             SubComponent={this.state.withSubComponent ? SubComp : null}
             cellRenderer={{
@@ -415,14 +533,14 @@ class DataTableInstance extends React.Component {
                   <MenuItem
                     key="menuItem1"
                     onClick={function() {
-                      console.log("I got clicked!");
+                      console.info("I got clicked!");
                     }}
                     text={"Menu text here"}
                   />,
                   <MenuItem
                     key="menuItem2"
                     onClick={function() {
-                      console.log("I also got clicked!");
+                      console.info("I also got clicked!");
                     }}
                     text={"Some more"}
                   />

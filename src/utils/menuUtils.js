@@ -39,7 +39,15 @@ export const EnhancedMenuItem = compose(
       if (props.onClick) props.onClick(e);
     };
   }
-  return <MenuItem {...props} onClick={clickHandler} />;
+  return (
+    <MenuItem
+      popoverProps={{
+        autoFocus: false
+      }}
+      {...props}
+      onClick={clickHandler}
+    />
+  );
 });
 
 // First Non-Undefined
@@ -78,11 +86,12 @@ export const commandMenuEnhancer = (commands, config = {}) => (
     item.disabled = fnu(item.disabled, isDisabled);
 
     item.key = item.key || cmdId;
+    item.submenu = item.submenu || command.submenu;
 
     if (toggles) {
       if (useTicks) {
         item.text = item.text || command.shortName || command.name;
-        item.checked = isActive;
+        item.checked = item.checked || isActive;
       } else {
         item.text =
           item.text ||
@@ -133,21 +142,34 @@ const dividerShorthandEnhancer = def =>
     ? { divider: def.substr(2) }
     : def;
 
+// filter out unwanted attributes here! we won't want these to show up on the dom element or react will give nasty warnings
+const unwantedAttrs = [
+  "submenu",
+  "hotkey",
+  "showInSearchMenu",
+  "hideFromMenuSearch"
+];
+
 /** A menu item component that adds many features over the standard MenuItem,
  * and allows for dynamic menu structures that are computed efficiently (only
  * visible sections are computed and rendered).
  * TODO: document and add examples
  */
-export const DynamicMenuItem = ({ def, enhancers = [ident], context }) => {
+export const DynamicMenuItem = ({
+  def,
+  enhancers = [ident],
+  context,
+  doNotEnhanceTopLevelItem
+}) => {
   // If passed an element instead of a menu item definition, return it.
   // This allows mixing menu item elements and menu item defs, and makes it
   // safe to call menu creation utils with their own output.
   if (React.isValidElement(def)) return def;
 
-  const item = [dividerShorthandEnhancer, ...enhancers].reduce(
-    (v, f) => f(v, context),
-    def
-  );
+  const item = [
+    dividerShorthandEnhancer,
+    ...(doNotEnhanceTopLevelItem ? [ident] : enhancers)
+  ].reduce((v, f) => f(v, context), def);
   let out;
 
   if (item.divider !== undefined) {
@@ -156,7 +178,8 @@ export const DynamicMenuItem = ({ def, enhancers = [ident], context }) => {
     const ItemComponent = item.component || EnhancedMenuItem;
     out = (
       <ItemComponent
-        {...omit(item, ["submenu", "hotkey"])}
+        // filter out unwanted attributes here!
+        {...omit(item, unwantedAttrs)}
         icon={item.icon || item.iconName}
         labelElement={item.hotkey && <KeyCombo minimal combo={item.hotkey} />}
         text={item.text}
@@ -279,10 +302,10 @@ export function showCommandContextMenu(
  * Usage example:
  *
  * const menu = createMenu([
- *   { text: 'Item One', icon: 'add', onClick: () => console.log('Clicked 1') },
- *   { text: 'Item One', onClick: () => console.log('Clicked 2') },
+ *   { text: 'Item One', icon: 'add', onClick: () => console.info('Clicked 1') },
+ *   { text: 'Item One', onClick: () => console.info('Clicked 2') },
  *   { divider: '' },
- *   { text: 'Item Three', icon: 'numerical', onClick: () => console.log('Clicked 3') },
+ *   { text: 'Item Three', icon: 'numerical', onClick: () => console.info('Clicked 3') },
  *   { divider: '' },
  *   { text: 'Submenus', submenu: [
  *     { text: 'Sub One' },
@@ -293,18 +316,31 @@ export function showCommandContextMenu(
  */
 export const createMenu = createDynamicMenu;
 
-export function showContextMenu(menuDef, enhancers, event, onClose, context) {
+export function showContextMenu(
+  menuDef,
+  enhancers,
+  event,
+  onClose,
+  context,
+  menuComp = Menu
+) {
   menuDef = filterMenuForCorrectness(menuDef);
   if (!menuDef) return;
 
+  const MenuComponent = menuComp;
+
   // Render a context menu at the passed event's position
   ContextMenu.show(
-    <Menu>{createDynamicMenu(menuDef, enhancers, context)}</Menu>,
+    <MenuComponent
+      /* popoverProps={{transitionDuration: 1}} */ autoFocus={false}
+    >
+      {createDynamicMenu(menuDef, enhancers, context)}
+    </MenuComponent>,
     { left: event.clientX, top: event.clientY },
     onClose
   );
-  event.stopPropagation();
-  event.preventDefault();
+  event.stopPropagation && event.stopPropagation();
+  event.preventDefault && event.preventDefault();
 }
 
 function filterMenuForCorrectness(menuDef) {

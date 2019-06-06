@@ -11,3 +11,27 @@
 .j5-report-fieldname {
   font-weight: bold;
 }
+
+.record-info-table {
+  width: 100%;
+  display: block;
+}
+
+/*
+  Slightly separate sections within the table. Not sure what the relevance of
+  sections is here, though. This can be removed if needed.
+*/
+.record-info-table tr.section-start:not(:first-child) td {
+  padding-top: 8px;
+}
+
+.record-info-table td:first-child {
+  padding-right: 15px;
+  font-weight: 400;
+}
+
+.record-info-table td:last-child {
+  text-align: left;
+  font-weight: 100;
+  max-width: 300px;
+}

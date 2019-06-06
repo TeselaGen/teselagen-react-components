@@ -30,7 +30,7 @@
   <br />
   <InfoHelper isPopover content={"Hey I'm some helpful info!"} />
   <br />
-  isPopover=true size=30 (doesn't work)
+  isPopover=true size=30
   <br />
   <InfoHelper size={30} isPopover content={"Hey I'm some helpful info!"} />
   <br />

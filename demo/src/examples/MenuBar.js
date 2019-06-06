@@ -7,10 +7,36 @@ class MenuBarDemo extends React.Component {
     // This can be (re)used for hotkey handling, top menu clicks, context menu
     // clicks, etc.
     const commandDefs = {
+      cmdSubmenu: {
+        preventDefault: true,
+        hotkey: "mod+n",
+        text: "cmdSubmenu",
+        submenu: props => {
+          return [
+            {
+              text: "yay I'm a dynamic submenu",
+              onClick: () => {}
+            }
+          ];
+        },
+        handler: () => alert('Triggered "New File"')
+      },
       newFile: {
         preventDefault: true,
         hotkey: "mod+n",
         handler: () => alert('Triggered "New File"')
+      },
+      fakeCmd1: {
+        handler: () => alert("Triggering Fake Cmd"),
+        name: () => {
+          return "Fake Cmd";
+        }
+      },
+      fakeCmd2: {
+        handler: () => alert("Triggering Fake Cmd 2"),
+        name: () => {
+          return "Fake Cmd 2";
+        }
       },
       openFile: {
         isDisabled: () => {
@@ -36,11 +62,14 @@ class MenuBarDemo extends React.Component {
     };
 
     // Create commands without any special logic
+    /* eslint-disable no-undef*/ 
     const commands = genericCommandFactory({
+    /* eslint-enable no-undef*/ 
       commandDefs,
       getArguments: () => [],
       handleReturn: () => {}
     });
+    this.commands = commands;
 
     let menu = [
       {
@@ -52,9 +81,52 @@ class MenuBarDemo extends React.Component {
             tooltip: "May use tooltips",
             cmd: "newFile"
           },
+          {
+            text: <span>ReactText {9}</span>,
+            onClick: () => {
+              window.toastr.success("Fired ReactText!");
+            },
+            submenu: [
+              {
+                text: "hello!!",
+                onClick: () => {
+                  window.toastr.success("hello!");
+                }
+              },
+              "cmdSubmenu"
+            ]
+          },
+          "cmdSubmenu",
+          {
+            shouldDismissPopover: false,
+            text: (
+              <span>
+                Long React El Text <input /> <span> Text</span>{" "}
+                <span>Other Text </span>
+              </span>
+            ),
+            onClick: () => {}
+          },
+          {
+            shouldDismissPopover: false,
+            text: "Don't Dismiss",
+            onClick: () => {
+              window.toastr.success("This menu's not going away any time soon")
+            }
+          },
           { text: "Open...", icon: "document", cmd: "openFile" },
           { divider: "" },
           { cmd: "showHotkeys" },
+          {
+            cmd: "fakeCmd1",
+            submenu: ["fakeCmd1", "fakeCmd1", "fakeCmd1",
+            {disabled: true, text: "YYY", onClick: () => {}},
+            {disabled: true, text: "Y", onClick: () => {}},
+            {disabled: true, text: "YYYY", onClick: () => {}},
+            {disabled: true, text: "YY", onClick: () => {}},
+            {disabled: true, text: "YYYYY", onClick: () => {}},
+          ]
+          },
           { divider: "" },
           { icon: "log-out", cmd: "quit" } // no text prop here
         ]
@@ -69,12 +141,28 @@ class MenuBarDemo extends React.Component {
               "Hey I'm a tooltip created by passing a string to disabled:''",
             cmd: "copy"
           },
+          { text: "I'm disabled", disabled: true,  onClick: () => {} },
           { icon: "clipboard", cmd: "paste" },
           { divider: "" },
           {
             text: "Other",
+            showInSearchMenu: true, //you can also just define an onClick handler and it will show up as well!
             submenu: [
               // no hotkeys or commands used here
+              {
+                text: "Not a command",
+                label: "Label",
+                icon: "code",
+                onClick: () => {
+                  console.info("h");
+                }
+              },
+              {
+                text: "XXXXX",
+                onClick: () => {
+                  window.toastr.success("XXXXX");
+                }
+              },
               {
                 text: "Some command 1",
                 label: "Label",
@@ -95,7 +183,29 @@ class MenuBarDemo extends React.Component {
       {
         text: "No Submenu",
         onClick: () => alert("This triggers an action directly")
-      }
+      },
+      {
+        text: "Help",
+        submenu: [
+          { isMenuSearch: true }, //this will only work in a top level item submenu
+          "--",
+          {
+            text: "About",
+            hideFromMenuSearch: true,
+            onClick: () => {
+              window.toastr.success("About clicked");
+            }
+          },
+          {
+            text: "App Info",
+            hideFromMenuSearch: true,
+            onClick: () => {
+              window.toastr.success("App Info clicked");
+            }
+          }
+        ]
+      },
+      // { isMenuSearch: true },
     ];
 
     // Sets will normally be different routes/modules/views of an app, but any
@@ -107,7 +217,7 @@ class MenuBarDemo extends React.Component {
         somethingElse: "alt+shift+e"
       }
     };
-
+    /* eslint-disable no-undef*/ 
     // An existing component may be wrapped, or a new one created, as in this case
     this.hotkeyEnabler = withHotkeys(
       getCommandHotkeys(commands), // in this example, equivalent to `hotkeys`,
@@ -116,6 +226,7 @@ class MenuBarDemo extends React.Component {
 
     this.menu = menu;
     this.menuEnhancers = [commandMenuEnhancer(commands)];
+    /* eslint-enable no-undef*/ 
 
     this.state = {
       showDialog: false
@@ -135,16 +246,22 @@ class MenuBarDemo extends React.Component {
       <div>
         <div
           style={{
-            backgroundColor: "#f8f8f8",
+            // backgroundColor: "#f8f8f8",
             height: "300px",
             border: "1px solid #eee"
           }}
         >
-          <MenuBar menu={this.menu} enhancers={this.menuEnhancers} />
+          <MenuBar
+            menu={this.menu}
+            enhancers={this.menuEnhancers}
+            // menuSearchHotkey="alt+/"
+          />
         </div>
         <button
           onClick={e => {
+            /* eslint-disable no-undef*/ 
             showContextMenu(
+            /* eslint-enable no-undef*/ 
               [
                 { text: "hey" },
                 undefined,
@@ -154,10 +271,10 @@ class MenuBarDemo extends React.Component {
                     {
                       text: "yup",
                       willUnmount: () => {
-                        console.log("hellllo");
+                        console.info("hellllo");
                       },
                       didMount: ({ className }) => {
-                        console.log("yaaa");
+                        console.info("yaaa");
                       }
                     }
                   ]
@@ -166,7 +283,7 @@ class MenuBarDemo extends React.Component {
               undefined,
               e,
               () => {
-                console.log("closin");
+                console.info("closin");
               }
             );
           }}
@@ -174,6 +291,11 @@ class MenuBarDemo extends React.Component {
           Click to see a menu created using the imperative showContextMenu(menu,
           undefined, event)
         </button>
+        <h3>Examples of using CmdCheckbox, CmdSwitch, CmdDiv, CmdButton</h3>
+        <CmdCheckbox cmd={this.commands.fakeCmd1} />
+        <CmdSwitch cmd={this.commands.fakeCmd1} />
+        <CmdDiv cmd={this.commands.fakeCmd2} />
+        <CmdButton cmd={this.commands.fakeCmd2} />
         <this.hotkeyEnabler />
         <HotkeysDialog
           hotkeySets={this.hotkeySets}

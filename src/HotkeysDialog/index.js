@@ -22,7 +22,6 @@ export default function HotkeysDialog(props) {
   const sections = Object.keys(props.hotkeySets);
   return (
     <Dialog
-      icon="heat-grid"
       isOpen={props.isOpen}
       onClose={props.onClose}
       title="Keyboard Shortcuts"

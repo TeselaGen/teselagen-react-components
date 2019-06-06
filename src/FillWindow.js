@@ -1,6 +1,7 @@
 import React from "react";
 import { isFunction } from "lodash";
 import rerenderOnWindowResize from "./rerenderOnWindowResize";
+import "./FillWindow.css";
 
 // use like:
 // <FillWindow>
@@ -40,7 +41,7 @@ export default class FillWindow extends React.Component {
     if (this.props.disabled) return this.props.children(windowDimensions);
     return (
       <div
-        className={"fillWindow " + className || ""}
+        className={"tg-fillWindow " + className || ""}
         style={{
           ...style,
           width,

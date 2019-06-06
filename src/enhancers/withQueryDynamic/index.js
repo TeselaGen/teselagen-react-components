@@ -1,8 +1,7 @@
 import { Query } from "react-apollo";
-import { get, upperFirst, camelCase, isEmpty, isFunction } from "lodash";
+import { get, upperFirst, camelCase, isEmpty, isFunction, keyBy } from "lodash";
 import React from "react";
-// import deepEqual from "deep-equal";
-// import compose from "lodash/fp/compose";
+import deepEqual from "deep-equal";
 import pluralize from "pluralize";
 import generateQuery from "../../utils/generateQuery";
 import generateFragmentWithFields from "../../utils/generateFragmentWithFields";
@@ -36,6 +35,25 @@ export default function withQuery(__inputFragment, maybeOptions) {
     options = _inputFragment;
     _inputFragment = undefined;
   }
+
+  const { asQueryObj, asFunction } = options;
+
+  let inputFragment = _inputFragment;
+
+  if (asFunction || asQueryObj) {
+    return getAsFnOrQueryHelper(inputFragment, options);
+  }
+
+  let fragment, gqlQuery;
+  // make this out here if possible because query
+  // will rerun too much
+  if (inputFragment) {
+    fragment = Array.isArray(inputFragment)
+      ? generateFragmentWithFields(...inputFragment)
+      : inputFragment;
+    gqlQuery = generateQuery(fragment, options);
+  }
+
   return Component => props => {
     // runTimeQueryOptions are used to override query options by passing them
     // directly to the component wrapped with withQuery
@@ -45,6 +63,7 @@ export default function withQuery(__inputFragment, maybeOptions) {
       isPlural,
       asFunction,
       asQueryObj,
+      LoadingComp = Loading,
       nameOverride,
       client,
       variables,
@@ -54,8 +73,9 @@ export default function withQuery(__inputFragment, maybeOptions) {
       showLoading,
       inDialog,
       fragment: _fragment,
-      // showError = true,
+      showError = true,
       options: queryOptions,
+      skip: skipQueryFn,
       ...rest
     } = mergedOpts;
 
@@ -66,12 +86,15 @@ export default function withQuery(__inputFragment, maybeOptions) {
       notifyOnNetworkStatusChange
     } = { ...componentProps, ...options, ...runTimeQueryOptions };
 
-    const inputFragment = _inputFragment || _fragment;
-    const fragment = Array.isArray(inputFragment)
-      ? generateFragmentWithFields(...inputFragment)
-      : inputFragment;
+    // if it is dynamic then these options will be used
+    if (runTimeQueryOptions) {
+      let inputFragment = _fragment || _inputFragment;
+      fragment = Array.isArray(_fragment)
+        ? generateFragmentWithFields(..._fragment)
+        : inputFragment;
+      gqlQuery = generateQuery(fragment, options);
+    }
 
-    const gqlQuery = generateQuery(fragment, mergedOpts);
     const modelName = get(fragment, "definitions[0].typeCondition.name.value");
     const nameToUse =
       nameOverride || (isPlural ? pluralize(modelName) : modelName);
@@ -91,20 +114,30 @@ export default function withQuery(__inputFragment, maybeOptions) {
         /* eslint-enable */
       }
     }
+
+    let shouldSkipQuery = false;
+    if (skipQueryFn) {
+      shouldSkipQuery = skipQueryFn(componentProps);
+    }
+
     let extraOptions = queryOptions || {};
     if (typeof queryOptions === "function") {
       extraOptions = queryOptions(props) || {};
     }
+
     const {
       variables: extraOptionVariables,
       ...otherExtraOptions
     } = extraOptions;
-    const variablesToUse = {
-      ...(!!id && { id }),
-      ...variables,
-      ...propVariables,
-      ...(extraOptionVariables && extraOptionVariables)
-    };
+    const variablesToUse = getVariables(
+      props,
+      propVariables,
+      extraOptionVariables,
+      {
+        ...options,
+        queryNameToUse
+      }
+    );
 
     if (
       get(variablesToUse, "filter.entity") &&
@@ -123,74 +156,95 @@ export default function withQuery(__inputFragment, maybeOptions) {
           ssr: false,
           pollInterval,
           notifyOnNetworkStatusChange,
+          skip: shouldSkipQuery,
           ...otherExtraOptions,
           ...rest //overwrite defaults here
         }}
       >
         {({ data: _data, ...queryProps }) => {
-          const data = {
-            ..._data,
-            ...queryProps
-          };
-          const results = get(data, nameToUse + (isPlural ? ".results" : ""));
-          const { tableParams } = componentProps;
-          const totalResults = isPlural
-            ? get(data, nameToUse + ".totalResults", 0)
-            : results && 1;
-          const newData = {
-            ...data,
-            totalResults,
-            //adding these for consistency with withItemsQuery
-            entities: results,
-            entityCount: totalResults,
-            [nameToUse]: results,
-            ["error" + upperFirst(nameToUse)]: data.error,
-            ["loading" + upperFirst(nameToUse)]: data.loading
-          };
+          let allPropsForComponent = componentProps,
+            newData;
+          if (!shouldSkipQuery) {
+            const data = {
+              ..._data,
+              ...queryProps
+            };
 
-          data.loading = data.loading || data.networkStatus === 4;
+            const results = get(data, nameToUse + (isPlural ? ".results" : ""));
+            const { tableParams } = componentProps;
+            const totalResults = isPlural
+              ? get(data, nameToUse + ".totalResults", 0)
+              : results && 1;
 
-          const propsToReturn = {
-            ...(tableParams && !tableParams.entities && !tableParams.isLoading
-              ? {
-                  tableParams: {
-                    ...tableParams,
-                    isLoading: data.loading,
-                    entities: results,
-                    entityCount: totalResults,
-                    onRefresh: data.refetch,
-                    fragment
-                  }
-                }
-              : {}),
-            data: newData,
-            [queryNameToUse]: newData,
-            [nameToUse]: results,
-            [nameToUse + "Error"]: data.error,
-            [nameToUse + "Loading"]: data.loading,
-            [nameToUse + "Count"]: totalResults,
-            [camelCase("refetch_" + nameToUse)]: data.refetch,
-            fragment,
-            gqlQuery
-          };
+            newData = {
+              ...data,
+              totalResults,
+              //adding these for consistency with withItemsQuery
+              entities: results,
+              entityCount: totalResults,
+              ["error" + upperFirst(nameToUse)]: data.error,
+              ["loading" + upperFirst(nameToUse)]: data.loading
+            };
 
-          if (data.loading && showLoading) {
-            const bounce = inDialog || showLoading === "bounce";
-            return <Loading inDialog={inDialog} bounce={bounce} />;
+            data.loading = data.loading || data.networkStatus === 4;
+
+            let newTableParams;
+            if (
+              tableParams &&
+              !tableParams.entities &&
+              !tableParams.isLoading
+            ) {
+              const entities = results;
+
+              newTableParams = {
+                ...tableParams,
+                isLoading: data.loading,
+                entities,
+                entityCount: totalResults,
+                onRefresh: data.refetch,
+                variables: variablesToUse,
+                fragment
+              };
+            }
+
+            const propsToReturn = {
+              ...(newTableParams && { tableParams: newTableParams }),
+              data: newData,
+              [queryNameToUse]: newData,
+              [nameToUse]: results,
+              [nameToUse + "Error"]: data.error,
+              [nameToUse + "Loading"]: data.loading,
+              [nameToUse + "Count"]: totalResults,
+              [camelCase("refetch_" + nameToUse)]: data.refetch,
+              fragment,
+              gqlQuery
+            };
+
+            if (data.loading && showLoading) {
+              const bounce = inDialog || showLoading === "bounce";
+              return <LoadingComp inDialog={inDialog} bounce={bounce} />;
+            }
+
+            allPropsForComponent = {
+              ...componentProps,
+              ...propsToReturn
+            };
+
+            if (isFunction(mapQueryProps)) {
+              allPropsForComponent = {
+                ...allPropsForComponent,
+                ...mapQueryProps(allPropsForComponent)
+              };
+            }
           }
 
-          const allPropsForComponent = {
-            ...componentProps,
-            ...propsToReturn
-          };
-
           return (
-            <Component
-              {...{
-                ...allPropsForComponent,
-                ...(isFunction(mapQueryProps) &&
-                  mapQueryProps(allPropsForComponent))
-              }}
+            <ComponentHelper
+              Component={Component}
+              showError={showError}
+              data={newData}
+              queryNameToUse={queryNameToUse}
+              componentProps={allPropsForComponent}
             />
           );
         }}
@@ -201,4 +255,135 @@ export default function withQuery(__inputFragment, maybeOptions) {
 
 function getMergedOpts(topLevelOptions, runTimeQueryOptions) {
   return { ...topLevelOptions, ...runTimeQueryOptions };
+}
+
+function getVariables(ownProps, propVariables, extraOptionVariables, options) {
+  const { getIdFromParams, queryNameToUse, variables } = options;
+  let id;
+  if (getIdFromParams) {
+    id = parseInt(get(ownProps, "match.params.id"), 10);
+    if (!id) {
+      console.error(
+        "There needs to be an id passed here to ",
+        queryNameToUse,
+        "but none was found"
+      );
+      debugger; // eslint-disable-line
+      // to prevent crash
+      id = -1;
+    }
+  }
+
+  return {
+    ...(getIdFromParams && { id }),
+    ...variables,
+    ...propVariables,
+    ...(extraOptionVariables && extraOptionVariables)
+  };
+}
+
+class ComponentHelper extends React.Component {
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    const { showError, data, loggedIn, queryNameToUse } = this.props;
+    if (
+      showError &&
+      nextProps.data &&
+      data &&
+      !deepEqual(nextProps.data.error, data.error)
+    ) {
+      const error = nextProps.data.error;
+      if (loggedIn) {
+        console.error("error:", error);
+        window.toastr.error(`Error loading ${queryNameToUse}`);
+      } else {
+        console.warn("Error supressed, not logged in");
+      }
+    }
+  }
+
+  selectTableRecords = (ids, keepOldEntities) => {
+    const {
+      componentProps: {
+        tableParams: { entities, selectedEntities, changeFormValue }
+      }
+    } = this.props;
+    setTimeout(function() {
+      const entitiesById = keyBy(entities, "id");
+      const newIdMap = {
+        ...(keepOldEntities && selectedEntities)
+      };
+      ids.forEach(id => {
+        const entity = entitiesById[id];
+        if (!entity) return;
+        newIdMap[id] = {
+          entity
+        };
+      });
+      changeFormValue("reduxFormSelectedEntityIdMap", newIdMap);
+    });
+  };
+
+  render() {
+    const { Component, componentProps } = this.props;
+    const extraProps = {};
+    if (componentProps.tableParams) {
+      extraProps.selectTableRecords = this.selectTableRecords;
+    }
+    return <Component {...componentProps} {...extraProps} />;
+  }
+}
+
+function getAsFnOrQueryHelper(fragment, options) {
+  const {
+    asQueryObj,
+    asFunction,
+    isPlural,
+    nameOverride,
+    client,
+    options: queryOptions,
+    variables
+  } = options;
+
+  const gqlQuery = generateQuery(fragment, options);
+  const modelName = Array.isArray(fragment)
+    ? fragment[0]
+    : get(fragment, "definitions[0].typeCondition.name.value");
+  const nameToUse =
+    nameOverride || (isPlural ? pluralize(modelName) : modelName);
+
+  if (asQueryObj) {
+    return gqlQuery;
+  }
+  if (asFunction) {
+    if (!client) {
+      return console.error(
+        "You need to pass the apollo client to withQuery if using as a function"
+      );
+    }
+
+    return function query(localVars) {
+      return client
+        .query({
+          query: gqlQuery,
+          ssr: false,
+          fetchPolicy: "network-only",
+          ...queryOptions,
+          variables:
+            localVars ||
+            variables ||
+            (queryOptions && queryOptions.variables) ||
+            undefined
+        })
+        .then(function(res) {
+          let toReturn;
+          if (isPlural) {
+            toReturn = [...res.data[nameToUse].results];
+            toReturn.totalResults = res.data[nameToUse].totalResults;
+          } else {
+            toReturn = res.data[nameToUse];
+          }
+          return toReturn;
+        });
+    };
+  }
 }

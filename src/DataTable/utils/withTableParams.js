@@ -1,6 +1,14 @@
 //@flow
 import { change, formValueSelector } from "redux-form";
 import { connect } from "react-redux";
+import compose from "lodash/fp/compose";
+import { isFunction } from "lodash";
+import { withRouter } from "react-router-dom";
+import { branch } from "recompose";
+
+import pureNoFunc from "../../utils/pureNoFunc";
+import convertSchema from "./convertSchema";
+import { getRecordsFromReduxForm } from "./withSelectedEntities";
 import {
   makeDataTableHandlers,
   getQueryParams,
@@ -8,14 +16,6 @@ import {
   getMergedOpts,
   getCurrentParamsFromUrl
 } from "./queryParams";
-import compose from "lodash/fp/compose";
-import { isFunction } from "lodash";
-import { withRouter } from "react-router-dom";
-import { branch } from "recompose";
-
-import convertSchema from "./convertSchema";
-import { getRecordsFromReduxForm } from "./withSelectedEntities";
-import pureNoFunc from "../../utils/pureNoFunc";
 
 /**
  *  Note all these options can be passed at Design Time or at Runtime (like reduxForm())
@@ -28,6 +28,7 @@ import pureNoFunc from "../../utils/pureNoFunc";
  * @property {Object | Function} schema - The data table schema or a function returning it. The function wll be called with props as the argument.
  * @property {boolean} urlConnected - whether the table should connect to/update the URL
  * @property {boolean} withSelectedEntities - whether or not to pass the selected entities
+ * @property {boolean} isCodeModel - whether the model is keyed by code instead of id in the db
  * @property {object} defaults - tableParam defaults such as pageSize, filter, etc
  * @property {boolean} noOrderError - won't console an error if an order is not found on schema
  */
@@ -57,7 +58,12 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       doNotCoercePageSize,
       initialValues,
       additionalFilter = {},
-      noOrderError
+      additionalOrFilter = {},
+      noOrderError,
+      withDisplayOptions,
+      cellRenderer,
+      model,
+      isCodeModel
     } = mergedOpts;
 
     const schema = getSchema(mergedOpts);
@@ -115,8 +121,28 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       typeof additionalFilter === "function"
         ? additionalFilter.bind(this, ownProps)
         : () => additionalFilter;
-    return {
-      ...mergedOpts,
+    const additionalOrFilterToUse =
+      typeof additionalOrFilter === "function"
+        ? additionalOrFilter.bind(this, ownProps)
+        : () => additionalOrFilter;
+    const mapStateProps = {
+      history,
+      urlConnected,
+      withSelectedEntities,
+      formName,
+      defaults,
+      isInfinite,
+      isSimple,
+      withPaging,
+      doNotCoercePageSize,
+      additionalFilter,
+      additionalOrFilter,
+      noOrderError,
+      withDisplayOptions,
+      cellRenderer,
+      isLocalCall,
+      model,
+      schema,
       ...getQueryParams({
         doNotCoercePageSize,
         currentParams,
@@ -127,7 +153,9 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         isInfinite: isInfinite || (isSimple && !withPaging),
         isLocalCall,
         additionalFilter: additionalFilterToUse,
-        noOrderError
+        additionalOrFilter: additionalOrFilterToUse,
+        noOrderError,
+        isCodeModel
       }),
       formNameFromWithTPCall: formNameFromWithTableParamsCall,
       randomVarToForceLocalStorageUpdate: formSelector(
@@ -145,6 +173,8 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         reduxFormSearchInput: currentParams.searchTerm
       }
     };
+    return mapStateProps;
+    // return { ...mergedOpts, ...mapStateProps };
   };
 
   const mapDispatchToProps = (dispatch, ownProps) => {
@@ -159,11 +189,13 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       defaults,
       onlyOneFilter
     } = mergedOpts;
-    function resetSearch() {
+
+    function updateSearch(val) {
       setTimeout(function() {
-        dispatch(change(formName, "reduxFormSearchInput", ""));
+        dispatch(change(formName, "reduxFormSearchInput", val || ""));
       });
     }
+
     let setNewParams;
     if (urlConnected) {
       setNewParams = function(newParams) {
@@ -175,12 +207,15 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         dispatch(change(formName, "reduxFormQueryParams", newParams));
       };
     }
-    return makeDataTableHandlers({
-      setNewParams,
-      resetSearch,
-      defaults,
-      onlyOneFilter
-    });
+    return {
+      bindThese: makeDataTableHandlers({
+        setNewParams,
+        updateSearch,
+        defaults,
+        onlyOneFilter
+      }),
+      dispatch
+    };
   };
 
   function mergeProps(stateProps, dispatchProps, ownProps) {
@@ -190,26 +225,35 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
     const { currentParams, formName } = stateProps;
     let boundDispatchProps = {};
     //bind currentParams to actions
-    Object.keys(dispatchProps).forEach(function(key) {
-      const action = dispatchProps[key];
+    Object.keys(dispatchProps.bindThese).forEach(function(key) {
+      const action = dispatchProps.bindThese[key];
       boundDispatchProps[key] = function(...args) {
         action(...args, currentParams);
       };
     });
     const { variables, selectedEntities, ...restStateProps } = stateProps;
-    return {
+
+    const changeFormValue = (...args) =>
+      dispatchProps.dispatch(change(formName, ...args));
+
+    const tableParams = {
+      changeFormValue,
+      selectedEntities,
+      ...ownProps.tableParams,
+      ...restStateProps,
+      ...boundDispatchProps,
+      form: formName, //this will override the default redux form name
+      isTableParamsConnected: true //let the table know not to do local sorting/filtering etc.
+    };
+
+    const allMergedProps = {
       ...ownProps,
       variables: stateProps.variables,
       selectedEntities: stateProps.selectedEntities,
-      tableParams: {
-        ...ownProps.tableParams,
-        ...restStateProps,
-        ...dispatchProps,
-        ...boundDispatchProps,
-        form: formName, //this will override the default redux form name
-        isTableParamsConnected: true //let the table know not to do local sorting/filtering etc.
-      }
+      tableParams
     };
+
+    return allMergedProps;
   }
 
   const toReturn = compose(

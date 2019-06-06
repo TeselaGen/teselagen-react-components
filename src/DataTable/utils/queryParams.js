@@ -1,5 +1,5 @@
 //@flow
-import queryString from "query-string";
+import queryString from "qs";
 import QueryBuilder from "tg-client-query-builder";
 import moment from "moment";
 
@@ -99,7 +99,7 @@ function orderEntitiesLocal(orderArray, entities, schema) {
       } else {
         orderFuncs.push(r => {
           const val = get(r, path);
-          return val.toLowerCase ? val.toLowerCase() : val;
+          return val && val.toLowerCase ? val.toLowerCase() : val;
         });
       }
     });
@@ -233,12 +233,17 @@ function getSubFilter(
   filterValue
 ) {
   const ccSelectedFilter = camelCase(selectedFilter);
+  let stringFilterValue =
+    filterValue && filterValue.toString ? filterValue.toString() : filterValue;
+  stringFilterValue = stringFilterValue || "";
   const filterValLower =
-    filterValue && filterValue.toLowerCase && filterValue.toLowerCase();
-
+    stringFilterValue.toLowerCase && stringFilterValue.toLowerCase();
+  const arrayFilterValue = Array.isArray(filterValue)
+    ? filterValue
+    : stringFilterValue.split(".");
   if (ccSelectedFilter === "startsWith") {
     return qb
-      ? qb.startsWith(filterValue) //filter using qb (aka we're backend connected)
+      ? qb.startsWith(stringFilterValue) //filter using qb (aka we're backend connected)
       : fieldVal => {
           //filter using plain old javascript (aka we've got a local table that isn't backend connected)
           if (!fieldVal || !fieldVal.toLowerCase) return false;
@@ -246,18 +251,15 @@ function getSubFilter(
         };
   } else if (ccSelectedFilter === "endsWith") {
     return qb
-      ? qb.endsWith(filterValue) //filter using qb (aka we're backend connected)
+      ? qb.endsWith(stringFilterValue) //filter using qb (aka we're backend connected)
       : fieldVal => {
           //filter using plain old javascript (aka we've got a local table that isn't backend connected)
           if (!fieldVal || !fieldVal.toLowerCase) return false;
           return endsWith(fieldVal.toLowerCase(), filterValLower);
         };
   } else if (ccSelectedFilter === "contains") {
-    const filterValueToUse = filterValue.toString
-      ? filterValue.toString()
-      : filterValue;
     return qb
-      ? qb.contains(filterValueToUse) //filter using qb (aka we're backend connected)
+      ? qb.contains(stringFilterValue.replace(/_/g, "\\_")) //filter using qb (aka we're backend connected)
       : fieldVal => {
           //filter using plain old javascript (aka we've got a local table that isn't backend connected)
           if (!fieldVal || !fieldVal.toLowerCase) return false;
@@ -267,15 +269,13 @@ function getSubFilter(
           );
         };
   } else if (ccSelectedFilter === "inList") {
-    const filterValueToUse =
-      filterValue && filterValue.split && filterValue.split(".");
     return qb
-      ? qb.inList(filterValueToUse) //filter using qb (aka we're backend connected)
+      ? qb.inList(arrayFilterValue) //filter using qb (aka we're backend connected)
       : fieldVal => {
           //filter using plain old javascript (aka we've got a local table that isn't backend connected)
           if (!fieldVal || !fieldVal.toLowerCase) return false;
           return (
-            filterValueToUse
+            arrayFilterValue
               .map(val => val && val.toLowerCase())
               .indexOf(fieldVal.toLowerCase()) > -1
           );
@@ -301,15 +301,13 @@ function getSubFilter(
           return !fieldVal;
         };
   } else if (ccSelectedFilter === "isBetween") {
-    const filterValueToUse =
-      filterValue && filterValue.split && filterValue.split(".");
     return qb
-      ? qb.between(new Date(filterValueToUse[0]), new Date(filterValueToUse[1]))
+      ? qb.between(new Date(arrayFilterValue[0]), new Date(arrayFilterValue[1]))
       : fieldVal => {
           return (
-            moment(filterValueToUse[0]).valueOf() <=
+            moment(arrayFilterValue[0]).valueOf() <=
               moment(fieldVal).valueOf() &&
-            moment(fieldVal).valueOf() <= moment(filterValueToUse[1]).valueOf()
+            moment(fieldVal).valueOf() <= moment(arrayFilterValue[1]).valueOf()
           );
         };
   } else if (ccSelectedFilter === "isBefore") {
@@ -357,7 +355,7 @@ function getSubFilter(
 
 export function getCurrentParamsFromUrl(location) {
   const { search } = location;
-  return parseFilters(queryString.parse(search));
+  return parseFilters(queryString.parse(search, { ignoreQueryPrefix: true }));
 }
 export function setCurrentParamsOnUrl(newParams, replace) {
   const stringifiedFilters = stringifyFilters(newParams);
@@ -372,7 +370,7 @@ function stringifyFilters(newParams) {
     filters = newParams.filters.reduce(
       (acc, { filterOn, selectedFilter, filterValue }, index) => {
         acc +=
-          (index > 0 ? "___" : "") +
+          (index > 0 ? "::" : "") +
           `${filterOn}__${camelCase(selectedFilter)}__${safeStringify(
             Array.isArray(filterValue) ? filterValue.join(".") : filterValue
           )}`;
@@ -400,7 +398,7 @@ function parseFilters(newParams) {
     order: newParams.order && newParams.order.split("___"),
     filters:
       newParams.filters &&
-      newParams.filters.split("___").map(filter => {
+      newParams.filters.split("::").map(filter => {
         const splitFilter = filter.split("__");
         return {
           filterOn: splitFilter[0],
@@ -430,7 +428,7 @@ function buildRef(qb, reference, searchField, expression) {
 
 export function makeDataTableHandlers({
   setNewParams,
-  resetSearch,
+  updateSearch,
   defaults,
   onlyOneFilter
 }) {
@@ -442,6 +440,7 @@ export function makeDataTableHandlers({
       searchTerm: searchTerm === defaults.searchTerm ? undefined : searchTerm
     };
     setNewParams(newParams);
+    updateSearch(searchTerm);
     onlyOneFilter && clearFilters();
   }
   function addFilters(newFilters, currentParams) {
@@ -457,7 +456,7 @@ export function makeDataTableHandlers({
       filters
     };
     setNewParams(newParams);
-    onlyOneFilter && resetSearch();
+    onlyOneFilter && updateSearch();
   }
   function removeSingleFilter(filterOn, currentParams) {
     const filters = currentParams.filters
@@ -481,7 +480,7 @@ export function makeDataTableHandlers({
       toClear[key] = undefined;
     });
     setNewParams(toClear);
-    resetSearch();
+    updateSearch();
   }
   function setPageSize(pageSize, currentParams) {
     let newParams = {
@@ -581,8 +580,10 @@ export function getQueryParams({
   entities,
   isLocalCall,
   additionalFilter,
+  additionalOrFilter,
   doNotCoercePageSize,
-  noOrderError
+  noOrderError,
+  isCodeModel
 }) {
   Object.keys(currentParams).forEach(function(key) {
     if (currentParams[key] === undefined) {
@@ -694,11 +695,13 @@ export function getQueryParams({
       allFilters
     );
     const additionalFilterToUse = additionalFilter(qb, currentParams);
+    const additionalOrFilterToUse = additionalOrFilter(qb, currentParams);
     try {
       const allOrFilters = [getQueries(orFilters, qb, ccFields)];
       otherOrFilters.forEach(orFilters => {
         allOrFilters.push(getQueries(orFilters, qb, ccFields));
       });
+      allOrFilters.push(additionalOrFilterToUse);
       qb.whereAll(
         getQueries(andFilters, qb, ccFields),
         additionalFilterToUse
@@ -717,6 +720,16 @@ export function getQueryParams({
     }
 
     graphqlQueryParams.filter = qb.toJSON();
+
+    // by default make sort by updated at
+    if (!graphqlQueryParams.sort.length) {
+      graphqlQueryParams.sort.push("-updatedAt");
+    }
+
+    // in case entries that have the same value in the column being sorted on
+    // fall back to id as a secondary sort to make sure ordering happens correctly
+    graphqlQueryParams.sort.push(isCodeModel ? "code" : "id");
+
     return {
       ...toReturn,
       //the query params will get passed directly to as variables to the graphql query
@@ -733,8 +746,16 @@ function getQueries(filters, qb, ccFields) {
       return acc;
     }
     const { selectedFilter, filterValue, filterOn } = filter;
-    const subFilter = getSubFilter(qb, selectedFilter, filterValue);
     const fieldSchema = ccFields[filterOn];
+    let filterValueToUse = filterValue;
+    if (fieldSchema && fieldSchema.normalizeFilter) {
+      filterValueToUse = fieldSchema.normalizeFilter(
+        filterValue,
+        selectedFilter,
+        filterOn
+      );
+    }
+    const subFilter = getSubFilter(qb, selectedFilter, filterValueToUse);
     if (fieldSchema) {
       const { path, reference } = fieldSchema;
       if (reference) {

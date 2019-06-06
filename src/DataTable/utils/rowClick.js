@@ -9,7 +9,8 @@ export default function rowClick(e, rowInfo, entities, props) {
     isSingleSelect,
     noSelect,
     onRowClick,
-    isEntityDisabled
+    isEntityDisabled,
+    withCheckboxes
   } = props;
   const entity = rowInfo.original;
   onRowClick(e, entity, rowInfo);
@@ -17,8 +18,8 @@ export default function rowClick(e, rowInfo, entities, props) {
   const rowId = getIdOrCodeOrIndex(entity, rowInfo.index);
   if (rowId === undefined) return;
 
-  const ctrl = e.metaKey || e.ctrlKey;
-  const oldIdMap = reduxFormSelectedEntityIdMap.input.value || {};
+  const ctrl = e.metaKey || e.ctrlKey || (withCheckboxes && !e.shiftKey);
+  const oldIdMap = reduxFormSelectedEntityIdMap || {};
   const rowSelected = oldIdMap[rowId];
   let newIdMap = {
     [rowId]: {
@@ -110,13 +111,13 @@ export default function rowClick(e, rowInfo, entities, props) {
 
 export function finalizeSelection({ idMap, props }) {
   const {
-    reduxFormSelectedEntityIdMap,
     onDeselect,
     onSingleRowSelect,
     onMultiRowSelect,
     noDeselectAll,
     onRowSelect,
-    noSelect
+    noSelect,
+    change
   } = props;
   if (noSelect) return;
   if (
@@ -127,7 +128,7 @@ export function finalizeSelection({ idMap, props }) {
   ) {
     return;
   }
-  reduxFormSelectedEntityIdMap.input.onChange(idMap);
+  change("reduxFormSelectedEntityIdMap", idMap);
   const selectedRecords = getRecordsFromIdMap(idMap);
   onRowSelect(selectedRecords);
 

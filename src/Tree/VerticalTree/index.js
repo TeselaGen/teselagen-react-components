@@ -2,6 +2,7 @@ import React from "react";
 import { get, pick } from "lodash";
 import ReactResizeDetector from "react-resize-detector";
 import PropTypes from "prop-types";
+import { Tooltip } from "@blueprintjs/core";
 import Minimap from "../TreeMinimap";
 import blackOrWhiteContrastsMore from "../blackOrWhiteContrastsMore";
 
@@ -264,18 +265,28 @@ export default class VerticalTree extends React.Component {
                   <div
                     style={{
                       position: "absolute",
-                      bottom: -connectorThickness,
-                      width: connectorThickness,
-                      height: connectorThickness,
+                      bottom: -connectorThickness + "px",
+                      left: -connectorThickness * 0.4 + "px",
+                      width: connectorThickness * 2 + "px",
+                      height: connectorThickness * 2 + "px",
+                      borderRadius: connectorThickness + "px",
+                      paddingTop: connectorThickness * 0.6 + "px",
                       backgroundColor: connectorColor,
                       color: blackOrWhiteContrastsMore(connectorColor),
                       textAlign: "center",
                       lineHeight: connectorThickness + "px",
-                      fontSize: connectorThickness + "px"
+                      fontSize: connectorThickness * 1.2 + "px",
+                      boxShadow: "0 0 1px #0006 inset"
                     }}
                     onClick={this.handleExpanderClick(node)}
                   >
-                    {collapsedNodes[nodeId] ? "►" : "▼"}
+                    <Tooltip
+                      content={
+                        collapsedNodes[nodeId] ? "Expand node" : "Collapse node"
+                      }
+                    >
+                      <span>{collapsedNodes[nodeId] ? "►" : "▼"}</span>
+                    </Tooltip>
                   </div>
                 </div>
               )}
@@ -342,13 +353,13 @@ export default class VerticalTree extends React.Component {
     );
   };
 
-  renderHorizontalLeaves = (nodes, isMinimap, depth, colorCodes) => {
+  renderHorizontalLeaves = (nodes, isMinimap, depth /*, colorCodes*/) => {
     const {
       renderNode,
       renderMinimapNode,
       cardIdKey,
-      connectorThickness,
-      colorByDepth
+      connectorThickness
+      /*colorByDepth*/
     } = this.props;
     const actuallyRenderNode = (isMinimap && renderMinimapNode) || renderNode;
 
@@ -361,11 +372,8 @@ export default class VerticalTree extends React.Component {
           transformOrigin: "0 0"
         }}
       >
-        {nodes.map((node, i) => {
+        {nodes.map(node => {
           const nodeId = get(node, cardIdKey);
-          const connectorColor = colorByDepth
-            ? colorCodes[(depth + 1) % colorCodes.length]
-            : colorCodes[i % colorCodes.length];
 
           return (
             <div key={nodeId} style={{ marginLeft: connectorThickness }}>
@@ -374,7 +382,6 @@ export default class VerticalTree extends React.Component {
                   style={{
                     position: "absolute",
                     left: -connectorThickness,
-                    borderLeft: `${connectorThickness}px solid ${connectorColor}`,
                     height: "100%"
                   }}
                 />

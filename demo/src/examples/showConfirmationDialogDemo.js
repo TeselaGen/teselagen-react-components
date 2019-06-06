@@ -11,7 +11,7 @@ function Demo() {
               cancelButtonText: "Nope",
               canEscapeKeyCancel: true //this is false by default
           });
-          console.log("doAction:", doAction);
+          console.info("doAction:", doAction);
         }}
         text="Do some action"
       />

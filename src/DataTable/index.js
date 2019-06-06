@@ -6,7 +6,15 @@ import ReactDOM from "react-dom";
 import moment from "moment";
 import { arrayMove } from "react-sortable-hoc";
 import copy from "copy-to-clipboard";
-import { camelCase, get, startCase, noop, isEqual, cloneDeep } from "lodash";
+import {
+  map,
+  toString,
+  camelCase,
+  startCase,
+  noop,
+  isEqual,
+  cloneDeep
+} from "lodash";
 import {
   Button,
   Menu,
@@ -17,30 +25,32 @@ import {
   Icon,
   Popover,
   Intent,
-  Callout
+  Callout,
+  Hotkey,
+  Hotkeys,
+  HotkeysTarget,
+  Tooltip
 } from "@blueprintjs/core";
 import classNames from "classnames";
 import scrollIntoView from "dom-scroll-into-view";
 import { SortableElement } from "react-sortable-hoc";
 import { BooleanValue } from "react-values";
+import ReactTable from "react-table";
+import { withProps, branch } from "recompose";
+import InfoHelper from "../InfoHelper";
 import { getSelectedRowsFromEntities } from "./utils/selection";
 import rowClick, { finalizeSelection } from "./utils/rowClick";
-import ReactTable from "react-table";
 import PagingTool from "./PagingTool";
 import FilterAndSortMenu from "./FilterAndSortMenu";
 import getIdOrCodeOrIndex from "./utils/getIdOrCodeOrIndex";
 import SearchBar from "./SearchBar";
 import DisplayOptions from "./DisplayOptions";
-// import withQuery from "../enhancers/withQuery";
-// import withUpsert from "../enhancers/withUpsert";
 // import tableConfigurationFragment from "./utils/tableConfigurationFragment";
 // import currentUserFragment from "./utils/currentUserFragment";
 // import withDelete from "../enhancers/withDelete";
 // import fieldOptionFragment from "./utils/fieldOptionFragment";
 import DisabledLoadingComponent from "./DisabledLoadingComponent";
-import InfoHelper from "../InfoHelper";
 import SortableColumns from "./SortableColumns";
-import { withProps, branch } from "recompose";
 import computePresets from "./utils/computePresets";
 import dataTableEnhancer from "./dataTableEnhancer";
 import defaultProps from "./defaultProps";
@@ -70,7 +80,8 @@ class DataTable extends React.Component {
       expandAllByDefault,
       selectAllByDefault,
       reduxFormSelectedEntityIdMap,
-      reduxFormExpandedEntityIdMap
+      reduxFormExpandedEntityIdMap,
+      change
     } = newProps;
 
     //handle programatic filter adding
@@ -101,21 +112,21 @@ class DataTable extends React.Component {
       )
     ) {
       if (selectAllByDefault) {
-        reduxFormSelectedEntityIdMap.input.onChange({
+        change("reduxFormSelectedEntityIdMap", {
           ...entities.reduce((acc, entity) => {
             acc[entity.id] = { entity };
             return acc;
           }, {}),
-          ...(reduxFormSelectedEntityIdMap.input.value || {})
+          ...(reduxFormSelectedEntityIdMap || {})
         });
       }
       if (expandAllByDefault) {
-        reduxFormExpandedEntityIdMap.input.onChange({
+        change("reduxFormExpandedEntityIdMap", {
           ...entities.reduce((acc, e) => {
             acc[e.id] = true;
             return acc;
           }, {}),
-          ...(reduxFormExpandedEntityIdMap.input.value || {})
+          ...(reduxFormExpandedEntityIdMap || {})
         });
       }
     }
@@ -153,21 +164,128 @@ class DataTable extends React.Component {
 
   componentDidMount() {
     this.updateFromProps({}, computePresets(this.props));
+    const table = ReactDOM.findDOMNode(this.table);
+    let theads = table.getElementsByClassName("rt-thead");
+    let tbody = table.getElementsByClassName("rt-tbody")[0];
+
+    tbody.addEventListener("scroll", () => {
+      for (let i = 0; i < theads.length; i++) {
+        theads.item(i).scrollLeft = tbody.scrollLeft;
+      }
+    });
   }
 
   componentDidUpdate(oldProps) {
     const table = ReactDOM.findDOMNode(this.table);
-    const tableBody = table.querySelector(".rt-tbody");
-    const headerNode = table.querySelector(".rt-thead.-header");
-    if (headerNode) headerNode.style.overflowY = "inherit";
-    if (tableBody && tableBody.scrollHeight > tableBody.clientHeight) {
-      if (headerNode) {
-        headerNode.style.overflowY = "scroll";
-        headerNode.style.overflowX = "hidden";
+    // const tableBody = table.querySelector(".rt-tbody");
+    // const headerNode = table.querySelector(".rt-thead.-header");
+    // if (headerNode) headerNode.style.overflowY = "inherit";
+    // if (tableBody && tableBody.scrollHeight > tableBody.clientHeight) {
+    //   if (headerNode) {
+    //     headerNode.style.overflowY = "scroll";
+    //     headerNode.style.overflowX = "hidden";
+    //   }
+    // }
+
+    this.updateFromProps(computePresets(oldProps), computePresets(this.props));
+
+    let theads = table.getElementsByClassName("rt-thead");
+    let tbody = table.getElementsByClassName("rt-tbody")[0];
+
+    if (tbody.scrollHeight > tbody.clientHeight) {
+      for (let i = 0; i < theads.length; i++) {
+        theads.item(i).classList.add("vertical-scrollbar-present");
+      }
+    } else {
+      for (let i = 0; i < theads.length; i++) {
+        theads.item(i).classList.remove("vertical-scrollbar-present");
       }
     }
 
-    this.updateFromProps(computePresets(oldProps), computePresets(this.props));
+    // comment in to test what is causing re-render
+    // Object.entries(this.props).forEach(
+    //   ([key, val]) =>
+    //     oldProps[key] !== val && console.info(`Prop '${key}' changed`)
+    // );
+  }
+
+  handleCopyHotkey = () => {
+    const { reduxFormSelectedEntityIdMap } = this.props;
+    this.handleCopySelectedRows(
+      getRecordsFromIdMap(reduxFormSelectedEntityIdMap)
+    );
+  };
+
+  getCellCopyText = cellWrapper => {
+    const text = cellWrapper && cellWrapper.getAttribute("data-copy-text");
+    return text || "";
+  };
+
+  handleCopyRow = rowEl => {
+    //takes in a row element
+    const text = this.getRowCopyText(rowEl);
+    if (!text) return;
+    this.handleCopyHelper(text, "Row Copied");
+  };
+
+  getRowCopyText = rowEl => {
+    //takes in a row element
+    if (!rowEl) return;
+    return map(rowEl.children, cellEl => {
+      const cellChild = cellEl.querySelector(`[data-copy-text]`);
+      if (!cellChild) return;
+      return this.getCellCopyText(cellChild);
+    }).join("\t");
+  };
+
+  handleCopyHelper = (stringToCopy, message) => {
+    const copyHandler = e => {
+      e.preventDefault();
+      e.clipboardData.setData("text/plain", stringToCopy);
+    };
+    document.addEventListener("copy", copyHandler);
+    !window.Cypress && copy(stringToCopy); //only fire the copy event if not in a cypress test
+    document.removeEventListener("copy", copyHandler);
+    window.toastr.success(message);
+  };
+
+  handleCopySelectedRows = (selectedRecords, e) => {
+    const { entities = [] } = computePresets(this.props);
+    const idToIndex = entities.reduce((acc, e, i) => {
+      acc[e.id || e.code] = i;
+      return acc;
+    }, {});
+
+    //index 0 of the table is the column titles
+    //must add 1 to rowNum
+    const rowNumbersToCopy = selectedRecords
+      .map(rec => idToIndex[rec.id || rec.code] + 1)
+      .sort();
+
+    if (!rowNumbersToCopy.length) return;
+    const allRowEls = e.target
+      .closest(".ReactTable")
+      .querySelectorAll(".rt-tr");
+    const rowEls = rowNumbersToCopy.map(i => allRowEls[i]);
+
+    //get row elements and call this.handleCopyRow for each const rowEls = this.getRowEls(rowNumbersToCopy)
+    const textToCopy = map(rowEls, rowEl => this.getRowCopyText(rowEl))
+      .filter(text => text)
+      .join("\n");
+    if (!textToCopy) return window.toastr.warning("No text to copy");
+    this.handleCopyHelper(textToCopy, "Selected rows copied");
+  };
+
+  renderHotkeys() {
+    return (
+      <Hotkeys>
+        <Hotkey
+          combo="mod + c"
+          label="Copy rows"
+          onKeyDown={this.handleCopyHotkey}
+        />
+      </Hotkeys>
+    );
   }
 
   moveColumn = ({ oldIndex, newIndex }) => {
@@ -199,15 +317,15 @@ class DataTable extends React.Component {
     const {
       withDisplayOptions,
       moveColumnPersist,
-      localStorageForceUpdate,
-      syncDisplayOptionsToDb
+      syncDisplayOptionsToDb,
+      change
     } = computePresets(this.props);
     let moveColumnPersistToUse = moveColumnPersist;
     if (moveColumnPersist && withDisplayOptions && !syncDisplayOptionsToDb) {
       //little hack to make localstorage changes get reflected in UI (we force an update to get the enhancers to run again :)
       moveColumnPersistToUse = (...args) => {
         moveColumnPersist(...args);
-        localStorageForceUpdate.input.onChange(Math.random());
+        change("localStorageForceUpdate", Math.random());
       };
     }
     return (
@@ -264,7 +382,7 @@ class DataTable extends React.Component {
       resizePersist,
       updateColumnVisibility,
       updateTableDisplayDensity,
-      localStorageForceUpdate,
+      change,
       syncDisplayOptionsToDb,
       resetDefaultVisibility,
       maxHeight,
@@ -286,6 +404,7 @@ class DataTable extends React.Component {
       isSingleSelect,
       noSelect,
       SubComponent,
+      shouldShowSubComponent,
       ReactTableProps = {},
       hideSelectedCount,
       hideColumnHeader,
@@ -297,6 +416,7 @@ class DataTable extends React.Component {
       currentParams,
       hasOptionForForcedHidden,
       showForcedHiddenColumns,
+      searchMenuButton,
       setShowForcedHidden
     } = computePresets(this.props);
     let updateColumnVisibilityToUse = updateColumnVisibility;
@@ -306,15 +426,15 @@ class DataTable extends React.Component {
       //little hack to make localstorage changes get reflected in UI (we force an update to get the enhancers to run again :)
       updateColumnVisibilityToUse = (...args) => {
         updateColumnVisibility(...args);
-        localStorageForceUpdate.input.onChange(Math.random());
+        change("localStorageForceUpdate", Math.random());
       };
       updateTableDisplayDensityToUse = (...args) => {
         updateTableDisplayDensity(...args);
-        localStorageForceUpdate.input.onChange(Math.random());
+        change("localStorageForceUpdate", Math.random());
       };
       resetDefaultVisibilityToUse = (...args) => {
         resetDefaultVisibility(...args);
-        localStorageForceUpdate.input.onChange(Math.random());
+        change("localStorageForceUpdate", Math.random());
       };
     }
     let compactClassName = "";
@@ -352,7 +472,7 @@ class DataTable extends React.Component {
       });
     }
     const numRows = isInfinite ? entities.length : pageSize;
-    const idMap = reduxFormSelectedEntityIdMap.input.value || {};
+    const idMap = reduxFormSelectedEntityIdMap || {};
     const selectedRowCount = Object.keys(idMap).filter(key => idMap[key])
       .length;
 
@@ -365,11 +485,10 @@ class DataTable extends React.Component {
 
     const expandedRows = entities.reduce((acc, row, index) => {
       const rowId = getIdOrCodeOrIndex(row, index);
-      acc[index] = reduxFormExpandedEntityIdMap.input.value[rowId];
+      acc[index] = reduxFormExpandedEntityIdMap[rowId];
       return acc;
     }, {});
     const showHeader = (withTitle || withSearch || children) && !noHeader;
-
     const toggleFullscreenButton = (
       <Button
         icon="fullscreen"
@@ -399,6 +518,18 @@ class DataTable extends React.Component {
       withPaging &&
       (hidePageSizeWhenPossible ? entityCount > pageSize : true);
 
+    let SubComponentToUse;
+    if (SubComponent) {
+      SubComponentToUse = row => {
+        let shouldShow = true;
+        if (shouldShowSubComponent) {
+          shouldShow = shouldShowSubComponent(row.original);
+        }
+        if (shouldShow) {
+          return SubComponent(row);
+        }
+      };
+    }
     return (
       <div
         className={classNames(
@@ -415,33 +546,42 @@ class DataTable extends React.Component {
         )}
       >
         {showHeader && (
-          <div className={"data-table-header"}>
-            <div className={"data-table-title-and-buttons"}>
-              {tableName &&
-                withTitle && (
-                  <span className={"data-table-title"}>{tableName}</span>
-                )}
+          <div className="data-table-header">
+            <div className="data-table-title-and-buttons">
+              {tableName && withTitle && (
+                <span className="data-table-title">{tableName}</span>
+              )}
               {children}
               {topLeftItems}
             </div>
             {errorParsingUrlString && (
-              <Callout icon="error" intent={Intent.WARNING}>
+              <Callout
+                icon="error"
+                style={{
+                  width: "unset"
+                }}
+                intent={Intent.WARNING}
+              >
                 Error parsing URL
               </Callout>
             )}
             {filtersOnNonDisplayedFields.length
               ? filtersOnNonDisplayedFields.map(
                   ({ displayName, path, selectedFilter, filterValue }) => {
+                    let filterValToDisplay = filterValue;
+                    if (Array.isArray(filterValue)) {
+                      filterValToDisplay = filterValue.toString();
+                    }
                     return (
                       <div
                         key={displayName || startCase(path)}
-                        className={"tg-filter-on-non-displayed-field"}
+                        className="tg-filter-on-non-displayed-field"
                       >
                         <Icon icon="filter" />
                         <span>
                           {" "}
                           {displayName || startCase(path)} {selectedFilter}{" "}
-                          {filterValue}{" "}
+                          {filterValToDisplay}{" "}
                         </span>
                       </div>
                     );
@@ -449,16 +589,20 @@ class DataTable extends React.Component {
                 )
               : ""}
             {withSearch && (
-              <div className={"data-table-search-and-clear-filter-container"}>
+              <div className="data-table-search-and-clear-filter-container">
                 {hasFilters ? (
-                  <Button
-                    disabled={disabled}
-                    className={"data-table-clear-filters"}
-                    onClick={() => {
-                      clearFilters(additionalFilterKeys);
-                    }}
-                    text={"Clear filters"}
-                  />
+                  <Tooltip content="Clear Filters">
+                    <Button
+                      minimal
+                      intent="danger"
+                      icon="filter-remove"
+                      disabled={disabled}
+                      className="data-table-clear-filters"
+                      onClick={() => {
+                        clearFilters(additionalFilterKeys);
+                      }}
+                    />
+                  </Tooltip>
                 ) : (
                   ""
                 )}
@@ -467,6 +611,7 @@ class DataTable extends React.Component {
                     reduxFormSearchInput,
                     setSearchTerm,
                     loading: isLoading,
+                    searchMenuButton,
                     disabled
                   }}
                 />
@@ -487,8 +632,19 @@ class DataTable extends React.Component {
           sortable={false}
           loading={isLoading || disabled}
           defaultResized={resized}
-          onResizedChange={newResized => {
-            resizePersist(newResized);
+          onResizedChange={(newResized = []) => {
+            const resizedToUse = newResized.map(column => {
+              // have a min width of 50 so that columns don't disappear
+              if (column.value < 50) {
+                return {
+                  ...column,
+                  value: 50
+                };
+              } else {
+                return column;
+              }
+            });
+            resizePersist(resizedToUse);
           }}
           getTbodyProps={() => ({
             id: tableId
@@ -507,12 +663,12 @@ class DataTable extends React.Component {
             minHeight: 150,
             ...style
           }}
-          SubComponent={SubComponent}
+          SubComponent={SubComponentToUse}
           {...ReactTableProps}
         />
         {!noFooter && (
           <div
-            className={"data-table-footer"}
+            className="data-table-footer"
             style={{
               justifyContent:
                 !showNumSelected && !showCount ? "flex-end" : "space-between"
@@ -554,24 +710,27 @@ class DataTable extends React.Component {
       onDoubleClick,
       history,
       entities,
-      isEntityDisabled
+      isEntityDisabled,
+      change
     } = computePresets(this.props);
     if (!rowInfo) return {};
     const entity = rowInfo.original;
     const rowId = getIdOrCodeOrIndex(entity, rowInfo.index);
-    const rowSelected = reduxFormSelectedEntityIdMap.input.value[rowId];
-    const isExpanded = reduxFormExpandedEntityIdMap.input.value[rowId];
+    const rowSelected = reduxFormSelectedEntityIdMap[rowId];
+    const isExpanded = reduxFormExpandedEntityIdMap[rowId];
     const rowDisabled = isEntityDisabled(entity);
     return {
       onClick: e => {
         // if checkboxes are activated or row expander is clicked don't select row
         if (e.target.matches(".tg-expander, .tg-expander *")) {
-          reduxFormExpandedEntityIdMap.input.onChange({
-            ...reduxFormExpandedEntityIdMap.input.value,
+          change("reduxFormExpandedEntityIdMap", {
+            ...reduxFormExpandedEntityIdMap,
             [rowId]: !isExpanded
           });
           return;
-        } else if (withCheckboxes) {
+        } else if (
+          e.target.closest(".tg-react-table-checkbox-cell-container")
+        ) {
           return;
         }
         rowClick(e, rowInfo, entities, computePresets(this.props));
@@ -579,8 +738,7 @@ class DataTable extends React.Component {
       onContextMenu: e => {
         e.preventDefault();
         if (rowId === undefined || rowDisabled) return;
-        const oldIdMap =
-          cloneDeep(reduxFormSelectedEntityIdMap.input.value) || {};
+        const oldIdMap = cloneDeep(reduxFormSelectedEntityIdMap) || {};
         let newIdMap;
         if (withCheckboxes) {
           newIdMap = oldIdMap;
@@ -614,7 +772,7 @@ class DataTable extends React.Component {
     } = computePresets(this.props);
     const checkedRows = getSelectedRowsFromEntities(
       entities,
-      reduxFormSelectedEntityIdMap.input.value
+      reduxFormSelectedEntityIdMap
     );
     const checkboxProps = {
       checked: false,
@@ -637,8 +795,7 @@ class DataTable extends React.Component {
         disabled={noSelect || noUserSelect}
         /* eslint-disable react/jsx-no-bind */
         onChange={() => {
-          const newIdMap =
-            cloneDeep(reduxFormSelectedEntityIdMap.input.value) || {};
+          const newIdMap = cloneDeep(reduxFormSelectedEntityIdMap) || {};
           entities.forEach((entity, i) => {
             if (isEntityDisabled(entity)) return;
             const entityId = getIdOrCodeOrIndex(entity, i);
@@ -673,7 +830,7 @@ class DataTable extends React.Component {
     } = computePresets(this.props);
     const checkedRows = getSelectedRowsFromEntities(
       entities,
-      reduxFormSelectedEntityIdMap.input.value
+      reduxFormSelectedEntityIdMap
     );
 
     const { lastCheckedRow } = this.state;
@@ -690,8 +847,7 @@ class DataTable extends React.Component {
         disabled={noSelect || noUserSelect || isEntityDisabled(entity)}
         /* eslint-disable react/jsx-no-bind*/
         onChange={e => {
-          let newIdMap =
-            cloneDeep(reduxFormSelectedEntityIdMap.input.value) || {};
+          let newIdMap = cloneDeep(reduxFormSelectedEntityIdMap) || {};
           const isRowCurrentlyChecked = checkedRows.indexOf(rowIndex) > -1;
           const entityId = getIdOrCodeOrIndex(entity, rowIndex);
           if (isSingleSelect) {
@@ -728,7 +884,6 @@ class DataTable extends React.Component {
               newIdMap[entityId] = { entity };
             }
           }
-
           finalizeSelection({
             idMap: newIdMap,
             props: computePresets(this.props)
@@ -746,93 +901,96 @@ class DataTable extends React.Component {
       cellRenderer,
       withCheckboxes,
       SubComponent,
+      shouldShowSubComponent,
       entities,
       getCellHoverText,
       withExpandAndCollapseAllButton,
-      reduxFormExpandedEntityIdMap
+      reduxFormExpandedEntityIdMap,
+      change
     } = computePresets(this.props);
     const { columns } = this.state;
     if (!columns.length) {
       return columns;
     }
-    const columnsToRender = [
-      ...(SubComponent
-        ? [
-            {
-              ...(withExpandAndCollapseAllButton && {
-                Header: () => {
-                  const showCollapseAll =
-                    Object.values(
-                      reduxFormExpandedEntityIdMap.input.value
-                    ).filter(i => i).length === entities.length;
-                  return (
-                    <InfoHelper
-                      content={showCollapseAll ? "Collapse All" : "Expand All"}
-                      isButton
-                      popoverProps={{
-                        modifiers: {
-                          preventOverflow: { enabled: false },
-                          hide: { enabled: false }
-                        }
-                      }}
-                      onClick={() => {
-                        showCollapseAll
-                          ? reduxFormExpandedEntityIdMap.input.onChange({})
-                          : reduxFormExpandedEntityIdMap.input.onChange(
-                              entities.reduce((acc, e) => {
-                                acc[e.id] = true;
-                                return acc;
-                              }, {})
-                            );
-                      }}
-                      className={classNames(
-                        "tg-expander-all",
-                        Classes.MINIMAL,
-                        Classes.SMALL
-                      )}
-                      icon={showCollapseAll ? "chevron-down" : "chevron-right"}
-                    />
-                  );
-                }
-              }),
-              expander: true,
-              Expander: ({ isExpanded }) => {
-                return (
-                  <Button
-                    className={classNames(
-                      "tg-expander",
-                      Classes.MINIMAL,
-                      Classes.SMALL
-                    )}
-                    icon={isExpanded ? "chevron-down" : "chevron-right"}
-                  />
-                );
-              }
-            }
-          ]
-        : []),
-      ...(withCheckboxes
-        ? [
-            {
-              Header: this.renderCheckboxHeader,
-              Cell: this.renderCheckboxCell,
-              width: 35,
-              resizable: false,
-              getHeaderProps: () => {
-                return {
-                  className: "tg-react-table-checkbox-header-container",
-                  immovable: "true"
-                };
-              },
-              getProps: () => {
-                return {
-                  className: "tg-react-table-checkbox-cell-container"
-                };
-              }
-            }
-          ]
-        : [])
-    ];
+    const columnsToRender = [];
+    if (SubComponent) {
+      columnsToRender.push({
+        ...(withExpandAndCollapseAllButton && {
+          Header: () => {
+            const showCollapseAll =
+              Object.values(reduxFormExpandedEntityIdMap).filter(i => i)
+                .length === entities.length;
+            return (
+              <InfoHelper
+                content={showCollapseAll ? "Collapse All" : "Expand All"}
+                isButton
+                popoverProps={{
+                  modifiers: {
+                    preventOverflow: { enabled: false },
+                    hide: { enabled: false }
+                  }
+                }}
+                onClick={() => {
+                  showCollapseAll
+                    ? change("reduxFormExpandedEntityIdMap", {})
+                    : change(
+                        "reduxFormExpandedEntityIdMap",
+                        entities.reduce((acc, e) => {
+                          acc[e.id] = true;
+                          return acc;
+                        }, {})
+                      );
+                }}
+                className={classNames(
+                  "tg-expander-all",
+                  Classes.MINIMAL,
+                  Classes.SMALL
+                )}
+                icon={showCollapseAll ? "chevron-down" : "chevron-right"}
+              />
+            );
+          }
+        }),
+        expander: true,
+        Expander: ({ isExpanded, original: record }) => {
+          let shouldShow = true;
+          if (shouldShowSubComponent) {
+            shouldShow = shouldShowSubComponent(record);
+          }
+          if (!shouldShow) return null;
+          return (
+            <Button
+              className={classNames(
+                "tg-expander",
+                Classes.MINIMAL,
+                Classes.SMALL
+              )}
+              icon={isExpanded ? "chevron-down" : "chevron-right"}
+            />
+          );
+        }
+      });
+    }
+
+    if (withCheckboxes) {
+      columnsToRender.push({
+        Header: this.renderCheckboxHeader,
+        Cell: this.renderCheckboxCell,
+        width: 35,
+        resizable: false,
+        getHeaderProps: () => {
+          return {
+            className: "tg-react-table-checkbox-header-container",
+            immovable: "true"
+          };
+        },
+        getProps: () => {
+          return {
+            className: "tg-react-table-checkbox-cell-container"
+          };
+        }
+      });
+    }
     columns.forEach(column => {
       const tableColumn = {
         ...column,
@@ -868,12 +1026,17 @@ class DataTable extends React.Component {
         tableColumn.Cell = props => props.value;
       }
       const oldFunc = tableColumn.Cell;
+
       tableColumn.Cell = (...args) => {
-        //wrap the original tableColumn.Cell function in another div in order to add a title attribute
+        const [row] = args;
         const val = oldFunc(...args);
+        const text = this.getCopyTextForCell(val, row, column);
+
+        //wrap the original tableColumn.Cell function in another div in order to add a title attribute
         let title = typeof val !== "string" ? args[0].value : val;
         if (title) title = String(title);
         if (getCellHoverText) title = getCellHoverText(...args);
+        if (column.getTitleAttr) title = column.getTitleAttr(...args);
         return (
           <div
             style={
@@ -881,6 +1044,9 @@ class DataTable extends React.Component {
                 ? {}
                 : { textOverflow: "ellipsis", overflow: "hidden" }
             }
+            data-test={"tgCell_" + column.path}
+            className="tg-cell-wrapper"
+            data-copy-text={text}
             title={title || undefined}
           >
             {val}
@@ -893,27 +1059,21 @@ class DataTable extends React.Component {
     return columnsToRender;
   };
 
-  setManyRowsToCopy = selectedRecords => {
-    const { columns } = this.state;
-    let allRowsText = [];
-    selectedRecords.forEach((record, i) => {
-      let textForRow = [];
-      columns.forEach(col => {
-        let text = get(record, col.path);
-        if (col.getClipboardData) {
-          text = col.getClipboardData(text, record);
-        } else if (col.render) {
-          text = col.render(text, record, i);
-        } else if (text !== undefined) {
-          text = String(text);
-        } else text = " ";
-        if (text) {
-          textForRow.push(text);
-        }
-      });
-      allRowsText.push(textForRow.join("\t"));
-    });
-    return allRowsText.join("\n");
+  getCopyTextForCell = (val, row, column) => {
+    // TODOCOPY we need a way to potentially omit certain columns from being added as a \t element (talk to taoh about this)
+
+    let text = val;
+    const record = row.original;
+    if (column.getClipboardData) {
+      text = column.getClipboardData(row.value, record);
+    } else if (column.render) {
+      text = column.render(row.value, record, row, this.props);
+    } else if (text) {
+      text = String(text);
+    }
+    const stringText = toString(text);
+    if (stringText === "[object Object]") return "";
+    return stringText;
   };
 
   showContextMenu = (idMap, e) => {
@@ -924,21 +1084,63 @@ class DataTable extends React.Component {
       history
     });
     if (!itemsToRender && !isCopyable) return null;
+    const copyMenuItems = [];
+    if (
+      isCopyable &&
+      (selectedRecords.length === 0 || selectedRecords.length === 1)
+    ) {
+      copyMenuItems.push(
+        <MenuItem
+          key="copySelectedRows"
+          onClick={() => {
+            const cell =
+              e.target.querySelector(".tg-cell-wrapper") ||
+              e.target.closest(".tg-cell-wrapper");
+            const row = cell.closest(".rt-tr");
+            this.handleCopyRow(row);
+            // loop through each cell in the row
+          }}
+          icon="clipboard"
+          text="Copy Row to Clipboard"
+        />
+      );
+    }
+    if (isCopyable && selectedRecords.length > 1) {
+      copyMenuItems.push(
+        <MenuItem
+          key="copySelectedRows"
+          onClick={() => {
+            this.handleCopySelectedRows(selectedRecords, e);
+            // loop through each cell in the row
+          }}
+          icon="clipboard"
+          text="Copy Selected Rows to Clipboard"
+        />
+      );
+    }
+    e.persist();
+    if (isCopyable) {
+      copyMenuItems.push(
+        <MenuItem
+          key="copyCell"
+          onClick={() => {
+            //TODOCOPY: we need to make sure that the cell copy is being used by the row copy.. right now we have 2 different things going on
+            //do we need to be able to copy hidden cells? It seems like it should just copy what's on the page..?
+            const cellWrapper =
+              e.target.querySelector(".tg-cell-wrapper") ||
+              e.target.closest(".tg-cell-wrapper");
+            const text = this.getCellCopyText(cellWrapper);
+            this.handleCopyHelper(text, "Cell copied");
+          }}
+          icon="clipboard"
+          text="Copy Cell to Clipboard"
+        />
+      );
+    }
     const menu = (
       <Menu>
         {itemsToRender}
-        {isCopyable &&
-          selectedRecords.length > 0 && (
-            <MenuItem
-              key="copySelectedRows"
-              onClick={() => {
-                copy(this.setManyRowsToCopy(selectedRecords));
-                window.toastr.success("Selected rows copied");
-              }}
-              icon="clipboard"
-              text={"Copy Rows to Clipboard"}
-            />
-          )}
+        {copyMenuItems}
       </Menu>
     );
     ContextMenu.show(menu, { left: e.clientX, top: e.clientY });
@@ -961,6 +1163,7 @@ class DataTable extends React.Component {
       displayName,
       sortDisabled,
       filterDisabled,
+      columnFilterDisabled,
       renderTitleInner,
       filterIsActive = noop,
       noTitle,
@@ -1000,7 +1203,7 @@ class DataTable extends React.Component {
     const sortUp = ordering && !sortDown;
     const sortComponent =
       withSort && !disableSorting && !isActionColumn ? (
-        <div className={"tg-sort-arrow-container"}>
+        <div className="tg-sort-arrow-container">
           <Icon
             title="Sort Z-A (Hold shift to sort multiple columns)"
             icon="chevron-up"
@@ -1014,7 +1217,7 @@ class DataTable extends React.Component {
             }}
           />
           <Icon
-            title={"Sort A-Z (Hold shift to sort multiple columns)"}
+            title="Sort A-Z (Hold shift to sort multiple columns)"
             icon="chevron-down"
             color={sortDown ? "#106ba3" : undefined}
             iconSize={12}
@@ -1029,7 +1232,10 @@ class DataTable extends React.Component {
       ) : null;
     const FilterMenu = column.FilterMenu || FilterAndSortMenu;
     const filterMenu =
-      withFilter && !isActionColumn && !filterDisabled ? (
+      withFilter &&
+      !isActionColumn &&
+      !filterDisabled &&
+      !columnFilterDisabled ? (
         <BooleanValue defaultValue={false}>
           {({ value, toggle, clear }) => {
             return (
@@ -1041,7 +1247,8 @@ class DataTable extends React.Component {
                 isOpen={value}
                 modifiers={{
                   preventOverflow: { enabled: false },
-                  hide: { enabled: false }
+                  hide: { enabled: false },
+                  flip: { enabled: false }
                 }}
               >
                 <Icon
@@ -1070,13 +1277,15 @@ class DataTable extends React.Component {
       ) : null;
 
     return (
-      <div className={"tg-react-table-column-header"}>
-        {(displayName || startCase(path)) &&
-          !noTitle && (
-            <span title={columnTitle} className={"tg-react-table-name"}>
-              {renderTitleInner ? renderTitleInner : columnTitle}
-            </span>
-          )}
+      <div
+        data-test={displayName || startCase(path)}
+        className="tg-react-table-column-header"
+      >
+        {(displayName || startCase(path)) && !noTitle && (
+          <span title={columnTitle} className="tg-react-table-name">
+            {renderTitleInner ? renderTitleInner : columnTitle}
+          </span>
+        )}
         {sortComponent}
         {filterMenu}
       </div>
@@ -1084,6 +1293,11 @@ class DataTable extends React.Component {
   };
 }
 
-export default dataTableEnhancer(DataTable);
+// const CompToExport =  dataTableEnhancer(HotkeysTarget(DataTable));
+// // CompToExport.selectRecords = (form, value) => {
+// //   return change(form, "reduxFormSelectedEntityIdMap", value)
+// // }
+// export default CompToExport
+export default dataTableEnhancer(HotkeysTarget(DataTable));
 const ConnectedPagingTool = dataTableEnhancer(PagingTool);
 export { ConnectedPagingTool };

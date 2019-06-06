@@ -1,5 +1,5 @@
 
-
+let showFirst = true
 function Demo() {
   return (
     <div>
@@ -27,6 +27,15 @@ function Demo() {
       <Button intent="danger" onClick={() => {
         window.toastr.error("heyy")
       }} text="show error toast" />
+
+      <Button onClick={() => {
+        if (showFirst) {
+          window.toastr.info("Saving...", {key: "saveMsg"})
+        } else {
+          window.toastr.success("Saved", {updateTimeout: true, key: "saveMsg"})
+        }
+        showFirst = !showFirst
+      }} text="Click me once and click again to see that toast updated"></Button>
     </div>
   );
 }

@@ -74,7 +74,7 @@ class HotkeysDialogDemo extends React.Component {
     return (
       <div>
         <div style={{
-          backgroundColor: '#f8f8f8',
+          // backgroundColor: '#f8f8f8',
           height: '300px',
           border: '1px solid #eee',
           display: 'flex',

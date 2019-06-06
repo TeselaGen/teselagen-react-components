@@ -1,7 +1,9 @@
+import { omitBy, isNil } from "lodash";
 //we use this to make adding preset prop groups simpler
 export default function computePresets(props) {
   const { isSimple } = props;
-  let toReturn = { ...props };
+  let toReturn = omitBy(props, isNil);
+
   if (isSimple) {
     //isSimplePreset
     toReturn = {
@@ -9,7 +11,7 @@ export default function computePresets(props) {
       noFooter: !props.withPaging,
       noPadding: true,
       noFullscreenButton: true,
-      hidePageSizeWhenPossible: true,
+      hidePageSizeWhenPossible: !props.withPaging,
       isInfinite: !props.withPaging,
       hideSelectedCount: true,
       withTitle: false,

@@ -34,6 +34,8 @@ export default schema => {
     if (!fieldToUse.path) {
       fieldToUse = {
         ...fieldToUse,
+        filterDisabled: true,
+        sortDisabled: true,
         path: "fake-path" + i
       };
     }

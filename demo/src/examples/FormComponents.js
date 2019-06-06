@@ -54,6 +54,7 @@ class FormComponentsDemo extends React.Component {
             name={"radioGroup"}
             inlineLabel={this.state.inlineLabels}
             label={"Radio Group Input"}
+            tooltipInfo="hello hello I'm tooltipInfo"
             defaultValue={"true"}
             onFieldSubmit={onFieldSubmit}
             options={[
@@ -70,6 +71,7 @@ class FormComponentsDemo extends React.Component {
           <NumericInputField
             secondaryLabel="(optional)"
             name={"numericInput"}
+            tooltipInfo="hello hello I'm tooltipInfo"
             inlineLabel={this.state.inlineLabels}
             label="Numeric Input"
             placeholder="0"
@@ -77,6 +79,7 @@ class FormComponentsDemo extends React.Component {
           />
           <FileUploadField
             label="Upload component"
+            tooltipInfo="hello hello I'm tooltipInfo"
             onFieldSubmit={function(fileList) {
               console.info(
                 "do something with the finished file list:",
@@ -94,6 +97,7 @@ class FormComponentsDemo extends React.Component {
             defaultValue={"Default Value Here!"}
             placeholder="Enter input..."
             onFieldSubmit={onFieldSubmit}
+            containerStyle={{ background: "black", height: 200 }}
           />
           <InputField
             name={"inputFieldWithTooltipError"}
@@ -107,6 +111,7 @@ class FormComponentsDemo extends React.Component {
             placeholder="Enter input..."
           />
           <SelectField
+            tooltipInfo="hello hello I'm tooltipInfo"
             onFieldSubmit={onFieldSubmit}
             options={["hey", "you", "guys"]}
             name={"selectField"}
@@ -248,8 +253,7 @@ class FormComponentsDemo extends React.Component {
             inlineLabel={this.state.inlineLabels}
             label={
               <span>
-             CheckboxField  
-                Label and Icon <Icon icon="tick" />
+                CheckboxField Label and Icon <Icon icon="tick" />
               </span>
             }
           />
@@ -261,10 +265,19 @@ class FormComponentsDemo extends React.Component {
             label="I'm a SwitchField"
           />
           <TextareaField
+          isRequired
             name={"textAreaField"}
             inlineLabel={this.state.inlineLabels}
             onFieldSubmit={onFieldSubmit}
             label="TextareaField"
+            placeholder="Enter notes..."
+          />
+          <TextareaField
+            clickToEdit
+            name={"textAreaFieldWithClickToEdit"}
+            inlineLabel={this.state.inlineLabels}
+            onFieldSubmit={onFieldSubmit}
+            label="TextareaField with clickToEdit=true"
             placeholder="Enter notes..."
           />
           <EditableTextField
@@ -315,6 +328,41 @@ class FormComponentsDemo extends React.Component {
             multi
             onFieldSubmit={onFieldSubmit}
             loadOptions={getOptions}
+          />
+          <ReactSelectField
+            creatable
+            name="reactSelectFieldCreatable"
+            inlineLabel={this.state.inlineLabels}
+            label="ReactSelectField Creatable"
+            onFieldSubmit={onFieldSubmit}
+            options={[
+              {
+                label: "Rodrigo Pavez",
+                value: { name: "Rodrigo Pavez", id: "123" }
+              },
+              { label: "Ximena Morales", value: "Ximena Morales" },
+              { label: "Kyle Craft", value: "Kyle Craft" },
+              { label: "Sam Denicola", value: "Sam Denicola" },
+              { label: "Tom Ogasawara", value: "Tom Ogasawara" }
+            ]}
+          />
+          <ReactSelectField
+            creatable
+            name="reactSelectFieldCreatableMulti"
+            inlineLabel={this.state.inlineLabels}
+            label="ReactSelectField Creatable Multi"
+            multi
+            onFieldSubmit={onFieldSubmit}
+            options={[
+              {
+                label: "Rodrigo Pavez",
+                value: { name: "Rodrigo Pavez", id: "123" }
+              },
+              { label: "Ximena Morales", value: "Ximena Morales" },
+              { label: "Kyle Craft", value: "Kyle Craft" },
+              { label: "Sam Denicola", value: "Sam Denicola" },
+              { label: "Tom Ogasawara", value: "Tom Ogasawara" }
+            ]}
           />
           <ReactColorField
             name="reactColorField"

@@ -3,15 +3,7 @@ import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
 import moment from "moment";
 import { camelCase } from "lodash";
 import classNames from "classnames";
-import getMomentFormatter from "../utils/getMomentFormatter";
-import { onEnterHelper } from "../utils/handlerHelpers";
 import React from "react";
-import type {
-  TableDataTypes
-  // SchemaForField,
-  // QueryParams,
-  // Paging,
-} from "../flow_types";
 import {
   Menu,
   Intent,
@@ -19,6 +11,14 @@ import {
   InputGroup,
   Classes
 } from "@blueprintjs/core";
+import getMomentFormatter from "../utils/getMomentFormatter";
+import { onEnterHelper } from "../utils/handlerHelpers";
+import type {
+  TableDataTypes
+  // SchemaForField,
+  // QueryParams,
+  // Paging,
+} from "../flow_types";
 import DialogFooter from "../DialogFooter";
 import "./style.css";
 import "../toastr";
@@ -110,8 +110,8 @@ export default class FilterAndSortMenu extends React.Component {
     const requiresValue = ccSelectedFilter && ccSelectedFilter !== "none";
 
     return (
-      <Menu className={"data-table-header-menu"}>
-        <div className={"custom-menu-item"}>
+      <Menu className="data-table-header-menu">
+        <div className="custom-menu-item">
           <div className={classNames(Classes.SELECT, Classes.FILL)}>
             <select
               onChange={function(e) {
@@ -130,7 +130,7 @@ export default class FilterAndSortMenu extends React.Component {
             </select>
           </div>
         </div>
-        <div className={"custom-menu-item"}>
+        <div className="custom-menu-item">
           <FilterInput
             dataType={dataType}
             requiresValue={requiresValue}
@@ -148,7 +148,7 @@ export default class FilterAndSortMenu extends React.Component {
           }}
           intent={Intent.SUCCESS}
           text="Filter"
-          secondaryText={"Clear"}
+          secondaryText="Clear"
           secondaryAction={() => {
             currentFilter && removeSingleFilter(currentFilter.filterOn);
           }}
@@ -157,6 +157,15 @@ export default class FilterAndSortMenu extends React.Component {
     );
   }
 }
+
+const dateMinMaxHelpers = {
+  minDate: moment()
+    .subtract(25, "years")
+    .toDate(),
+  maxDate: moment()
+    .add(25, "years")
+    .toDate()
+};
 
 class FilterInput extends React.Component {
   render() {
@@ -172,7 +181,7 @@ class FilterInput extends React.Component {
     switch (filterType) {
       case "text":
         inputGroup = (
-          <div className={"custom-menu-item"}>
+          <div className="custom-menu-item">
             <InputGroup
               placeholder="Value"
               onChange={function(e) {
@@ -186,7 +195,7 @@ class FilterInput extends React.Component {
         break;
       case "number":
         inputGroup = (
-          <div className={"custom-menu-item"}>
+          <div className="custom-menu-item">
             <InputGroup
               placeholder="Value"
               onChange={function(e) {
@@ -194,14 +203,14 @@ class FilterInput extends React.Component {
               }}
               {...onEnterHelper(handleFilterSubmit)}
               value={filterValue}
-              type={"number"}
+              type="number"
             />
           </div>
         );
         break;
       case "numberRange":
         inputGroup = (
-          <div className={"custom-menu-item"}>
+          <div className="custom-menu-item">
             <InputGroup
               placeholder="Value"
               onChange={function(e) {
@@ -209,7 +218,7 @@ class FilterInput extends React.Component {
               }}
               {...onEnterHelper(handleFilterSubmit)}
               value={filterValue && filterValue[0]}
-              type={"number"}
+              type="number"
             />
             <InputGroup
               placeholder="Value"
@@ -218,19 +227,18 @@ class FilterInput extends React.Component {
               }}
               {...onEnterHelper(handleFilterSubmit)}
               value={filterValue && filterValue[1]}
-              type={"number"}
+              type="number"
             />
           </div>
         );
         break;
       case "date":
         inputGroup = (
-          <div className={"custom-menu-item"}>
+          <div className="custom-menu-item">
             <DateInput
               value={filterValue ? moment(filterValue).toDate() : undefined}
               {...getMomentFormatter("MM/DD/YYYY")}
-              minDate={moment(0).toDate()}
-              maxDate={moment(9999999999999).toDate()}
+              {...dateMinMaxHelpers}
               onChange={selectedDates => {
                 handleFilterValueChange(selectedDates);
               }}
@@ -239,10 +247,15 @@ class FilterInput extends React.Component {
         );
         break;
       case "dateRange":
-        const filterValueToUse =
-          filterValue && filterValue.split && filterValue.split(".");
+        let filterValueToUse;
+        if (Array.isArray(filterValue)) {
+          filterValueToUse = filterValue;
+        } else {
+          filterValueToUse =
+            filterValue && filterValue.split && filterValue.split(".");
+        }
         inputGroup = (
-          <div className={"custom-menu-item"}>
+          <div className="custom-menu-item">
             <DateRangeInput
               value={
                 filterValueToUse && filterValueToUse[0] && filterValueToUse[1]
@@ -252,9 +265,16 @@ class FilterInput extends React.Component {
                     ]
                   : undefined
               }
-              {...getMomentFormatter("MM/DD/YYYY")}
-              minDate={moment(0).toDate()}
-              maxDate={moment(99999999999999).toDate()}
+              popoverProps={{
+                captureDismiss: true
+              }}
+              {...{
+                formatDate: date =>
+                  date == null ? "" : date.toLocaleDateString(),
+                parseDate: str => new Date(Date.parse(str)),
+                placeholder: "JS Date"
+              }}
+              {...dateMinMaxHelpers}
               onChange={selectedDates => {
                 if (selectedDates[0] && selectedDates[1]) {
                   handleFilterValueChange(selectedDates);

@@ -1,14 +1,11 @@
 import classNames from "classnames";
-import sortify from "./sortify"; //tnr TODO: export this from json.sortify when https://github.com/ThomasR/JSON.sortify/issues/11 is resolved
 import { SketchPicker } from "react-color";
-import { isNumber, noop } from "lodash";
+import { isNumber, noop, kebabCase } from "lodash";
 import mathExpressionEvaluator from "math-expression-evaluator";
 import deepEqual from "deep-equal";
 import React from "react";
 import { Field } from "redux-form";
 import Select from "react-select";
-import Uploader from "./Uploader";
-import getMomentFormatter from "../utils/getMomentFormatter";
 
 import "./style.css";
 import {
@@ -22,10 +19,16 @@ import {
   Position,
   Switch,
   Classes,
-  FormGroup
+  FormGroup,
+  Button
 } from "@blueprintjs/core";
 
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
+import InfoHelper from "../InfoHelper";
+import getMomentFormatter from "../utils/getMomentFormatter";
+import Uploader from "./Uploader";
+import sortify from "./sortify"; //tnr TODO: export this from json.sortify when https://github.com/ThomasR/JSON.sortify/issues/11 is resolved
+import { fieldRequired } from "./utils";
 
 function getIntent({ showErrorIfUntouched, meta: { touched, error } }) {
   return (touched || showErrorIfUntouched) && error ? Intent.DANGER : undefined;
@@ -44,6 +47,7 @@ function removeUnwantedProps(props) {
   delete cleanedProps.inlineLabel;
   delete cleanedProps.showErrorIfUntouched;
   delete cleanedProps.onChange;
+  delete cleanedProps.containerStyle;
   delete cleanedProps.onFieldSubmit;
   delete cleanedProps.onBlur;
   delete cleanedProps.intent;
@@ -110,13 +114,16 @@ class AbstractInput extends React.Component {
       tooltipError,
       disabled,
       intent,
+      tooltipInfo,
       label,
       inlineLabel,
       secondaryLabel,
       className,
       showErrorIfUntouched,
       meta,
+      containerStyle,
       noOuterLabel,
+      input,
       noFillField
     } = this.props;
     const { touched, error } = meta;
@@ -134,10 +141,11 @@ class AbstractInput extends React.Component {
     ) : (
       children
     );
+    const testClassName = "tg-test-" + kebabCase(input.name);
     if (noFillField) {
       componentToWrap = (
         <div
-          className={classNames({
+          className={classNames(testClassName, {
             "tg-no-fill-field": noFillField
           })}
         >
@@ -147,15 +155,31 @@ class AbstractInput extends React.Component {
     }
     return (
       <FormGroup
-        className={classNames(className, {
+        className={classNames(className, testClassName, {
           "tg-tooltipError": tooltipError
         })}
+        // data-test={}
         disabled={disabled}
         helperText={!tooltipError && showError && error}
         intent={intent}
-        label={!noOuterLabel && label}
+        label={
+          !noOuterLabel &&
+          (tooltipInfo ? (
+            <div style={{ display: "flex" }}>
+              {label}{" "}
+              <InfoHelper
+                style={{ marginLeft: "5px", marginTop: "-6px" }}
+                size={12}
+                content={tooltipInfo}
+              />
+            </div>
+          ) : (
+            label
+          ))
+        }
         inline={inlineLabel}
         labelInfo={secondaryLabel}
+        style={containerStyle}
       >
         {componentToWrap}
       </FormGroup>
@@ -237,11 +261,7 @@ export const renderBlueprintCheckbox = props => {
       label={label}
       onChange={function(e, val) {
         input.onChange(e, val);
-        let valToUse = val;
-        if (e.target) {
-          valToUse = e.target.value !== "false";
-        }
-        onFieldSubmit(valToUse);
+        onFieldSubmit(e.target ? e.target.checked : val);
       }}
     />
   );
@@ -257,7 +277,7 @@ export const renderBlueprintSwitch = props => {
       label={label}
       onChange={function(e, val) {
         input.onChange(e, val);
-        onFieldSubmit(e.target ? e.target.value : val);
+        onFieldSubmit(e.target ? e.target.checked : val);
       }}
     />
   );
@@ -275,40 +295,109 @@ export const renderFileUpload = props => {
   );
 };
 
-export const renderBlueprintTextarea = props => {
-  const {
-    input,
-    intentClass,
-    inputClassName,
-    onFieldSubmit,
-    onKeyDown = noop,
-    ...rest
-  } = props;
-  return (
-    <textarea
-      {...removeUnwantedProps(rest)}
-      className={classNames(
-        intentClass,
-        inputClassName,
-        Classes.INPUT,
-        Classes.FILL
-      )}
-      {...input}
-      onBlur={function(e, val) {
-        if (rest.readOnly) return;
-        input.onBlur(e, val);
-        onFieldSubmit(e.target ? e.target.value : val, { blur: true }, e);
-      }}
-      onKeyDown={function(...args) {
-        const e = args[0];
-        onKeyDown(...args);
-        if (e.keyCode === 13 && (e.metaKey || e.ctrlKey)) {
-          onFieldSubmit(e.target.value, { cmdEnter: true }, e);
-        }
-      }}
-    />
-  );
-};
+export class renderBlueprintTextarea extends React.Component {
+  state = {
+    value: null,
+    isOpen: false
+  };
+  allowEdit = () => {
+    this.setState({ isOpen: true });
+  };
+  stopEdit = () => {
+    this.setState({ isOpen: false });
+    this.setState({ value: null });
+  };
+  updateVal = e => {
+    this.setState({ value: e.target.value });
+  };
+  handleValSubmit = () => {
+    this.props.input.onChange(this.state.value);
+    this.props.onFieldSubmit(this.state.value, { cmdEnter: true });
+
+    this.stopEdit();
+  };
+  onKeyDown = (...args) => {
+    const e = args[0];
+    (this.props.onKeyDown || noop)(...args);
+    if (e.keyCode === 13 && (e.metaKey || e.ctrlKey)) {
+      this.props.onFieldSubmit(e.target.value, { cmdEnter: true }, e);
+      this.props.input.onChange(e);
+      this.stopEdit();
+    }
+  };
+  render() {
+    const {
+      input,
+      intentClass,
+      inputClassName,
+      onFieldSubmit,
+      clickToEdit,
+      onKeyDown,
+      ...rest
+    } = this.props;
+    if (clickToEdit) {
+      const isDisabled = clickToEdit && !this.state.isOpen;
+
+      return (
+        <React.Fragment>
+          <textarea
+            disabled={isDisabled}
+            {...removeUnwantedProps(rest)}
+            className={classNames(
+              intentClass,
+              inputClassName,
+              Classes.INPUT,
+              Classes.FILL
+            )}
+            value={this.state.value === null ? input.value : this.state.value}
+            onChange={this.updateVal}
+            onKeyDown={this.onKeyDown}
+          />
+          {clickToEdit &&
+            (this.state.isOpen ? (
+              //show okay/cancel buttons
+              <div>
+                <Button onClick={this.stopEdit} intent="danger">
+                  Cancel
+                </Button>
+                <Button onClick={this.handleValSubmit} intent="success">
+                  Ok
+                </Button>
+              </div>
+            ) : (
+              //show click to edit button
+              <Button onClick={this.allowEdit}>Edit</Button>
+            ))}
+        </React.Fragment>
+      );
+    } else {
+      return (
+        <textarea
+          {...removeUnwantedProps(rest)}
+          className={classNames(
+            intentClass,
+            inputClassName,
+            Classes.INPUT,
+            Classes.FILL
+          )}
+          {...input}
+          onBlur={function(e, val) {
+            if (rest.readOnly) return;
+            input.onBlur(e, val);
+            onFieldSubmit(e.target ? e.target.value : val, { blur: true }, e);
+          }}
+          onKeyDown={(...args) => {
+            const e = args[0];
+            (onKeyDown || noop)(...args);
+            if (e.keyCode === 13 && (e.metaKey || e.ctrlKey)) {
+              onFieldSubmit(e.target.value, { cmdEnter: true }, e);
+            }
+          }}
+        />
+      );
+    }
+  }
+}
 
 // class ClickToEditWrapper extends React.Component {
 //   state = { isEditing: false };
@@ -331,31 +420,54 @@ export const renderBlueprintEditableText = props => {
   );
 };
 
+const reactSelectCreatableOptionClassName = "Select-create-option-placeholder";
 export const renderReactSelect = props => {
   // spreading input not working, grab the values needed instead
   const {
     async,
+    creatable,
     input: { value, onChange },
     hideValue,
     options,
     onFieldSubmit,
     ...rest
   } = props;
-  const optsToUse = getOptions(options);
-  const valueToUse = //here we're coercing json values into an object with {label,value} because react-select does not seem to recognize the json value directly
-    !Array.isArray(value) && typeof value === "object"
-      ? optsToUse.find(obj => {
-          return deepEqual(obj.value, value);
-        })
-      : Array.isArray(value)
-        ? value.map(val => {
-            return optsToUse
-              ? optsToUse.find(obj => {
-                  return deepEqual(obj.value, val);
-                })
-              : val;
-          })
-        : value;
+
+  let optionsPassed = options;
+
+  const optsToUse = getOptions(optionsPassed);
+  let valueToUse;
+
+  if (!Array.isArray(value) && typeof value === "object") {
+    if (value.userCreated) {
+      valueToUse = {
+        label: value.value,
+        value
+      };
+    } else {
+      valueToUse = optsToUse.find(obj => {
+        return deepEqual(obj.value, value);
+      });
+    }
+  } else if (Array.isArray(value)) {
+    valueToUse = value.map(val => {
+      if (val.userCreated) {
+        return {
+          label: val.value,
+          value: val
+        };
+      }
+      if (optsToUse) {
+        return optsToUse.find(obj => {
+          return deepEqual(obj.value, val);
+        });
+      } else {
+        return val;
+      }
+    });
+  } else {
+    valueToUse = value;
+  }
 
   const propsToUse = {
     ...removeUnwantedProps(rest),
@@ -363,13 +475,29 @@ export const renderReactSelect = props => {
     value: valueToUse,
     closeOnSelect: !rest.multi,
     onChange(valOrVals, ...rest2) {
-      const valToPass = Array.isArray(valOrVals)
-        ? valOrVals.map(function(val) {
-            return val.value;
-          })
-        : valOrVals
-          ? valOrVals.value
-          : "";
+      let valToPass;
+      if (Array.isArray(valOrVals)) {
+        valToPass = valOrVals.map(function(val) {
+          if (val.className === reactSelectCreatableOptionClassName) {
+            return {
+              userCreated: true,
+              value: val.value
+            };
+          }
+          return val.value;
+        });
+      } else if (valOrVals) {
+        if (valOrVals.className === reactSelectCreatableOptionClassName) {
+          valToPass = {
+            userCreated: true,
+            value: valOrVals.value
+          };
+        } else {
+          valToPass = valOrVals.value;
+        }
+      } else {
+        valToPass = "";
+      }
       if (props.cancelSubmit && props.cancelSubmit(valToPass)) {
         //allow the user to cancel the submit
         return;
@@ -379,9 +507,11 @@ export const renderReactSelect = props => {
     },
     onBlur() {
       const valToPass = Array.isArray(valueToUse)
-        ? valueToUse.filter(val => !!val).map(function(val) {
-            return val.value;
-          })
+        ? valueToUse
+            .filter(val => !!val)
+            .map(function(val) {
+              return val.value;
+            })
         : valueToUse;
       if (props.cancelSubmit && props.cancelSubmit(valToPass)) {
         return; //allow the user to cancel the submit
@@ -391,7 +521,13 @@ export const renderReactSelect = props => {
       }
     }
   };
-  return async ? <Select.Async {...propsToUse} /> : <Select {...propsToUse} />;
+  if (async) {
+    return <Select.Async {...propsToUse} />;
+  } else if (creatable) {
+    return <Select.Creatable {...propsToUse} />;
+  } else {
+    return <Select {...propsToUse} />;
+  }
 };
 
 export const BPSelect = ({ value, onChange, ...rest }) => {
@@ -426,8 +562,8 @@ export const renderSelect = props => {
           placeholder && value === ""
             ? "__placeholder__"
             : typeof value !== "string"
-              ? sortify(value) //deterministically sort and stringify the object/number coming in because select fields only support string values
-              : value
+            ? sortify(value) //deterministically sort and stringify the object/number coming in because select fields only support string values
+            : value
         }
         {...(hideValue ? { value: "" } : {})}
         onChange={function(e) {
@@ -490,6 +626,7 @@ export const renderBlueprintNumericInput = props => {
     intent,
     inputClassName,
     onFieldSubmit,
+    onAnyNumberChange,
     ...rest
   } = props;
   function handleBlurOrButtonClick(stringVal) {
@@ -513,6 +650,8 @@ export const renderBlueprintNumericInput = props => {
       onValueChange={(numericVal, stringVal) => {
         // needed for redux form to change value
         input.onChange(stringVal);
+        //tnr: use this handler if you want to listen to all value changes!
+        onAnyNumberChange && onAnyNumberChange(numericVal);
       }}
       onButtonClick={function(numericVal, stringVal) {
         handleBlurOrButtonClick(stringVal);
@@ -621,7 +760,12 @@ export class RenderReactColorPicker extends React.Component {
 
 function generateField(component, opts) {
   const compWithDefaultVal = withAbstractWrapper(component, opts);
-  return function FieldMaker({ name, onFieldSubmit = noop, ...rest }) {
+  return function FieldMaker({
+    name,
+    isRequired,
+    onFieldSubmit = noop,
+    ...rest
+  }) {
     // function onFieldSubmit(e,val) {
     //   _onFieldSubmit && _onFieldSubmit(e.target ? e.target.value : val)
     // }
@@ -630,6 +774,7 @@ function generateField(component, opts) {
         onFieldSubmit={onFieldSubmit}
         name={name}
         component={compWithDefaultVal}
+        {...(isRequired ? { validate: fieldRequired } : {})}
         {...rest}
       />
     );
