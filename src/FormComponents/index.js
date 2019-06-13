@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { SketchPicker } from "react-color";
-import { isNumber, noop, kebabCase } from "lodash";
+import { isNumber, noop, kebabCase, isPlainObject } from "lodash";
 import mathExpressionEvaluator from "math-expression-evaluator";
 import deepEqual from "deep-equal";
 import React from "react";
@@ -19,7 +19,8 @@ import {
   Switch,
   Classes,
   FormGroup,
-  Button
+  Button,
+  TextArea
 } from "@blueprintjs/core";
 
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
@@ -335,7 +336,7 @@ export class renderBlueprintTextarea extends React.Component {
 
       return (
         <React.Fragment>
-          <textarea
+          <TextArea
             disabled={isDisabled}
             {...removeUnwantedProps(rest)}
             className={classNames(
@@ -367,7 +368,7 @@ export class renderBlueprintTextarea extends React.Component {
       );
     } else {
       return (
-        <textarea
+        <TextArea
           {...removeUnwantedProps(rest)}
           className={classNames(
             intentClass,
@@ -557,7 +558,13 @@ export const renderSelect = props => {
         onChange={function(e) {
           let val = e.target.value;
           try {
-            val = JSON.parse(e.target.value); //try to json parse the string coming in
+            const maybeNewValue = JSON.parse(e.target.value); //try to json parse the string coming in
+            const hasMatchInOriginalOptions = options.find(
+              opt => opt === maybeNewValue || opt.value === maybeNewValue
+            );
+            if (hasMatchInOriginalOptions || isPlainObject(maybeNewValue)) {
+              val = maybeNewValue;
+            }
           } catch (e) {
             //empty
           }
