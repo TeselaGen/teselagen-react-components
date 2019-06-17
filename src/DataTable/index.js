@@ -745,7 +745,12 @@ class DataTable extends React.Component {
         } else {
           // if we are not using checkboxes we need to make sure
           // that the id of the record gets added to the id map
-          newIdMap = oldIdMap[rowId] ? oldIdMap : { [rowId]: { entity } };
+
+          // this will update the record in redux to have the fresh data.
+          // tg: we were running into issues of stale data because the redux
+          // record does not get automatically updated when the record is updated
+          oldIdMap[rowId] = { ...oldIdMap[rowId], entity };
+          newIdMap = oldIdMap;
           finalizeSelection({
             idMap: newIdMap,
             props: computePresets(this.props)
