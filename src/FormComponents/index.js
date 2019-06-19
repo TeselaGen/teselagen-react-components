@@ -757,7 +757,7 @@ export class RenderReactColorPicker extends React.Component {
   }
 }
 
-function generateField(component, opts) {
+export function generateField(component, opts) {
   const compWithDefaultVal = withAbstractWrapper(component, opts);
   return function FieldMaker({
     name,
