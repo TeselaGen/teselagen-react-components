@@ -294,7 +294,6 @@ class FormComponentsDemo extends React.Component {
           })}
           <ReactSelectField
             name="reactSelectField"
-            disabled
             inlineLabel={this.state.inlineLabels}
             label="ReactSelectField Collaborators"
             placeholder="This has a long placeholder, wow, I hope it fits"
