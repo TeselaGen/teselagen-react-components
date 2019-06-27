@@ -140,8 +140,10 @@ class TgSelect extends React.Component {
       placeholder = "Select...",
       isLoading,
       onBlur,
+      disabled,
       ...rest
     } = this.props;
+
     const rightElement = isLoading ? (
       <Button loading minimal />
     ) : (
@@ -260,6 +262,7 @@ class TgSelect extends React.Component {
             },
             onRemove: multi ? this.handleTagInputRemove : null,
             rightElement: rightElement,
+            disabled,
             ...tagInputProps, //spread additional tag input props here
             inputProps: {
               onBlur,
