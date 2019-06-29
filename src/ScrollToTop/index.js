@@ -50,7 +50,7 @@ function ScrollToTop({
     <Transition in={shouldShow} timeout={duration}>
       {state =>
         state === "exited" ? null : (
-          <div style={{ position: "fixed", bottom: 25, right: 25 }}>
+          <div style={{ position: "fixed", bottom: 25, right: 25, zIndex: 10 }}>
             <Button
               style={{
                 borderRadius: "50%",
