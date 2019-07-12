@@ -131,6 +131,7 @@ const schemas = {
   j5AssemblyPieces: {
     fields: [
       { path: "id", type: "string", displayName: "Piece ID" },
+      { path: "name", type: "string", displayName: "Name" },
       { path: "type", type: "string", displayName: "Source" },
       {
         path: "sequence.polynucleotideMaterialId",

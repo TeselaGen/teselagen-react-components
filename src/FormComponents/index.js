@@ -1,11 +1,10 @@
 import classNames from "classnames";
 import { SketchPicker } from "react-color";
-import { isNumber, noop, kebabCase } from "lodash";
+import { isNumber, noop, kebabCase, isPlainObject } from "lodash";
 import mathExpressionEvaluator from "math-expression-evaluator";
 import deepEqual from "deep-equal";
 import React from "react";
 import { Field } from "redux-form";
-import Select from "react-select";
 
 import "./style.css";
 import {
@@ -20,10 +19,12 @@ import {
   Switch,
   Classes,
   FormGroup,
-  Button
+  Button,
+  TextArea
 } from "@blueprintjs/core";
 
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
+import TgSelect from "../TgSelect";
 import InfoHelper from "../InfoHelper";
 import getMomentFormatter from "../utils/getMomentFormatter";
 import Uploader from "./Uploader";
@@ -58,6 +59,7 @@ function removeUnwantedProps(props) {
   delete cleanedProps.tabIndex;
   delete cleanedProps.secondaryLabel;
   delete cleanedProps.tooltipError;
+  delete cleanedProps.tooltipInfo;
   delete cleanedProps.tooltipProps;
   if (cleanedProps.inputClassName) {
     cleanedProps.className = cleanedProps.inputClassName;
@@ -144,13 +146,7 @@ class AbstractInput extends React.Component {
     const testClassName = "tg-test-" + kebabCase(input.name);
     if (noFillField) {
       componentToWrap = (
-        <div
-          className={classNames(testClassName, {
-            "tg-no-fill-field": noFillField
-          })}
-        >
-          {componentToWrap}
-        </div>
+        <div className="tg-no-fill-field">{componentToWrap}</div>
       );
     }
     return (
@@ -340,7 +336,7 @@ export class renderBlueprintTextarea extends React.Component {
 
       return (
         <React.Fragment>
-          <textarea
+          <TextArea
             disabled={isDisabled}
             {...removeUnwantedProps(rest)}
             className={classNames(
@@ -372,7 +368,7 @@ export class renderBlueprintTextarea extends React.Component {
       );
     } else {
       return (
-        <textarea
+        <TextArea
           {...removeUnwantedProps(rest)}
           className={classNames(
             intentClass,
@@ -420,7 +416,6 @@ export const renderBlueprintEditableText = props => {
   );
 };
 
-const reactSelectCreatableOptionClassName = "Select-create-option-placeholder";
 export const renderReactSelect = props => {
   // spreading input not working, grab the values needed instead
   const {
@@ -473,25 +468,19 @@ export const renderReactSelect = props => {
     ...removeUnwantedProps(rest),
     options: optsToUse,
     value: valueToUse,
-    closeOnSelect: !rest.multi,
+    // closeOnSelect: !rest.multi,
     onChange(valOrVals, ...rest2) {
       let valToPass;
       if (Array.isArray(valOrVals)) {
         valToPass = valOrVals.map(function(val) {
-          if (val.className === reactSelectCreatableOptionClassName) {
-            return {
-              userCreated: true,
-              value: val.value
-            };
+          if (val.userCreated) {
+            return val;
           }
           return val.value;
         });
       } else if (valOrVals) {
-        if (valOrVals.className === reactSelectCreatableOptionClassName) {
-          valToPass = {
-            userCreated: true,
-            value: valOrVals.value
-          };
+        if (valOrVals.userCreated) {
+          valToPass = valOrVals;
         } else {
           valToPass = valOrVals.value;
         }
@@ -522,11 +511,11 @@ export const renderReactSelect = props => {
     }
   };
   if (async) {
-    return <Select.Async {...propsToUse} />;
+    return <TgSelect {...propsToUse} />;
   } else if (creatable) {
-    return <Select.Creatable {...propsToUse} />;
+    return <TgSelect {...propsToUse} />;
   } else {
-    return <Select {...propsToUse} />;
+    return <TgSelect {...propsToUse} />;
   }
 };
 
@@ -569,7 +558,13 @@ export const renderSelect = props => {
         onChange={function(e) {
           let val = e.target.value;
           try {
-            val = JSON.parse(e.target.value); //try to json parse the string coming in
+            const maybeNewValue = JSON.parse(e.target.value); //try to json parse the string coming in
+            const hasMatchInOriginalOptions = options.find(
+              opt => opt === maybeNewValue || opt.value === maybeNewValue
+            );
+            if (hasMatchInOriginalOptions || isPlainObject(maybeNewValue)) {
+              val = maybeNewValue;
+            }
           } catch (e) {
             //empty
           }
@@ -636,6 +631,10 @@ export const renderBlueprintNumericInput = props => {
       input.onBlur(num);
       onFieldSubmit(num);
     } catch (e) {
+      console.error(
+        "TRC: Error occurring when setting evaluated numeric input field:",
+        e
+      );
       input.onBlur("");
       onFieldSubmit("");
     }
@@ -758,7 +757,7 @@ export class RenderReactColorPicker extends React.Component {
   }
 }
 
-function generateField(component, opts) {
+export function generateField(component, opts) {
   const compWithDefaultVal = withAbstractWrapper(component, opts);
   return function FieldMaker({
     name,

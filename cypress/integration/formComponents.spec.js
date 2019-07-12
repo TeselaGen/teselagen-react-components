@@ -2,6 +2,119 @@ describe("formComponents", () => {
   beforeEach(() => {
     cy.visit("#/FormComponents");
   });
+  it(`ReactSelectField works for single select`, () => {
+    cy.get(".tg-test-react-select-field .tg-select")
+      .click()
+      .as("inputWrapper")
+      .contains("Kyle Craft")
+      .click();
+    cy.get("@inputWrapper").contains(`.bp3-tag`, "Kyle Craft");
+    cy.get("@inputWrapper")
+      .find(".bp3-icon-cross")
+      .click();
+    cy.get("@inputWrapper")
+      .contains(`.bp3-tag`, "Kyle Craft")
+      .should("not.exist");
+  });
+  it(`ReactSelectField can be closed with an esc`, () => {
+    cy.get(".tg-test-react-select-field-multi .tg-select input")
+      .type("k")
+      .as("input");
+
+    cy.get(".tg-select-option").should("exist");
+    cy.get("@input").type("{esc}");
+    cy.get(".tg-select-option").should("not.exist");
+  });
+  it(`ReactSelectField multi can add a tag and remove it by hitting the single remove button and not have the 
+  menu pop up again`, () => {
+    cy.get(".tg-test-react-select-field-multi .tg-select")
+      .click()
+      .as("inputWrapper")
+      .contains("Kyle Craft")
+      .click();
+    cy.get("@inputWrapper").contains(".bp3-tag", "Kyle Craft");
+    cy.get("@inputWrapper")
+      .find(".tg-select-option")
+      .should("exist");
+    cy.get("@inputWrapper")
+      .find(".bp3-icon-caret-up")
+      .click();
+    cy.get("@inputWrapper")
+      .find(".tg-select-option")
+      .should("not.exist", { timeout: 10000 });
+    cy.get("@inputWrapper")
+      .contains(".bp3-tag", "Kyle Craft")
+      .should("exist")
+      .find(".bp3-icon-small-cross")
+      .click();
+    //the select-options should not pop up again after clearing a tag
+    cy.get("@inputWrapper")
+      .find(".tg-select-option")
+      .should("not.exist");
+  });
+  it(`ReactSelectField multi can add a tag and remove it by hitting the bulk remove button`, () => {
+    cy.get(".tg-test-react-select-field-multi .tg-select")
+      .click()
+      .as("inputWrapper")
+      .contains("Kyle Craft")
+      .click();
+    cy.get("@inputWrapper").contains(".bp3-tag", "Kyle Craft");
+    cy.get("@inputWrapper")
+      .find(".bp3-icon-cross")
+      .click();
+    cy.get("@inputWrapper")
+      .contains(".bp3-tag", "Kyle Craft")
+      .should("not.exist");
+  });
+  it(`ReactSelectField multi delete keyboard shortcut works as expected`, () => {
+    cy.get(".tg-test-react-select-field-multi .tg-select input")
+      .as("inputWrapper")
+      .type("Kyle Craft{enter}");
+    cy.get("@inputWrapper")
+      .parent()
+      .contains(".bp3-tag", "Kyle Craft");
+    cy.get("@inputWrapper").type("{backspace}{backspace}");
+    cy.get("@inputWrapper")
+      .parent()
+      .contains(".bp3-tag", "Kyle Craft")
+      .should("not.exist");
+    cy.get(".tg-test-react-select-field-multi .tg-select-option").should(
+      "exist"
+    );
+    cy.get("@inputWrapper").type("{enter}");
+    cy.get("@inputWrapper")
+      .parent()
+      .contains(".bp3-tag", "Rodrigo Pavez");
+
+    // cy.get("@inputWrapper")
+    //   .contains(".bp3-tag", "Kyle Craft")
+    //   .should("not.exist");
+  });
+  it(`ReactSelectField multi multiple enter keyboard shortcuts work as expected`, () => {
+    cy.get(".tg-test-react-select-field-multi .tg-select input")
+      .as("inputWrapper")
+      .type("{enter}{enter}");
+    cy.get("@inputWrapper")
+      .parent()
+      .contains(".bp3-tag", "Rodrigo Pavez");
+    cy.get("@inputWrapper")
+      .parent()
+      .contains(".bp3-tag", "Ximena Morales");
+    // cy.get("@inputWrapper").type("{backspace}{backspace}");
+    // cy.get("@inputWrapper")
+    //   .parent()
+    //   .contains(".bp3-tag", "Kyle Craft")
+    //   .should("not.exist");
+    //   cy.get(".tg-test-react-select-field-multi .tg-select-option").should("exist")
+    //   cy.get("@inputWrapper").type("{enter}");
+    //   cy.get("@inputWrapper")
+    //   .parent()
+    //   .contains(".bp3-tag", "Rodrigo Pavez");
+
+    // cy.get("@inputWrapper")
+    //   .contains(".bp3-tag", "Kyle Craft")
+    //   .should("not.exist");
+  });
   it(`isRequired can be passed to any field to make it required!`, () => {
     cy.contains(".bp3-button", "Submit Form").click();
     cy.contains(".tg-test-text-area-field", "This field is required.");

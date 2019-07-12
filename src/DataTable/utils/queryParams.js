@@ -14,7 +14,8 @@ import {
   last,
   orderBy,
   take,
-  drop
+  drop,
+  isEmpty
 } from "lodash";
 
 const pageSizes = [5, 10, 15, 25, 50, 100, 200];
@@ -697,15 +698,21 @@ export function getQueryParams({
     const additionalFilterToUse = additionalFilter(qb, currentParams);
     const additionalOrFilterToUse = additionalOrFilter(qb, currentParams);
     try {
-      const allOrFilters = [getQueries(orFilters, qb, ccFields)];
+      let allOrFilters = [getQueries(orFilters, qb, ccFields)];
       otherOrFilters.forEach(orFilters => {
         allOrFilters.push(getQueries(orFilters, qb, ccFields));
       });
       allOrFilters.push(additionalOrFilterToUse);
-      qb.whereAll(
-        getQueries(andFilters, qb, ccFields),
-        additionalFilterToUse
-      ).andWhereAny(...allOrFilters);
+      allOrFilters = allOrFilters.filter(obj => !isEmpty(obj));
+      let allAndFilters = [getQueries(andFilters, qb, ccFields)];
+      allAndFilters.push(additionalFilterToUse);
+      allAndFilters = allAndFilters.filter(obj => !isEmpty(obj));
+      if (allAndFilters.length) {
+        qb.whereAll(...allAndFilters);
+      }
+      if (allOrFilters.length) {
+        qb.andWhereAny(...allOrFilters);
+      }
     } catch (e) {
       if (urlConnected) {
         errorParsingUrlString = e;

@@ -10,7 +10,6 @@
       "name": "cypress",
       "focus": true,
       "description": "Run cypress devtools",
-      "execute": false,
       "//persistent": "cypress_persistent",
       "commands": ["yarn c;"]
     }

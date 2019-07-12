@@ -19,12 +19,13 @@ import showLoadingMask from "../../src/showLoadingMask";
 import CustomIcons from "./examples/CustomIcons";
 import S3Uploader from "./examples/S3Uploader";
 import SimpleTable from "./examples/SimpleTable";
+import TgSelectDemo from "./examples/TgSelectDemo";
 import InfoHelper from "./examples/InfoHelper";
 import Loading from "./examples/Loading";
 import DownloadLink from "./examples/DownloadLink";
 import DemoNav from "./DemoNav";
 import DemoHeader from "./DemoHeader";
-import { withTableParams, DataTable, PagingTool } from "../../src";
+import { withTableParams, DataTable, PagingTool, createGenericSelect, modelNameToReadableName } from "../../src";
 import Uploader from "../../src/FormComponents/Uploader";
 import { FileUploadField } from "../../src/FormComponents";
 import J5ReportRecordView from "./examples/J5ReportRecordView";
@@ -38,6 +39,7 @@ import { bigTreeData, smallTreeData } from "./data/treeData";
 import S3Download from "../../src/utils/S3Download";
 import magicDownload from "../../src/DownloadLink/magicDownload";
 import FillWindow from "../../src/FillWindow";
+import TgSelect from "../../src/TgSelect";
 import Timeline from "../../src/Timeline";
 import TimelineEvent from "../../src/Timeline/TimelineEvent";
 import TimelineDemo from "./examples/TimelineDemo";
@@ -51,6 +53,7 @@ import {
   CmdSwitch
 } from "../../src/utils/commandControls";
 import ScrollToTop from "../../src/ScrollToTop";
+import GenericSelectDemo from "./examples/GenericSelectDemo";
 
 import "./style.css";
 import React, { Component } from "react";
@@ -166,6 +169,43 @@ const demos = {
         type: "string",
         description: "Override the default info icon."
       }
+    ]
+  },
+  TgSelect: {
+    demo: TgSelectDemo,
+    scope: {
+      Classes,
+      TgSelect,
+      renderToggle,
+    },
+    props: [
+      {
+        name: "className",
+        description:
+          "The CSS class name passed to the Button (if Popover) or Tooltip",
+        type: "string"
+      },
+    ]
+  },
+  GenericSelect: {
+    demo: GenericSelectDemo,
+    scope: {
+      Classes,
+      modelNameToReadableName,
+      createGenericSelect,
+      renderToggle,
+      reduxForm,
+      ApolloProvider,
+client,
+store,
+    },
+    props: [
+      {
+        name: "className",
+        description:
+          "The CSS class name passed to the Button (if Popover) or Tooltip",
+        type: "string"
+      },
     ]
   },
   CollapsibleCard: {
@@ -319,6 +359,7 @@ const demos = {
       Switch,
       reduxForm,
       Uploader,
+      renderToggle,
       Classes,
       Icon
     }
@@ -336,14 +377,16 @@ const demos = {
   showConfirmationDialog: {
     scope: {
       showConfirmationDialog,
-      Intent
+      Intent,
+      renderToggle,
     },
     demo: showConfirmationDialogDemo
   },
   showLoadingMask: {
     scope: {
       showLoadingMask,
-      Intent
+      Intent,
+      renderToggle,
     },
     demo: showLoadingMaskDemo
   },
@@ -351,6 +394,7 @@ const demos = {
     scope: {
       MultiSelectSideBySide,
       Component,
+      renderToggle,
       HTMLSelect
     },
     demo: MultiSelectSideBySideDemo
@@ -358,6 +402,7 @@ const demos = {
   ResizableDraggableDialog: {
     scope: {
       ResizableDraggableDialog,
+      renderToggle,
       Component,
       Classes
       // HTMLSelect,
@@ -366,12 +411,14 @@ const demos = {
   },
   customIcons: {
     scope: {
+      renderToggle,
       customIcons
     },
     demo: CustomIcons
   },
   S3Uploader: {
     scope: {
+      renderToggle,
       Provider,
       store,
       reduxForm,
@@ -386,18 +433,21 @@ const demos = {
   J5ReportRecordView: {
     demo: J5ReportRecordView,
     scope: {
+      renderToggle,
       data: j5ReportRecordViewData
     }
   },
   FillWindow: {
     demo: FillWindowExample,
     scope: {
+      renderToggle,
       FillWindow
     }
   },
   tree: {
     demo: Tree,
     scope: {
+      renderToggle,
       bigTreeData,
       smallTreeData
     }
@@ -405,6 +455,7 @@ const demos = {
   Timeline: {
     demo: TimelineDemo,
     scope: {
+      renderToggle,
       Timeline,
       TimelineEvent
     }
@@ -412,12 +463,14 @@ const demos = {
   IntentText: {
     demo: IntentTextDemo,
     scope: {
+      renderToggle,
       IntentText
     }
   },
   ScrollToTop: {
     demo: ScrollToTopDemo,
     scope: {
+      renderToggle,
       ScrollToTop
     }
   }
@@ -485,6 +538,7 @@ function DemoComponentWrapper({ demo: Demo, scope, props = [] }, demoTitle) {
               "https://github.com/TeselaGen/teselagen-react-components/tree/master/src"
             }
             target="_blank"
+            rel="noopener noreferrer"
           >
             Component Source
           </a>

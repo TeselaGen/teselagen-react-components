@@ -395,7 +395,6 @@ class DataTable extends React.Component {
       schema,
       filters,
       errorParsingUrlString,
-      userSpecifiedCompact,
       hideDisplayOptionsIcon,
       compact,
       compactPaging,
@@ -441,7 +440,7 @@ class DataTable extends React.Component {
     if (compactPaging) {
       compactClassName += " tg-compact-paging";
     }
-    if (compact || userSpecifiedCompact) {
+    if (compact) {
       compactClassName += "tg-compact-table";
     }
     const { tableId } = this.state;
@@ -679,12 +678,12 @@ class DataTable extends React.Component {
               {!noFullscreenButton && toggleFullscreenButton}
               {withDisplayOptions && (
                 <DisplayOptions
+                  compact={compact}
                   disabled={disabled}
                   hideDisplayOptionsIcon={hideDisplayOptionsIcon}
                   resetDefaultVisibility={resetDefaultVisibilityToUse}
                   updateColumnVisibility={updateColumnVisibilityToUse}
                   updateTableDisplayDensity={updateTableDisplayDensityToUse}
-                  userSpecifiedCompact={userSpecifiedCompact}
                   showForcedHiddenColumns={showForcedHiddenColumns}
                   setShowForcedHidden={setShowForcedHidden}
                   hasOptionForForcedHidden={hasOptionForForcedHidden}
@@ -745,7 +744,16 @@ class DataTable extends React.Component {
         } else {
           // if we are not using checkboxes we need to make sure
           // that the id of the record gets added to the id map
-          newIdMap = oldIdMap[rowId] ? oldIdMap : { [rowId]: { entity } };
+
+          if (oldIdMap[rowId]) {
+            // this will update the record in redux to have the fresh data.
+            // tg: we were running into issues of stale data because the redux
+            // record does not get automatically updated when the record is updated
+            oldIdMap[rowId] = { ...oldIdMap[rowId], entity };
+            newIdMap = oldIdMap;
+          } else {
+            newIdMap = { [rowId]: { entity } };
+          }
           finalizeSelection({
             idMap: newIdMap,
             props: computePresets(this.props)

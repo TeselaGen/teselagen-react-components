@@ -8,7 +8,6 @@ import { connect } from "react-redux";
 import { withQuery } from "@teselagen/apollo-methods";
 import { branch, withProps } from "recompose";
 import { change, clearFields, reduxForm } from "redux-form";
-import ReactSelect from "react-select";
 import moment from "moment";
 import generateQuery from "../utils/generateQuery";
 import DialogFooter from "../DialogFooter";
@@ -17,6 +16,7 @@ import withDialog from "../enhancers/withDialog";
 import withTableParams from "../DataTable/utils/withTableParams";
 import DataTable from "../DataTable";
 import { withAbstractWrapper } from "../FormComponents";
+import TgSelect from "../TgSelect";
 
 function preventBubble(e) {
   e.stopPropagation();
@@ -54,9 +54,9 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
     // onSelect - optional callback for doing things with the selected data
     //
     // ################################   asReactSelect   ################################
-    // idAs="id" - use this to get the react select to use some other property as the "value" aka idAs="code" for code based selects
-    // asReactSelect - optionally make the generic select a simple react-select component instead of the default datatables
-    // reactSelectProps - optionally pass additional props to the react select (https://github.com/JedWatson/react-select/blob/v1.x/README.md)
+    // idAs="id" - use this to get the TgSelect to use some other property as the "value" aka idAs="code" for code based selects
+    // asReactSelect - optionally make the generic select a simple TgSelect component instead of the default datatables
+    // reactSelectProps - optionally pass additional props to the TgSelect
     // ** preventing unselect if you don't want a certain option to be unselected ever, you can pass initialValues with a property called clearableValue  entity.clearableValue,
     branch(
       props => props.noForm,
@@ -78,6 +78,7 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
         schema,
         dialogProps,
         postSelectDTProps,
+        noFill,
         passedName
       }) => {
         const modelName = Array.isArray(fragment)
@@ -91,9 +92,11 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
           });
         return {
           readableName,
-          containerStyle: {
-            width: "100%"
-          },
+          ...(!noFill && {
+            containerStyle: {
+              width: "100%"
+            }
+          }),
           modelName,
           ...(postSelectDTProps && {
             postSelectFormName: passedName + "PostSelect"
@@ -172,15 +175,13 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
           meta: { form },
           input: { name },
           changeFieldValue,
-          setNullOnClear,
-          clearFields,
+          isMultiSelect,
+          // setNullOnClear,
+          // clearFields,
           onClear = noop
         } = this.props;
-        //because clearFields doesn't work if there is an initialValue passed
-        //for the genericSelect field, we allow users to specifically changeFieldValue to null
-        setNullOnClear
-          ? changeFieldValue(form, name, null)
-          : clearFields(form, false, false, name);
+        const newVal = isMultiSelect ? [] : null;
+        changeFieldValue(form, name, newVal);
         onClear();
         this.setState({
           tempValue: null
@@ -306,6 +307,10 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
           currentValue: value
         };
 
+        let hasValue = !!value;
+        // need to account for case where value = [] which is empty
+        if (Array.isArray(value) && !value.length) hasValue = false;
+
         return noDialog ? (
           <div className="tg-generic-select-container" onClick={preventBubble}>
             <GenericSelectInner {...propsToPass} />
@@ -322,11 +327,11 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
                     getButton(value, propsToPass, this.state)
                   ) : (
                     <Button
-                      intent={value ? Intent.NONE : Intent.PRIMARY}
+                      intent={hasValue ? Intent.NONE : Intent.PRIMARY}
                       text={
                         getButtonText
                           ? getButtonText(value)
-                          : value
+                          : hasValue
                           ? "Change " + readableName
                           : `Select ${readableName}`
                       }
@@ -335,7 +340,7 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
                     />
                   )}
                 </GenericSelectInner>
-                {value && !noRemoveButton && !noForm && (
+                {hasValue && !noRemoveButton && !noForm && (
                   <Tooltip
                     disabled={buttonProps.disabled}
                     content={"Clear " + readableName}
@@ -572,25 +577,6 @@ const GenericSelectInner = compose(
       this.getInnerComponent();
     }
 
-    // UNSAFE_componentWillMount() {
-    //   const {
-    //     meta: { dispatch, form },
-    //     defaultValue,
-    //     enableReinitialize,
-    //     input: { name, value }
-    //   } = this.props;
-    //   ((value !== false && !value) || enableReinitialize) &&
-    //     defaultValue !== undefined &&
-    //     dispatch({
-    //       type: "@@redux-form/CHANGE",
-    //       meta: {
-    //         form,
-    //         field: name
-    //       },
-    //       payload: defaultValue
-    //     });
-    // }
-
     UNSAFE_componentWillReceiveProps(newProps) {
       const propsToPick = [
         "fragment",
@@ -603,27 +589,6 @@ const GenericSelectInner = compose(
       ) {
         this.getInnerComponent();
       }
-
-      // const { defaultValue: oldDefaultValue, enableReinitialize } = this.props;
-      // const {
-      //   meta: { dispatch, form },
-      //   defaultValue,
-      //   input: { name, value }
-      // } = newProps;
-
-      // if (
-      //   ((value !== false && !value) || enableReinitialize) &&
-      //   !deepEqual(defaultValue, oldDefaultValue)
-      // ) {
-      //   dispatch({
-      //     type: "@@redux-form/CHANGE",
-      //     meta: {
-      //       form,
-      //       field: name
-      //     },
-      //     payload: defaultValue
-      //   });
-      // }
     }
 
     getInnerComponent = () => {
@@ -700,8 +665,11 @@ class InnerComp extends Component {
     const lastItem = [];
     if (entityCount > (tableParams.entities || []).length) {
       lastItem.push({
-        reactSelectHandleLoadMore: this.reactSelectHandleLoadMore,
         value: "__LOAD_MORE",
+        onClick: () => {
+          this.reactSelectHandleLoadMore();
+          return;
+        },
         label: (
           <span className={Classes.TEXT_MUTED} style={{ fontStyle: "italic" }}>
             Showing {entities.length} of{" "}
@@ -783,6 +751,7 @@ class InnerComp extends Component {
       additionalOptions,
       idAs
     } = this.props;
+    //we want to save the entity/entity array itself to the redux form value, not the {label,value} that is passed here
     let entitiesById = keyBy(
       [...tableParams.entities, ...additionalOptions],
       idAs || "id"
@@ -798,7 +767,7 @@ class InnerComp extends Component {
       }
     }
     try {
-      if (!valOrVals) {
+      if (!valOrVals || valOrVals.length === 0) {
         handleSelection([]);
       } else {
         const records = (Array.isArray(valOrVals)
@@ -851,35 +820,33 @@ class InnerComp extends Component {
     }
 
     if (asReactSelect) {
+      const addValueToEntity = entity => {
+        //we need to add a .value field to every entity based on the entities id/code
+        return {
+          ...entity,
+          value: entity[idAs || "id"]
+        };
+      };
       const value = isMultiSelect
         ? !input.value || !input.value.length
           ? ""
-          : input.value.map(entity => {
-              return entity[idAs || "id"];
-            })
+          : input.value.map(addValueToEntity)
         : !input.value
         ? ""
-        : input.value[idAs || "id"];
+        : addValueToEntity(input.value);
 
       return (
-        <ReactSelect
-          filterOptions={(options, filter, currentValues) => {
-            // just filter out the selected options (the search will do the rest of the filtering for us)
-            const currentValuesByKey = keyBy(currentValues, "value");
-            return options.filter(({ value }) => {
+        <TgSelect
+          itemListPredicate={(queryString, items) => {
+            const currentValuesByKey = keyBy(value, "value");
+            return items.filter(({ value }) => {
               return !currentValuesByKey[value];
             });
-            // return options
           }}
           value={value}
           isLoading={tableParams.isLoading}
-          onSelectResetsInput={false}
           multi={isMultiSelect}
-          closeOnSelect={!isMultiSelect}
-          autoBlur={false}
-          closeMenuOnSelect={false}
           onChange={this.handleReactSelectFieldSubmit}
-          optionComponent={OptionOverride}
           options={this.getReactSelectOptions()}
           onInputChange={this.handleReactSelectSearch}
           name={passedName}
@@ -927,56 +894,6 @@ class InnerComp extends Component {
               : readableName)
           }
         />
-      </div>
-    );
-  }
-}
-
-class OptionOverride extends React.Component {
-  node = React.createRef();
-  componentDidMount() {
-    this.node.current.ontouchstart = this.preventPropagation;
-    this.node.current.touchstart = this.preventPropagation;
-    this.node.current.onmousedown = this.handleMouseDown;
-    this.node.current.mousedown = this.handleMouseDown;
-  }
-  preventPropagation = event => {
-    event.preventDefault();
-    event.stopPropagation();
-  };
-  handleMouseDown = event => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (this.props.option.value === "__LOAD_MORE") {
-      this.props.option.reactSelectHandleLoadMore &&
-        this.props.option.reactSelectHandleLoadMore();
-      return;
-    }
-    this.props.onSelect(this.props.option, event);
-  };
-  handleMouseEnter = event => {
-    this.props.onFocus(this.props.option, event);
-  };
-  handleMouseMove = event => {
-    if (this.props.isFocused) return;
-    this.props.onFocus(this.props.option, event);
-  };
-  render() {
-    return (
-      <div
-        className={this.props.className}
-        onBlur={this.preventPropagation}
-        onClick={this.preventPropagation}
-        ref={this.node}
-        onMouseUp={this.preventPropagation}
-        onTouchStart={this.preventPropagation}
-        onTouchStartCapture={this.preventPropagation}
-        onMouseDown={this.handleMouseDown}
-        onMouseEnter={this.handleMouseEnter}
-        onMouseMove={this.handleMouseMove}
-        title={this.props.option.title}
-      >
-        {this.props.children}
       </div>
     );
   }

@@ -22,7 +22,8 @@ export class PagingTool extends React.Component {
   };
 
   state = {
-    selectedPage: 1
+    selectedPage: 1,
+    refetching: false
   };
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -34,8 +35,14 @@ export class PagingTool extends React.Component {
     });
   }
 
-  onRefresh = () => {
-    this.props.onRefresh();
+  onRefresh = async () => {
+    this.setState({
+      refetching: true
+    });
+    await this.props.onRefresh();
+    this.setState({
+      refetching: false
+    });
   };
 
   setPage = page => {
@@ -77,8 +84,8 @@ export class PagingTool extends React.Component {
       pageValue > lastPage
         ? lastPage
         : pageValue < 1 || isNaN(pageValue)
-          ? 1
-          : pageValue;
+        ? 1
+        : pageValue;
 
     this.setState({
       selectedPage
@@ -87,7 +94,7 @@ export class PagingTool extends React.Component {
   };
 
   render() {
-    const { selectedPage } = this.state;
+    const { selectedPage, refetching } = this.state;
     const {
       paging: { pageSize, page, total },
       onRefresh,
@@ -104,6 +111,7 @@ export class PagingTool extends React.Component {
         {onRefresh && (
           <Button
             minimal
+            loading={refetching}
             icon="refresh"
             disabled={disabled}
             onClick={this.onRefresh}

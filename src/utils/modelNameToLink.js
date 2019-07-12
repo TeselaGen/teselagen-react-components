@@ -2,8 +2,7 @@ import { kebabCase } from "lodash";
 import pluralize from "pluralize";
 
 let modelNameMap = {
-  j5Report: "assembly-report",
-  microserviceQueue: "microservice-task"
+  j5Report: "assembly-report"
 };
 
 export const setModelLinkMap = map => {
