@@ -44,7 +44,7 @@ export default class DisplayOptions extends React.Component {
       schema,
       updateColumnVisibility = noop,
       resetDefaultVisibility = noop,
-      userSpecifiedCompact,
+      compact,
       disabled,
       hasOptionForForcedHidden,
       showForcedHiddenColumns,
@@ -147,7 +147,7 @@ export default class DisplayOptions extends React.Component {
               <div className={Classes.SELECT}>
                 <select
                   onChange={this.changeTableDensity}
-                  value={userSpecifiedCompact ? "compact" : "normal"}
+                  value={compact ? "compact" : "normal"}
                 >
                   <option className={Classes.POPOVER_DISMISS} value="normal">
                     Normal

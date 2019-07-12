@@ -395,7 +395,6 @@ class DataTable extends React.Component {
       schema,
       filters,
       errorParsingUrlString,
-      userSpecifiedCompact,
       hideDisplayOptionsIcon,
       compact,
       compactPaging,
@@ -441,7 +440,7 @@ class DataTable extends React.Component {
     if (compactPaging) {
       compactClassName += " tg-compact-paging";
     }
-    if (compact || userSpecifiedCompact) {
+    if (compact) {
       compactClassName += "tg-compact-table";
     }
     const { tableId } = this.state;
@@ -679,12 +678,12 @@ class DataTable extends React.Component {
               {!noFullscreenButton && toggleFullscreenButton}
               {withDisplayOptions && (
                 <DisplayOptions
+                  compact={compact}
                   disabled={disabled}
                   hideDisplayOptionsIcon={hideDisplayOptionsIcon}
                   resetDefaultVisibility={resetDefaultVisibilityToUse}
                   updateColumnVisibility={updateColumnVisibilityToUse}
                   updateTableDisplayDensity={updateTableDisplayDensityToUse}
-                  userSpecifiedCompact={userSpecifiedCompact}
                   showForcedHiddenColumns={showForcedHiddenColumns}
                   setShowForcedHidden={setShowForcedHidden}
                   hasOptionForForcedHidden={hasOptionForForcedHidden}

@@ -87,7 +87,8 @@ export default compose(
       cellRenderer = {},
       showForcedHiddenColumns,
       isSimple,
-      isInfinite
+      isInfinite,
+      compact
     } = propsToUse;
     let schemaToUse = convertSchema(schema);
     let fieldOptsByPath = {};
@@ -98,7 +99,7 @@ export default compose(
     let resizePersist;
     let resized;
     let updateTableDisplayDensity;
-    let userSpecifiedCompact;
+    let compactToUse = !!compact;
 
     if (isViewable) {
       schemaToUse.fields = [viewColumn, ...schemaToUse.fields];
@@ -117,7 +118,9 @@ export default compose(
           fieldOptions: []
         };
       }
-      userSpecifiedCompact = tableConfig.density === "compact";
+      if (tableConfig.density) {
+        compactToUse = tableConfig.density === "compact";
+      }
       const columnOrderings = tableConfig.columnOrderings;
       fieldOptsByPath = keyBy(tableConfig.fieldOptions, "path");
       schemaToUse = {
@@ -250,11 +253,11 @@ export default compose(
     return {
       ...propsToUse,
       schema: schemaToUse,
+      compact: compactToUse,
       resized,
       resetDefaultVisibility,
       updateColumnVisibility,
       updateTableDisplayDensity,
-      userSpecifiedCompact,
       resizePersist,
       moveColumnPersist,
       hasOptionForForcedHidden
