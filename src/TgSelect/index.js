@@ -193,13 +193,13 @@ class TgSelect extends React.Component {
       <MultiSelect
         onActiveItemChange={this.handleActiveItemChange}
         closeOnSelect={!multi}
+        resetOnSelect={!multi}
         items={options || []}
         activeItem={
           this.state.activeItem ||
           (options && options.filter(opt => !selectedItems.includes(opt))[0])
         }
         itemDisabled={itemDisabled}
-        resetOnSelect
         query={this.state.query}
         popoverProps={{
           minimal: true,
