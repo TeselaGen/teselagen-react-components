@@ -207,9 +207,10 @@ class Uploader extends Component {
   };
 
   render() {
+    const { loading, uploading } = this.state;
     const {
       accept,
-      contentOverride,
+      contentOverride: maybeContentOverride,
       innerIcon,
       innerText,
       action,
@@ -232,6 +233,12 @@ class Uploader extends Component {
       showFilesCount,
       S3Params // if this is defined we assume we want to upload to aws s3 (or minio)
     } = this.props;
+
+    let contentOverride = maybeContentOverride;
+    if (contentOverride && typeof contentOverride === "function") {
+      contentOverride = contentOverride({ uploading, loading });
+    }
+
     const self = this;
     let acceptToUse = Array.isArray(accept) ? accept.join(", ") : accept;
     let fileListToUse = fileList ? fileList : [];
@@ -247,6 +254,9 @@ class Uploader extends Component {
           accept={acceptToUse}
           {...{
             onDrop: async (acceptedFiles, rejectedFiles) => {
+              this.setState({
+                loading: true
+              });
               if (rejectedFiles.length) {
                 const fileNames = rejectedFiles.map(f => f.name);
                 window.toastr &&
@@ -385,6 +395,9 @@ class Uploader extends Component {
                   })
                 );
               }
+              this.setState({
+                loading: false
+              });
             }
           }}
           {...dropzoneProps}
