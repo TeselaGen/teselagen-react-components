@@ -1,4 +1,4 @@
-import { MultiSelect } from "@blueprintjs/select";
+import { MultiSelect, getCreateNewItem } from "@blueprintjs/select";
 import { Keys, Button, MenuItem } from "@blueprintjs/core";
 import React from "react";
 import { filter, isEqual } from "lodash";
@@ -109,12 +109,10 @@ class TgSelect extends React.Component {
     });
     onInputChange(query);
   };
-  handleActiveItemChange = item => {
-    // const { onInputChange = () => {} } = this.props;
+  handleActiveItemChange = (item, isCreateNewItem) => {
     this.setState({
-      activeItem: item
+      activeItem: item || (isCreateNewItem ? getCreateNewItem() : null)
     });
-    // onInputChange(query);
   };
   onInteraction = () => {
     if (this.input != null && this.input !== document.activeElement) {
@@ -124,6 +122,25 @@ class TgSelect extends React.Component {
       // open the popover when focusing the tag input
       this.setState({ isOpen: true });
     }
+  };
+
+  queryHasExactOptionMatch = () => {
+    return (
+      [
+        ...(this.props.options || []),
+        ...(Array.isArray(this.props.value)
+          ? this.props.value
+          : [this.props.value])
+      ].filter(o => {
+        const { label, value } = o || {};
+        return (
+          this.state.query ===
+          (label && label.toLowerCase
+            ? label.toLowerCase()
+            : value && value.toLowerCase && value.toLowerCase())
+        );
+      }).length > 0
+    );
   };
 
   render() {
@@ -176,8 +193,12 @@ class TgSelect extends React.Component {
         />
       </span>
     );
+
     const maybeCreateNewItemFromQuery = creatable ? createNewOption : undefined;
-    const maybeCreateNewItemRenderer = creatable ? renderCreateNewOption : null;
+    const maybeCreateNewItemRenderer =
+      creatable && !this.queryHasExactOptionMatch()
+        ? renderCreateNewOption
+        : null;
     const selectedItems = getValueArray(value).map(value => {
       if (value && value.label) return value; //if the value has a label, just use that
       //if not, look for an existing option to use that value
@@ -288,6 +309,7 @@ export const renderCreateNewOption = (query, active, handleClick) => (
 );
 
 export function createNewOption(newValString) {
+  // getCreateNewItem
   return {
     userCreated: true,
     label: newValString,
