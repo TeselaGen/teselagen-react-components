@@ -420,7 +420,6 @@ export const renderReactSelect = props => {
   // spreading input not working, grab the values needed instead
   const {
     async,
-    creatable,
     input: { value, onChange },
     hideValue,
     options,
@@ -510,13 +509,8 @@ export const renderReactSelect = props => {
       }
     }
   };
-  if (async) {
-    return <TgSelect {...propsToUse} />;
-  } else if (creatable) {
-    return <TgSelect {...propsToUse} />;
-  } else {
-    return <TgSelect {...propsToUse} />;
-  }
+
+  return <TgSelect {...propsToUse} />;
 };
 
 export const BPSelect = ({ value, onChange, ...rest }) => {
