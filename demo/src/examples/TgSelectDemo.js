@@ -6,7 +6,7 @@ class TgSelectDemo extends React.Component {
   render() {
     // const {} = this.props;
 
-    const { multi, val } = this.state;
+    const { multi, val, creatable } = this.state;
     return (
       <div>
         Default:
@@ -16,6 +16,7 @@ class TgSelectDemo extends React.Component {
             this.setState({ val });
           }}
           multi={multi}
+          creatable={creatable}
           value={val}
           options={[
             { label: "hey", value: "1234" },
@@ -24,12 +25,17 @@ class TgSelectDemo extends React.Component {
               value: "14556"
             },
             { label: "my", value: "122434" },
-            { label: "friend", value: "127734" },
+            { label: "friend", value: "127734" }
           ]}
         />
         {renderToggle({
           that: this,
           type: "multi"
+          // type: "reactSelectFieldCreateable"
+        })}
+        {renderToggle({
+          that: this,
+          type: "creatable"
           // type: "reactSelectFieldCreateable"
         })}
       </div>
