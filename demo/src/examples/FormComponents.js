@@ -301,7 +301,7 @@ class FormComponentsDemo extends React.Component {
             createable={this.state.reactSelectFieldCreateable}
             options={[
               {
-                label: "Rodrigo Pavez",
+                label: "Rodrigo Pavez aoiwjefoiawjfiojawe faowijefoiajwefoijawf woaiefjawoie",
                 value: { name: "Rodrigo Pavez", id: "123" }
               },
               { label: "Ximena Morales", value: "Ximena Morales" },

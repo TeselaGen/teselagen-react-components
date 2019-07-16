@@ -10,8 +10,12 @@
 }
 /* Fix cutoff placeholder */
 .tg-select .bp3-input-ghost {
-  width: 80%;
+  width: 60%;
   text-overflow: ellipsis;
+}
+
+.tg-select-value {
+  width: 60%;
 }
 
 .tg-single-select input {
