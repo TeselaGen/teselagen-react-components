@@ -552,7 +552,7 @@ export interface TgSelectProps {
   multi: boolean;
   options: any;
   value: any;
-  createable: boolean;
+  creatable: boolean;
   optionRenderer: any;
   tagInputProps: any;
   noResultsText: any;

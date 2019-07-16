@@ -131,7 +131,7 @@ class TgSelect extends React.Component {
       multi,
       options,
       value,
-      createable,
+      creatable,
       optionRenderer, //pull this one out here so it doesn't get passsed along
       tagInputProps,
       noResultsText,
@@ -176,12 +176,8 @@ class TgSelect extends React.Component {
         />
       </span>
     );
-    const maybeCreateNewItemFromQuery = createable
-      ? createNewOption
-      : undefined;
-    const maybeCreateNewItemRenderer = createable
-      ? renderCreateNewOption
-      : null;
+    const maybeCreateNewItemFromQuery = creatable ? createNewOption : undefined;
+    const maybeCreateNewItemRenderer = creatable ? renderCreateNewOption : null;
     const selectedItems = getValueArray(value).map(value => {
       if (value && value.label) return value; //if the value has a label, just use that
       //if not, look for an existing option to use that value

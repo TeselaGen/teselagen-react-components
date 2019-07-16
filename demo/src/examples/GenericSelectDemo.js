@@ -51,7 +51,7 @@ class GenericSelectDemo extends React.Component {
         {renderToggle({
           that: this,
           type: "multi"
-          // type: "reactSelectFieldCreateable"
+          // type: "reactSelectFieldcreatable"
         })}
       </div>
       </ApolloProvider>

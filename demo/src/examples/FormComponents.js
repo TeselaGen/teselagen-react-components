@@ -289,8 +289,8 @@ class FormComponentsDemo extends React.Component {
           />
           {renderToggle({
             that: this,
-            label: "createable",
-            type: "reactSelectFieldCreateable"
+            label: "creatable",
+            type: "reactSelectFieldcreatable"
           })}
           <ReactSelectField
             name="reactSelectField"
@@ -298,7 +298,7 @@ class FormComponentsDemo extends React.Component {
             label="ReactSelectField Collaborators"
             placeholder="This has a long placeholder, wow, I hope it fits"
             onFieldSubmit={onFieldSubmit}
-            createable={this.state.reactSelectFieldCreateable}
+            creatable={this.state.reactSelectFieldcreatable}
             options={[
               {
                 label: "Rodrigo Pavez aoiwjefoiawjfiojawe faowijefoiajwefoijawf woaiefjawoie",
@@ -315,7 +315,7 @@ class FormComponentsDemo extends React.Component {
             inlineLabel={this.state.inlineLabels}
             label="ReactSelectField Custom Label"
             onFieldSubmit={onFieldSubmit}
-            createable={this.state.reactSelectFieldCreateable}
+            creatable={this.state.reactSelectFieldcreatable}
             options={["hah", "yah", "nope", "yep"].map((type, i) => {
               return {
                 value: type,
@@ -348,7 +348,7 @@ class FormComponentsDemo extends React.Component {
             inlineLabel={this.state.inlineLabels}
             label="ReactSelectField Collaborators Multi"
             onFieldSubmit={onFieldSubmit}
-            createable={this.state.reactSelectFieldCreateable}
+            creatable={this.state.reactSelectFieldcreatable}
             multi
             options={[
               {
