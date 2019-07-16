@@ -125,6 +125,7 @@ class TgSelect extends React.Component {
   };
 
   queryHasExactOptionMatch = () => {
+    //we don't want to show the creatable if the thing being created already exactly matches the label
     return (
       [
         ...(this.props.options || []),
