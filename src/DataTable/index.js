@@ -358,6 +358,7 @@ class DataTable extends React.Component {
 
   render() {
     const { fullscreen } = this.state;
+    const propPresets = computePresets(this.props);
     const {
       extraClasses,
       className,
@@ -410,14 +411,14 @@ class DataTable extends React.Component {
       subHeader,
       isViewable,
       entities,
-      children,
+      children: maybeChildren,
       topLeftItems,
       currentParams,
       hasOptionForForcedHidden,
       showForcedHiddenColumns,
       searchMenuButton,
       setShowForcedHidden
-    } = computePresets(this.props);
+    } = propPresets;
     let updateColumnVisibilityToUse = updateColumnVisibility;
     let updateTableDisplayDensityToUse = updateTableDisplayDensity;
     let resetDefaultVisibilityToUse = resetDefaultVisibility;
@@ -487,6 +488,10 @@ class DataTable extends React.Component {
       acc[index] = reduxFormExpandedEntityIdMap[rowId];
       return acc;
     }, {});
+    let children = maybeChildren;
+    if (children && typeof children === "function") {
+      children = children(propPresets);
+    }
     const showHeader = (withTitle || withSearch || children) && !noHeader;
     const toggleFullscreenButton = (
       <Button
