@@ -167,7 +167,7 @@
 }
 
 .tg-no-fill-field {
-  display: flex !important;
+  display: table !important;
 }
 
 .item-upload-container {
