@@ -263,7 +263,7 @@ export default compose(
       hasOptionForForcedHidden
     };
   }),
-  reduxForm({}), //the formName is passed via withTableParams and is often user overridden
+  branch(props => !props.noForm, reduxForm({})), //the formName is passed via withTableParams and is often user overridden
   formValues(
     "localStorageForceUpdate",
     "reduxFormQueryParams",
