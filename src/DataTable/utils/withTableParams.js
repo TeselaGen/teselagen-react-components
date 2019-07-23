@@ -63,7 +63,8 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       withDisplayOptions,
       cellRenderer,
       model,
-      isCodeModel
+      isCodeModel,
+      noForm
     } = mergedOpts;
 
     const schema = getSchema(mergedOpts);
@@ -89,7 +90,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
 
     let formNameFromWithTableParamsCall;
     if (isLocalCall) {
-      if (!formName || formName === "tgDataTable") {
+      if (!noForm && (!formName || formName === "tgDataTable")) {
         console.error(
           "Please pass a unique 'formName' prop to the locally connected <DataTable/> component with schema: ",
           schema
