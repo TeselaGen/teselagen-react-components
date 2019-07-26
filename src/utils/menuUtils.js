@@ -27,8 +27,12 @@ export const EnhancedMenuItem = compose(
     }
   }),
   branch(({ navTo }) => navTo, withRouter)
-)(function({ navTo, staticContext, ...props }) {
-  let clickHandler = props.onClick;
+)(function({ navTo, context, staticContext, didMount, willUnmount, ...props }) {
+  let clickHandler = props.onClick
+    ? (...args) => {
+        return props.onClick(...args, context);
+      }
+    : undefined;
   if (navTo) {
     clickHandler = e => {
       if (e.metaKey || e.ctrlKey) {
@@ -180,6 +184,7 @@ export const DynamicMenuItem = ({
       <ItemComponent
         // filter out unwanted attributes here!
         {...omit(item, unwantedAttrs)}
+        context={context}
         icon={item.icon || item.iconName}
         labelElement={item.hotkey && <KeyCombo minimal combo={item.hotkey} />}
         text={item.text}
@@ -328,12 +333,10 @@ export function showContextMenu(
   if (!menuDef) return;
 
   const MenuComponent = menuComp;
-
+  event.persist();
   // Render a context menu at the passed event's position
   ContextMenu.show(
-    <MenuComponent
-      /* popoverProps={{transitionDuration: 1}} */ autoFocus={false}
-    >
+    <MenuComponent>
       {createDynamicMenu(menuDef, enhancers, context)}
     </MenuComponent>,
     { left: event.clientX, top: event.clientY },
