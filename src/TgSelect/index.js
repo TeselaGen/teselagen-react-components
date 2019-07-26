@@ -43,10 +43,14 @@ class TgSelect extends React.Component {
   };
 
   handleItemSelect = item => {
-    const { onChange, value, multi } = this.props;
+    const { onChange, value, multi, closeOnSelect } = this.props;
     this.setState({ activeItem: null });
     if (multi) {
       const valArray = getValueArray(value);
+      if (closeOnSelect) {
+        this.setState({ isOpen: false });
+        this.input && this.input.blur();
+      }
       return onChange([...valArray, item]);
     } else {
       this.setState({ isOpen: false });
@@ -63,6 +67,7 @@ class TgSelect extends React.Component {
     );
     e.stopPropagation();
     onChange(filteredVals);
+    this.setState({ isOpen: false });
     this.input.focus();
   };
   handleTagInputRemove = (val, index) => {
@@ -280,7 +285,7 @@ class TgSelect extends React.Component {
             },
             onRemove: multi ? this.handleTagInputRemove : null,
             rightElement: rightElement,
-            disabled,
+            disabled: disabled || isLoading,
             ...tagInputProps, //spread additional tag input props here
             inputProps: {
               onBlur,
@@ -288,7 +293,6 @@ class TgSelect extends React.Component {
             }
           }
         }}
-        isLoading={isLoading}
         {...rest}
       />
     );
