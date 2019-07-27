@@ -176,6 +176,7 @@ const demos = {
     scope: {
       Classes,
       TgSelect,
+      Icon,
       renderToggle,
     },
     props: [

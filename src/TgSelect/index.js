@@ -99,10 +99,13 @@ class TgSelect extends React.Component {
       );
       if (filteredVals.length !== valArray.length) return false;
     }
+
     return fuzzysearch(
       queryString.toLowerCase(),
-      label && label.toLowerCase
-        ? label.toLowerCase()
+      label
+        ? label.toLowerCase
+          ? label.toLowerCase()
+          : getTextFromEl(label)
         : (item.value && item.value.toLowerCase && item.value.toLowerCase()) ||
             ""
     );
@@ -323,4 +326,20 @@ export function createNewOption(newValString) {
 
 function getValueArray(value) {
   return value || value === 0 ? (Array.isArray(value) ? value : [value]) : [];
+}
+
+function getTextFromEl(el) {
+  return el.props && el.props.children
+    ? (el.props.children.reduce
+        ? el.props.children
+        : [el.props.children]
+      ).reduce((acc, child) => {
+        if (child && child.props && child.props.children) {
+          acc += getTextFromEl(child);
+        } else if (typeof child === "string") {
+          acc += child.toLowerCase();
+        }
+        return acc;
+      }, "")
+    : "";
 }

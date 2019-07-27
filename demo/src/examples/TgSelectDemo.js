@@ -20,6 +20,7 @@ class TgSelectDemo extends React.Component {
           creatable={creatable}
           value={val}
           options={[
+            { label: <span>hey <div>I'm some texttt</div> <Icon icon="circle"></Icon></span>, value: "1234" },
             { label: "hey", value: "1234" },
             {
               label: "there",
