@@ -19,7 +19,18 @@ class HotkeysDialogDemo extends React.Component {
       anotherOne: ['alt+shift+a', '', { stopPropagation: true }],
 
       // full object syntax
-      showHotkeys: { combo: 'mod+h', preventDefault: true }
+      showHotkeys: { combo: 'mod+h', preventDefault: true },
+      showHotkeys0: { combo: 'mod+h', preventDefault: true },
+      showHotkeys1: { combo: 'mod+h', preventDefault: true },
+      showHotkeys2: { combo: 'mod+h', preventDefault: true },
+      showHotkeys3: { combo: 'mod+h', preventDefault: true },
+      showHotkeys4: { combo: 'mod+h', preventDefault: true },
+      showHotkeys5: { combo: 'mod+h', preventDefault: true },
+      showHotkeys6: { combo: 'mod+h', preventDefault: true },
+      showHotkeys7: { combo: 'mod+h', preventDefault: true },
+      showHotkeys8: { combo: 'mod+h', preventDefault: true },
+      showHotkeys9: { combo: 'mod+h', preventDefault: true },
+      showHotkeys10: { combo: 'mod+h', preventDefault: true },
     };
 
     const hotkeys2 = {
