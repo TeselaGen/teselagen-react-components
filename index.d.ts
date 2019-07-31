@@ -65,6 +65,8 @@ export function withUpsert(
   options: WithUpsertOptions
 ): void;
 
+export function noop(): void;
+
 /**
  * Note all these options can be passed at Design Time or at Runtime (like reduxForm())
  */
