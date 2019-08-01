@@ -7,10 +7,10 @@ import {
   Classes /*, Tooltip*/
 } from "@blueprintjs/core";
 // import { startCase } from "lodash";
+import classNames from "classnames";
 import {
   getHotkeyProps /*, hotkeysById, comboToLabel*/
 } from "../utils/hotkeyUtils";
-import classNames from "classnames";
 
 import "./style.css";
 
@@ -24,7 +24,7 @@ export default function HotkeysDialog(props) {
     <Dialog
       isOpen={props.isOpen}
       onClose={props.onClose}
-      title="Keyboard Shortcuts"
+      title={props.dialogTitle || "Keyboard Shortcuts"}
     >
       <Tabs className="tg-hotkeys-dialog">
         {sections.map(name => (
