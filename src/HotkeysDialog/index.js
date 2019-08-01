@@ -31,7 +31,7 @@ export default function HotkeysDialog(props) {
           <Tab
             key={name}
             id={name}
-            title={name}
+            title={sections.length === 1 ? undefined : name}
             panel={
               <div className="tg-table-wrapper">
                 <table
