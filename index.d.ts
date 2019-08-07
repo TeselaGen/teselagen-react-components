@@ -67,6 +67,10 @@ export function withUpsert(
 
 export function noop(): void;
 
+export function showDialogOnDocBody(): void;
+
+
+
 /**
  * Note all these options can be passed at Design Time or at Runtime (like reduxForm())
  */
