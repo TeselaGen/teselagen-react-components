@@ -363,6 +363,7 @@ class J5ReportRecordView extends Component {
       fragmentMap = {},
       linkFragmentMap,
       noPrebuiltConstructs = false,
+      customSchemaGeneratorForAssemblies,
       dataTableProps: passedDataTableProps,
       synthonSequenceTitleElements = []
     } = this.props;
@@ -636,7 +637,10 @@ class J5ReportRecordView extends Component {
             }
             fragment={fragmentMap.j5RunConstruct}
             tableProps={dataTableProps}
-            createSchema={this.createSchemaForCombinationOfAssemblyPieces}
+            createSchema={
+              customSchemaGeneratorForAssemblies ||
+              this.createSchemaForCombinationOfAssemblyPieces
+            }
           />
 
           {/*<div className="tg-card">

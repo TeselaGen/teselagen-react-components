@@ -4,6 +4,9 @@ import { compose } from "recompose";
 
 const processInputParts = inputParts =>
   inputParts.map(inputPart => {
+    if (inputPart.metadata) {
+      return inputPart;
+    }
     const sequencePart = get(inputPart, "sequencePart", {});
     return {
       ...inputPart,
@@ -68,9 +71,16 @@ const processPrebuiltConstructs = j5RunConstructs =>
 const getInputPartsFromInputSequences = j5InputSequences =>
   j5InputSequences
     .map(({ j5InputParts, sequence }) =>
-      j5InputParts.map(({ sequencePart }) => ({
-        sequencePart: { ...sequencePart, sequence }
-      }))
+      j5InputParts.map(({ sequencePart, metadata }) => {
+        if (metadata) {
+          return {
+            metadata
+          };
+        }
+        return {
+          sequencePart: { ...sequencePart, sequence }
+        };
+      })
     )
     .reduce((a, b) => a.concat(b), []);
 
@@ -81,10 +91,16 @@ const processJ5AssemblyPieces = j5AssemblyPieces =>
   }));
 
 const processInputSequences = j5InputSequences =>
-  j5InputSequences.map(s => ({
-    ...s,
-    sequence: { ...s.sequence, id: "sequence_" + s.sequence.id }
-  }));
+  j5InputSequences.map(s => {
+    if (s.sequence) {
+      return {
+        ...s,
+        sequence: { ...s.sequence, id: "sequence_" + s.sequence.id }
+      };
+    } else {
+      return s;
+    }
+  });
 
 const processJ5PcrReactions = j5PcrReactions =>
   j5PcrReactions.map(pcr => ({
@@ -122,11 +138,17 @@ const processJ5AnnealedOligo = j5Oligos => {
     .map(j5Oligo => {
       let targetPart = "";
       try {
-        targetPart = j5Oligo.oligo.j5AnnealedOligosTopOligos.length
-          ? j5Oligo.oligo.j5AnnealedOligosTopOligos[0].sequence.j5AssemblyPiece
-              .j5AssemblyPieceParts[0].j5InputPart.part.name
-          : j5Oligo.oligo.j5AnnealedOligosBottomOligos[0].sequence
-              .j5AssemblyPiece.j5AssemblyPieceParts[0].j5InputPart.part.name;
+        let topOligo = j5Oligo.oligo.j5AnnealedOligosTopOligos[0];
+        let bottomOligo = j5Oligo.oligo.j5AnnealedOligosBottomOligos[0];
+        let oligo = topOligo || bottomOligo;
+
+        if (oligo.sequence.j5AssemblyPiece.metadata) {
+          targetPart = oligo.sequence.j5AssemblyPiece.metadata.parts_contained_names.join(
+            ", "
+          );
+        } else {
+          targetPart = oligo.j5InputPart.part.name;
+        }
       } catch (e) {
         targetPart = "not found";
       }
