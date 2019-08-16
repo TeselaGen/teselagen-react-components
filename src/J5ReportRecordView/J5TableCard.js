@@ -24,7 +24,8 @@ function J5TableCard({
   tableParams = {},
   createSchema = noop,
   processData = identity,
-  fragment
+  fragment,
+  SubComponent
 }) {
   let entities = maybeEntities;
   // using remote paging
@@ -51,6 +52,7 @@ function J5TableCard({
     >
       <DataTable
         {...tableProps}
+        SubComponent={SubComponent || null}
         onDoubleClick={onDoubleClick}
         formName={camelCase(title)} //because these tables are currently not connected to table params, we need to manually pass a formName here
         cellRenderer={cellRenderer}
