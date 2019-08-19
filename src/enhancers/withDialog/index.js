@@ -52,6 +52,7 @@ export default function withDialog(topLevelDialogProps) {
           hideModal,
           fetchPolicy = "network-only",
           children,
+          onCloseHook,
           dialogProps,
           title,
           isDraggable,
@@ -62,6 +63,7 @@ export default function withDialog(topLevelDialogProps) {
           ...topLevelDialogProps,
           ...dialogProps
         };
+        const _onCloseHook = onCloseHook || extraDialogProps.onCloseHook;
         const { noButtonClickPropagate } = {
           ...this.props,
           ...extraDialogProps
@@ -82,6 +84,7 @@ export default function withDialog(topLevelDialogProps) {
               <DialogToUse
                 onClose={function() {
                   hideModal();
+                  _onCloseHook && _onCloseHook();
                 }}
                 title={title}
                 isOpen={isOpen}
