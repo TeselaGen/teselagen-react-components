@@ -350,6 +350,7 @@ class FormComponentsDemo extends React.Component {
             inlineLabel={this.state.inlineLabels}
             label="ReactSelectField Collaborators Multi"
             onFieldSubmit={onFieldSubmit}
+            resetOnSelect
             creatable={this.state.reactSelectFieldcreatable}
             multi
             options={[

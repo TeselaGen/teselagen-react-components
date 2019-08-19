@@ -24,7 +24,7 @@ describe("formComponents", () => {
     cy.get(`[data-test="tgCell_type.special"]`)
       .first()
       .trigger("contextmenu");
-    cy.contains("Copy Row to Clipboard").click();
+    cy.contains("Copy Row to Clipboard").click({ force: true }); //the force true prevents cypress from unecessarily scrolling when clicking the context menu
     cy.contains("Row Copied");
     cy.get(`[data-test="tgCell_type.special"]`)
       .first()
@@ -33,7 +33,7 @@ describe("formComponents", () => {
     cy.get(`[data-test="tgCell_type.special"]`)
       .first()
       .trigger("contextmenu");
-    cy.contains("Copy Cell to Clipboard").click();
+    cy.contains("Copy Cell to Clipboard").click({ force: true }); //the force true prevents cypress from unecessarily scrolling when clicking the context menu
     cy.contains("Cell copied");
     // - copying multiple selected rows
     cy.get(`[data-test="tgCell_type.special"]`)
@@ -42,7 +42,7 @@ describe("formComponents", () => {
     cy.get(`[data-test="tgCell_type.special"]`)
       .first()
       .trigger("contextmenu");
-    cy.contains("Copy Selected Rows to Clipboard").click();
+    cy.contains("Copy Selected Rows to Clipboard").click({ force: true }); //the force true prevents cypress from unecessarily scrolling when clicking the context menu
     cy.contains("Selected rows copied");
   });
   it(`doesn't break when selecting items across pages and copying`, () => {
@@ -66,7 +66,7 @@ describe("formComponents", () => {
     cy.get(`[data-test="tgCell_type.special"]`)
       .first()
       .trigger("contextmenu");
-    cy.contains("Copy Selected Rows to Clipboard").click();
+    cy.contains("Copy Selected Rows to Clipboard").click({force: true}); //the force true prevents cypress from unecessarily scrolling when clicking the context menu
     cy.contains("Selected rows copied");
   });
   it(`it can click the tg filter menu and type some stuff`, () => {

@@ -31,7 +31,7 @@ const withMultiSelectState = WrappedComponent =>
       };
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
       if (this.props.selectedItems !== nextProps.selectedItems) {
         this.setState({ selectedItems: nextProps.selectedItems });
       }
