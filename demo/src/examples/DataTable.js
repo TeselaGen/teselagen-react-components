@@ -1,5 +1,4 @@
 const chance = new Chance();
-
 const schema = {
   model: "material",
   fields: [
