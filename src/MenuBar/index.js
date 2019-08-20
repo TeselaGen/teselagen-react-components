@@ -24,8 +24,8 @@ import {
 import { createDynamicMenu, DynamicMenuItem } from "../utils/menuUtils";
 import { comboToLabel } from "../utils/hotkeyUtils";
 
-@HotkeysTarget 
-export default class MenuBar extends React.Component {
+@HotkeysTarget
+class MenuBar extends React.Component {
   static defaultProps = {
     className: "",
     style: {}
@@ -257,9 +257,8 @@ export default class MenuBar extends React.Component {
               minimal
               canEscapeKeyClose
               onClosed={() => {
-                this.props.onMenuClose && this.props.onMenuClose()
-                }
-              }
+                this.props.onMenuClose && this.props.onMenuClose();
+              }}
               portalClassName="tg-menu-bar-popover"
               position={Position.BOTTOM_LEFT}
               isOpen={isOpen && i === openIndex}
@@ -292,7 +291,6 @@ function noop() {}
 
 const isDivider = item => item.divider !== undefined;
 
-
 function getAllMenuTextsAndHandlers(menu, enhancers, context, path = []) {
   if (!menu) return [];
   return flatMap(menu, item => {
@@ -313,7 +311,6 @@ function getAllMenuTextsAndHandlers(menu, enhancers, context, path = []) {
     ];
   });
 }
-
 
 const filterMenuItems = (searchVal, items) => {
   const newItems = flatMap(items, item => {
@@ -406,3 +403,4 @@ function highlight(query, text, opts) {
 
   return flatten([before, match, after]);
 }
+export default MenuBar;
