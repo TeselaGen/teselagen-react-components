@@ -255,7 +255,6 @@ export default class MenuBar extends React.Component {
               autoFocus={false}
               key={i}
               minimal
-              hasBackdrop
               canEscapeKeyClose
               onClosed={() => {
                 this.props.onMenuClose && this.props.onMenuClose()
