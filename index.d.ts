@@ -67,7 +67,13 @@ export function withUpsert(
 
 export function noop(): void;
 
-export function showDialogOnDocBody(): void;
+interface showDialogOnDocBodyOptions = {
+  /**
+   *  * @property {boolean} addDialogContainer - add a dialog to this
+   */
+  addDialogContainer: false
+}
+export function showDialogOnDocBody(DialogComp, showDialogOnDocBodyOptions): void;
 
 
 
