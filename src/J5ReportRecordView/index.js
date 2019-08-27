@@ -32,6 +32,7 @@ class J5ReportRecordView extends Component {
   state = {
     linkDialogName: undefined,
     partCidMap: {},
+    exportingCsv: false,
     loadingExportOligos: false
   };
   showLinkModal = name => {
@@ -136,11 +137,26 @@ class J5ReportRecordView extends Component {
   //   };
   // };
 
+  onExportAsCsvClick = async () => {
+    this.setState({
+      exportingCsv: true
+    });
+    await this.props.onExportAsCsvClick();
+    this.setState({
+      exportingCsv: false
+    });
+  };
+
   renderDownloadButton = () => {
     // option to override export handler
     const { onExportAsCsvClick } = this.props;
     return (
-      <Button onClick={onExportAsCsvClick || this.downloadCSV}>
+      <Button
+        loading={this.state.exportingCsv}
+        onClick={
+          onExportAsCsvClick ? this.onExportAsCsvClick : this.downloadCSV
+        }
+      >
         Export as CSV
       </Button>
     );
