@@ -83,7 +83,7 @@
     "@blueprintjs/select": "^3.8.0",
     "@teselagen/apollo-methods": "^1.2.1",
     "@types/lodash": "npm:@types/lodash-es",
-    "apollo-boost": "^0.1.15",
+    "apollo-boost": "^0.4.4",
     "apollo-cache-invalidation": "^0.0.3",
     "axios": "^0.18.0",
     "babel-jest": "^23.6.0",
