@@ -276,7 +276,7 @@ class J5ReportRecordView extends Component {
       <span className="j5-report-fieldname">Parameter Preset:</span>{" "}
       {assemblyType}
     </div> */}
-        <div className={Classes.BUTTON_GROUP} style={{ marginTop: 10 }}>
+        <div style={{ marginTop: 10 }}>
           {this.renderDownloadButton()}
           {additionalHeaderButtons}
           {LinkJ5TableDialog && !LinkJ5ReportButton && (
