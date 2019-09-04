@@ -3,7 +3,7 @@ import { get, isEqual, noop, pick, debounce, keyBy } from "lodash";
 import pluralize from "pluralize";
 import { Query } from "react-apollo";
 import React, { Component } from "react";
-import { compose } from "react-apollo";
+import { compose } from "recompose";
 import { connect } from "react-redux";
 import { withQuery } from "@teselagen/apollo-methods";
 import { branch, withProps } from "recompose";
