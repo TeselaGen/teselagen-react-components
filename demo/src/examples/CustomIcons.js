@@ -10,7 +10,11 @@ function CustomIconsDemo() {
         be sure to add it to the `demo/src/examples/CustomIcons.js` page to TEST
         THAT IT WORKS and so that people know it exists!
       </h4>
-      <Button intent={"primary"} icon={customIcons.flaskIcon} text="flaskIcon" />
+      <Button
+        intent={"primary"}
+        icon={customIcons.flaskIcon}
+        text="flaskIcon"
+      />
       <Button icon={customIcons.orfIcon} text="orfIcon" />
       <Button icon={customIcons.featureIcon} text="featureIcon" />
       <Button icon={customIcons.dnaIcon} text="dnaIcon" />
@@ -25,6 +29,7 @@ function CustomIconsDemo() {
       <Button icon={customIcons.driveIcon} text="driveIcon" />
       <Button icon={customIcons.sharedDriveIcon} text="sharedDriveIcon" />
       <Button icon={customIcons.proteinIcon} text="proteinIcon" />
+      <Button icon={customIcons.tubeIcon} text="tubeIcon" />
     </div>
   );
 }

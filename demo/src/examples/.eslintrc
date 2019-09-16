@@ -23,6 +23,7 @@
     "reduxForm": false,
     "times": false,
     "withDialog": false,
-    "Classes": false
+    "Classes": false,
+    "customIcons": false
   }
 }
