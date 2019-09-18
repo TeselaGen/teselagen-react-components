@@ -202,6 +202,20 @@ class DataTable extends React.Component {
       }
     }
 
+    // if switching pages or searching the table we want to reset the scrollbar
+    if (tbody.scrollTop > 0) {
+      const { entities = [] } = this.props;
+      const { entities: oldEntities = [] } = oldProps;
+      const reloaded = oldProps.isLoading && !this.props.isLoading;
+      const entitiesHaveChanged =
+        oldEntities.length !== entities.length ||
+        getIdOrCodeOrIndex(entities[0] || {}) !==
+          getIdOrCodeOrIndex(oldEntities[0] || {});
+      if (reloaded || entitiesHaveChanged) {
+        tbody.scrollTop = 0;
+      }
+    }
+
     // comment in to test what is causing re-render
     // Object.entries(this.props).forEach(
     //   ([key, val]) =>
