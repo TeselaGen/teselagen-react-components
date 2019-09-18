@@ -369,7 +369,20 @@ export interface InputFieldProps extends GenericFormFieldProps {
 declare class FileUploadField extends React.Component<FileUploadFieldProps, any> { }
 
 export interface FileUploadFieldProps extends GenericFormFieldProps {
-
+  innerIcon: "string";
+  innerText: "string";
+  accept: string | array;
+  contentOverride: function;
+  action: string: ;
+  className: string;
+  fileLimit: integer;
+  readBeforeUpload: boolean;
+  showUploadList: boolean;
+  fileListItemRenderer: function;
+  onFileClick: function;
+  dropzoneProps: object;
+  showFilesCount: boolean;
+  S3Params: object;
 }
 // DateInputField
 declare class DateInputField extends React.Component<DateInputFieldProps, any> { }
