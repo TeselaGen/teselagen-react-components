@@ -48,7 +48,7 @@
     "qs": "^6.6.0",
     "react-addons-pure-render-mixin": "^15.6.0",
     "react-color": "^2.14.1",
-    "react-dropzone": "^4.2.12",
+    "react-dropzone": "^10.1.9",
     "react-overflow-tooltip": "^2.0.1",
     "react-resize-detector": "^2.3.0",
     "react-rnd": "^8.0.2",
