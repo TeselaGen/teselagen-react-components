@@ -49,10 +49,12 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
     // noRemoveButton=false - set to true to not have the option to remove the selection
     // fragment - the fragment powering the lookup/datatable
     // dialogProps - any dialog overrides you might want to make
+    // dialogFooterProps - any dialogFooter overrides you might want to make
     // additionalDataFragment - optional fragment for fetching more data based on the initially selected data
     // postSelectDTProps - props passed to the DataTable shown after select. If none are passed the DataTable isn't shown
     // onSelect - optional callback for doing things with the selected data
     //
+
     // ################################   asReactSelect   ################################
     // idAs="id" - use this to get the TgSelect to use some other property as the "value" aka idAs="code" for code based selects
     // asReactSelect - optionally make the generic select a simple TgSelect component instead of the default datatables
@@ -582,6 +584,7 @@ const GenericSelectInner = compose(
         "fragment",
         "passedName",
         "queryOptions",
+        "dialogFooterProps",
         "tableParamOptions"
       ];
       if (
@@ -792,6 +795,7 @@ class InnerComp extends Component {
       additionalTableProps,
       readableName,
       minSelected,
+      dialogFooterProps,
       mustSelect,
       reactSelectProps,
       passedName,
@@ -893,6 +897,7 @@ class InnerComp extends Component {
               ? pluralize(readableName)
               : readableName)
           }
+          {...dialogFooterProps}
         />
       </div>
     );
