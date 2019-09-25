@@ -602,11 +602,13 @@ const GenericSelectInner = compose(
         tableParamOptions,
         isCodeModel
       } = this.props;
+
       this.innerComponent = compose(
         withTableParams({
           formName: passedName + "DataTable",
           withSelectedEntities: true,
           noOrderError: true,
+          isCodeModel,
           doNotCoercePageSize: true,
           defaults: {
             order: ["-modified"]
