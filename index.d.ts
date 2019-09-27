@@ -649,7 +649,7 @@ export interface TreeProps {
  * reactSelectProps - optionally pass additional props to the TgSelect
  * ** preventing unselect if you don't want a certain option to be unselected ever, you can pass initialValues with a property called clearableValue  entity.clearableValue,
  */
-declare class GenericSelect extends React.Component<GenericSelect, any> { }
+declare class GenericSelect extends React.Component<GenericSelectProps, any> { }
 
 
 export interface GenericSelectProps {
