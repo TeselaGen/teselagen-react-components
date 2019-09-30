@@ -712,7 +712,7 @@ export interface GenericSelectProps {
   /**
    * optionally pass additional props to the TgSelect
    */
-  reactSelectProps: object;
+  reactSelectProps: reactSelectProps;
 }
 
 declare function createGenericSelect(options: CreateGenericSelectOptions) {
@@ -725,6 +725,12 @@ interface CreateGenericSelectOptions {
    *
    */
   modelNameToReadableName: function;
+}
+interface reactSelectProps {
+  /**
+   * allow the user to create new values
+   */
+  creatable: boolean;
 }
 
 
