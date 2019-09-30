@@ -778,8 +778,9 @@ class InnerComp extends Component {
         const records = (Array.isArray(valOrVals)
           ? valOrVals
           : [valOrVals]
-        ).map(({ value }) => {
-          return entitiesById[value];
+        ).map(val => {
+          const { value, userCreated } = val;
+          return userCreated ? val : entitiesById[value];
         });
         handleSelection(records);
       }
