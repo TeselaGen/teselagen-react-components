@@ -16,7 +16,7 @@ import withDialog from "../enhancers/withDialog";
 import withTableParams from "../DataTable/utils/withTableParams";
 import DataTable from "../DataTable";
 import { withAbstractWrapper } from "../FormComponents";
-import TgSelect from "../TgSelect";
+import TgSelect, { singleItemPredicate } from "../TgSelect";
 
 function preventBubble(e) {
   e.stopPropagation();
@@ -59,6 +59,7 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
     // idAs="id" - use this to get the TgSelect to use some other property as the "value" aka idAs="code" for code based selects
     // asReactSelect - optionally make the generic select a simple TgSelect component instead of the default datatables
     // reactSelectProps - optionally pass additional props to the TgSelect
+    // ...rest - all additional props will be passed to the TgSelect
     // ** preventing unselect if you don't want a certain option to be unselected ever, you can pass initialValues with a property called clearableValue  entity.clearableValue,
     branch(
       props => props.noForm,
@@ -654,17 +655,22 @@ class InnerComp extends Component {
     const inputIds = [];
     const inputEntities = [];
     if (input.value) {
-      (Array.isArray(input.value) ? input.value : [input.value]).forEach(e => {
-        inputIds.push(e[idAs || "id"]);
-        inputEntities.push(e);
-      });
+      (Array.isArray(input.value) ? input.value : [input.value]).forEach(
+        ent => {
+          inputIds.push(ent[idAs || "id"]);
+          inputEntities.push(ent);
+        }
+      );
     }
 
+    //here we need to append "inputEntities" to our regular list of entities
+    //input entities can be initialValues
+    //it is important that we spread inputEntities second as the initialValues might not yet be loaded by the default table query
     const entities = [
       ...(tableParams.entities || []).filter(
-        e => !inputIds.includes(e[idAs || "id"])
+        ent => !inputIds.includes(ent[idAs || "id"])
       ),
-      ...inputEntities
+      ...inputEntities.map(ent => ({ ...ent, __isInputEnt: true }))
     ];
     if (!entities.length) return [];
     const lastItem = [];
@@ -690,6 +696,7 @@ class InnerComp extends Component {
 
     const entityOptions = entities.map(entity => {
       return {
+        ...pick(entity, ["__isInputEnt", "userCreated"]),
         clearableValue: entity.clearableValue,
         value: entity[idAs || "id"],
         label: (
@@ -745,6 +752,9 @@ class InnerComp extends Component {
     this.props.tableParams.setSearchTerm(val);
   }, 250);
   handleReactSelectSearch = val => {
+    this.setState({
+      reactSelectQueryString: val
+    });
     this.handleReactSelectSearchDebounced(val);
     return val; //return val for react-select to work properly
   };
@@ -805,7 +815,8 @@ class InnerComp extends Component {
       input,
       idAs,
       handlersObj,
-      asReactSelect
+      asReactSelect,
+      ...rest
     } = this.props;
     if (handlersObj) {
       handlersObj.refetch = tableParams.onRefresh;
@@ -846,7 +857,13 @@ class InnerComp extends Component {
         <TgSelect
           itemListPredicate={(queryString, items) => {
             const currentValuesByKey = keyBy(value, "value");
-            return items.filter(({ value }) => {
+            return items.filter(item => {
+              const { value, __isInputEnt, userCreated } = item;
+              if (userCreated) return false; //don't show user created option as option to select
+              if (__isInputEnt) {
+                //we need to filter it out manually
+                return singleItemPredicate(queryString, item);
+              }
               return !currentValuesByKey[value];
             });
           }}
@@ -858,6 +875,7 @@ class InnerComp extends Component {
           onInputChange={this.handleReactSelectSearch}
           name={passedName}
           {...reactSelectProps}
+          {...rest}
         />
       );
     }
