@@ -88,7 +88,6 @@ class TgSelect extends React.Component {
   };
 
   itemPredicate = (queryString, item) => {
-    const { label } = item;
     const { value, multi } = this.props;
     if (multi) {
       const valArray = getValueArray(value);
@@ -99,16 +98,7 @@ class TgSelect extends React.Component {
       );
       if (filteredVals.length !== valArray.length) return false;
     }
-
-    return fuzzysearch(
-      queryString.toLowerCase(),
-      label
-        ? label.toLowerCase
-          ? label.toLowerCase()
-          : getTextFromEl(label)
-        : (item.value && item.value.toLowerCase && item.value.toLowerCase()) ||
-            ""
-    );
+    return singleItemPredicate(queryString, item);
   };
   onQueryChange = query => {
     const { onInputChange = () => {} } = this.props;
@@ -119,7 +109,10 @@ class TgSelect extends React.Component {
   };
   handleActiveItemChange = (item, isCreateNewItem) => {
     this.setState({
-      activeItem: item || (isCreateNewItem ? getCreateNewItem() : null)
+      activeItem:
+        item ||
+        //if there's no item and we're in creatable mode, auto-select the create-new option
+        (isCreateNewItem || this.props.creatable ? getCreateNewItem() : null)
     });
   };
   onInteraction = () => {
@@ -223,7 +216,8 @@ class TgSelect extends React.Component {
         items={options || []}
         activeItem={
           this.state.activeItem ||
-          (options && options.filter(opt => !selectedItems.includes(opt))[0])
+          (options && options.filter(opt => !selectedItems.includes(opt))[0]) ||
+          null //it's important we pass null here instead of undefined if no active item is found
         }
         itemDisabled={itemDisabled}
         query={this.state.query}
@@ -288,7 +282,7 @@ class TgSelect extends React.Component {
             },
             onRemove: multi ? this.handleTagInputRemove : null,
             rightElement: rightElement,
-            disabled: disabled || isLoading,
+            disabled: disabled, // tg: adding isLoading will cause the input to be blurred when using generic select asReactSelect (don't do it),
             ...tagInputProps, //spread additional tag input props here
             inputProps: {
               onBlur,
@@ -343,3 +337,14 @@ function getTextFromEl(el) {
       }, "")
     : "";
 }
+
+//we export this here for use in createGenericSelect
+export const singleItemPredicate = (queryString, item) =>
+  fuzzysearch(
+    queryString.toLowerCase(),
+    item.label
+      ? item.label.toLowerCase
+        ? item.label.toLowerCase()
+        : getTextFromEl(item.label)
+      : (item.value && item.value.toLowerCase && item.value.toLowerCase()) || ""
+  );

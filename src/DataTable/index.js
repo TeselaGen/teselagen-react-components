@@ -202,6 +202,20 @@ class DataTable extends React.Component {
       }
     }
 
+    // if switching pages or searching the table we want to reset the scrollbar
+    if (tbody.scrollTop > 0) {
+      const { entities = [] } = this.props;
+      const { entities: oldEntities = [] } = oldProps;
+      const reloaded = oldProps.isLoading && !this.props.isLoading;
+      const entitiesHaveChanged =
+        oldEntities.length !== entities.length ||
+        getIdOrCodeOrIndex(entities[0] || {}) !==
+          getIdOrCodeOrIndex(oldEntities[0] || {});
+      if (reloaded || entitiesHaveChanged) {
+        tbody.scrollTop = 0;
+      }
+    }
+
     // comment in to test what is causing re-render
     // Object.entries(this.props).forEach(
     //   ([key, val]) =>
@@ -224,7 +238,7 @@ class DataTable extends React.Component {
   handleCopyRow = rowEl => {
     //takes in a row element
     const text = this.getRowCopyText(rowEl);
-    if (!text) return;
+    if (!text) return window.toastr.warning("No text to copy");
     this.handleCopyHelper(text, "Row Copied");
   };
 
@@ -1102,14 +1116,15 @@ class DataTable extends React.Component {
       isCopyable &&
       (selectedRecords.length === 0 || selectedRecords.length === 1)
     ) {
+      //compute the row here so we don't lose access to it
+      const cell =
+        e.target.querySelector(".tg-cell-wrapper") ||
+        e.target.closest(".tg-cell-wrapper");
+      const row = cell.closest(".rt-tr");
       copyMenuItems.push(
         <MenuItem
           key="copySelectedRows"
           onClick={() => {
-            const cell =
-              e.target.querySelector(".tg-cell-wrapper") ||
-              e.target.closest(".tg-cell-wrapper");
-            const row = cell.closest(".rt-tr");
             this.handleCopyRow(row);
             // loop through each cell in the row
           }}
@@ -1133,15 +1148,18 @@ class DataTable extends React.Component {
     }
     e.persist();
     if (isCopyable) {
+      //compute the cellWrapper here so we don't lose access to it
+
+      const cellWrapper =
+        e.target.querySelector(".tg-cell-wrapper") ||
+        e.target.closest(".tg-cell-wrapper");
       copyMenuItems.push(
         <MenuItem
           key="copyCell"
           onClick={() => {
             //TODOCOPY: we need to make sure that the cell copy is being used by the row copy.. right now we have 2 different things going on
             //do we need to be able to copy hidden cells? It seems like it should just copy what's on the page..?
-            const cellWrapper =
-              e.target.querySelector(".tg-cell-wrapper") ||
-              e.target.closest(".tg-cell-wrapper");
+
             const text = this.getCellCopyText(cellWrapper);
             this.handleCopyHelper(text, "Cell copied");
           }}

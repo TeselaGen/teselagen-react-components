@@ -4,6 +4,7 @@ import { Dialog } from "@blueprintjs/core";
 import { connect } from "react-redux";
 import { lifecycle } from "recompose";
 import uniqid from "uniqid";
+import { camelCase } from "lodash";
 import ResizableDraggableDialog from "../../ResizableDraggableDialog";
 
 /**
@@ -13,6 +14,7 @@ import ResizableDraggableDialog from "../../ResizableDraggableDialog";
  *   withDialog({ title: "Select Aliquot(s) From", other bp dialog props here  })
  * )
  *
+ *
  * in react component
  * import MyDialogEnhancedComponent from "./MyDialogEnhancedComponent"
  *
@@ -20,7 +22,6 @@ import ResizableDraggableDialog from "../../ResizableDraggableDialog";
  *  return <div>
  *    <MyDialogEnhancedComponent
  *      dialogProps={} //bp dialog overrides can go here
- *      dialogName={string} **OPTIONAL** a unique dialog name can optionally be passed
  *      target={<button>Open Dialog</button> } //target can also be passed as a child component
  *      myRandomProp={'yuppp'} //pass any other props like normal to the component
  *
@@ -28,6 +29,18 @@ import ResizableDraggableDialog from "../../ResizableDraggableDialog";
  *  </div>
  * }
  */
+
+//  or programatically:
+// const ProgramaticDialog = withDialog({
+//   dialogName: "programaticDialog", //giving it a unique dialogName means you can
+//   title: "Programatic Dialog Demo"
+// })(DialogInner);
+//
+// add the no target dialog somewhere on the page
+// <ProgramaticDialog></ProgramaticDialog> //this just renders without any target
+//
+// somewhere else on the page:
+// <Button>Click To Open Dialog</Button>
 
 export default function withDialog(topLevelDialogProps) {
   function dialogHoc(WrappedComponent) {
@@ -48,10 +61,12 @@ export default function withDialog(topLevelDialogProps) {
           noTarget,
           isDialogOpen,
           showModal,
+          dialogName,
           onClickRename,
           hideModal,
           fetchPolicy = "network-only",
           children,
+          onCloseHook,
           dialogProps,
           title,
           isDraggable,
@@ -62,16 +77,17 @@ export default function withDialog(topLevelDialogProps) {
           ...topLevelDialogProps,
           ...dialogProps
         };
+        const _onCloseHook = onCloseHook || extraDialogProps.onCloseHook;
         const { noButtonClickPropagate } = {
           ...this.props,
           ...extraDialogProps
         };
         const isOpen = isDialogOpen || extraDialogProps.isOpen;
         const targetEl = target || children;
-        if (!targetEl && !noTarget)
-          throw new Error(
-            "withDialog error: Please provide a target or child element to the withDialog() enhanced component. If you really don't want a target, please pass a 'noTarget=true' prop"
-          );
+        // if (!targetEl && !dialogName)
+        //   throw new Error(
+        //     "withDialog error: Please provide a target or child element to the withDialog() enhanced component. If you really don't want a target, please pass a 'noTarget=true' prop"
+        //   );
         const DialogToUse =
           isDraggable || extraDialogProps.isDraggable
             ? ResizableDraggableDialog
@@ -82,7 +98,9 @@ export default function withDialog(topLevelDialogProps) {
               <DialogToUse
                 onClose={function() {
                   hideModal();
+                  _onCloseHook && _onCloseHook();
                 }}
+                className={dialogName || camelCase()}
                 title={title}
                 isOpen={isOpen}
                 canEscapeKeyClose={false}
@@ -117,7 +135,7 @@ export default function withDialog(topLevelDialogProps) {
 
   return compose(
     connect(({ tg_modalState }) => {
-      return { tg_modalState };
+      return { ...topLevelDialogProps, tg_modalState };
     }),
     lifecycle({
       componentWillMount: function() {
@@ -141,7 +159,6 @@ export default function withDialog(topLevelDialogProps) {
       function({ tg_modalState }, { nameToUse, uniqueName }) {
         const dialogState = tg_modalState[nameToUse] || {};
         const { open, __registeredAs, ...rest } = dialogState;
-
         const newProps = {
           ...rest,
           isDialogOpen:

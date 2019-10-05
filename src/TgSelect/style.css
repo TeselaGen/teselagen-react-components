@@ -14,10 +14,6 @@
   text-overflow: ellipsis;
 }
 
-.tg-select-value {
-  width: 60%;
-}
-
 .tg-single-select input {
   position: absolute;
   top: 5px;

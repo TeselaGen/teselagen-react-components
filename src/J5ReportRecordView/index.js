@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import { reduxForm } from "redux-form";
 import { Button, Dialog, Classes, Colors } from "@blueprintjs/core";
 import { getApolloMethods } from "@teselagen/apollo-methods";
-import { each, get, startCase, times, zip, flatten, noop } from "lodash";
+import { get, startCase, times, zip, flatten, noop } from "lodash";
 import moment from "moment";
 import papaparse from "papaparse";
 import { ApolloConsumer } from "react-apollo";
@@ -32,6 +32,7 @@ class J5ReportRecordView extends Component {
   state = {
     linkDialogName: undefined,
     partCidMap: {},
+    exportingCsv: false,
     loadingExportOligos: false
   };
   showLinkModal = name => {
@@ -82,27 +83,27 @@ class J5ReportRecordView extends Component {
     magicDownload(csvString, `Oligo_Synthesis_${data.j5Report.name}.csv`);
   };
 
-  downloadCSV = () => {
-    const entitiesForAllTables = this.getEntitiesForAllTables();
-    let csvString = "";
-    each(schemas, (schema, modelType) => {
-      const entities = entitiesForAllTables[modelType];
-      const tableCsvString = papaparse.unparse(
-        entities.map(row => {
-          return schema.fields.reduce((acc, field) => {
-            acc[field.displayName || field.path] = get(row, field.path);
-            return acc;
-          }, {});
-        })
-      );
-      csvString +=
-        startCase(modelType).replace("J 5", "j5") +
-        "\n" +
-        tableCsvString +
-        "\n\n";
-    });
-    magicDownload(csvString, "j5_Report.csv");
-  };
+  // downloadCSV = () => {
+  //   const entitiesForAllTables = this.getEntitiesForAllTables();
+  //   let csvString = "";
+  //   each(schemas, (schema, modelType) => {
+  //     const entities = entitiesForAllTables[modelType];
+  //     const tableCsvString = papaparse.unparse(
+  //       entities.map(row => {
+  //         return schema.fields.reduce((acc, field) => {
+  //           acc[field.displayName || field.path] = get(row, field.path);
+  //           return acc;
+  //         }, {});
+  //       })
+  //     );
+  //     csvString +=
+  //       startCase(modelType).replace("J 5", "j5") +
+  //       "\n" +
+  //       tableCsvString +
+  //       "\n\n";
+  //   });
+  //   magicDownload(csvString, "j5_Report.csv");
+  // };
 
   // getEntitiesForAllTables = () => {
   //   const { data } = this.props;
@@ -136,14 +137,26 @@ class J5ReportRecordView extends Component {
   //   };
   // };
 
+  onExportAsCsvClick = async () => {
+    this.setState({
+      exportingCsv: true
+    });
+    await this.props.onExportAsCsvClick();
+    this.setState({
+      exportingCsv: false
+    });
+  };
+
   renderDownloadButton = () => {
     // option to override export handler
     const { onExportAsCsvClick } = this.props;
-    return (
-      <Button onClick={onExportAsCsvClick || this.downloadCSV}>
-        Export as CSV
-      </Button>
-    );
+    if (onExportAsCsvClick) {
+      return (
+        <Button loading={this.state.exportingCsv} onClick={onExportAsCsvClick}>
+          Export as CSV
+        </Button>
+      );
+    }
   };
 
   renderDownloadOligoButton = () => {
@@ -263,7 +276,7 @@ class J5ReportRecordView extends Component {
       <span className="j5-report-fieldname">Parameter Preset:</span>{" "}
       {assemblyType}
     </div> */}
-        <div className={Classes.BUTTON_GROUP} style={{ marginTop: 10 }}>
+        <div style={{ marginTop: 10 }}>
           {this.renderDownloadButton()}
           {additionalHeaderButtons}
           {LinkJ5TableDialog && !LinkJ5ReportButton && (

@@ -369,7 +369,9 @@ store,
     demo: WithDialog,
     scope: {
       renderToggle,
-      Classes
+      Classes,
+      Provider,
+      store,
     }
   },
   toastr: {

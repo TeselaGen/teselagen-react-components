@@ -90,3 +90,4 @@ export { default as showProgressToast } from "./utils/showProgressToast";
 export { default as ScrollToTop } from "./ScrollToTop";
 const noop = () => undefined;
 export { noop };
+export { default as showDialogOnDocBody } from "./showDialogOnDocBody";

@@ -401,10 +401,14 @@ function parseFilters(newParams) {
       newParams.filters &&
       newParams.filters.split("::").map(filter => {
         const splitFilter = filter.split("__");
+        const [filterOn, selectedFilter, filterValue] = splitFilter;
         return {
-          filterOn: splitFilter[0],
-          selectedFilter: splitFilter[1],
-          filterValue: safeParse(splitFilter[2])
+          filterOn,
+          selectedFilter,
+          filterValue:
+            // for inList filters safeParse will convert two id values to a single number.
+            // ex. "9.10" will become 9.1 which would completely mess up our filter
+            selectedFilter === "inList" ? filterValue : safeParse(filterValue)
         };
       })
   };

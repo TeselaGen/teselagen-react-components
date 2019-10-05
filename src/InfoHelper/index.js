@@ -31,7 +31,8 @@ export default class InfoHelper extends Component {
     let toReturn;
     const toolTipOrPopoverProps = {
       disabled: disabled,
-      popoverClassName: !noPopoverSizing && " bp3-popover-content-sizing",
+      popoverClassName:
+        isPopover && !noPopoverSizing && " bp3-popover-content-sizing",
       content: content || children,
       modifiers: {
         preventOverflow: { enabled: false },

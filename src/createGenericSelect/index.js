@@ -3,7 +3,7 @@ import { get, isEqual, noop, pick, debounce, keyBy } from "lodash";
 import pluralize from "pluralize";
 import { Query } from "react-apollo";
 import React, { Component } from "react";
-import { compose } from "react-apollo";
+import { compose } from "recompose";
 import { connect } from "react-redux";
 import { withQuery } from "@teselagen/apollo-methods";
 import { branch, withProps } from "recompose";
@@ -16,7 +16,7 @@ import withDialog from "../enhancers/withDialog";
 import withTableParams from "../DataTable/utils/withTableParams";
 import DataTable from "../DataTable";
 import { withAbstractWrapper } from "../FormComponents";
-import TgSelect from "../TgSelect";
+import TgSelect, { singleItemPredicate } from "../TgSelect";
 
 function preventBubble(e) {
   e.stopPropagation();
@@ -49,14 +49,17 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
     // noRemoveButton=false - set to true to not have the option to remove the selection
     // fragment - the fragment powering the lookup/datatable
     // dialogProps - any dialog overrides you might want to make
+    // dialogFooterProps - any dialogFooter overrides you might want to make
     // additionalDataFragment - optional fragment for fetching more data based on the initially selected data
     // postSelectDTProps - props passed to the DataTable shown after select. If none are passed the DataTable isn't shown
     // onSelect - optional callback for doing things with the selected data
     //
+
     // ################################   asReactSelect   ################################
     // idAs="id" - use this to get the TgSelect to use some other property as the "value" aka idAs="code" for code based selects
     // asReactSelect - optionally make the generic select a simple TgSelect component instead of the default datatables
     // reactSelectProps - optionally pass additional props to the TgSelect
+    // ...rest - all additional props will be passed to the TgSelect
     // ** preventing unselect if you don't want a certain option to be unselected ever, you can pass initialValues with a property called clearableValue  entity.clearableValue,
     branch(
       props => props.noForm,
@@ -582,6 +585,7 @@ const GenericSelectInner = compose(
         "fragment",
         "passedName",
         "queryOptions",
+        "dialogFooterProps",
         "tableParamOptions"
       ];
       if (
@@ -599,11 +603,13 @@ const GenericSelectInner = compose(
         tableParamOptions,
         isCodeModel
       } = this.props;
+
       this.innerComponent = compose(
         withTableParams({
           formName: passedName + "DataTable",
           withSelectedEntities: true,
           noOrderError: true,
+          isCodeModel,
           doNotCoercePageSize: true,
           defaults: {
             order: ["-modified"]
@@ -649,17 +655,22 @@ class InnerComp extends Component {
     const inputIds = [];
     const inputEntities = [];
     if (input.value) {
-      (Array.isArray(input.value) ? input.value : [input.value]).forEach(e => {
-        inputIds.push(e[idAs || "id"]);
-        inputEntities.push(e);
-      });
+      (Array.isArray(input.value) ? input.value : [input.value]).forEach(
+        ent => {
+          inputIds.push(ent[idAs || "id"]);
+          inputEntities.push(ent);
+        }
+      );
     }
 
+    //here we need to append "inputEntities" to our regular list of entities
+    //input entities can be initialValues
+    //it is important that we spread inputEntities second as the initialValues might not yet be loaded by the default table query
     const entities = [
       ...(tableParams.entities || []).filter(
-        e => !inputIds.includes(e[idAs || "id"])
+        ent => !inputIds.includes(ent[idAs || "id"])
       ),
-      ...inputEntities
+      ...inputEntities.map(ent => ({ ...ent, __isInputEnt: true }))
     ];
     if (!entities.length) return [];
     const lastItem = [];
@@ -685,6 +696,7 @@ class InnerComp extends Component {
 
     const entityOptions = entities.map(entity => {
       return {
+        ...pick(entity, ["__isInputEnt", "userCreated"]),
         clearableValue: entity.clearableValue,
         value: entity[idAs || "id"],
         label: (
@@ -740,6 +752,9 @@ class InnerComp extends Component {
     this.props.tableParams.setSearchTerm(val);
   }, 250);
   handleReactSelectSearch = val => {
+    this.setState({
+      reactSelectQueryString: val
+    });
     this.handleReactSelectSearchDebounced(val);
     return val; //return val for react-select to work properly
   };
@@ -773,8 +788,9 @@ class InnerComp extends Component {
         const records = (Array.isArray(valOrVals)
           ? valOrVals
           : [valOrVals]
-        ).map(({ value }) => {
-          return entitiesById[value];
+        ).map(val => {
+          const { value, userCreated } = val;
+          return userCreated ? val : entitiesById[value];
         });
         handleSelection(records);
       }
@@ -792,13 +808,15 @@ class InnerComp extends Component {
       additionalTableProps,
       readableName,
       minSelected,
+      dialogFooterProps,
       mustSelect,
       reactSelectProps,
       passedName,
       input,
       idAs,
       handlersObj,
-      asReactSelect
+      asReactSelect,
+      ...rest
     } = this.props;
     if (handlersObj) {
       handlersObj.refetch = tableParams.onRefresh;
@@ -839,7 +857,13 @@ class InnerComp extends Component {
         <TgSelect
           itemListPredicate={(queryString, items) => {
             const currentValuesByKey = keyBy(value, "value");
-            return items.filter(({ value }) => {
+            return items.filter(item => {
+              const { value, __isInputEnt, userCreated } = item;
+              if (userCreated) return false; //don't show user created option as option to select
+              if (__isInputEnt) {
+                //we need to filter it out manually
+                return singleItemPredicate(queryString, item);
+              }
               return !currentValuesByKey[value];
             });
           }}
@@ -851,6 +875,7 @@ class InnerComp extends Component {
           onInputChange={this.handleReactSelectSearch}
           name={passedName}
           {...reactSelectProps}
+          {...rest}
         />
       );
     }
@@ -893,6 +918,7 @@ class InnerComp extends Component {
               ? pluralize(readableName)
               : readableName)
           }
+          {...dialogFooterProps}
         />
       </div>
     );

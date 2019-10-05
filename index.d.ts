@@ -67,6 +67,16 @@ export function withUpsert(
 
 export function noop(): void;
 
+interface showDialogOnDocBodyOptions = {
+  /**
+   *  * @property {boolean} addDialogContainer - add a dialog to this
+   */
+  addDialogContainer: false
+}
+export function showDialogOnDocBody(DialogComp, showDialogOnDocBodyOptions): void;
+
+
+
 /**
  * Note all these options can be passed at Design Time or at Runtime (like reduxForm())
  */
@@ -359,7 +369,20 @@ export interface InputFieldProps extends GenericFormFieldProps {
 declare class FileUploadField extends React.Component<FileUploadFieldProps, any> { }
 
 export interface FileUploadFieldProps extends GenericFormFieldProps {
-
+  innerIcon: "string";
+  innerText: "string";
+  accept: string | array;
+  contentOverride: function;
+  action: string: ;
+  className: string;
+  fileLimit: integer;
+  readBeforeUpload: boolean;
+  showUploadList: boolean;
+  fileListItemRenderer: function;
+  onFileClick: function;
+  dropzoneProps: object;
+  showFilesCount: boolean;
+  S3Params: object;
 }
 // DateInputField
 declare class DateInputField extends React.Component<DateInputFieldProps, any> { }
@@ -585,6 +608,133 @@ export interface TreeProps {
   marginRight: number;
   marginBottom: number;
 }
+
+
+/**
+ *
+ * useage example:
+ * <GenericSelect {...{
+ *   name: "selectedWorklists" - the field name within the redux form Field
+ *   isMultiSelect: true,
+ *   schema: ["name", "lastModified"],
+ *   fragment: worklistMinimalFragment,
+ *   additionalDataFragment: worklistFragment,
+ * }}/>
+
+ * if you want initialValues, simply pass them to the reduxForm wrapped component like:
+ * {
+ *   initialValues: {
+ *     selectedWorklists: [{id: 1, name: "worklist1"}]
+ *   }
+ * }
+
+ *options:
+ * name - the field name of the redux form Field!
+ * schema - the schema for the data table
+ * getButtonText(selectedEntities) - function to override the button text if necessary
+ * isMultiSelect=false - do you want users to be able to select multiple entities or just one
+ * noDialog=false - set to true to not have the selector show up in a dialog
+ * noRemoveButton=false - set to true to not have the option to remove the selection
+ * fragment - the fragment powering the lookup/datatable
+ * dialogProps - any dialog overrides you might want to make
+ * dialogFooterProps - any dialogFooter overrides you might want to make
+ * additionalDataFragment - optional fragment for fetching more data based on the initially selected data
+ * postSelectDTProps - props passed to the DataTable shown after select. If none are passed the DataTable isn't shown
+ * onSelect - optional callback for doing things with the selected data
+ *
+
+ * ################################   asReactSelect   ################################
+ * idAs="id" - use this to get the TgSelect to use some other property as the "value" aka idAs="code" for code based selects
+ * asReactSelect - optionally make the generic select a simple TgSelect component instead of the default datatables
+ * reactSelectProps - optionally pass additional props to the TgSelect
+ * ** preventing unselect if you don't want a certain option to be unselected ever, you can pass initialValues with a property called clearableValue  entity.clearableValue,
+ */
+declare class GenericSelect extends React.Component<GenericSelectProps, any> { }
+
+
+export interface GenericSelectProps {
+  /**
+   *  the field name of the redux form Field!
+   */
+  name
+  /**
+   *  the schema for the data table
+   */
+  schema
+  /**
+   * takes in (selectedEntities) function to override the button text if necessary
+   */
+  getButtonText
+  /**
+   * default=false do you want users to be able to select multiple entities or just one
+   */
+  isMultiSelect
+  /**
+   * default=false set to true to not have the selector show up in a dialog
+   */
+  noDialog
+  /**
+   * default=false set to true to not have the option to remove the selection
+   */
+  noRemoveButton
+  /**
+   *  the fragment powering the lookup/datatable
+   */
+  fragment
+  /**
+   *  any dialog overrides you might want to make
+   */
+  dialogProps
+  /**
+   *  any dialogFooter overrides you might want to make
+   */
+  dialogFooterProps
+  /**
+   *  optional fragment for fetching more data based on the initially selected data
+   */
+  additionalDataFragment
+  /**
+   *  props passed to the DataTable shown after select. If none are passed the DataTable isn't shown
+   */
+  postSelectDTProps
+  /**
+   *  optional callback for doing things with the selected data
+   */
+  onSelect
+  /**
+     * optionally make the generic select a simple TgSelect component instead of the default datatables
+     */
+  asReactSelect: boolean;
+  /**
+   * default="id" use this to get the TgSelect to use some other property as the "value" aka idAs="code" for code based selects
+   */
+  idAs: string;
+  /**
+   * optionally pass additional props to the TgSelect
+   */
+  reactSelectProps: reactSelectProps;
+}
+
+declare function createGenericSelect(options: CreateGenericSelectOptions) {
+  return GenericSelect
+}
+
+interface CreateGenericSelectOptions {
+  /**
+   * @property {function} modelNameToReadableName - a function that takes in a model name and spits out a human readable name
+   *
+   */
+  modelNameToReadableName: function;
+}
+interface reactSelectProps {
+  /**
+   * allow the user to create new values
+   */
+  creatable: boolean;
+}
+
+
+
 
 
 //Todo: 

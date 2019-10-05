@@ -154,7 +154,6 @@ class AbstractInput extends React.Component {
         className={classNames(className, testClassName, {
           "tg-tooltipError": tooltipError
         })}
-        // data-test={}
         disabled={disabled}
         helperText={!tooltipError && showError && error}
         intent={intent}
