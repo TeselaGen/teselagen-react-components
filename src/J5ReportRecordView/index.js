@@ -479,26 +479,30 @@ class J5ReportRecordView extends Component {
             helperMessage="Constructs are the desired sequences to be built in a j5 run."
             title="Assembled Constructs"
             processData={processDataForTables.j5RunConstruct}
-            SubComponent={rowData => (
-              <div
-                className="tg-test-warning-box"
-                style={{ marginLeft: "2em", marginTop: "2em" }}
-              >
-                <div style={{ fontSize: "1.5em", color: Colors.GOLD3 }}>
-                  {"Warnings:"}
-                </div>
-                <br />
-                {rowData.original.j5LogMessages.map((log, i) => (
-                  <div
-                    key={Date.now() + i}
-                    style={{
-                      padding: "1em",
-                      fontSize: "1em"
-                    }}
-                  >{`• ${log.message}`}</div>
-                ))}
-              </div>
-            )}
+            SubComponent={
+              j5Report.version
+                ? rowData => (
+                    <div
+                      className="tg-test-warning-box"
+                      style={{ marginLeft: "2em", marginTop: "2em" }}
+                    >
+                      <div style={{ fontSize: "1.5em", color: Colors.GOLD3 }}>
+                        {"Warnings:"}
+                      </div>
+                      <br />
+                      {rowData.original.j5LogMessages.map((log, i) => (
+                        <div
+                          key={Date.now() + i}
+                          style={{
+                            padding: "1em",
+                            fontSize: "1em"
+                          }}
+                        >{`• ${log.message}`}</div>
+                      ))}
+                    </div>
+                  )
+                : null
+            }
             entities={
               get(j5Report, "j5RunConstructs[0].isPrebuilt") !== null &&
               !fragmentMap.j5RunConstruct
