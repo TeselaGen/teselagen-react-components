@@ -156,7 +156,7 @@ class TgSelect extends React.Component {
       noResultsText,
       noResults = noResultsDefault,
       inputProps,
-      placeholder = "Select...",
+      placeholder,
       isLoading,
       onBlur,
       disabled,
@@ -273,7 +273,8 @@ class TgSelect extends React.Component {
             inputRef: n => {
               if (n) this.input = n;
             },
-            placeholder,
+            placeholder:
+              placeholder || creatable ? "Select/Create..." : "Select...",
             tagProps: {
               intent: "primary",
               minimal: true,
