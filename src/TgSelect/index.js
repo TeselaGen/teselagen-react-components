@@ -274,7 +274,7 @@ class TgSelect extends React.Component {
               if (n) this.input = n;
             },
             placeholder:
-              placeholder || creatable ? "Select/Create..." : "Select...",
+              placeholder || (creatable ? "Select/Create..." : "Select..."),
             tagProps: {
               intent: "primary",
               minimal: true,
