@@ -16,6 +16,9 @@ module.exports = {
       // "ve-sequence-utils":
       //   console.log("comment me back out!") ||
       //   path.resolve("../../ve-sequence-utils/src/"),
+      // "@teselagen/react-table":
+      //   console.log("comment me back out!") ||
+      //   path.resolve("../react-table/src/"),
       // "bio-parsers":
       //   console.log("comment me back out!") ||
       //   path.resolve("../../ve-sequence-parsers/src/parsers/"),
