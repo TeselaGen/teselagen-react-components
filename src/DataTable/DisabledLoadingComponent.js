@@ -1,5 +1,5 @@
 import React from "react";
-import { ReactTableDefaults } from "react-table";
+import { ReactTableDefaults } from "@teselagen/react-table";
 const { LoadingComponent } = ReactTableDefaults;
 
 function DisabledLoadingComponent({ disabled, loading, loadingText }) {

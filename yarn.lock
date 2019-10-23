@@ -257,6 +257,21 @@
   dependencies:
     pascal-case "^2.0.1"
 
+"@teselagen/react-list@0.8.16":
+  version "0.8.16"
+  resolved "https://registry.yarnpkg.com/@teselagen/react-list/-/react-list-0.8.16.tgz#27bd62a714c20c418d14b58225cef47473064c2c"
+  integrity sha512-ooXRYIRaQN0QE7QV2U2/FZ2SACVAXHACfCFJqckeLauaqv7tgUBX95aV9NlPNtVwODmOMoaHXDVla/4fFgWVoQ==
+  dependencies:
+    prop-types "15"
+
+"@teselagen/react-table@^6.10.1":
+  version "6.10.1"
+  resolved "https://registry.yarnpkg.com/@teselagen/react-table/-/react-table-6.10.1.tgz#ae14dfc15975caf78de48af059446c5c562c619a"
+  integrity sha512-NxP/Jm8a0sZjhw76XM3D/JrBAD1wxeevQFNL4qa0ByLCsuSeo3wjnq4zznnCvQXnyGddderDq4gbv+YsMmTkHg==
+  dependencies:
+    "@teselagen/react-list" "0.8.16"
+    classnames "^2.2.5"
+
 "@types/dom4@^2.0.1":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@types/dom4/-/dom4-2.0.1.tgz#506d5781b9bcab81bd9a878b198aec7dee2a6033"
@@ -9659,7 +9674,7 @@ prop-types-exact@^1.2.0:
     object.assign "^4.1.0"
     reflect.ownkeys "^0.2.0"
 
-prop-types@^15.5.10, prop-types@^15.5.7, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@15, prop-types@^15.5.10, prop-types@^15.5.7, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -10114,13 +10129,6 @@ react-sortable-hoc@^0.6.8:
     invariant "^2.2.1"
     lodash "^4.12.0"
     prop-types "^15.5.7"
-
-react-table@^6.8.0:
-  version "6.10.0"
-  resolved "https://registry.yarnpkg.com/react-table/-/react-table-6.10.0.tgz#20444b19d8ca3c1a08e7544e5c3a93e4ba56690e"
-  integrity sha512-s/mQLI1+mNvlae45MfAZyZ04YIT3jUzWJqx34s0tfwpDdgJkpeK6vyzwMUkKFCpGODBxpjBOekYZzcEmk+2FiQ==
-  dependencies:
-    classnames "^2.2.5"
 
 react-test-renderer@^16.0.0-0, react-test-renderer@^16.5.0:
   version "16.9.0"

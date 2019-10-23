@@ -18,7 +18,7 @@ import {
   isEmpty
 } from "lodash";
 
-const pageSizes = [5, 10, 15, 25, 50, 100, 200];
+const pageSizes = [5, 10, 15, 25, 50, 100, 200, 400];
 
 export { pageSizes };
 

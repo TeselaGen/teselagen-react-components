@@ -480,28 +480,43 @@ class J5ReportRecordView extends Component {
             title="Assembled Constructs"
             processData={processDataForTables.j5RunConstruct}
             SubComponent={
-              j5Report.version
-                ? rowData => (
-                    <div
-                      className="tg-test-warning-box"
-                      style={{ marginLeft: "2em", marginTop: "2em" }}
-                    >
-                      <div style={{ fontSize: "1.5em", color: Colors.GOLD3 }}>
-                        {"Warnings:"}
-                      </div>
-                      <br />
-                      {rowData.original.j5LogMessages.map((log, i) => (
+              !j5Report.version
+                ? null
+                : rowData => {
+                    if (rowData.original.j5LogMessages.length === 0)
+                      return (
                         <div
-                          key={Date.now() + i}
                           style={{
-                            padding: "1em",
-                            fontSize: "1em"
+                            marginLeft: "2em",
+                            marginTop: "0.5em",
+                            fontSize: "1.3em",
+                            color: Colors.GREEN3
                           }}
-                        >{`• ${log.message}`}</div>
-                      ))}
-                    </div>
-                  )
-                : null
+                        >
+                          No warnings or errors for this construct
+                        </div>
+                      );
+                    return (
+                      <div
+                        className="tg-test-warning-box"
+                        style={{ marginLeft: "2em", marginTop: "1em" }}
+                      >
+                        <div style={{ fontSize: "1.5em", color: Colors.GOLD3 }}>
+                          {"Warnings:"}
+                        </div>
+                        <br />
+                        {rowData.original.j5LogMessages.map((log, i) => (
+                          <div
+                            key={Date.now() + i}
+                            style={{
+                              padding: "1em",
+                              fontSize: "1em"
+                            }}
+                          >{`• ${log.message}`}</div>
+                        ))}
+                      </div>
+                    );
+                  }
             }
             entities={
               get(j5Report, "j5RunConstructs[0].isPrebuilt") !== null &&

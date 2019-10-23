@@ -1,6 +1,6 @@
 {
   "name": "teselagen-react-components",
-  "version": "27.2.2",
+  "version": "28.0.0",
   "description": "Teselagen React Component Library",
   "main": "lib/index.js",
   "types": "./index.d.ts",
@@ -27,6 +27,7 @@
     "test": "yarn cypress run"
   },
   "dependencies": {
+    "@teselagen/react-table": "^6.10.1",
     "classnames": "^2.2.6",
     "copy-to-clipboard": "^3.0.8",
     "cross-env": "^5.2.0",
@@ -72,7 +73,7 @@
     "react-dom": "*",
     "react-redux": "^5.0.4",
     "react-router-dom": "^4.1.1",
-    "react-table": "^6",
+    "@teselagen/react-table": "^6",
     "redux-form": "^7.3.0",
     "tg-client-query-builder": "^2.6.0",
     "ve-range-utils": "^2.5.0"
@@ -115,7 +116,7 @@
     "react-markdown": "^4.0.8",
     "react-redux": "^5.0.7",
     "react-router-dom": "^4.3.1",
-    "react-table": "^6.8.0",
+    "@teselagen/react-table": "^6.8.0",
     "react-test-renderer": "^16.5.0",
     "react-transition-group": "^2.4.0",
     "redux-form": "^7.4.2",

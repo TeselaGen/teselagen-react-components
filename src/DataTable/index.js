@@ -35,7 +35,7 @@ import classNames from "classnames";
 import scrollIntoView from "dom-scroll-into-view";
 import { SortableElement } from "react-sortable-hoc";
 import { BooleanValue } from "react-values";
-import ReactTable from "react-table";
+import ReactTable from "@teselagen/react-table";
 import { withProps, branch } from "recompose";
 import InfoHelper from "../InfoHelper";
 import { getSelectedRowsFromEntities } from "./utils/selection";
