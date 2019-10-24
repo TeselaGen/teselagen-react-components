@@ -720,6 +720,8 @@ declare function createGenericSelect(options: CreateGenericSelectOptions) {
   return GenericSelect
 }
 
+declare function withSelectedEntities(tableName: string) {}
+
 interface CreateGenericSelectOptions {
   /**
    * @property {function} modelNameToReadableName - a function that takes in a model name and spits out a human readable name
