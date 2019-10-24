@@ -251,6 +251,7 @@ export interface DataTableProps {
   hidePageSizeWhenPossible: boolean;
   doNotShowEmptyRows: boolean;
   withTitle: boolean;
+  withCheckboxes: boolean;
   withSearch: boolean;
   withPaging: boolean;
   isInfinite: boolean;
