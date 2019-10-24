@@ -246,6 +246,7 @@ export interface DataTableProps {
   tableName: string;
   isLoading: boolean;
   searchTerm: string;
+  noRowsFoundMessage: string;
   setSearchTerm: function;
   clearFilters: function;
   hidePageSizeWhenPossible: boolean;
@@ -720,7 +721,18 @@ declare function createGenericSelect(options: CreateGenericSelectOptions) {
   return GenericSelect
 }
 
-declare function withSelectedEntities(tableName: string) {}
+/**
+ *
+ * @param {*string} formName
+ * @param {*string} formName
+ * @param {*string} formName
+ * @param {*string} ...etc
+ * @example
+ * withSelectedEntities("sequenceTable")
+ * //adds a new prop sequenceTableSelectedEntities 
+ * //generically : `${formName}SelectedEntities` 
+ */
+declare function withSelectedEntities(tableName: string, tableName2: string) {}
 
 interface CreateGenericSelectOptions {
   /**
