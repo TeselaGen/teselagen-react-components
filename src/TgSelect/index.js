@@ -78,11 +78,13 @@ class TgSelect extends React.Component {
   };
 
   handleClear = e => {
+    const { multi } = this.props;
+
     e.stopPropagation();
     e.preventDefault();
     const { onChange } = this.props;
     this.setState({ query: "" });
-    onChange([]);
+    onChange(multi ? [] : null);
     this.setState({ isOpen: false });
     this.input.focus();
   };
