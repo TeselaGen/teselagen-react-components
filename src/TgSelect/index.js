@@ -162,6 +162,7 @@ class TgSelect extends React.Component {
       isLoading,
       onBlur,
       disabled,
+      popoverProps,
       ...rest
     } = this.props;
 
@@ -232,7 +233,8 @@ class TgSelect extends React.Component {
           usePortal: false,
           canEscapeKeyClose: true,
           onInteraction: this.onInteraction,
-          isOpen: this.state.isOpen
+          isOpen: this.state.isOpen,
+          ...popoverProps
         }}
         onKeyDown={e => {
           const { which } = e;
