@@ -230,8 +230,19 @@ export interface CollapsibleCardProps {
   openTitleElements: boolean;
   initialClosed: boolean;
 }
+
+declare class CmdCheckbox extends React.Component<CmdProps, any> { }
+declare class CmdSwitch extends React.Component<CmdProps, any> { }
+declare class CmdDiv extends React.Component<CmdProps, any> { }
+declare class CmdButton extends React.Component<CmdProps, any> { }
+
+export interface CmdProps {
+  prefix: string;
+  cmd: function;
+}
 // DNALoader
 declare class DNALoader extends React.Component<DNALoaderProps, any> { }
+
 
 export interface DNALoaderProps {
   style: object;
@@ -732,7 +743,7 @@ declare function createGenericSelect(options: CreateGenericSelectOptions) {
  * //adds a new prop sequenceTableSelectedEntities 
  * //generically : `${formName}SelectedEntities` 
  */
-declare function withSelectedEntities(tableName: string, tableName2: string) {}
+declare function withSelectedEntities(tableName: string, tableName2: string) { }
 
 interface CreateGenericSelectOptions {
   /**
