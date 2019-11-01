@@ -130,11 +130,15 @@ interface ToastrFunc {
    *    you can also chain them using a unique key
    *    window.toastr.info("Sequence Saving", {key: "seqSave"})
    *    window.toastr.success("Sequence Saved!", {key: "seqSave"})
+   *    window.toastr.success("Sequence Saved!", {timeout: 10000}) //wait longer or shorter to clear the toast
+   *    window.toastr.success("Sequence Saved!", {icon: "chat"})
    */
   (message: string, options: ToastrFuncOptions): void;
 }
 
 interface ToastrFuncOptions {
+  icon: string;
+  timeout: number;
   /**
    * defaults to false, set this only if you're also using a key option and you want to
    * have the timeout be refreshed
@@ -775,4 +779,3 @@ interface reactSelectProps {
 // showConfirmationDialog
 // showLoadingMask
 // style
-// toastr
