@@ -264,10 +264,10 @@
   dependencies:
     prop-types "15"
 
-"@teselagen/react-table@^6.10.8":
-  version "6.10.8"
-  resolved "https://registry.yarnpkg.com/@teselagen/react-table/-/react-table-6.10.8.tgz#7f5d51639ace7de1bea57f998dd38d377da9d091"
-  integrity sha512-aOsNGs613YoWZDYLYSkad7kCNk8u70ZxyPUrPIW/M5C1f9xDJzhLoMzvlCt7dXU+/AzOP0xvCoQeXMGUkxoSTw==
+"@teselagen/react-table@^6.10.9":
+  version "6.10.9"
+  resolved "https://registry.yarnpkg.com/@teselagen/react-table/-/react-table-6.10.9.tgz#9b361b16a41612c7e75addf7f41459bdef520c28"
+  integrity sha512-4txApK3EKGng3xHSMpQ8aSLRAm3x7vrerxVS/X6VGq+E17vxz1APmsoy7MU7QANLxHusfKz1JPYBwCbZs2m2Ww==
   dependencies:
     "@teselagen/react-list" "0.8.18"
     classnames "^2.2.5"
