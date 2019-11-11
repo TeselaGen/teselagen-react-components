@@ -417,6 +417,7 @@ class DataTable extends React.Component {
       showCount,
       isSingleSelect,
       noSelect,
+      noRowsFoundMessage,
       SubComponent,
       shouldShowSubComponent,
       ReactTableProps = {},
@@ -671,7 +672,9 @@ class DataTable extends React.Component {
           ThComponent={this.getThComponent}
           getTrGroupProps={this.getTableRowProps}
           NoDataComponent={({ children }) =>
-            isLoading ? null : <div className="rt-noData">{children}</div>
+            isLoading ? null : (
+              <div className="rt-noData">{noRowsFoundMessage || children}</div>
+            )
           }
           LoadingComponent={props => (
             <DisabledLoadingComponent {...{ ...props, disabled }} />

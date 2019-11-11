@@ -78,11 +78,13 @@ class TgSelect extends React.Component {
   };
 
   handleClear = e => {
+    const { multi } = this.props;
+
     e.stopPropagation();
     e.preventDefault();
     const { onChange } = this.props;
     this.setState({ query: "" });
-    onChange([]);
+    onChange(multi ? [] : null);
     this.setState({ isOpen: false });
     this.input.focus();
   };
@@ -160,6 +162,7 @@ class TgSelect extends React.Component {
       isLoading,
       onBlur,
       disabled,
+      popoverProps,
       ...rest
     } = this.props;
 
@@ -230,7 +233,8 @@ class TgSelect extends React.Component {
           usePortal: false,
           canEscapeKeyClose: true,
           onInteraction: this.onInteraction,
-          isOpen: this.state.isOpen
+          isOpen: this.state.isOpen,
+          ...popoverProps
         }}
         onKeyDown={e => {
           const { which } = e;

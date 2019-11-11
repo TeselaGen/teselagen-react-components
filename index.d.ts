@@ -130,11 +130,15 @@ interface ToastrFunc {
    *    you can also chain them using a unique key
    *    window.toastr.info("Sequence Saving", {key: "seqSave"})
    *    window.toastr.success("Sequence Saved!", {key: "seqSave"})
+   *    window.toastr.success("Sequence Saved!", {timeout: 10000}) //wait longer or shorter to clear the toast
+   *    window.toastr.success("Sequence Saved!", {icon: "chat"})
    */
   (message: string, options: ToastrFuncOptions): void;
 }
 
 interface ToastrFuncOptions {
+  icon: string;
+  timeout: number;
   /**
    * defaults to false, set this only if you're also using a key option and you want to
    * have the timeout be refreshed
@@ -230,8 +234,19 @@ export interface CollapsibleCardProps {
   openTitleElements: boolean;
   initialClosed: boolean;
 }
+
+declare class CmdCheckbox extends React.Component<CmdProps, any> { }
+declare class CmdSwitch extends React.Component<CmdProps, any> { }
+declare class CmdDiv extends React.Component<CmdProps, any> { }
+declare class CmdButton extends React.Component<CmdProps, any> { }
+
+export interface CmdProps {
+  prefix: string;
+  cmd: function;
+}
 // DNALoader
 declare class DNALoader extends React.Component<DNALoaderProps, any> { }
+
 
 export interface DNALoaderProps {
   style: object;
@@ -246,11 +261,13 @@ export interface DataTableProps {
   tableName: string;
   isLoading: boolean;
   searchTerm: string;
+  noRowsFoundMessage: string;
   setSearchTerm: function;
   clearFilters: function;
   hidePageSizeWhenPossible: boolean;
   doNotShowEmptyRows: boolean;
   withTitle: boolean;
+  withCheckboxes: boolean;
   withSearch: boolean;
   withPaging: boolean;
   isInfinite: boolean;
@@ -719,6 +736,19 @@ declare function createGenericSelect(options: CreateGenericSelectOptions) {
   return GenericSelect
 }
 
+/**
+ *
+ * @param {*string} formName
+ * @param {*string} formName
+ * @param {*string} formName
+ * @param {*string} ...etc
+ * @example
+ * withSelectedEntities("sequenceTable")
+ * //adds a new prop sequenceTableSelectedEntities 
+ * //generically : `${formName}SelectedEntities` 
+ */
+declare function withSelectedEntities(tableName: string, tableName2: string) { }
+
 interface CreateGenericSelectOptions {
   /**
    * @property {function} modelNameToReadableName - a function that takes in a model name and spits out a human readable name
@@ -749,4 +779,3 @@ interface reactSelectProps {
 // showConfirmationDialog
 // showLoadingMask
 // style
-// toastr

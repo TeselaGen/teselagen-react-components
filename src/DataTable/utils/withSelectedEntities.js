@@ -1,5 +1,3 @@
-//@flow
-
 import { formValueSelector } from "redux-form";
 import { reduce } from "lodash";
 import { connect } from "react-redux";
@@ -9,6 +7,7 @@ import { connect } from "react-redux";
  * @param {*string} formName
  * @param {*string} formName
  * @param {*string} ...etc
+ * adds a new prop `${formName}SelectedEntities` eg sequenceTableSelectedEntities
  */
 export default function withSelectedEntities(...formNames) {
   if (!formNames.length) {

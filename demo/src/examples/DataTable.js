@@ -232,6 +232,7 @@ class DataTableInstance extends React.Component {
       isInfinite: false,
       isSingleSelect: false,
       maxHeight: false,
+      noRowsFoundMessage: false,
       isLoading: false,
       disabled: false,
       compact: false,
@@ -452,6 +453,10 @@ class DataTableInstance extends React.Component {
         })}
         {renderToggle({
           that: this,
+          type: "noRowsFoundMessage"
+        })}
+        {renderToggle({
+          that: this,
           type: "hideSelectedCount"
         })}
         {renderToggle({
@@ -574,6 +579,7 @@ class DataTableInstance extends React.Component {
             doNotShowEmptyRows={this.state.doNotShowEmptyRows}
             withCheckboxes={this.state.withCheckboxes}
             isSingleSelect={this.state.isSingleSelect}
+            noRowsFoundMessage={this.state.noRowsFoundMessage && "I guess we didn't find anything .. :("}
             hideSelectedCount={this.state.hideSelectedCount}
             showCount={this.state.showCount}
             isCopyable={this.state.isCopyable}
