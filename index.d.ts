@@ -259,6 +259,7 @@ export interface DataTableProps {
   extraClasses: string;
   className: string;
   tableName: string;
+  mustClickCheckboxToSelect: boolean;
   isLoading: boolean;
   searchTerm: string;
   noRowsFoundMessage: string;
