@@ -59,7 +59,7 @@
     "react-virtualized": "^9.20.1",
     "recompose": "^0.26.0",
     "redux": "^3.7.2",
-    "uniqid": "^4.1.1",
+    "uniqid": "^5.1.0",
     "url-join": "^4.0.1"
   },
   "peerDependencies": {

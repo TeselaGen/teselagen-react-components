@@ -7903,11 +7903,6 @@ lru-memoize@^1.0.2:
   resolved "https://registry.yarnpkg.com/lru-memoize/-/lru-memoize-1.1.0.tgz#073900ad72abdc67a3b455a797c7e94d7103e69a"
   integrity sha512-klI4QO8wE8V6rl8EwQTZP6vgM0URWN/0OMFdG9E2fJTaWc6Ox+nSTs8cgJ8QNd0We0vX40n+sd6K4cgb+BzXuA==
 
-macaddress@^0.2.8:
-  version "0.2.9"
-  resolved "https://registry.yarnpkg.com/macaddress/-/macaddress-0.2.9.tgz#3579b8b9acd5b96b4553abf0f394185a86813cb3"
-  integrity sha512-k4F1JUof6cQXxNFzx3thLby4oJzXTXQueAOOts944Vqizn+Rjc2QNFenT9FJSLU1CH3PmrHRSyZs2E+Cqw+P2w==
-
 magic-string@^0.25.3:
   version "0.25.3"
   resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.25.3.tgz#34b8d2a2c7fec9d9bdf9929a3fd81d271ef35be9"
@@ -12203,12 +12198,10 @@ union-value@^1.0.0:
     is-extendable "^0.1.1"
     set-value "^2.0.1"
 
-uniqid@^4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/uniqid/-/uniqid-4.1.1.tgz#89220ddf6b751ae52b5f72484863528596bb84c1"
-  integrity sha1-iSIN32t1GuUrX3JISGNShZa7hME=
-  dependencies:
-    macaddress "^0.2.8"
+uniqid@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/uniqid/-/uniqid-5.1.0.tgz#47e4f7567f12409fa7664f80abdfb1730fc021c3"
+  integrity sha512-iBt38h8uFnbDFrRK4E7vdzjtynBii5aSwGZ27gle7xnbYSIZzJ5x5BqughgUvMNCZ1cMhtnpcF+w7XGbqm6d9Q==
 
 unique-filename@^1.1.0:
   version "1.1.1"
