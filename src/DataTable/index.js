@@ -1038,7 +1038,12 @@ class DataTable extends React.Component {
       }
       if (cellRenderer && cellRenderer[column.path]) {
         tableColumn.Cell = row => {
-          const val = cellRenderer[column.path](row.value, row.original, row);
+          const val = cellRenderer[column.path](
+            row.value,
+            row.original,
+            row,
+            this.props
+          );
           return val;
         };
       } else if (column.render) {

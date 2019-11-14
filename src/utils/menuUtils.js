@@ -10,6 +10,7 @@ import {
   Menu
 } from "@blueprintjs/core";
 import { startCase, omit } from "lodash";
+import joinUrl from "url-join";
 
 const noop = () => {};
 
@@ -36,7 +37,15 @@ export const EnhancedMenuItem = compose(
   if (navTo) {
     clickHandler = e => {
       if (e.metaKey || e.ctrlKey) {
-        window.open(navTo);
+        let newWinUrl = navTo;
+        if (window.frontEndConfig.clientBasePath) {
+          newWinUrl = joinUrl(
+            window.location.origin,
+            window.frontEndConfig.clientBasePath,
+            navTo
+          );
+        }
+        window.open(newWinUrl);
       } else {
         props.history.push(navTo);
       }
