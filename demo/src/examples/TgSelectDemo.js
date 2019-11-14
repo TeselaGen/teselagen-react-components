@@ -6,7 +6,7 @@ class TgSelectDemo extends React.Component {
   render() {
     // const {} = this.props;
 
-    const { multi, val, creatable } = this.state;
+    const { multi, val, creatable, hasError } = this.state;
 
     return (
       <div>
@@ -17,6 +17,7 @@ class TgSelectDemo extends React.Component {
             this.setState({ val });
           }}
           multi={multi}
+          intent={hasError ? "danger" : ""}
           creatable={creatable}
           value={val}
           options={[
@@ -33,6 +34,11 @@ class TgSelectDemo extends React.Component {
         {renderToggle({
           that: this,
           type: "multi"
+          // type: "reactSelectFieldcreatable"
+        })}
+        {renderToggle({
+          that: this,
+          type: "hasError"
           // type: "reactSelectFieldcreatable"
         })}
         {renderToggle({

@@ -289,6 +289,7 @@ class TgSelect extends React.Component {
             rightElement: rightElement,
             disabled: disabled, // tg: adding isLoading will cause the input to be blurred when using generic select asReactSelect (don't do it),
             ...tagInputProps, //spread additional tag input props here
+            intent: this.props.intent,
             inputProps: {
               onBlur,
               ...(tagInputProps && tagInputProps.inputProps)

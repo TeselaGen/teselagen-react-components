@@ -421,6 +421,7 @@ export const renderReactSelect = props => {
     async,
     input: { value, onChange },
     hideValue,
+    intent,
     options,
     onFieldSubmit,
     ...rest
@@ -464,6 +465,7 @@ export const renderReactSelect = props => {
 
   const propsToUse = {
     ...removeUnwantedProps(rest),
+    intent,
     options: optsToUse,
     value: valueToUse,
     // closeOnSelect: !rest.multi,
@@ -508,7 +510,6 @@ export const renderReactSelect = props => {
       }
     }
   };
-
   return <TgSelect {...propsToUse} />;
 };
 
