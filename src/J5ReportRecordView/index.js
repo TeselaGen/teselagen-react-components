@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 // import EditViewHOC from '../../EditViewHOC'
 import { reduxForm } from "redux-form";
-import { Button, Dialog, Classes } from "@blueprintjs/core";
+import { Button, Dialog, Classes, Colors } from "@blueprintjs/core";
 import { getApolloMethods } from "@teselagen/apollo-methods";
 import { get, startCase, times, zip, flatten, noop } from "lodash";
 import moment from "moment";
@@ -376,6 +376,7 @@ class J5ReportRecordView extends Component {
       fragmentMap = {},
       linkFragmentMap,
       noPrebuiltConstructs = false,
+      customSchemaGeneratorForAssemblies,
       dataTableProps: passedDataTableProps,
       synthonSequenceTitleElements = []
     } = this.props;
@@ -478,6 +479,45 @@ class J5ReportRecordView extends Component {
             helperMessage="Constructs are the desired sequences to be built in a j5 run."
             title="Assembled Constructs"
             processData={processDataForTables.j5RunConstruct}
+            SubComponent={
+              !j5Report.version
+                ? null
+                : rowData => {
+                    if (rowData.original.j5LogMessages.length === 0)
+                      return (
+                        <div
+                          style={{
+                            marginLeft: "2em",
+                            marginTop: "0.5em",
+                            fontSize: "1.3em",
+                            color: Colors.GREEN3
+                          }}
+                        >
+                          No warnings or errors for this construct
+                        </div>
+                      );
+                    return (
+                      <div
+                        className="tg-test-warning-box"
+                        style={{ marginLeft: "2em", marginTop: "1em" }}
+                      >
+                        <div style={{ fontSize: "1.5em", color: Colors.GOLD3 }}>
+                          {"Warnings:"}
+                        </div>
+                        <br />
+                        {rowData.original.j5LogMessages.map((log, i) => (
+                          <div
+                            key={Date.now() + i}
+                            style={{
+                              padding: "1em",
+                              fontSize: "1em"
+                            }}
+                          >{`• ${log.message}`}</div>
+                        ))}
+                      </div>
+                    );
+                  }
+            }
             entities={
               get(j5Report, "j5RunConstructs[0].isPrebuilt") !== null &&
               !fragmentMap.j5RunConstruct
@@ -649,7 +689,10 @@ class J5ReportRecordView extends Component {
             }
             fragment={fragmentMap.j5RunConstruct}
             tableProps={dataTableProps}
-            createSchema={this.createSchemaForCombinationOfAssemblyPieces}
+            createSchema={
+              customSchemaGeneratorForAssemblies ||
+              this.createSchemaForCombinationOfAssemblyPieces
+            }
           />
 
           {/*<div className="tg-card">
