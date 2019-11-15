@@ -68,9 +68,10 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
         asyncBlurFields: [] //hacky fix for weird redux form asyncValidate error https://github.com/erikras/redux-form/issues/1675
       })
     ),
-    withProps(({ name, asReactSelect, idAs }) => ({
+    withProps(({ name, asReactSelect, idAs, isCodeModel }) => ({
       passedName: name,
-      isCodeModel: idAs === "code",
+      isCodeModel: isCodeModel || idAs === "code",
+      idAs: idAs || (isCodeModel ? "code" : undefined),
       ...(asReactSelect && { noDialog: true })
     })),
     withProps(

@@ -1,6 +1,6 @@
 {
   "name": "teselagen-react-components",
-  "version": "28.0.10",
+  "version": "28.0.13",
   "description": "Teselagen React Component Library",
   "main": "lib/index.js",
   "types": "./index.d.ts",
@@ -59,7 +59,8 @@
     "react-virtualized": "^9.20.1",
     "recompose": "^0.26.0",
     "redux": "^3.7.2",
-    "uniqid": "^4.1.1"
+    "uniqid": "^4.1.1",
+    "url-join": "^4.0.1"
   },
   "peerDependencies": {
     "@blueprintjs/core": "^3",

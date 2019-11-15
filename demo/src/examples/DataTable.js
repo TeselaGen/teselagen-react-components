@@ -211,6 +211,7 @@ class DataTableInstance extends React.Component {
       additionalFilters: false,
       isSimple: false,
       isCopyable: true,
+      mustClickCheckboxToSelect: false,
       noSelect: false,
       withTitle: true,
       isViewable: true,
@@ -473,6 +474,10 @@ class DataTableInstance extends React.Component {
         })}
         {renderToggle({
           that: this,
+          type: "mustClickCheckboxToSelect"
+        })}
+        {renderToggle({
+          that: this,
 
           type: "maxHeight",
           description:
@@ -583,6 +588,7 @@ class DataTableInstance extends React.Component {
             hideSelectedCount={this.state.hideSelectedCount}
             showCount={this.state.showCount}
             isCopyable={this.state.isCopyable}
+            mustClickCheckboxToSelect={this.state.mustClickCheckboxToSelect}
             {...(this.state.maxHeight
               ? {
                   maxHeight: "200px"

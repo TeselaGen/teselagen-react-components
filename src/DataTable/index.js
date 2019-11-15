@@ -730,6 +730,7 @@ class DataTable extends React.Component {
       withCheckboxes,
       onDoubleClick,
       history,
+      mustClickCheckboxToSelect,
       entities,
       isEntityDisabled,
       change
@@ -752,6 +753,8 @@ class DataTable extends React.Component {
         } else if (
           e.target.closest(".tg-react-table-checkbox-cell-container")
         ) {
+          return;
+        } else if (mustClickCheckboxToSelect) {
           return;
         }
         rowClick(e, rowInfo, entities, computePresets(this.props));
@@ -1038,7 +1041,12 @@ class DataTable extends React.Component {
       }
       if (cellRenderer && cellRenderer[column.path]) {
         tableColumn.Cell = row => {
-          const val = cellRenderer[column.path](row.value, row.original, row);
+          const val = cellRenderer[column.path](
+            row.value,
+            row.original,
+            row,
+            this.props
+          );
           return val;
         };
       } else if (column.render) {
