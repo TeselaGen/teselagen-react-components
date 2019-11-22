@@ -7,7 +7,7 @@
   <InfoHelper isButton disabled content={"Hey I'm some helpful info!"} />
   <br />
   inline:
-  <InfoHelper isInline content={"Hey I'm some helpful info!"} />
+  <InfoHelper isInline color="red" content={"Hey I'm some helpful info!"} />
   <br />
   <br />
   <br />
@@ -18,11 +18,15 @@
   As different icon (icon="align-left"):
   <br />
   <InfoHelper icon="align-left" content={"Hey I'm some helpful info!"} />
+  With color (color="blue"):
+  <br />
+  <InfoHelper color="blue" icon="align-left" content={"Hey I'm some helpful info!"} />
   <br />
   As Button (isButton=true):
   <br />
   <InfoHelper
     isButton
+    intent="primary"
     text="Hello world!"
     icon="align-left"
     content={"Hey I'm some helpful info!"}
@@ -30,7 +34,7 @@
   <br />
   size=45
   <br />
-  <InfoHelper size={45} content={"Hey I'm some helpful info!"} />
+  <InfoHelper size={45} color="green" content={"Hey I'm some helpful info!"} />
   <br />
   isPopover=true
   <br />

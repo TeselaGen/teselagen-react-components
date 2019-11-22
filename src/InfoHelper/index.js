@@ -13,6 +13,7 @@ export default class InfoHelper extends Component {
       isButton,
       size,
       isInline,
+      color,
       popoverProps = {},
       disabled,
       noPopoverSizing,
@@ -23,6 +24,7 @@ export default class InfoHelper extends Component {
     const IconToUse = isButton ? Button : Icon;
     const iconProps = {
       icon,
+      color,
       className,
       disabled
     };
