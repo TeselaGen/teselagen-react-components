@@ -454,7 +454,7 @@ export interface RadioGroupFieldProps extends GenericFormFieldProps {
 declare class ReactSelectField extends React.Component<ReactSelectFieldProps, any> { }
 
 export interface ReactSelectFieldProps extends GenericFormFieldProps {
-
+  multi: boolean;
 }
 // SelectField
 declare class SelectField extends React.Component<SelectFieldProps, any> { }
@@ -749,6 +749,23 @@ declare function createGenericSelect(options: CreateGenericSelectOptions) {
  * //generically : `${formName}SelectedEntities` 
  */
 declare function withSelectedEntities(tableName: string, tableName2: string) { }
+
+/**
+ *
+ * @param {*string} formName
+ * @param {*string} formName
+ * @param {*string} formName
+ * @param {*string} ...etc
+ * @example
+ * withSelectedEntities("sequenceTable")
+ * //adds a new prop sequenceTableSelectedEntities 
+ * //generically : `${formName}SelectedEntities` 
+ */
+declare function showLoadingMask(opts) {
+  return closeLoadingMask
+}
+
+function closeLoadingMask
 
 interface CreateGenericSelectOptions {
   /**
