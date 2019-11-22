@@ -12,6 +12,7 @@ export default class InfoHelper extends Component {
       isPopover,
       isButton,
       size,
+      isInline,
       popoverProps = {},
       disabled,
       noPopoverSizing,
@@ -59,13 +60,14 @@ export default class InfoHelper extends Component {
     } else {
       toReturn = <Tooltip {...toolTipOrPopoverProps} target={IconInner} />;
     }
+    const El = isInline ? "span" : "div";
     return (
-      <div
-        style={{ display: "flex", ...style }}
+      <El
+        style={{ ...(isInline ? {} : { display: "flex" }), ...style }}
         className="info-helper-wrapper"
       >
         {toReturn}
-      </div>
+      </El>
     );
   }
 }

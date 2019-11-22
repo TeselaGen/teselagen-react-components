@@ -5,6 +5,12 @@
   As Button disabled:
   <br />
   <InfoHelper isButton disabled content={"Hey I'm some helpful info!"} />
+  <br />
+  inline:
+  <InfoHelper isInline content={"Hey I'm some helpful info!"} />
+  <br />
+  <br />
+  <br />
   displayToSide :
   <br />
   <InfoHelper displayToSide content={"Hey I'm some helpful info!"} />

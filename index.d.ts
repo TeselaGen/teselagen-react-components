@@ -486,6 +486,7 @@ export interface InfoHelperProps {
   children: any;
   icon: string;
   isPopover: boolean;
+  isInline: boolean;
   isButton: boolean;
   size: integer;
   popoverProps: object;
