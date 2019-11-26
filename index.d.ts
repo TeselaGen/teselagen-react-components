@@ -767,6 +767,35 @@ declare function showLoadingMask(opts) {
   return closeLoadingMask
 }
 
+/**
+ *
+ * @example
+ * const confirm = await showConfirmationDialog({
+ *   text:
+ *     selectedCount > 1
+ *       ? `Are you sure you want to delete these custom icons?
+ *           You cannot undo this action.`
+ *       : `Are you sure you want to delete this custom icon?
+ *           You cannot undo this action.`,
+ *   intent: Intent.DANGER,
+ *   confirmButtonText: "Delete",
+ *   cancelButtonText: "Cancel",
+ *   canEscapeKeyCancel: true
+ * });
+ * if (confirm) {
+ * } 
+ */
+declare function showConfirmationDialog(showConfirmationDialogOpts):Promise
+
+interface showConfirmationDialogOpts {
+  text: string;
+  intent: string;
+  confirmButtonText: string;
+  cancelButtonText: string;
+  canEscapeKeyCancel: boolean;
+}
+
+
 function closeLoadingMask
 
 interface CreateGenericSelectOptions {
