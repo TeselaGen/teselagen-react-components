@@ -699,6 +699,7 @@ class InnerComp extends Component {
       return {
         ...pick(entity, ["__isInputEnt", "userCreated"]),
         clearableValue: entity.clearableValue,
+        record: entity,
         value: entity[idAs || "id"],
         label: (
           <span

@@ -108,7 +108,8 @@ export default compose(
     props => props.runTimeQueryOptions,
     compose(
       withTableParams({
-        urlConnected: false
+        urlConnected: false,
+        withDisplayOptions: true
       }),
       withQueryDynamic({
         isPlural: true
