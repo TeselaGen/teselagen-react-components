@@ -16,7 +16,7 @@ import withDialog from "../enhancers/withDialog";
 import withTableParams from "../DataTable/utils/withTableParams";
 import DataTable from "../DataTable";
 import { withAbstractWrapper } from "../FormComponents";
-import TgSelect, { singleItemPredicate } from "../TgSelect";
+import TgSelect from "../TgSelect";
 
 function preventBubble(e) {
   e.stopPropagation();
@@ -694,11 +694,11 @@ class InnerComp extends Component {
         )
       });
     }
-
     const entityOptions = entities.map(entity => {
       return {
         ...pick(entity, ["__isInputEnt", "userCreated"]),
         clearableValue: entity.clearableValue,
+        record: entity,
         value: entity[idAs || "id"],
         label: (
           <span
@@ -860,11 +860,11 @@ class InnerComp extends Component {
             const currentValuesByKey = keyBy(value, "value");
             return items.filter(item => {
               const { value, __isInputEnt, userCreated } = item;
-              if (userCreated) return false; //don't show user created option as option to select
-              if (__isInputEnt) {
-                //we need to filter it out manually
-                return singleItemPredicate(queryString, item);
-              }
+              if (userCreated || __isInputEnt) return false; //don't show user created option as option to select
+              // if (__isInputEnt) {
+              //we need to filter it out manually
+              // return singleItemPredicate(queryString, item);
+              // }
               return !currentValuesByKey[value];
             });
           }}

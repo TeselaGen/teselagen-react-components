@@ -36,7 +36,7 @@ export const EnhancedMenuItem = compose(
   if (navTo) {
     clickHandler = e => {
       if (e.metaKey || e.ctrlKey) {
-        window.open(navTo);
+        window.open(props.history.createHref({ pathname: navTo }));
       } else {
         props.history.push(navTo);
       }
