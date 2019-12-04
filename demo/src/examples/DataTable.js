@@ -105,6 +105,31 @@ class DataTableDemo extends React.Component {
         <div>
           <Router>
             <div>
+            <details>
+              <summary>Passing props from an unrelated query into a DataTable via withTableParams() </summary>
+              <ReactMarkdown source={`
+\`\`\`
+withQuery(["stage", "id name"], {
+  isPlural: true,
+  props: p => {
+    //pass additional data to the data table
+    return { tableParams: { stages: p.data.stages } };
+  }
+}),
+withTableParams({
+  urlConnected: true,
+  schema,
+  formName: "DesignLibrary",
+  withDisplayOptions: true
+}),
+//we're actually querying for designs
+withQuery(
+  [
+    "design",
+\`\`\`
+                  `} />
+              
+            </details>
               <h3>Demo specific options:</h3>
               <br />
               {renderToggle({

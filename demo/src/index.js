@@ -1,3 +1,4 @@
+import ReactMarkdown from "react-markdown";
 import ReactPlayground from "./ReactPlayground";
 import CollapsibleCard from "./examples/CollapsibleCard";
 import MenuBar from "./examples/MenuBar";
@@ -113,6 +114,7 @@ const demos = {
       client,
       withTableParams,
       DataTable,
+      ReactMarkdown,
       PagingTool,
       renderToggle,
       Router,
