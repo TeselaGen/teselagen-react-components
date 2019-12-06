@@ -254,9 +254,6 @@ class Uploader extends Component {
           accept={acceptToUse}
           {...{
             onDrop: async (acceptedFiles, rejectedFiles) => {
-              this.setState({
-                loading: true
-              });
               if (rejectedFiles.length) {
                 const fileNames = rejectedFiles.map(f => f.name);
                 window.toastr &&
@@ -264,6 +261,10 @@ class Uploader extends Component {
                     .warning(`This uploader accepts ${acceptToUse}. These files were rejected because they \
                 do not have the proper extension: ${fileNames.join(", ")}`);
               }
+              if (!acceptedFiles.length) return;
+              this.setState({
+                loading: true
+              });
               if (fileLimit) {
                 acceptedFiles = acceptedFiles.slice(0, fileLimit);
               }
