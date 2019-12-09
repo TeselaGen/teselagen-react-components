@@ -35,6 +35,9 @@ function J5TableCard({
   entities = entities || [];
   const filteredEntities = processData(entities);
 
+  const formName =
+    (window.frontEndConfig.tgModuleName || "") + "-" + camelCase(title);
+
   return (
     <CollapsibleCard
       icon={helperMessage && <InfoHelper>{helperMessage}</InfoHelper>}
@@ -54,7 +57,7 @@ function J5TableCard({
         {...tableProps}
         SubComponent={SubComponent || null}
         onDoubleClick={onDoubleClick}
-        formName={camelCase(title)} //because these tables are currently not connected to table params, we need to manually pass a formName here
+        formName={formName} //because these tables are currently not connected to table params, we need to manually pass a formName here
         cellRenderer={cellRenderer}
         {...tableParams}
         entities={filteredEntities}
