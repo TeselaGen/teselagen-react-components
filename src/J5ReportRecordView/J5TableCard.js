@@ -10,6 +10,7 @@ import withQueryDynamic from "../enhancers/withQueryDynamic";
 
 function J5TableCard({
   title,
+  formName,
   helperMessage,
   entities: maybeEntities, // directly passed, not remote paging
   tableProps,
@@ -34,9 +35,6 @@ function J5TableCard({
   }
   entities = entities || [];
   const filteredEntities = processData(entities);
-
-  const formName =
-    (window.frontEndConfig.tgModuleName || "") + "-" + camelCase(title);
 
   return (
     <CollapsibleCard
@@ -72,10 +70,14 @@ function J5TableCard({
 export default compose(
   withProps(props => {
     const { fragment, title, schema: maybeSchema, j5ReportId } = props;
-    if (!fragment)
+    const formName =
+      (window.frontEndConfig.tgModuleName || "") + "-" + camelCase(title);
+
+    if (!fragment) {
       return {
-        formName: camelCase(title)
+        formName
       };
+    }
     const modelName = get(fragment, "definitions[0].typeCondition.name.value");
     let schema = maybeSchema;
     if (schema && !schema.model) {
@@ -94,7 +96,7 @@ export default compose(
     }
     return {
       schema,
-      formName: camelCase(title),
+      formName,
       runTimeQueryOptions: {
         fragment,
         options: {
