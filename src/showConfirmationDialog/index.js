@@ -27,9 +27,9 @@ class AlertWrapper extends Component {
   render() {
     const {
       handleClose,
-      text = "customize like --  {text: 'your text here'} ",
+      text,
       resolve,
-      content = null,
+      content,
       cancelButtonText = "Cancel",
       intent = Intent.PRIMARY,
       ...rest
@@ -49,7 +49,7 @@ class AlertWrapper extends Component {
         {...rest}
       >
         {content}
-        <p style={{ marginBottom: 10 }}>{text}</p>
+        {text && <p style={{ marginBottom: 10 }}>{text}</p>}
       </Alert>
     );
   }

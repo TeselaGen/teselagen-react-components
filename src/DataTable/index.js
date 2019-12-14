@@ -786,7 +786,10 @@ class DataTable extends React.Component {
         }
         this.showContextMenu(newIdMap, e, entity);
       },
-      className: rowSelected && !withCheckboxes ? "selected" : "",
+      className: classNames({
+        selected: rowSelected && !withCheckboxes
+      }),
+      "data-test-id": entity.id || entity.code,
       onDoubleClick: () => {
         if (rowDisabled) return;
         onDoubleClick(rowInfo.original, rowInfo.index, history);
