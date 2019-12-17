@@ -26,7 +26,13 @@ import Loading from "./examples/Loading";
 import DownloadLink from "./examples/DownloadLink";
 import DemoNav from "./DemoNav";
 import DemoHeader from "./DemoHeader";
-import { withTableParams, DataTable, PagingTool, createGenericSelect, modelNameToReadableName } from "../../src";
+import {
+  withTableParams,
+  DataTable,
+  PagingTool,
+  createGenericSelect,
+  modelNameToReadableName
+} from "../../src";
 import Uploader from "../../src/FormComponents/Uploader";
 import { FileUploadField } from "../../src/FormComponents";
 import J5ReportRecordView from "./examples/J5ReportRecordView";
@@ -179,7 +185,7 @@ const demos = {
       Classes,
       TgSelect,
       Icon,
-      renderToggle,
+      renderToggle
     },
     props: [
       {
@@ -187,7 +193,7 @@ const demos = {
         description:
           "The CSS class name passed to the Button (if Popover) or Tooltip",
         type: "string"
-      },
+      }
     ]
   },
   GenericSelect: {
@@ -199,8 +205,8 @@ const demos = {
       renderToggle,
       reduxForm,
       ApolloProvider,
-client,
-store,
+      client,
+      store
     },
     props: [
       {
@@ -208,7 +214,7 @@ store,
         description:
           "The CSS class name passed to the Button (if Popover) or Tooltip",
         type: "string"
-      },
+      }
     ]
   },
   CollapsibleCard: {
@@ -373,7 +379,7 @@ store,
       renderToggle,
       Classes,
       Provider,
-      store,
+      store
     }
   },
   toastr: {
@@ -383,7 +389,7 @@ store,
     scope: {
       showConfirmationDialog,
       Intent,
-      renderToggle,
+      renderToggle
     },
     demo: showConfirmationDialogDemo
   },
@@ -391,7 +397,7 @@ store,
     scope: {
       showLoadingMask,
       Intent,
-      renderToggle,
+      renderToggle
     },
     demo: showLoadingMaskDemo
   },

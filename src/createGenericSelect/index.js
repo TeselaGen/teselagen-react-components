@@ -68,12 +68,24 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
         asyncBlurFields: [] //hacky fix for weird redux form asyncValidate error https://github.com/erikras/redux-form/issues/1675
       })
     ),
-    withProps(({ name, asReactSelect, idAs, isCodeModel }) => ({
-      passedName: name,
-      isCodeModel: isCodeModel || idAs === "code",
-      idAs: idAs || (isCodeModel ? "code" : undefined),
-      ...(asReactSelect && { noDialog: true })
-    })),
+    withProps(
+      ({ name, asReactSelect, idAs: _idAs, isCodeModel: _isCodeModel }) => {
+        let idAs = _idAs;
+        if (!idAs) {
+          idAs = _isCodeModel ? "code" : "id";
+        }
+        let isCodeModel = _isCodeModel;
+        if (!isCodeModel) {
+          isCodeModel = idAs === "code";
+        }
+        return {
+          passedName: name,
+          isCodeModel,
+          idAs,
+          ...(asReactSelect && { noDialog: true })
+        };
+      }
+    ),
     withProps(
       ({
         fragment,
@@ -160,9 +172,9 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
 
       removeEntityFromSelection = record => {
         const {
-          input: { onChange, value = [] }
+          input: { onChange, idAs, value = [] }
         } = this.props;
-        const newValue = value.filter(r => r.id !== record.id);
+        const newValue = value.filter(r => r[idAs] !== record[idAs]);
         if (newValue.length) {
           onChange(newValue);
           this.setState({
@@ -196,13 +208,16 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
       handleOnChange = newValue => {
         const {
           input: { onChange = noop, value = [] },
+          idAs,
           isMultiSelect,
           preserveValue
         } = this.props;
         let toSelect = newValue;
         if (isMultiSelect && value.length && preserveValue) {
-          const newIds = newValue.map(r => r.id);
-          toSelect = value.filter(r => !newIds.includes(r.id)).concat(newValue);
+          const newIds = newValue.map(r => r[idAs]);
+          toSelect = value
+            .filter(r => !newIds.includes(r[idAs]))
+            .concat(newValue);
         }
         onChange(toSelect);
       };
@@ -215,7 +230,7 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
           onSelect,
           isMultiSelect,
           postSelectDTProps,
-          isCodeModel
+          idAs
         } = this.props;
         const toSelect = isMultiSelect ? records : records[0];
         this.resetPostSelectSelection();
@@ -233,11 +248,7 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
         });
         const queryVariables = {
           filter: {
-            [isCodeModel ? "code" : "id"]: isMultiSelect
-              ? records.map(({ id, code }) => (isCodeModel ? code : id))
-              : isCodeModel
-              ? records[0].code
-              : records[0].id
+            [idAs]: isMultiSelect ? records.map(r => r[idAs]) : records[0][idAs]
           }
         };
         if (!postSelectDTProps) {
@@ -398,7 +409,8 @@ const PostSelectTable = branch(
         const {
           additionalDataFragment,
           isMultiSelect,
-          initialEntities
+          initialEntities,
+          idAs
         } = this.props;
 
         const gqlQuery = generateQuery(additionalDataFragment, {
@@ -409,9 +421,9 @@ const PostSelectTable = branch(
           <Query
             variables={{
               filter: {
-                id: isMultiSelect
-                  ? initialEntities.map(({ id }) => id)
-                  : initialEntities[0].id
+                [idAs]: isMultiSelect
+                  ? initialEntities.map(e => e[idAs])
+                  : initialEntities[0][idAs]
               }
             }}
             query={gqlQuery}
@@ -561,13 +573,13 @@ const GenericSelectInner = compose(
     })
   ),
   withProps(props => {
-    const { currentValue, asReactSelect } = props;
+    const { currentValue, asReactSelect, idAs } = props;
     if (!asReactSelect && Array.isArray(currentValue) && currentValue.length) {
       // preserve old selection in table
       return {
         initialValues: {
           reduxFormSelectedEntityIdMap: currentValue.reduce((acc, entity) => {
-            acc[entity.id] = { entity };
+            acc[entity[idAs]] = { entity };
             return acc;
           }, {})
         }
@@ -658,7 +670,7 @@ class InnerComp extends Component {
     if (input.value) {
       (Array.isArray(input.value) ? input.value : [input.value]).forEach(
         ent => {
-          inputIds.push(ent[idAs || "id"]);
+          inputIds.push(ent[idAs]);
           inputEntities.push(ent);
         }
       );
@@ -669,7 +681,7 @@ class InnerComp extends Component {
     //it is important that we spread inputEntities second as the initialValues might not yet be loaded by the default table query
     const entities = [
       ...(tableParams.entities || []).filter(
-        ent => !inputIds.includes(ent[idAs || "id"])
+        ent => !inputIds.includes(ent[idAs])
       ),
       ...inputEntities.map(ent => ({ ...ent, __isInputEnt: true }))
     ];
@@ -699,7 +711,7 @@ class InnerComp extends Component {
         ...pick(entity, ["__isInputEnt", "userCreated"]),
         clearableValue: entity.clearableValue,
         record: entity,
-        value: entity[idAs || "id"],
+        value: entity[idAs],
         label: (
           <span
             style={{
@@ -770,16 +782,16 @@ class InnerComp extends Component {
     //we want to save the entity/entity array itself to the redux form value, not the {label,value} that is passed here
     let entitiesById = keyBy(
       [...tableParams.entities, ...additionalOptions],
-      idAs || "id"
+      idAs
     );
     if (input.value) {
       if (Array.isArray(input.value)) {
         entitiesById = {
           ...entitiesById,
-          ...keyBy(input.value, idAs || "id")
+          ...keyBy(input.value, idAs)
         };
       } else {
-        entitiesById[input.value[idAs || "id"]] = input.value;
+        entitiesById[input.value[idAs]] = input.value;
       }
     }
     try {
@@ -843,7 +855,7 @@ class InnerComp extends Component {
         //we need to add a .value field to every entity based on the entities id/code
         return {
           ...entity,
-          value: entity[idAs || "id"]
+          value: entity[idAs]
         };
       };
       const value = isMultiSelect

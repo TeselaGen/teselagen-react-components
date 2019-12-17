@@ -148,9 +148,10 @@ class TgSelect extends React.Component {
   };
 
   getTagProps = label => {
-    const { multi, options = [] } = this.props;
-    const matchingOption = options.find(op => op.label === label);
-    const disabled = matchingOption && matchingOption.disabled;
+    const { multi, value = [] } = this.props;
+    const val = Array.isArray(value) ? value : [value];
+    const matchingVal = val.find(op => op.label === label);
+    const disabled = matchingVal && matchingVal.disabled;
 
     return {
       intent: disabled ? "" : "primary",
