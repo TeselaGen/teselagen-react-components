@@ -155,7 +155,9 @@ class TgSelect extends React.Component {
     return {
       intent: disabled ? "" : "primary",
       minimal: true,
-      className: "tg-select-value",
+      className: classNames("tg-select-value", {
+        disabled
+      }),
       onRemove: multi && !disabled ? this.handleTagRemove : null
     };
   };
