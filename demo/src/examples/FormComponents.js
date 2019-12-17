@@ -353,18 +353,15 @@ class FormComponentsDemo extends React.Component {
             resetOnSelect
             creatable={this.state.reactSelectFieldcreatable}
             multi
+            defaultValue={["Ximena Morales", "Sam Denicola"]}
             options={[
               {
                 label: "Rodrigo Pavez",
                 value: { name: "Rodrigo Pavez", id: "123" }
               },
-              { label: "Ximena Morales", value: "Ximena Morales" },
+              { label: "Ximena Morales", value: "Ximena Morales", disabled: true },
               { label: "Kyle Craft", value: "Kyle Craft" },
               { label: "Sam Denicola", value: "Sam Denicola" },
-              { label: "Tom Ogasawara", value: "Tom Ogasawara" },
-              { label: "Tom Ogasawara", value: "Tom Ogasawara" },
-              { label: "Tom Ogasawara", value: "Tom Ogasawara" },
-              { label: "Tom Ogasawara", value: "Tom Ogasawara" },
               { label: "Tom Ogasawara", value: "Tom Ogasawara" }
             ]}
           />

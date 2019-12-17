@@ -147,6 +147,19 @@ class TgSelect extends React.Component {
     );
   };
 
+  getTagProps = label => {
+    const { multi, options = [] } = this.props;
+    const matchingOption = options.find(op => op.label === label);
+    const disabled = matchingOption && matchingOption.disabled;
+
+    return {
+      intent: disabled ? "" : "primary",
+      minimal: true,
+      className: "tg-select-value",
+      onRemove: multi && !disabled ? this.handleTagRemove : null
+    };
+  };
+
   render() {
     const {
       multi,
@@ -279,12 +292,7 @@ class TgSelect extends React.Component {
             },
             placeholder:
               placeholder || (creatable ? "Select/Create..." : "Select..."),
-            tagProps: {
-              intent: "primary",
-              minimal: true,
-              className: "tg-select-value",
-              onRemove: multi ? this.handleTagRemove : null
-            },
+            tagProps: this.getTagProps,
             onRemove: multi ? this.handleTagInputRemove : null,
             rightElement: rightElement,
             disabled: disabled, // tg: adding isLoading will cause the input to be blurred when using generic select asReactSelect (don't do it),
