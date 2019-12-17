@@ -300,7 +300,8 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
           isMultiSelect,
           handlersObj,
           onSelect,
-          noForm
+          noForm,
+          idAs
         } = this.props;
         if (handlersObj) {
           handlersObj.removeSelection = this.removeSelection;
@@ -376,6 +377,7 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
                 !!postSelectDataTableValue.length && (
                   <PostSelectTable
                     {...{
+                      idAs,
                       additionalDataFragment,
                       initialEntities: postSelectDataTableValue,
                       genericSelectValue: value,
