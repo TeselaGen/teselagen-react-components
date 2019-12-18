@@ -1,6 +1,6 @@
 import { omitBy, isNil } from "lodash";
 //we use this to make adding preset prop groups simpler
-export default function computePresets(props) {
+export default function computePresets(props = {}) {
   const { isSimple } = props;
   let toReturn = omitBy(props, isNil);
 
@@ -36,5 +36,5 @@ export default function computePresets(props) {
       ...toReturn
     };
   }
-  return toReturn;
+  return toReturn || {};
 }
