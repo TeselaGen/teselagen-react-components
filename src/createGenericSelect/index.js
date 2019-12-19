@@ -648,6 +648,9 @@ const GenericSelectInner = compose(
 );
 
 class InnerComp extends Component {
+  state = {
+    reactSelectQueryString: ""
+  };
   onDoubleClick = record => {
     const { hideModal, handleSelection, isMultiSelect } = this.props;
     if (isMultiSelect) return;
@@ -664,6 +667,7 @@ class InnerComp extends Component {
     setPageSize((currentParams.pageSize || defaults.pageSize) + 25);
   };
   getReactSelectOptions = () => {
+    const { reactSelectQueryString } = this.state;
     const { tableParams, input, idAs, additionalOptions = [] } = this.props;
     const { entityCount, schema } = tableParams;
 
@@ -734,6 +738,7 @@ class InnerComp extends Component {
               let val = get(entity, field.path || field);
               if (field.render) {
                 val = field.render(val, entity, undefined, {
+                  reactSelectQueryString,
                   ...this.props,
                   ...this.props.additionalTableProps
                 });
