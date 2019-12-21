@@ -19,9 +19,10 @@ class TgSelect extends React.Component {
   };
   itemRenderer = (i, { index, handleClick, modifiers }) => {
     const { optionRenderer } = this.props;
+    const onClick = i.onClick || handleClick;
     return (
       <div //we specifically don't use a BP MenuItem component here because the menu item is too slow when 100s are loaded and will cause the component to lag
-        onClick={i.onClick || handleClick}
+        onClick={modifiers.disabled ? undefined : onClick}
         key={index}
         className={classNames(
           "tg-select-option bp3-menu-item bp3-fill bp3-text-overflow-ellipsis",
