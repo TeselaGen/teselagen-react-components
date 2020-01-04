@@ -12,8 +12,8 @@ export const withCommand = mappings => WrappedComponent => ({
       mappings[k] === "execute"
         ? event => cmd.execute({ event })
         : typeof mappings[k] === "function"
-          ? mappings[k](cmd, props)
-          : cmd[mappings[k]];
+        ? mappings[k](cmd, props)
+        : cmd[mappings[k]];
   });
 
   let out = <WrappedComponent {...props} {...mappedProps} />;
@@ -29,6 +29,7 @@ export const withCommand = mappings => WrappedComponent => ({
 export const CmdCheckbox = withCommand({
   onChange: "execute",
   label: (cmd, props) =>
+    props.name ||
     (props.prefix && (
       <React.Fragment>
         {props.prefix}
@@ -43,6 +44,7 @@ export const CmdCheckbox = withCommand({
 export const CmdSwitch = withCommand({
   onChange: "execute",
   label: (cmd, props) =>
+    props.name ||
     (props.prefix && (
       <React.Fragment>
         {props.prefix}
@@ -61,6 +63,7 @@ const Div = ({ onChange, children }) => {
 export const CmdDiv = withCommand({
   onChange: "execute",
   children: (cmd, props) =>
+    props.name ||
     (props.prefix && (
       <React.Fragment>
         {props.prefix}
