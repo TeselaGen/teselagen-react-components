@@ -247,6 +247,7 @@ declare class CmdDiv extends React.Component<CmdProps, any> { }
 declare class CmdButton extends React.Component<CmdProps, any> { }
 
 export interface CmdProps {
+  name: string;
   prefix: string;
   cmd: function;
 }
