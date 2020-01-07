@@ -240,6 +240,7 @@ class DataTableInstance extends React.Component {
       noSelect: false,
       withTitle: true,
       isViewable: true,
+      minimalStyle: true,
       withSearch: true,
       withPaging: true,
       noDeselectAll: false,
@@ -387,9 +388,13 @@ class DataTableInstance extends React.Component {
         })}
         {renderToggle({
           that: this,
-
           type: "isViewable",
           description: "Make sure withCheckboxes is off when using this"
+        })}
+        {renderToggle({
+          that: this,
+          type: "minimalStyle",
+          description: "Make the datatable blend into the background"
         })}
         {renderToggle({
           that: this,
@@ -582,6 +587,7 @@ class DataTableInstance extends React.Component {
               }
             }
             isViewable={this.state.isViewable}
+            minimalStyle={this.state.minimalStyle}
             withTitle={this.state.withTitle}
             noSelect={this.state.noSelect}
             isSimple={this.state.isSimple}

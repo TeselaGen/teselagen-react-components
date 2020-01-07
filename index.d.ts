@@ -1,3 +1,4 @@
+/* eslint-disable no-unreachable*/ 
 import * as React from "react";
 import * as Blueprint from "@blueprintjs/core";
 /*~ If this module has methods, declare them as functions like so.
@@ -73,7 +74,7 @@ export function withQuery(
 
 export function noop(): void;
 
-interface showDialogOnDocBodyOptions = {
+interface showDialogOnDocBodyOptions {
   /**
    *  * @property {boolean} addDialogContainer - add a dialog to this
    */
@@ -398,7 +399,7 @@ export interface FileUploadFieldProps extends GenericFormFieldProps {
   innerText: "string";
   accept: string | array;
   contentOverride: function;
-  action: string: ;
+  action: string;
   className: string;
   fileLimit: integer;
   readBeforeUpload: boolean;
@@ -757,7 +758,7 @@ declare function createGenericSelect(options: CreateGenericSelectOptions) {
  * //adds a new prop sequenceTableSelectedEntities 
  * //generically : `${formName}SelectedEntities` 
  */
-declare function withSelectedEntities(tableName: string, tableName2: string) { }
+declare function withSelectedEntities(tableName: string, tableName2: string)
 
 /**
  *
@@ -803,7 +804,7 @@ interface showConfirmationDialogOpts {
 }
 
 
-function closeLoadingMask
+function closeLoadingMask(){}
 
 interface CreateGenericSelectOptions {
   /**

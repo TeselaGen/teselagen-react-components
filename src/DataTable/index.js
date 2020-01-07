@@ -134,7 +134,6 @@ class DataTable extends React.Component {
     }
 
     // handle programmatic selection and scrolling
-
     const { selectedIds: oldSelectedIds } = oldProps;
     if (isEqual(selectedIds, oldSelectedIds)) return;
     const idArray = Array.isArray(selectedIds) ? selectedIds : [selectedIds];
@@ -145,6 +144,7 @@ class DataTable extends React.Component {
       acc[getIdOrCodeOrIndex(entity)] = { entity };
       return acc;
     }, {});
+    change("reduxFormExpandedEntityIdMap", newIdMap);
     finalizeSelection({ idMap: newIdMap, props: newProps });
     const idToScrollTo = idArray[0];
     if (!idToScrollTo && idToScrollTo !== 0) return;
@@ -159,9 +159,14 @@ class DataTable extends React.Component {
       entityIndexToScrollTo
     ];
     if (!rowEl) return;
-    scrollIntoView(rowEl, tableBody, {
-      alignWithTop: true
-    });
+    setTimeout(() => {
+      //we need to delay for a teeny bit to make sure the table has drawn
+      rowEl &&
+        tableBody &&
+        scrollIntoView(rowEl, tableBody, {
+          alignWithTop: true
+        });
+    }, 0);
   };
 
   componentDidMount() {
@@ -427,6 +432,7 @@ class DataTable extends React.Component {
       hideColumnHeader,
       subHeader,
       isViewable,
+      minimalStyle,
       entities,
       children: maybeChildren,
       topLeftItems,
@@ -561,6 +567,7 @@ class DataTable extends React.Component {
           {
             fullscreen,
             "dt-isViewable": isViewable,
+            "dt-minimalStyle": minimalStyle,
             "no-padding": noPadding,
             "hide-column-header": hideColumnHeader
           }
