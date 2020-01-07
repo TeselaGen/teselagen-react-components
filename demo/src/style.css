@@ -26,9 +26,9 @@ h6 {
   flex-wrap: row;
 }
 
-.toggle-button-holder span {
+/* .toggle-button-holder span {
   margin-left: 30px;
-}
+} */
 
 .demo-nav-container {
   display: flex;
