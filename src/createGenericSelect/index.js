@@ -222,7 +222,7 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
         onChange(toSelect);
       };
 
-      handleSelection = async records => {
+      handleSelection = async (records, options) => {
         const {
           additionalDataFragment,
           readableName,
@@ -238,7 +238,7 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
           return this.removeSelection();
         }
         if (!additionalDataFragment) {
-          onSelect && onSelect(toSelect);
+          onSelect && onSelect(toSelect, options);
           this.handleOnChange(toSelect || null);
           return;
         }
@@ -264,7 +264,7 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
               })(queryVariables);
             }
             const toSelect = isMultiSelect ? records : records[0];
-            onSelect && onSelect(toSelect);
+            onSelect && onSelect(toSelect, options);
             this.handleOnChange(toSelect);
           } catch (error) {
             console.error("err:", error);
@@ -651,15 +651,22 @@ class InnerComp extends Component {
   state = {
     reactSelectQueryString: ""
   };
+
+  finishSelection = records => {
+    const { reactSelectQueryString } = this.state;
+    const { handleSelection } = this.props;
+    handleSelection(records, { reactSelectQueryString });
+  };
+
   onDoubleClick = record => {
-    const { hideModal, handleSelection, isMultiSelect } = this.props;
+    const { hideModal, isMultiSelect } = this.props;
     if (isMultiSelect) return;
     hideModal && hideModal();
-    handleSelection([record]);
+    this.finishSelection([record]);
   };
   makeSelection = () => {
-    const { hideModal, handleSelection, selectedEntities } = this.props;
-    handleSelection(selectedEntities);
+    const { hideModal, selectedEntities } = this.props;
+    this.finishSelection(selectedEntities);
     hideModal && hideModal();
   };
   reactSelectHandleLoadMore = () => {
@@ -779,13 +786,7 @@ class InnerComp extends Component {
     return val; //return val for react-select to work properly
   };
   handleReactSelectFieldSubmit = valOrVals => {
-    const {
-      handleSelection,
-      input,
-      tableParams,
-      additionalOptions,
-      idAs
-    } = this.props;
+    const { input, tableParams, additionalOptions, idAs } = this.props;
     //we want to save the entity/entity array itself to the redux form value, not the {label,value} that is passed here
     let entitiesById = keyBy(
       [...tableParams.entities, ...additionalOptions],
@@ -803,7 +804,7 @@ class InnerComp extends Component {
     }
     try {
       if (!valOrVals || valOrVals.length === 0) {
-        handleSelection([]);
+        this.finishSelection([]);
       } else {
         const records = (Array.isArray(valOrVals)
           ? valOrVals
@@ -812,7 +813,7 @@ class InnerComp extends Component {
           const { value, userCreated } = val;
           return userCreated ? val : entitiesById[value];
         });
-        handleSelection(records);
+        this.finishSelection(records);
       }
     } catch (error) {
       console.error(`errror:`, error);
