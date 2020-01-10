@@ -121,7 +121,7 @@
     "react-transition-group": "^2.4.0",
     "redux-form": "^7.4.2",
     "redux-thunk": "*",
-    "sinon": "^4.4.9",
+    "sinon": "^8.0.4",
     "tg-client-query-builder": "^2.12.2",
     "typescript": "^3.2.2",
     "ve-range-utils": "^2.5.2",
