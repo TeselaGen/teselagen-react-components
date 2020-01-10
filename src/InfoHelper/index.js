@@ -1,6 +1,7 @@
 //@flow
 import React, { Component } from "react";
 import { Popover, Button, Tooltip, Icon } from "@blueprintjs/core";
+import classnames from "classnames";
 
 export default class InfoHelper extends Component {
   render() {
@@ -66,7 +67,7 @@ export default class InfoHelper extends Component {
     return (
       <El
         style={{ ...(isInline ? {} : { display: "flex" }), ...style }}
-        className="info-helper-wrapper"
+        className={classnames("info-helper-wrapper", className)}
       >
         {toReturn}
       </El>

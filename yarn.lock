@@ -250,10 +250,10 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@teselagen/apollo-methods@^1.2.1":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@teselagen/apollo-methods/-/apollo-methods-1.2.1.tgz#6117fcda1ec6714a15077d05cec33a7252b25ba8"
-  integrity sha512-xFTGF9qADsMhONGJ+iuA15R+rxhDXIOAy9jf+1srRVj2dkWGcPxouQ+3B4TFeKtrLNN5g4frFbGZWzUsBgqf7Q==
+"@teselagen/apollo-methods@^1.2.7":
+  version "1.2.7"
+  resolved "https://registry.yarnpkg.com/@teselagen/apollo-methods/-/apollo-methods-1.2.7.tgz#645e1e2b8905690d2d42e452f1e71d45facdbc7f"
+  integrity sha512-t+kTj8PvqN23DnNHPhxKgEKa7Q0Of57QLIFAGU0LVuCw0uRdTvWw4cKDrr5Jw7KFT67cdMB9cmvgnJwZpq6Zug==
   dependencies:
     pascal-case "^2.0.1"
 
