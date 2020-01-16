@@ -15,6 +15,10 @@
   <br />
   <InfoHelper displayToSide content={"Hey I'm some helpful info!"} />
   <br />
+  clickable and displayToSide :
+  <br />
+  <InfoHelper displayToSide clickable content={"Hey I'm some helpful info!"} />
+  <br />
   As different icon (icon="align-left"):
   <br />
   <InfoHelper icon="align-left" content={"Hey I'm some helpful info!"} />

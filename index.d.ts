@@ -494,6 +494,7 @@ export interface InfoHelperProps {
   children: any;
   icon: string;
   color: string;
+  clickable: boolean;
   isPopover: boolean;
   isInline: boolean;
   isButton: boolean;

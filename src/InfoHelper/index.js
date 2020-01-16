@@ -14,6 +14,7 @@ export default class InfoHelper extends Component {
       isButton,
       size,
       isInline,
+      clickable,
       color,
       popoverProps = {},
       disabled,
@@ -66,7 +67,11 @@ export default class InfoHelper extends Component {
     const El = isInline ? "span" : "div";
     return (
       <El
-        style={{ ...(isInline ? {} : { display: "flex" }), ...style }}
+        style={{
+          ...(clickable ? { cursor: "pointer" } : {}),
+          ...(isInline ? {} : { display: "flex" }),
+          ...style
+        }}
         className={classnames("info-helper-wrapper", className)}
       >
         {toReturn}
