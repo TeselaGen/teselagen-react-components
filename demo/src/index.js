@@ -136,7 +136,8 @@ const demos = {
       SimpleTable: {
         demo: SimpleTable
       }
-    }
+    },
+    noLiveCode: true
   },
   InfoHelper: {
     demo: InfoHelper,
@@ -371,7 +372,8 @@ const demos = {
       renderToggle,
       Classes,
       Icon
-    }
+    },
+    noLiveCode: true
   },
   withDialog: {
     demo: WithDialog,
@@ -509,11 +511,11 @@ const demoPropsSchema = [
   }
 ];
 
-function DemoComponentWrapper({ demo: Demo, scope, props = [] }, demoTitle) {
+function DemoComponentWrapper({ demo: Demo, scope, props = [], noLiveCode }, demoTitle) {
   return () => {
     const component = (
       <div>
-        <ReactPlayground codeText={Demo} scope={scope} />
+        {<ReactPlayground codeText={Demo} scope={scope} noLiveCode={noLiveCode} />}
         {!!props.length && (
           <React.Fragment>
             <h6

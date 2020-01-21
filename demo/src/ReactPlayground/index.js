@@ -13,7 +13,7 @@ const scope = {
 
 export default class Playground extends React.Component {
   render() {
-    const { codeText, scope: extraScope } = this.props;
+    const { codeText, scope: extraScope, noLiveCode } = this.props;
 
     return (
       <LiveProvider
@@ -35,9 +35,9 @@ export default class Playground extends React.Component {
           <LivePreview />
         </div>
         <LiveError />
-        <div className="tg-code-editor">
+        {!noLiveCode && <div className="tg-code-editor">
           <LiveEditor />
-        </div>
+        </div>}
       </LiveProvider>
     );
   }
