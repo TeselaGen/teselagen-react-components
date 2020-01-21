@@ -116,13 +116,14 @@
 
 .ReactTable.ReactTable .rt-tbody .rt-tr-group {
   border-bottom: 1px solid rgb(233, 233, 233);
+  width: fit-content;
 }
 
 .ReactTable.ReactTable .rt-tbody .rt-tr {
   border: none;
 }
 
-.bp3-dark .ReactTable.ReactTable .rt-tbody .rt-tr {
+.bp3-dark .ReactTable.ReactTable .rt-tbody .rt-tr-group {
   border-bottom-color: rgba(16, 22, 26, 0.15);
 }
 
@@ -226,14 +227,25 @@
   background: #f7f7f7;
 }
 
-.ReactTable .rt-thead.-header {
+.ReactTable .rt-thead {
   box-shadow: none;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  /* background: #f7f7f7; */
-  overflow-x: hidden;
+  position: sticky;
+  top: 0px;
+  width: fit-content;
+  background: #ebf1f5;
+  z-index: 1;
 }
+
+.bp3-dark .ReactTable .rt-thead {
+  background: #202b33;
+}
+
 .ReactTable .rt-tbody {
   background: white;
+  min-width: 0px !important;
+  overflow: visible !important;
+  width: fit-content;
 }
 .ReactTable .rt-tbody .rt-td {
   cursor: pointer;
@@ -250,11 +262,9 @@
   padding: 3px 5px;
 }
 
-/*  //tnr: hopefully this isn't needed because it messes up the row "expander" styling
 .ReactTable .rt-tr-group {
-  flex: initial;
-  min-height: 35px !important;
-} */
+  min-width: 0px !important;
+}
 
 .ReactTable .rt-tbody .rt-tr-group {
   border-bottom-color: rgb(233, 233, 233);
@@ -320,8 +330,9 @@
   flex-direction: column;
 }
 
-.rt-table {
-  flex: 100000 0 auto;
+.ReactTable .rt-table {
+  /* flex: 100000 0 auto; */
+  overflow: auto !important;
 }
 
 .-pagination,
@@ -414,24 +425,6 @@
   right: -5px;
 }
 
-.rt-table {
-  overflow: hidden !important;
-}
-
-.rt-tbody {
-  min-width: 0px !important;
-}
-.rt-thead {
-  min-width: 0px !important;
-  overflow: hidden !important;
-}
-
-.rt-tr-group {
-  min-width: 0px !important;
-}
-.vertical-scrollbar-present {
-  width: calc(100% - 15px) !important;
-}
 .bp3-dark .dt-minimalStyle .ReactTable {
   background: transparent !important;
 }

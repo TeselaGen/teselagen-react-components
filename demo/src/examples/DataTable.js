@@ -27,7 +27,7 @@ const schema = {
         return (
           <span
             style={{
-              color: Math.random() > 0.5 ? "green" : "red"
+              color: value.length > 8 ? "green" : "red"
             }}
           >
             {value}
@@ -39,6 +39,20 @@ const schema = {
           <Icon icon="search-around" /> Name
         </span>
       )
+    },
+    { path: "createdAt", type: "timestamp", displayName: "Date Created" },
+    { path: "updatedAt", type: "timestamp", displayName: "Last Edited" },
+    {
+      type: "lookup",
+      displayName: "User Status",
+      path: "user.status.name"
+    },
+    { path: "createdAt", type: "timestamp", displayName: "Date Created" },
+    { path: "updatedAt", type: "timestamp", displayName: "Last Edited" },
+    {
+      type: "lookup",
+      displayName: "User Status",
+      path: "user.status.name"
     },
     { path: "createdAt", type: "timestamp", displayName: "Date Created" },
     { path: "updatedAt", type: "timestamp", displayName: "Last Edited" },

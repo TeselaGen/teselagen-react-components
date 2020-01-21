@@ -171,15 +171,15 @@ class DataTable extends React.Component {
 
   componentDidMount() {
     this.updateFromProps({}, computePresets(this.props));
-    const table = ReactDOM.findDOMNode(this.table);
-    let theads = table.getElementsByClassName("rt-thead");
-    let tbody = table.getElementsByClassName("rt-tbody")[0];
+    // const table = ReactDOM.findDOMNode(this.table);
+    // let theads = table.getElementsByClassName("rt-thead");
+    // let tbody = table.getElementsByClassName("rt-tbody")[0];
 
-    tbody.addEventListener("scroll", () => {
-      for (let i = 0; i < theads.length; i++) {
-        theads.item(i).scrollLeft = tbody.scrollLeft;
-      }
-    });
+    // tbody.addEventListener("scroll", () => {
+    //   for (let i = 0; i < theads.length; i++) {
+    //     theads.item(i).scrollLeft = tbody.scrollLeft;
+    //   }
+    // });
   }
 
   componentDidUpdate(oldProps) {
@@ -196,18 +196,18 @@ class DataTable extends React.Component {
 
     this.updateFromProps(computePresets(oldProps), computePresets(this.props));
 
-    let theads = table.getElementsByClassName("rt-thead");
+    // let theads = table.getElementsByClassName("rt-thead");
     let tbody = table.getElementsByClassName("rt-tbody")[0];
 
-    if (tbody.scrollHeight > tbody.clientHeight) {
-      for (let i = 0; i < theads.length; i++) {
-        theads.item(i).classList.add("vertical-scrollbar-present");
-      }
-    } else {
-      for (let i = 0; i < theads.length; i++) {
-        theads.item(i).classList.remove("vertical-scrollbar-present");
-      }
-    }
+    // if (tbody.scrollHeight > tbody.clientHeight) {
+    //   for (let i = 0; i < theads.length; i++) {
+    //     theads.item(i).classList.add("vertical-scrollbar-present");
+    //   }
+    // } else {
+    //   for (let i = 0; i < theads.length; i++) {
+    //     theads.item(i).classList.remove("vertical-scrollbar-present");
+    //   }
+    // }
 
     // if switching pages or searching the table we want to reset the scrollbar
     if (tbody.scrollTop > 0) {
