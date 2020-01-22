@@ -467,7 +467,6 @@ class DataTable extends React.Component {
     if (compact) {
       compactClassName += "tg-compact-table";
     }
-    const { tableId } = this.state;
     const hasFilters =
       filters.length ||
       searchTerm ||
@@ -653,6 +652,10 @@ class DataTable extends React.Component {
           ref={n => {
             if (n) this.table = n;
           }}
+          className={classNames({
+            "tg-table-loading": isLoading,
+            "tg-table-disabled": disabled
+          })}
           columns={this.renderColumns()}
           pageSize={rowsToShow}
           expanded={expandedRows}
@@ -674,9 +677,6 @@ class DataTable extends React.Component {
             });
             resizePersist(resizedToUse);
           }}
-          getTbodyProps={() => ({
-            id: tableId
-          })}
           TheadComponent={this.getTheadComponent}
           ThComponent={this.getThComponent}
           getTrGroupProps={this.getTableRowProps}
