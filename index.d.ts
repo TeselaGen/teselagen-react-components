@@ -300,7 +300,11 @@ export interface DataTableProps {
   filters: object;
   userSpecifiedCompact: boolean;
   hideDisplayOptionsIcon: boolean;
+  /**
+   * By deafult compact is true! To get the table to be "comfortable", set compact={false}
+   */
   compact: boolean;
+  extraCompact: boolean;
   compactPaging: boolean;
   entityCount: number;
   showCount: boolean;

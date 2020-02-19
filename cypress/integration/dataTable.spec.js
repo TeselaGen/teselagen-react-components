@@ -19,6 +19,20 @@ describe("formComponents", () => {
       .click();
     cy.contains("2 Selected");
   });
+  it('should be "normal" (normal===tg-compact-table) by default and have 3 modes, compact===tg-extra-compact-table, normal=tg-compact-table, comfortable=NOTHING_HERE ', () => {
+    cy.get(".data-table-container.tg-compact-table");
+    cy.get(".tg-table-display-options").click();
+    cy.get(".tg-table-display-density select").should("have.value", "compact");
+    cy.get(".tg-table-display-density select").select("extraCompact");
+    cy.get(".data-table-container.tg-extra-compact-table");
+    cy.get(".tg-table-display-options").click();
+    cy.get(".tg-table-display-density select").should(
+      "have.value",
+      "extraCompact"
+    );
+    cy.get(".tg-table-display-density select").select("normal");
+    cy.get(".data-table-container.tg-extra-compact-table").should("not.exist");
+  });
   it(`it can copy a single row, selected rows, or cells to the clipboard`, () => {
     //  - copying a single row (selected or not)
     cy.get(`[data-test="tgCell_type.special"]`)
@@ -66,7 +80,7 @@ describe("formComponents", () => {
     cy.get(`[data-test="tgCell_type.special"]`)
       .first()
       .trigger("contextmenu");
-    cy.contains("Copy Selected Rows to Clipboard").click({force: true}); //the force true prevents cypress from unecessarily scrolling when clicking the context menu
+    cy.contains("Copy Selected Rows to Clipboard").click({ force: true }); //the force true prevents cypress from unecessarily scrolling when clicking the context menu
     cy.contains("Selected rows copied");
   });
   it(`it can click the tg filter menu and type some stuff`, () => {

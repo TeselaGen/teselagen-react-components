@@ -16,6 +16,7 @@ export default function computePresets(props = {}) {
       hideSelectedCount: true,
       withTitle: false,
       withSearch: false,
+      compact: true,
       withPaging: false,
       withFilter: false,
       ...toReturn
@@ -25,6 +26,7 @@ export default function computePresets(props = {}) {
       // the usual defaults:
       noFooter: false,
       noPadding: false,
+      compact: true,
       noFullscreenButton: false,
       hidePageSizeWhenPossible: false,
       isInfinite: false,

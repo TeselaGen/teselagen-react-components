@@ -45,6 +45,7 @@ export default class DisplayOptions extends React.Component {
       updateColumnVisibility = noop,
       resetDefaultVisibility = noop,
       compact,
+      extraCompact,
       disabled,
       hasOptionForForcedHidden,
       showForcedHiddenColumns,
@@ -144,15 +145,28 @@ export default class DisplayOptions extends React.Component {
           <Menu>
             <div style={{ padding: 10, paddingLeft: 20, paddingRight: 20 }}>
               <h5 style={{ marginBottom: 10 }}>Display Density:</h5>
-              <div className={Classes.SELECT}>
+              <div className={Classes.SELECT + " tg-table-display-density"}>
                 <select
                   onChange={this.changeTableDensity}
-                  value={compact ? "compact" : "normal"}
+                  value={
+                    extraCompact
+                      ? "extraCompact"
+                      : compact
+                      ? "compact"
+                      : "normal"
+                  }
                 >
                   <option className={Classes.POPOVER_DISMISS} value="normal">
+                    Comfortable
+                  </option>
+                  {/* tnr: as you can see we're calling what was "compact" Normal now in response to https://github.com/TeselaGen/lims/issues/4713 */}
+                  <option className={Classes.POPOVER_DISMISS} value="compact">
                     Normal
                   </option>
-                  <option className={Classes.POPOVER_DISMISS} value="compact">
+                  <option
+                    className={Classes.POPOVER_DISMISS}
+                    value="extraCompact"
+                  >
                     Compact
                   </option>
                 </select>
@@ -160,8 +174,10 @@ export default class DisplayOptions extends React.Component {
               <h5 style={{ marginBottom: 10, marginTop: 10 }}>
                 Displayed Columns:
               </h5>
-              {mainFields.map(getFieldCheckbox)}
-              {fieldGroupMenu}
+              <div style={{ maxHeight: 290, overflowY: "auto" }}>
+                {mainFields.map(getFieldCheckbox)}
+                {fieldGroupMenu}
+              </div>
               {hasOptionForForcedHidden && (
                 <div style={{ marginTop: 15 }}>
                   <Switch
@@ -191,6 +207,7 @@ export default class DisplayOptions extends React.Component {
         }
       >
         <Button
+          className="tg-table-display-options"
           onClick={this.openPopover}
           disabled={disabled}
           minimal

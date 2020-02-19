@@ -276,7 +276,8 @@ class DataTableInstance extends React.Component {
       noRowsFoundMessage: false,
       isLoading: false,
       disabled: false,
-      compact: false,
+      compact: true,
+      extraCompact: false,
       hidePageSizeWhenPossible: false,
       hideSelectedCount: false,
       showCount: false,
@@ -510,7 +511,12 @@ class DataTableInstance extends React.Component {
         })}
         {renderToggle({
           that: this,
-          type: "compact"
+          type: "compact",
+          description: "The table is compact by default (and this is called Normal)"
+        })}
+        {renderToggle({
+          that: this,
+          type: "extraCompact"
         })}
         {renderToggle({
           that: this,
@@ -625,6 +631,7 @@ class DataTableInstance extends React.Component {
             isLoading={this.state.isLoading}
             disabled={this.state.disabled}
             compact={this.state.compact}
+            extraCompact={this.state.extraCompact}
             hidePageSizeWhenPossible={this.state.hidePageSizeWhenPossible}
             doNotShowEmptyRows={this.state.doNotShowEmptyRows}
             withCheckboxes={this.state.withCheckboxes}

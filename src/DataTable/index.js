@@ -419,6 +419,7 @@ class DataTable extends React.Component {
       errorParsingUrlString,
       hideDisplayOptionsIcon,
       compact,
+      extraCompact,
       compactPaging,
       entityCount,
       showCount,
@@ -464,9 +465,12 @@ class DataTable extends React.Component {
     if (compactPaging) {
       compactClassName += " tg-compact-paging";
     }
-    if (compact) {
-      compactClassName += "tg-compact-table";
-    }
+    compactClassName += extraCompact
+      ? " tg-extra-compact-table"
+      : compact
+      ? " tg-compact-table"
+      : "";
+
     const hasFilters =
       filters.length ||
       searchTerm ||
@@ -656,6 +660,13 @@ class DataTable extends React.Component {
             "tg-table-loading": isLoading,
             "tg-table-disabled": disabled
           })}
+          itemSizeEstimator={
+            extraCompact
+              ? itemSizeEstimators.compact
+              : compact
+              ? itemSizeEstimators.normal
+              : itemSizeEstimators.comfortable
+          }
           columns={this.renderColumns()}
           pageSize={rowsToShow}
           expanded={expandedRows}
@@ -710,6 +721,7 @@ class DataTable extends React.Component {
               {withDisplayOptions && (
                 <DisplayOptions
                   compact={compact}
+                  extraCompact={extraCompact}
                   disabled={disabled}
                   hideDisplayOptionsIcon={hideDisplayOptionsIcon}
                   resetDefaultVisibility={resetDefaultVisibilityToUse}
@@ -1356,3 +1368,9 @@ class DataTable extends React.Component {
 export default dataTableEnhancer(HotkeysTarget(DataTable));
 const ConnectedPagingTool = dataTableEnhancer(PagingTool);
 export { ConnectedPagingTool };
+
+const itemSizeEstimators = {
+  compact: () => 25.34,
+  normal: () => 33.34,
+  comfortable: () => 41.34
+};
