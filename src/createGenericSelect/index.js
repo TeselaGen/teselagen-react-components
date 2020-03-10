@@ -172,7 +172,8 @@ export default ({ modelNameToReadableName, withQueryAsFn, safeQuery }) => {
 
       removeEntityFromSelection = record => {
         const {
-          input: { onChange, idAs, value = [] }
+          idAs,
+          input: { onChange, value = [] }
         } = this.props;
         const newValue = value.filter(r => r[idAs] !== record[idAs]);
         if (newValue.length) {
