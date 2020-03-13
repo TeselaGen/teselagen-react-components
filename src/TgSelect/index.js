@@ -5,6 +5,7 @@ import { filter, isEqual } from "lodash";
 import fuzzysearch from "fuzzysearch";
 import classNames from "classnames";
 import "./style.css";
+import getTextFromEl from "../utils/getTextFromEl";
 
 class TgSelect extends React.Component {
   state = {
@@ -340,22 +341,6 @@ function getValueArray(value) {
   return value || value === 0 ? (Array.isArray(value) ? value : [value]) : [];
 }
 
-function getTextFromEl(el) {
-  return el.props && el.props.children
-    ? (el.props.children.reduce
-        ? el.props.children
-        : [el.props.children]
-      ).reduce((acc, child) => {
-        if (child && child.props && child.props.children) {
-          acc += getTextFromEl(child);
-        } else if (typeof child === "string") {
-          acc += child.toLowerCase();
-        }
-        return acc;
-      }, "")
-    : "";
-}
-
 //we export this here for use in createGenericSelect
 export const singleItemPredicate = (queryString, item) =>
   fuzzysearch(
@@ -363,6 +348,6 @@ export const singleItemPredicate = (queryString, item) =>
     item.label
       ? item.label.toLowerCase
         ? item.label.toLowerCase()
-        : getTextFromEl(item.label)
+        : getTextFromEl(item.label, { lowerCase: true })
       : (item.value && item.value.toLowerCase && item.value.toLowerCase()) || ""
   );

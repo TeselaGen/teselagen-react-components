@@ -756,12 +756,17 @@ class DataTable extends React.Component {
       isEntityDisabled,
       change
     } = computePresets(this.props);
-    if (!rowInfo) return {};
+    if (!rowInfo) {
+      return {
+        className: "no-row-data"
+      };
+    }
     const entity = rowInfo.original;
     const rowId = getIdOrCodeOrIndex(entity, rowInfo.index);
     const rowSelected = reduxFormSelectedEntityIdMap[rowId];
     const isExpanded = reduxFormExpandedEntityIdMap[rowId];
     const rowDisabled = isEntityDisabled(entity);
+    const dataId = entity.id || entity.code;
     return {
       onClick: e => {
         // if checkboxes are activated or row expander is clicked don't select row
@@ -811,7 +816,7 @@ class DataTable extends React.Component {
       className: classNames({
         selected: rowSelected && !withCheckboxes
       }),
-      "data-test-id": entity.id || entity.code,
+      "data-test-id": dataId,
       onDoubleClick: () => {
         if (rowDisabled) return;
         onDoubleClick(rowInfo.original, rowInfo.index, history);

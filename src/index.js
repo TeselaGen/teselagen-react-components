@@ -87,6 +87,7 @@ export {
 } from "./utils/modelNameToReadableName";
 
 export { default as showProgressToast } from "./utils/showProgressToast";
+export { default as getTextFromEl } from "./utils/getTextFromEl";
 export { default as ScrollToTop } from "./ScrollToTop";
 const noop = () => undefined;
 export { noop };

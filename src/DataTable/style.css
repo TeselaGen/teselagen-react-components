@@ -118,6 +118,11 @@
   border-bottom: 1px solid rgb(233, 233, 233);
 }
 
+/* tgreen: we don't want the border for rows that don't have any data */
+.ReactTable.ReactTable .rt-tbody .rt-tr-group.no-row-data {
+  border-bottom: none;
+}
+
 .ReactTable.ReactTable .rt-tbody .rt-tr {
   border: none;
 }
