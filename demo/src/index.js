@@ -18,6 +18,7 @@ import ResizableDraggableDialog from "../../src/ResizableDraggableDialog";
 import showLoadingMask from "../../src/showLoadingMask";
 
 import CustomIcons from "./examples/CustomIcons";
+import CSSOnlyToolTip from "./examples/CSSOnlyToolTip";
 import S3Uploader from "./examples/S3Uploader";
 import SimpleTable from "./examples/SimpleTable";
 import TgSelectDemo from "./examples/TgSelectDemo";
@@ -428,6 +429,12 @@ const demos = {
       customIcons
     },
     demo: CustomIcons
+  },
+  "CSS-Only ToolTip": {
+    scope: {
+      renderToggle
+    },
+    demo: CSSOnlyToolTip
   },
   S3Uploader: {
     scope: {

@@ -610,6 +610,10 @@ export interface TgSelectProps {
   multi: boolean;
   options: any;
   value: any;
+  /**
+   * The tool uses a fuzzy search by default. This makes it use a simple indexOf search
+   */
+  isSimpleSearch: boolean;
   creatable: boolean;
   optionRenderer: any;
   tagInputProps: any;

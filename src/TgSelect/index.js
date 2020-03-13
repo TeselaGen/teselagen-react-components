@@ -33,7 +33,7 @@ class TgSelect extends React.Component {
           }
         )}
       >
-        {optionRenderer ? optionRenderer(i) : i.label}
+        {optionRenderer ? optionRenderer(i, this.props) : i.label}
       </div>
     );
   };
@@ -49,7 +49,7 @@ class TgSelect extends React.Component {
     this.setState({ activeItem: null });
     if (multi) {
       const valArray = getValueArray(value);
-      if (closeOnSelect) {
+      if (closeOnSelect || item.closeOnSelect) {
         this.setState({ isOpen: false });
         this.input && this.input.blur();
       }
@@ -92,7 +92,7 @@ class TgSelect extends React.Component {
   };
 
   itemPredicate = (queryString, item) => {
-    const { value, multi } = this.props;
+    const { value, multi, isSimpleSearch } = this.props;
     if (multi) {
       const valArray = getValueArray(value);
 
@@ -102,7 +102,7 @@ class TgSelect extends React.Component {
       );
       if (filteredVals.length !== valArray.length) return false;
     }
-    return singleItemPredicate(queryString, item);
+    return singleItemPredicate(queryString, item, isSimpleSearch);
   };
   onQueryChange = query => {
     const { onInputChange = () => {} } = this.props;
@@ -154,11 +154,12 @@ class TgSelect extends React.Component {
     const val = Array.isArray(value) ? value : [value];
     const matchingVal = val.find(op => op.label === label);
     const disabled = matchingVal && matchingVal.disabled;
+    const className = matchingVal && matchingVal.className;
 
     return {
       intent: disabled ? "" : "primary",
       minimal: true,
-      className: classNames("tg-select-value", {
+      className: classNames(className, "tg-select-value", {
         disabled
       }),
       onRemove: multi && !disabled ? this.handleTagRemove : null
@@ -342,8 +343,8 @@ function getValueArray(value) {
 }
 
 //we export this here for use in createGenericSelect
-export const singleItemPredicate = (queryString, item) =>
-  fuzzysearch(
+export const singleItemPredicate = (queryString, item, isSimpleSearch) =>
+  (isSimpleSearch ? simplesearch : fuzzysearch)(
     queryString.toLowerCase(),
     item.label
       ? item.label.toLowerCase
@@ -351,3 +352,7 @@ export const singleItemPredicate = (queryString, item) =>
         : getTextFromEl(item.label, { lowerCase: true })
       : (item.value && item.value.toLowerCase && item.value.toLowerCase()) || ""
   );
+
+function simplesearch(needle, haystack) {
+  return (haystack || "").indexOf(needle) !== -1;
+}

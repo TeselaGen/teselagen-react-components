@@ -15,10 +15,15 @@ import {
   orderBy,
   take,
   drop,
-  isEmpty
+  isEmpty,
+  toInteger
 } from "lodash";
 
-const pageSizes = [5, 10, 15, 25, 50, 100, 200, 400];
+const additionalPageSize =
+  window.frontendConfig && window.frontendConfig.additionalPageSize
+    ? [toInteger(window.frontendConfig.additionalPageSize)]
+    : [];
+const pageSizes = [5, 10, 15, 25, 50, 100, 200, 400, ...additionalPageSize];
 
 export { pageSizes };
 

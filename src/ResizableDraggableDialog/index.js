@@ -46,7 +46,7 @@ export default class ResizableDraggableDialog extends React.Component {
 
     return (
       <div
-        className={"tg-bp3-dialog-resizable-draggable"}
+        className="tg-bp3-dialog-resizable-draggable"
         style={{ top: 0, left: 0, position: "fixed" }}
       >
         <Rnd
@@ -62,7 +62,7 @@ export default class ResizableDraggableDialog extends React.Component {
           maxWidth={windowWidth}
           // minWidth={Math.min(defaultDialogWidth, 300) }
           // minHeight={Math.min(defaultDialogHeight, 200) }
-          bounds={"window"}
+          bounds="window"
           default={{
             width: Math.min(defaultDialogWidth, windowWidth),
             height: Math.min(defaultDialogHeight, windowHeight)
@@ -74,7 +74,12 @@ export default class ResizableDraggableDialog extends React.Component {
           dragHandleClassName={Classes.DIALOG_HEADER}
           {...RndProps}
         >
-          <Dialog hasBackdrop={false} usePortal={false} {...rest} />
+          <Dialog
+            enforceFocus={false}
+            hasBackdrop={false}
+            usePortal={false}
+            {...rest}
+          />
         </Rnd>
       </div>
     );

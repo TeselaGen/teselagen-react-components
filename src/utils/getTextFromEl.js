@@ -14,6 +14,8 @@ export default function getTextFromEl(el, options = {}) {
           } else {
             acc += child;
           }
+        } else if (typeof child === "number") {
+          acc += child + "";
         }
         return acc;
       }, "")
