@@ -239,6 +239,10 @@
   background: #ebf1f5;
   z-index: 1;
 }
+/* tnr: this is a hack to make cypress be able to correctly click the table without the sticky header getting in the way. remove me once https://github.com/cypress-io/cypress/issues/871 is fixed */
+.in_cypress_test .ReactTable .rt-thead {
+  position: unset;
+}
 
 .bp3-dark .ReactTable .rt-thead {
   background: #202b33;

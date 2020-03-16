@@ -1,9 +1,13 @@
 describe("formComponents", () => {
-  beforeEach(() => {
-    cy.visit("#/DataTable");
+  it("can click the first row of a table that has a scroll bar (aka cypress should not incorrectly scroll the top row under the header)", () => {
+    cy.visit("#/DataTable?pageSize=100");
+    cy.get(`.rt-tr-group[data-test-id="1"] .rt-tr .rt-td`)
+      .first()
+      .click();
   });
   //TODO THIS IS BREAKING!
   it.skip(`it can select entities across pages`, () => {
+    cy.visit("#/DataTable");
     cy.contains("0 Selected");
     //select first entity
     cy.get(`[data-test="tgCell_type.special"]`)
@@ -20,6 +24,7 @@ describe("formComponents", () => {
     cy.contains("2 Selected");
   });
   it('should be "normal" (normal===tg-compact-table) by default and have 3 modes, compact===tg-extra-compact-table, normal=tg-compact-table, comfortable=NOTHING_HERE ', () => {
+    cy.visit("#/DataTable");
     cy.get(".data-table-container.tg-compact-table");
     cy.get(".tg-table-display-options").click();
     cy.get(".tg-table-display-density select").should("have.value", "compact");
@@ -34,6 +39,7 @@ describe("formComponents", () => {
     cy.get(".data-table-container.tg-extra-compact-table").should("not.exist");
   });
   it(`it can copy a single row, selected rows, or cells to the clipboard`, () => {
+    cy.visit("#/DataTable");
     //  - copying a single row (selected or not)
     cy.get(`[data-test="tgCell_type.special"]`)
       .first()
@@ -60,6 +66,7 @@ describe("formComponents", () => {
     cy.contains("Selected rows copied");
   });
   it(`doesn't break when selecting items across pages and copying`, () => {
+    cy.visit("#/DataTable");
     //we have to toggle off the url connected option for right now because it is breaking multi page selection
     cy.tgToggle("urlConnected", false);
     cy.get(".data-table-footer .paging-arrow-right").click();
@@ -84,6 +91,7 @@ describe("formComponents", () => {
     cy.contains("Selected rows copied");
   });
   it(`it can click the tg filter menu and type some stuff`, () => {
+    cy.visit("#/DataTable");
     cy.get(`[data-test="Hunger Level"]`)
       .find(".tg-filter-menu-button")
       .click({ force: true });
@@ -97,6 +105,7 @@ describe("formComponents", () => {
     cy.get(".data-table-clear-filters").should("not.exist");
   });
   it(`it can select a cell via a data-test attribute`, () => {
+    cy.visit("#/DataTable");
     cy.get(`[data-test="tgCell_type.special"]`)
       .eq(3) //get the third cell just for kicks
       .should("be.visible");

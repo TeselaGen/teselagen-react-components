@@ -569,6 +569,7 @@ class DataTable extends React.Component {
           compactClassName,
           {
             fullscreen,
+            in_cypress_test: window.Cypress, //tnr: this is a hack to make cypress be able to correctly click the table without the sticky header getting in the way. remove me once https://github.com/cypress-io/cypress/issues/871 is fixed
             "dt-isViewable": isViewable,
             "dt-minimalStyle": minimalStyle,
             "no-padding": noPadding,
