@@ -31,14 +31,28 @@ import Uploader from "./Uploader";
 import sortify from "./sortify"; //tnr TODO: export this from json.sortify when https://github.com/ThomasR/JSON.sortify/issues/11 is resolved
 import { fieldRequired } from "./utils";
 
-function getIntent({ showErrorIfUntouched, meta: { touched, error } }) {
-  return (touched || showErrorIfUntouched) && error ? Intent.DANGER : undefined;
+function getIntent({
+  showErrorIfUntouched,
+  meta: { touched, error, warning }
+}) {
+  const hasError = (touched || showErrorIfUntouched) && error;
+  const hasWarning = (touched || showErrorIfUntouched) && warning;
+  if (hasError) {
+    return Intent.DANGER;
+  } else if (hasWarning) {
+    return Intent.WARNING;
+  }
 }
 
-function getIntentClass({ showErrorIfUntouched, meta: { touched, error } }) {
-  return (touched || showErrorIfUntouched) && error
-    ? Classes.INTENT_DANGER
-    : "";
+function getIntentClass(...args) {
+  const intent = getIntent(...args);
+  if (intent === Intent.DANGER) {
+    return Classes.INTENT_DANGER;
+  } else if (intent === Intent.WARNING) {
+    return Classes.INTENT_WARNING;
+  } else {
+    return "";
+  }
 }
 
 function removeUnwantedProps(props) {
@@ -128,13 +142,14 @@ class AbstractInput extends React.Component {
       input,
       noFillField
     } = this.props;
-    const { touched, error } = meta;
+    const { touched, error, warning } = meta;
     const showError = (touched || showErrorIfUntouched) && error;
+    const showWarning = (touched || showErrorIfUntouched) && warning;
     let componentToWrap = tooltipError ? (
       <Tooltip
         disabled={!showError}
-        intent={Intent.DANGER}
-        content={error}
+        intent={error ? "danger" : "warning"}
+        content={error || warning}
         position={Position.TOP}
         {...tooltipProps}
       >
@@ -149,13 +164,23 @@ class AbstractInput extends React.Component {
         <div className="tg-no-fill-field">{componentToWrap}</div>
       );
     }
+
+    let helperText;
+    if (!tooltipError) {
+      if (showError) {
+        helperText = error;
+      } else if (showWarning) {
+        helperText = warning;
+      }
+    }
+
     return (
       <FormGroup
         className={classNames(className, testClassName, {
           "tg-tooltipError": tooltipError
         })}
         disabled={disabled}
-        helperText={!tooltipError && showError && error}
+        helperText={helperText}
         intent={intent}
         label={
           !noOuterLabel &&

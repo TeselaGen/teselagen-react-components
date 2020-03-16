@@ -185,23 +185,19 @@ class TgSelect extends React.Component {
       ...rest
     } = this.props;
 
+    const hasValue = Array.isArray(value) ? value.length > 0 : !!value;
+
     const rightElement = isLoading ? (
       <Button loading minimal />
     ) : (
       <span>
-        {(Array.isArray(value) ? (
-          value.length > 0
-        ) : (
-          value
-        )) ? (
+        {hasValue && (
           <Button
             className="tg-select-clear-all"
             icon="cross"
             minimal
             onClick={this.handleClear}
           />
-        ) : (
-          undefined
         )}
         <Button
           onClick={e => {
