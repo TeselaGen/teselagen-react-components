@@ -517,31 +517,7 @@ export interface IntentTextProps {
   text: string;
   children: any;
 }
-// J5ReportRecordView
-declare class J5ReportRecordView extends React.Component<J5ReportRecordViewProps, any> { }
 
-export interface J5ReportRecordViewProps {
-  data: any;
-  additionalHeaderButtons: any;
-  LinkJ5TableDialog: any;
-  LinkJ5ReportButton: any;
-  additionalHeaderComponent: any;
-  getSchema: any;
-  data: any;
-  getIsLinkedCellRenderer: any;
-  LinkJ5TableDialog: any;
-  LinkJ5ReportButton: any;
-  onConstructDoubleClick: any;
-  pcrReactionsTitleElements: any;
-  constructsTitleElements: any;
-  oligosTitleElements: any;
-  linkDialogWidth: any;
-  fragmentMap: any;
-  linkFragmentMap: any;
-  noPrebuiltConstructs: any;
-  dataTableProps: any;
-  synthonSequenceTitleElements: any;
-}
 // Loading
 declare class Loading extends React.Component<LoadingProps, any> { }
 

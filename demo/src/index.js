@@ -31,14 +31,11 @@ import {
   withTableParams,
   DataTable,
   PagingTool,
-  createGenericSelect,
   modelNameToReadableName
 } from "../../src";
 import Uploader from "../../src/FormComponents/Uploader";
 import { FileUploadField } from "../../src/FormComponents";
-import J5ReportRecordView from "./examples/J5ReportRecordView";
 import FillWindowExample from "./examples/FillWindow";
-import j5ReportRecordViewData from "./data/j5ReportRecordView";
 import * as customIcons from "../../src/customIcons";
 
 import Tree from "./examples/Tree";
@@ -449,13 +446,6 @@ const demos = {
       magicDownload
     },
     demo: S3Uploader
-  },
-  J5ReportRecordView: {
-    demo: J5ReportRecordView,
-    scope: {
-      renderToggle,
-      data: j5ReportRecordViewData
-    }
   },
   FillWindow: {
     demo: FillWindowExample,
