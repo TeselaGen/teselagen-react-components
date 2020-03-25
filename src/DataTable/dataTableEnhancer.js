@@ -20,48 +20,6 @@ export default compose(
     isLocalCall: true
   }),
   withState("showForcedHiddenColumns", "setShowForcedHidden", false),
-  // withDelete(tableConfigurationFragment, {
-  //   refetchQueries: ["tableConfigurationQuery"]
-  // }),
-  // withUpsert(tableConfigurationFragment, {
-  //   refetchQueries: ["tableConfigurationQuery"]
-  // }),
-  // withUpsert(fieldOptionFragment, {
-  //   refetchQueries: ["tableConfigurationQuery"]
-  // }),
-  // withQuery(currentUserFragment, {
-  //   argsOverride: ["", ""],
-  //   nameOverride: "currentUser",
-  //   queryName: "dataTableCurrentUserQuery",
-  //   options: props => {
-  //     const { withDisplayOptions, syncDisplayOptionsToDb } = props;
-  //     return {
-  //       skip: !syncDisplayOptionsToDb || !withDisplayOptions
-  //     };
-  //   }
-  // }),
-  // withQuery(tableConfigurationFragment, {
-  //   queryName: "tableConfigurationQuery",
-  //   isPlural: true,
-  //   options: props => {
-  //     const {
-  //       formName,
-  //       withDisplayOptions,
-  //       syncDisplayOptionsToDb,
-  //       currentUser
-  //     } = props;
-  //     const userId = get(currentUser, "user.id");
-  //     return {
-  //       skip: !syncDisplayOptionsToDb || !withDisplayOptions || !userId,
-  //       variables: {
-  //         filter: {
-  //           userId,
-  //           formName
-  //         }
-  //       }
-  //     };
-  //   }
-  // }),
   withProps(ownProps => {
     let propsToUse = ownProps;
     if (!ownProps.isTableParamsConnected) {
