@@ -58,7 +58,6 @@ import {
   CmdSwitch
 } from "../../src/utils/commandControls";
 import ScrollToTop from "../../src/ScrollToTop";
-import GenericSelectDemo from "./examples/GenericSelectDemo";
 
 import "./style.css";
 import React, { Component } from "react";
@@ -185,27 +184,6 @@ const demos = {
       TgSelect,
       Icon,
       renderToggle
-    },
-    props: [
-      {
-        name: "className",
-        description:
-          "The CSS class name passed to the Button (if Popover) or Tooltip",
-        type: "string"
-      }
-    ]
-  },
-  GenericSelect: {
-    demo: GenericSelectDemo,
-    scope: {
-      Classes,
-      modelNameToReadableName,
-      createGenericSelect,
-      renderToggle,
-      reduxForm,
-      ApolloProvider,
-      client,
-      store
     },
     props: [
       {

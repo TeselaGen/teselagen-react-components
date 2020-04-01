@@ -682,13 +682,10 @@ interface showConfirmationDialogOpts {
 function closeLoadingMask(){}
 
 //Todo: 
-// createGenericSelect
-// getApolloMethods
 
 // constants
 // customIcons
 // enhancers
-// flow_types
 // rerenderOnWindowResize
 // showConfirmationDialog
 // showLoadingMask
