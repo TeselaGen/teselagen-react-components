@@ -20,8 +20,8 @@ import {
 } from "lodash";
 
 const additionalPageSize =
-  window.frontendConfig && window.frontendConfig.additionalPageSize
-    ? [toInteger(window.frontendConfig.additionalPageSize)]
+  window.frontEndConfig && window.frontEndConfig.additionalPageSize
+    ? [toInteger(window.frontEndConfig.additionalPageSize)]
     : [];
 const pageSizes = [5, 10, 15, 25, 50, 100, 200, 400, ...additionalPageSize];
 
