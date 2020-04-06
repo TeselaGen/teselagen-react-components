@@ -230,7 +230,7 @@ class TgSelect extends React.Component {
       <MultiSelect
         onActiveItemChange={this.handleActiveItemChange}
         closeOnSelect={!multi}
-        resetOnSelect={!multi}
+        resetOnSelect={true}
         items={options || []}
         activeItem={
           this.state.activeItem ||

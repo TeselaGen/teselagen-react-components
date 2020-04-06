@@ -31,7 +31,6 @@ import {
   withTableParams,
   DataTable,
   PagingTool,
-  modelNameToReadableName
 } from "../../src";
 import Uploader from "../../src/FormComponents/Uploader";
 import { FileUploadField } from "../../src/FormComponents";

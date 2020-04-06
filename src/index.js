@@ -28,9 +28,6 @@ export { default as DownloadLink } from "./DownloadLink";
 export { default as MultiSelectSideBySide } from "./MultiSelectSideBySide";
 export { default as magicDownload } from "./DownloadLink/magicDownload";
 export { default as IntentText } from "./IntentText";
-export {
-  default as routeDoubleClick
-} from "./DataTable/utils/routeDoubleClick";
 export { default as withTableParams } from "./DataTable/utils/withTableParams";
 export { default as InfoHelper } from "./InfoHelper";
 export { default as showConfirmationDialog } from "./showConfirmationDialog";
@@ -72,17 +69,6 @@ export { default as Tree } from "./Tree";
 export {
   default as AsyncValidateFieldSpinner
 } from "./AsyncValidateFieldSpinner";
-
-export {
-  default as modelNameToLink,
-  setModelLinkMap
-} from "./utils/modelNameToLink";
-export {
-  default as modelNameToReadableName,
-  setModelUppercaseMap,
-  setModelLowercaseMap
-} from "./utils/modelNameToReadableName";
-
 export { default as showProgressToast } from "./utils/showProgressToast";
 export { default as getTextFromEl } from "./utils/getTextFromEl";
 export { default as ScrollToTop } from "./ScrollToTop";
