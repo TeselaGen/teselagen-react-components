@@ -2,7 +2,6 @@ import { formValueSelector } from "redux-form";
 import { reduce } from "lodash";
 import { connect } from "react-redux";
 /**
- *
  * @param {*string} formName
  * @param {*string} formName
  * @param {*string} formName
