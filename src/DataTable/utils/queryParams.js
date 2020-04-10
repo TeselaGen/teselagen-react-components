@@ -15,17 +15,12 @@ import {
   orderBy,
   take,
   drop,
-  isEmpty,
-  toInteger
+  isEmpty
 } from "lodash";
 
-const additionalPageSize =
-  window.frontEndConfig && window.frontEndConfig.additionalPageSize
-    ? [toInteger(window.frontEndConfig.additionalPageSize)]
-    : [];
-const pageSizes = [5, 10, 15, 25, 50, 100, 200, 400, ...additionalPageSize];
+const defaultPageSizes = [5, 10, 15, 25, 50, 100, 200, 400];
 
-export { pageSizes };
+export { defaultPageSizes };
 
 export function getMergedOpts(topLevel = {}, instanceLevel = {}) {
   return {
@@ -614,7 +609,7 @@ export function getQueryParams({
   }
   if (pageSize !== undefined && !doNotCoercePageSize) {
     //pageSize might come in as an unexpected number so we coerce it to be one of the nums in our pageSizes array
-    let closest = clone(pageSizes).sort(
+    let closest = clone(window.tgPageSizes || defaultPageSizes).sort(
       (a, b) => Math.abs(pageSize - a) - Math.abs(pageSize - b)
     )[0];
     pageSize = closest;

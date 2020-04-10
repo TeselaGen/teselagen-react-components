@@ -2,11 +2,11 @@
 import React from "react";
 import { withProps, withHandlers, compose } from "recompose";
 import classNames from "classnames";
-import { noop, get } from "lodash";
+import { noop, get, toInteger } from "lodash";
 import { Button, Classes } from "@blueprintjs/core";
 import type { Paging } from "../flow_types";
 import { onEnterOrBlurHelper } from "../utils/handlerHelpers";
-import { pageSizes } from "./utils/queryParams";
+import { defaultPageSizes } from "./utils/queryParams";
 import getIdOrCodeOrIndex from "./utils/getIdOrCodeOrIndex";
 
 export class PagingTool extends React.Component {
@@ -92,6 +92,14 @@ export class PagingTool extends React.Component {
     });
     this.setPage(selectedPage);
   };
+  componentDidMount() {
+    //set a
+    const additionalPageSize =
+      window.frontEndConfig && window.frontEndConfig.additionalPageSize
+        ? [toInteger(window.frontEndConfig.additionalPageSize)]
+        : [];
+    window.tgPageSizes = [...defaultPageSizes, ...additionalPageSize];
+  }
 
   render() {
     const { selectedPage, refetching } = this.state;
@@ -131,7 +139,7 @@ export class PagingTool extends React.Component {
               <option key="page-size-placeholder" disabled value="fake">
                 Size
               </option>,
-              ...pageSizes.map(size => {
+              ...(window.tgPageSizes || defaultPageSizes).map(size => {
                 return (
                   <option key={size} value={size}>
                     {size}
