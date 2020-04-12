@@ -24,7 +24,7 @@ const generateToast = intent => (message, options) => {
     }
   }
   if (window.Cypress && intent === Intent.DANGER) {
-    console.error("toastr error message:", message);
+    console.error("toastr error message: ", message);
   }
   const uniqKey = toastToUse.show(
     {

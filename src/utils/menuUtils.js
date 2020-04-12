@@ -1,17 +1,35 @@
 import React from "react";
 import { lifecycle, compose, branch } from "recompose";
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 import {
   MenuItem,
   MenuDivider,
   Tooltip,
   KeyCombo,
   ContextMenu,
-  Menu
+  Menu,
+  Classes,
+  Icon
 } from "@blueprintjs/core";
 import { startCase, omit } from "lodash";
 
 const noop = () => {};
+
+// https://github.com/palantir/blueprint/issues/2820
+function MenuItemLink({ text, onClick, icon, navTo }) {
+  const handleLinkClick = e => {
+    e.target.closest(`.${Classes.POPOVER_DISMISS}`).click();
+  };
+
+  return (
+    <li className={Classes.POPOVER_DISMISS} onClick={onClick}>
+      <Link onClick={handleLinkClick} to={navTo} className="bp3-menu-item">
+        {icon && <Icon icon={icon} />}
+        <div className="bp3-text-overflow-ellipsis bp3-fill">{text}</div>
+      </Link>
+    </li>
+  );
+}
 
 // Enhanced MenuItem that supports history-based navigation when passed a
 // `navTo` prop
@@ -28,28 +46,18 @@ export const EnhancedMenuItem = compose(
   }),
   branch(({ navTo }) => navTo, withRouter)
 )(function({ navTo, context, staticContext, didMount, willUnmount, ...props }) {
-  let clickHandler = props.onClick
-    ? (...args) => {
-        return props.onClick(...args, context);
-      }
-    : undefined;
+  let MenuItemComp = MenuItem;
   if (navTo) {
-    clickHandler = e => {
-      if (e.metaKey || e.ctrlKey) {
-        window.open(props.history.createHref({ pathname: navTo }));
-      } else {
-        props.history.push(navTo);
-      }
-      if (props.onClick) props.onClick(e);
-    };
+    MenuItemComp = MenuItemLink;
   }
+
   return (
-    <MenuItem
+    <MenuItemComp
       popoverProps={{
         autoFocus: false
       }}
+      navTo={navTo}
       {...props}
-      onClick={clickHandler}
     />
   );
 });
