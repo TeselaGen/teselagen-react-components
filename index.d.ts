@@ -66,12 +66,6 @@ export function withUpsert(
   options: WithUpsertOptions
 ): void;
 
-//tnrtodo: we should really just re-export withquery etc from @teselagen/apollo-methods in 
-export function withQuery(
-  nameOrFragment: string,
-  options: WithUpsertOptions
-): void;
-
 export function noop(): void;
 
 interface showDialogOnDocBodyOptions {

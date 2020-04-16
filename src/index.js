@@ -1,12 +1,5 @@
-import {
-  withDelete,
-  withUpsert,
-  getApolloMethods
-} from "@teselagen/apollo-methods";
 import "./style.css";
 
-export { withDelete, withUpsert, getApolloMethods };
-export { default as withQuery } from "./enhancers/withQuery";
 export {
   getCurrentParamsFromUrl,
   setCurrentParamsOnUrl
@@ -39,14 +32,10 @@ export {
 export { default as MenuBar } from "./MenuBar";
 export { default as rerenderOnWindowResize } from "./rerenderOnWindowResize";
 export { default as HotkeysDialog } from "./HotkeysDialog";
-export { default as withQueryDynamic } from "./enhancers/withQueryDynamic";
 export { default as withFields } from "./enhancers/withFields";
 export { default as withField } from "./enhancers/withField";
 export { default as withDialog } from "./enhancers/withDialog";
 export { default as tg_modalState } from "./enhancers/withDialog/tg_modalState";
-export {
-  default as generateFragmentWithFields
-} from "./utils/generateFragmentWithFields";
 export { default as Timeline, TimelineEvent } from "./Timeline";
 export * from "./FormComponents";
 export * from "./toastr";
@@ -64,7 +53,6 @@ export * from "./utils/hotkeyUtils";
 export * from "./utils/menuUtils";
 export * from "./utils/commandUtils";
 export * from "./utils/commandControls";
-export { default as generateQuery } from "./utils/generateQuery";
 export { default as Tree } from "./Tree";
 export {
   default as AsyncValidateFieldSpinner
