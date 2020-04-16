@@ -86,7 +86,7 @@
     "@types/lodash": "npm:@types/lodash-es",
     "apollo-boost": "^0.1.15",
     "apollo-cache-invalidation": "^0.0.3",
-    "axios": "^0.18.0",
+    "axios": "^0.19.2",
     "babel-jest": "^23.6.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
