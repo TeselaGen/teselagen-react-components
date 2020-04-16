@@ -150,10 +150,10 @@ class TgSelect extends React.Component {
   };
 
   getTagProps = label => {
-    const { multi, value = [] } = this.props;
+    const { multi, value = [], disabled: _disabled } = this.props;
     const val = Array.isArray(value) ? value : [value];
     const matchingVal = val.find(op => op.label === label);
-    const disabled = matchingVal && matchingVal.disabled;
+    const disabled = _disabled || (matchingVal && matchingVal.disabled);
     const className = matchingVal && matchingVal.className;
 
     return {
@@ -191,7 +191,7 @@ class TgSelect extends React.Component {
       <Button loading minimal />
     ) : (
       <span>
-        {hasValue && (
+        {hasValue && !disabled && (
           <Button
             className="tg-select-clear-all"
             icon="cross"
@@ -207,6 +207,7 @@ class TgSelect extends React.Component {
               this.setState({ isOpen: false });
             }
           }}
+          disabled={disabled}
           className="tg-select-toggle"
           minimal
           icon={this.state.isOpen ? "caret-up" : "caret-down"}

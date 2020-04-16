@@ -173,4 +173,26 @@ describe("formComponents", () => {
       "test text33"
     );
   });
+
+  it("disabled react select field should not be editable", () => {
+    cy.contains(
+      ".tg-test-react-select-field-disabled .tg-select-value",
+      "Ximena Morales"
+    );
+
+    // no remove option button
+    cy.get(
+      ".tg-test-react-select-field-disabled .tg-select-value .bp3-tag-remove"
+    ).should("not.exist");
+
+    // no clear all button
+    cy.get(".tg-test-react-select-field-disabled .tg-select-clear-all").should(
+      "not.exist"
+    );
+
+    // open select button is disabled
+    cy.get(".tg-test-react-select-field-disabled .tg-select-toggle").should(
+      "be.disabled"
+    );
+  });
 });

@@ -359,7 +359,33 @@ class FormComponentsDemo extends React.Component {
                 label: "Rodrigo Pavez",
                 value: { name: "Rodrigo Pavez", id: "123" }
               },
-              { label: "Ximena Morales", value: "Ximena Morales", disabled: true },
+              {
+                label: "Ximena Morales",
+                value: "Ximena Morales",
+                disabled: true
+              },
+              { label: "Kyle Craft", value: "Kyle Craft" },
+              { label: "Sam Denicola", value: "Sam Denicola" },
+              { label: "Tom Ogasawara", value: "Tom Ogasawara" }
+            ]}
+          />
+          <ReactSelectField
+            name="reactSelectFieldDisabled"
+            inlineLabel={this.state.inlineLabels}
+            label="ReactSelectField Disabled"
+            onFieldSubmit={onFieldSubmit}
+            multi
+            disabled
+            defaultValue={["Ximena Morales"]}
+            options={[
+              {
+                label: "Rodrigo Pavez",
+                value: { name: "Rodrigo Pavez", id: "123" }
+              },
+              {
+                label: "Ximena Morales",
+                value: "Ximena Morales"
+              },
               { label: "Kyle Craft", value: "Kyle Craft" },
               { label: "Sam Denicola", value: "Sam Denicola" },
               { label: "Tom Ogasawara", value: "Tom Ogasawara" }
