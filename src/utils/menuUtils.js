@@ -56,7 +56,7 @@ export const EnhancedMenuItem = compose(
       popoverProps={{
         autoFocus: false
       }}
-      navTo={navTo}
+      {...(navTo && { navTo })}
       {...props}
     />
   );
