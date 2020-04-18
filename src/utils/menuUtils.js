@@ -58,6 +58,13 @@ export const EnhancedMenuItem = compose(
       }}
       {...(navTo && { navTo })}
       {...props}
+      onClick={
+        props.onClick
+          ? (...args) => {
+              return props.onClick(...args, context);
+            }
+          : undefined
+      }
     />
   );
 });
