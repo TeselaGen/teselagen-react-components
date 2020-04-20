@@ -437,7 +437,8 @@ class DataTable extends React.Component {
       hasOptionForForcedHidden,
       showForcedHiddenColumns,
       searchMenuButton,
-      setShowForcedHidden
+      setShowForcedHidden,
+      noFocus
     } = propPresets;
     let updateColumnVisibilityToUse = updateColumnVisibility;
     let updateTableDisplayDensityToUse = updateTableDisplayDensity;
@@ -640,7 +641,8 @@ class DataTable extends React.Component {
                     setSearchTerm,
                     loading: isLoading,
                     searchMenuButton,
-                    disabled
+                    disabled,
+                    noFocus
                   }}
                 />
               </div>
