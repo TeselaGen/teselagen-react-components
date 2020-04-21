@@ -792,7 +792,7 @@ export function generateField(component, opts) {
         onFieldSubmit={onFieldSubmit}
         name={name}
         component={compWithDefaultVal}
-        {...(isRequired ? { validate: fieldRequired } : {})}
+        {...(isRequired && { validate: fieldRequired })}
         {...rest}
       />
     );
