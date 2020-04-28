@@ -182,6 +182,7 @@ class TgSelect extends React.Component {
       onBlur,
       disabled,
       popoverProps,
+      resetOnSelect = true,
       ...rest
     } = this.props;
 
@@ -231,7 +232,7 @@ class TgSelect extends React.Component {
       <MultiSelect
         onActiveItemChange={this.handleActiveItemChange}
         closeOnSelect={!multi}
-        resetOnSelect={true}
+        resetOnSelect={resetOnSelect}
         items={options || []}
         activeItem={
           this.state.activeItem ||
@@ -278,7 +279,6 @@ class TgSelect extends React.Component {
             this.setState({ isOpen: true });
           }
         }}
-        resetOnClose
         onItemSelect={this.handleItemSelect}
         createNewItemFromQuery={maybeCreateNewItemFromQuery}
         createNewItemRenderer={maybeCreateNewItemRenderer}
