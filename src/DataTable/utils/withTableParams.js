@@ -1,4 +1,3 @@
-//@flow
 import { change, formValueSelector } from "redux-form";
 import { connect } from "react-redux";
 import compose from "lodash/fp/compose";

@@ -1,10 +1,8 @@
-//@flow
 import React from "react";
 import { withProps, withHandlers, compose } from "recompose";
 import classNames from "classnames";
 import { noop, get, toInteger } from "lodash";
 import { Button, Classes } from "@blueprintjs/core";
-import type { Paging } from "../flow_types";
 import { onEnterOrBlurHelper } from "../utils/handlerHelpers";
 import { defaultPageSizes } from "./utils/queryParams";
 import getIdOrCodeOrIndex from "./utils/getIdOrCodeOrIndex";
@@ -12,13 +10,6 @@ import getIdOrCodeOrIndex from "./utils/getIdOrCodeOrIndex";
 export class PagingTool extends React.Component {
   static defaultProps = {
     onPageChange: noop
-  };
-
-  props: {
-    paging: Paging,
-    setPageSize: Function,
-    onRefresh?: Function,
-    setPage: Function
   };
 
   state = {

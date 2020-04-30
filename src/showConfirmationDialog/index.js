@@ -1,4 +1,3 @@
-//@flow
 import React, { Component } from "react";
 import { Alert, Intent } from "@blueprintjs/core";
 import { renderOnDoc } from "../utils/renderOnDoc";

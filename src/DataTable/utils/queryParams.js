@@ -1,4 +1,3 @@
-//@flow
 import queryString from "qs";
 import QueryBuilder from "tg-client-query-builder";
 import moment from "moment";

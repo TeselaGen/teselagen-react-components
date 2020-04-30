@@ -1,5 +1,3 @@
-//@flow
-
 export default function stripFields(data, fieldStripper) {
   fieldStripper = fieldStripper || [];
   if (!data) return undefined;

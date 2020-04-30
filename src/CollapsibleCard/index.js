@@ -1,19 +1,7 @@
-//@flow
 import React, { Component } from "react";
 import { Button, Classes, Icon } from "@blueprintjs/core";
 import classNames from "classnames";
 import "./style.css";
-
-type Props = {
-  title: string,
-  icon: string,
-  openTitleElements: boolean,
-  initialClosed: boolean
-};
-
-// type State = {
-//   open: boolean
-// };
 
 export default class CollapsibleCard extends Component {
   state = {
@@ -57,7 +45,7 @@ export default class CollapsibleCard extends Component {
       noCard = false,
       className,
       style
-    }: Props = this.props;
+    } = this.props;
     return (
       <div
         className={classNames({ "tg-card": !noCard, open }, className)}

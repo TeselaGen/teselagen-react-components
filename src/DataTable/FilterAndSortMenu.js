@@ -1,4 +1,3 @@
-//@flow
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
 import moment from "moment";
 import { camelCase } from "lodash";
@@ -13,12 +12,6 @@ import {
 } from "@blueprintjs/core";
 import getMomentFormatter from "../utils/getMomentFormatter";
 import { onEnterHelper } from "../utils/handlerHelpers";
-import type {
-  TableDataTypes
-  // SchemaForField,
-  // QueryParams,
-  // Paging,
-} from "../flow_types";
 import DialogFooter from "../DialogFooter";
 import "./style.css";
 import "../toastr";
@@ -32,17 +25,10 @@ export default class FilterAndSortMenu extends React.Component {
       filterValue: ""
     };
   }
-  props: {
-    dataType: TableDataTypes,
-    schemaForField: Object,
-    filterOn: string,
-    addFilters: Function,
-    removeSingleFilter: Function
-  };
-  handleFilterChange = (selectedFilter: string) => {
+  handleFilterChange = selectedFilter => {
     this.setState({ selectedFilter: camelCase(selectedFilter) });
   };
-  handleFilterValueChange = (filterValue: string): void => {
+  handleFilterValueChange = filterValue => {
     this.setState({ filterValue });
   };
   handleFilterSubmit = () => {
@@ -177,7 +163,7 @@ class FilterInput extends React.Component {
     } = this.props;
     //Options: Text, Single number (before, after, equals), 2 numbers (range),
     //Single Date (before, after, on), 2 dates (range)
-    let inputGroup: JSX.Element = <div />;
+    let inputGroup = <div />;
     switch (filterType) {
       case "text":
         inputGroup = (

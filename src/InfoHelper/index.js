@@ -1,4 +1,3 @@
-//@flow
 import React, { Component } from "react";
 import { Popover, Button, Tooltip, Icon } from "@blueprintjs/core";
 import classnames from "classnames";
@@ -22,7 +21,7 @@ export default class InfoHelper extends Component {
       displayToSide,
       style,
       ...rest
-    }: Props = this.props;
+    } = this.props;
     const IconToUse = isButton ? Button : Icon;
     const iconProps = {
       icon,
