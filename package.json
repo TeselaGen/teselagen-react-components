@@ -73,7 +73,7 @@
     "react-live": "^1.11.0",
     "react-markdown": "^4.0.8",
     "react-redux": "^5.0.7",
-    "redux": "^3.7.2",
+    "redux": "^4.0.5",
     "redux-thunk": "*",
     "stats-webpack-plugin": "^0.7.0",
     "webpack-bundle-analyzer": "^3.7.0"
