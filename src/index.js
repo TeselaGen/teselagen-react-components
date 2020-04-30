@@ -18,13 +18,11 @@ export { default as BlueprintError } from "./BlueprintError";
 export { default as DialogFooter } from "./DialogFooter";
 export { default as adHoc } from "./utils/adHoc";
 export { default as DownloadLink } from "./DownloadLink";
-export { default as MultiSelectSideBySide } from "./MultiSelectSideBySide";
 export { default as magicDownload } from "./DownloadLink/magicDownload";
 export { default as IntentText } from "./IntentText";
 export { default as withTableParams } from "./DataTable/utils/withTableParams";
 export { default as InfoHelper } from "./InfoHelper";
 export { default as showConfirmationDialog } from "./showConfirmationDialog";
-export { default as showLoadingMask } from "./showLoadingMask";
 export { default as CollapsibleCard } from "./CollapsibleCard";
 export {
   default as ResizableDraggableDialog

@@ -9,13 +9,9 @@ import WithDialog from "./examples/WithDialog";
 import Toastr from "./examples/Toastr";
 import showConfirmationDialogDemo from "./examples/showConfirmationDialogDemo";
 import showConfirmationDialog from "../../src/showConfirmationDialog";
-import showLoadingMaskDemo from "./examples/showLoadingMaskDemo";
-import MultiSelectSideBySideDemo from "./examples/MultiSelectSideBySide";
-import MultiSelectSideBySide from "../../src/MultiSelectSideBySide";
 import ResizableDraggableDialogDemo from "./examples/ResizableDraggableDialog";
 import ResizableDraggableDialog from "../../src/ResizableDraggableDialog";
 
-import showLoadingMask from "../../src/showLoadingMask";
 
 import CustomIcons from "./examples/CustomIcons";
 import CSSOnlyToolTip from "./examples/CSSOnlyToolTip";
@@ -80,15 +76,12 @@ import {
   Switch,
   Checkbox,
   Button,
-  HTMLSelect,
   Icon,
   Classes
 } from "@blueprintjs/core";
 import renderToggle from "./renderToggle";
 import Chance from "chance";
 import times from "lodash/times";
-import client from "./client";
-import { ApolloProvider } from "react-apollo";
 import {
   createMenu,
   showContextMenu,
@@ -101,9 +94,6 @@ import {
 } from "../../src/utils/commandUtils";
 import { withHotkeys, getHotkeyProps } from "../../src/utils/hotkeyUtils";
 
-// const { whyDidYouUpdate } = require("why-did-you-update");
-// whyDidYouUpdate(React);
-
 FocusStyleManager.onlyShowFocusOnTabs();
 
 const demos = {
@@ -111,9 +101,7 @@ const demos = {
     demo: DataTableExample,
     scope: {
       MenuItem,
-      ApolloProvider,
       Dialog,
-      client,
       withTableParams,
       DataTable,
       ReactMarkdown,
@@ -370,23 +358,16 @@ const demos = {
     },
     demo: showConfirmationDialogDemo
   },
-  showLoadingMask: {
-    scope: {
-      showLoadingMask,
-      Intent,
-      renderToggle
-    },
-    demo: showLoadingMaskDemo
-  },
-  MultiSelectSideBySide: {
-    scope: {
-      MultiSelectSideBySide,
-      Component,
-      renderToggle,
-      HTMLSelect
-    },
-    demo: MultiSelectSideBySideDemo
-  },
+  
+  // MultiSelectSideBySide: {
+  //   scope: {
+  //     MultiSelectSideBySide,
+  //     Component,
+  //     renderToggle,
+  //     HTMLSelect
+  //   },
+  //   demo: MultiSelectSideBySideDemo
+  // },
   ResizableDraggableDialog: {
     scope: {
       ResizableDraggableDialog,

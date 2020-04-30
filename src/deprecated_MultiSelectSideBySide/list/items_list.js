@@ -1,6 +1,5 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import { AutoSizer } from "react-virtualized/dist/commonjs/AutoSizer";
 
 import InnerList from "./list";
 

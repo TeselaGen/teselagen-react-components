@@ -5,10 +5,9 @@
  * @property {string} queryName What the props come back on ( by default = modelName + 'Query')
  */
 import { reduxForm, formValues } from "redux-form";
-import { compose } from "redux";
 import { arrayMove } from "react-sortable-hoc";
 import { toArray, keyBy, get } from "lodash";
-import { withProps, withState, branch } from "recompose";
+import { withProps, withState, branch, compose } from "recompose";
 import withTableParams from "../DataTable/utils/withTableParams";
 import convertSchema from "../DataTable/utils/convertSchema";
 import viewColumn from "../DataTable/viewColumn";
@@ -152,7 +151,6 @@ export default compose(
         };
         updateColumnVisibility = function({ shouldShow, path }) {
           if (tableConfigurationId) {
-            // toArray({...stripFields(fieldOptsByPath, ['__typename']), [path]: {isHidden: !shouldShow, path, ...stripFields(fieldOptsByPath[path] || {}, ['__typename']) }  })
             const existingFieldOpt = fieldOptsByPath[path] || {};
             upsertFieldOption({
               id: existingFieldOpt.id,

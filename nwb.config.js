@@ -1,4 +1,9 @@
 const path = require("path");
+const StatsPlugin = require("stats-webpack-plugin");
+let plugins = [];
+if (process.env.ANALYZE_BUNDLE) {
+  plugins.push(new StatsPlugin("stats.json", { chunkModules: true }));
+}
 
 module.exports = {
   type: "react-component",
@@ -6,13 +11,9 @@ module.exports = {
     umd: false
   },
   webpack: {
-    uglify: false,
     aliases: {
       // **** You can comment one or more of these in to override an npm module with a local module. *****
       // **** Just be sure to comment them back out before committing! *****
-      // "ve-range-utils":
-      //   console.log("comment me back out!") ||
-      //   path.resolve("../../ve-range-utils/src/"),
       // "ve-sequence-utils":
       //   console.log("comment me back out!") ||
       //   path.resolve("../../ve-sequence-utils/src/"),
@@ -39,6 +40,7 @@ module.exports = {
       react: path.resolve(__dirname, "node_modules/react")
     },
     extra: {
+      plugins,
       devtool: "source-map",
       module: {
         rules: [{ test: /demo\/src\/examples\//, loader: "raw-loader" }]

@@ -115,7 +115,6 @@ class DataTableDemo extends React.Component {
     ConnectedTable = withRouter(ConnectedTable);
 
     return (
-      <ApolloProvider client={client} store={store}>
         <div>
           <Router>
             <div>
@@ -213,7 +212,6 @@ withQuery(
             </div>
           </Router>
         </div>
-      </ApolloProvider>
     );
   }
 }

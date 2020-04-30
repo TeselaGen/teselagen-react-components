@@ -1,8 +1,7 @@
 import classNames from "classnames";
 import { SketchPicker } from "react-color";
-import { isNumber, noop, kebabCase, isPlainObject } from "lodash";
+import { isNumber, noop, kebabCase, isPlainObject, isEqual } from "lodash";
 import mathExpressionEvaluator from "math-expression-evaluator";
-import deepEqual from "deep-equal";
 import React from "react";
 import { Field } from "redux-form";
 
@@ -28,7 +27,7 @@ import TgSelect from "../TgSelect";
 import InfoHelper from "../InfoHelper";
 import getMomentFormatter from "../utils/getMomentFormatter";
 import Uploader from "./Uploader";
-import sortify from "./sortify"; //tnr TODO: export this from json.sortify when https://github.com/ThomasR/JSON.sortify/issues/11 is resolved
+import sortify from "./sortify";
 import { fieldRequired } from "./utils";
 
 function getIntent({
@@ -110,7 +109,7 @@ class AbstractInput extends React.Component {
     const { defaultValue: oldDefaultValue, enableReinitialize } = this.props;
     if (
       ((value !== false && !value) || enableReinitialize) &&
-      !deepEqual(defaultValue, oldDefaultValue)
+      !isEqual(defaultValue, oldDefaultValue)
     ) {
       dispatch({
         type: "@@redux-form/CHANGE",
@@ -465,7 +464,7 @@ export const renderReactSelect = props => {
       };
     } else {
       valueToUse = optsToUse.find(obj => {
-        return deepEqual(obj.value, value);
+        return isEqual(obj.value, value);
       });
     }
   } else if (Array.isArray(value)) {
@@ -478,7 +477,7 @@ export const renderReactSelect = props => {
       }
       if (optsToUse) {
         return optsToUse.find(obj => {
-          return deepEqual(obj.value, val);
+          return isEqual(obj.value, val);
         });
       } else {
         return val;

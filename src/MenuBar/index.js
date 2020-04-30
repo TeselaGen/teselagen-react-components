@@ -24,7 +24,6 @@ import {
 import { createDynamicMenu, DynamicMenuItem } from "../utils/menuUtils";
 import { comboToLabel } from "../utils/hotkeyUtils";
 
-@HotkeysTarget
 class MenuBar extends React.Component {
   static defaultProps = {
     className: "",
@@ -403,4 +402,5 @@ function highlight(query, text, opts) {
 
   return flatten([before, match, after]);
 }
-export default MenuBar;
+
+export default HotkeysTarget(MenuBar);

@@ -54,11 +54,11 @@ class Example extends Component {
         />
         <br />
         <br />
-        <MultiSelectSideBySide
+        {/* <MultiSelectSideBySide
           items={items}
           selectedItems={selectedItems}
           onChange={this.handleChange}
-        />
+        /> */}
       </div>
     );
   }

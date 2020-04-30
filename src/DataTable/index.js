@@ -1,7 +1,5 @@
 /* eslint react/jsx-no-bind: 0 */
-import deepEqual from "deep-equal";
-import { compose } from "redux";
-import React from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import moment from "moment";
 import { arrayMove } from "react-sortable-hoc";
@@ -36,9 +34,8 @@ import {
 import classNames from "classnames";
 import scrollIntoView from "dom-scroll-into-view";
 import { SortableElement } from "react-sortable-hoc";
-import { BooleanValue } from "react-values";
 import ReactTable from "@teselagen/react-table";
-import { withProps, branch } from "recompose";
+import { withProps, branch, compose } from "recompose";
 import InfoHelper from "../InfoHelper";
 import { getSelectedRowsFromEntities } from "./utils/selection";
 import rowClick, { finalizeSelection } from "./utils/rowClick";
@@ -83,10 +80,10 @@ class DataTable extends React.Component {
     } = newProps;
 
     //handle programatic filter adding
-    if (!deepEqual(newProps.additionalFilters, oldProps.additionalFilters)) {
+    if (!isEqual(newProps.additionalFilters, oldProps.additionalFilters)) {
       newProps.addFilters(newProps.additionalFilters);
     }
-    if (!deepEqual(newProps.schema, oldProps.schema)) {
+    if (!isEqual(newProps.schema, oldProps.schema)) {
       const { schema = {} } = newProps;
       const columns = schema.fields
         ? schema.fields.reduce(function(columns, field, i) {
@@ -104,7 +101,7 @@ class DataTable extends React.Component {
     //handle selecting all or expanding all
     if (
       (selectAllByDefault || expandAllByDefault) &&
-      !deepEqual(
+      !isEqual(
         newProps.entities.map(({ id }) => id),
         oldProps.entities && oldProps.entities.map(({ id }) => id)
       )
@@ -1302,49 +1299,24 @@ class DataTable extends React.Component {
         </div>
       ) : null;
     const FilterMenu = column.FilterMenu || FilterAndSortMenu;
+
     const filterMenu =
       withFilter &&
       !isActionColumn &&
       !filterDisabled &&
       !columnFilterDisabled ? (
-        <BooleanValue defaultValue={false}>
-          {({ value, toggle, clear }) => {
-            return (
-              <Popover
-                position="bottom"
-                onClose={() => {
-                  clear();
-                }}
-                isOpen={value}
-                modifiers={{
-                  preventOverflow: { enabled: false },
-                  hide: { enabled: false },
-                  flip: { enabled: false }
-                }}
-              >
-                <Icon
-                  style={{ marginLeft: 5 }}
-                  icon="filter"
-                  onClick={toggle}
-                  className={classNames("tg-filter-menu-button", {
-                    "tg-active-filter": !!filterActiveForColumn
-                  })}
-                />
-                <FilterMenu
-                  addFilters={addFilters}
-                  togglePopover={clear}
-                  removeSingleFilter={removeSingleFilter}
-                  currentFilter={currentFilter}
-                  filterOn={ccDisplayName}
-                  dataType={columnDataType}
-                  schemaForField={column}
-                  currentParams={currentParams}
-                  setNewParams={setNewParams}
-                />
-              </Popover>
-            );
-          }}
-        </BooleanValue>
+        <ColumnFilterMenu
+          FilterMenu={FilterMenu}
+          filterActiveForColumn={filterActiveForColumn}
+          addFilters={addFilters}
+          removeSingleFilter={removeSingleFilter}
+          currentFilter={currentFilter}
+          filterOn={ccDisplayName}
+          dataType={columnDataType}
+          schemaForField={column}
+          currentParams={currentParams}
+          setNewParams={setNewParams}
+        />
       ) : null;
 
     return (
@@ -1378,3 +1350,38 @@ const itemSizeEstimators = {
   normal: () => 33.34,
   comfortable: () => 41.34
 };
+
+function ColumnFilterMenu({ FilterMenu, filterActiveForColumn, ...rest }) {
+  const [columnFilterMenuOpen, setColumnFilterMenuOpen] = useState(false);
+  return (
+    <Popover
+      position="bottom"
+      onClose={() => {
+        setColumnFilterMenuOpen(false);
+      }}
+      isOpen={columnFilterMenuOpen}
+      modifiers={{
+        preventOverflow: { enabled: false },
+        hide: { enabled: false },
+        flip: { enabled: false }
+      }}
+    >
+      <Icon
+        style={{ marginLeft: 5 }}
+        icon="filter"
+        onClick={() => {
+          setColumnFilterMenuOpen(!columnFilterMenuOpen);
+        }}
+        className={classNames("tg-filter-menu-button", {
+          "tg-active-filter": !!filterActiveForColumn
+        })}
+      />
+      <FilterMenu
+        togglePopover={() => {
+          setColumnFilterMenuOpen(false);
+        }}
+        {...rest}
+      />
+    </Popover>
+  );
+}

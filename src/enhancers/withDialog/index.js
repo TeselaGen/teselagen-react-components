@@ -1,8 +1,7 @@
-import { compose } from "redux";
 import React from "react";
 import { Dialog } from "@blueprintjs/core";
 import { connect } from "react-redux";
-import { lifecycle } from "recompose";
+import { lifecycle, compose } from "recompose";
 import uniqid from "uniqid";
 import { camelCase } from "lodash";
 import ResizableDraggableDialog from "../../ResizableDraggableDialog";

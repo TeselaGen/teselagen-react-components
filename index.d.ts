@@ -791,28 +791,29 @@ export interface MenuBarProps {
   enhancers: any;
   menuSearchHotkey: any;
 }
-// MultiSelectSideBySide
-declare class MultiSelectSideBySide extends React.Component<MultiSelectSideBySideProps, any> { }
+// // MultiSelectSideBySide
+// declare class MultiSelectSideBySide extends React.Component<MultiSelectSideBySideProps, any> { }
 
-export interface MultiSelectSideBySideProps {
-  selectedItems: array;
-  filteredItems: array;
-  loading: boolean;
-  messages: object;
-  onChange: func;
-  showSearch: boolean;
-  showSelectAll: boolean;
-  showSelectedItems: boolean;
-  searchIcon: string;
-  deleteIcon: string;
-  searchRenderer: func;
-  selectedItemRenderer: any;
-  height: number;
-  itemHeight: number;
-  selectAllHeight: number;
-  loaderRenderer: any;
-  maxSelectedItems: number;
-}
+// export interface MultiSelectSideBySideProps {
+//   selectedItems: array;
+//   filteredItems: array;
+//   loading: boolean;
+//   messages: object;
+//   onChange: func;
+//   showSearch: boolean;
+//   showSelectAll: boolean;
+//   showSelectedItems: boolean;
+//   searchIcon: string;
+//   deleteIcon: string;
+//   searchRenderer: func;
+//   selectedItemRenderer: any;
+//   height: number;
+//   itemHeight: number;
+//   selectAllHeight: number;
+//   loaderRenderer: any;
+//   maxSelectedItems: number;
+// }
+
 // ResizableDraggableDialog
 declare class ResizableDraggableDialog extends React.Component<ResizableDraggableDialogProps, any> { }
 
@@ -884,20 +885,6 @@ export interface TreeProps {
  */
 declare function withSelectedEntities(tableName: string, tableName2: string)
 
-/**
- *
- * @param {*string} formName
- * @param {*string} formName
- * @param {*string} formName
- * @param {*string} ...etc
- * @example
- * withSelectedEntities("sequenceTable")
- * //adds a new prop sequenceTableSelectedEntities 
- * //generically : `${formName}SelectedEntities` 
- */
-declare function showLoadingMask(opts) {
-  return closeLoadingMask
-}
 
 /**
  *
@@ -928,8 +915,6 @@ interface showConfirmationDialogOpts {
 }
 
 
-function closeLoadingMask(){}
-
 //Todo: 
 
 // constants
@@ -937,5 +922,4 @@ function closeLoadingMask(){}
 // enhancers
 // rerenderOnWindowResize
 // showConfirmationDialog
-// showLoadingMask
 // style

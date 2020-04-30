@@ -1,6 +1,5 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import { List } from "react-virtualized/dist/commonjs/List";
 
 import "./list.css";
 import Item from "../items/item";
