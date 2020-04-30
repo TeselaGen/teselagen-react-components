@@ -226,10 +226,46 @@ export interface BounceLoaderProps {
   className: string;
 }
 
-// CollapsibleCard
+/**
+ * @example
+ * <CollapsibleCard
+        title="Additives"
+        noCard
+        openTitleElements={
+          <ButtonGroup minimal>
+            <Button
+              text="Add Additives"
+              icon="add"
+              intent={Intent.SUCCESS}
+              onClick={this.renderAddAdditivesDialog}
+            />
+          </ButtonGroup>
+        }
+      >
+        <DataTable
+          {...tableParams}
+          className="additives-card"
+          contextMenu={this.renderContextMenu}
+        />
+      </CollapsibleCard>
+    @example
+    <CollapsibleCard title="Replicate Aliquots" noCard>
+      {aliquot.replicateAliquots && (
+        <DataTable
+          entities={aliquot.replicateAliquots}
+          maxHeight={300}
+          isSimple
+          schema={schema}
+          formName="replicateAliquotForm"
+          onDoubleClick={routeDoubleClick}
+        />
+      )}
+    </CollapsibleCard>
+ */
 declare class CollapsibleCard extends React.Component<CollapsibleCardProps, any> { }
 
 export interface CollapsibleCardProps {
+  noCard: boolean;
   title: string;
   icon: string;
   openTitleElements: boolean;
@@ -254,7 +290,43 @@ export interface DNALoaderProps {
   style: object;
   className: string;
 }
-// DataTable
+
+/**
+ * @example
+ * <DataTable
+    formName="placementStrategyDescriptionTypes"
+    entities={types}
+    schema={schema}
+    isSimple
+    compact
+  />
+  @example
+  <DataTable
+    withCheckboxes={false}
+    isSingleSelect
+    isSimple
+    formName="sequencesToSubmitTable"
+    withSelectedEntitites
+    schema={orderSequencesSchema}
+    entities={sequencesToOrder}
+  />
+  @example
+  <DataTable
+    schema={[
+      "name",
+      "strain",
+      {
+        displayName: "Species",
+        path: "species",
+        render: v => <i>{v}</i>
+      }
+    ]}
+    formName="strainMaterialsTable"
+    entities={strainMaterialCompEntities}
+    isSimple
+    onDoubleClick={routeDoubleClick}
+  />
+ */
 declare class DataTable extends React.Component<DataTableProps, any> { }
 
 export interface DataTableProps {
@@ -320,7 +392,16 @@ export interface DataTableProps {
   setShowForcedHidden: function;
 
 }
-// DialogFooter
+
+/**
+ * @example
+ * <DialogFooter
+          text="Next"
+          submitting={submitting}
+          onClick={handleSubmit(onSubmit)}
+        />
+
+ */
 declare class DialogFooter extends React.Component<DialogFooterProps, any> { }
 
 export interface DialogFooterProps {
@@ -384,12 +465,33 @@ export interface GenericFormFieldProps {
 // BPSelect
 
 // InputField
+/**
+ * @example
+ * <InputField label="Search" isRequired name="searchQuery"></InputField>
+ */
 declare class InputField extends React.Component<InputFieldProps, any> { }
 
 export interface InputFieldProps extends GenericFormFieldProps {
 
 }
-// FileUploadField
+
+/**
+ * @example
+ * <FileUploadField
+          name="alignmentToolSequenceUpload"
+          innerText="Upload Sequences to Align (.ab1, .fasta, .gb)"
+          accept={[".ab1", ".fasta", ".fa", ".gb", ".zip"]}
+          style={{ maxWidth: 400 }}
+          beforeUpload={async (files, onChange) => {...}}
+        />
+ * <FileUploadField accept={[".csv", ".xlsx"]} name="oligoFiles" />
+ * <FileUploadField
+          accept={[".csv", ".json", ".xlsx", ".zip"]}
+          label="Upload Existing Design Template File Here"
+          name="inputFiles"
+          fileLimit={1}
+        />
+ */
 declare class FileUploadField extends React.Component<FileUploadFieldProps, any> { }
 
 export interface FileUploadFieldProps extends GenericFormFieldProps {
@@ -408,7 +510,22 @@ export interface FileUploadFieldProps extends GenericFormFieldProps {
   showFilesCount: boolean;
   S3Params: object;
 }
-// DateInputField
+
+/**
+ * @example
+ * <DateInputField
+              defaultValue={new Date()}
+              label="Start Date"
+              name="startDate"
+              minDate={initialValues ? undefined : new Date()}
+            />
+ * <DateInputField
+            name="serviceContractExpiration"
+            label="Service Contract Expiration Date"
+            minDate={new Date("1/1/2010")}
+            maxDate={new Date("12/31/2100")}
+          />
+ */
 declare class DateInputField extends React.Component<DateInputFieldProps, any> { }
 
 export interface DateInputFieldProps extends GenericFormFieldProps {
@@ -420,43 +537,156 @@ declare class DateRangeInputField extends React.Component<DateRangeInputFieldPro
 export interface DateRangeInputFieldProps extends GenericFormFieldProps {
 
 }
-// CheckboxField
+/**
+ * @example 
+ * <CheckboxField
+              name={fieldPrefix + "shouldAssignToLocation"}
+              label="Assign to Location"
+              defaultValue
+            />
+ * <CheckboxField
+              name="isInfinite"
+              style={{ marginTop: 20 }}
+              label="Set Infinite Capacity"
+              defaultValue={false}
+            />
+            
+ */
 declare class CheckboxField extends React.Component<CheckboxFieldProps, any> { }
 
 export interface CheckboxFieldProps extends GenericFormFieldProps {
 
 }
-// SwitchField
+
+/**
+ * @example 
+ * <SwitchField name="combineWorklists" label="Combine Worklists" />
+ * <SwitchField
+          label="Only Show Pending Worklists"
+          name="onlyShowPending"
+          defaultValue={true}
+          onFieldSubmit={() => {
+            setNewParams({
+              ...currentParams,
+              showAllWorklists: !currentParams.showAllWorklists
+            });
+          }}
+        />
+            
+ */
 declare class SwitchField extends React.Component<SwitchFieldProps, any> { }
 
 export interface SwitchFieldProps extends GenericFormFieldProps {
 
 }
-// TextareaField
+/**
+ * @example 
+ * <TextareaField
+        style={{ maxWidth: 400 }}
+        placeholder="AGTTGAGC"
+        name="sequence"
+      />
+ * <TextareaField
+          name="description"
+          label="Description"
+          readOnly={!!design.isLocked}
+          onFieldSubmit={this.handleFieldSubmit("description")}
+        />         
+ */
 declare class TextareaField extends React.Component<TextareaFieldProps, any> { }
 
 export interface TextareaFieldProps extends GenericFormFieldProps {
 
 }
-// EditableTextField
+/**
+ * @example 
+ * <EditableTextField
+    disabled={isUsedInWorkflowRun}
+    placeholder="Input name..."
+    name={"inputLabel.id" + id}
+    onFieldSubmit={async v => {
+      await safeUpsert(["workflowToolInputDefinition", "id label"], {
+        id,
+        label: v
+      });
+      this.props.triggerSaved();
+    }}
+  />       
+  <EditableTextField
+    name="name"
+    onFieldSubmit={handleSubmit(this.onSubmit)}
+    placeholder="Workflow Name..."
+  />
+ */
 declare class EditableTextField extends React.Component<EditableTextFieldProps, any> { }
 
 export interface EditableTextFieldProps extends GenericFormFieldProps {
 
 }
-// NumericInputField
+/**
+ * @example 
+ * <NumericInputField
+    label="End Offset"
+    name="partEndOffset"
+    defaultValue={0}
+    placeholder="600"
+    disabled={!createPartsFromSequences}
+  />
+  <NumericInputField name="part.endBp" label="End BP" readOnly />
+ */
 declare class NumericInputField extends React.Component<NumericInputFieldProps, any> { }
 
 export interface NumericInputFieldProps extends GenericFormFieldProps {
 
 }
-// RadioGroupField
+/**
+ * @example
+ * <RadioGroupField
+    name="format"
+    label="Export as"
+    options={[
+      { label: "Genbank", value: "genbank" },
+      { label: "Fasta", value: "fasta" }
+    ]}
+    defaultValue="genbank"
+  />
+  <RadioGroupField
+    name="readOrientation"
+    defaultValue="fr"
+    options={[
+      {
+        label: "Forward / Reverse",
+        value: "fr"
+      },
+      {
+        label: "Reverse / Forward",
+        value: "rf"
+      },
+      {
+        label: "Forward / Forward",
+        value: "ff"
+      }
+    ]}
+  />
+ */
 declare class RadioGroupField extends React.Component<RadioGroupFieldProps, any> { }
 
 export interface RadioGroupFieldProps extends GenericFormFieldProps {
 
 }
-// ReactSelectField
+
+/**
+ * @example
+ * <ReactSelectField
+    name="containerTypeCode"
+    label="Container Type"
+    placeholder="Select a container type"
+    options={arrayToIdOrCodeValuedOptions(containerTypes)}
+    disabled={!!initialValues.id}
+    defaultValue={initialItemType}
+    isRequired
+    />
+ */
 declare class ReactSelectField extends React.Component<ReactSelectFieldProps, any> { }
 
 export interface ReactSelectFieldProps extends GenericFormFieldProps {
@@ -468,7 +698,14 @@ declare class SelectField extends React.Component<SelectFieldProps, any> { }
 export interface SelectFieldProps extends GenericFormFieldProps {
 
 }
-// ReactColorField
+/**
+ * @example
+ * <ReactColorField
+    defaultValue="lightblue"
+    label="Color"
+    name="color"
+  />
+ */
 declare class ReactColorField extends React.Component<ReactColorFieldProps, any> { }
 
 export interface ReactColorFieldProps extends GenericFormFieldProps {
@@ -483,7 +720,25 @@ export interface HotkeysDialogProps {
   isOpen: boolean;
   onClose: boolean;
 }
-// InfoHelper
+/**
+ * @example
+ * <InfoHelper
+    isInline
+    color="darkgrey"
+    icon="lock"
+    onClick={() => {...}}
+    content={
+      <div>
+        {lockedMessage}{" "}
+        <div style={{ fontSize: 11, fontStyle: "italic" }}>
+          {lockMsgDescription}
+        </div>
+      </div>
+    }
+  />
+  <InfoHelper isButton disabled content={"Hey I'm some helpful info!"} />
+  <InfoHelper isPopover content={"Hey I'm some helpful info!"} />
+ */
 declare class InfoHelper extends React.Component<InfoHelperProps, any> { }
 
 export interface InfoHelperProps {
