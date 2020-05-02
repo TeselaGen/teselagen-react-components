@@ -26,6 +26,7 @@ import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
 import TgSelect from "../TgSelect";
 import InfoHelper from "../InfoHelper";
 import getMomentFormatter from "../utils/getMomentFormatter";
+import AsyncValidateFieldSpinner from "../AsyncValidateFieldSpinner";
 import Uploader from "./Uploader";
 import sortify from "./sortify";
 import { fieldRequired } from "./utils";
@@ -248,12 +249,22 @@ export const renderBlueprintDateRangeInput = props => {
 };
 
 export const renderBlueprintInput = props => {
-  const { input, intent, onFieldSubmit, onKeyDown = noop, ...rest } = props;
+  const {
+    input,
+    meta = {},
+    intent,
+    onFieldSubmit,
+    onKeyDown = noop,
+    ...rest
+  } = props;
   return (
     <InputGroup
       {...removeUnwantedProps(rest)}
       intent={intent}
       {...input}
+      rightElement={
+        <AsyncValidateFieldSpinner validating={meta.asyncValidating} />
+      }
       onKeyDown={function(...args) {
         onKeyDown(...args);
         const e = args[0];
