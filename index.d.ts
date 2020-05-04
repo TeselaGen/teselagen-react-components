@@ -261,6 +261,30 @@ export interface BounceLoaderProps {
         />
       )}
     </CollapsibleCard>
+    const schema = {
+      model: "defaultPositions",
+      fields: [
+        {
+          displayName: "Name",
+          path: "name"
+        },
+        {
+          displayName: "Label",
+          path: "label"
+        },
+        {
+          displayName: "Index",
+          path: "index"
+        }
+      ]
+    };
+    const schema = [
+      "name",
+      {
+        displayName: "Destination Plate Type",
+        path: "containerArrayType"
+      }
+    ];
  */
 declare class CollapsibleCard extends React.Component<CollapsibleCardProps, any> { }
 
