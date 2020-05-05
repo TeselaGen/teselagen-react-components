@@ -729,7 +729,9 @@ export function getQueryParams({
       }
     }
 
-    graphqlQueryParams.filter = qb.toJSON();
+    if (qb.query.filters.length) {
+      graphqlQueryParams.filter = qb.toJSON();
+    }
 
     // by default make sort by updated at
     if (!graphqlQueryParams.sort.length) {
