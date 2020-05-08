@@ -1280,7 +1280,7 @@ class DataTable extends React.Component {
             color={sortUp ? "#106ba3" : undefined}
             style={{
               opacity: sortUp ? 1 : undefined,
-              display: sortDown && !sortUp ? "none" : undefined
+              display: sortDown ? "none" : undefined
             }}
             iconSize={extraCompact ? 10 : 12}
             onClick={e => {
@@ -1294,7 +1294,7 @@ class DataTable extends React.Component {
             iconSize={extraCompact ? 10 : 12}
             style={{
               opacity: sortDown ? 1 : undefined,
-              display: sortUp && !sortDown ? "none" : undefined
+              display: sortUp ? "none" : undefined
             }}
             onClick={e => {
               setOrder(ccDisplayName, sortDown, e.shiftKey);
