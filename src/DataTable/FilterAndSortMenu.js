@@ -22,7 +22,8 @@ export default class FilterAndSortMenu extends React.Component {
     const selectedFilter = camelCase(getFilterMenuItems(props.dataType)[0]);
     this.state = {
       selectedFilter,
-      filterValue: ""
+      filterValue: "",
+      ...this.props.currentFilter
     };
   }
   handleFilterChange = selectedFilter => {
@@ -53,13 +54,6 @@ export default class FilterAndSortMenu extends React.Component {
     ]);
     togglePopover();
   };
-  UNSAFE_componentWillMount() {
-    if (this.props.currentFilter) {
-      this.setState({
-        ...this.props.currentFilter
-      });
-    }
-  }
   // handleSubmit(event) {
   //   alert('A name was submitted: ' + this.state.value);
   //   event.preventDefault();
@@ -173,6 +167,7 @@ class FilterInput extends React.Component {
               onChange={function(e) {
                 handleFilterValueChange(e.target.value);
               }}
+              autoFocus
               {...onEnterHelper(handleFilterSubmit)}
               value={filterValue}
             />
@@ -187,6 +182,7 @@ class FilterInput extends React.Component {
               onChange={function(e) {
                 handleFilterValueChange(e.target.value);
               }}
+              autoFocus
               {...onEnterHelper(handleFilterSubmit)}
               value={filterValue}
               type="number"

@@ -1225,7 +1225,9 @@ class DataTable extends React.Component {
       removeSingleFilter,
       currentParams,
       isLocalCall,
-      setNewParams
+      setNewParams,
+      compact,
+      extraCompact
     } = computePresets(this.props);
     const {
       displayName,
@@ -1247,7 +1249,7 @@ class DataTable extends React.Component {
     if (isActionColumn) columnTitle = "";
     const currentFilter =
       filters &&
-      filters.length &&
+      !!filters.length &&
       filters.filter(({ filterOn }) => {
         return filterOn === ccDisplayName;
       })[0];
@@ -1277,9 +1279,10 @@ class DataTable extends React.Component {
             icon="chevron-up"
             color={sortUp ? "#106ba3" : undefined}
             style={{
-              display: sortUp ? "inherit" : undefined
+              opacity: sortUp ? 1 : undefined,
+              display: sortDown && !sortUp ? "none" : undefined
             }}
-            iconSize={12}
+            iconSize={extraCompact ? 10 : 12}
             onClick={e => {
               setOrder("-" + ccDisplayName, sortUp, e.shiftKey);
             }}
@@ -1288,9 +1291,10 @@ class DataTable extends React.Component {
             title="Sort A-Z (Hold shift to sort multiple columns)"
             icon="chevron-down"
             color={sortDown ? "#106ba3" : undefined}
-            iconSize={12}
+            iconSize={extraCompact ? 10 : 12}
             style={{
-              display: sortDown ? "inherit" : undefined
+              opacity: sortDown ? 1 : undefined,
+              display: sortUp && !sortDown ? "none" : undefined
             }}
             onClick={e => {
               setOrder(ccDisplayName, sortDown, e.shiftKey);
@@ -1316,6 +1320,8 @@ class DataTable extends React.Component {
           schemaForField={column}
           currentParams={currentParams}
           setNewParams={setNewParams}
+          compact={compact}
+          extraCompact={extraCompact}
         />
       ) : null;
 
@@ -1351,7 +1357,13 @@ const itemSizeEstimators = {
   comfortable: () => 41.34
 };
 
-function ColumnFilterMenu({ FilterMenu, filterActiveForColumn, ...rest }) {
+function ColumnFilterMenu({
+  FilterMenu,
+  filterActiveForColumn,
+  compact,
+  extraCompact,
+  ...rest
+}) {
   const [columnFilterMenuOpen, setColumnFilterMenuOpen] = useState(false);
   return (
     <Popover
@@ -1369,6 +1381,7 @@ function ColumnFilterMenu({ FilterMenu, filterActiveForColumn, ...rest }) {
       <Icon
         style={{ marginLeft: 5 }}
         icon="filter"
+        iconSize={extraCompact ? 14 : undefined}
         onClick={() => {
           setColumnFilterMenuOpen(!columnFilterMenuOpen);
         }}
