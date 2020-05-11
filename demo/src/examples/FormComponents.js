@@ -287,6 +287,18 @@ class FormComponentsDemo extends React.Component {
             label="EditableTextField"
             placeholder="Enter new text..."
           />
+          <SuggestField
+            name="suggestField"
+            inlineLabel={this.state.inlineLabels}
+            label="SuggestField Collaborators"
+            options={[
+              "Rodrigo Pavez aoiwjefoiawjfiojawe faowijefoiajwefoijawf woaiefjawoie",
+              "Ximena Morales",
+              "Kyle Craft",
+              "Sam Denicola",
+              "Tom Ogasawara Og Og Og"
+            ]}
+          />
           {renderToggle({
             that: this,
             label: "creatable",

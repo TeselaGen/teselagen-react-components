@@ -701,6 +701,19 @@ export interface RadioGroupFieldProps extends GenericFormFieldProps {
 
 /**
  * @example
+ * <SuggestField
+    validate={validateNames}
+    options={["taoh", "thomas", "tiff"]}
+    name={`username`}
+  />
+ */
+declare class SuggestField extends React.Component<SuggestFieldProps, any> { }
+
+export interface SuggestFieldProps extends GenericFormFieldProps {
+}
+
+/**
+ * @example
  * <ReactSelectField
     name="containerTypeCode"
     label="Container Type"
@@ -936,6 +949,13 @@ interface showConfirmationDialogOpts {
   confirmButtonText: string;
   cancelButtonText: string;
   canEscapeKeyCancel: boolean;
+}
+
+/**
+ * This function allows you to override a schema with another schema
+ */
+export function mergeSchemas(schema, schemaOverrides) {
+  return schema
 }
 
 

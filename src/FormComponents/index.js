@@ -24,6 +24,7 @@ import {
 
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
 import TgSelect from "../TgSelect";
+import TgSuggest from "../TgSuggest";
 import InfoHelper from "../InfoHelper";
 import getMomentFormatter from "../utils/getMomentFormatter";
 // import AsyncValidateFieldSpinner from "../AsyncValidateFieldSpinner";
@@ -548,6 +549,39 @@ export const renderReactSelect = props => {
   return <TgSelect {...propsToUse} />;
 };
 
+export const renderSuggest_old = props => {
+  return renderReactSelect({ ...props, asSuggest: true });
+};
+
+export const renderSuggest = props => {
+  const {
+    async,
+    input: { value, onChange },
+    hideValue,
+    intent,
+    options,
+    onFieldSubmit,
+    ...rest
+  } = props;
+
+  const propsToUse = {
+    ...removeUnwantedProps(rest),
+    intent,
+    options,
+    value,
+    onChange(val) {
+      onChange(val);
+      if (!rest.submitOnBlur) onFieldSubmit(val);
+    },
+    onBlur() {
+      if (rest.submitOnBlur) {
+        onFieldSubmit(value);
+      }
+    }
+  };
+  return <TgSuggest {...propsToUse}></TgSuggest>;
+};
+
 export const BPSelect = ({ value, onChange, ...rest }) => {
   return renderSelect({ ...rest, input: { onChange, value } });
 };
@@ -837,6 +871,7 @@ export const SwitchField = generateField(renderBlueprintSwitch, {
   noFillField: true
 });
 export const TextareaField = generateField(renderBlueprintTextarea);
+export const SuggestField = generateField(renderSuggest);
 export const EditableTextField = generateField(renderBlueprintEditableText);
 export const NumericInputField = generateField(renderBlueprintNumericInput);
 export const RadioGroupField = generateField(renderBlueprintRadioGroup, {
