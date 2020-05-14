@@ -3,68 +3,6 @@ import * as React from "react";
 import * as Blueprint from "@blueprintjs/core";
 /*~ If this module has methods, declare them as functions like so.
  */
-interface WithUpsertOptions {
-  /**
-   * @property {string} mutationName - optional rename of the default upsert function withXXXX to whatever you want
-   *
-   */
-  mutationName: string;
-  /**
-   * @property {[queryNameStrings]} refetchQueries -
-   *
-   */
-  refetchQueries: [queryNameStrings];
-  /**
-   * @property {boolean} showError - default=true -- whether or not to show a default error message on failure
-   *
-   */
-  showError: boolean;
-  /**
-   * @property {obj | function} extraMutateArgs - obj or function that
-   * returns obj to get passed to the actual mutation call
-   *
-   */
-  extraMutateArgs: obj | function;
-  /**
-   * @property {[string]} invalidate - array of model types to invalidate after the mutate
-   *
-   */
-  invalidate: [string];
-  /**
-   * @property {boolean} asFunction - if true, this gives you back a function you can call directly instead of a HOC
-   *
-   */
-  asFunction: boolean;
-  /**
-   * @property {string} idAs - if not using a fragment, you get an id
-   * field back as default. But, if the record doesn't have an id field,
-   * and instead has a 'code', you can set idAs: 'code'
-   *
-   */
-  idAs: string;
-  /**
-   *  * @property {boolean} forceCreate - sometimes the thing you're creating
-   *  won't have an id field (it might have a code or something else as its primary key).
-   * This lets you override the default behavior of updating if no id is found
-   *
-   */
-  forceCreate: boolean;
-  /**
-   *  * @property {boolean} forceUpdate - sometimes the thing you're updating might have
-   * an id field. This lets you override that. This lets you override the default behavior of creating if an id is found
-   *
-   */
-  forceUpdate: boolean;
-  /**
-   *  * @property {boolean} excludeResults - don't fetch back result entities after update or create
-   */
-  excludeResults: boolean;
-}
-
-export function withUpsert(
-  nameOrFragment: string,
-  options: WithUpsertOptions
-): void;
 
 export function noop(): void;
 

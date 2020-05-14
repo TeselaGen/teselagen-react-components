@@ -342,9 +342,13 @@ export class renderBlueprintTextarea extends React.Component {
     this.setState({ value: e.target.value });
   };
   handleValSubmit = () => {
-    this.props.input.onChange(this.state.value);
-    this.props.onFieldSubmit(this.state.value, { cmdEnter: true });
-
+    this.props.input.onChange(
+      this.state.value === null ? this.props.input.value : this.state.value
+    );
+    this.props.onFieldSubmit(
+      this.state.value === null ? this.props.input.value : this.state.value,
+      { cmdEnter: true }
+    );
     this.stopEdit();
   };
   onKeyDown = (...args) => {
