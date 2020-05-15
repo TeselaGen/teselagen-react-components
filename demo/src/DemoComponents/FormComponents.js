@@ -1,15 +1,39 @@
-/* eslint no-console: ["warn", { allow: ["warn", "error", "info"] }] */
+/* eslint-disable no-console */
 
-const getOptions = function(input, callback) {
-  setTimeout(function() {
-    callback(null, {
-      options: [{ value: "one", label: "One" }, { value: "two", label: "Two" }],
-      // CAREFUL! Only set this to true when there are no more options,
-      // or more specific queries will not be sent to the server.
-      complete: true
-    });
-  }, 500);
-};
+import React from "react";
+import { Provider } from "react-redux";
+import { reduxForm } from "redux-form";
+import { Switch, Icon, Button } from "@blueprintjs/core";
+import store from "../store";
+import Uploader from "../../../src/FormComponents/Uploader";
+import {
+  RadioGroupField,
+  NumericInputField,
+  FileUploadField,
+  InputField,
+  SelectField,
+  BPSelect,
+  DateRangeInputField,
+  DateInputField,
+  CheckboxField,
+  SwitchField,
+  TextareaField,
+  EditableTextField,
+  ReactSelectField,
+  ReactColorField
+} from "../../../src";
+import renderToggle from "../renderToggle";
+
+// const getOptions = function(input, callback) {
+//   setTimeout(function() {
+//     callback(null, {
+//       options: [{ value: "one", label: "One" }, { value: "two", label: "Two" }],
+//       // CAREFUL! Only set this to true when there are no more options,
+//       // or more specific queries will not be sent to the server.
+//       complete: true
+//     });
+//   }, 500);
+// };
 
 class FormComponentsDemo extends React.Component {
   constructor(props) {
@@ -100,11 +124,46 @@ class FormComponentsDemo extends React.Component {
             containerStyle={{ background: "black", height: 200 }}
           />
           <InputField
+            name={"inputFieldWithAsyncValidateOnBlur"}
+            inlineLabel={this.state.inlineLabels}
+            label="Input With Async Validate on Blur (default)"
+            onFieldSubmit={onFieldSubmit}
+            asyncValidate={function(value) {
+              return new Promise(resolve => {
+                setTimeout(() => {
+                  if (value === "john") {
+                    resolve("async blur validation failed");
+                  } else {
+                    resolve();
+                  }
+                }, 2000);
+              });
+            }}
+          />
+          <InputField
+            name={"inputFieldWithAsyncValidateOnChange"}
+            inlineLabel={this.state.inlineLabels}
+            validateOnChange
+            label="Input With Async Validate on Change"
+            onFieldSubmit={onFieldSubmit}
+            asyncValidate={function(value) {
+              return new Promise(resolve => {
+                setTimeout(() => {
+                  if (value === "john") {
+                    resolve("async change validation failed");
+                  } else {
+                    resolve();
+                  }
+                }, 2000);
+              });
+            }}
+          />
+          <InputField
             name={"inputFieldWithTooltipError"}
             inlineLabel={this.state.inlineLabels}
             tooltipError
             tooltipProps={{
-              position: Position.TOP
+              position: "top"
             }}
             onFieldSubmit={onFieldSubmit}
             label="Input"
@@ -123,7 +182,7 @@ class FormComponentsDemo extends React.Component {
             inlineLabel={this.state.inlineLabels}
             tooltipError
             tooltipProps={{
-              position: Position.TOP
+              position: "top"
             }}
             onFieldSubmit={onFieldSubmit}
             label="Input with toolTip error with inlineLabel = true"
@@ -397,8 +456,9 @@ class FormComponentsDemo extends React.Component {
             label="ReactColorField"
             onFieldSubmit={onFieldSubmit}
           />
+          ƒ
           <Button
-            intent={Intent.SUCCESS}
+            intent="success"
             text="Submit Form"
             onClick={handleSubmit(function(formData) {
               console.info("submitted data:", formData);
@@ -430,12 +490,10 @@ const validate = values => {
   return errors;
 };
 
-const formWrapped = reduxForm({
+export default reduxForm({
   form: "demoForm",
   validate
 })(FormComponentsDemo);
-
-render(formWrapped);
 
 function onFieldSubmit(val) {
   console.info("on field submit", val);

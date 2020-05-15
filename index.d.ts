@@ -484,6 +484,8 @@ export interface GenericFormFieldProps {
   containerStyle: object;
   noOuterLabel: boolean;
   noFillField: boolean;
+  asyncValidate: function;
+  validateOnChange: boolean;
 }
 
 // BPSelect

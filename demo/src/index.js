@@ -4,14 +4,13 @@ import CollapsibleCard from "./examples/CollapsibleCard";
 import MenuBar from "./examples/MenuBar";
 import HotkeysDialog from "./examples/HotkeysDialog";
 import DataTableExample from "./examples/DataTable";
-import FormComponents from "./examples/FormComponents";
+import FormComponents from "./DemoComponents/FormComponents";
 import WithDialog from "./examples/WithDialog";
 import Toastr from "./examples/Toastr";
 import showConfirmationDialogDemo from "./examples/showConfirmationDialogDemo";
 import showConfirmationDialog from "../../src/showConfirmationDialog";
 import ResizableDraggableDialogDemo from "./examples/ResizableDraggableDialog";
 import ResizableDraggableDialog from "../../src/ResizableDraggableDialog";
-
 
 import CustomIcons from "./examples/CustomIcons";
 import CSSOnlyToolTip from "./examples/CSSOnlyToolTip";
@@ -23,11 +22,7 @@ import Loading from "./examples/Loading";
 import DownloadLink from "./examples/DownloadLink";
 import DemoNav from "./DemoNav";
 import DemoHeader from "./DemoHeader";
-import {
-  withTableParams,
-  DataTable,
-  PagingTool,
-} from "../../src";
+import { withTableParams, DataTable, PagingTool } from "../../src";
 import Uploader from "../../src/FormComponents/Uploader";
 import { FileUploadField } from "../../src/FormComponents";
 import FillWindowExample from "./examples/FillWindow";
@@ -70,10 +65,8 @@ import {
   Dialog,
   MenuItem,
   FocusStyleManager,
-  Position,
   Intent,
   KeyCombo,
-  Switch,
   Checkbox,
   Button,
   Icon,
@@ -323,20 +316,7 @@ const demos = {
     ]
   },
   FormComponents: {
-    demo: FormComponents,
-    scope: {
-      Position,
-      Intent,
-      Provider,
-      store,
-      Switch,
-      reduxForm,
-      Uploader,
-      renderToggle,
-      Classes,
-      Icon
-    },
-    noLiveCode: true
+    DemoComponent: FormComponents
   },
   withDialog: {
     demo: WithDialog,
@@ -358,7 +338,7 @@ const demos = {
     },
     demo: showConfirmationDialogDemo
   },
-  
+
   // MultiSelectSideBySide: {
   //   scope: {
   //     MultiSelectSideBySide,
@@ -466,31 +446,45 @@ const demoPropsSchema = [
   }
 ];
 
-function DemoComponentWrapper({ demo: Demo, scope, props = [], noLiveCode }, demoTitle) {
+function DemoComponentWrapper(
+  { demo: Demo, DemoComponent, scope, props = [], noLiveCode },
+  demoTitle
+) {
   return () => {
-    const component = (
-      <div>
-        {<ReactPlayground codeText={Demo} scope={scope} noLiveCode={noLiveCode} />}
-        {!!props.length && (
-          <React.Fragment>
-            <h6
-              style={{
-                marginTop: 25,
-                marginBottom: 15
-              }}
-            >
-              Properties
-            </h6>
-            <DataTable
-              formName="demoProps"
-              entities={props}
-              isSimple
-              schema={demoPropsSchema}
+    let component;
+    if (DemoComponent) {
+      component = <DemoComponent />;
+    } else {
+      component = (
+        <div>
+          {
+            <ReactPlayground
+              codeText={Demo}
+              scope={scope}
+              noLiveCode={noLiveCode}
             />
-          </React.Fragment>
-        )}
-      </div>
-    );
+          }
+          {!!props.length && (
+            <React.Fragment>
+              <h6
+                style={{
+                  marginTop: 25,
+                  marginBottom: 15
+                }}
+              >
+                Properties
+              </h6>
+              <DataTable
+                formName="demoProps"
+                entities={props}
+                isSimple
+                schema={demoPropsSchema}
+              />
+            </React.Fragment>
+          )}
+        </div>
+      );
+    }
     return (
       <React.Fragment>
         <div

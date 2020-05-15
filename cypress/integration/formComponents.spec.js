@@ -195,4 +195,26 @@ describe("formComponents", () => {
       "be.disabled"
     );
   });
+
+  it("input with asyncValidate works: with validateOnChange or on blur", () => {
+    cy.get(".tg-test-input-field-with-async-validate-on-blur input").type(
+      "john"
+    );
+    cy.get(".tg-test-input-field-with-async-validate-on-blur input").trigger(
+      "blur"
+    );
+    cy.get(".bp3-spinner", {
+      timeout: 5000
+    }).should("not.exist");
+    cy.contains("async blur validation failed");
+    cy.get(".tg-test-input-field-with-async-validate-on-change input").type(
+      "john"
+    );
+    cy.get(".bp3-spinner", {
+      timeout: 5000
+    }).should("not.exist");
+    cy.contains("async change validation failed");
+    // make sure other field error was not cleared
+    cy.contains("async blur validation failed");
+  });
 });

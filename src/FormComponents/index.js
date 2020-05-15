@@ -1,9 +1,22 @@
 import classNames from "classnames";
 import { SketchPicker } from "react-color";
-import { isNumber, noop, kebabCase, isPlainObject, isEqual } from "lodash";
+import {
+  isNumber,
+  noop,
+  kebabCase,
+  isPlainObject,
+  isEqual,
+  debounce
+} from "lodash";
 import mathExpressionEvaluator from "math-expression-evaluator";
-import React from "react";
-import { Field } from "redux-form";
+import React, { Component } from "react";
+import {
+  Field,
+  stopAsyncValidation,
+  clearAsyncError,
+  getFormAsyncErrors,
+  startAsyncValidation
+} from "redux-form";
 
 import "./style.css";
 import {
@@ -23,10 +36,11 @@ import {
 } from "@blueprintjs/core";
 
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
+import { connect } from "react-redux";
 import TgSelect from "../TgSelect";
 import InfoHelper from "../InfoHelper";
 import getMomentFormatter from "../utils/getMomentFormatter";
-// import AsyncValidateFieldSpinner from "../AsyncValidateFieldSpinner";
+import AsyncValidateFieldSpinner from "../AsyncValidateFieldSpinner";
 import Uploader from "./Uploader";
 import sortify from "./sortify";
 import { fieldRequired } from "./utils";
@@ -75,6 +89,9 @@ function removeUnwantedProps(props) {
   delete cleanedProps.tooltipError;
   delete cleanedProps.tooltipInfo;
   delete cleanedProps.tooltipProps;
+  delete cleanedProps.asyncValidate;
+  delete cleanedProps.asyncValidating;
+  delete cleanedProps.validateOnChange;
   if (cleanedProps.inputClassName) {
     cleanedProps.className = cleanedProps.inputClassName;
     delete cleanedProps.inputClassName;
@@ -136,6 +153,7 @@ class AbstractInput extends React.Component {
       secondaryLabel,
       className,
       showErrorIfUntouched,
+      asyncValidating,
       meta,
       containerStyle,
       noOuterLabel,
@@ -143,8 +161,12 @@ class AbstractInput extends React.Component {
       noFillField
     } = this.props;
     const { touched, error, warning } = meta;
-    const showError = (touched || showErrorIfUntouched) && error;
+
+    // if our custom field level validation is happening then we don't want to show the error visually
+    const showError =
+      (touched || showErrorIfUntouched) && error && !asyncValidating;
     const showWarning = (touched || showErrorIfUntouched) && warning;
+
     let componentToWrap = tooltipError ? (
       <Tooltip
         disabled={!showError}
@@ -255,13 +277,12 @@ export const renderBlueprintInput = props => {
     intent,
     onFieldSubmit,
     onKeyDown = noop,
+    asyncValidating,
     ...rest
   } = props;
   return (
     <InputGroup
-      // rightElement={
-      //   <AsyncValidateFieldSpinner validating={meta.asyncValidating} />
-      // }
+      rightElement={<AsyncValidateFieldSpinner validating={asyncValidating} />}
       {...removeUnwantedProps(rest)}
       intent={intent}
       {...input}
@@ -786,36 +807,149 @@ export class RenderReactColorPicker extends React.Component {
   }
 }
 
+class AddAsyncValidate extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      asyncValidating: false
+    };
+    this.runAsyncValidationDebounced = debounce(this.runAsyncValidation, 500);
+  }
+
+  componentDidUpdate(oldProps) {
+    const { validateOnChange } = this.props;
+    if (validateOnChange) {
+      const newValue = this.props.input.value;
+      const oldValue = oldProps.input.value;
+      if (oldValue !== newValue) {
+        this.runAsyncValidationDebounced(newValue);
+      }
+    }
+  }
+
+  triggerAsyncValidation(error) {
+    const {
+      input: { name },
+      meta: { dispatch, form },
+      formAsyncErrors
+    } = this.props;
+    // this needs to get a fresh prop for formAsyncErrors otherwise it will get out of sync.
+    // the test will catch this.
+    dispatch(
+      stopAsyncValidation(form, {
+        ...formAsyncErrors,
+        [name]: error
+      })
+    );
+  }
+
+  runAsyncValidation = async val => {
+    const {
+      input: { name },
+      meta: { dispatch, form },
+      asyncValidate
+    } = this.props;
+
+    this.setState({
+      asyncValidating: true
+    });
+    // mark this field as invalid so that the user can not submit this form while async validating
+    this.triggerAsyncValidation("asyncValidating");
+    dispatch(startAsyncValidation(form));
+    const error = await asyncValidate(val);
+    this.triggerAsyncValidation(error);
+    // if there is no error then clear it from redux
+    if (!error) {
+      dispatch(clearAsyncError(form, name));
+    }
+
+    this.setState({
+      asyncValidating: false
+    });
+
+    return error;
+  };
+
+  onBlur = (...args) => {
+    const { input } = this.props;
+    // always run this on input blur so that the user cannot submit a form with a field that has not finished validating
+    this.runAsyncValidation(input.value);
+    input.onBlur(...args);
+  };
+
+  render() {
+    const { asyncValidating } = this.state;
+    const { passedComponent: Component, input, ...rest } = this.props;
+
+    return (
+      <Component
+        {...rest}
+        input={{
+          ...input,
+          onBlur: this.onBlur
+        }}
+        asyncValidating={asyncValidating}
+      />
+    );
+  }
+}
+
+const WrappedAddAsyncValidate = connect((state, { meta }) => {
+  return {
+    formAsyncErrors: getFormAsyncErrors(meta.form)(state)
+  };
+})(AddAsyncValidate);
+
 export function generateField(component, opts) {
   const compWithDefaultVal = withAbstractWrapper(component, opts);
   return function FieldMaker({
     name,
     isRequired,
     onFieldSubmit = noop,
+    asyncValidate,
     ...rest
   }) {
-    // function onFieldSubmit(e,val) {
-    //   _onFieldSubmit && _onFieldSubmit(e.target ? e.target.value : val)
-    // }
-    return (
-      <Field
-        onFieldSubmit={onFieldSubmit}
-        name={name}
-        component={compWithDefaultVal}
-        {...(isRequired && { validate: fieldRequired })}
-        {...rest}
-      />
-    );
+    let component = compWithDefaultVal;
+
+    let props = {
+      onFieldSubmit,
+      name,
+      component,
+      ...(isRequired && { validate: fieldRequired }),
+      ...rest
+    };
+
+    if (asyncValidate) {
+      props = {
+        ...props,
+        asyncValidate,
+        showErrorIfUntouched: true,
+        component: WrappedAddAsyncValidate,
+        passedComponent: component
+      };
+    }
+
+    return <Field {...props} />;
   };
 }
 
 export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
   return props => {
+    const asyncValidating = props.asyncValidating;
     let defaultProps = {
       ...props,
       intent: getIntent(props),
       intentClass: getIntentClass(props)
     };
+
+    // don't show intent while async validating
+    if (asyncValidating) {
+      delete defaultProps.intent;
+      delete defaultProps.intentClass;
+    }
+    if (props.asyncValidate) {
+      defaultProps.showErrorIfUntouched = true;
+    }
     return (
       <AbstractInput {...{ ...opts, ...defaultProps }}>
         <ComponentToWrap {...defaultProps} />
