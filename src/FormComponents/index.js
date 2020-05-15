@@ -1,22 +1,9 @@
 import classNames from "classnames";
 import { SketchPicker } from "react-color";
-import {
-  isNumber,
-  noop,
-  kebabCase,
-  isPlainObject,
-  isEqual,
-  debounce
-} from "lodash";
+import { isNumber, noop, kebabCase, isPlainObject, isEqual } from "lodash";
 import mathExpressionEvaluator from "math-expression-evaluator";
-import React, { Component } from "react";
-import {
-  Field,
-  stopAsyncValidation,
-  clearAsyncError,
-  getFormAsyncErrors,
-  startAsyncValidation
-} from "redux-form";
+import React from "react";
+import { Field, touch } from "redux-form";
 
 import "./style.css";
 import {
@@ -36,7 +23,6 @@ import {
 } from "@blueprintjs/core";
 
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
-import { connect } from "react-redux";
 import TgSelect from "../TgSelect";
 import TgSuggest from "../TgSuggest";
 import InfoHelper from "../InfoHelper";
@@ -90,15 +76,28 @@ function removeUnwantedProps(props) {
   delete cleanedProps.tooltipError;
   delete cleanedProps.tooltipInfo;
   delete cleanedProps.tooltipProps;
-  delete cleanedProps.asyncValidate;
-  delete cleanedProps.asyncValidating;
-  delete cleanedProps.validateOnChange;
+  // delete cleanedProps.asyncValidate;
+  // delete cleanedProps.asyncValidating;
+  // delete cleanedProps.validateOnChange;
+  delete cleanedProps.hasCustomError;
+  delete cleanedProps.touchOnChange;
   if (cleanedProps.inputClassName) {
     cleanedProps.className = cleanedProps.inputClassName;
     delete cleanedProps.inputClassName;
   }
   return cleanedProps;
 }
+
+// will help tooltip to not get smushed
+const popoverOverflowModifiers = {
+  preventOverflow: { enabled: false },
+  hide: {
+    enabled: false
+  },
+  flip: {
+    boundariesElement: "viewport"
+  }
+};
 
 class AbstractInput extends React.Component {
   UNSAFE_componentWillMount() {
@@ -141,6 +140,17 @@ class AbstractInput extends React.Component {
     }
   }
 
+  componentDidUpdate(oldProps) {
+    const {
+      touchOnChange,
+      input: { name, value },
+      meta: { touched, dispatch, form }
+    } = this.props;
+    if (touchOnChange && !touched && value !== oldProps.input.value) {
+      dispatch(touch(form, name));
+    }
+  }
+
   render() {
     const {
       children,
@@ -174,6 +184,7 @@ class AbstractInput extends React.Component {
         intent={error ? "danger" : "warning"}
         content={error || warning}
         position={Position.TOP}
+        modifiers={popoverOverflowModifiers}
         {...tooltipProps}
       >
         {children}
@@ -845,98 +856,112 @@ export class RenderReactColorPicker extends React.Component {
   }
 }
 
-class AddAsyncValidate extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      asyncValidating: false
-    };
-    this.runAsyncValidationDebounced = debounce(this.runAsyncValidation, 500);
-  }
+// tgreen: This doesn't work because the async validate function will not be automatically rerun onSubmit
+// class AddAsyncValidate extends Component {
+//   constructor(props) {
+//     super(props);
+//     this.state = {
+//       asyncValidating: false
+//     };
+//     this.runAsyncValidationDebounced = debounce(this.runAsyncValidation, 500);
+//   }
 
-  componentDidUpdate(oldProps) {
-    const { validateOnChange } = this.props;
-    if (validateOnChange) {
-      const newValue = this.props.input.value;
-      const oldValue = oldProps.input.value;
-      if (oldValue !== newValue) {
-        this.runAsyncValidationDebounced(newValue);
-      }
-    }
-  }
+//   componentDidUpdate(oldProps) {
+//     const {
+//       validateOnChange,
+//       input: { name, value },
+//       meta: { touched, form, dispatch }
+//     } = this.props;
+//     const newValue = value;
+//     const oldValue = oldProps.input.value;
+//     const valueHasChanged = newValue !== oldValue;
+//     if (validateOnChange && valueHasChanged) {
+//       this.runAsyncValidationDebounced(newValue);
+//     }
+//     // mark the input as touched after changing value
+//     if (valueHasChanged && !touched) {
+//       dispatch(touch(form, name));
+//     }
+//   }
 
-  triggerAsyncValidation(error) {
-    const {
-      input: { name },
-      meta: { dispatch, form },
-      formAsyncErrors
-    } = this.props;
-    // this needs to get a fresh prop for formAsyncErrors otherwise it will get out of sync.
-    // the test will catch this.
-    dispatch(
-      stopAsyncValidation(form, {
-        ...formAsyncErrors,
-        [name]: error
-      })
-    );
-  }
+//   triggerAsyncValidation(error) {
+//     const {
+//       input: { name },
+//       meta: { dispatch, form },
+//       formAsyncErrors
+//     } = this.props;
+//     // this needs to get a fresh prop for formAsyncErrors otherwise it will get out of sync.
+//     // the test will catch this.
+//     dispatch(
+//       stopAsyncValidation(form, {
+//         ...formAsyncErrors,
+//         [name]: error
+//       })
+//     );
+//   }
 
-  runAsyncValidation = async val => {
-    const {
-      input: { name },
-      meta: { dispatch, form },
-      asyncValidate
-    } = this.props;
+//   runAsyncValidation = async val => {
+//     const {
+//       input: { name },
+//       meta: { dispatch, form },
+//       asyncValidate
+//     } = this.props;
 
-    this.setState({
-      asyncValidating: true
-    });
-    // mark this field as invalid so that the user can not submit this form while async validating
-    this.triggerAsyncValidation("asyncValidating");
-    dispatch(startAsyncValidation(form));
-    const error = await asyncValidate(val);
-    this.triggerAsyncValidation(error);
-    // if there is no error then clear it from redux
-    if (!error) {
-      dispatch(clearAsyncError(form, name));
-    }
+//     this.setState({
+//       asyncValidating: true
+//     });
+//     // mark this field as invalid so that the user can not submit this form while async validating
+//     this.triggerAsyncValidation("asyncValidating");
+//     dispatch(startAsyncValidation(form));
+//     const error = await asyncValidate(val);
+//     this.triggerAsyncValidation(error);
+//     // if there is no error then clear it from redux
+//     if (!error) {
+//       dispatch(clearAsyncError(form, name));
+//     }
 
-    this.setState({
-      asyncValidating: false
-    });
+//     this.setState({
+//       asyncValidating: false
+//     });
 
-    return error;
-  };
+//     return error;
+//   };
 
-  onBlur = (...args) => {
-    const { input } = this.props;
-    // always run this on input blur so that the user cannot submit a form with a field that has not finished validating
-    this.runAsyncValidation(input.value);
-    input.onBlur(...args);
-  };
+//   onBlur = (...args) => {
+//     const { input } = this.props;
+//     // always run this on input blur so that the user cannot submit a form with a field that has not finished validating
+//     this.runAsyncValidation(input.value);
+//     input.onBlur(...args);
+//   };
 
-  render() {
-    const { asyncValidating } = this.state;
-    const { passedComponent: Component, input, ...rest } = this.props;
+//   render() {
+//     const { asyncValidating } = this.state;
+//     const {
+//       passedComponent: Component,
+//       input,
+//       formAsyncErrors, // don't pass through
+//       dispatch, // don't pass through
+//       ...rest
+//     } = this.props;
 
-    return (
-      <Component
-        {...rest}
-        input={{
-          ...input,
-          onBlur: this.onBlur
-        }}
-        asyncValidating={asyncValidating}
-      />
-    );
-  }
-}
+//     return (
+//       <Component
+//         {...rest}
+//         input={{
+//           ...input,
+//           onBlur: this.onBlur
+//         }}
+//         asyncValidating={asyncValidating}
+//       />
+//     );
+//   }
+// }
 
-const WrappedAddAsyncValidate = connect((state, { meta }) => {
-  return {
-    formAsyncErrors: getFormAsyncErrors(meta.form)(state)
-  };
-})(AddAsyncValidate);
+// const WrappedAddAsyncValidate = connect((state, { meta }) => {
+//   return {
+//     formAsyncErrors: getFormAsyncErrors(meta.form)(state)
+//   };
+// })(AddAsyncValidate);
 
 export function generateField(component, opts) {
   const compWithDefaultVal = withAbstractWrapper(component, opts);
@@ -944,7 +969,7 @@ export function generateField(component, opts) {
     name,
     isRequired,
     onFieldSubmit = noop,
-    asyncValidate,
+    // asyncValidate,
     ...rest
   }) {
     let component = compWithDefaultVal;
@@ -957,15 +982,14 @@ export function generateField(component, opts) {
       ...rest
     };
 
-    if (asyncValidate) {
-      props = {
-        ...props,
-        asyncValidate,
-        showErrorIfUntouched: true,
-        component: WrappedAddAsyncValidate,
-        passedComponent: component
-      };
-    }
+    // if (asyncValidate) {
+    //   props = {
+    //     ...props,
+    //     asyncValidate,
+    //     component: WrappedAddAsyncValidate,
+    //     passedComponent: component
+    //   };
+    // }
 
     return <Field {...props} />;
   };
@@ -973,7 +997,7 @@ export function generateField(component, opts) {
 
 export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
   return props => {
-    const asyncValidating = props.asyncValidating;
+    // const asyncValidating = props.asyncValidating;
     let defaultProps = {
       ...props,
       intent: getIntent(props),
@@ -981,13 +1005,10 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
     };
 
     // don't show intent while async validating
-    if (asyncValidating) {
-      delete defaultProps.intent;
-      delete defaultProps.intentClass;
-    }
-    if (props.asyncValidate) {
-      defaultProps.showErrorIfUntouched = true;
-    }
+    // if (asyncValidating) {
+    //   delete defaultProps.intent;
+    //   delete defaultProps.intentClass;
+    // }
     return (
       <AbstractInput {...{ ...opts, ...defaultProps }}>
         <ComponentToWrap {...defaultProps} />

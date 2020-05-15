@@ -424,6 +424,7 @@ export interface GenericFormFieldProps {
   noFillField: boolean;
   asyncValidate: function;
   validateOnChange: boolean;
+  touchOnChange: boolean;
 }
 
 // BPSelect

@@ -20,7 +20,8 @@ import {
   TextareaField,
   EditableTextField,
   ReactSelectField,
-  ReactColorField
+  ReactColorField,
+  SuggestField
 } from "../../../src";
 import renderToggle from "../renderToggle";
 
