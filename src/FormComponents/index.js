@@ -38,6 +38,7 @@ import {
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
 import { connect } from "react-redux";
 import TgSelect from "../TgSelect";
+import TgSuggest from "../TgSuggest";
 import InfoHelper from "../InfoHelper";
 import getMomentFormatter from "../utils/getMomentFormatter";
 import AsyncValidateFieldSpinner from "../AsyncValidateFieldSpinner";
@@ -362,9 +363,13 @@ export class renderBlueprintTextarea extends React.Component {
     this.setState({ value: e.target.value });
   };
   handleValSubmit = () => {
-    this.props.input.onChange(this.state.value);
-    this.props.onFieldSubmit(this.state.value, { cmdEnter: true });
-
+    this.props.input.onChange(
+      this.state.value === null ? this.props.input.value : this.state.value
+    );
+    this.props.onFieldSubmit(
+      this.state.value === null ? this.props.input.value : this.state.value,
+      { cmdEnter: true }
+    );
     this.stopEdit();
   };
   onKeyDown = (...args) => {
@@ -567,6 +572,39 @@ export const renderReactSelect = props => {
     }
   };
   return <TgSelect {...propsToUse} />;
+};
+
+export const renderSuggest_old = props => {
+  return renderReactSelect({ ...props, asSuggest: true });
+};
+
+export const renderSuggest = props => {
+  const {
+    async,
+    input: { value, onChange },
+    hideValue,
+    intent,
+    options,
+    onFieldSubmit,
+    ...rest
+  } = props;
+
+  const propsToUse = {
+    ...removeUnwantedProps(rest),
+    intent,
+    options,
+    value,
+    onChange(val) {
+      onChange(val);
+      if (!rest.submitOnBlur) onFieldSubmit(val);
+    },
+    onBlur() {
+      if (rest.submitOnBlur) {
+        onFieldSubmit(value);
+      }
+    }
+  };
+  return <TgSuggest {...propsToUse}></TgSuggest>;
 };
 
 export const BPSelect = ({ value, onChange, ...rest }) => {
@@ -971,6 +1009,7 @@ export const SwitchField = generateField(renderBlueprintSwitch, {
   noFillField: true
 });
 export const TextareaField = generateField(renderBlueprintTextarea);
+export const SuggestField = generateField(renderSuggest);
 export const EditableTextField = generateField(renderBlueprintEditableText);
 export const NumericInputField = generateField(renderBlueprintNumericInput);
 export const RadioGroupField = generateField(renderBlueprintRadioGroup, {

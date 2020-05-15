@@ -1,9 +1,10 @@
 import "./style.css";
-
+export { mergeSchemas } from "./DataTable/utils/convertSchema";
 export {
   getCurrentParamsFromUrl,
   setCurrentParamsOnUrl
 } from "./DataTable/utils/queryParams";
+
 export {
   default as withSelectedEntities,
   getSelectedEntities

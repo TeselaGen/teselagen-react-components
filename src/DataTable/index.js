@@ -70,7 +70,7 @@ class DataTable extends React.Component {
   updateFromProps = (oldProps, newProps) => {
     const {
       selectedIds,
-      entities,
+      entities = [],
       isEntityDisabled,
       expandAllByDefault,
       selectAllByDefault,
@@ -102,13 +102,13 @@ class DataTable extends React.Component {
     if (
       (selectAllByDefault || expandAllByDefault) &&
       !isEqual(
-        newProps.entities.map(({ id }) => id),
+        (newProps.entities || []).map(({ id }) => id),
         oldProps.entities && oldProps.entities.map(({ id }) => id)
       )
     ) {
       if (selectAllByDefault) {
         change("reduxFormSelectedEntityIdMap", {
-          ...entities.reduce((acc, entity) => {
+          ...(entities || []).reduce((acc, entity) => {
             acc[entity.id] = { entity };
             return acc;
           }, {}),
@@ -117,7 +117,7 @@ class DataTable extends React.Component {
       }
       if (expandAllByDefault) {
         change("reduxFormExpandedEntityIdMap", {
-          ...entities.reduce((acc, e) => {
+          ...(entities || []).reduce((acc, e) => {
             acc[e.id] = true;
             return acc;
           }, {}),

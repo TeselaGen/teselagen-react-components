@@ -1,6 +1,6 @@
-import { startCase } from "lodash";
+import { startCase, keyBy, map } from "lodash";
 
-export default schema => {
+function convertSchema(schema) {
   let schemaToUse = schema;
   if (!schemaToUse.fields && Array.isArray(schema)) {
     schemaToUse = {
@@ -42,4 +42,27 @@ export default schema => {
     return fieldToUse;
   });
   return schemaToUse;
-};
+}
+
+export function mergeSchemas(_originalSchema, _overrideSchema) {
+  const originalSchema = convertSchema(_originalSchema);
+  const overrideSchema = convertSchema(_overrideSchema);
+
+  const overridesByKey = keyBy(overrideSchema.fields, "path");
+  return {
+    ...originalSchema,
+    ...overrideSchema,
+    fields: originalSchema.fields
+      .map(f => {
+        const override = overridesByKey[f.path];
+        if (override) {
+          delete overridesByKey[f.path];
+          return override;
+        }
+        return f;
+      })
+      .concat(map(overridesByKey))
+  };
+}
+
+export default convertSchema;
