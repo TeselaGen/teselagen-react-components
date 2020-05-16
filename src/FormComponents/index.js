@@ -32,6 +32,8 @@ import Uploader from "./Uploader";
 import sortify from "./sortify";
 import { fieldRequired } from "./utils";
 
+export { fieldRequired };
+
 function getIntent({
   showErrorIfUntouched,
   meta: { touched, error, warning }
