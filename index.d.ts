@@ -2,6 +2,8 @@
 
 import * as React from "react";
 import * as Blueprint from "@blueprintjs/core";
+export * as DialogFooter from "./src/DialogFooter";
+
 /*~ If this module has methods, declare them as functions like so.
  */
 
