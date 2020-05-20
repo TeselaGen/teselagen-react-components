@@ -1,21 +1,36 @@
-// import Rnd from "react-rnd";
 import React from "react";
 import { Dialog, Classes } from "@blueprintjs/core";
-import Rnd from "react-rnd";
+import { Rnd } from "react-rnd";
 import "./style.css";
 
 export default class ResizableDraggableDialog extends React.Component {
-  constructor(props) {
-    super(props);
-    const {
-      width: defaultDialogWidth = 400,
-      height: defaultDialogHeight = 450
-    } = this.props;
-    const { windowWidth, windowHeight } = this.getWindowWidthAndHeight();
-    this.state = {
-      x: Math.round(Math.max((windowWidth - defaultDialogWidth) / 2, 0)),
-      y: Math.round(Math.max((windowHeight - defaultDialogHeight) / 2, 0))
-    };
+  componentDidMount() {
+    window.addEventListener("resize", this.onWindowResize);
+  }
+
+  onWindowResize = () => {
+    //trigger a fake drag event here so that the dialog will stay in the window on window resize
+    const targetNode = document.querySelector(`.${Classes.DIALOG_HEADER}`);
+    if (targetNode) {
+      //--- Simulate a natural mouse-click sequence.
+      triggerMouseEvent(targetNode, "mouseover");
+      triggerMouseEvent(targetNode, "mousedown");
+      triggerMouseEvent(document, "mousemove");
+      triggerMouseEvent(targetNode, "mouseup");
+      triggerMouseEvent(targetNode, "click");
+    } else {
+      // eslint-disable-next-line no-console
+      console.log("*** Target node not found!");
+    }
+
+    function triggerMouseEvent(node, eventType) {
+      const clickEvent = document.createEvent("MouseEvents");
+      clickEvent.initEvent(eventType, true, true);
+      node.dispatchEvent(clickEvent);
+    }
+  };
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.onWindowResize);
   }
 
   getWindowWidthAndHeight = () => {
@@ -29,10 +44,6 @@ export default class ResizableDraggableDialog extends React.Component {
       windowWidth,
       windowHeight
     };
-  };
-
-  onDragStop = (e, d) => {
-    this.setState({ x: Math.round(d.x), y: Math.round(d.y) });
   };
 
   render() {
@@ -50,8 +61,6 @@ export default class ResizableDraggableDialog extends React.Component {
         style={{ top: 0, left: 0, position: "fixed" }}
       >
         <Rnd
-          onDragStop={this.onDragStop}
-          position={{ x: this.state.x, y: this.state.y }}
           enableResizing={{
             bottomLeft: true,
             bottomRight: true,
@@ -64,6 +73,10 @@ export default class ResizableDraggableDialog extends React.Component {
           // minHeight={Math.min(defaultDialogHeight, 200) }
           bounds="window"
           default={{
+            x: Math.round(Math.max((windowWidth - defaultDialogWidth) / 2, 0)),
+            y: Math.round(
+              Math.max((windowHeight - defaultDialogHeight) / 2, 0)
+            ),
             width: Math.min(defaultDialogWidth, windowWidth),
             height: Math.min(defaultDialogHeight, windowHeight)
           }}
