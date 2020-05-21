@@ -28,8 +28,6 @@ import { FileUploadField } from "../../src/FormComponents";
 import FillWindowExample from "./examples/FillWindow";
 import * as customIcons from "../../src/customIcons";
 
-import Tree from "./examples/Tree";
-import { bigTreeData, smallTreeData } from "./data/treeData";
 
 import S3Download from "../../src/utils/S3Download";
 import magicDownload from "../../src/DownloadLink/magicDownload";
@@ -390,14 +388,6 @@ const demos = {
     scope: {
       renderToggle,
       FillWindow
-    }
-  },
-  tree: {
-    demo: Tree,
-    scope: {
-      renderToggle,
-      bigTreeData,
-      smallTreeData
     }
   },
   Timeline: {

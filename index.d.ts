@@ -857,22 +857,6 @@ declare class Timeline extends React.Component<TimelineProps, any> {}
 export interface TimelineProps {
   children: any;
 }
-// Tree
-declare class Tree extends React.Component<TreeProps, any> {}
-
-export interface TreeProps {
-  layout: string;
-  cardIdKey: string;
-  childrenKey: string;
-  colorCodes: any;
-  connectorThickness: number;
-  horizontalLeaves: boolean;
-  colorByDepth: boolean;
-  includeMinimap: boolean;
-  zoom: number;
-  marginRight: number;
-  marginBottom: number;
-}
 
 /**
  *

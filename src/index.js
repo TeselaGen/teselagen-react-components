@@ -51,7 +51,7 @@ export * from "./utils/hotkeyUtils";
 export * from "./utils/menuUtils";
 export * from "./utils/commandUtils";
 export * from "./utils/commandControls";
-export { default as Tree } from "./Tree";
+
 export {
   default as AsyncValidateFieldSpinner
 } from "./AsyncValidateFieldSpinner";
