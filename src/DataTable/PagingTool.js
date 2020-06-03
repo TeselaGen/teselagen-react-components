@@ -17,13 +17,16 @@ export class PagingTool extends React.Component {
     refetching: false
   };
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  componentDidUpdate() {
+    const { selectedPage } = this.state;
     const {
       paging: { page }
-    } = nextProps;
-    this.setState({
-      selectedPage: page
-    });
+    } = this.props;
+    if (selectedPage !== page) {
+      this.setState({
+        selectedPage: page
+      });
+    }
   }
 
   onRefresh = async () => {

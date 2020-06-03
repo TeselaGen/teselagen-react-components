@@ -190,7 +190,8 @@ class DataTable extends React.Component {
     this.updateFromProps(computePresets(oldProps), computePresets(this.props));
 
     // let theads = table.getElementsByClassName("rt-thead");
-    let tbody = table.getElementsByClassName("rt-tbody")[0];
+    // let tbody = table.getElementsByClassName("rt-tbody")[0];
+    const tableScrollElement = table.getElementsByClassName("rt-table")[0];
 
     // if (tbody.scrollHeight > tbody.clientHeight) {
     //   for (let i = 0; i < theads.length; i++) {
@@ -203,7 +204,7 @@ class DataTable extends React.Component {
     // }
 
     // if switching pages or searching the table we want to reset the scrollbar
-    if (tbody.scrollTop > 0) {
+    if (tableScrollElement.scrollTop > 0) {
       const { entities = [] } = this.props;
       const { entities: oldEntities = [] } = oldProps;
       const reloaded = oldProps.isLoading && !this.props.isLoading;
@@ -212,7 +213,7 @@ class DataTable extends React.Component {
         getIdOrCodeOrIndex(entities[0] || {}) !==
           getIdOrCodeOrIndex(oldEntities[0] || {});
       if (reloaded || entitiesHaveChanged) {
-        tbody.scrollTop = 0;
+        tableScrollElement.scrollTop = 0;
       }
     }
 
