@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import * as Blueprint from "@blueprintjs/core";
-export * as DialogFooter from "./src/DialogFooter";
 import { Intent, Button, Classes } from "@blueprintjs/core";
 import { noop } from "lodash";
 
