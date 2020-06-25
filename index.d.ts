@@ -3,6 +3,8 @@
 import * as React from "react";
 import * as Blueprint from "@blueprintjs/core";
 export * as DialogFooter from "./src/DialogFooter";
+import { Intent, Button, Classes } from "@blueprintjs/core";
+import { noop } from "lodash";
 
 /*~ If this module has methods, export them as functions like so.
  */
@@ -367,13 +369,39 @@ export interface DataTableProps {
 /**
  * @example
  * <DialogFooter
-          text="Next"
-          submitting={submitting}
-          onClick={handleSubmit(onSubmit)}
-        />
-
+    text="Next"
+    submitting={submitting}
+    onClick={handleSubmit(onSubmit)}
+  />
+  @example
+  <DialogFooter
+    onBackClick={() => {}}
+    hideModal={hideModal}
+    submitting={submitting}
+    onClick={handleSubmit(onSubmit)}
+  />
  */
-export class DialogFooter extends React.Component<DialogFooterProps, any> {}
+export function DialogFooter({
+  hideModal = noop,
+  loading,
+  onBackClick,
+  submitting,
+  onClick = noop,
+  secondaryAction,
+  intent = Intent.PRIMARY,
+  secondaryIntent,
+  secondaryText = "Cancel",
+  additionalButtons,
+  className,
+  secondaryClassName = "",
+  text = "Submit",
+  disabled,
+  noCancel
+}) {
+  return "";
+}
+
+
 
 export interface DialogFooterProps {
   hideModal: function;
