@@ -4,7 +4,7 @@ import * as React from "react";
 import * as Blueprint from "@blueprintjs/core";
 export * as DialogFooter from "./src/DialogFooter";
 
-/*~ If this module has methods, declare them as functions like so.
+/*~ If this module has methods, export them as functions like so.
  */
 
 export function noop(): void;
@@ -93,7 +93,7 @@ interface ToastrFuncOptions {
   key: string;
 }
 
-declare global {
+export global {
   interface Window {
     toastr: {
       success: ToastrFunc;
@@ -107,18 +107,18 @@ declare global {
 
 // export function myOtherMethod(a: number): number;
 
-// /*~ You can declare types that are available via importing the module */
+// /*~ You can export types that are available via importing the module */
 // export interface SomeType {
 //   name: string;
 //   length: number;
 //   extras?: string[];
 // }
 
-// /*~ You can declare properties of the module using const, let, or var */
+// /*~ You can export properties of the module using const, let, or var */
 // export const myField: number;
 
 // /*~ If there are types, properties, or methods inside dotted names
-//  *~ of the module, declare them inside a 'namespace'.
+//  *~ of the module, export them inside a 'namespace'.
 //  */
 // export namespace subProp {
 //   /*~ For example, given this definition, someone could write:
@@ -132,7 +132,7 @@ declare global {
 //   export function foo(): void;
 // }
 
-declare class SimpleSelect extends React.Component<SimpleSelectProps, any> {}
+export class SimpleSelect extends React.Component<SimpleSelectProps, any> {}
 
 export interface SimpleSelectProps {
   autofocus?: boolean;
@@ -146,7 +146,7 @@ export interface SimpleSelectProps {
 }
 
 // AsyncValidateFieldSpinner
-declare class AsyncValidateFieldSpinner extends React.Component<
+export class AsyncValidateFieldSpinner extends React.Component<
   AsyncValidateFieldSpinnerProps,
   any
 > {}
@@ -156,7 +156,7 @@ export interface AsyncValidateFieldSpinnerProps {
 }
 
 // BlueprintError
-declare class BlueprintError extends React.Component<
+export class BlueprintError extends React.Component<
   BlueprintErrorProps,
   any
 > {}
@@ -165,7 +165,7 @@ export interface BlueprintErrorProps {
   error: string;
 }
 // BounceLoader
-declare class BounceLoader extends React.Component<BounceLoaderProps, any> {}
+export class BounceLoader extends React.Component<BounceLoaderProps, any> {}
 
 export interface BounceLoaderProps {
   style: object;
@@ -232,7 +232,7 @@ export interface BounceLoaderProps {
       }
     ];
  */
-declare class CollapsibleCard extends React.Component<
+export class CollapsibleCard extends React.Component<
   CollapsibleCardProps,
   any
 > {}
@@ -245,10 +245,10 @@ export interface CollapsibleCardProps {
   initialClosed: boolean;
 }
 
-declare class CmdCheckbox extends React.Component<CmdProps, any> {}
-declare class CmdSwitch extends React.Component<CmdProps, any> {}
-declare class CmdDiv extends React.Component<CmdProps, any> {}
-declare class CmdButton extends React.Component<CmdProps, any> {}
+export class CmdCheckbox extends React.Component<CmdProps, any> {}
+export class CmdSwitch extends React.Component<CmdProps, any> {}
+export class CmdDiv extends React.Component<CmdProps, any> {}
+export class CmdButton extends React.Component<CmdProps, any> {}
 
 export interface CmdProps {
   name: string;
@@ -256,7 +256,7 @@ export interface CmdProps {
   cmd: function;
 }
 // DNALoader
-declare class DNALoader extends React.Component<DNALoaderProps, any> {}
+export class DNALoader extends React.Component<DNALoaderProps, any> {}
 
 export interface DNALoaderProps {
   style: object;
@@ -299,7 +299,7 @@ export interface DNALoaderProps {
     onDoubleClick={routeDoubleClick}
   />
  */
-declare class DataTable extends React.Component<DataTableProps, any> {}
+export class DataTable extends React.Component<DataTableProps, any> {}
 
 export interface DataTableProps {
   extraClasses: string;
@@ -373,7 +373,7 @@ export interface DataTableProps {
         />
 
  */
-declare class DialogFooter extends React.Component<DialogFooterProps, any> {}
+export class DialogFooter extends React.Component<DialogFooterProps, any> {}
 
 export interface DialogFooterProps {
   hideModal: function;
@@ -393,7 +393,7 @@ export interface DialogFooterProps {
   noCancel: boolean;
 }
 // DownloadLink
-declare class DownloadLink extends React.Component<DownloadLinkProps, any> {}
+export class DownloadLink extends React.Component<DownloadLinkProps, any> {}
 
 export interface DownloadLinkProps {
   getFileString: function;
@@ -401,7 +401,7 @@ export interface DownloadLinkProps {
   fileString: string;
 }
 // FillWindow
-declare class FillWindow extends React.Component<FillWindowProps, any> {}
+export class FillWindow extends React.Component<FillWindowProps, any> {}
 
 export interface FillWindowProps {
   containerStyle: string;
@@ -454,7 +454,7 @@ export interface GenericFormFieldProps {
  * @example
  * <InputField label="Search" isRequired name="searchQuery"></InputField>
  */
-declare class InputField extends React.Component<InputFieldProps, any> {}
+export class InputField extends React.Component<InputFieldProps, any> {}
 
 export interface InputFieldProps extends GenericFormFieldProps {}
 
@@ -475,7 +475,7 @@ export interface InputFieldProps extends GenericFormFieldProps {}
           fileLimit={1}
         />
  */
-declare class FileUploadField extends React.Component<
+export class FileUploadField extends React.Component<
   FileUploadFieldProps,
   any
 > {}
@@ -512,14 +512,14 @@ export interface FileUploadFieldProps extends GenericFormFieldProps {
             maxDate={new Date("12/31/2100")}
           />
  */
-declare class DateInputField extends React.Component<
+export class DateInputField extends React.Component<
   DateInputFieldProps,
   any
 > {}
 
 export interface DateInputFieldProps extends GenericFormFieldProps {}
 // DateRangeInputField
-declare class DateRangeInputField extends React.Component<
+export class DateRangeInputField extends React.Component<
   DateRangeInputFieldProps,
   any
 > {}
@@ -540,7 +540,7 @@ export interface DateRangeInputFieldProps extends GenericFormFieldProps {}
             />
             
  */
-declare class CheckboxField extends React.Component<CheckboxFieldProps, any> {}
+export class CheckboxField extends React.Component<CheckboxFieldProps, any> {}
 
 export interface CheckboxFieldProps extends GenericFormFieldProps {}
 
@@ -560,7 +560,7 @@ export interface CheckboxFieldProps extends GenericFormFieldProps {}
         />
             
  */
-declare class SwitchField extends React.Component<SwitchFieldProps, any> {}
+export class SwitchField extends React.Component<SwitchFieldProps, any> {}
 
 export interface SwitchFieldProps extends GenericFormFieldProps {}
 /**
@@ -577,7 +577,7 @@ export interface SwitchFieldProps extends GenericFormFieldProps {}
           onFieldSubmit={this.handleFieldSubmit("description")}
         />         
  */
-declare class TextareaField extends React.Component<TextareaFieldProps, any> {}
+export class TextareaField extends React.Component<TextareaFieldProps, any> {}
 
 export interface TextareaFieldProps extends GenericFormFieldProps {}
 /**
@@ -600,7 +600,7 @@ export interface TextareaFieldProps extends GenericFormFieldProps {}
     placeholder="Workflow Name..."
   />
  */
-declare class EditableTextField extends React.Component<
+export class EditableTextField extends React.Component<
   EditableTextFieldProps,
   any
 > {}
@@ -617,7 +617,7 @@ export interface EditableTextFieldProps extends GenericFormFieldProps {}
   />
   <NumericInputField name="part.endBp" label="End BP" readOnly />
  */
-declare class NumericInputField extends React.Component<
+export class NumericInputField extends React.Component<
   NumericInputFieldProps,
   any
 > {}
@@ -653,7 +653,7 @@ export interface NumericInputFieldProps extends GenericFormFieldProps {}
     ]}
   />
  */
-declare class RadioGroupField extends React.Component<
+export class RadioGroupField extends React.Component<
   RadioGroupFieldProps,
   any
 > {}
@@ -668,7 +668,7 @@ export interface RadioGroupFieldProps extends GenericFormFieldProps {}
     name={`username`}
   />
  */
-declare class SuggestField extends React.Component<SuggestFieldProps, any> {}
+export class SuggestField extends React.Component<SuggestFieldProps, any> {}
 
 export interface SuggestFieldProps extends GenericFormFieldProps {}
 
@@ -684,7 +684,7 @@ export interface SuggestFieldProps extends GenericFormFieldProps {}
     isRequired
     />
  */
-declare class ReactSelectField extends React.Component<
+export class ReactSelectField extends React.Component<
   ReactSelectFieldProps,
   any
 > {}
@@ -693,7 +693,7 @@ export interface ReactSelectFieldProps extends GenericFormFieldProps {
   multi: boolean;
 }
 // SelectField
-declare class SelectField extends React.Component<SelectFieldProps, any> {}
+export class SelectField extends React.Component<SelectFieldProps, any> {}
 
 export interface SelectFieldProps extends GenericFormFieldProps {}
 /**
@@ -704,7 +704,7 @@ export interface SelectFieldProps extends GenericFormFieldProps {}
     name="color"
   />
  */
-declare class ReactColorField extends React.Component<
+export class ReactColorField extends React.Component<
   ReactColorFieldProps,
   any
 > {}
@@ -712,7 +712,7 @@ declare class ReactColorField extends React.Component<
 export interface ReactColorFieldProps extends GenericFormFieldProps {}
 
 // HotkeysDialog
-declare class HotkeysDialog extends React.Component<HotkeysDialogProps, any> {}
+export class HotkeysDialog extends React.Component<HotkeysDialogProps, any> {}
 
 export interface HotkeysDialogProps {
   hotkeySets: object;
@@ -738,7 +738,7 @@ export interface HotkeysDialogProps {
   <InfoHelper isButton disabled content={"Hey I'm some helpful info!"} />
   <InfoHelper isPopover content={"Hey I'm some helpful info!"} />
  */
-declare class InfoHelper extends React.Component<InfoHelperProps, any> {}
+export class InfoHelper extends React.Component<InfoHelperProps, any> {}
 
 export interface InfoHelperProps {
   className: string;
@@ -758,7 +758,7 @@ export interface InfoHelperProps {
   style: object;
 }
 // IntentText
-declare class IntentText extends React.Component<IntentTextProps, any> {}
+export class IntentText extends React.Component<IntentTextProps, any> {}
 
 export interface IntentTextProps {
   intent: Blueprint.Intent;
@@ -767,7 +767,7 @@ export interface IntentTextProps {
 }
 
 // Loading
-declare class Loading extends React.Component<LoadingProps, any> {}
+export class Loading extends React.Component<LoadingProps, any> {}
 
 export interface LoadingProps {
   loading: any;
@@ -781,7 +781,7 @@ export interface LoadingProps {
   inDialog: any;
 }
 // MenuBar
-declare class MenuBar extends React.Component<MenuBarProps, any> {}
+export class MenuBar extends React.Component<MenuBarProps, any> {}
 
 export interface MenuBarProps {
   menu: any;
@@ -791,7 +791,7 @@ export interface MenuBarProps {
   menuSearchHotkey: any;
 }
 // // MultiSelectSideBySide
-// declare class MultiSelectSideBySide extends React.Component<MultiSelectSideBySideProps, any> { }
+// export class MultiSelectSideBySide extends React.Component<MultiSelectSideBySideProps, any> { }
 
 // export interface MultiSelectSideBySideProps {
 //   selectedItems: array;
@@ -814,7 +814,7 @@ export interface MenuBarProps {
 // }
 
 // ResizableDraggableDialog
-declare class ResizableDraggableDialog extends React.Component<
+export class ResizableDraggableDialog extends React.Component<
   ResizableDraggableDialogProps,
   any
 > {}
@@ -825,14 +825,14 @@ export interface ResizableDraggableDialogProps {
   RndProps: object;
 }
 // ScrollToTop
-declare class ScrollToTop extends React.Component<ScrollToTopProps, any> {}
+export class ScrollToTop extends React.Component<ScrollToTopProps, any> {}
 
 export interface ScrollToTopProps {
   showAt: number;
   scrollContainer: any;
 }
 // TgSelect
-declare class TgSelect extends React.Component<TgSelectProps, any> {}
+export class TgSelect extends React.Component<TgSelectProps, any> {}
 
 export interface TgSelectProps {
   multi: boolean;
@@ -852,7 +852,7 @@ export interface TgSelectProps {
   isLoading: boolean;
 }
 // Timeline
-declare class Timeline extends React.Component<TimelineProps, any> {}
+export class Timeline extends React.Component<TimelineProps, any> {}
 
 export interface TimelineProps {
   children: any;
@@ -869,7 +869,7 @@ export interface TimelineProps {
  * //adds a new prop sequenceTableSelectedEntities
  * //generically : `${formName}SelectedEntities`
  */
-declare function withSelectedEntities(tableName: string, tableName2: string);
+export function withSelectedEntities(tableName: string, tableName2: string);
 
 /**
  *
@@ -889,7 +889,7 @@ declare function withSelectedEntities(tableName: string, tableName2: string);
  * if (confirm) {
  * }
  */
-declare function showConfirmationDialog(showConfirmationDialogOpts): Promise;
+export function showConfirmationDialog(showConfirmationDialogOpts): Promise;
 
 interface showConfirmationDialogOpts {
   text: string;

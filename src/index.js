@@ -31,6 +31,7 @@ export {
 export { default as MenuBar } from "./MenuBar";
 export { default as rerenderOnWindowResize } from "./rerenderOnWindowResize";
 export { default as HotkeysDialog } from "./HotkeysDialog";
+export { default as FillWindow } from "./FillWindow";
 export { default as withFields } from "./enhancers/withFields";
 export { default as withField } from "./enhancers/withField";
 export { default as withDialog } from "./enhancers/withDialog";
