@@ -870,7 +870,6 @@ class DataTable extends React.Component {
             idMap: newIdMap,
             props: computePresets(this.props)
           });
-          this.setState({ lastCheckedRow: undefined });
         }}
         /* eslint-enable react/jsx-no-bind */
         {...checkboxProps}
@@ -882,7 +881,6 @@ class DataTable extends React.Component {
     const rowIndex = row.index;
     const {
       reduxFormSelectedEntityIdMap,
-      isSingleSelect,
       noSelect,
       noUserSelect,
       entities,
@@ -892,8 +890,6 @@ class DataTable extends React.Component {
       entities,
       reduxFormSelectedEntityIdMap
     );
-
-    const { lastCheckedRow } = this.state;
 
     const isSelected = checkedRows.some(rowNum => {
       return rowNum === rowIndex;
@@ -905,52 +901,9 @@ class DataTable extends React.Component {
     return (
       <Checkbox
         disabled={noSelect || noUserSelect || isEntityDisabled(entity)}
-        /* eslint-disable react/jsx-no-bind*/
-        onChange={e => {
-          let newIdMap = cloneDeep(reduxFormSelectedEntityIdMap) || {};
-          const isRowCurrentlyChecked = checkedRows.indexOf(rowIndex) > -1;
-          const entityId = getIdOrCodeOrIndex(entity, rowIndex);
-          if (isSingleSelect) {
-            newIdMap = {
-              [entityId]: {
-                entity
-              }
-            };
-          } else if (e.shiftKey && rowIndex !== lastCheckedRow) {
-            const start = rowIndex;
-            const end = lastCheckedRow;
-            for (
-              let i = Math.min(start, end);
-              i < Math.max(start, end) + 1;
-              i++
-            ) {
-              const isLastCheckedRowCurrentlyChecked =
-                checkedRows.indexOf(lastCheckedRow) > -1;
-              const tempEntity = entities[i];
-              const tempEntityId = getIdOrCodeOrIndex(tempEntity, i);
-              if (isLastCheckedRowCurrentlyChecked) {
-                newIdMap[tempEntityId] = {
-                  entity: tempEntity
-                };
-              } else {
-                newIdMap[tempEntityId] = false;
-              }
-            }
-          } else {
-            //no shift key
-            if (isRowCurrentlyChecked) {
-              newIdMap[entityId] = false;
-            } else {
-              newIdMap[entityId] = { entity };
-            }
-          }
-          finalizeSelection({
-            idMap: newIdMap,
-            props: computePresets(this.props)
-          });
-          this.setState({ lastCheckedRow: rowIndex });
+        onClick={e => {
+          rowClick(e, row, entities, computePresets(this.props));
         }}
-        /* eslint-enable react/jsx-no-bind*/
         checked={isSelected}
       />
     );

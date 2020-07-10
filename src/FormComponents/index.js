@@ -3,7 +3,7 @@ import { SketchPicker } from "react-color";
 import { isNumber, noop, kebabCase, isPlainObject, isEqual } from "lodash";
 import mathExpressionEvaluator from "math-expression-evaluator";
 import React from "react";
-import { Field, touch } from "redux-form";
+import { Field, touch, change } from "redux-form";
 
 import "./style.css";
 import {
@@ -102,56 +102,50 @@ const popoverOverflowModifiers = {
 };
 
 class AbstractInput extends React.Component {
-  UNSAFE_componentWillMount() {
+  componentDidMount() {
     const {
-      meta: { dispatch, form },
       defaultValue,
       enableReinitialize,
-      input: { name, value }
+      input: { value }
     } = this.props;
-    ((value !== false && !value) || enableReinitialize) &&
-      defaultValue !== undefined &&
-      dispatch({
-        type: "@@redux-form/CHANGE",
-        meta: {
-          form,
-          field: name
-        },
-        payload: defaultValue
-      });
-  }
-
-  UNSAFE_componentWillReceiveProps({
-    meta: { dispatch, form },
-    defaultValue,
-    input: { name, value }
-  }) {
-    const { defaultValue: oldDefaultValue, enableReinitialize } = this.props;
     if (
       ((value !== false && !value) || enableReinitialize) &&
-      !isEqual(defaultValue, oldDefaultValue)
+      defaultValue !== undefined
     ) {
-      dispatch({
-        type: "@@redux-form/CHANGE",
-        meta: {
-          form,
-          field: name
-        },
-        payload: defaultValue
-      });
+      this.updateDefaultValue();
     }
   }
 
   componentDidUpdate(oldProps) {
+    const { defaultValue: oldDefaultValue } = oldProps;
     const {
       touchOnChange,
-      input: { name, value },
-      meta: { touched, dispatch, form }
+      meta: { touched, dispatch, form },
+      defaultValue,
+      enableReinitialize,
+      input: { name, value }
     } = this.props;
+
+    if (
+      ((value !== false && !value) || enableReinitialize) &&
+      !isEqual(defaultValue, oldDefaultValue)
+    ) {
+      this.updateDefaultValue();
+    }
+
     if (touchOnChange && !touched && value !== oldProps.input.value) {
       dispatch(touch(form, name));
     }
   }
+
+  updateDefaultValue = () => {
+    const {
+      defaultValue,
+      input: { name },
+      meta: { dispatch, form }
+    } = this.props;
+    dispatch(change(form, name, defaultValue));
+  };
 
   render() {
     const {
