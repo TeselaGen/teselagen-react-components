@@ -112,6 +112,7 @@ function getAndAndOrFilters(allFilters) {
   const orFilters = [];
   const andFilters = [];
   const otherOrFilters = [];
+
   allFilters.forEach(filter => {
     if (
       filter.isOrFilter &&
@@ -221,6 +222,13 @@ function getFiltersFromSearchTerm(searchTerm, schema) {
             isOrFilter: true
           });
         }
+      } else if (type === "number" && !isNaN(Number(searchTerm))) {
+        searchTermFilters.push({
+          filterOn: nameToUse,
+          filterValue: Number(searchTerm),
+          selectedFilter: "equalTo",
+          isOrFilter: true
+        });
       }
     });
   }
@@ -701,9 +709,19 @@ export function getQueryParams({
     const additionalFilterToUse = additionalFilter(qb, currentParams);
     const additionalOrFilterToUse = additionalOrFilter(qb, currentParams);
     try {
-      let allOrFilters = [getQueries(orFilters, qb, ccFields)];
+      const orFiltersObject = getQueries(orFilters, qb, ccFields);
+      let allOrFilters = [
+        ...Object.keys(orFiltersObject).map(key => ({
+          [key]: orFiltersObject[key]
+        }))
+      ];
       otherOrFilters.forEach(orFilters => {
-        allOrFilters.push(getQueries(orFilters, qb, ccFields));
+        const otherOrFiltersObject = getQueries(orFilters, qb, ccFields);
+        allOrFilters = allOrFilters.concat(
+          Object.keys(otherOrFiltersObject).map(key => ({
+            [key]: otherOrFiltersObject[key]
+          }))
+        );
       });
       allOrFilters.push(additionalOrFilterToUse);
       allOrFilters = allOrFilters.filter(obj => !isEmpty(obj));
