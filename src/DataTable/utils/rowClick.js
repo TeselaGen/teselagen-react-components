@@ -17,7 +17,6 @@ export default function rowClick(e, rowInfo, entities, props) {
   if (noSelect || isEntityDisabled(entity)) return;
   const rowId = getIdOrCodeOrIndex(entity, rowInfo.index);
   if (rowId === undefined) return;
-
   const ctrl = e.metaKey || e.ctrlKey || (withCheckboxes && !e.shiftKey);
   const oldIdMap = reduxFormSelectedEntityIdMap || {};
   const rowSelected = oldIdMap[rowId];
@@ -135,6 +134,6 @@ export function finalizeSelection({ idMap, props }) {
   selectedRecords.length === 0
     ? onDeselect()
     : selectedRecords.length > 1
-      ? onMultiRowSelect(selectedRecords)
-      : onSingleRowSelect(selectedRecords[0]);
+    ? onMultiRowSelect(selectedRecords)
+    : onSingleRowSelect(selectedRecords[0]);
 }
