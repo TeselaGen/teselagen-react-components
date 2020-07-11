@@ -810,7 +810,7 @@ class DataTable extends React.Component {
         }
         this.showContextMenu(newIdMap, e, entity);
       },
-      className: classNames({
+      className: classNames("with-row-data", {
         selected: rowSelected && !withCheckboxes
       }),
       "data-test-id": dataId,
