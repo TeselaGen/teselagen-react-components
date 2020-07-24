@@ -231,6 +231,7 @@ class Uploader extends Component {
       dropzoneProps = {},
       overflowList,
       showFilesCount,
+      onPreviewClick,
       S3Params // if this is defined we assume we want to upload to aws s3 (or minio)
     } = this.props;
 
@@ -471,17 +472,27 @@ class Uploader extends Component {
                     </a>
                   </div>
                   {!loading && (
-                    <div
-                      onClick={() => {
-                        onRemove(file, index, fileList);
-                        onChange(
-                          fileList.filter((file, index2) => {
-                            return index2 !== index;
-                          })
-                        );
-                      }}
-                    >
+                    <div style={{ display: "flex" }}>
+                      {onPreviewClick && (
+                        <Icon
+                          style={{ marginRight: 3 }}
+                          onClick={() => {
+                            onPreviewClick(file, index, fileList);
+                          }}
+                          iconSize={16}
+                          icon="eye-open"
+                          className="tg-upload-file-list-item-preview"
+                        />
+                      )}
                       <Icon
+                        onClick={() => {
+                          onRemove(file, index, fileList);
+                          onChange(
+                            fileList.filter((file, index2) => {
+                              return index2 !== index;
+                            })
+                          );
+                        }}
                         iconSize={16}
                         icon="cross"
                         className="tg-upload-file-list-item-close"
