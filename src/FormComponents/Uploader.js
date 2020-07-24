@@ -439,12 +439,18 @@ class Uploader extends Component {
                 downloadName
               } = file;
               let icon;
+              let isPreviewable = false;
               if (loading) {
                 icon = "repeat";
               } else if (error) {
                 icon = "error";
               } else {
-                icon = "saved";
+                if (onPreviewClick) {
+                  isPreviewable = true;
+                  icon = "eye-open";
+                } else {
+                  icon = "saved";
+                }
               }
               return fileListItemRenderer ? (
                 fileListItemRenderer(file, self)
@@ -455,9 +461,16 @@ class Uploader extends Component {
                   <div>
                     <Icon
                       className={classnames({
-                        "tg-spin": loading
+                        "tg-spin": loading,
+                        "tg-upload-file-list-item-preview": isPreviewable
                       })}
+                      style={{ marginRight: 5 }}
                       icon={icon}
+                      onClick={() => {
+                        if (isPreviewable) {
+                          onPreviewClick(file, index, fileList);
+                        }
+                      }}
                     />
                     <a
                       name={name || originalName}
@@ -472,32 +485,19 @@ class Uploader extends Component {
                     </a>
                   </div>
                   {!loading && (
-                    <div style={{ display: "flex" }}>
-                      {onPreviewClick && (
-                        <Icon
-                          style={{ marginRight: 3 }}
-                          onClick={() => {
-                            onPreviewClick(file, index, fileList);
-                          }}
-                          iconSize={16}
-                          icon="eye-open"
-                          className="tg-upload-file-list-item-preview"
-                        />
-                      )}
-                      <Icon
-                        onClick={() => {
-                          onRemove(file, index, fileList);
-                          onChange(
-                            fileList.filter((file, index2) => {
-                              return index2 !== index;
-                            })
-                          );
-                        }}
-                        iconSize={16}
-                        icon="cross"
-                        className="tg-upload-file-list-item-close"
-                      />
-                    </div>
+                    <Icon
+                      onClick={() => {
+                        onRemove(file, index, fileList);
+                        onChange(
+                          fileList.filter((file, index2) => {
+                            return index2 !== index;
+                          })
+                        );
+                      }}
+                      iconSize={16}
+                      icon="cross"
+                      className="tg-upload-file-list-item-close"
+                    />
                   )}
                 </div>
               );
