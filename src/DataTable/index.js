@@ -1051,10 +1051,9 @@ class DataTable extends React.Component {
         const text = this.getCopyTextForCell(val, row, column);
 
         //wrap the original tableColumn.Cell function in another div in order to add a title attribute
-        let title = typeof val !== "string" ? args[0].value : val;
-        if (title) title = String(title);
+        let title = text;
         if (getCellHoverText) title = getCellHoverText(...args);
-        if (column.getTitleAttr) title = column.getTitleAttr(...args);
+        else if (column.getTitleAttr) title = column.getTitleAttr(...args);
         return (
           <div
             style={
