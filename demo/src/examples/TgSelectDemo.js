@@ -6,7 +6,7 @@ class TgSelectDemo extends React.Component {
   render() {
     // const {} = this.props;
 
-    const { multi, val, creatable, hasError } = this.state;
+    const { multi, isTagSelect, val, creatable, hasError } = this.state;
 
     return (
       <div>
@@ -16,19 +16,30 @@ class TgSelectDemo extends React.Component {
           onChange={val => {
             this.setState({ val });
           }}
-          multi={multi}
+          isTagSelect={isTagSelect}
+          multi={multi || isTagSelect}
           intent={hasError ? "danger" : ""}
           creatable={creatable}
           value={val}
           options={[
-            { label: <span>hey <div>I'm some texttt</div> <Icon icon="circle"></Icon></span>, value: "1234" },
-            { label: "hey", value: "1234" },
             {
+              color: "red",
+              label: (
+                <span>
+                  hey <div>I'm some texttt</div> <Icon icon="circle"></Icon>
+                </span>
+              ),
+              value: "123y4"
+            },
+            { color: "green", label: "hey", value: "as1234" },
+            {
+              color: "yellow",
               label: "there",
               value: "14556"
             },
-            { label: "my", value: "122434" },
-            { label: "friend", value: "127734" }
+            { color: "blue", label: "my", value: "122434" },
+            { color: "orange", label: "friend", value: "12rr7734" },
+            { color: "white", label: "friend", value: "12773asd4" }
           ]}
         />
         {renderToggle({
@@ -44,6 +55,12 @@ class TgSelectDemo extends React.Component {
         {renderToggle({
           that: this,
           type: "creatable"
+          // type: "reactSelectFieldcreatable"
+        })}
+        {renderToggle({
+          that: this,
+          type: "isTagSelect",
+          label: "isTagSelect   *Note: isTagSelect requires isMulti to be true"
           // type: "reactSelectFieldcreatable"
         })}
       </div>

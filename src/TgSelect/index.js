@@ -1,11 +1,13 @@
 import { MultiSelect, getCreateNewItem } from "@blueprintjs/select";
-import { Keys, Button, MenuItem } from "@blueprintjs/core";
+import { Keys, Button, MenuItem, Tag } from "@blueprintjs/core";
 import React from "react";
 import { filter, isEqual } from "lodash";
 import fuzzysearch from "fuzzysearch";
 import classNames from "classnames";
+// import Tag from "../Tag";
 import "./style.css";
 import getTextFromEl from "../utils/getTextFromEl";
+import determineBlackOrWhiteTextColor from "../utils/determineBlackOrWhiteTextColor";
 
 class TgSelect extends React.Component {
   state = {
@@ -19,7 +21,7 @@ class TgSelect extends React.Component {
     value: undefined
   };
   itemRenderer = (i, { index, handleClick, modifiers }) => {
-    const { optionRenderer } = this.props;
+    const optionRenderer = this.getOptionRenderer();
     const onClick = i.onClick || handleClick;
     return (
       <div //we specifically don't use a BP MenuItem component here because the menu item is too slow when 100s are loaded and will cause the component to lag
@@ -41,6 +43,7 @@ class TgSelect extends React.Component {
     if (!i || (!this.props.multi && this.state.query)) {
       return null;
     }
+    // return i
     return i.label;
   };
 
@@ -150,6 +153,7 @@ class TgSelect extends React.Component {
   };
 
   getTagProps = label => {
+    // console.log(`label:`,label)
     const { multi, value = [], disabled: _disabled } = this.props;
     const val = Array.isArray(value) ? value : [value];
     const matchingVal = val.find(op => op.label === label);
@@ -157,6 +161,7 @@ class TgSelect extends React.Component {
     const className = matchingVal && matchingVal.className;
 
     return {
+      ...getTagColorStyle(multi && matchingVal && matchingVal.color),
       intent: disabled ? "" : "primary",
       minimal: true,
       className: classNames(className, "tg-select-value", {
@@ -164,6 +169,14 @@ class TgSelect extends React.Component {
       }),
       onRemove: multi && !disabled ? this.handleTagRemove : null
     };
+  };
+  getOptionRenderer = () => {
+    const { isTagSelect, optionRenderer, multi } = this.props;
+
+    if (isTagSelect && multi) {
+      return tgSelectOptionRenderer;
+    }
+    return optionRenderer;
   };
 
   render() {
@@ -352,4 +365,24 @@ export const singleItemPredicate = (queryString, item, isSimpleSearch) =>
 
 function simplesearch(needle, haystack) {
   return (haystack || "").indexOf(needle) !== -1;
+}
+function tgSelectOptionRenderer(vals) {
+  return (
+    <Tag
+      {...getTagColorStyle(vals.color)}
+      children={vals.label || vals.name}
+      {...vals}
+    ></Tag>
+  );
+}
+
+function getTagColorStyle(color) {
+  return color
+    ? {
+        style: {
+          backgroundColor: color,
+          color: determineBlackOrWhiteTextColor(color)
+        }
+      }
+    : {};
 }
