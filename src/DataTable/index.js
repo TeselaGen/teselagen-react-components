@@ -1050,10 +1050,13 @@ class DataTable extends React.Component {
         const val = oldFunc(...args);
         const text = this.getCopyTextForCell(val, row, column);
 
+        let oldTitle = typeof val !== "string" ? args[0].value : val;
+        if (oldTitle) oldTitle = String(oldTitle);
         //wrap the original tableColumn.Cell function in another div in order to add a title attribute
         let title = text;
         if (getCellHoverText) title = getCellHoverText(...args);
         else if (column.getTitleAttr) title = column.getTitleAttr(...args);
+
         return (
           <div
             style={
@@ -1078,8 +1081,7 @@ class DataTable extends React.Component {
 
   getCopyTextForCell = (val, row, column) => {
     // TODOCOPY we need a way to potentially omit certain columns from being added as a \t element (talk to taoh about this)
-
-    let text = val;
+    let text = typeof val !== "string" ? row.value : val;
     const record = row.original;
     if (column.getClipboardData) {
       text = column.getClipboardData(row.value, record);
