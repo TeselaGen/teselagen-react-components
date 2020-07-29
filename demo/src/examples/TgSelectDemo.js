@@ -60,7 +60,7 @@ class TgSelectDemo extends React.Component {
         {renderToggle({
           that: this,
           type: "isTagSelect",
-          label: "isTagSelect   *Note: isTagSelect requires isMulti to be true"
+          label: "isTagSelect   *Note: isTagSelect requires multi to be true"
           // type: "reactSelectFieldcreatable"
         })}
       </div>
