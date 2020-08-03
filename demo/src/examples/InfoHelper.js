@@ -24,7 +24,11 @@
   <InfoHelper icon="align-left" content={"Hey I'm some helpful info!"} />
   With color (color="blue"):
   <br />
-  <InfoHelper color="blue" icon="align-left" content={"Hey I'm some helpful info!"} />
+  <InfoHelper
+    color="blue"
+    icon="align-left"
+    content={"Hey I'm some helpful info!"}
+  />
   <br />
   As Button (isButton=true):
   <br />
@@ -69,4 +73,11 @@
       style={{ position: "absolute", right: 0, bottom: 0 }}
     />
   </div>
+  Long Info:
+  <br />
+  <InfoHelper
+    content={
+      "Hey I'm some helpful info!  aiojeifj oiwjefia ofja iowjef aoiwejfoiajweif jawfo joaiwefjaiw faoiwjf ioawjef awoefijawioefj awofj oawjf oawj efojafoaj eofijawiofjaiw efaoiwjefoiawjioef aiojeifj oiwjefia ofja iowjef aoiwejfoiajweif jawfo joaiwefjaiw faoiwjf ioawjef awoefijawioefj awofj oawjf oawj efojafoaj eofijawiofjaiw efaoiwjefoiawjioef aiojeifj oiwjefia ofja iowjef aoiwejfoiajweif jawfo joaiwefjaiw faoiwjf ioawjef awoefijawioefj awofj oawjf oawj efojafoaj eofijawiofjaiw efaoiwjefoiawjioef aiojeifj oiwjefia ofja iowjef aoiwejfoiajweif jawfo joaiwefjaiw faoiwjf ioawjef awoefijawioefj awofj oawjf oawj efojafoaj eofijawiofjaiw efaoiwjefoiawjioef aiojeifj oiwjefia ofja iowjef aoiwejfoiajweif jawfo joaiwefjaiw faoiwjf ioawjef awoefijawioefj awofj oawjf oawj efojafoaj eofijawiofjaiw efaoiwjefoiawjioef aiojeifj oiwjefia ofja iowjef aoiwejfoiajweif jawfo joaiwefjaiw faoiwjf ioawjef awoefijawioefj awofj oawjf oawj efojafoaj eofijawiofjaiw efaoiwjefoiawjioef"
+    }
+  />
 </div>;
