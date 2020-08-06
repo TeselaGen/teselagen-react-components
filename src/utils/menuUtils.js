@@ -282,9 +282,9 @@ export function showCommandContextMenu(
   return showContextMenu(
     menuDef,
     [commandMenuEnhancer(commands, config)],
-    context,
     event,
-    onClose
+    onClose,
+    context,
   );
 }
 
@@ -348,7 +348,8 @@ export function showContextMenu(
   if (!menuDef) return;
 
   const MenuComponent = menuComp;
-  event.persist();
+  console.log(`event:`,event)
+  event.persist && event.persist();
   // Render a context menu at the passed event's position
   ContextMenu.show(
     <MenuComponent>

@@ -21,6 +21,17 @@ class MenuBarDemo extends React.Component {
         },
         handler: () => alert('Triggered "New File"')
       },
+      cmdWithTicks: {
+        isActive: p => {
+          return this.state.isChecked
+          // const ret = Math.round(Math.random())
+          // console.log(`ret:`,ret)
+          // return ret
+        },
+        handler: (p) => {
+          this.setState({isChecked: !this.state.isChecked})
+        }
+      },
       newFile: {
         preventDefault: true,
         hotkey: "mod+n",
@@ -62,9 +73,9 @@ class MenuBarDemo extends React.Component {
     };
 
     // Create commands without any special logic
-    /* eslint-disable no-undef*/ 
+    /* eslint-disable no-undef*/
     const commands = genericCommandFactory({
-    /* eslint-enable no-undef*/ 
+      /* eslint-enable no-undef*/
       commandDefs,
       getArguments: () => [],
       handleReturn: () => {}
@@ -109,9 +120,13 @@ class MenuBarDemo extends React.Component {
           },
           {
             shouldDismissPopover: false,
+            cmd: "cmdWithTicks",
+          },
+          {
+            shouldDismissPopover: false,
             text: "Don't Dismiss",
             onClick: () => {
-              window.toastr.success("This menu's not going away any time soon")
+              window.toastr.success("This menu's not going away any time soon");
             }
           },
           { text: "Open...", icon: "document", cmd: "openFile" },
@@ -119,13 +134,16 @@ class MenuBarDemo extends React.Component {
           { cmd: "showHotkeys" },
           {
             cmd: "fakeCmd1",
-            submenu: ["fakeCmd1", "fakeCmd1", "fakeCmd1",
-            {disabled: true, text: "YYY", onClick: () => {}},
-            {disabled: true, text: "Y", onClick: () => {}},
-            {disabled: true, text: "YYYY", onClick: () => {}},
-            {disabled: true, text: "YY", onClick: () => {}},
-            {disabled: true, text: "YYYYY", onClick: () => {}},
-          ]
+            submenu: [
+              "fakeCmd1",
+              "fakeCmd1",
+              "fakeCmd1",
+              { disabled: true, text: "YYY", onClick: () => {} },
+              { disabled: true, text: "Y", onClick: () => {} },
+              { disabled: true, text: "YYYY", onClick: () => {} },
+              { disabled: true, text: "YY", onClick: () => {} },
+              { disabled: true, text: "YYYYY", onClick: () => {} }
+            ]
           },
           { divider: "" },
           { icon: "log-out", cmd: "quit" } // no text prop here
@@ -141,7 +159,7 @@ class MenuBarDemo extends React.Component {
               "Hey I'm a tooltip created by passing a string to disabled:''",
             cmd: "copy"
           },
-          { text: "I'm disabled", disabled: true,  onClick: () => {} },
+          { text: "I'm disabled", disabled: true, onClick: () => {} },
           { icon: "clipboard", cmd: "paste" },
           { divider: "" },
           {
@@ -204,7 +222,7 @@ class MenuBarDemo extends React.Component {
             }
           }
         ]
-      },
+      }
       // { isMenuSearch: true },
     ];
 
@@ -217,7 +235,8 @@ class MenuBarDemo extends React.Component {
         somethingElse: "alt+shift+e"
       }
     };
-    /* eslint-disable no-undef*/ 
+    /* eslint-disable no-undef*/
+
     // An existing component may be wrapped, or a new one created, as in this case
     this.hotkeyEnabler = withHotkeys(
       getCommandHotkeys(commands), // in this example, equivalent to `hotkeys`,
@@ -225,10 +244,13 @@ class MenuBarDemo extends React.Component {
     )();
 
     this.menu = menu;
-    this.menuEnhancers = [commandMenuEnhancer(commands)];
-    /* eslint-enable no-undef*/ 
+    this.menuEnhancers = [commandMenuEnhancer(commands, {
+      useTicks: true
+    })];
+    /* eslint-enable no-undef*/
 
     this.state = {
+      isChecked: false,
       showDialog: false
     };
   }
@@ -251,17 +273,39 @@ class MenuBarDemo extends React.Component {
             border: "1px solid #eee"
           }}
         >
-          <MenuBar
+          {/* <MenuBar
             menu={this.menu}
             enhancers={this.menuEnhancers}
             // menuSearchHotkey="alt+/"
-          />
+          /> */}
         </div>
         <button
           onClick={e => {
-            /* eslint-disable no-undef*/ 
+            /* eslint-disable no-undef*/
+            return showCommandContextMenu(
+              /* eslint-enable no-undef*/
+              this.menu[0].submenu,
+              this.commands,
+              {
+                useTicks: true
+              },
+              e,
+              () => {console.log(`closin 2`)},
+              {}
+            );
+          }}
+        >
+          config.useTicks
+          config.omitIcons
+          config.forceIconAlignment
+          Click to see a menu created using the imperative
+          showCommandContextMenu
+        </button>
+        <button
+          onClick={e => {
+            /* eslint-disable no-undef*/
             showContextMenu(
-            /* eslint-enable no-undef*/ 
+              /* eslint-enable no-undef*/
               [
                 { text: "hey" },
                 undefined,

@@ -76,6 +76,7 @@ import times from "lodash/times";
 import {
   createMenu,
   showContextMenu,
+  showCommandContextMenu,
   commandMenuEnhancer
 } from "../../src/utils/menuUtils";
 import {
@@ -243,6 +244,7 @@ const demos = {
       CmdDiv,
       CmdSwitch,
       showContextMenu,
+      showCommandContextMenu,
       commandMenuEnhancer,
       genericCommandFactory,
       getCommandHotkeys,
