@@ -110,4 +110,16 @@ describe("formComponents", () => {
       .eq(3) //get the third cell just for kicks
       .should("be.visible");
   });
+
+  it("can use paging input to change pages", () => {
+    cy.visit("#/DataTable");
+    cy.contains(".rt-td", "row 4");
+    cy.contains(".rt-td", "row 17").should("not.exist");
+    cy.get(".paging-toolbar-container input")
+      .last()
+      .clear()
+      .type("4{enter}");
+    cy.contains(".rt-td", "row 4").should("not.exist");
+    cy.contains(".rt-td", "row 17");
+  });
 });

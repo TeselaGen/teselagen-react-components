@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { withProps, withHandlers, compose } from "recompose";
 import classNames from "classnames";
 import { noop, get, toInteger } from "lodash";
@@ -7,27 +7,39 @@ import { onEnterOrBlurHelper } from "../utils/handlerHelpers";
 import { defaultPageSizes } from "./utils/queryParams";
 import getIdOrCodeOrIndex from "./utils/getIdOrCodeOrIndex";
 
+function PagingInput({ disabled, onBlur, defaultPage }) {
+  const [page, setPage] = useState(defaultPage);
+  const defaultValue = useRef(defaultPage);
+
+  useEffect(() => {
+    if (page !== defaultPage && defaultValue.current !== defaultPage) {
+      setPage(defaultPage);
+    }
+    defaultValue.current = defaultPage;
+  }, [page, defaultPage]);
+
+  return (
+    <input
+      style={{ marginLeft: 5, width: 35, marginRight: 8 }}
+      value={page}
+      disabled={disabled}
+      onChange={e => {
+        setPage(e.target.value);
+      }}
+      {...onEnterOrBlurHelper(onBlur)}
+      className={Classes.INPUT}
+    />
+  );
+}
+
 export class PagingTool extends React.Component {
   static defaultProps = {
     onPageChange: noop
   };
 
   state = {
-    selectedPage: 1,
     refetching: false
   };
-
-  componentDidUpdate() {
-    const { selectedPage } = this.state;
-    const {
-      paging: { page }
-    } = this.props;
-    if (selectedPage !== page) {
-      this.setState({
-        selectedPage: page
-      });
-    }
-  }
 
   onRefresh = async () => {
     this.setState({
@@ -62,12 +74,6 @@ export class PagingTool extends React.Component {
     this.setPage(parseInt(page, 10) + 1);
   };
 
-  setSelectedPage = e => {
-    this.setState({
-      selectedPage: e.target.value
-    });
-  };
-
   pageInputBlur = e => {
     const {
       paging: { pageSize, total }
@@ -96,7 +102,7 @@ export class PagingTool extends React.Component {
   }
 
   render() {
-    const { selectedPage, refetching } = this.state;
+    const { refetching } = this.state;
     const {
       paging: { pageSize, page, total },
       onRefresh,
@@ -153,13 +159,10 @@ export class PagingTool extends React.Component {
         <div>
           {total ? (
             <div>
-              <input
-                style={{ marginLeft: 5, width: 35, marginRight: 8 }}
-                value={selectedPage}
+              <PagingInput
                 disabled={disabled}
-                onChange={this.setSelectedPage}
-                {...onEnterOrBlurHelper(this.pageInputBlur)}
-                className={Classes.INPUT}
+                onBlur={this.pageInputBlur}
+                defaultPage={page}
               />
               of {lastPage}
             </div>
