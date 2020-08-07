@@ -32,7 +32,7 @@ function PagingInput({ disabled, onBlur, defaultPage }) {
   );
 }
 
-export class PagingTool extends React.Component {
+class PagingTool extends React.Component {
   static defaultProps = {
     onPageChange: noop
   };
@@ -106,7 +106,8 @@ export class PagingTool extends React.Component {
     const {
       paging: { pageSize, page, total },
       onRefresh,
-      disabled
+      disabled,
+      disableSetPageSize
     } = this.props;
     const pageStart = (page - 1) * pageSize + 1;
     if (pageStart < 0) throw new Error("We should never have page be <0");
@@ -132,7 +133,7 @@ export class PagingTool extends React.Component {
           <select
             className="paging-page-size"
             onChange={this.setPageSize}
-            disabled={disabled}
+            disabled={disabled || disableSetPageSize}
             value={pageSize}
           >
             {[
@@ -183,7 +184,7 @@ export class PagingTool extends React.Component {
   }
 }
 
-const ConnectedPagingTool = compose(
+export default compose(
   withProps(props => {
     const {
       entityCount,
@@ -191,19 +192,25 @@ const ConnectedPagingTool = compose(
       pageSize,
       disabled,
       onRefresh,
+      controlled_setPage,
+      controlled_setPageSize,
+      controlled_page,
+      controlled_pageSize,
+      controlled_total,
+      controlled_onRefresh,
       setPage,
       setPageSize
     } = props;
     return {
       paging: {
-        total: entityCount,
-        page,
-        pageSize
+        total: controlled_total || entityCount,
+        page: controlled_page || page,
+        pageSize: controlled_pageSize || pageSize
       },
       disabled: disabled,
-      onRefresh: onRefresh,
-      setPage: setPage,
-      setPageSize: setPageSize
+      onRefresh: controlled_onRefresh || onRefresh,
+      setPage: controlled_setPage || setPage,
+      setPageSize: controlled_setPageSize || setPageSize
     };
   }),
   withHandlers({
@@ -215,5 +222,3 @@ const ConnectedPagingTool = compose(
     }
   })
 )(PagingTool);
-
-export default ConnectedPagingTool;

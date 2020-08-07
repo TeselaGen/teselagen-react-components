@@ -405,6 +405,10 @@ class DataTableInstance extends React.Component {
         })}
         {renderToggle({
           that: this,
+          type: "disableSetPageSize"
+        })}
+        {renderToggle({
+          that: this,
           type: "isViewable",
           description: "Make sure withCheckboxes is off when using this"
         })}
@@ -427,6 +431,10 @@ class DataTableInstance extends React.Component {
         {renderToggle({
           that: this,
           type: "withPaging"
+        })}
+        {renderToggle({
+          that: this,
+          type: "controlledPaging"
         })}
         {renderToggle({
           that: this,
@@ -615,12 +623,21 @@ class DataTableInstance extends React.Component {
             noSelect={this.state.noSelect}
             isSimple={this.state.isSimple}
             withSearch={this.state.withSearch}
+            disableSetPageSize={this.state.disableSetPageSize}
             withExpandAndCollapseAllButton={
               this.state.withExpandAndCollapseAllButton
             }
             expandAllByDefault={this.state.expandAllByDefault}
             selectAllByDefault={this.state.selectAllByDefault}
             withPaging={this.state.withPaging}
+            {...this.state.controlledPaging && {
+              controlled_setPage: () => {console.log(`controlled_setPage hit`)},
+              controlled_setPageSize: () => {console.log(`controlled_setPageSize hit`)},
+              controlled_page: 6,
+              controlled_pageSize: 33,
+              controlled_total: 440,
+              controlled_onRefresh: () => {console.log(`controlled_onRefresh hit`)},
+            }}
             noDeselectAll={this.state.noDeselectAll}
             withFilter={this.state.withFilter}
             withSort={this.state.withSort}
