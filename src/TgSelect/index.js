@@ -187,6 +187,7 @@ class TgSelect extends React.Component {
       creatable,
       optionRenderer, //pull this one out here so it doesn't get passsed along
       tagInputProps,
+      autoFocus,
       noResultsText,
       noResults = noResultsDefault,
       inputProps,
@@ -315,6 +316,7 @@ class TgSelect extends React.Component {
             ...tagInputProps, //spread additional tag input props here
             intent: this.props.intent,
             inputProps: {
+              autoFocus,
               onBlur,
               ...(tagInputProps && tagInputProps.inputProps)
             }

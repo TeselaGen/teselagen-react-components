@@ -21,6 +21,7 @@ class TgSelectDemo extends React.Component {
           intent={hasError ? "danger" : ""}
           creatable={creatable}
           value={val}
+          autoFocus
           options={[
             {
               color: "red",

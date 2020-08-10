@@ -870,6 +870,7 @@ export interface TgSelectProps {
    */
   isSimpleSearch: boolean;
   creatable: boolean;
+  autoFocus: boolean;
   optionRenderer: any;
   tagInputProps: any;
   noResultsText: any;
