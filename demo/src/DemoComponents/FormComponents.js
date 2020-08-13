@@ -81,6 +81,7 @@ class FormComponentsDemo extends React.Component {
             <Button>Hey there</Button>
             &nbsp;
           <Uploader
+            accept=".json"
             action={"docs.google.com/upload"}
             minimal
             fileList={[
@@ -96,7 +97,7 @@ class FormComponentsDemo extends React.Component {
           </div>
           FileUploadField with minimal=true
           <FileUploadField
-            innerText="Import"
+            innerText="Upload"
             minimal
             fileList={[
               {
