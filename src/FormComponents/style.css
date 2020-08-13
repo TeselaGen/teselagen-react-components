@@ -18,6 +18,18 @@
   align-items: center;
   font-size: 16px;
 }
+.tg-dropzone.tg-dropzone-minimal {
+  height: 30px !important;
+  width: fit-content !important;
+}
+.tg-dropzone-minimal .tg-upload-inner {
+  flex-direction: row;
+  margin: 4px;
+}
+.tg-dropzone-minimal .bp3-icon {
+  flex-direction: row;
+  margin-right: 5px;
+}
 
 .tg-hide-drop-target .ant-upload.ant-upload-drag {
   display: none;

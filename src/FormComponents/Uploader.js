@@ -215,6 +215,7 @@ class Uploader extends Component {
       innerText,
       action,
       className = "",
+      minimal,
       fileLimit,
       readBeforeUpload, //read the file using the browser's FileReader before passing it to onChange and/or uploading it
       uploadInBulk, //tnr: not yet implemented
@@ -246,7 +247,9 @@ class Uploader extends Component {
     return (
       <div>
         <Dropzone
-          className={"tg-dropzone " + className}
+          className={classnames("tg-dropzone", className, {
+            "tg-dropzone-minimal": minimal
+          })}
           multiple={fileLimit !== 1}
           activeClassName="tg-dropzone-active"
           rejectClassName="tg-dropzone-reject"
@@ -418,12 +421,12 @@ class Uploader extends Component {
               }
               className="tg-upload-inner"
             >
-              {innerIcon || <Icon icon="upload" iconSize={30} />}
-              {innerText || "Click or drag to upload"}
+              {innerIcon || <Icon icon="upload" iconSize={minimal ? 15 : 30} />}
+              {innerText || (minimal ? "Upload" : "Click or drag to upload")}
             </div>
           )}
         </Dropzone>
-        {fileList && showUploadList && !!fileList.length && (
+        {fileList && showUploadList && !minimal && !!fileList.length && (
           <div
             className={
               overflowList ? "tg-upload-file-list-item-overflow" : null

@@ -75,6 +75,48 @@ class FormComponentsDemo extends React.Component {
               }
             ]}
           />
+          Importer with minimal=true
+          <div style={{display: 'flex',}}>
+            
+            <Button>Hey there</Button>
+            &nbsp;
+          <Uploader
+            action={"docs.google.com/upload"}
+            minimal
+            fileList={[
+              {
+                uid: 1, //you must set a unique id for this to work properly
+                name: "yarn.lock",
+                status: "error"
+              }
+            ]}
+          />
+            &nbsp;
+          
+          </div>
+          FileUploadField with minimal=true
+          <FileUploadField
+            innerText="Import"
+            minimal
+            fileList={[
+              {
+                uid: 1, //you must set a unique id for this to work properly
+                name: "yarn.lock",
+                status: "error"
+              }
+            ]}
+            label="Upload component"
+            tooltipInfo="hello hello I'm tooltipInfo"
+            onFieldSubmit={function(fileList) {
+              console.info(
+                "do something with the finished file list:",
+                fileList
+              );
+            }}
+            action={"//jsonplaceholder.typicode.com/posts/"}
+            name={"uploadfield"}
+            inlineLabel={this.state.inlineLabels}
+          />
           <RadioGroupField
             name={"radioGroup"}
             inlineLabel={this.state.inlineLabels}
