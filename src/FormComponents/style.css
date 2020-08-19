@@ -1,3 +1,7 @@
+.tg-flex-form-content .bp3-form-content {
+  display: flex;
+}
+
 .error-popover {
   margin: 5px;
   color: red;

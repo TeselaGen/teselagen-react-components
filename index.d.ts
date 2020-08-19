@@ -454,6 +454,8 @@ export interface GenericFormFieldProps {
   name: string;
   isRequired: boolean;
   onFieldSubmit: function;
+  leftElement: any;
+  rightElement: any;
   children: any;
   defaultValue: any;
   tooltipProps: any;

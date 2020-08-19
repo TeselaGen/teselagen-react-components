@@ -163,6 +163,8 @@ class AbstractInput extends React.Component {
       asyncValidating,
       meta,
       containerStyle,
+      leftElement,
+      rightElement,
       noOuterLabel,
       input,
       noFillField
@@ -207,6 +209,7 @@ class AbstractInput extends React.Component {
     return (
       <FormGroup
         className={classNames(className, testClassName, {
+          "tg-flex-form-content": leftElement || rightElement,
           "tg-tooltipError": tooltipError
         })}
         disabled={disabled}
@@ -231,7 +234,7 @@ class AbstractInput extends React.Component {
         labelInfo={secondaryLabel}
         style={containerStyle}
       >
-        {componentToWrap}
+        {leftElement} {componentToWrap} {rightElement}
       </FormGroup>
     );
   }

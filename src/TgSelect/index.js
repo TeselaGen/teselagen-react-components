@@ -48,13 +48,31 @@ class TgSelect extends React.Component {
   };
 
   handleItemSelect = item => {
-    const { onChange, value, multi, closeOnSelect } = this.props;
+    const { onChange, value, multi, closeOnSelect, isTagSelect } = this.props;
     this.setState({ activeItem: null });
     if (multi) {
-      const valArray = getValueArray(value);
+      let valArray = getValueArray(value);
+
       if (closeOnSelect || item.closeOnSelect) {
         this.setState({ isOpen: false });
         this.input && this.input.blur();
+      }
+      if (
+        isTagSelect &&
+        item.value &&
+        item.value.includes &&
+        item.value.includes(":")
+      ) {
+        const topLevelId = item.value.split(":")[0];
+        valArray = valArray.filter(val => {
+          if (val.value && val.value.includes && val.value.includes(":")) {
+            const valId = val.value.split(":")[0];
+            if (valId === topLevelId) {
+              return false;
+            }
+          }
+          return true;
+        });
       }
       return onChange([...valArray, item]);
     } else {

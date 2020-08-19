@@ -38,9 +38,9 @@ class TgSelectDemo extends React.Component {
               label: "there",
               value: "14556"
             },
-            { color: "blue", label: "my", value: "122434" },
-            { color: "orange", label: "friend", value: "12rr7734" },
-            { color: "white", label: "friend", value: "12773asd4" }
+            { color: "blue", label: "my: neighbor", value: "14:11545" },
+            { color: "orange", label: "my: friend", value: "14:98798" },
+            { color: "white", label: "my: accomplice", value: "14:001212" }
           ]}
         />
         {renderToggle({
