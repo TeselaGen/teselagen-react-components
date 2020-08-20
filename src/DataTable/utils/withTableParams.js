@@ -155,7 +155,8 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         additionalFilter: additionalFilterToUse,
         additionalOrFilter: additionalOrFilterToUse,
         noOrderError,
-        isCodeModel
+        isCodeModel,
+        ownProps
       }),
       formNameFromWithTPCall: formNameFromWithTableParamsCall,
       randomVarToForceLocalStorageUpdate: formSelector(

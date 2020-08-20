@@ -66,7 +66,7 @@ function getFieldsMappedByCCDisplayName(schema) {
   }, {});
 }
 
-function orderEntitiesLocal(orderArray, entities, schema) {
+function orderEntitiesLocal(orderArray, entities, schema, ownProps) {
   if (orderArray && orderArray.length) {
     let orderFuncs = [];
     let ascOrDescArray = [];
@@ -94,7 +94,7 @@ function orderEntitiesLocal(orderArray, entities, schema) {
         orderFuncs.push(...toOrder);
       } else if (getValueToFilterOn) {
         orderFuncs.push(o => {
-          return getValueToFilterOn(o);
+          return getValueToFilterOn(o, ownProps);
         });
       } else {
         orderFuncs.push(r => {
@@ -149,7 +149,13 @@ function getAndAndOrFilters(allFilters) {
   };
 }
 
-function filterEntitiesLocal(filters = [], searchTerm, entities, schema) {
+function filterEntitiesLocal(
+  filters = [],
+  searchTerm,
+  entities,
+  schema,
+  ownProps
+) {
   const allFilters = getAllFilters(filters, searchTerm, schema);
 
   if (allFilters.length) {
@@ -159,14 +165,19 @@ function filterEntitiesLocal(filters = [], searchTerm, entities, schema) {
     );
     //filter ands first
     andFilters.forEach(filter => {
-      entities = getEntitiesForGivenFilter(entities, filter, ccFields);
+      entities = getEntitiesForGivenFilter(
+        entities,
+        filter,
+        ccFields,
+        ownProps
+      );
     });
     //then filter ors
     if (orFilters.length) {
       let orEntities = [];
       orFilters.concat(...otherOrFilters).forEach(filter => {
         orEntities = orEntities.concat(
-          getEntitiesForGivenFilter(entities, filter, ccFields)
+          getEntitiesForGivenFilter(entities, filter, ccFields, ownProps)
         );
       });
       entities = uniq(orEntities);
@@ -175,14 +186,14 @@ function filterEntitiesLocal(filters = [], searchTerm, entities, schema) {
   return entities;
 }
 
-function getEntitiesForGivenFilter(entities, filter, ccFields) {
+function getEntitiesForGivenFilter(entities, filter, ccFields, ownProps) {
   const { filterOn, filterValue, selectedFilter } = filter;
   const field = ccFields[filterOn];
   const { path, getValueToFilterOn } = field;
   const subFilter = getSubFilter(false, selectedFilter, filterValue);
   entities = entities.filter(entity => {
     const fieldVal = getValueToFilterOn
-      ? getValueToFilterOn(entity)
+      ? getValueToFilterOn(entity, ownProps)
       : get(entity, path);
     const shouldKeep = subFilter(fieldVal);
     return shouldKeep;
@@ -595,7 +606,8 @@ export function getQueryParams({
   additionalOrFilter,
   doNotCoercePageSize,
   noOrderError,
-  isCodeModel
+  isCodeModel,
+  ownProps
 }) {
   Object.keys(currentParams).forEach(function(key) {
     if (currentParams[key] === undefined) {
@@ -634,8 +646,14 @@ export function getQueryParams({
     let newEntities = entities;
     //if the table is local (aka not directly connected to a db) then we need to
     //handle filtering/paging/sorting all on the front end
-    newEntities = filterEntitiesLocal(filters, searchTerm, newEntities, schema);
-    newEntities = orderEntitiesLocal(order, newEntities, schema);
+    newEntities = filterEntitiesLocal(
+      filters,
+      searchTerm,
+      newEntities,
+      schema,
+      ownProps
+    );
+    newEntities = orderEntitiesLocal(order, newEntities, schema, ownProps);
 
     let newEntityCount = newEntities.length;
     //calculate the sorted, filtered, paged entities for the local table

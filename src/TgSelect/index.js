@@ -7,7 +7,7 @@ import classNames from "classnames";
 // import Tag from "../Tag";
 import "./style.css";
 import getTextFromEl from "../utils/getTextFromEl";
-import determineBlackOrWhiteTextColor from "../utils/determineBlackOrWhiteTextColor";
+import { getTagColorStyle, getTagProps } from "../utils/tagUtils";
 
 class TgSelect extends React.Component {
   state = {
@@ -117,9 +117,8 @@ class TgSelect extends React.Component {
     if (multi) {
       const valArray = getValueArray(value);
 
-      const filteredVals = filter(
-        value,
-        obj => !isEqual(obj.value, item.value)
+      const filteredVals = filter(value, obj =>
+        !obj ? false : !isEqual(obj.value, item.value)
       );
       if (filteredVals.length !== valArray.length) return false;
     }
@@ -387,22 +386,5 @@ function simplesearch(needle, haystack) {
   return (haystack || "").indexOf(needle) !== -1;
 }
 function tgSelectOptionRenderer(vals) {
-  return (
-    <Tag
-      {...getTagColorStyle(vals.color)}
-      children={vals.label || vals.name}
-      {...vals}
-    ></Tag>
-  );
-}
-
-function getTagColorStyle(color) {
-  return color
-    ? {
-        style: {
-          backgroundColor: color,
-          color: determineBlackOrWhiteTextColor(color)
-        }
-      }
-    : {};
+  return <Tag {...getTagProps(vals)}></Tag>;
 }

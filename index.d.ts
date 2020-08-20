@@ -944,3 +944,7 @@ export function mergeSchemas(schema, schemaOverrides) {
 // rerenderOnWindowResize
 // showConfirmationDialog
 // style
+
+export function getTagProps(){}
+export function getTagsAndTagOptions(){}
+export function getKeyedTagsAndTagOptions(){}

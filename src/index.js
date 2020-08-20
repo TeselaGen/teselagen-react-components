@@ -50,6 +50,7 @@ export {
   default as combineReducersWithFullState
 } from "./utils/combineReducersWithFullState";
 export { default as pureNoFunc } from "./utils/pureNoFunc";
+export * from "./utils/tagUtils";
 export * from "./utils/hotkeyUtils";
 export * from "./utils/menuUtils";
 export * from "./utils/commandUtils";
