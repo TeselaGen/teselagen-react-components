@@ -223,6 +223,7 @@ class AbstractInput extends React.Component {
               <InfoHelper
                 style={{ marginLeft: "5px", marginTop: "-6px" }}
                 size={12}
+                noPopoverSizing
                 content={tooltipInfo}
               />
             </div>
@@ -289,11 +290,18 @@ export const renderBlueprintInput = props => {
     onFieldSubmit,
     onKeyDown = noop,
     asyncValidating,
+    rightElement,
     ...rest
   } = props;
   return (
     <InputGroup
-      rightElement={<AsyncValidateFieldSpinner validating={asyncValidating} />}
+      rightElement={
+        asyncValidating ? (
+          <AsyncValidateFieldSpinner validating />
+        ) : (
+          rightElement
+        )
+      }
       {...removeUnwantedProps(rest)}
       intent={intent}
       {...input}

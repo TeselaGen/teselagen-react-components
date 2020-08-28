@@ -13,7 +13,8 @@ import {
   isEqual,
   cloneDeep,
   keyBy,
-  forEach
+  forEach,
+  lowerCase
 } from "lodash";
 import {
   Button,
@@ -555,6 +556,47 @@ class DataTable extends React.Component {
         }
       };
     }
+    let nonDisplayedFilterComp;
+    if (filtersOnNonDisplayedFields.length) {
+      const content = filtersOnNonDisplayedFields.map(
+        ({ displayName, path, selectedFilter, filterValue }) => {
+          let filterValToDisplay = filterValue;
+          if (selectedFilter === "inList") {
+            filterValToDisplay = Array.isArray(filterValToDisplay)
+              ? filterValToDisplay
+              : filterValToDisplay && filterValToDisplay.split(".");
+          }
+          if (Array.isArray(filterValToDisplay)) {
+            filterValToDisplay = filterValToDisplay.join(", ");
+          }
+          return (
+            <div
+              key={displayName || startCase(path)}
+              className="tg-filter-on-non-displayed-field"
+            >
+              {displayName || startCase(path)} {lowerCase(selectedFilter)}{" "}
+              {filterValToDisplay}
+            </div>
+          );
+        }
+      );
+      nonDisplayedFilterComp = (
+        <div style={{ marginRight: 5, marginLeft: "auto" }}>
+          <Tooltip
+            content={
+              <div>
+                Active filters on hidden columns:
+                <br />
+                <br />
+                {content}
+              </div>
+            }
+          >
+            <Icon icon="filter-list" />
+          </Tooltip>
+        </div>
+      );
+    }
     return (
       <div
         className={classNames(
@@ -592,29 +634,7 @@ class DataTable extends React.Component {
                 Error parsing URL
               </Callout>
             )}
-            {filtersOnNonDisplayedFields.length
-              ? filtersOnNonDisplayedFields.map(
-                  ({ displayName, path, selectedFilter, filterValue }) => {
-                    let filterValToDisplay = filterValue;
-                    if (Array.isArray(filterValue)) {
-                      filterValToDisplay = filterValue.toString();
-                    }
-                    return (
-                      <div
-                        key={displayName || startCase(path)}
-                        className="tg-filter-on-non-displayed-field"
-                      >
-                        <Icon icon="filter" />
-                        <span>
-                          {" "}
-                          {displayName || startCase(path)} {selectedFilter}{" "}
-                          {filterValToDisplay}{" "}
-                        </span>
-                      </div>
-                    );
-                  }
-                )
-              : ""}
+            {nonDisplayedFilterComp}
             {withSearch && (
               <div className="data-table-search-and-clear-filter-container">
                 {hasFilters ? (
