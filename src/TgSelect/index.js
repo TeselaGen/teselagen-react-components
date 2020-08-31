@@ -10,16 +10,23 @@ import getTextFromEl from "../utils/getTextFromEl";
 import { getTagColorStyle, getTagProps } from "../utils/tagUtils";
 
 class TgSelect extends React.Component {
-  state = {
-    isOpen: false,
-    activeItem: null,
-    query: ""
-  };
+  constructor(props) {
+    super(props);
+    const { autoOpen = false } = this.props;
+
+    this.state = {
+      isOpen: autoOpen,
+      activeItem: null,
+      query: ""
+    };
+  }
+
   static defaultProps = {
     onChange: () => {},
     options: [],
     value: undefined
   };
+
   itemRenderer = (i, { index, handleClick, modifiers }) => {
     const optionRenderer = this.getOptionRenderer();
     const onClick = i.onClick || handleClick;
@@ -205,6 +212,7 @@ class TgSelect extends React.Component {
       optionRenderer, //pull this one out here so it doesn't get passsed along
       tagInputProps,
       autoFocus,
+      autoOpen,
       noResultsText,
       noResults = noResultsDefault,
       inputProps,
@@ -333,7 +341,7 @@ class TgSelect extends React.Component {
             ...tagInputProps, //spread additional tag input props here
             intent: this.props.intent,
             inputProps: {
-              autoFocus,
+              autoFocus: autoFocus || autoOpen,
               onBlur,
               ...(tagInputProps && tagInputProps.inputProps)
             }
