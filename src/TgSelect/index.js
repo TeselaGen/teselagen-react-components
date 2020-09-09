@@ -108,13 +108,19 @@ class TgSelect extends React.Component {
   };
 
   handleClear = e => {
-    const { multi } = this.props;
+    const { multi, value } = this.props;
 
     e.stopPropagation();
     e.preventDefault();
+    let newValue = null;
+    if (multi) {
+      newValue = filter(value, obj => obj.disabled) || [];
+    } else if (value && value.disabled) {
+      newValue = value;
+    }
     const { onChange } = this.props;
     this.setState({ query: "" });
-    onChange(multi ? [] : null);
+    onChange(newValue);
     this.setState({ isOpen: false });
     this.input.focus();
   };
