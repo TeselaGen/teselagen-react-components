@@ -118,6 +118,9 @@ span.bp3-popover-target {
 button[aria-label][data-balloon-pos] {
   overflow: visible;
 }
+.notClickable {
+  cursor: default !important;
+}
 
 [aria-label][data-balloon-pos] {
   position: relative;
