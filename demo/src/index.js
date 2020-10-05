@@ -46,6 +46,8 @@ import {
   CmdSwitch
 } from "../../src/utils/commandControls";
 import ScrollToTop from "../../src/ScrollToTop";
+import showAppSpinnerDemo from "./examples/showAppSpinnerDemo";
+import showAppSpinner from "../../src/showAppSpinner";
 
 import "./style.css";
 import React, { Component } from "react";
@@ -337,6 +339,14 @@ const demos = {
       renderToggle
     },
     demo: showConfirmationDialogDemo
+  },
+  showAppSpinner: {
+    scope: {
+      showAppSpinner,
+      Intent,
+      renderToggle
+    },
+    demo: showAppSpinnerDemo
   },
 
   // MultiSelectSideBySide: {

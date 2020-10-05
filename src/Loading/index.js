@@ -30,7 +30,8 @@ export default class Loading extends React.Component {
       displayInstantly = false,
       bounce = false,
       withTimeout,
-      inDialog
+      inDialog,
+      centeredInPage
     } = this.props;
     const { longerThan200MS } = this.state;
     const style = {
@@ -38,7 +39,6 @@ export default class Loading extends React.Component {
       ...(inDialog && { minHeight: 120 })
     };
     const LoaderComp = bounce || inDialog ? BounceLoader : DNALoader;
-
     if (loading || !children) {
       if (
         !displayInstantly &&
@@ -49,10 +49,19 @@ export default class Loading extends React.Component {
       }
       return (
         <div
-          className={"tg-loader-container tg-flex justify-center align-center"}
+          className="tg-loader-container tg-flex justify-center align-center"
           style={{
             width: "100%",
-            ...containerStyle
+            ...containerStyle,
+            ...(centeredInPage && {
+              width: "360px",
+              zIndex: "20",
+              height: "10px",
+              position: "fixed",
+              top: "50%",
+              left: "50%",
+              transform: "translateX(-50%) translateY(-50%)"
+            })
           }}
         >
           <LoaderComp style={style} className={className} />
