@@ -904,6 +904,21 @@ export function withSelectedEntities(tableName: string, tableName2: string);
 /**
  *
  * @example
+ * <Button
+    onClick={async function handleClick() {
+      const closeAppSpinner = showAppSpinner();
+      setTimeout(() => {
+        closeAppSpinner()
+      }, 2000);
+    }}
+    text="Show the app spinner"
+  />
+ */
+export function showAppSpinner();
+
+/**
+ *
+ * @example
  * const confirm = await showConfirmationDialog({
  *   text:
  *     selectedCount > 1

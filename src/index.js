@@ -25,6 +25,7 @@ export { default as IntentText } from "./IntentText";
 export { default as withTableParams } from "./DataTable/utils/withTableParams";
 export { default as InfoHelper } from "./InfoHelper";
 export { default as showConfirmationDialog } from "./showConfirmationDialog";
+export { default as showAppSpinner } from "./showAppSpinner";
 export { default as CollapsibleCard } from "./CollapsibleCard";
 export {
   default as ResizableDraggableDialog

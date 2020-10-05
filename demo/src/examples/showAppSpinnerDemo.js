@@ -3,7 +3,7 @@ function Demo() {
     <div>
       <Button
         onClick={async function handleClick() {
-          const closeAppSpinner = await showAppSpinner();
+          const closeAppSpinner = showAppSpinner();
           setTimeout(() => {
             closeAppSpinner()
           }, 2000);
