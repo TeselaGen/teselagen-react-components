@@ -6,7 +6,7 @@ function Demo() {
           const closeAppSpinner = showAppSpinner();
           setTimeout(() => {
             closeAppSpinner()
-          }, 200000);
+          }, 2000);
         }}
         text="Show the app spinner"
       />
