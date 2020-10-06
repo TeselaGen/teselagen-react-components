@@ -437,7 +437,8 @@ class DataTable extends React.Component {
       showForcedHiddenColumns,
       searchMenuButton,
       setShowForcedHidden,
-      noFocus
+      noFocus,
+      additionalFooterButtons
     } = propPresets;
     let updateColumnVisibilityToUse = updateColumnVisibility;
     let updateTableDisplayDensityToUse = updateTableDisplayDensity;
@@ -734,6 +735,7 @@ class DataTable extends React.Component {
           >
             {selectedAndTotalMessage}
             <div style={{ display: "flex", flexWrap: "wrap" }}>
+              {additionalFooterButtons}
               {!noFullscreenButton && toggleFullscreenButton}
               {withDisplayOptions && (
                 <DisplayOptions
