@@ -54,7 +54,7 @@ export default class Loading extends React.Component {
             width: "100%",
             ...containerStyle,
             ...(centeredInPage && {
-              width: "360px",
+              width: "390px",
               zIndex: "20",
               height: "10px",
               position: "fixed",
