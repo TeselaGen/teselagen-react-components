@@ -273,11 +273,11 @@ class MenuBarDemo extends React.Component {
             border: "1px solid #eee"
           }}
         >
-          {/* <MenuBar
+          <MenuBar
             menu={this.menu}
             enhancers={this.menuEnhancers}
             // menuSearchHotkey="alt+/"
-          /> */}
+          />
         </div>
         <button
           onClick={e => {

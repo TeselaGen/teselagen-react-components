@@ -392,7 +392,7 @@ export const singleItemPredicate = (queryString, item, isSimpleSearch) =>
     item.label
       ? item.label.toLowerCase
         ? item.label.toLowerCase()
-        : getTextFromEl(item.label, { lowerCase: true })
+        : getTextFromEl(item.label).toLowerCase()
       : (item.value && item.value.toLowerCase && item.value.toLowerCase()) || ""
   );
 
