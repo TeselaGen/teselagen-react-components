@@ -234,7 +234,9 @@ class DataTable extends React.Component {
 
   getCellCopyText = cellWrapper => {
     const text = cellWrapper && cellWrapper.getAttribute("data-copy-text");
-    return text || "";
+
+    const toRet = text || cellWrapper.textContent || "";
+    return toRet;
   };
 
   handleCopyRow = rowEl => {

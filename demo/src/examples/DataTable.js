@@ -10,6 +10,7 @@ const schema = {
     },
     { path: "hungerLevel", type: "string" },
     { path: "type.special", type: "lookup", displayName: "Special Type" },
+
     {
       path: "checkboxData",
       type: "boolean",
@@ -52,7 +53,14 @@ const schema = {
     {
       type: "lookup",
       displayName: "User Status",
-      path: "user.status.name"
+      path: "user.status.name",
+      render: (s) => {
+        return <span>
+          <button>{s}</button>
+          <button>yep {s} </button>
+        </span>
+      }
+
     },
     { path: "createdAt", type: "timestamp", displayName: "Date Created" },
     { path: "updatedAt", type: "timestamp", displayName: "Last Edited" },
