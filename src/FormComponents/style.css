@@ -211,3 +211,12 @@
 .bp3-dark input {
   color: #f5f8fa;
 }
+
+.tg-no-fill-field .bp3-checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.bp3-form-group .info-helper-wrapper {
+  margin-top: -9px !important;
+}

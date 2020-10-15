@@ -101,6 +101,22 @@ const popoverOverflowModifiers = {
   }
 };
 
+function LabelWithTooltipInfo({ label, tooltipInfo }) {
+  return tooltipInfo ? (
+    <div style={{ display: "flex", alignItems: "center" }}>
+      {label}{" "}
+      <InfoHelper
+        style={{ marginLeft: "5px", marginTop: "-6px" }}
+        size={12}
+        noPopoverSizing
+        content={tooltipInfo}
+      />
+    </div>
+  ) : (
+    label || null
+  );
+}
+
 class AbstractInput extends React.Component {
   componentDidMount() {
     const {
@@ -216,20 +232,9 @@ class AbstractInput extends React.Component {
         helperText={helperText}
         intent={intent}
         label={
-          !noOuterLabel &&
-          (tooltipInfo ? (
-            <div style={{ display: "flex" }}>
-              {label}{" "}
-              <InfoHelper
-                style={{ marginLeft: "5px", marginTop: "-6px" }}
-                size={12}
-                noPopoverSizing
-                content={tooltipInfo}
-              />
-            </div>
-          ) : (
-            label
-          ))
+          !noOuterLabel && (
+            <LabelWithTooltipInfo label={label} tooltipInfo={tooltipInfo} />
+          )
         }
         inline={inlineLabel}
         labelInfo={secondaryLabel}
@@ -322,13 +327,13 @@ export const renderBlueprintInput = props => {
 };
 
 export const renderBlueprintCheckbox = props => {
-  const { input, label, onFieldSubmit, ...rest } = props;
+  const { input, label, tooltipInfo, onFieldSubmit, ...rest } = props;
   return (
     <Checkbox
       {...removeUnwantedProps(rest)}
       {...input}
       checked={input.value}
-      label={label}
+      label={<LabelWithTooltipInfo label={label} tooltipInfo={tooltipInfo} />}
       onChange={function(e, val) {
         input.onChange(e, val);
         onFieldSubmit(e.target ? e.target.checked : val);
@@ -338,13 +343,13 @@ export const renderBlueprintCheckbox = props => {
 };
 
 export const renderBlueprintSwitch = props => {
-  const { input, label, onFieldSubmit, ...rest } = props;
+  const { input, label, tooltipInfo, onFieldSubmit, ...rest } = props;
   return (
     <Switch
       {...removeUnwantedProps(rest)}
       {...input}
       checked={input.value}
-      label={label}
+      label={<LabelWithTooltipInfo label={label} tooltipInfo={tooltipInfo} />}
       onChange={function(e, val) {
         input.onChange(e, val);
         onFieldSubmit(e.target ? e.target.checked : val);

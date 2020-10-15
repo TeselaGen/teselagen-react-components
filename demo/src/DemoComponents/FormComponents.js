@@ -345,6 +345,7 @@ class FormComponentsDemo extends React.Component {
           <CheckboxField
             onFieldSubmit={onFieldSubmit}
             defaultValue
+            tooltipInfo={"I am some info!"}
             name={"CheckboxField"}
             inlineLabel={this.state.inlineLabels}
             label="CheckboxField"
