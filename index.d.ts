@@ -316,6 +316,7 @@ export interface DataTableProps {
   doNotShowEmptyRows: boolean;
   withTitle: boolean;
   withCheckboxes: boolean;
+  autoFocusSearch: boolean;
   withSearch: boolean;
   withPaging: boolean;
   isInfinite: boolean;

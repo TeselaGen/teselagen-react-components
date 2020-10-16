@@ -10,11 +10,11 @@ const SearchBar = ({
   loading,
   searchMenuButton,
   disabled,
-  noFocus
+  autoFocusSearch
 }) => {
   return (
     <InputField
-      autoFocus={!noFocus}
+      autoFocus={autoFocusSearch}
       disabled={disabled}
       loading={loading}
       type="search"
