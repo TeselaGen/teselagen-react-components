@@ -101,6 +101,9 @@ class FormComponentsDemo extends React.Component {
           </div>
           FileUploadField with minimal=true
           <FileUploadField
+          threeDotMenuItems={
+            <MenuItem text="Download Example File"> </MenuItem>
+          }
             innerText="Upload"
             minimal
             fileList={[
@@ -150,6 +153,9 @@ class FormComponentsDemo extends React.Component {
             onFieldSubmit={onFieldSubmit}
           />
           <FileUploadField
+          threeDotMenuItems={
+            <MenuItem text="Download Example File"> </MenuItem>
+          }
             label="Upload component"
             tooltipInfo="hello hello I'm tooltipInfo"
             onFieldSubmit={function(fileList) {

@@ -534,14 +534,7 @@ class Uploader extends Component {
             <Popover
               minimal
               content={
-                <Menu>
-                  {
-                    <MenuItem
-                      text="Download Template"
-                      content={threeDotMenuItems}
-                    ></MenuItem>
-                  }
-                </Menu>
+                <Menu>{<MenuItem text={threeDotMenuItems}></MenuItem>}</Menu>
               }
               position={Position.BOTTOM_RIGHT}
             >
