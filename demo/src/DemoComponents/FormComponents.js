@@ -3,7 +3,7 @@
 import React from "react";
 import { Provider } from "react-redux";
 import { reduxForm } from "redux-form";
-import { Switch, Icon, Button } from "@blueprintjs/core";
+import { Switch, Icon, Button, MenuItem } from "@blueprintjs/core";
 import store from "../store";
 import Uploader from "../../../src/FormComponents/Uploader";
 import {
@@ -66,6 +66,9 @@ class FormComponentsDemo extends React.Component {
             ################################################################################################{" "}
           </Switch>
           <Uploader
+            threeDotMenuItems={
+              <MenuItem text="Download Example File"> </MenuItem>
+            }
             action={"docs.google.com/upload"}
             fileList={[
               {
@@ -76,24 +79,25 @@ class FormComponentsDemo extends React.Component {
             ]}
           />
           Importer with minimal=true
-          <div style={{display: 'flex',}}>
-            
+          <div style={{ display: "flex" }}>
             <Button>Hey there</Button>
             &nbsp;
-          <Uploader
-            accept=".json"
-            action={"docs.google.com/upload"}
-            minimal
-            fileList={[
-              {
-                uid: 1, //you must set a unique id for this to work properly
-                name: "yarn.lock",
-                status: "error"
+            <Uploader
+              threeDotMenuItems={
+                <MenuItem text="Download Example File"> </MenuItem>
               }
-            ]}
-          />
+              accept=".json"
+              action={"docs.google.com/upload"}
+              minimal
+              fileList={[
+                {
+                  uid: 1, //you must set a unique id for this to work properly
+                  name: "yarn.lock",
+                  status: "error"
+                }
+              ]}
+            />
             &nbsp;
-          
           </div>
           FileUploadField with minimal=true
           <FileUploadField

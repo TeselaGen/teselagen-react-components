@@ -513,6 +513,7 @@ export class FileUploadField extends React.Component<
 export interface FileUploadFieldProps extends GenericFormFieldProps {
   innerIcon: "string";
   innerText: "string";
+  threeDotMenuItems: any;
   accept: string | array;
   contentOverride: function;
   action: string;
