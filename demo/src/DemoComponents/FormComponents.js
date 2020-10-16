@@ -21,7 +21,8 @@ import {
   EditableTextField,
   ReactSelectField,
   ReactColorField,
-  SuggestField
+  SuggestField,
+  InfoHelper
 } from "../../../src";
 import renderToggle from "../renderToggle";
 
@@ -67,7 +68,14 @@ class FormComponentsDemo extends React.Component {
           </Switch>
           <Uploader
             threeDotMenuItems={
-              <MenuItem text="Download Example File"> </MenuItem>
+              <MenuItem
+                text={
+                  <div style={{ display: "flex", alignContent: "center" }}>
+                    Download Example File{" "} &nbsp;&nbsp;
+                    <InfoHelper content="I'm some helper text"></InfoHelper>
+                  </div>
+                }
+              ></MenuItem>
             }
             action={"docs.google.com/upload"}
             fileList={[
@@ -101,9 +109,9 @@ class FormComponentsDemo extends React.Component {
           </div>
           FileUploadField with minimal=true
           <FileUploadField
-          threeDotMenuItems={
-            <MenuItem text="Download Example File"> </MenuItem>
-          }
+            threeDotMenuItems={
+              <MenuItem text="Download Example File"> </MenuItem>
+            }
             innerText="Upload"
             minimal
             fileList={[
@@ -153,9 +161,9 @@ class FormComponentsDemo extends React.Component {
             onFieldSubmit={onFieldSubmit}
           />
           <FileUploadField
-          threeDotMenuItems={
-            <MenuItem text="Download Example File"> </MenuItem>
-          }
+            threeDotMenuItems={
+              <MenuItem text="Download Example File"> </MenuItem>
+            }
             label="Upload component"
             tooltipInfo="hello hello I'm tooltipInfo"
             onFieldSubmit={function(fileList) {

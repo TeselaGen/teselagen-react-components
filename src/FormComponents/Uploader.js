@@ -525,6 +525,7 @@ class Uploader extends Component {
         {threeDotMenuItems && (
           <div className="tg-dropzone-extra-options">
             <Popover
+              autoFocus={false}
               minimal
               content={<Menu>{threeDotMenuItems}</Menu>}
               position={Position.BOTTOM_RIGHT}
