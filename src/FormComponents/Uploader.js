@@ -1,13 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
-import {
-  Button,
-  Icon,
-  Menu,
-  MenuItem,
-  Popover,
-  Position
-} from "@blueprintjs/core";
+import { Button, Icon, Menu, Popover, Position } from "@blueprintjs/core";
 import Dropzone from "react-dropzone";
 // import { first } from "lodash";
 import uniqid from "uniqid";
@@ -533,9 +526,7 @@ class Uploader extends Component {
           <div className="tg-dropzone-extra-options">
             <Popover
               minimal
-              content={
-                <Menu>{<MenuItem text={threeDotMenuItems}></MenuItem>}</Menu>
-              }
+              content={<Menu>{threeDotMenuItems}</Menu>}
               position={Position.BOTTOM_RIGHT}
             >
               <Button minimal icon="more" />
