@@ -417,6 +417,10 @@ class DataTableInstance extends React.Component {
         })}
         {renderToggle({
           that: this,
+          type: "hideTotalPages"
+        })}
+        {renderToggle({
+          that: this,
           type: "isViewable",
           description: "Make sure withCheckboxes is off when using this"
         })}
@@ -577,6 +581,8 @@ class DataTableInstance extends React.Component {
           entities={entitiesToPass}
           entityCount={entities.length}
           onRefresh={this.onRefresh}
+          disableSetPageSize={this.state.disableSetPageSize}
+          hideTotalPages={this.state.hideTotalPages}
         />
         --------------
         <div className={"wrappingdiv"}>
@@ -632,6 +638,7 @@ class DataTableInstance extends React.Component {
             isSimple={this.state.isSimple}
             withSearch={this.state.withSearch}
             disableSetPageSize={this.state.disableSetPageSize}
+            hideTotalPages={this.state.hideTotalPages}
             withExpandAndCollapseAllButton={
               this.state.withExpandAndCollapseAllButton
             }

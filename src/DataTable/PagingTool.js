@@ -106,6 +106,7 @@ class PagingTool extends React.Component {
     const {
       paging: { pageSize, page, total },
       onRefresh,
+      hideTotalPages,
       disabled,
       disableSetPageSize
     } = this.props;
@@ -158,7 +159,9 @@ class PagingTool extends React.Component {
           icon="chevron-left"
         />
         <div>
-          {total ? (
+          {hideTotalPages ? (
+            page
+          ) : total ? (
             <div>
               <PagingInput
                 disabled={disabled}
