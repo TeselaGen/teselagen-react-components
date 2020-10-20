@@ -22,12 +22,16 @@ const defaultPageSizes = [5, 10, 15, 25, 50, 100, 200, 400];
 export { defaultPageSizes };
 
 export function getMergedOpts(topLevel = {}, instanceLevel = {}) {
+  const merged = {
+    ...topLevel,
+    ...instanceLevel
+  };
   return {
     formName: "tgDataTable",
-    ...topLevel,
-    ...instanceLevel,
+    ...merged,
+    pageSize: merged.controlled_pageSize || merged.pageSize,
     defaults: {
-      pageSize: 25,
+      pageSize: merged.controlled_pageSize || 25,
       order: [], //[-name, statusCode] //an array of camelCase display names with - sign to denote reverse
       searchTerm: "",
       page: 1,
@@ -636,7 +640,7 @@ export function getQueryParams({
   const toReturn = {
     //these are values that might be generally useful for the wrapped component
     page,
-    pageSize,
+    pageSize: ownProps.controlled_pageSize || pageSize,
     order,
     filters,
     searchTerm
@@ -657,10 +661,9 @@ export function getQueryParams({
 
     let newEntityCount = newEntities.length;
     //calculate the sorted, filtered, paged entities for the local table
-
-    if (!isInfinite) {
-      const offset = (page - 1) * pageSize;
-      newEntities = take(drop(newEntities, offset), pageSize);
+    if (!isInfinite && !ownProps.controlled_pageSize) {
+      const offset = (page - 1) * ownProps.pageSize;
+      newEntities = take(drop(newEntities, offset), ownProps.pageSize);
     }
     toReturn.entities = newEntities;
     toReturn.entityCount = newEntityCount;
@@ -677,7 +680,7 @@ export function getQueryParams({
       graphqlQueryParams.pageNumber = 1;
     } else {
       graphqlQueryParams.pageNumber = page;
-      graphqlQueryParams.pageSize = pageSize;
+      graphqlQueryParams.pageSize = ownProps.controlled_pageSize || pageSize;
     }
 
     const { model } = schema;

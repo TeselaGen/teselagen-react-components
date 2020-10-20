@@ -1,3 +1,4 @@
+const controlled_page_size = 33;
 const chance = new Chance();
 const schema = {
   model: "material",
@@ -54,13 +55,14 @@ const schema = {
       type: "lookup",
       displayName: "User Status",
       path: "user.status.name",
-      render: (s) => {
-        return <span>
-          <button>{s}</button>
-          <button>yep {s} </button>
-        </span>
+      render: s => {
+        return (
+          <span>
+            <button>{s}</button>
+            <button>yep {s} </button>
+          </span>
+        );
       }
-
     },
     { path: "createdAt", type: "timestamp", displayName: "Date Created" },
     { path: "updatedAt", type: "timestamp", displayName: "Last Edited" },
@@ -86,15 +88,15 @@ class DataTableDemo extends React.Component {
       urlConnected: true,
       onlyOneFilter: false,
       inDialog: false,
-      withSelectedEntities: false,
-      ...JSON.parse(localStorage.tableWrapperState || "{}")
+      withSelectedEntities: false
+      // ...JSON.parse(localStorage.tableWrapperState || "{}")
     };
     this.closeDialog = this.closeDialog.bind(this);
   }
 
-  componentDidUpdate() {
-    localStorage.tableWrapperState = JSON.stringify(this.state);
-  }
+  // componentDidUpdate() {
+  //   localStorage.tableWrapperState = JSON.stringify(this.state);
+  // }
 
   UNSAFE_componentWillMount() {
     //tnr: the following code allows the DataTable test to set defaults on the demo (which is used in the testing)
@@ -296,17 +298,17 @@ class DataTableInstance extends React.Component {
       numOfEntities: 60,
       selectedIds: undefined,
       alwaysRerender: false,
-      entities: generateFakeRows(defaultNumOfEntities),
-      ...JSON.parse(localStorage.tableState || "{}")
+      entities: generateFakeRows(defaultNumOfEntities)
+      // ...JSON.parse(localStorage.tableState || "{}")
     };
     this.changeNumEntities = this.changeNumEntities.bind(this);
     this.changeSelectedRecords = this.changeSelectedRecords.bind(this);
     this.onRefresh = this.onRefresh.bind(this);
   }
 
-  componentDidUpdate() {
-    localStorage.tableState = JSON.stringify(this.state);
-  }
+  // componentDidUpdate() {
+  //   localStorage.tableState = JSON.stringify(this.state);
+  // }
 
   changeNumEntities(e) {
     const numOfEntities = parseInt(e.target.value, 10);
@@ -339,7 +341,14 @@ class DataTableInstance extends React.Component {
     if (this.state.isInfinite || !isTableParamsConnected) {
       entitiesToPass = entities;
     } else {
-      for (let i = (page - 1) * pageSize; i < page * pageSize; i++) {
+      for (
+        let i =
+          (page - 1) *
+          (this.state.controlledPaging ? controlled_page_size : pageSize);
+        i <
+        page * (this.state.controlledPaging ? controlled_page_size : pageSize);
+        i++
+      ) {
         entities[i] && entitiesToPass.push(entities[i]);
       }
     }
@@ -417,7 +426,19 @@ class DataTableInstance extends React.Component {
         })}
         {renderToggle({
           that: this,
+          type: "keepSelectionOnPageChange"
+        })}
+        {renderToggle({
+          that: this,
+          type: "hideSetPageSize"
+        })}
+        {renderToggle({
+          that: this,
           type: "hideTotalPages"
+        })}
+        {renderToggle({
+          that: this,
+          type: "forceNoNextPage"
         })}
         {renderToggle({
           that: this,
@@ -582,7 +603,9 @@ class DataTableInstance extends React.Component {
           entityCount={entities.length}
           onRefresh={this.onRefresh}
           disableSetPageSize={this.state.disableSetPageSize}
+          hideSetPageSize={this.state.hideSetPageSize}
           hideTotalPages={this.state.hideTotalPages}
+          controlled_hasNextPage={!this.state.forceNoNextPage}
         />
         --------------
         <div className={"wrappingdiv"}>
@@ -637,22 +660,31 @@ class DataTableInstance extends React.Component {
             noSelect={this.state.noSelect}
             isSimple={this.state.isSimple}
             withSearch={this.state.withSearch}
+            keepSelectionOnPageChange={this.state.keepSelectionOnPageChange}
             disableSetPageSize={this.state.disableSetPageSize}
+            hideSetPageSize={this.state.hideSetPageSize}
             hideTotalPages={this.state.hideTotalPages}
+            controlled_hasNextPage={!this.state.forceNoNextPage}
             withExpandAndCollapseAllButton={
               this.state.withExpandAndCollapseAllButton
             }
             expandAllByDefault={this.state.expandAllByDefault}
             selectAllByDefault={this.state.selectAllByDefault}
             withPaging={this.state.withPaging}
-            {...this.state.controlledPaging && {
-              controlled_setPage: () => {console.log(`controlled_setPage hit`)},
-              controlled_setPageSize: () => {console.log(`controlled_setPageSize hit`)},
+            {...(this.state.controlledPaging && {
+              controlled_setPage: () => {
+                console.info(`controlled_setPage hit`);
+              },
+              controlled_setPageSize: () => {
+                console.info(`controlled_setPageSize hit`);
+              },
               controlled_page: 6,
-              controlled_pageSize: 33,
+              controlled_pageSize: controlled_page_size,
               controlled_total: 440,
-              controlled_onRefresh: () => {console.log(`controlled_onRefresh hit`)},
-            }}
+              controlled_onRefresh: () => {
+                console.info(`controlled_onRefresh hit`);
+              }
+            })}
             noDeselectAll={this.state.noDeselectAll}
             withFilter={this.state.withFilter}
             withSort={this.state.withSort}

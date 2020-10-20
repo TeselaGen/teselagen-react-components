@@ -41,7 +41,6 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
     Component = compOrOpts;
   }
   const { isLocalCall } = topLevelOptions;
-
   const mapStateToProps = (state, ownProps) => {
     const mergedOpts = getMergedOpts(topLevelOptions, ownProps);
     const {
@@ -143,10 +142,11 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       isLocalCall,
       model,
       schema,
+      mergedOpts,
       ...getQueryParams({
         doNotCoercePageSize,
         currentParams,
-        entities: ownProps.entities, // for local table
+        entities: mergedOpts.entities, // for local table
         urlConnected,
         defaults,
         schema: convertSchema(schema),
@@ -156,7 +156,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         additionalOrFilter: additionalOrFilterToUse,
         noOrderError,
         isCodeModel,
-        ownProps
+        ownProps: mergedOpts
       }),
       formNameFromWithTPCall: formNameFromWithTableParamsCall,
       randomVarToForceLocalStorageUpdate: formSelector(
@@ -232,7 +232,12 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         action(...args, currentParams);
       };
     });
-    const { variables, selectedEntities, ...restStateProps } = stateProps;
+    const {
+      variables,
+      selectedEntities,
+      mergedOpts,
+      ...restStateProps
+    } = stateProps;
 
     const changeFormValue = (...args) =>
       dispatchProps.dispatch(change(formName, ...args));
@@ -249,6 +254,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
 
     const allMergedProps = {
       ...ownProps,
+      ...mergedOpts,
       variables: stateProps.variables,
       selectedEntities: stateProps.selectedEntities,
       tableParams

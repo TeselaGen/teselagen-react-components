@@ -19,8 +19,7 @@ export default class ResizableDraggableDialog extends React.Component {
       triggerMouseEvent(targetNode, "mouseup");
       triggerMouseEvent(targetNode, "click");
     } else {
-      // eslint-disable-next-line no-console
-      console.log("*** Target node not found!");
+      console.info("*** Target node not found!");
     }
 
     function triggerMouseEvent(node, eventType) {

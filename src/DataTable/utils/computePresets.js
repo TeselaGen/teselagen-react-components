@@ -3,7 +3,7 @@ import { omitBy, isNil } from "lodash";
 export default function computePresets(props = {}) {
   const { isSimple } = props;
   let toReturn = omitBy(props, isNil);
-
+  toReturn.pageSize = toReturn.controlled_pageSize || toReturn.pageSize;
   if (isSimple) {
     //isSimplePreset
     toReturn = {

@@ -108,14 +108,19 @@ class PagingTool extends React.Component {
       onRefresh,
       hideTotalPages,
       disabled,
-      disableSetPageSize
+      controlled_hasNextPage,
+      disableSetPageSize,
+      hideSetPageSize
     } = this.props;
     const pageStart = (page - 1) * pageSize + 1;
     if (pageStart < 0) throw new Error("We should never have page be <0");
     const backEnabled = page - 1 > 0;
     const forwardEnabled = page * pageSize < total;
     const lastPage = Math.ceil(total / pageSize);
-
+    const options = [...(window.tgPageSizes || defaultPageSizes)];
+    if (!options.includes(pageSize)) {
+      options.push(pageSize);
+    }
     return (
       <div className="paging-toolbar-container">
         {onRefresh && (
@@ -127,30 +132,32 @@ class PagingTool extends React.Component {
             onClick={this.onRefresh}
           />
         )}
-        <div
-          title="Set Page Size"
-          className={classNames(Classes.SELECT, Classes.MINIMAL)}
-        >
-          <select
-            className="paging-page-size"
-            onChange={this.setPageSize}
-            disabled={disabled || disableSetPageSize}
-            value={pageSize}
+        {!hideSetPageSize && (
+          <div
+            title="Set Page Size"
+            className={classNames(Classes.SELECT, Classes.MINIMAL)}
           >
-            {[
-              <option key="page-size-placeholder" disabled value="fake">
-                Size
-              </option>,
-              ...(window.tgPageSizes || defaultPageSizes).map(size => {
-                return (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
-                );
-              })
-            ]}
-          </select>
-        </div>
+            <select
+              className="paging-page-size"
+              onChange={this.setPageSize}
+              disabled={disabled || disableSetPageSize}
+              value={pageSize}
+            >
+              {[
+                <option key="page-size-placeholder" disabled value="fake">
+                  Size
+                </option>,
+                ...options.map(size => {
+                  return (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  );
+                })
+              ]}
+            </select>
+          </div>
+        )}
         <Button
           onClick={this.pageBack}
           disabled={!backEnabled || disabled}
@@ -176,7 +183,11 @@ class PagingTool extends React.Component {
         </div>
         <Button
           style={{ marginLeft: 5 }}
-          disabled={!forwardEnabled || disabled}
+          disabled={
+            (controlled_hasNextPage === undefined
+              ? !forwardEnabled
+              : !controlled_hasNextPage) || disabled
+          }
           icon="chevron-right"
           minimal
           className="paging-arrow-right"
@@ -194,11 +205,12 @@ export default compose(
       page,
       pageSize,
       disabled,
+      pagingDisabled,
       onRefresh,
       controlled_setPage,
       controlled_setPageSize,
       controlled_page,
-      controlled_pageSize,
+
       controlled_total,
       controlled_onRefresh,
       setPage,
@@ -208,18 +220,21 @@ export default compose(
       paging: {
         total: controlled_total || entityCount,
         page: controlled_page || page,
-        pageSize: controlled_pageSize || pageSize
+        pageSize
       },
-      disabled: disabled,
+      disabled: disabled || pagingDisabled,
       onRefresh: controlled_onRefresh || onRefresh,
       setPage: controlled_setPage || setPage,
       setPageSize: controlled_setPageSize || setPageSize
     };
   }),
   withHandlers({
-    onPageChange: ({ entities, change }) => () => {
+    onPageChange: ({ entities, keepSelectionOnPageChange, change }) => () => {
       const record = get(entities, "[0]");
-      if (!record || !getIdOrCodeOrIndex(record)) {
+      if (
+        !keepSelectionOnPageChange &&
+        (!record || !getIdOrCodeOrIndex(record))
+      ) {
         change("reduxFormSelectedEntityIdMap", {});
       }
     }

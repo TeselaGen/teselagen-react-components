@@ -507,7 +507,6 @@ class DataTable extends React.Component {
     // if there are no entities then provide enough space to show
     // no rows found message
     if (entities.length === 0 && rowsToShow < 3) rowsToShow = 3;
-
     const expandedRows = entities.reduce((acc, row, index) => {
       const rowId = getIdOrCodeOrIndex(row, index);
       acc[index] = reduxFormExpandedEntityIdMap[rowId];
@@ -755,9 +754,7 @@ class DataTable extends React.Component {
                   schema={schema}
                 />
               )}
-              {shouldShowPaging && (
-                <PagingTool {...computePresets(this.props)} />
-              )}
+              {shouldShowPaging && <PagingTool {...propPresets} />}
             </div>
           </div>
         )}

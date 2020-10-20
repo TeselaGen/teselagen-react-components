@@ -9,14 +9,14 @@ class DemoHeader extends Component {
     const darkTheme = localStorage.getItem("darkTheme");
     document.body.classList.toggle(Classes.DARK, darkTheme === "true");
     this.state = {
-      darkTheme
+      darkTheme: !!darkTheme
     };
   }
 
   componentDidUpdate() {
     const { darkTheme } = this.state;
     localStorage.setItem("darkTheme", darkTheme);
-    document.body.classList.toggle(Classes.DARK, darkTheme);
+    document.body.classList.toggle(Classes.DARK, !!darkTheme );
   }
 
   toggleTheme = () => {
