@@ -389,3 +389,13 @@ button[aria-label][data-balloon-pos] {
 .bp3-toast-container {
   z-index: 100001;
 }
+
+.link-button {
+  background: none !important;
+  border: none;
+  padding: 0 !important;
+  font-family: arial, sans-serif;
+  color: #069;
+  text-decoration: underline;
+  cursor: pointer;
+}
