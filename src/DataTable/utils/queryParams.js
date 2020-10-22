@@ -662,8 +662,8 @@ export function getQueryParams({
     let newEntityCount = newEntities.length;
     //calculate the sorted, filtered, paged entities for the local table
     if (!isInfinite && !ownProps.controlled_pageSize) {
-      const offset = (page - 1) * ownProps.pageSize;
-      newEntities = take(drop(newEntities, offset), ownProps.pageSize);
+      const offset = (page - 1) * pageSize;
+      newEntities = take(drop(newEntities, offset), pageSize);
     }
     toReturn.entities = newEntities;
     toReturn.entityCount = newEntityCount;
