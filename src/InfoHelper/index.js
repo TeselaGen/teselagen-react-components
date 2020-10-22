@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Popover, Button, Tooltip, Icon } from "@blueprintjs/core";
 import classnames from "classnames";
+import "./style.css";
 
 export default class InfoHelper extends Component {
   render() {
@@ -17,7 +18,6 @@ export default class InfoHelper extends Component {
       color,
       popoverProps = {},
       disabled,
-      noPopoverSizing,
       displayToSide,
       style,
       ...rest
@@ -35,7 +35,7 @@ export default class InfoHelper extends Component {
     let toReturn;
     const toolTipOrPopoverProps = {
       disabled: disabled,
-      popoverClassName: !noPopoverSizing && " bp3-popover-content-sizing",
+      popoverClassName: "tg-info-helper-popover bp3-tooltip",
       content: content || children,
       modifiers: {
         preventOverflow: { enabled: false },

@@ -1,7 +1,7 @@
 <div>
   Default:
   <br />
-  <InfoHelper content={"Hey I'm some helpful info!"} />
+  <InfoHelper content={"Hey I'm some helpful info! And I'm some really long helpful info.. This should wrap lines"} />
   As Button disabled:
   <br />
   <InfoHelper isButton disabled content={"Hey I'm some helpful info!"} />

@@ -108,7 +108,6 @@ function LabelWithTooltipInfo({ label, tooltipInfo }) {
       <InfoHelper
         style={{ marginLeft: "5px", marginTop: "-6px" }}
         size={12}
-        noPopoverSizing
         content={tooltipInfo}
       />
     </div>

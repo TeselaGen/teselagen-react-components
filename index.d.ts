@@ -784,7 +784,6 @@ export interface InfoHelperProps {
   size: integer;
   popoverProps: object;
   disabled: boolean;
-  noPopoverSizing: boolean;
   displayToSide: boolean;
   style: object;
 }
