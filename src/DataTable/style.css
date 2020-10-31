@@ -185,7 +185,7 @@
 }
 
 .tg-sort-arrow-container .bp3-icon {
-  opacity: 0;
+  display: none;
 }
 
 .tg-sort-arrow-container > *:hover {
@@ -193,9 +193,10 @@
 }
 
 .tg-filter-menu-button {
-  opacity: 0;
   cursor: pointer;
+  display: none;
   color: darkgrey;
+  margin-right: 4px;
 }
 
 .tg-filter-menu-button:hover {
@@ -204,17 +205,22 @@
 
 .tg-filter-menu-button.tg-active-filter {
   color: #106ba3;
-  opacity: 1;
 }
 
-.tg-react-table-column-header:hover .tg-sort-arrow-container .bp3-icon {
-  opacity: 1;
+/* this keeps the buttons from jumping around on hover */
+.tg-react-table-column-header.sort-active .tg-filter-menu-button {
   display: block !important;
+  opacity: 0;
 }
 
+.tg-filter-menu-button.tg-active-filter,
+.tg-sort-arrow-container .bp3-icon.active,
+.tg-react-table-column-header:hover .tg-sort-arrow-container .bp3-icon,
 .tg-react-table-column-header:hover .tg-filter-menu-button,
+.tg-filter-menu-button.tg-active-filter,
 .tg-react-table-column-header .bp3-popover-open .tg-filter-menu-button {
-  opacity: 1;
+  display: block !important;
+  opacity: 1 !important;
 }
 
 .data-table-footer {

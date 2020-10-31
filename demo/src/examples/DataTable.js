@@ -266,7 +266,7 @@ class DataTableInstance extends React.Component {
       noSelect: false,
       withTitle: true,
       isViewable: true,
-      minimalStyle: true,
+      minimalStyle: false,
       withSearch: true,
       withPaging: true,
       noDeselectAll: false,

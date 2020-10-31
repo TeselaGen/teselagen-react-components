@@ -1253,11 +1253,10 @@ class DataTable extends React.Component {
           <Icon
             title="Sort Z-A (Hold shift to sort multiple columns)"
             icon="chevron-up"
+            className={classNames({
+              active: sortUp
+            })}
             color={sortUp ? "#106ba3" : undefined}
-            style={{
-              opacity: sortUp ? 1 : undefined,
-              display: sortDown ? "none" : undefined
-            }}
             iconSize={extraCompact ? 10 : 12}
             onClick={e => {
               setOrder("-" + ccDisplayName, sortUp, e.shiftKey);
@@ -1266,12 +1265,11 @@ class DataTable extends React.Component {
           <Icon
             title="Sort A-Z (Hold shift to sort multiple columns)"
             icon="chevron-down"
+            className={classNames({
+              active: sortDown
+            })}
             color={sortDown ? "#106ba3" : undefined}
             iconSize={extraCompact ? 10 : 12}
-            style={{
-              opacity: sortDown ? 1 : undefined,
-              display: sortUp ? "none" : undefined
-            }}
             onClick={e => {
               setOrder(ccDisplayName, sortDown, e.shiftKey);
             }}
@@ -1304,15 +1302,21 @@ class DataTable extends React.Component {
     return (
       <div
         data-test={displayName || startCase(path)}
-        className="tg-react-table-column-header"
+        className={classNames("tg-react-table-column-header", {
+          "sort-active": sortUp || sortDown
+        })}
       >
         {(displayName || startCase(path)) && !noTitle && (
           <span title={columnTitle} className="tg-react-table-name">
             {renderTitleInner ? renderTitleInner : columnTitle}
           </span>
         )}
-        {sortComponent}
-        {filterMenu}
+        <div
+          style={{ display: "flex", marginLeft: "auto", alignItems: "center" }}
+        >
+          {sortComponent}
+          {filterMenu}
+        </div>
       </div>
     );
   };
