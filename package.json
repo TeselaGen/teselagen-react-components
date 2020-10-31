@@ -1,6 +1,6 @@
 {
   "name": "teselagen-react-components",
-  "version": "29.2.52",
+  "version": "29.2.53",
   "description": "Teselagen React Component Library",
   "main": "lib/index.js",
   "types": "./index.d.ts",
