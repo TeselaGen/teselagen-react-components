@@ -71,7 +71,7 @@ class FormComponentsDemo extends React.Component {
               <MenuItem
                 text={
                   <div style={{ display: "flex", alignContent: "center" }}>
-                    Download Example File{" "} &nbsp;&nbsp;
+                    Download Example File &nbsp;&nbsp;
                     <InfoHelper content="I'm some helper text"></InfoHelper>
                   </div>
                 }
@@ -184,41 +184,6 @@ class FormComponentsDemo extends React.Component {
             placeholder="Enter input..."
             onFieldSubmit={onFieldSubmit}
             containerStyle={{ background: "black", height: 200 }}
-          />
-          <InputField
-            name={"inputFieldWithAsyncValidateOnBlur"}
-            inlineLabel={this.state.inlineLabels}
-            label="Input With Async Validate on Blur (default)"
-            onFieldSubmit={onFieldSubmit}
-            asyncValidate={function(value) {
-              return new Promise(resolve => {
-                setTimeout(() => {
-                  if (value === "john") {
-                    resolve("async blur validation failed");
-                  } else {
-                    resolve();
-                  }
-                }, 2000);
-              });
-            }}
-          />
-          <InputField
-            name={"inputFieldWithAsyncValidateOnChange"}
-            inlineLabel={this.state.inlineLabels}
-            validateOnChange
-            label="Input With Async Validate on Change"
-            onFieldSubmit={onFieldSubmit}
-            asyncValidate={function(value) {
-              return new Promise(resolve => {
-                setTimeout(() => {
-                  if (value === "john") {
-                    resolve("async change validation failed");
-                  } else {
-                    resolve();
-                  }
-                }, 2000);
-              });
-            }}
           />
           <InputField
             name={"inputFieldWithTooltipError"}
