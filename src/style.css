@@ -399,3 +399,7 @@ button[aria-label][data-balloon-pos] {
   text-decoration: underline;
   cursor: pointer;
 }
+
+.above-dialog {
+  z-index: 100001;
+}
