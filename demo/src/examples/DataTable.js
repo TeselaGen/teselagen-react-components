@@ -269,6 +269,7 @@ class DataTableInstance extends React.Component {
       minimalStyle: false,
       withSearch: true,
       withPaging: true,
+      getRowClassName: false,
       noDeselectAll: false,
       expandAllByDefault: false,
       withExpandAndCollapseAllButton: false,
@@ -464,6 +465,10 @@ class DataTableInstance extends React.Component {
         {renderToggle({
           that: this,
           type: "withPaging"
+        })}
+        {renderToggle({
+          that: this,
+          type: "getRowClassName"
         })}
         {renderToggle({
           that: this,
@@ -671,6 +676,14 @@ class DataTableInstance extends React.Component {
             expandAllByDefault={this.state.expandAllByDefault}
             selectAllByDefault={this.state.selectAllByDefault}
             withPaging={this.state.withPaging}
+            {...(this.state.getRowClassName && {
+              getRowClassName: rowInfo => {
+                console.log(`rowInfo:`, rowInfo);
+                return {
+                  "custom-getRowClassName": true
+                };
+              }
+            })}
             {...(this.state.controlledPaging && {
               controlled_setPage: () => {
                 console.info(`controlled_setPage hit`);

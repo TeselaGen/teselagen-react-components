@@ -772,7 +772,8 @@ class DataTable extends React.Component {
       mustClickCheckboxToSelect,
       entities,
       isEntityDisabled,
-      change
+      change,
+      getRowClassName
     } = computePresets(this.props);
     if (!rowInfo) {
       return {
@@ -831,9 +832,13 @@ class DataTable extends React.Component {
         }
         this.showContextMenu(newIdMap, e, entity);
       },
-      className: classNames("with-row-data", {
-        selected: rowSelected && !withCheckboxes
-      }),
+      className: classNames(
+        "with-row-data",
+        getRowClassName && getRowClassName(rowInfo, state, this.props),
+        {
+          selected: rowSelected && !withCheckboxes
+        }
+      ),
       "data-test-id": dataId,
       onDoubleClick: () => {
         if (rowDisabled) return;
