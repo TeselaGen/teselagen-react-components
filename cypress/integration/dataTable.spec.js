@@ -5,13 +5,13 @@ describe("formComponents", () => {
       .first()
       .click();
   });
-  //TODO THIS IS BREAKING!
-  it(`it can select entities across pages`, () => {
+  it("can add a custom class name to a row in the table", () => {
     cy.visit("#/DataTable");
     cy.get(".rt-tr-group.custom-getRowClassName").should("not.exist");
     cy.tgToggle("getRowClassName");
     cy.get(".rt-tr-group.custom-getRowClassName").should("exist");
   });
+  //TODO THIS IS BREAKING!
   it.skip(`it can select entities across pages`, () => {
     cy.visit("#/DataTable");
     cy.contains("0 Selected");

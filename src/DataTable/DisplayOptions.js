@@ -173,7 +173,7 @@ export default class DisplayOptions extends React.Component {
               <h5 style={{ marginBottom: 10, marginTop: 10 }}>
                 Displayed Columns:
               </h5>
-              <div style={{ maxHeight: 260, overflowY: "auto" }}>
+              <div style={{ maxHeight: 260, overflowY: "auto", padding: 2 }}>
                 {mainFields.map(getFieldCheckbox)}
               </div>
               <div>{fieldGroupMenu}</div>

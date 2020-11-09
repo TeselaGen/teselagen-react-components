@@ -1108,11 +1108,13 @@ class DataTable extends React.Component {
   getCopyTextForCell = (val, row, column) => {
     // TODOCOPY we need a way to potentially omit certain columns from being added as a \t element (talk to taoh about this)
     let text = typeof val !== "string" ? row.value : val;
+
     const record = row.original;
-    if (column.getClipboardData) {
-      text = column.getClipboardData(row.value, record);
-    } else if (column.render) {
-      text = column.render(row.value, record, row, this.props);
+    const getTextFn =
+      column.getClipboardData || column.getValueToFilterOn || column.render;
+
+    if (getTextFn) {
+      text = getTextFn(row.value, record, row, this.props);
     } else if (text) {
       text = String(text);
     }
