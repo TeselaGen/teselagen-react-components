@@ -1110,11 +1110,12 @@ class DataTable extends React.Component {
     let text = typeof val !== "string" ? row.value : val;
 
     const record = row.original;
-    const getTextFn =
-      column.getClipboardData || column.getValueToFilterOn || column.render;
+    const getTextFn = column.getClipboardData || column.render;
 
     if (getTextFn) {
       text = getTextFn(row.value, record, row, this.props);
+    } else if (column.getValueToFilterOn) {
+      text = column.getValueToFilterOn(record, this.props);
     } else if (text) {
       text = String(text);
     }
