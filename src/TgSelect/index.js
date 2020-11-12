@@ -231,7 +231,9 @@ class TgSelect extends React.Component {
       ...rest
     } = this.props;
 
-    const hasValue = Array.isArray(value) ? value.length > 0 : !!value;
+    const hasValue = Array.isArray(value)
+      ? value.length > 0
+      : !!value && value !== 0;
 
     const rightElement = isLoading ? (
       <Button loading minimal />
