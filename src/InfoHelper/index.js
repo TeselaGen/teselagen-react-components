@@ -70,7 +70,13 @@ export default class InfoHelper extends Component {
           ...(isInline ? {} : { display: "flex" }),
           ...style
         }}
-        className={classnames("info-helper-wrapper", className)}
+        className={classnames(
+          "info-helper-wrapper",
+          {
+            "info-helper-clickable": isPopover
+          },
+          className
+        )}
       >
         {toReturn}
       </El>
