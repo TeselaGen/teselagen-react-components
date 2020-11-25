@@ -821,6 +821,7 @@ export class RenderReactColorPicker extends React.Component {
           }}
           content={
             <SketchPicker
+              className="tg-color-picker-selector"
               color={input.value}
               onChangeComplete={this.handleChange}
               {...removeUnwantedProps(rest)}
@@ -838,6 +839,7 @@ export class RenderReactColorPicker extends React.Component {
             }}
           >
             <div
+              className="tg-color-picker-selected-color"
               style={{
                 width: "36px",
                 height: "14px",
