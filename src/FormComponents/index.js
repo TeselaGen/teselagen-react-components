@@ -428,8 +428,8 @@ export class renderBlueprintTextarea extends React.Component {
       return (
         <React.Fragment>
           <TextArea
-            disabled={isDisabled}
             {...removeUnwantedProps(rest)}
+            disabled={rest.disabled || isDisabled}
             className={classNames(
               intentClass,
               inputClassName,
