@@ -217,6 +217,6 @@
   align-items: center;
 }
 
-.bp3-form-group .info-helper-wrapper {
+.bp3-form-group .info-helper-wrapper:not(.info-helper-wrapper-noMarginTop) {
   margin-top: -9px !important;
 }

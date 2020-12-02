@@ -777,6 +777,7 @@ export interface InfoHelperProps {
   children: any;
   icon: string;
   color: string;
+  noMarginTop: boolean;
   clickable: boolean;
   isPopover: boolean;
   isInline: boolean;

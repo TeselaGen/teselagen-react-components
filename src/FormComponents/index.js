@@ -2,7 +2,7 @@ import classNames from "classnames";
 import { SketchPicker } from "react-color";
 import { isNumber, noop, kebabCase, isPlainObject, isEqual } from "lodash";
 import mathExpressionEvaluator from "math-expression-evaluator";
-import React from "react";
+import React, { useContext, useState } from "react";
 import { Field, touch, change } from "redux-form";
 
 import "./style.css";
@@ -23,11 +23,13 @@ import {
 } from "@blueprintjs/core";
 
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
+import useDeepCompareEffect from "use-deep-compare-effect";
 import TgSelect from "../TgSelect";
 import TgSuggest from "../TgSuggest";
 import InfoHelper from "../InfoHelper";
 import getMomentFormatter from "../utils/getMomentFormatter";
 import AsyncValidateFieldSpinner from "../AsyncValidateFieldSpinner";
+import { AssignDefaultsModeContext } from "../AssignDefaultsModeContext";
 import Uploader from "./Uploader";
 import sortify from "./sortify";
 import { fieldRequired } from "./utils";
@@ -132,17 +134,23 @@ class AbstractInput extends React.Component {
   }
 
   componentDidUpdate(oldProps) {
-    const { defaultValue: oldDefaultValue } = oldProps;
+    const {
+      defaultValue: oldDefaultValue,
+      defaultValCount: oldDefaultValCount
+    } = oldProps;
     const {
       touchOnChange,
       meta: { touched, dispatch, form },
       defaultValue,
+      defaultValCount,
       enableReinitialize,
       input: { name, value }
     } = this.props;
 
     if (
-      ((value !== false && !value) || enableReinitialize) &&
+      ((value !== false && !value) ||
+        enableReinitialize ||
+        defaultValCount !== oldDefaultValCount) &&
       !isEqual(defaultValue, oldDefaultValue)
     ) {
       this.updateDefaultValue();
@@ -1008,9 +1016,41 @@ export function generateField(component, opts) {
 
 export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
   return props => {
+    const { generateDefaultValue, ...rest } = props;
+    //get is assign defaults mode
+    //if assign default value mode then add on to the component
+    const [count, updateCount] = React.useState(0);
+    const [defaultValCount, setDefaultValCount] = React.useState(0);
+    const [defaultValue, setDefault] = useState(props.defaultValue);
+    const [allowUserOverride, setUserOverride] = useState(true);
+    const [isLoading, setLoading] = useState(false);
+    const { inAssignDefaultsMode } = useContext(AssignDefaultsModeContext);
+    // if generateDefaultValue, hit the backend for that value
+    useDeepCompareEffect(() => {
+      if (!window.__triggerGetDefaultValueRequest) return;
+      if (!generateDefaultValue) return;
+      setLoading(true);
+
+      (async () => {
+        try {
+          const res = await window.__triggerGetDefaultValueRequest(
+            generateDefaultValue.code,
+            generateDefaultValue.customParams
+          );
+          setDefault(res.defaultValue);
+          setUserOverride(res.allowUserOverride);
+          setDefaultValCount(defaultValCount + 1);
+        } catch (error) {
+          console.error(`error aswf298f:`, error);
+        }
+        setLoading(false);
+      })();
+    }, [generateDefaultValue || {}, count]);
     // const asyncValidating = props.asyncValidating;
     let defaultProps = {
-      ...props,
+      ...rest,
+      defaultValue,
+      disabled: props.disabled || isLoading || allowUserOverride === false,
       intent: getIntent(props),
       intentClass: getIntentClass(props)
     };
@@ -1021,7 +1061,24 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
     //   delete defaultProps.intentClass;
     // }
     return (
-      <AbstractInput {...{ ...opts, ...defaultProps }}>
+      <AbstractInput {...{ ...opts, defaultValCount, ...defaultProps }}>
+        {inAssignDefaultsMode && generateDefaultValue && (
+          <Button
+            onClick={() =>
+              window.__showAssignDefaultValueModal &&
+              window.__showAssignDefaultValueModal({
+                ...props,
+                onFinish: () => {
+                  updateCount(count + 1);
+                }
+              })
+            }
+            small
+            style={{ background: "yellow", color: "black" }}
+          >
+            Assign Default
+          </Button>
+        )}
         <ComponentToWrap {...defaultProps} />
       </AbstractInput>
     );
