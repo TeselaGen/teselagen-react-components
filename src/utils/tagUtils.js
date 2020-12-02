@@ -40,7 +40,6 @@ export function getTagColorStyle(color) {
 export function getTagProps(vals) {
   return {
     ...getTagColorStyle(vals.color),
-    children: vals.label || vals.name,
-    ...vals
+    children: vals.label || vals.name
   };
 }
