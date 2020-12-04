@@ -25,6 +25,7 @@ import {
 
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
 import useDeepCompareEffect from "use-deep-compare-effect";
+import { difference } from "lodash";
 import TgSelect from "../TgSelect";
 import TgSuggest from "../TgSuggest";
 import InfoHelper from "../InfoHelper";
@@ -190,6 +191,8 @@ class AbstractInput extends React.Component {
       leftEl,
       rightEl,
       noOuterLabel,
+      assignDefaultButton,
+      showGenerateDefaultDot,
       input,
       noFillField
     } = this.props;
@@ -248,6 +251,16 @@ class AbstractInput extends React.Component {
         labelInfo={secondaryLabel}
         style={containerStyle}
       >
+        {showGenerateDefaultDot && (
+          <div
+            style={{ zIndex: 10, position: "relative", height: 0, width: 0 }}
+          >
+            <Tooltip content="Allows a Default to be Set. Enter Set Default Mode by pressing Cmd+Shift+I">
+              <div className="generateDefaultDot"></div>
+            </Tooltip>
+          </div>
+        )}
+        {assignDefaultButton}
         {leftEl} {componentToWrap} {rightEl}
       </FormGroup>
     );
@@ -1017,6 +1030,34 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
       if (!window.__triggerGetDefaultValueRequest) return;
       if (!generateDefaultValue) return;
       setLoading(true);
+      //custom params should match params keys. if not throw an error
+      const doParamsMatch = isEqual(
+        Object.keys(generateDefaultValue.params || {}).sort(),
+        Object.keys(generateDefaultValue.customParams || {}).sort()
+      );
+      if (!doParamsMatch) {
+        console.warn(
+          `Issue with generateDefaultValue. customParams don't match params`
+        );
+        console.warn(
+          `generateDefaultValue.params:`,
+          generateDefaultValue.params
+        );
+        console.warn(
+          `generateDefaultValue.customParams:`,
+          generateDefaultValue.customParams
+        );
+        throw new Error(
+          `Issue with generateDefaultValue code=${
+            generateDefaultValue.code
+          }: Difference detected with: ${difference(
+            Object.keys(generateDefaultValue.params || {}),
+            Object.keys(generateDefaultValue.customParams || {})
+          ).join(
+            ", "
+          )}. customParams passed into the field should match params (as defined in defaultValueConstants.js). See console for more details.`
+        );
+      }
 
       (async () => {
         try {
@@ -1048,26 +1089,36 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
     //   delete defaultProps.intentClass;
     // }
     return (
-      <AbstractInput {...{ ...opts, defaultValCount, ...defaultProps }}>
-        {inAssignDefaultsMode && generateDefaultValue && (
-          <Button
-            onClick={() =>
-              window.__showAssignDefaultValueModal &&
-              window.__showAssignDefaultValueModal({
-                ...props,
-                onFinish: () => {
-                  updateCount(count + 1);
+      <React.Fragment>
+        <AbstractInput
+          {...{
+            ...opts,
+            defaultValCount,
+            ...defaultProps,
+            showGenerateDefaultDot:
+              !inAssignDefaultsMode && !!generateDefaultValue,
+            assignDefaultButton: inAssignDefaultsMode && generateDefaultValue && (
+              <Button
+                onClick={() =>
+                  window.__showAssignDefaultValueModal &&
+                  window.__showAssignDefaultValueModal({
+                    ...props,
+                    onFinish: () => {
+                      updateCount(count + 1);
+                    }
+                  })
                 }
-              })
-            }
-            small
-            style={{ background: "yellow", color: "black" }}
-          >
-            Assign Default
-          </Button>
-        )}
-        <ComponentToWrap {...defaultProps} />
-      </AbstractInput>
+                small
+                style={{ background: "yellow", color: "black" }}
+              >
+                Assign Default
+              </Button>
+            )
+          }}
+        >
+          <ComponentToWrap {...defaultProps} />
+        </AbstractInput>
+      </React.Fragment>
     );
   };
 };

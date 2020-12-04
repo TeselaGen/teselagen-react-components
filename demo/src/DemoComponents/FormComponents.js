@@ -152,6 +152,7 @@ class FormComponentsDemo extends React.Component {
             ]}
           />
           <NumericInputField
+            generateDefaultValue={{}} //just here to see the css
             secondaryLabel="(optional)"
             name={"numericInput"}
             tooltipInfo="hello hello I'm tooltipInfo"
