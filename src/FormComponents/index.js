@@ -167,9 +167,12 @@ class AbstractInput extends React.Component {
     const {
       defaultValue,
       input: { name },
-      meta: { dispatch, form }
+      meta: { dispatch, form },
+      onDefaultValChanged
     } = this.props;
     dispatch(change(form, name, defaultValue));
+    onDefaultValChanged &&
+      onDefaultValChanged(defaultValue, name, form, this.props);
   };
 
   render() {
@@ -1096,7 +1099,10 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
             defaultValCount,
             ...defaultProps,
             showGenerateDefaultDot:
-              !inAssignDefaultsMode && !!generateDefaultValue,
+              !inAssignDefaultsMode &&
+              window.__showGenerateDefaultDot &&
+              window.__showGenerateDefaultDot() &&
+              !!generateDefaultValue,
             assignDefaultButton: inAssignDefaultsMode && generateDefaultValue && (
               <Button
                 onClick={() =>

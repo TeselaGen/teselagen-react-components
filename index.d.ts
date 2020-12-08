@@ -459,6 +459,8 @@ export interface GenericFormFieldProps {
   rightEl: any;
   children: any;
   defaultValue: any;
+  onDefaultValChanged: function;
+  generateDefaultValue: any;
   tooltipProps: any;
   tooltipError: any;
   disabled: boolean;
