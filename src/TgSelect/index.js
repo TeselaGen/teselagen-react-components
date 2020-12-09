@@ -224,6 +224,7 @@ class TgSelect extends React.Component {
       inputProps,
       placeholder,
       isLoading,
+      disallowClear,
       onBlur,
       disabled,
       popoverProps,
@@ -239,7 +240,7 @@ class TgSelect extends React.Component {
       <Button loading minimal />
     ) : (
       <span>
-        {hasValue && !disabled && (
+        {hasValue && !disallowClear && !disabled && (
           <Button
             className="tg-select-clear-all"
             icon="cross"
