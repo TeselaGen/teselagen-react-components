@@ -1019,12 +1019,16 @@ export function generateField(component, opts) {
 
 export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
   return props => {
-    const { generateDefaultValue, ...rest } = props;
+    const {
+      generateDefaultValue,
+      defaultValue: defaultValueFromProps,
+      ...rest
+    } = props;
     //get is assign defaults mode
     //if assign default value mode then add on to the component
     const [count, updateCount] = React.useState(0);
     const [defaultValCount, setDefaultValCount] = React.useState(0);
-    const [defaultValue, setDefault] = useState(props.defaultValue);
+    const [defaultValueFromBackend, setDefault] = useState();
     const [allowUserOverride, setUserOverride] = useState(true);
     const [isLoading, setLoading] = useState(false);
     const { inAssignDefaultsMode } = useContext(AssignDefaultsModeContext);
@@ -1080,7 +1084,7 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
     // const asyncValidating = props.asyncValidating;
     let defaultProps = {
       ...rest,
-      defaultValue,
+      defaultValue: defaultValueFromBackend || defaultValueFromProps,
       disabled: props.disabled || isLoading || allowUserOverride === false,
       intent: getIntent(props),
       intentClass: getIntentClass(props)
