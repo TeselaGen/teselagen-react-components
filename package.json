@@ -1,6 +1,6 @@
 {
   "name": "teselagen-react-components",
-  "version": "29.2.63",
+  "version": "29.2.68",
   "description": "Teselagen React Component Library",
   "main": "lib/index.js",
   "types": "./index.d.ts",
@@ -54,7 +54,8 @@
     "recompose": "^0.30.0",
     "redux-form": "^7.4.2",
     "tg-client-query-builder": "^2.12.2",
-    "uniqid": "^5.2.0"
+    "uniqid": "^5.2.0",
+    "use-deep-compare-effect": "^1.5.0"
   },
   "devDependencies": {
     "@types/lodash": "npm:@types/lodash-es",

@@ -6,7 +6,7 @@ class TgSelectDemo extends React.Component {
   render() {
     // const {} = this.props;
 
-    const { multi, isTagSelect, val, creatable, hasError } = this.state;
+    const { multi, isTagSelect, val, creatable, disallowClear, hasError } = this.state;
 
     return (
       <div>
@@ -20,6 +20,7 @@ class TgSelectDemo extends React.Component {
           multi={multi || isTagSelect}
           intent={hasError ? "danger" : ""}
           creatable={creatable}
+          disallowClear={disallowClear}
           value={val}
           autoFocus
           options={[
@@ -46,6 +47,11 @@ class TgSelectDemo extends React.Component {
         {renderToggle({
           that: this,
           type: "multi"
+          // type: "reactSelectFieldcreatable"
+        })}
+        {renderToggle({
+          that: this,
+          type: "disallowClear"
           // type: "reactSelectFieldcreatable"
         })}
         {renderToggle({

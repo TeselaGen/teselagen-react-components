@@ -217,6 +217,20 @@
   align-items: center;
 }
 
-.bp3-form-group .info-helper-wrapper {
+.bp3-form-group .info-helper-wrapper:not(.info-helper-wrapper-noMarginTop) {
   margin-top: -9px !important;
+}
+
+.generateDefaultDot {
+  position: absolute;
+  border-radius: 50%;
+  background: #ffca00;
+  box-shadow: 0px 0px 2px black;
+  height: 5px;
+  width: 5px;
+  left: 0px;
+  top: 0px;
+}
+.bp3-dark .generateDefaultDot {
+  background: yellow;
 }

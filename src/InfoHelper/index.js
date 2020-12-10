@@ -16,6 +16,7 @@ export default class InfoHelper extends Component {
       isInline,
       clickable,
       color,
+      noMarginTop,
       popoverProps = {},
       disabled,
       displayToSide,
@@ -73,6 +74,7 @@ export default class InfoHelper extends Component {
         className={classnames(
           "info-helper-wrapper",
           {
+            "info-helper-wrapper-noMarginTop": noMarginTop,
             "info-helper-clickable": isPopover
           },
           className

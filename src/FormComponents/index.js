@@ -2,7 +2,7 @@ import classNames from "classnames";
 import { SketchPicker } from "react-color";
 import { isNumber, noop, kebabCase, isPlainObject, isEqual } from "lodash";
 import mathExpressionEvaluator from "math-expression-evaluator";
-import React from "react";
+import React, { useContext, useState } from "react";
 import { Field, touch, change } from "redux-form";
 
 import "./style.css";
@@ -24,11 +24,14 @@ import {
 } from "@blueprintjs/core";
 
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
+import useDeepCompareEffect from "use-deep-compare-effect";
+import { difference } from "lodash";
 import TgSelect from "../TgSelect";
 import TgSuggest from "../TgSuggest";
 import InfoHelper from "../InfoHelper";
 import getMomentFormatter from "../utils/getMomentFormatter";
 import AsyncValidateFieldSpinner from "../AsyncValidateFieldSpinner";
+import { AssignDefaultsModeContext } from "../AssignDefaultsModeContext";
 import Uploader from "./Uploader";
 import sortify from "./sortify";
 import { fieldRequired } from "./utils";
@@ -133,17 +136,23 @@ class AbstractInput extends React.Component {
   }
 
   componentDidUpdate(oldProps) {
-    const { defaultValue: oldDefaultValue } = oldProps;
+    const {
+      defaultValue: oldDefaultValue,
+      defaultValCount: oldDefaultValCount
+    } = oldProps;
     const {
       touchOnChange,
       meta: { touched, dispatch, form },
       defaultValue,
+      defaultValCount,
       enableReinitialize,
       input: { name, value }
     } = this.props;
 
     if (
-      ((value !== false && !value) || enableReinitialize) &&
+      ((value !== false && !value) ||
+        enableReinitialize ||
+        defaultValCount !== oldDefaultValCount) &&
       !isEqual(defaultValue, oldDefaultValue)
     ) {
       this.updateDefaultValue();
@@ -158,9 +167,12 @@ class AbstractInput extends React.Component {
     const {
       defaultValue,
       input: { name },
-      meta: { dispatch, form }
+      meta: { dispatch, form },
+      onDefaultValChanged
     } = this.props;
     dispatch(change(form, name, defaultValue));
+    onDefaultValChanged &&
+      onDefaultValChanged(defaultValue, name, form, this.props);
   };
 
   render() {
@@ -182,6 +194,8 @@ class AbstractInput extends React.Component {
       leftEl,
       rightEl,
       noOuterLabel,
+      assignDefaultButton,
+      showGenerateDefaultDot,
       input,
       noFillField
     } = this.props;
@@ -240,6 +254,16 @@ class AbstractInput extends React.Component {
         labelInfo={secondaryLabel}
         style={containerStyle}
       >
+        {showGenerateDefaultDot && (
+          <div
+            style={{ zIndex: 10, position: "relative", height: 0, width: 0 }}
+          >
+            <Tooltip content="Allows a Default to be Set. Enter Set Default Mode by pressing Cmd+Shift+I">
+              <div className="generateDefaultDot"></div>
+            </Tooltip>
+          </div>
+        )}
+        {assignDefaultButton}
         {leftEl} {componentToWrap} {rightEl}
       </FormGroup>
     );
@@ -420,8 +444,8 @@ export class renderBlueprintTextarea extends React.Component {
       return (
         <React.Fragment>
           <TextArea
-            disabled={isDisabled}
             {...removeUnwantedProps(rest)}
+            disabled={rest.disabled || isDisabled}
             className={classNames(
               intentClass,
               inputClassName,
@@ -995,9 +1019,69 @@ export function generateField(component, opts) {
 
 export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
   return props => {
+    const { generateDefaultValue, ...rest } = props;
+    //get is assign defaults mode
+    //if assign default value mode then add on to the component
+    const [count, updateCount] = React.useState(0);
+    const [defaultValCount, setDefaultValCount] = React.useState(0);
+    const [defaultValue, setDefault] = useState(props.defaultValue);
+    const [allowUserOverride, setUserOverride] = useState(true);
+    const [isLoading, setLoading] = useState(false);
+    const { inAssignDefaultsMode } = useContext(AssignDefaultsModeContext);
+    // if generateDefaultValue, hit the backend for that value
+    useDeepCompareEffect(() => {
+      if (!window.__triggerGetDefaultValueRequest) return;
+      if (!generateDefaultValue) return;
+      setLoading(true);
+      //custom params should match params keys. if not throw an error
+      const doParamsMatch = isEqual(
+        Object.keys(generateDefaultValue.params || {}).sort(),
+        Object.keys(generateDefaultValue.customParams || {}).sort()
+      );
+      if (!doParamsMatch) {
+        console.warn(
+          `Issue with generateDefaultValue. customParams don't match params`
+        );
+        console.warn(
+          `generateDefaultValue.params:`,
+          generateDefaultValue.params
+        );
+        console.warn(
+          `generateDefaultValue.customParams:`,
+          generateDefaultValue.customParams
+        );
+        throw new Error(
+          `Issue with generateDefaultValue code=${
+            generateDefaultValue.code
+          }: Difference detected with: ${difference(
+            Object.keys(generateDefaultValue.params || {}),
+            Object.keys(generateDefaultValue.customParams || {})
+          ).join(
+            ", "
+          )}. customParams passed into the field should match params (as defined in defaultValueConstants.js). See console for more details.`
+        );
+      }
+
+      (async () => {
+        try {
+          const res = await window.__triggerGetDefaultValueRequest(
+            generateDefaultValue.code,
+            generateDefaultValue.customParams
+          );
+          setDefault(res.defaultValue);
+          setUserOverride(res.allowUserOverride);
+          setDefaultValCount(defaultValCount + 1);
+        } catch (error) {
+          console.error(`error aswf298f:`, error);
+        }
+        setLoading(false);
+      })();
+    }, [generateDefaultValue || {}, count]);
     // const asyncValidating = props.asyncValidating;
     let defaultProps = {
-      ...props,
+      ...rest,
+      defaultValue,
+      disabled: props.disabled || isLoading || allowUserOverride === false,
       intent: getIntent(props),
       intentClass: getIntentClass(props)
     };
@@ -1008,9 +1092,39 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
     //   delete defaultProps.intentClass;
     // }
     return (
-      <AbstractInput {...{ ...opts, ...defaultProps }}>
-        <ComponentToWrap {...defaultProps} />
-      </AbstractInput>
+      <React.Fragment>
+        <AbstractInput
+          {...{
+            ...opts,
+            defaultValCount,
+            ...defaultProps,
+            showGenerateDefaultDot:
+              !inAssignDefaultsMode &&
+              window.__showGenerateDefaultDot &&
+              window.__showGenerateDefaultDot() &&
+              !!generateDefaultValue,
+            assignDefaultButton: inAssignDefaultsMode && generateDefaultValue && (
+              <Button
+                onClick={() =>
+                  window.__showAssignDefaultValueModal &&
+                  window.__showAssignDefaultValueModal({
+                    ...props,
+                    onFinish: () => {
+                      updateCount(count + 1);
+                    }
+                  })
+                }
+                small
+                style={{ background: "yellow", color: "black" }}
+              >
+                Assign Default
+              </Button>
+            )
+          }}
+        >
+          <ComponentToWrap {...defaultProps} />
+        </AbstractInput>
+      </React.Fragment>
     );
   };
 };

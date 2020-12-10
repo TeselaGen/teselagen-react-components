@@ -152,6 +152,7 @@ class FormComponentsDemo extends React.Component {
             ]}
           />
           <NumericInputField
+            generateDefaultValue={{}} //just here to see the css
             secondaryLabel="(optional)"
             name={"numericInput"}
             tooltipInfo="hello hello I'm tooltipInfo"
@@ -394,6 +395,7 @@ class FormComponentsDemo extends React.Component {
           <ReactSelectField
             name="reactSelectField"
             resetOnSelect
+            disallowClear
             inlineLabel={this.state.inlineLabels}
             label="ReactSelectField Collaborators"
             placeholder="This has a long placeholder, wow, I hope it fits"
