@@ -12,6 +12,28 @@ const SearchBar = ({
   disabled,
   autoFocusSearch
 }) => {
+  let rightElement;
+  // need to always render searchMenuButton so it doesn't close
+  if (searchMenuButton) {
+    rightElement = (
+      <div style={{ display: "flex" }}>
+        {loading && <Spinner size="18" />}
+        {searchMenuButton}
+      </div>
+    );
+  } else {
+    rightElement = loading ? (
+      <Spinner size="18" />
+    ) : (
+      <Button
+        minimal
+        icon="search"
+        onClick={() => {
+          setSearchTerm(reduxFormSearchInput);
+        }}
+      />
+    );
+  }
   return (
     <InputField
       autoFocus={autoFocusSearch}
@@ -25,21 +47,7 @@ const SearchBar = ({
         e.preventDefault();
         setSearchTerm(reduxFormSearchInput);
       })}
-      rightElement={
-        loading ? (
-          <Spinner size="18" />
-        ) : (
-          searchMenuButton || (
-            <Button
-              minimal
-              icon="search"
-              onClick={() => {
-                setSearchTerm(reduxFormSearchInput);
-              }}
-            />
-          )
-        )
-      }
+      rightElement={rightElement}
     />
   );
 };

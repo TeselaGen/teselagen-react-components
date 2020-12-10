@@ -54,7 +54,8 @@ class TgSelect extends React.Component {
     return i.label;
   };
 
-  handleItemSelect = item => {
+  handleItemSelect = (item, e) => {
+    e.stopPropagation();
     const { onChange, value, multi, closeOnSelect, isTagSelect } = this.props;
     this.setState({ activeItem: null });
     if (multi) {
