@@ -1085,7 +1085,8 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
     let defaultProps = {
       ...rest,
       defaultValue: defaultValueFromBackend || defaultValueFromProps,
-      disabled: props.disabled || isLoading || allowUserOverride === false,
+      disabled: props.disabled || allowUserOverride === false,
+      readOnly: props.readOnly || isLoading,
       intent: getIntent(props),
       intentClass: getIntentClass(props)
     };
