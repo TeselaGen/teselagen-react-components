@@ -9,6 +9,11 @@ describe("formComponents", () => {
       .contains("Kyle Craft")
       .click();
     cy.get("@inputWrapper").contains(`.bp3-tag`, "Kyle Craft");
+    cy.contains("label", "disallowClear").click();
+    cy.get(".tg-test-react-select-field .tg-select .bp3-icon-cross").should(
+      "not.exist"
+    );
+    cy.contains("label", "disallowClear").click();
     cy.get("@inputWrapper")
       .find(".bp3-icon-cross")
       .click();

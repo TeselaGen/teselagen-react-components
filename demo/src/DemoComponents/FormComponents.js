@@ -392,10 +392,15 @@ class FormComponentsDemo extends React.Component {
             label: "creatable",
             type: "reactSelectFieldcreatable"
           })}
+          {renderToggle({
+            that: this,
+            label: "disallowClear",
+            type: "reactSelectFielddisallowClear"
+          })}
           <ReactSelectField
             name="reactSelectField"
             resetOnSelect
-            disallowClear
+            disallowClear={this.state.reactSelectFielddisallowClear}
             inlineLabel={this.state.inlineLabels}
             label="ReactSelectField Collaborators"
             placeholder="This has a long placeholder, wow, I hope it fits"
@@ -498,7 +503,6 @@ class FormComponentsDemo extends React.Component {
             label="ReactColorField"
             onFieldSubmit={onFieldSubmit}
           />
-          ƒ
           <Button
             intent="success"
             text="Submit Form"
