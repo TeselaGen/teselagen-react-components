@@ -14,7 +14,6 @@ import ResizableDraggableDialog from "../../src/ResizableDraggableDialog";
 
 import CustomIcons from "./examples/CustomIcons";
 import CSSOnlyToolTip from "./examples/CSSOnlyToolTip";
-import S3Uploader from "./examples/S3Uploader";
 import SimpleTable from "./examples/SimpleTable";
 import TgSelectDemo from "./examples/TgSelectDemo";
 import InfoHelper from "./examples/InfoHelper";
@@ -380,20 +379,6 @@ const demos = {
       renderToggle
     },
     demo: CSSOnlyToolTip
-  },
-  S3Uploader: {
-    scope: {
-      renderToggle,
-      Provider,
-      store,
-      reduxForm,
-      Uploader,
-      FileUploadField,
-      Button,
-      S3Download,
-      magicDownload
-    },
-    demo: S3Uploader
   },
   FillWindow: {
     demo: FillWindowExample,

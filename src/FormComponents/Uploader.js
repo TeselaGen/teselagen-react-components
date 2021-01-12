@@ -6,7 +6,6 @@ import Dropzone from "react-dropzone";
 import uniqid from "uniqid";
 import classnames from "classnames";
 import { some, forEach, map, every, compact, findIndex, merge } from "lodash";
-import S3Upload from "../utils/S3upload";
 import ItemUpload from "./itemUpload";
 
 function noop() {}
@@ -91,43 +90,6 @@ class Uploader extends Component {
       error: JSON.stringify(e)
     });
     this.checkLoadings(up);
-  };
-
-  sendFiles = async files => {
-    const up = this.state.uploading;
-    files.forEach(file => {
-      const f = new File([file.originFileObj], uniqid(), {
-        type: file.originFileObj.type,
-        id: file.id
-      });
-      const options = this.props.S3Params;
-      options.files = [f];
-      options.fileId = file.id;
-      options.onProgress = options.onProgress || this.showProgress;
-      options.onFinish = options.onFinish || this.onFinishUpload;
-      options.onError = options.onError || this.onUploadError;
-
-      options.signingUrlWithCredentials = true;
-
-      // If you want to upload to a different bucket, pass a different signingURL and adjust params on the server!
-      options.signingUrl = options.signingUrl || "/s3/sign";
-
-      if (!this.uploadingFiles[file.id]) {
-        up[file.id] = {
-          loading: true,
-          percentage: 0,
-          error: null,
-          saved: false,
-          originalFileName: file.name
-        };
-        file.loading = true;
-        this.uploadingFiles[file.id] = new S3Upload(options);
-      }
-    });
-    this.setState({
-      loading: true,
-      uploading: up
-    });
   };
 
   abortUpload = item => {
@@ -233,8 +195,7 @@ class Uploader extends Component {
       overflowList,
       showFilesCount,
       threeDotMenuItems,
-      onPreviewClick,
-      S3Params // if this is defined we assume we want to upload to aws s3 (or minio)
+      onPreviewClick
     } = this.props;
 
     let contentOverride = maybeContentOverride;
@@ -333,10 +294,6 @@ class Uploader extends Component {
                   : true;
                 if (!keepGoing) return;
 
-                if (S3Params) {
-                  // this is s3/minio upload
-                  return this.sendFiles(cleanedFileList);
-                }
                 if (action) {
                   if (uploadInBulk) {
                     //tnr: not yet implemented
@@ -363,7 +320,7 @@ class Uploader extends Component {
                         const data = new FormData();
                         data.append("file", fileToUpload);
 
-                        return axios
+                        return (window.api || axios)
                           .post(action, data)
                           .then(function(res) {
                             responses.push(res.data && res.data[0]);
@@ -471,8 +428,6 @@ class Uploader extends Component {
                 }
                 return fileListItemRenderer ? (
                   fileListItemRenderer(file, self)
-                ) : S3Params ? (
-                  this.itemListRender(file, self)
                 ) : (
                   <div key={index} className="tg-upload-file-list-item">
                     <div>
