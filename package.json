@@ -25,7 +25,8 @@
     "fontsave": "make fontsave",
     "analyze-build": "ANALYZE_BUNDLE=1 yarn buildWithDemo && webpack-bundle-analyzer demo/dist/stats.json build",
     "c": "yarn cypress open",
-    "test": "yarn cypress run"
+    "test": "yarn cypress run",
+    "version": "auto-changelog -p && git add CHANGELOG.md"
   },
   "dependencies": {
     "@blueprintjs/core": "^3.26.0",
@@ -59,6 +60,7 @@
   },
   "devDependencies": {
     "@types/lodash": "npm:@types/lodash-es",
+    "auto-changelog": "^2.2.1",
     "chance": "^1.1.4",
     "cypress": "^4.5.0",
     "eslint": "^6.8.0",
