@@ -463,6 +463,7 @@ export interface GenericFormFieldProps {
   generateDefaultValue: any;
   tooltipProps: any;
   tooltipError: any;
+  isLabelTooltip: boolean;
   disabled: boolean;
   intent: Blueprint.Intent;
   tooltipInfo: any;

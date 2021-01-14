@@ -67,6 +67,7 @@ function removeUnwantedProps(props) {
   delete cleanedProps.className;
   delete cleanedProps.units;
   delete cleanedProps.inlineLabel;
+  delete cleanedProps.isLabelTooltip;
   delete cleanedProps.showErrorIfUntouched;
   delete cleanedProps.onChange;
   delete cleanedProps.containerStyle;
@@ -185,6 +186,7 @@ class AbstractInput extends React.Component {
       tooltipInfo,
       label,
       inlineLabel,
+      isLabelTooltip,
       secondaryLabel,
       className,
       showErrorIfUntouched,
@@ -206,20 +208,21 @@ class AbstractInput extends React.Component {
       (touched || showErrorIfUntouched) && error && !asyncValidating;
     const showWarning = (touched || showErrorIfUntouched) && warning;
 
-    let componentToWrap = tooltipError ? (
-      <Tooltip
-        disabled={!showError}
-        intent={error ? "danger" : "warning"}
-        content={error || warning}
-        position={Position.TOP}
-        modifiers={popoverOverflowModifiers}
-        {...tooltipProps}
-      >
-        {children}
-      </Tooltip>
-    ) : (
-      children
-    );
+    let componentToWrap =
+      isLabelTooltip || tooltipError ? (
+        <Tooltip
+          disabled={isLabelTooltip ? false : !showError}
+          intent={isLabelTooltip ? "none" : error ? "danger" : "warning"}
+          content={isLabelTooltip ? label : error || warning}
+          position={Position.TOP}
+          modifiers={popoverOverflowModifiers}
+          {...tooltipProps}
+        >
+          {children}
+        </Tooltip>
+      ) : (
+        children
+      );
     const testClassName = "tg-test-" + kebabCase(input.name);
     if (noFillField) {
       componentToWrap = (
@@ -246,6 +249,7 @@ class AbstractInput extends React.Component {
         helperText={helperText}
         intent={intent}
         label={
+          !isLabelTooltip &&
           !noOuterLabel && (
             <LabelWithTooltipInfo label={label} tooltipInfo={tooltipInfo} />
           )

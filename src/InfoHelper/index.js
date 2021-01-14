@@ -27,7 +27,6 @@ export default class InfoHelper extends Component {
     const iconProps = {
       icon,
       color,
-      className,
       disabled
     };
     if (!isButton) iconProps.iconSize = size;
@@ -35,7 +34,7 @@ export default class InfoHelper extends Component {
     const IconInner = <IconToUse {...iconProps} {...rest} />;
     let toReturn;
     const toolTipOrPopoverProps = {
-      disabled: disabled,
+      disabled: disabled || window.Cypress,
       popoverClassName: "tg-info-helper-popover bp3-tooltip",
       content: content || children,
       modifiers: {
