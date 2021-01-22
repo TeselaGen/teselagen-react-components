@@ -262,7 +262,7 @@ class AbstractInput extends React.Component {
           <div
             style={{ zIndex: 10, position: "relative", height: 0, width: 0 }}
           >
-            <Tooltip content="Allows a Default to be Set. Enter Set Default Mode by pressing Cmd+Shift+I">
+            <Tooltip content="Allows a Default to be Set. Enter Set Default Mode by pressing Shift+D">
               <div className="generateDefaultDot"></div>
             </Tooltip>
           </div>
