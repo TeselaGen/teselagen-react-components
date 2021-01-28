@@ -34,7 +34,7 @@ export default class InfoHelper extends Component {
     const IconInner = <IconToUse {...iconProps} {...rest} />;
     let toReturn;
     const toolTipOrPopoverProps = {
-      disabled: disabled || window.Cypress,
+      disabled: disabled || (!isPopover && window.Cypress),
       popoverClassName: "tg-info-helper-popover bp3-tooltip",
       content: content || children,
       modifiers: {
