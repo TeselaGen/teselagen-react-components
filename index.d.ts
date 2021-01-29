@@ -528,6 +528,7 @@ export interface FileUploadFieldProps extends GenericFormFieldProps {
   onFileClick: function;
   dropzoneProps: object;
   showFilesCount: boolean;
+  axiosInstance: object;
 }
 
 /**

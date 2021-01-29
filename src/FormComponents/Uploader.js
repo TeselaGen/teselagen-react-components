@@ -195,7 +195,8 @@ class Uploader extends Component {
       overflowList,
       showFilesCount,
       threeDotMenuItems,
-      onPreviewClick
+      onPreviewClick,
+      axiosInstance = window.api || axios
     } = this.props;
 
     let contentOverride = maybeContentOverride;
@@ -320,7 +321,7 @@ class Uploader extends Component {
                         const data = new FormData();
                         data.append("file", fileToUpload);
 
-                        return (window.api || axios)
+                        return axiosInstance
                           .post(action, data)
                           .then(function(res) {
                             responses.push(res.data && res.data[0]);
