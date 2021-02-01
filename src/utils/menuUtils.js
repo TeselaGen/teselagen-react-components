@@ -165,6 +165,7 @@ const dividerShorthandEnhancer = def =>
 const unwantedAttrs = [
   "submenu",
   "hotkey",
+  "changingProps",
   "showInSearchMenu",
   "hideFromMenuSearch"
 ];
@@ -284,7 +285,7 @@ export function showCommandContextMenu(
     [commandMenuEnhancer(commands, config)],
     event,
     onClose,
-    context,
+    context
   );
 }
 
@@ -348,7 +349,6 @@ export function showContextMenu(
   if (!menuDef) return;
 
   const MenuComponent = menuComp;
-  console.log(`event:`,event)
   event.persist && event.persist();
   // Render a context menu at the passed event's position
   ContextMenu.show(
