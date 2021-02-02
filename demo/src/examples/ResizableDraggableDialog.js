@@ -2,35 +2,51 @@ class Example extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isOpen: true
+      isOpen: true,
+      randomInt: 20
     };
   }
 
   render() {
+    const arrayOfLength = Array.from({ length: this.state.randomInt }, () =>
+      Math.floor(Math.random() * 9)
+    );
     return (
       <div>
         <Button
           onClick={() => {
             this.setState({ isOpen: true });
+            this.setState({
+              randomInt: Math.floor(Math.random() * (20 - 5 + 1)) + 5
+            });
           }}
         >
           Open Resizable Dialog
         </Button>
+        {renderToggle({
+            that: this,
+            label: "Fixed Height and Width",
+            type: "fixedHeightAndWidth"
+          })}
         <br />
         <br />
-        <ResizableDraggableDialog
-          isOpen={this.state.isOpen}
+        {this.state.isOpen && <ResizableDraggableDialog
+          isOpen={true}
           onClose={() => {
             this.setState({ isOpen: false });
           }}
-          height={300}
-          width={300}
+          {...(this.state.fixedHeightAndWidth
+            ? {
+                height: 300,
+                width: 300
+              }
+            : {})}
           title={"I'm Resizable and Draggable!"}
         >
           <div className={Classes.DIALOG_BODY}>
             I am a dialog
-            <div style={{ width: 250 }}>with a bunch of stuff in it</div>
-            {[1, 2, 3, 4, 5, 5, 6, 6, 77, 7, 12, 2, 34].map((num, i) => {
+            <div style={{ width: this.state.randomInt * 40 }}>with a bunch of stuff in it</div>
+            {arrayOfLength.map((num, i) => {
               return (
                 <div key={i} style={{ height: 40, background: Math.random() }}>
                   {num}
@@ -38,7 +54,7 @@ class Example extends Component {
               );
             })}
           </div>
-        </ResizableDraggableDialog>
+        </ResizableDraggableDialog>}
       </div>
     );
   }

@@ -1,32 +1,36 @@
 import React from "react";
 import { Dialog, Classes } from "@blueprintjs/core";
 import { Rnd } from "react-rnd";
+import uniqid from "uniqid";
 import "./style.css";
 
 export default class ResizableDraggableDialog extends React.Component {
   componentDidMount() {
     window.addEventListener("resize", this.onWindowResize);
+    this.setState({ triggerRerender: uniqid() });
   }
+  state = { triggerRerender: 1 };
 
   onWindowResize = () => {
+    this.setState({ triggerRerender: uniqid() });
     //trigger a fake drag event here so that the dialog will stay in the window on window resize
-    const targetNode = document.querySelector(`.${Classes.DIALOG_HEADER}`);
-    if (targetNode) {
-      //--- Simulate a natural mouse-click sequence.
-      triggerMouseEvent(targetNode, "mouseover");
-      triggerMouseEvent(targetNode, "mousedown");
-      triggerMouseEvent(document, "mousemove");
-      triggerMouseEvent(targetNode, "mouseup");
-      triggerMouseEvent(targetNode, "click");
-    } else {
-      console.info("*** Target node not found!");
-    }
+    // const targetNode = document.querySelector(`.${Classes.DIALOG_HEADER}`);
+    // if (targetNode) {
+    //   //--- Simulate a natural mouse-click sequence.
+    //   triggerMouseEvent(targetNode, "mouseover");
+    //   triggerMouseEvent(targetNode, "mousedown");
+    //   triggerMouseEvent(document, "mousemove");
+    //   triggerMouseEvent(targetNode, "mouseup");
+    //   triggerMouseEvent(targetNode, "click");
+    // } else {
+    //   console.info("*** Target node not found!");
+    // }
 
-    function triggerMouseEvent(node, eventType) {
-      const clickEvent = document.createEvent("MouseEvents");
-      clickEvent.initEvent(eventType, true, true);
-      node.dispatchEvent(clickEvent);
-    }
+    // function triggerMouseEvent(node, eventType) {
+    //   const clickEvent = document.createEvent("MouseEvents");
+    //   clickEvent.initEvent(eventType, true, true);
+    //   node.dispatchEvent(clickEvent);
+    // }
   };
   componentWillUnmount() {
     window.removeEventListener("resize", this.onWindowResize);
@@ -41,18 +45,33 @@ export default class ResizableDraggableDialog extends React.Component {
       windowHeight = w.innerHeight || e.clientHeight || g.clientHeight;
     return {
       windowWidth,
-      windowHeight
+      windowHeight: windowHeight - 20 //add a small correction here
     };
   };
 
   render() {
-    const {
-      width: defaultDialogWidth = 400,
-      height: defaultDialogHeight = 450,
-      RndProps,
-      ...rest
-    } = this.props;
+    const { width, height, RndProps, ...rest } = this.props;
     const { windowWidth, windowHeight } = this.getWindowWidthAndHeight();
+    const defaultDialogWidth = 400;
+    const defaultDialogHeight = 450;
+    let heightToUse;
+    if (height) {
+      heightToUse = height;
+    } else {
+      heightToUse = (document.querySelector(".bp3-dialog-body") || {})
+        .scrollHeight;
+      if (heightToUse) {
+        heightToUse = heightToUse + 60;
+      } else {
+        heightToUse = defaultDialogHeight;
+      }
+    }
+    let widthToUse;
+    if (width) {
+      widthToUse = width;
+    } else {
+      widthToUse = defaultDialogWidth;
+    }
 
     return (
       <div
@@ -60,6 +79,7 @@ export default class ResizableDraggableDialog extends React.Component {
         style={{ top: 0, left: 0, position: "fixed" }}
       >
         <Rnd
+          key={this.state.triggerRerender}
           enableResizing={{
             bottomLeft: true,
             bottomRight: true,
@@ -68,16 +88,15 @@ export default class ResizableDraggableDialog extends React.Component {
           }}
           maxHeight={windowHeight}
           maxWidth={windowWidth}
-          // minWidth={Math.min(defaultDialogWidth, 300) }
-          // minHeight={Math.min(defaultDialogHeight, 200) }
           bounds="window"
           default={{
-            x: Math.round(Math.max((windowWidth - defaultDialogWidth) / 2, 0)),
-            y: Math.round(
-              Math.max((windowHeight - defaultDialogHeight) / 2, 0)
-            ),
-            width: Math.min(defaultDialogWidth, windowWidth),
-            height: Math.min(defaultDialogHeight, windowHeight)
+            x: Math.round(Math.max((windowWidth - widthToUse) / 2, 0)),
+            y: Math.round(Math.max((windowHeight - heightToUse) / 2, 0)),
+            width: Math.min(widthToUse, windowWidth),
+            height: Math.min(
+              Math.max(defaultDialogHeight, heightToUse),
+              windowHeight
+            )
           }}
           // default={{ //tnrtodo - implement this once strml merges my pr..
           //   x: "50%",
@@ -87,6 +106,7 @@ export default class ResizableDraggableDialog extends React.Component {
           {...RndProps}
         >
           <Dialog
+            canEscapeKeyClose={true}
             enforceFocus={false}
             hasBackdrop={false}
             usePortal={false}
