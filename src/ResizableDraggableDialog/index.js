@@ -1,56 +1,24 @@
 import React from "react";
 import { Dialog, Classes } from "@blueprintjs/core";
 import { Rnd } from "react-rnd";
-import uniqid from "uniqid";
 import "./style.css";
 
 export default class ResizableDraggableDialog extends React.Component {
   componentDidMount() {
     window.addEventListener("resize", this.onWindowResize);
-    this.setState({ triggerRerender: uniqid() });
+    setTimeout(() => {
+      this.setDefaults();
+    }, 0);
   }
-  state = { triggerRerender: 1 };
-
-  onWindowResize = () => {
-    this.setState({ triggerRerender: uniqid() });
-    //trigger a fake drag event here so that the dialog will stay in the window on window resize
-    // const targetNode = document.querySelector(`.${Classes.DIALOG_HEADER}`);
-    // if (targetNode) {
-    //   //--- Simulate a natural mouse-click sequence.
-    //   triggerMouseEvent(targetNode, "mouseover");
-    //   triggerMouseEvent(targetNode, "mousedown");
-    //   triggerMouseEvent(document, "mousemove");
-    //   triggerMouseEvent(targetNode, "mouseup");
-    //   triggerMouseEvent(targetNode, "click");
-    // } else {
-    //   console.info("*** Target node not found!");
-    // }
-
-    // function triggerMouseEvent(node, eventType) {
-    //   const clickEvent = document.createEvent("MouseEvents");
-    //   clickEvent.initEvent(eventType, true, true);
-    //   node.dispatchEvent(clickEvent);
-    // }
-  };
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.onWindowResize);
-  }
-
-  getWindowWidthAndHeight = () => {
-    const w = window,
-      d = document,
-      e = d.documentElement,
-      g = d.getElementsByTagName("body")[0],
-      windowWidth = w.innerWidth || e.clientWidth || g.clientWidth,
-      windowHeight = w.innerHeight || e.clientHeight || g.clientHeight;
-    return {
-      windowWidth,
-      windowHeight: windowHeight - 20 //add a small correction here
-    };
+  state = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0
   };
 
-  render() {
-    const { width, height, RndProps, ...rest } = this.props;
+  setDefaults = () => {
+    const { width, height } = this.props;
     const { windowWidth, windowHeight } = this.getWindowWidthAndHeight();
     const defaultDialogWidth = 400;
     const defaultDialogHeight = 450;
@@ -73,13 +41,42 @@ export default class ResizableDraggableDialog extends React.Component {
       widthToUse = defaultDialogWidth;
     }
 
+    this.setState({
+      x: Math.round(Math.max((windowWidth - widthToUse) / 2, 0)),
+      y: Math.round(Math.max((windowHeight - heightToUse) / 2, 0)),
+      width: Math.min(widthToUse, windowWidth),
+      height: Math.min(Math.max(defaultDialogHeight, heightToUse), windowHeight)
+    });
+  };
+  onWindowResize = () => {
+    this.setDefaults();
+  };
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.onWindowResize);
+  }
+
+  getWindowWidthAndHeight = () => {
+    const w = window,
+      d = document,
+      e = d.documentElement,
+      g = d.getElementsByTagName("body")[0],
+      windowWidth = w.innerWidth || e.clientWidth || g.clientWidth,
+      windowHeight = w.innerHeight || e.clientHeight || g.clientHeight;
+    return {
+      windowWidth,
+      windowHeight: windowHeight - 20 //add a small correction here
+    };
+  };
+
+  render() {
+    const { width, height, RndProps, ...rest } = this.props;
+    const { windowWidth, windowHeight } = this.getWindowWidthAndHeight();
     return (
       <div
         className="tg-bp3-dialog-resizable-draggable"
         style={{ top: 0, left: 0, position: "fixed" }}
       >
         <Rnd
-          key={this.state.triggerRerender}
           enableResizing={{
             bottomLeft: true,
             bottomRight: true,
@@ -89,27 +86,26 @@ export default class ResizableDraggableDialog extends React.Component {
           maxHeight={windowHeight}
           maxWidth={windowWidth}
           bounds="window"
-          default={{
-            x: Math.round(Math.max((windowWidth - widthToUse) / 2, 0)),
-            y: Math.round(Math.max((windowHeight - heightToUse) / 2, 0)),
-            width: Math.min(widthToUse, windowWidth),
-            height: Math.min(
-              Math.max(defaultDialogHeight, heightToUse),
-              windowHeight
-            )
+          size={{ width: this.state.width, height: this.state.height }}
+          position={{ x: this.state.x, y: this.state.y }}
+          onDragStop={(e, d) => {
+            this.setState({ x: d.x, y: d.y });
           }}
-          // default={{ //tnrtodo - implement this once strml merges my pr..
-          //   x: "50%",
-          //   y: "50%",
-          // }}
+          onResizeStop={(e, direction, ref, delta, position) => {
+            this.setState({
+              width: ref.style.width,
+              height: ref.style.height,
+              ...position
+            });
+          }}
           dragHandleClassName={Classes.DIALOG_HEADER}
           {...RndProps}
         >
           <Dialog
-            canEscapeKeyClose={true}
             enforceFocus={false}
             hasBackdrop={false}
             usePortal={false}
+            canEscapeKeyClose={true}
             {...rest}
           />
         </Rnd>

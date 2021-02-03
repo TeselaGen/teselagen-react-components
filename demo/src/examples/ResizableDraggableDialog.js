@@ -3,26 +3,27 @@ class Example extends Component {
     super(props);
     this.state = {
       isOpen: true,
-      randomInt: 20
+      numberOfItems: 12
     };
   }
 
   render() {
-    const arrayOfLength = Array.from({ length: this.state.randomInt }, () =>
+    const arrayOfLength = Array.from({ length: this.state.numberOfItems }, () =>
       Math.floor(Math.random() * 9)
     );
     return (
       <div>
-        <Button
+        {[5, 10, 20].map((n) => <Button
+        key={n}
           onClick={() => {
             this.setState({ isOpen: true });
             this.setState({
-              randomInt: Math.floor(Math.random() * (20 - 5 + 1)) + 5
+              numberOfItems: n
             });
           }}
         >
-          Open Resizable Dialog
-        </Button>
+          Open Dialog ({n} items)
+        </Button>)}
         {renderToggle({
             that: this,
             label: "Fixed Height and Width",
@@ -45,7 +46,7 @@ class Example extends Component {
         >
           <div className={Classes.DIALOG_BODY}>
             I am a dialog
-            <div style={{ width: this.state.randomInt * 40 }}>with a bunch of stuff in it</div>
+            <div>with a bunch of stuff in it</div>
             {arrayOfLength.map((num, i) => {
               return (
                 <div key={i} style={{ height: 40, background: Math.random() }}>
