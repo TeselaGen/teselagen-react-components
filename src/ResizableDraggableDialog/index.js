@@ -8,6 +8,7 @@ const defaultDialogHeight = 450;
 export default class ResizableDraggableDialog extends React.Component {
   componentDidMount() {
     window.addEventListener("resize", this.onWindowResize);
+    this.setDefaults();
     setTimeout(() => {
       this.setDefaults();
     }, 0);
