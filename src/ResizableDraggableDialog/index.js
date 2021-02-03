@@ -3,6 +3,8 @@ import { Dialog, Classes } from "@blueprintjs/core";
 import { Rnd } from "react-rnd";
 import "./style.css";
 
+const defaultDialogWidth = 400;
+const defaultDialogHeight = 450;
 export default class ResizableDraggableDialog extends React.Component {
   componentDidMount() {
     window.addEventListener("resize", this.onWindowResize);
@@ -13,15 +15,14 @@ export default class ResizableDraggableDialog extends React.Component {
   state = {
     x: 0,
     y: 0,
-    width: 0,
-    height: 0
+    width: defaultDialogWidth,
+    height: defaultDialogHeight
   };
 
   setDefaults = () => {
     const { width, height } = this.props;
     const { windowWidth, windowHeight } = this.getWindowWidthAndHeight();
-    const defaultDialogWidth = 400;
-    const defaultDialogHeight = 450;
+
     let heightToUse;
     if (height) {
       heightToUse = height;

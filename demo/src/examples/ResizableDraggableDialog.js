@@ -26,7 +26,7 @@ class Example extends Component {
         </Button>)}
         {renderToggle({
             that: this,
-            label: "Fixed Height and Width",
+            label: "Fixed Initial Height",
             type: "fixedHeightAndWidth"
           })}
         <br />
