@@ -31,7 +31,11 @@ import TgSuggest from "../TgSuggest";
 import InfoHelper from "../InfoHelper";
 import getMomentFormatter from "../utils/getMomentFormatter";
 import AsyncValidateFieldSpinner from "../AsyncValidateFieldSpinner";
-import { AssignDefaultsModeContext } from "../AssignDefaultsModeContext";
+import {
+  AssignDefaultsModeContext,
+  WorkflowDefaultParamsContext,
+  workflowDefaultParamsObj
+} from "../AssignDefaultsModeContext";
 import Uploader from "./Uploader";
 import sortify from "./sortify";
 import { fieldRequired } from "./utils";
@@ -1036,6 +1040,8 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
     const [allowUserOverride, setUserOverride] = useState(true);
     const [isLoading, setLoading] = useState(false);
     const { inAssignDefaultsMode } = useContext(AssignDefaultsModeContext);
+    const workflowParams = useContext(WorkflowDefaultParamsContext);
+
     // if generateDefaultValue, hit the backend for that value
     useDeepCompareEffect(() => {
       if (!window.__triggerGetDefaultValueRequest) return;
@@ -1043,8 +1049,14 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
       setLoading(true);
       //custom params should match params keys. if not throw an error
       const doParamsMatch = isEqual(
-        Object.keys(generateDefaultValue.params || {}).sort(),
-        Object.keys(generateDefaultValue.customParams || {}).sort()
+        Object.keys({
+          ...workflowDefaultParamsObj, //we don't want to compare these keys so we just spread them here
+          ...(generateDefaultValue.params || {})
+        }).sort(),
+        Object.keys({
+          ...workflowDefaultParamsObj, //we don't want to compare these keys so we just spread them here
+          ...(generateDefaultValue.customParams || {})
+        }).sort()
       );
       if (!doParamsMatch) {
         console.warn(
@@ -1074,9 +1086,19 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
         try {
           const res = await window.__triggerGetDefaultValueRequest(
             generateDefaultValue.code,
-            generateDefaultValue.customParams
+            {
+              ...workflowParams,
+              ...generateDefaultValue.customParams
+            }
           );
-          setDefault(res.defaultValue);
+          if (
+            ComponentToWrap === renderBlueprintCheckbox ||
+            ComponentToWrap === renderBlueprintSwitch
+          ) {
+            setDefault(res.defaultValue === "true");
+          } else {
+            setDefault(res.defaultValue);
+          }
           setUserOverride(res.allowUserOverride);
           setDefaultValCount(defaultValCount + 1);
         } catch (error) {
@@ -1118,6 +1140,13 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
                   window.__showAssignDefaultValueModal &&
                   window.__showAssignDefaultValueModal({
                     ...props,
+                    generateDefaultValue: {
+                      ...props.generateDefaultValue,
+                      customParams: {
+                        ...workflowParams,
+                        ...props.generateDefaultValue.customParams
+                      }
+                    },
                     onFinish: () => {
                       updateCount(count + 1);
                     }

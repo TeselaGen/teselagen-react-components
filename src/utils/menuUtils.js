@@ -11,7 +11,8 @@ import {
   Classes,
   Icon
 } from "@blueprintjs/core";
-import { startCase, omit } from "lodash";
+import { startCase, omit, isNumber, flatMap, isArray, isString } from "lodash";
+import fuzzysearch from "fuzzysearch";
 
 const noop = () => {};
 
@@ -364,4 +365,24 @@ export function showContextMenu(
 
 function filterMenuForCorrectness(menuDef) {
   return menuDef && menuDef.length && menuDef.filter(ident);
+}
+
+export function getStringFromReactComponent(comp) {
+  if (!comp) return "";
+  if (isString(comp) || isNumber(comp)) return comp;
+  const { children } = comp.props || {};
+  if (!children) return "";
+  if (isArray(children))
+    return flatMap(children, getStringFromReactComponent).join("");
+  if (isString(children)) return children;
+
+  if (children.props) {
+    return getStringFromReactComponent(children.props);
+  }
+}
+export function doesSearchValMatchText(searchVal, justText) {
+  return fuzzysearch(
+    searchVal ? searchVal.toLowerCase() : "",
+    justText ? justText.toLowerCase() : ""
+  );
 }
