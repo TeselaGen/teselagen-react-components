@@ -157,10 +157,7 @@ export interface AsyncValidateFieldSpinnerProps {
 }
 
 // BlueprintError
-export class BlueprintError extends React.Component<
-  BlueprintErrorProps,
-  any
-> {}
+export class BlueprintError extends React.Component<BlueprintErrorProps, any> {}
 
 export interface BlueprintErrorProps {
   error: string;
@@ -401,8 +398,6 @@ export function DialogFooter({
   return "";
 }
 
-
-
 export interface DialogFooterProps {
   hideModal: function;
   loading: boolean;
@@ -546,10 +541,7 @@ export interface FileUploadFieldProps extends GenericFormFieldProps {
             maxDate={new Date("12/31/2100")}
           />
  */
-export class DateInputField extends React.Component<
-  DateInputFieldProps,
-  any
-> {}
+export class DateInputField extends React.Component<DateInputFieldProps, any> {}
 
 export interface DateInputFieldProps extends GenericFormFieldProps {}
 // DateRangeInputField
@@ -965,6 +957,11 @@ export function mergeSchemas(schema, schemaOverrides) {
 // showConfirmationDialog
 // style
 
-export function getTagProps(){}
-export function getTagsAndTagOptions(){}
-export function getKeyedTagsAndTagOptions(){}
+export function getTagProps() {}
+export function getTagsAndTagOptions() {}
+export function getKeyedTagsAndTagOptions() {}
+
+export const TableFormTrackerContext = React.createContext({
+  formNames: [],
+  pushFormName: () => {}
+});
