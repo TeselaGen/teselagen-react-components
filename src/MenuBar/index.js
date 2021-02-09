@@ -1,16 +1,7 @@
 import React from "react";
-import {
-  pickBy,
-  isNumber,
-  startsWith,
-  flatMap,
-  isArray,
-  take,
-  flatten,
-  isString
-} from "lodash";
+import { pickBy, isNumber, startsWith, flatMap, take, flatten } from "lodash";
 import { Suggest } from "@blueprintjs/select";
-import fuzzysearch from "fuzzysearch";
+
 import "./style.css";
 import {
   Popover,
@@ -21,7 +12,12 @@ import {
   HotkeysTarget,
   Hotkey
 } from "@blueprintjs/core";
-import { createDynamicMenu, DynamicMenuItem } from "../utils/menuUtils";
+import {
+  createDynamicMenu,
+  DynamicMenuItem,
+  getStringFromReactComponent,
+  doesSearchValMatchText
+} from "../utils/menuUtils";
 import { comboToLabel } from "../utils/hotkeyUtils";
 
 class MenuBar extends React.Component {
@@ -337,9 +333,7 @@ const filterMenuItems = (searchVal, items) => {
       }
     }
 
-    if (
-      fuzzysearch(searchVal.toLowerCase(), justText && justText.toLowerCase())
-    ) {
+    if (doesSearchValMatchText(searchVal, justText)) {
       return {
         ...item,
         justText,
@@ -355,20 +349,6 @@ const filterMenuItems = (searchVal, items) => {
     justText: highlight(searchVal, i.justText)
   }));
 };
-
-function getStringFromReactComponent(comp) {
-  if (!comp) return "";
-  if (isString(comp) || isNumber(comp)) return comp;
-  const { children } = comp.props || {};
-  if (!children) return "";
-  if (isArray(children))
-    return flatMap(children, getStringFromReactComponent).join("");
-  if (isString(children)) return children;
-
-  if (children.props) {
-    return getStringFromReactComponent(children.props);
-  }
-}
 
 const menuSearchHotkey = "meta+/";
 
