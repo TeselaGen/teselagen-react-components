@@ -1,6 +1,13 @@
 import classNames from "classnames";
 import { SketchPicker } from "react-color";
-import { isNumber, noop, kebabCase, isPlainObject, isEqual } from "lodash";
+import {
+  isNumber,
+  noop,
+  kebabCase,
+  isPlainObject,
+  isEqual,
+  omitBy
+} from "lodash";
 import mathExpressionEvaluator from "math-expression-evaluator";
 import React, { useContext, useState } from "react";
 import { Field, touch, change } from "redux-form";
@@ -1143,7 +1150,7 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
                     generateDefaultValue: {
                       ...props.generateDefaultValue,
                       customParams: {
-                        ...workflowParams,
+                        ...omitBy(workflowParams, p => p === undefined),
                         ...props.generateDefaultValue.customParams
                       }
                     },
