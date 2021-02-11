@@ -1,13 +1,6 @@
 import classNames from "classnames";
 import { SketchPicker } from "react-color";
-import {
-  isNumber,
-  noop,
-  kebabCase,
-  isPlainObject,
-  isEqual,
-  omitBy
-} from "lodash";
+import { isNumber, noop, kebabCase, isPlainObject, isEqual } from "lodash";
 import mathExpressionEvaluator from "math-expression-evaluator";
 import React, { useContext, useState } from "react";
 import { Field, touch, change } from "redux-form";
@@ -1049,6 +1042,14 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
     const { inAssignDefaultsMode } = useContext(AssignDefaultsModeContext);
     const workflowParams = useContext(WorkflowDefaultParamsContext);
 
+    const caresAboutToolContext = generateDefaultValue?.params?.toolName;
+
+    const customParamsToUse = {
+      ...(caresAboutToolContext
+        ? { ...workflowDefaultParamsObj, ...workflowParams }
+        : {}),
+      ...generateDefaultValue.customParams
+    };
     // if generateDefaultValue, hit the backend for that value
     useDeepCompareEffect(() => {
       if (!window.__triggerGetDefaultValueRequest) return;
@@ -1057,13 +1058,10 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
       //custom params should match params keys. if not throw an error
       const doParamsMatch = isEqual(
         Object.keys({
-          ...workflowDefaultParamsObj, //we don't want to compare these keys so we just spread them here
+          ...(caresAboutToolContext ? workflowDefaultParamsObj : {}), //we don't want to compare these keys so we just spread them here
           ...(generateDefaultValue.params || {})
         }).sort(),
-        Object.keys({
-          ...workflowDefaultParamsObj, //we don't want to compare these keys so we just spread them here
-          ...(generateDefaultValue.customParams || {})
-        }).sort()
+        Object.keys(customParamsToUse).sort()
       );
       if (!doParamsMatch) {
         console.warn(
@@ -1073,16 +1071,13 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
           `generateDefaultValue.params:`,
           generateDefaultValue.params
         );
-        console.warn(
-          `generateDefaultValue.customParams:`,
-          generateDefaultValue.customParams
-        );
+        console.warn(`generateDefaultValue.customParams:`, customParamsToUse);
         throw new Error(
           `Issue with generateDefaultValue code=${
             generateDefaultValue.code
           }: Difference detected with: ${difference(
             Object.keys(generateDefaultValue.params || {}),
-            Object.keys(generateDefaultValue.customParams || {})
+            Object.keys(customParamsToUse || {})
           ).join(
             ", "
           )}. customParams passed into the field should match params (as defined in defaultValueConstants.js). See console for more details.`
@@ -1093,10 +1088,7 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
         try {
           const res = await window.__triggerGetDefaultValueRequest(
             generateDefaultValue.code,
-            {
-              ...workflowParams,
-              ...generateDefaultValue.customParams
-            }
+            customParamsToUse
           );
           if (
             ComponentToWrap === renderBlueprintCheckbox ||
@@ -1149,14 +1141,7 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
                     ...props,
                     generateDefaultValue: {
                       ...props.generateDefaultValue,
-                      customParams: {
-                        ...omitBy(
-                          workflowParams,
-                          (v, key) =>
-                            props.generateDefaultValue[key] === undefined
-                        ),
-                        ...props.generateDefaultValue.customParams
-                      }
+                      customParams: customParamsToUse
                     },
                     onFinish: () => {
                       updateCount(count + 1);
