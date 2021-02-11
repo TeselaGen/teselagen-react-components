@@ -1048,7 +1048,7 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
       ...(caresAboutToolContext
         ? { ...workflowDefaultParamsObj, ...workflowParams }
         : {}),
-      ...generateDefaultValue.customParams
+      ...(generateDefaultValue ? generateDefaultValue.customParams : {})
     };
     // if generateDefaultValue, hit the backend for that value
     useDeepCompareEffect(() => {
