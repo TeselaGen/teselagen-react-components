@@ -1153,7 +1153,7 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
                         ...omitBy(
                           workflowParams,
                           (v, key) =>
-                            props.generateDefaultValue[key] !== undefined
+                            props.generateDefaultValue[key] === undefined
                         ),
                         ...props.generateDefaultValue.customParams
                       }
