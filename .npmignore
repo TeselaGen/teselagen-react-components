@@ -1,0 +1,6 @@
+/coverage
+/demo/dist
+/src
+npm-debug.log*
+CHANGELOG.md
+README.md
