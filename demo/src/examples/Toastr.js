@@ -1,6 +1,8 @@
+import { Button } from '@blueprintjs/core';
+import React from 'react'
 
 let showFirst = true
-function Demo() {
+export default function Demo() {
   return (
     <div>
       There is a one time set up to get the window.toastr object. All you need to do is add 
@@ -40,4 +42,4 @@ function Demo() {
   );
 }
 
-render(Demo);
+

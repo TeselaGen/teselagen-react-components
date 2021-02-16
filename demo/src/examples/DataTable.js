@@ -1,3 +1,12 @@
+import { Button, Checkbox, Classes, Dialog, Icon, MenuItem } from "@blueprintjs/core";
+import { Chance } from "chance";
+import { times } from "lodash";
+import React from "react";
+import ReactMarkdown from "react-markdown";
+import { Router, withRouter } from "react-router-dom";
+import { DataTable, PagingTool, withTableParams } from "../../../src";
+import renderToggle from "../renderToggle";
+
 const controlled_page_size = 33;
 const chance = new Chance();
 const schema = {
@@ -80,7 +89,7 @@ const schema = {
   ]
 };
 
-class DataTableDemo extends React.Component {
+export default class DataTableDemo extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -766,4 +775,3 @@ function SubComp(row) {
   );
 }
 
-render(<DataTableDemo />);

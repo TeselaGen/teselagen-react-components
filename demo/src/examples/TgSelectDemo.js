@@ -1,4 +1,9 @@
-class TgSelectDemo extends React.Component {
+import { Icon } from '@blueprintjs/core';
+import React from 'react'
+import TgSelect from '../../../src/TgSelect'
+import renderToggle from '../renderToggle';
+
+export default class TgSelectDemo extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -74,5 +79,3 @@ class TgSelectDemo extends React.Component {
     );
   }
 }
-
-render(TgSelectDemo);

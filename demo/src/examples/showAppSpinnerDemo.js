@@ -1,4 +1,8 @@
-function Demo() {
+import { Button } from '@blueprintjs/core';
+import React from 'react'
+import showAppSpinner from '../../../src/showAppSpinner';
+
+export default function Demo() {
   return (
     <div>
       <Button
@@ -14,4 +18,4 @@ function Demo() {
   );
 }
 
-render(Demo);
+

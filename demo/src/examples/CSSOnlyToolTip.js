@@ -1,4 +1,6 @@
-function CustomIconsDemo() {
+import React from 'react'
+
+export default function CSSOnlyToolTip() {
   return (
     <div>
       <h3>See https://kazzkiq.github.io/balloon.css/ for more examples</h3>
@@ -8,5 +10,3 @@ function CustomIconsDemo() {
     </div>
   );
 }
-
-render(CustomIconsDemo);

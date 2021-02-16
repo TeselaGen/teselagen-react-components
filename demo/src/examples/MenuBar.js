@@ -1,4 +1,9 @@
-class MenuBarDemo extends React.Component {
+import React from 'react'
+import MenuBar from '../../../src/MenuBar'
+import {HotkeysDialog} from '../../../src'
+import {CmdButton, CmdCheckbox, CmdDiv, CmdSwitch, } from '../../../src/utils/commandControls'
+
+export default class MenuBarDemo extends React.Component {
   constructor(props) {
     super(props);
     this.showDialog = this.showDialog.bind(this);
@@ -370,4 +375,4 @@ class MenuBarDemo extends React.Component {
   }
 }
 
-render(<MenuBarDemo />);
+

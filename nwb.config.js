@@ -39,9 +39,6 @@ module.exports = {
     extra: {
       plugins,
       devtool: "source-map",
-      module: {
-        rules: [{ test: /demo\/src\/examples\//, loader: "raw-loader" }]
-      }
     }
   }
 };

@@ -1,4 +1,25 @@
-function CustomIconsDemo() {
+import { Button } from "@blueprintjs/core";
+import React from "react";
+import {
+  flaskIcon,
+  orfIcon,
+  featureIcon,
+  dnaIcon,
+  workqueueIcon,
+  inventoryIcon,
+  workflowIcon,
+  strainIcon,
+  designIcon,
+  moleculeIcon,
+  keyboardIcon,
+  cardDetailsIcon,
+  driveIcon,
+  sharedDriveIcon,
+  proteinIcon,
+  tubeIcon
+} from "../../../src/customIcons";
+
+export default function CustomIconsDemo() {
   return (
     <div>
       <h3>Instuctions for adding more icons:</h3>
@@ -10,28 +31,23 @@ function CustomIconsDemo() {
         be sure to add it to the `demo/src/examples/CustomIcons.js` page to TEST
         THAT IT WORKS and so that people know it exists!
       </h4>
-      <Button
-        intent={"primary"}
-        icon={customIcons.flaskIcon}
-        text="flaskIcon"
-      />
-      <Button icon={customIcons.orfIcon} text="orfIcon" />
-      <Button icon={customIcons.featureIcon} text="featureIcon" />
-      <Button icon={customIcons.dnaIcon} text="dnaIcon" />
-      <Button icon={customIcons.workqueueIcon} text="workqueueIcon" />
-      <Button icon={customIcons.inventoryIcon} text="inventoryIcon" />
-      <Button icon={customIcons.workflowIcon} text="workflowIcon" />
-      <Button icon={customIcons.strainIcon} text="strainIcon" />
-      <Button icon={customIcons.designIcon} text="designIcon" />
-      <Button icon={customIcons.moleculeIcon} text="moleculeIcon" />
-      <Button icon={customIcons.keyboardIcon} text="keyboardIcon" />
-      <Button icon={customIcons.cardDetailsIcon} text="cardDetailsIcon" />
-      <Button icon={customIcons.driveIcon} text="driveIcon" />
-      <Button icon={customIcons.sharedDriveIcon} text="sharedDriveIcon" />
-      <Button icon={customIcons.proteinIcon} text="proteinIcon" />
-      <Button icon={customIcons.tubeIcon} text="tubeIcon" />
+      <Button intent={"primary"} icon={flaskIcon} text="flaskIcon" />
+      <Button icon={orfIcon} text="orfIcon" />
+      <Button icon={featureIcon} text="featureIcon" />
+      <Button icon={dnaIcon} text="dnaIcon" />
+      <Button icon={workqueueIcon} text="workqueueIcon" />
+      <Button icon={inventoryIcon} text="inventoryIcon" />
+      <Button icon={workflowIcon} text="workflowIcon" />
+      <Button icon={strainIcon} text="strainIcon" />
+      <Button icon={designIcon} text="designIcon" />
+      <Button icon={moleculeIcon} text="moleculeIcon" />
+      <Button icon={keyboardIcon} text="keyboardIcon" />
+      <Button icon={cardDetailsIcon} text="cardDetailsIcon" />
+      <Button icon={driveIcon} text="driveIcon" />
+      <Button icon={sharedDriveIcon} text="sharedDriveIcon" />
+      <Button icon={proteinIcon} text="proteinIcon" />
+      <Button icon={tubeIcon} text="tubeIcon" />
     </div>
   );
 }
 
-render(CustomIconsDemo);

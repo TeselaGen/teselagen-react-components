@@ -1,4 +1,8 @@
-class HotkeysDialogDemo extends React.Component {
+import { KeyCombo } from '@blueprintjs/core';
+import React from 'react'
+import { hotkeysById, HotkeysDialog, withHotkeys } from '../../../src';
+
+export default class HotkeysDialogDemo extends React.Component {
   constructor(props) {
     super(props);
     this.showDialog = this.showDialog.bind(this);
@@ -113,4 +117,4 @@ class HotkeysDialogDemo extends React.Component {
   }
 }
 
-render(<HotkeysDialogDemo />);
+

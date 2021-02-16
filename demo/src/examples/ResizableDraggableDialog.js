@@ -1,4 +1,11 @@
-class Example extends Component {
+import { Button, Classes } from '@blueprintjs/core';
+import React from 'react'
+import { Component } from 'react';
+import renderToggle from '../renderToggle';
+import ResizableDraggableDialog from '../../../src/ResizableDraggableDialog';
+
+
+export default class Example extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -60,5 +67,3 @@ class Example extends Component {
     );
   }
 }
-
-render(Example);

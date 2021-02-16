@@ -1,4 +1,8 @@
-function Demo() {
+import { Button, Intent } from '@blueprintjs/core';
+import React from 'react'
+import showConfirmationDialog from '../../../src/showConfirmationDialog';
+
+export default function Demo() {
   return (
     <div>
       <Button
@@ -20,4 +24,3 @@ function Demo() {
   );
 }
 
-render(Demo);

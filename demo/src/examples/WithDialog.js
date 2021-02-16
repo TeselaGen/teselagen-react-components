@@ -1,3 +1,10 @@
+import { Button, Classes } from '@blueprintjs/core';
+import React from 'react'
+import { Provider,  } from 'react-redux';
+import withDialog from '../../../src/enhancers/withDialog';
+import store from '../store';
+import renderToggle from '../renderToggle';
+
 function DialogInner(p) {
   return (
     <div className={Classes.DIALOG_BODY}>
@@ -20,7 +27,7 @@ const ProgramaticDialog = withDialog({
   title: "Programatic Dialog Demo"
 })(DialogInner);
 
-class WithDialogDemo extends React.Component {
+export default class WithDialogDemo extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -65,4 +72,3 @@ class WithDialogDemo extends React.Component {
   }
 }
 
-render(WithDialogDemo);

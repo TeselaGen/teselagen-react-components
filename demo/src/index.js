@@ -1,5 +1,3 @@
-import ReactMarkdown from "react-markdown";
-import ReactPlayground from "./ReactPlayground";
 import CollapsibleCard from "./examples/CollapsibleCard";
 import MenuBar from "./examples/MenuBar";
 import HotkeysDialog from "./examples/HotkeysDialog";
@@ -8,10 +6,7 @@ import FormComponents from "./DemoComponents/FormComponents";
 import WithDialog from "./examples/WithDialog";
 import Toastr from "./examples/Toastr";
 import showConfirmationDialogDemo from "./examples/showConfirmationDialogDemo";
-import showConfirmationDialog from "../../src/showConfirmationDialog";
 import ResizableDraggableDialogDemo from "./examples/ResizableDraggableDialog";
-import ResizableDraggableDialog from "../../src/ResizableDraggableDialog";
-
 import CustomIcons from "./examples/CustomIcons";
 import CSSOnlyToolTip from "./examples/CSSOnlyToolTip";
 import SimpleTable from "./examples/SimpleTable";
@@ -21,94 +16,36 @@ import Loading from "./examples/Loading";
 import DownloadLink from "./examples/DownloadLink";
 import DemoNav from "./DemoNav";
 import DemoHeader from "./DemoHeader";
-import { withTableParams, DataTable, PagingTool } from "../../src";
-import Uploader from "../../src/FormComponents/Uploader";
-import { FileUploadField } from "../../src/FormComponents";
+import {DataTable } from "../../src";
+
 import FillWindowExample from "./examples/FillWindow";
-import * as customIcons from "../../src/customIcons";
 
-
-import S3Download from "../../src/utils/S3Download";
-import magicDownload from "../../src/DownloadLink/magicDownload";
-import FillWindow from "../../src/FillWindow";
-import TgSelect from "../../src/TgSelect";
-import Timeline from "../../src/Timeline";
-import TimelineEvent from "../../src/Timeline/TimelineEvent";
 import TimelineDemo from "./examples/TimelineDemo";
 import IntentTextDemo from "./examples/IntentText";
 import ScrollToTopDemo from "./examples/ScrollToTop";
-import IntentText from "../../src/IntentText";
-import {
-  CmdButton,
-  CmdCheckbox,
-  CmdDiv,
-  CmdSwitch
-} from "../../src/utils/commandControls";
-import ScrollToTop from "../../src/ScrollToTop";
+
 import showAppSpinnerDemo from "./examples/showAppSpinnerDemo";
-import showAppSpinner from "../../src/showAppSpinner";
 
 import "./style.css";
-import React, { Component } from "react";
+import React from "react";
 import { render } from "react-dom";
 import {
   HashRouter as Router,
   Route,
-  withRouter,
   Redirect
 } from "react-router-dom";
 import { Provider } from "react-redux";
-import { reduxForm } from "redux-form";
 import store from "./store";
 import {
-  Dialog,
-  MenuItem,
   FocusStyleManager,
-  Intent,
-  KeyCombo,
-  Checkbox,
-  Button,
-  Icon,
-  Classes
+
 } from "@blueprintjs/core";
-import renderToggle from "./renderToggle";
-import Chance from "chance";
-import times from "lodash/times";
-import {
-  createMenu,
-  showContextMenu,
-  showCommandContextMenu,
-  commandMenuEnhancer
-} from "../../src/utils/menuUtils";
-import {
-  genericCommandFactory,
-  getCommandHotkeys,
-  getCommandHotkeyHandlers
-} from "../../src/utils/commandUtils";
-import { withHotkeys, getHotkeyProps } from "../../src/utils/hotkeyUtils";
 
 FocusStyleManager.onlyShowFocusOnTabs();
 
 const demos = {
   DataTable: {
     demo: DataTableExample,
-    scope: {
-      MenuItem,
-      Dialog,
-      withTableParams,
-      DataTable,
-      ReactMarkdown,
-      PagingTool,
-      renderToggle,
-      Router,
-      withRouter,
-      Checkbox,
-      store,
-      Chance,
-      times,
-      Icon,
-      Classes
-    },
     childLinks: {
       SimpleTable: {
         demo: SimpleTable
@@ -118,9 +55,6 @@ const demos = {
   },
   InfoHelper: {
     demo: InfoHelper,
-    scope: {
-      Classes
-    },
     props: [
       {
         name: "className",
@@ -159,12 +93,6 @@ const demos = {
   },
   TgSelect: {
     demo: TgSelectDemo,
-    scope: {
-      Classes,
-      TgSelect,
-      Icon,
-      renderToggle
-    },
     props: [
       {
         name: "className",
@@ -211,9 +139,6 @@ const demos = {
   },
   "Hotkeys and HotkeysDialog": {
     demo: HotkeysDialog,
-    scope: {
-      KeyCombo
-    },
     props: [
       {
         name: "hotkeySets",
@@ -236,21 +161,6 @@ const demos = {
   },
   MenuBar: {
     demo: MenuBar,
-    scope: {
-      withHotkeys,
-      getHotkeyProps,
-      createMenu,
-      CmdButton,
-      CmdCheckbox,
-      CmdDiv,
-      CmdSwitch,
-      showContextMenu,
-      showCommandContextMenu,
-      commandMenuEnhancer,
-      genericCommandFactory,
-      getCommandHotkeys,
-      getCommandHotkeyHandlers
-    },
     props: [
       {
         name: "menu",
@@ -321,93 +231,40 @@ const demos = {
   },
   withDialog: {
     demo: WithDialog,
-    scope: {
-      renderToggle,
-      Classes,
-      Provider,
-      store
-    }
   },
   toastr: {
     demo: Toastr
   },
   showConfirmationDialog: {
-    scope: {
-      showConfirmationDialog,
-      Intent,
-      renderToggle
-    },
     demo: showConfirmationDialogDemo
   },
   showAppSpinner: {
-    scope: {
-      showAppSpinner,
-      Intent,
-      renderToggle
-    },
     demo: showAppSpinnerDemo
   },
 
-  // MultiSelectSideBySide: {
-  //   scope: {
-  //     MultiSelectSideBySide,
-  //     Component,
-  //     renderToggle,
-  //     HTMLSelect
-  //   },
+  // MultiSelectSideBySide: 
   //   demo: MultiSelectSideBySideDemo
   // },
   ResizableDraggableDialog: {
-    scope: {
-      ResizableDraggableDialog,
-      renderToggle,
-      Component,
-      Classes
-      // HTMLSelect,
-    },
     demo: ResizableDraggableDialogDemo
   },
   customIcons: {
-    scope: {
-      renderToggle,
-      customIcons
-    },
     demo: CustomIcons
   },
   "CSS-Only ToolTip": {
-    scope: {
-      renderToggle
-    },
     demo: CSSOnlyToolTip
   },
   FillWindow: {
     demo: FillWindowExample,
-    scope: {
-      renderToggle,
-      FillWindow
-    }
   },
   Timeline: {
     demo: TimelineDemo,
-    scope: {
-      renderToggle,
-      Timeline,
-      TimelineEvent
-    }
   },
   IntentText: {
     demo: IntentTextDemo,
-    scope: {
-      renderToggle,
-      IntentText
-    }
   },
   ScrollToTop: {
     demo: ScrollToTopDemo,
-    scope: {
-      renderToggle,
-      ScrollToTop
-    }
   }
   // fonticons: {
   //   demo: FontIconsDemo,
@@ -434,7 +291,7 @@ const demoPropsSchema = [
 ];
 
 function DemoComponentWrapper(
-  { demo: Demo, DemoComponent, scope, props = [], noLiveCode },
+  { demo: Demo, DemoComponent,  props = [] },
   demoTitle
 ) {
   return () => {
@@ -444,13 +301,7 @@ function DemoComponentWrapper(
     } else {
       component = (
         <div>
-          {
-            <ReactPlayground
-              codeText={Demo}
-              scope={scope}
-              noLiveCode={noLiveCode}
-            />
-          }
+         
           {!!props.length && (
             <React.Fragment>
               <h6
@@ -461,6 +312,7 @@ function DemoComponentWrapper(
               >
                 Properties
               </h6>
+              <Demo></Demo>
               <DataTable
                 formName="demoProps"
                 entities={props}
