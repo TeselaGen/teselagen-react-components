@@ -1,9 +1,16 @@
-import { Button, Checkbox, Classes, Dialog, Icon, MenuItem } from "@blueprintjs/core";
+import {
+  Button,
+  Checkbox,
+  Classes,
+  Dialog,
+  Icon,
+  MenuItem
+} from "@blueprintjs/core";
 import { Chance } from "chance";
 import { times } from "lodash";
 import React from "react";
 import ReactMarkdown from "react-markdown";
-import { Router, withRouter } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import { DataTable, PagingTool, withTableParams } from "../../../src";
 import renderToggle from "../renderToggle";
 
@@ -135,15 +142,14 @@ export default class DataTableDemo extends React.Component {
 
     return (
       <div>
-        <Router>
-          <div>
-            <details>
-              <summary>
-                Passing props from an unrelated query into a DataTable via
-                withTableParams(){" "}
-              </summary>
-              <ReactMarkdown
-                source={`
+        <div>
+          <details>
+            <summary>
+              Passing props from an unrelated query into a DataTable via
+              withTableParams(){" "}
+            </summary>
+            <ReactMarkdown
+              source={`
 \`\`\`
 withQuery(["stage", "id name"], {
   isPlural: true,
@@ -164,76 +170,75 @@ withQuery(
     "design",
 \`\`\`
                   `}
-              />
-            </details>
-            <h3>Demo specific options:</h3>
-            <br />
-            {renderToggle({
-              that: this,
+            />
+          </details>
+          <h3>Demo specific options:</h3>
+          <br />
+          {renderToggle({
+            that: this,
 
-              type: "renderUnconnectedTable",
-              description:
-                "Render the table without the withTableParams wrapper." +
-                " It's just a simple disconnected react component. You'll" +
-                " need to handle paging/sort/filters yourself. Try hitting" +
-                " isInfinite to see something actually show up with it"
-            })}
-            {renderToggle({
-              that: this,
-              type: "inDialog",
-              description: "Render the table in a dialog"
-            })}
-            <h3>withTableParams options:</h3>
-            <br />
-            {renderToggle({
-              that: this,
+            type: "renderUnconnectedTable",
+            description:
+              "Render the table without the withTableParams wrapper." +
+              " It's just a simple disconnected react component. You'll" +
+              " need to handle paging/sort/filters yourself. Try hitting" +
+              " isInfinite to see something actually show up with it"
+          })}
+          {renderToggle({
+            that: this,
+            type: "inDialog",
+            description: "Render the table in a dialog"
+          })}
+          <h3>withTableParams options:</h3>
+          <br />
+          {renderToggle({
+            that: this,
 
-              type: "urlConnected",
-              description:
-                "Turn off urlConnected if you don't want the url to be updated by the table"
-            })}
-            {renderToggle({
-              that: this,
+            type: "urlConnected",
+            description:
+              "Turn off urlConnected if you don't want the url to be updated by the table"
+          })}
+          {renderToggle({
+            that: this,
 
-              type: "onlyOneFilter",
-              description:
-                "Setting this true makes the table only keep 1 filter/search term in memory instead of allowing multiple"
-            })}
-            {renderToggle({
-              that: this,
+            type: "onlyOneFilter",
+            description:
+              "Setting this true makes the table only keep 1 filter/search term in memory instead of allowing multiple"
+          })}
+          {renderToggle({
+            that: this,
 
-              type: "withSelectedEntities",
-              description:
-                "Setting this true makes the table pass the selectedEntities"
-            })}
-            <br />
-            {this.state.inDialog ? (
-              <Dialog
-                onClose={this.closeDialog}
-                title="Table inside a dialog"
-                isOpen={this.state.inDialog}
-              >
-                <div className={Classes.DIALOG_BODY}>
-                  <ConnectedTable />
-                </div>
-              </Dialog>
-            ) : this.state.renderUnconnectedTable ? (
-              <DataTableInstance
-                {...{
-                  tableParams: {
-                    formName: "example 1", //this should be a unique name
-                    schema,
-                    urlConnected: this.state.urlConnected,
-                    onlyOneFilter: this.state.onlyOneFilter
-                  }
-                }}
-              />
-            ) : (
-              <ConnectedTable />
-            )}
-            <br />
-          </div>
-        </Router>
+            type: "withSelectedEntities",
+            description:
+              "Setting this true makes the table pass the selectedEntities"
+          })}
+          <br />
+          {this.state.inDialog ? (
+            <Dialog
+              onClose={this.closeDialog}
+              title="Table inside a dialog"
+              isOpen={this.state.inDialog}
+            >
+              <div className={Classes.DIALOG_BODY}>
+                <ConnectedTable />
+              </div>
+            </Dialog>
+          ) : this.state.renderUnconnectedTable ? (
+            <DataTableInstance
+              {...{
+                tableParams: {
+                  formName: "example 1", //this should be a unique name
+                  schema,
+                  urlConnected: this.state.urlConnected,
+                  onlyOneFilter: this.state.onlyOneFilter
+                }
+              }}
+            />
+          ) : (
+            <ConnectedTable />
+          )}
+          <br />
+        </div>
       </div>
     );
   }
@@ -687,7 +692,7 @@ class DataTableInstance extends React.Component {
             withPaging={this.state.withPaging}
             {...(this.state.getRowClassName && {
               getRowClassName: rowInfo => {
-                console.log(`rowInfo:`, rowInfo);
+                console.info(`rowInfo:`, rowInfo);
                 return {
                   "custom-getRowClassName": true
                 };
@@ -774,4 +779,3 @@ function SubComp(row) {
     </div>
   );
 }
-

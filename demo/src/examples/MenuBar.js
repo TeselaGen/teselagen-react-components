@@ -1,6 +1,6 @@
 import React from 'react'
 import MenuBar from '../../../src/MenuBar'
-import {HotkeysDialog} from '../../../src'
+import {commandMenuEnhancer, genericCommandFactory, getCommandHotkeyHandlers, getCommandHotkeys, HotkeysDialog, withHotkeys} from '../../../src'
 import {CmdButton, CmdCheckbox, CmdDiv, CmdSwitch, } from '../../../src/utils/commandControls'
 
 export default class MenuBarDemo extends React.Component {
@@ -16,7 +16,7 @@ export default class MenuBarDemo extends React.Component {
         preventDefault: true,
         hotkey: "mod+n",
         text: "cmdSubmenu",
-        submenu: props => {
+        submenu: () => {
           return [
             {
               text: "yay I'm a dynamic submenu",
@@ -27,13 +27,13 @@ export default class MenuBarDemo extends React.Component {
         handler: () => alert('Triggered "New File"')
       },
       cmdWithTicks: {
-        isActive: p => {
+        isActive: () => {
           return this.state.isChecked
           // const ret = Math.round(Math.random())
           // console.log(`ret:`,ret)
           // return ret
         },
-        handler: (p) => {
+        handler: () => {
           this.setState({isChecked: !this.state.isChecked})
         }
       },
@@ -78,7 +78,6 @@ export default class MenuBarDemo extends React.Component {
     };
 
     // Create commands without any special logic
-    /* eslint-disable no-undef*/
     const commands = genericCommandFactory({
       /* eslint-enable no-undef*/
       commandDefs,
@@ -240,7 +239,6 @@ export default class MenuBarDemo extends React.Component {
         somethingElse: "alt+shift+e"
       }
     };
-    /* eslint-disable no-undef*/
 
     // An existing component may be wrapped, or a new one created, as in this case
     this.hotkeyEnabler = withHotkeys(
@@ -286,7 +284,6 @@ export default class MenuBarDemo extends React.Component {
         </div>
         <button
           onClick={e => {
-            /* eslint-disable no-undef*/
             return showCommandContextMenu(
               /* eslint-enable no-undef*/
               this.menu[0].submenu,
@@ -295,7 +292,7 @@ export default class MenuBarDemo extends React.Component {
                 useTicks: true
               },
               e,
-              () => {console.log(`closin 2`)},
+              () => {console.info(`closin 2`)},
               {}
             );
           }}
@@ -308,7 +305,6 @@ export default class MenuBarDemo extends React.Component {
         </button>
         <button
           onClick={e => {
-            /* eslint-disable no-undef*/
             showContextMenu(
               /* eslint-enable no-undef*/
               [
@@ -322,7 +318,7 @@ export default class MenuBarDemo extends React.Component {
                       willUnmount: () => {
                         console.info("hellllo");
                       },
-                      didMount: ({ className }) => {
+                      didMount: () => {
                         console.info("yaaa");
                       }
                     }

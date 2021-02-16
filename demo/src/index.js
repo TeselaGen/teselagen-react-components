@@ -16,7 +16,7 @@ import Loading from "./examples/Loading";
 import DownloadLink from "./examples/DownloadLink";
 import DemoNav from "./DemoNav";
 import DemoHeader from "./DemoHeader";
-import {DataTable } from "../../src";
+import { DataTable } from "../../src";
 
 import FillWindowExample from "./examples/FillWindow";
 
@@ -29,17 +29,10 @@ import showAppSpinnerDemo from "./examples/showAppSpinnerDemo";
 import "./style.css";
 import React from "react";
 import { render } from "react-dom";
-import {
-  HashRouter as Router,
-  Route,
-  Redirect
-} from "react-router-dom";
+import { HashRouter as Router, Route, Redirect } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./store";
-import {
-  FocusStyleManager,
-
-} from "@blueprintjs/core";
+import { FocusStyleManager } from "@blueprintjs/core";
 
 FocusStyleManager.onlyShowFocusOnTabs();
 
@@ -230,7 +223,7 @@ const demos = {
     DemoComponent: FormComponents
   },
   withDialog: {
-    demo: WithDialog,
+    demo: WithDialog
   },
   toastr: {
     demo: Toastr
@@ -242,7 +235,7 @@ const demos = {
     demo: showAppSpinnerDemo
   },
 
-  // MultiSelectSideBySide: 
+  // MultiSelectSideBySide:
   //   demo: MultiSelectSideBySideDemo
   // },
   ResizableDraggableDialog: {
@@ -255,16 +248,16 @@ const demos = {
     demo: CSSOnlyToolTip
   },
   FillWindow: {
-    demo: FillWindowExample,
+    demo: FillWindowExample
   },
   Timeline: {
-    demo: TimelineDemo,
+    demo: TimelineDemo
   },
   IntentText: {
-    demo: IntentTextDemo,
+    demo: IntentTextDemo
   },
   ScrollToTop: {
-    demo: ScrollToTopDemo,
+    demo: ScrollToTopDemo
   }
   // fonticons: {
   //   demo: FontIconsDemo,
@@ -291,7 +284,7 @@ const demoPropsSchema = [
 ];
 
 function DemoComponentWrapper(
-  { demo: Demo, DemoComponent,  props = [] },
+  { demo: Demo, DemoComponent, props = [] },
   demoTitle
 ) {
   return () => {
@@ -301,7 +294,7 @@ function DemoComponentWrapper(
     } else {
       component = (
         <div>
-         
+          <Demo></Demo>
           {!!props.length && (
             <React.Fragment>
               <h6
@@ -312,7 +305,7 @@ function DemoComponentWrapper(
               >
                 Properties
               </h6>
-              <Demo></Demo>
+
               <DataTable
                 formName="demoProps"
                 entities={props}

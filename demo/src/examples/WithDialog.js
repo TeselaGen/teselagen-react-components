@@ -36,6 +36,7 @@ export default class WithDialogDemo extends React.Component {
   }
 
   render() {
+
     const { isDraggable } = this.state;
     const WithDialog = withDialog({ isDraggable, title: "Dialog Demo" })(
       DialogInner
