@@ -3,9 +3,9 @@ import axios from "axios";
 import { Button, Icon, Menu, Popover, Position } from "@blueprintjs/core";
 import Dropzone from "react-dropzone";
 // import { first } from "lodash";
-import uniqid from "uniqid";
 import classnames from "classnames";
 import { some, forEach, map, every, compact, findIndex, merge } from "lodash";
+import shortid from "shortid";
 import ItemUpload from "./itemUpload";
 
 function noop() {}
@@ -245,7 +245,7 @@ class Uploader extends Component {
                 acceptedFiles.forEach(file => {
                   file.loading = true;
                   if (!file.id) {
-                    file.id = uniqid();
+                    file.id = shortid();
                   }
                 });
                 if (readBeforeUpload) {

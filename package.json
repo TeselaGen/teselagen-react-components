@@ -54,8 +54,8 @@
     "react-transition-group": "^2.4.0",
     "recompose": "^0.30.0",
     "redux-form": "^7.4.2",
+    "shortid": "^2.2.16",
     "tg-client-query-builder": "^2.12.2",
-    "uniqid": "^5.2.0",
     "use-deep-compare-effect": "^1.5.0"
   },
   "devDependencies": {

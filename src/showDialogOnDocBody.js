@@ -1,14 +1,14 @@
 import ReactDOM from "react-dom";
 import React from "react";
-import uniqid from "uniqid";
 // import withDialog from "./enhancers/withDialog";
 import { Dialog } from "@blueprintjs/core";
+import shortid from "shortid";
 
 //this is only really useful for unconnected standalone simple dialogs
 //remember to pass usePortal={false} to the <Dialog/> component so it will close properly
 export default function showDialogOnDocBody(DialogComp, options = {}) {
   const dialogHolder = document.createElement("div");
-  const className = "myDialog" + uniqid();
+  const className = "myDialog" + shortid();
   dialogHolder.className = className;
   document.body.appendChild(dialogHolder);
   const onClose = () => {
