@@ -186,6 +186,7 @@ export const DynamicMenuItem = ({
   // This allows mixing menu item elements and menu item defs, and makes it
   // safe to call menu creation utils with their own output.
   if (React.isValidElement(def)) return def;
+  if (def.reactEl) return def.reactEl;
 
   const item = [
     dividerShorthandEnhancer,
@@ -370,6 +371,9 @@ function filterMenuForCorrectness(menuDef) {
 export function getStringFromReactComponent(comp) {
   if (!comp) return "";
   if (isString(comp) || isNumber(comp)) return comp;
+  if (comp.props?.text) {
+    return getStringFromReactComponent(comp.props.text);
+  }
   const { children } = comp.props || {};
   if (!children) return "";
   if (isArray(children))

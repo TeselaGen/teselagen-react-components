@@ -9,6 +9,13 @@ describe("MenuBar", () => {
     cy.focused().type("{meta}/");
     cy.get(".tg-menu-search-suggestions").should("not.exist");
   });
+  it(`reactEl item in a menubar can be searched!`, () => {
+    cy.contains(".bp3-button-text", "Help").click();
+    cy.focused().type("melting");
+    cy.get(
+      `.bp3-menu-item:contains(Melting Temp of Selection) .bp3-icon-small-tick`
+    );
+  });
   it(`menubar can be searched!`, () => {
     //
     cy.contains(".bp3-button-text", "Help").click();

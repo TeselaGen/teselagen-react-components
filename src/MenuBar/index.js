@@ -94,7 +94,7 @@ class MenuBar extends React.Component {
               onItemSelect={this.handleItemClickOrSelect()}
               inputValueRenderer={i => i.text}
               noResults={<div>No Results...</div>}
-              itemRenderer={this.itemRenderer}
+              itemRenderer={this.helpItemRenderer}
               {...rest}
             />
           )
@@ -105,7 +105,7 @@ class MenuBar extends React.Component {
     });
   };
 
-  itemRenderer = (i, b) => {
+  helpItemRenderer = (i, b) => {
     // if (i.submenu.length === 3) debugger;
     return (
       <DynamicMenuItem
@@ -114,6 +114,7 @@ class MenuBar extends React.Component {
           doNotEnhanceTopLevelItem: true,
           enhancers: this.props.enhancers,
           def: {
+            reactEl: i.reactEl,
             submenu: i.submenu,
             icon: i.icon,
             disabled: i.disabled,
@@ -314,17 +315,28 @@ const filterMenuItems = (searchVal, items) => {
       onClick,
       hidden,
       hideFromMenuSearch,
-      showInSearchMenu
+      showInSearchMenu,
+      reactEl
     } = item;
     if (
       !showInSearchMenu &&
-      (!text || !onClick || !searchVal || hideFromMenuSearch || hidden)
-    )
+      !reactEl &&
+      (reactEl ||
+        !text ||
+        !onClick ||
+        !searchVal ||
+        hideFromMenuSearch ||
+        hidden)
+    ) {
       return [];
+    }
     //fix this to use some smart regex
+
     let justText = text;
     let isSimpleText = true;
-    if (!text.toLowerCase) {
+    if (reactEl) {
+      justText = getStringFromReactComponent(reactEl);
+    } else if (!text.toLowerCase) {
       if (text.props) {
         isSimpleText = false;
         justText = getStringFromReactComponent(text);
@@ -332,7 +344,6 @@ const filterMenuItems = (searchVal, items) => {
         return [];
       }
     }
-
     if (doesSearchValMatchText(searchVal, justText)) {
       return {
         ...item,

@@ -1,7 +1,20 @@
-import React from 'react'
-import MenuBar from '../../../src/MenuBar'
-import {commandMenuEnhancer, genericCommandFactory, getCommandHotkeyHandlers, getCommandHotkeys, HotkeysDialog, withHotkeys} from '../../../src'
-import {CmdButton, CmdCheckbox, CmdDiv, CmdSwitch, } from '../../../src/utils/commandControls'
+import React from "react";
+import MenuBar from "../../../src/MenuBar";
+import {
+  commandMenuEnhancer,
+  genericCommandFactory,
+  getCommandHotkeyHandlers,
+  getCommandHotkeys,
+  HotkeysDialog,
+  withHotkeys
+} from "../../../src";
+import {
+  CmdButton,
+  CmdCheckbox,
+  CmdDiv,
+  CmdSwitch
+} from "../../../src/utils/commandControls";
+import { MenuItem } from "@blueprintjs/core";
 
 export default class MenuBarDemo extends React.Component {
   constructor(props) {
@@ -28,13 +41,13 @@ export default class MenuBarDemo extends React.Component {
       },
       cmdWithTicks: {
         isActive: () => {
-          return this.state.isChecked
+          return this.state.isChecked;
           // const ret = Math.round(Math.random())
           // console.log(`ret:`,ret)
           // return ret
         },
         handler: () => {
-          this.setState({isChecked: !this.state.isChecked})
+          this.setState({ isChecked: !this.state.isChecked });
         }
       },
       newFile: {
@@ -97,6 +110,19 @@ export default class MenuBarDemo extends React.Component {
             cmd: "newFile"
           },
           {
+            reactEl: (
+              <MenuItem
+                key="zoioink"
+                shouldDismissPopover={false}
+                text="Melting Temp of Selection"
+                onClick={() => {
+                  alert("hey");
+                }}
+                icon={"small-tick"}
+              ></MenuItem>
+            )
+          },
+          {
             text: <span>ReactText {9}</span>,
             onClick: () => {
               window.toastr.success("Fired ReactText!");
@@ -124,7 +150,7 @@ export default class MenuBarDemo extends React.Component {
           },
           {
             shouldDismissPopover: false,
-            cmd: "cmdWithTicks",
+            cmd: "cmdWithTicks"
           },
           {
             shouldDismissPopover: false,
@@ -247,9 +273,11 @@ export default class MenuBarDemo extends React.Component {
     )();
 
     this.menu = menu;
-    this.menuEnhancers = [commandMenuEnhancer(commands, {
-      useTicks: true
-    })];
+    this.menuEnhancers = [
+      commandMenuEnhancer(commands, {
+        useTicks: true
+      })
+    ];
     /* eslint-enable no-undef*/
 
     this.state = {
@@ -292,16 +320,15 @@ export default class MenuBarDemo extends React.Component {
                 useTicks: true
               },
               e,
-              () => {console.info(`closin 2`)},
+              () => {
+                console.info(`closin 2`);
+              },
               {}
             );
           }}
         >
-          config.useTicks
-          config.omitIcons
-          config.forceIconAlignment
-          Click to see a menu created using the imperative
-          showCommandContextMenu
+          config.useTicks config.omitIcons config.forceIconAlignment Click to
+          see a menu created using the imperative showCommandContextMenu
         </button>
         <button
           onClick={e => {
@@ -370,5 +397,3 @@ export default class MenuBarDemo extends React.Component {
     );
   }
 }
-
-
