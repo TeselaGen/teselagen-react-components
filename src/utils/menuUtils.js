@@ -107,6 +107,7 @@ export const commandMenuEnhancer = (commands, config = {}) => (
 
     item.key = item.key || cmdId;
     item.submenu = item.submenu || command.submenu;
+    item.component = item.component || command.component;
 
     if (toggles) {
       if (useTicks) {
@@ -164,7 +165,10 @@ const dividerShorthandEnhancer = def =>
 
 // filter out unwanted attributes here! we won't want these to show up on the dom element or react will give nasty warnings
 const unwantedAttrs = [
+  "isSimpleText",
+  "justText",
   "submenu",
+  "component",
   "hotkey",
   "changingProps",
   "showInSearchMenu",
@@ -186,7 +190,6 @@ export const DynamicMenuItem = ({
   // This allows mixing menu item elements and menu item defs, and makes it
   // safe to call menu creation utils with their own output.
   if (React.isValidElement(def)) return def;
-  if (def.reactEl) return def.reactEl;
 
   const item = [
     dividerShorthandEnhancer,

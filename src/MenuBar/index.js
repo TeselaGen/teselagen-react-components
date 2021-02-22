@@ -114,10 +114,7 @@ class MenuBar extends React.Component {
           doNotEnhanceTopLevelItem: true,
           enhancers: this.props.enhancers,
           def: {
-            reactEl: i.reactEl,
-            submenu: i.submenu,
-            icon: i.icon,
-            disabled: i.disabled,
+            ...i,
             text: i.isSimpleText ? i.justText || i.text : i.text,
             label: i.path.length && (
               <span style={{ fontSize: 8 }}>
@@ -316,27 +313,19 @@ const filterMenuItems = (searchVal, items) => {
       hidden,
       hideFromMenuSearch,
       showInSearchMenu,
-      reactEl
+      component
     } = item;
     if (
       !showInSearchMenu &&
-      !reactEl &&
-      (reactEl ||
-        !text ||
-        !onClick ||
-        !searchVal ||
-        hideFromMenuSearch ||
-        hidden)
+      !component &&
+      (!text || !onClick || !searchVal || hideFromMenuSearch || hidden)
     ) {
       return [];
     }
     //fix this to use some smart regex
-
     let justText = text;
     let isSimpleText = true;
-    if (reactEl) {
-      justText = getStringFromReactComponent(reactEl);
-    } else if (!text.toLowerCase) {
+    if (!text.toLowerCase) {
       if (text.props) {
         isSimpleText = false;
         justText = getStringFromReactComponent(text);

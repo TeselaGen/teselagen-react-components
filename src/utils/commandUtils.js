@@ -4,6 +4,7 @@ import { startCase } from "lodash";
 // TODO add documentation
 export function genericCommandFactory(config) {
   const out = {};
+  // eslint-disable-next-line no-unused-vars
   for (let cmdId in config.commandDefs) {
     const def = config.commandDefs[cmdId];
     const command = { id: cmdId };
@@ -18,6 +19,7 @@ export function genericCommandFactory(config) {
     const properties = [
       "icon",
       "name",
+      "component",
       "shortName",
       "description",
       "hotkey",

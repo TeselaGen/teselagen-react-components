@@ -6,6 +6,8 @@ import {
   getCommandHotkeyHandlers,
   getCommandHotkeys,
   HotkeysDialog,
+  showCommandContextMenu,
+  showContextMenu,
   withHotkeys
 } from "../../../src";
 import {
@@ -38,6 +40,19 @@ export default class MenuBarDemo extends React.Component {
           ];
         },
         handler: () => alert('Triggered "New File"')
+      },
+      cmdComponent: {
+        //cmd's can also pass component
+        preventDefault: true,
+        hotkey: "mod+n",
+        name: "component cmd example",
+        component: topLevelProps => instanceProps => {
+          //topLevelProps would be props passed to all cmds via the cmd enhancer
+          console.info(`topLevelProps:`,topLevelProps)
+          return (
+            <MenuItem text={instanceProps.name} {...instanceProps}></MenuItem>
+          );
+        }
       },
       cmdWithTicks: {
         isActive: () => {
@@ -110,11 +125,12 @@ export default class MenuBarDemo extends React.Component {
             cmd: "newFile"
           },
           {
-            reactEl: (
+            text: "Melting Temp of Selection",
+            component: props => (
               <MenuItem
+                {...props}
                 key="zoioink"
                 shouldDismissPopover={false}
-                text="Melting Temp of Selection"
                 onClick={() => {
                   alert("hey");
                 }}
@@ -122,6 +138,7 @@ export default class MenuBarDemo extends React.Component {
               ></MenuItem>
             )
           },
+          "cmdComponent",
           {
             text: <span>ReactText {9}</span>,
             onClick: () => {
