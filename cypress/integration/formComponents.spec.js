@@ -2,6 +2,9 @@ describe("formComponents", () => {
   beforeEach(() => {
     cy.visit("#/FormComponents");
   });
+  it(`a disabled SelectField should not be able to be interacted with`, () => {
+    cy.get(`[label="Select Simple with defaultValue"]`).should("be.disabled");
+  });
   it(`ReactSelectField works for single select`, () => {
     cy.get(".tg-test-react-select-field .tg-select")
       .click()

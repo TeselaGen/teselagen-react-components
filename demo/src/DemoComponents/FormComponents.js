@@ -257,6 +257,7 @@ class FormComponentsDemo extends React.Component {
             name={"selectFieldWithDefaultValue"}
             inlineLabel={this.state.inlineLabels}
             defaultValue={"you"}
+            disabled
             label="Select Simple with defaultValue"
           />
           <SelectField

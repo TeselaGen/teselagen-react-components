@@ -697,6 +697,7 @@ export const renderSelect = props => {
             ? sortify(value) //deterministically sort and stringify the object/number coming in because select fields only support string values
             : value
         }
+        disabled={disabled}
         {...(hideValue ? { value: "" } : {})}
         onChange={function(e) {
           let val = e.target.value;
