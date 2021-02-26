@@ -24,17 +24,6 @@ export default class HotkeysDialogDemo extends React.Component {
 
       // full object syntax
       showHotkeys: { combo: 'mod+h', preventDefault: true },
-      showHotkeys0: { combo: 'mod+h', preventDefault: true },
-      showHotkeys1: { combo: 'mod+h', preventDefault: true },
-      showHotkeys2: { combo: 'mod+h', preventDefault: true },
-      showHotkeys3: { combo: 'mod+h', preventDefault: true },
-      showHotkeys4: { combo: 'mod+h', preventDefault: true },
-      showHotkeys5: { combo: 'mod+h', preventDefault: true },
-      showHotkeys6: { combo: 'mod+h', preventDefault: true },
-      showHotkeys7: { combo: 'mod+h', preventDefault: true },
-      showHotkeys8: { combo: 'mod+h', preventDefault: true },
-      showHotkeys9: { combo: 'mod+h', preventDefault: true },
-      showHotkeys10: { combo: 'mod+h', preventDefault: true },
     };
 
     const hotkeys2 = {
@@ -59,7 +48,7 @@ export default class HotkeysDialogDemo extends React.Component {
     // An existing component may be wrapped, or a new one created, as in this
     // case. If using non-global hotkeys, an existing component must be wrapped,
     // so it can get focus.
-    this.hotkeyEnabler = withHotkeys({ ...hotkeys1, ...hotkeys2}, handlers)();
+    this.hotkeyEnabler = withHotkeys({ ...hotkeys1, ...hotkeys2}, handlers);
 
     // HotkeysDialog
     // Sets will normally be different routes/modules/views of an app, but any

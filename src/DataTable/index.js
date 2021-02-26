@@ -27,9 +27,6 @@ import {
   Popover,
   Intent,
   Callout,
-  Hotkey,
-  Hotkeys,
-  HotkeysTarget,
   Tooltip
 } from "@blueprintjs/core";
 import classNames from "classnames";
@@ -37,6 +34,7 @@ import scrollIntoView from "dom-scroll-into-view";
 import { SortableElement } from "react-sortable-hoc";
 import ReactTable from "@teselagen/react-table";
 import { withProps, branch, compose } from "recompose";
+import { withHotkeys } from "../utils/hotkeyUtils";
 import InfoHelper from "../InfoHelper";
 import { getSelectedRowsFromEntities } from "./utils/selection";
 import rowClick, { finalizeSelection } from "./utils/rowClick";
@@ -56,6 +54,17 @@ import { getRecordsFromIdMap } from "./utils/withSelectedEntities";
 import TableFormTrackerContext from "./TableFormTrackerContext";
 
 class DataTable extends React.Component {
+  constructor(props) {
+    super(props);
+    this.hotkeyEnabler = withHotkeys({
+      copyHotkey: {
+        global: false,
+        combo: "mod + c",
+        label: "Copy rows",
+        onKeyDown: this.handleCopyHotkey
+      }
+    });
+  }
   state = {
     columns: [],
     fullscreen: false
@@ -233,10 +242,11 @@ class DataTable extends React.Component {
     // );
   }
 
-  handleCopyHotkey = () => {
+  handleCopyHotkey = e => {
     const { reduxFormSelectedEntityIdMap } = this.props;
     this.handleCopySelectedRows(
-      getRecordsFromIdMap(reduxFormSelectedEntityIdMap)
+      getRecordsFromIdMap(reduxFormSelectedEntityIdMap),
+      e
     );
   };
 
@@ -289,9 +299,7 @@ class DataTable extends React.Component {
       .sort();
 
     if (!rowNumbersToCopy.length) return;
-    const allRowEls = e.target
-      .closest(".ReactTable")
-      .querySelectorAll(".rt-tr");
+    const allRowEls = e.target.querySelectorAll(".rt-tr");
     const rowEls = rowNumbersToCopy.map(i => allRowEls[i]);
 
     //get row elements and call this.handleCopyRow for each const rowEls = this.getRowEls(rowNumbersToCopy)
@@ -301,18 +309,6 @@ class DataTable extends React.Component {
     if (!textToCopy) return window.toastr.warning("No text to copy");
     this.handleCopyHelper(textToCopy, "Selected rows copied");
   };
-
-  renderHotkeys() {
-    return (
-      <Hotkeys>
-        <Hotkey
-          combo="mod + c"
-          label="Copy rows"
-          onKeyDown={this.handleCopyHotkey}
-        />
-      </Hotkeys>
-    );
-  }
 
   moveColumn = ({ oldIndex, newIndex }) => {
     const { columns } = this.state;
@@ -608,165 +604,169 @@ class DataTable extends React.Component {
       );
     }
     return (
-      <div
-        className={classNames(
-          "data-table-container",
-          extraClasses,
-          className,
-          compactClassName,
-          {
-            fullscreen,
-            in_cypress_test: window.Cypress, //tnr: this is a hack to make cypress be able to correctly click the table without the sticky header getting in the way. remove me once https://github.com/cypress-io/cypress/issues/871 is fixed
-            "dt-isViewable": isViewable,
-            "dt-minimalStyle": minimalStyle,
-            "no-padding": noPadding,
-            "hide-column-header": hideColumnHeader
-          }
-        )}
-      >
-        {showHeader && (
-          <div className="data-table-header">
-            <div className="data-table-title-and-buttons">
-              {tableName && withTitle && (
-                <span className="data-table-title">{tableName}</span>
-              )}
-              {children}
-              {topLeftItems}
-            </div>
-            {errorParsingUrlString && (
-              <Callout
-                icon="error"
-                style={{
-                  width: "unset"
-                }}
-                intent={Intent.WARNING}
-              >
-                Error parsing URL
-              </Callout>
-            )}
-            {nonDisplayedFilterComp}
-            {withSearch && (
-              <div className="data-table-search-and-clear-filter-container">
-                {hasFilters ? (
-                  <Tooltip content="Clear Filters">
-                    <Button
-                      minimal
-                      intent="danger"
-                      icon="filter-remove"
-                      disabled={disabled}
-                      className="data-table-clear-filters"
-                      onClick={() => {
-                        clearFilters(additionalFilterKeys);
-                      }}
-                    />
-                  </Tooltip>
-                ) : (
-                  ""
-                )}
-                <SearchBar
-                  {...{
-                    reduxFormSearchInput,
-                    setSearchTerm,
-                    loading: isLoading,
-                    searchMenuButton,
-                    disabled,
-                    autoFocusSearch
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        )}
-        {subHeader}
-        <ReactTable
-          data={entities}
-          ref={n => {
-            if (n) this.table = n;
-          }}
-          className={classNames({
-            "tg-table-loading": isLoading,
-            "tg-table-disabled": disabled
-          })}
-          itemSizeEstimator={
-            extraCompact
-              ? itemSizeEstimators.compact
-              : compact
-              ? itemSizeEstimators.normal
-              : itemSizeEstimators.comfortable
-          }
-          columns={this.renderColumns()}
-          pageSize={rowsToShow}
-          expanded={expandedRows}
-          showPagination={false}
-          sortable={false}
-          loading={isLoading || disabled}
-          defaultResized={resized}
-          onResizedChange={(newResized = []) => {
-            const resizedToUse = newResized.map(column => {
-              // have a min width of 50 so that columns don't disappear
-              if (column.value < 50) {
-                return {
-                  ...column,
-                  value: 50
-                };
-              } else {
-                return column;
-              }
-            });
-            resizePersist(resizedToUse);
-          }}
-          TheadComponent={this.getTheadComponent}
-          ThComponent={this.getThComponent}
-          getTrGroupProps={this.getTableRowProps}
-          NoDataComponent={({ children }) =>
-            isLoading ? null : (
-              <div className="rt-noData">{noRowsFoundMessage || children}</div>
-            )
-          }
-          LoadingComponent={props => (
-            <DisabledLoadingComponent {...{ ...props, disabled }} />
+      <this.hotkeyEnabler>
+        <div
+          className={classNames(
+            "data-table-container",
+            extraClasses,
+            className,
+            compactClassName,
+            {
+              fullscreen,
+              in_cypress_test: window.Cypress, //tnr: this is a hack to make cypress be able to correctly click the table without the sticky header getting in the way. remove me once https://github.com/cypress-io/cypress/issues/871 is fixed
+              "dt-isViewable": isViewable,
+              "dt-minimalStyle": minimalStyle,
+              "no-padding": noPadding,
+              "hide-column-header": hideColumnHeader
+            }
           )}
-          style={{
-            maxHeight,
-            minHeight: 150,
-            ...style
-          }}
-          SubComponent={SubComponentToUse}
-          {...ReactTableProps}
-        />
-        {!noFooter && (
-          <div
-            className="data-table-footer"
-            style={{
-              justifyContent:
-                !showNumSelected && !showCount ? "flex-end" : "space-between"
-            }}
-          >
-            {selectedAndTotalMessage}
-            <div style={{ display: "flex", flexWrap: "wrap" }}>
-              {additionalFooterButtons}
-              {!noFullscreenButton && toggleFullscreenButton}
-              {withDisplayOptions && (
-                <DisplayOptions
-                  compact={compact}
-                  extraCompact={extraCompact}
-                  disabled={disabled}
-                  hideDisplayOptionsIcon={hideDisplayOptionsIcon}
-                  resetDefaultVisibility={resetDefaultVisibilityToUse}
-                  updateColumnVisibility={updateColumnVisibilityToUse}
-                  updateTableDisplayDensity={updateTableDisplayDensityToUse}
-                  showForcedHiddenColumns={showForcedHiddenColumns}
-                  setShowForcedHidden={setShowForcedHidden}
-                  hasOptionForForcedHidden={hasOptionForForcedHidden}
-                  formName={formName}
-                  schema={schema}
-                />
+        >
+          {showHeader && (
+            <div className="data-table-header">
+              <div className="data-table-title-and-buttons">
+                {tableName && withTitle && (
+                  <span className="data-table-title">{tableName}</span>
+                )}
+                {children}
+                {topLeftItems}
+              </div>
+              {errorParsingUrlString && (
+                <Callout
+                  icon="error"
+                  style={{
+                    width: "unset"
+                  }}
+                  intent={Intent.WARNING}
+                >
+                  Error parsing URL
+                </Callout>
               )}
-              {shouldShowPaging && <PagingTool {...propPresets} />}
+              {nonDisplayedFilterComp}
+              {withSearch && (
+                <div className="data-table-search-and-clear-filter-container">
+                  {hasFilters ? (
+                    <Tooltip content="Clear Filters">
+                      <Button
+                        minimal
+                        intent="danger"
+                        icon="filter-remove"
+                        disabled={disabled}
+                        className="data-table-clear-filters"
+                        onClick={() => {
+                          clearFilters(additionalFilterKeys);
+                        }}
+                      />
+                    </Tooltip>
+                  ) : (
+                    ""
+                  )}
+                  <SearchBar
+                    {...{
+                      reduxFormSearchInput,
+                      setSearchTerm,
+                      loading: isLoading,
+                      searchMenuButton,
+                      disabled,
+                      autoFocusSearch
+                    }}
+                  />
+                </div>
+              )}
             </div>
-          </div>
-        )}
-      </div>
+          )}
+          {subHeader}
+          <ReactTable
+            data={entities}
+            ref={n => {
+              if (n) this.table = n;
+            }}
+            className={classNames({
+              "tg-table-loading": isLoading,
+              "tg-table-disabled": disabled
+            })}
+            itemSizeEstimator={
+              extraCompact
+                ? itemSizeEstimators.compact
+                : compact
+                ? itemSizeEstimators.normal
+                : itemSizeEstimators.comfortable
+            }
+            columns={this.renderColumns()}
+            pageSize={rowsToShow}
+            expanded={expandedRows}
+            showPagination={false}
+            sortable={false}
+            loading={isLoading || disabled}
+            defaultResized={resized}
+            onResizedChange={(newResized = []) => {
+              const resizedToUse = newResized.map(column => {
+                // have a min width of 50 so that columns don't disappear
+                if (column.value < 50) {
+                  return {
+                    ...column,
+                    value: 50
+                  };
+                } else {
+                  return column;
+                }
+              });
+              resizePersist(resizedToUse);
+            }}
+            TheadComponent={this.getTheadComponent}
+            ThComponent={this.getThComponent}
+            getTrGroupProps={this.getTableRowProps}
+            NoDataComponent={({ children }) =>
+              isLoading ? null : (
+                <div className="rt-noData">
+                  {noRowsFoundMessage || children}
+                </div>
+              )
+            }
+            LoadingComponent={props => (
+              <DisabledLoadingComponent {...{ ...props, disabled }} />
+            )}
+            style={{
+              maxHeight,
+              minHeight: 150,
+              ...style
+            }}
+            SubComponent={SubComponentToUse}
+            {...ReactTableProps}
+          />
+          {!noFooter && (
+            <div
+              className="data-table-footer"
+              style={{
+                justifyContent:
+                  !showNumSelected && !showCount ? "flex-end" : "space-between"
+              }}
+            >
+              {selectedAndTotalMessage}
+              <div style={{ display: "flex", flexWrap: "wrap" }}>
+                {additionalFooterButtons}
+                {!noFullscreenButton && toggleFullscreenButton}
+                {withDisplayOptions && (
+                  <DisplayOptions
+                    compact={compact}
+                    extraCompact={extraCompact}
+                    disabled={disabled}
+                    hideDisplayOptionsIcon={hideDisplayOptionsIcon}
+                    resetDefaultVisibility={resetDefaultVisibilityToUse}
+                    updateColumnVisibility={updateColumnVisibilityToUse}
+                    updateTableDisplayDensity={updateTableDisplayDensityToUse}
+                    showForcedHiddenColumns={showForcedHiddenColumns}
+                    setShowForcedHidden={setShowForcedHidden}
+                    hasOptionForForcedHidden={hasOptionForForcedHidden}
+                    formName={formName}
+                    schema={schema}
+                  />
+                )}
+                {shouldShowPaging && <PagingTool {...propPresets} />}
+              </div>
+            </div>
+          )}
+        </div>
+      </this.hotkeyEnabler>
     );
   }
 
@@ -1346,7 +1346,7 @@ DataTable.contextType = TableFormTrackerContext;
 // //   return change(form, "reduxFormSelectedEntityIdMap", value)
 // // }
 // export default CompToExport
-export default dataTableEnhancer(HotkeysTarget(DataTable));
+export default dataTableEnhancer(DataTable);
 const ConnectedPagingTool = dataTableEnhancer(PagingTool);
 export { ConnectedPagingTool };
 

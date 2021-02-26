@@ -3,24 +3,32 @@ import { pickBy, isNumber, startsWith, flatMap, take, flatten } from "lodash";
 import { Suggest } from "@blueprintjs/select";
 
 import "./style.css";
-import {
-  Popover,
-  Position,
-  Menu,
-  Button,
-  Hotkeys,
-  HotkeysTarget,
-  Hotkey
-} from "@blueprintjs/core";
+import { Popover, Position, Menu, Button } from "@blueprintjs/core";
 import {
   createDynamicMenu,
   DynamicMenuItem,
   getStringFromReactComponent,
   doesSearchValMatchText
 } from "../utils/menuUtils";
-import { comboToLabel } from "../utils/hotkeyUtils";
+import { comboToLabel, withHotkeys } from "../utils/hotkeyUtils";
 
 class MenuBar extends React.Component {
+  constructor(props) {
+    super(props);
+    const combo =
+      (this.props && this.props.menuSearchHotkey) || menuSearchHotkey;
+    this.hotkeyEnabler = withHotkeys({
+      searchHotkey: {
+        allowInInput: true,
+        global: true,
+        combo,
+        label: "Search the menu",
+        preventDefault: true,
+        stopPropagation: true,
+        onKeyDown: this.toggleFocusSearchMenu
+      }
+    });
+  }
   static defaultProps = {
     className: "",
     style: {}
@@ -169,26 +177,8 @@ class MenuBar extends React.Component {
       }
     }
   };
-  renderHotkeys() {
-    return (
-      <Hotkeys>
-        {isNumber(this.menuSearchIndex) && (
-          <Hotkey
-            allowInInput
-            global={true}
-            combo={
-              (this.props && this.props.menuSearchHotkey) || menuSearchHotkey
-            }
-            label="Search the menu"
-            preventDefault
-            stopPropagation
-            onKeyDown={this.toggleFocusSearchMenu}
-          />
-        )}
-      </Hotkeys>
-    );
-  }
   toggleFocusSearchMenu = () => {
+    if (!isNumber(this.menuSearchIndex)) return;
     //toggle off
     if (this.searchInput && document.activeElement === this.searchInput) {
       this.searchInput.blur();
@@ -214,6 +204,7 @@ class MenuBar extends React.Component {
     const { isOpen, openIndex } = this.state;
     return (
       <div className={"tg-menu-bar " + className} style={style}>
+        <this.hotkeyEnabler></this.hotkeyEnabler>
         {this.addHelpItemIfNecessary(menu).map((topLevelItem, i) => {
           const dataKeys = pickBy(topLevelItem, function(value, key) {
             return startsWith(key, "data-");
@@ -383,4 +374,4 @@ function highlight(query, text, opts) {
   return flatten([before, match, after]);
 }
 
-export default HotkeysTarget(MenuBar);
+export default MenuBar;

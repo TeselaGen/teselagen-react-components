@@ -287,7 +287,7 @@ export default class MenuBarDemo extends React.Component {
     this.hotkeyEnabler = withHotkeys(
       getCommandHotkeys(commands), // in this example, equivalent to `hotkeys`,
       getCommandHotkeyHandlers(commands) // in this example, equivalent to `handlers`
-    )();
+    );
 
     this.menu = menu;
     this.menuEnhancers = [
