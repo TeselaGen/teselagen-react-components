@@ -1039,7 +1039,7 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
     const [defaultValCount, setDefaultValCount] = React.useState(0);
     const [defaultValueFromBackend, setDefault] = useState();
     const [allowUserOverride, setUserOverride] = useState(true);
-    const [isLoading, setLoading] = useState(false);
+    const [isLoadingDefaultValue, setLoadingDefaultValue] = useState(false);
     const { inAssignDefaultsMode } = useContext(AssignDefaultsModeContext);
     const workflowParams = useContext(WorkflowDefaultParamsContext);
 
@@ -1055,7 +1055,7 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
     useDeepCompareEffect(() => {
       if (!window.__triggerGetDefaultValueRequest) return;
       if (!generateDefaultValue) return;
-      setLoading(true);
+      setLoadingDefaultValue(true);
       //custom params should match params keys. if not throw an error
       const doParamsMatch = isEqual(
         Object.keys({
@@ -1104,7 +1104,7 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
         } catch (error) {
           console.error(`error aswf298f:`, error);
         }
-        setLoading(false);
+        setLoadingDefaultValue(false);
       })();
     }, [generateDefaultValue || {}, count]);
     // const asyncValidating = props.asyncValidating;
@@ -1112,7 +1112,7 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
       ...rest,
       defaultValue: defaultValueFromBackend || defaultValueFromProps,
       disabled: props.disabled || allowUserOverride === false,
-      readOnly: props.readOnly || isLoading,
+      readOnly: props.readOnly || isLoadingDefaultValue,
       intent: getIntent(props),
       intentClass: getIntentClass(props)
     };
@@ -1122,44 +1122,48 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
     //   delete defaultProps.intent;
     //   delete defaultProps.intentClass;
     // }
+
+    // if in a cypress test show message so that inputs will not be interactable
+    if (window.Cypress && isLoadingDefaultValue) {
+      return "Loading default value...";
+    }
+
     return (
-      <React.Fragment>
-        <AbstractInput
-          {...{
-            ...opts,
-            defaultValCount,
-            ...defaultProps,
-            showGenerateDefaultDot:
-              !inAssignDefaultsMode &&
-              window.__showGenerateDefaultDot &&
-              window.__showGenerateDefaultDot() &&
-              !!generateDefaultValue,
-            assignDefaultButton: inAssignDefaultsMode && generateDefaultValue && (
-              <Button
-                onClick={() =>
-                  window.__showAssignDefaultValueModal &&
-                  window.__showAssignDefaultValueModal({
-                    ...props,
-                    generateDefaultValue: {
-                      ...props.generateDefaultValue,
-                      customParams: customParamsToUse
-                    },
-                    onFinish: () => {
-                      updateCount(count + 1);
-                    }
-                  })
-                }
-                small
-                style={{ background: "yellow", color: "black" }}
-              >
-                Assign Default
-              </Button>
-            )
-          }}
-        >
-          <ComponentToWrap {...defaultProps} />
-        </AbstractInput>
-      </React.Fragment>
+      <AbstractInput
+        {...{
+          ...opts,
+          defaultValCount,
+          ...defaultProps,
+          showGenerateDefaultDot:
+            !inAssignDefaultsMode &&
+            window.__showGenerateDefaultDot &&
+            window.__showGenerateDefaultDot() &&
+            !!generateDefaultValue,
+          assignDefaultButton: inAssignDefaultsMode && generateDefaultValue && (
+            <Button
+              onClick={() =>
+                window.__showAssignDefaultValueModal &&
+                window.__showAssignDefaultValueModal({
+                  ...props,
+                  generateDefaultValue: {
+                    ...props.generateDefaultValue,
+                    customParams: customParamsToUse
+                  },
+                  onFinish: () => {
+                    updateCount(count + 1);
+                  }
+                })
+              }
+              small
+              style={{ background: "yellow", color: "black" }}
+            >
+              Assign Default
+            </Button>
+          )
+        }}
+      >
+        <ComponentToWrap {...defaultProps} />
+      </AbstractInput>
     );
   };
 };
