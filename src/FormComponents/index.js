@@ -203,7 +203,8 @@ class AbstractInput extends React.Component {
       assignDefaultButton,
       showGenerateDefaultDot,
       input,
-      noFillField
+      noFillField,
+      isLoadingDefaultValue
     } = this.props;
     const { touched, error, warning } = meta;
 
@@ -241,6 +242,11 @@ class AbstractInput extends React.Component {
       } else if (showWarning) {
         helperText = warning;
       }
+    }
+
+    // if in a cypress test show message so that inputs will not be interactable
+    if (window.Cypress && isLoadingDefaultValue) {
+      return "Loading default value...";
     }
 
     return (
@@ -1104,6 +1110,9 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
         } catch (error) {
           console.error(`error aswf298f:`, error);
         }
+        if (window.Cypress && window.Cypress.addFakeDefaultValueWait) {
+          await fakeWait();
+        }
         setLoadingDefaultValue(false);
       })();
     }, [generateDefaultValue || {}, count]);
@@ -1123,17 +1132,13 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
     //   delete defaultProps.intentClass;
     // }
 
-    // if in a cypress test show message so that inputs will not be
-    if (window.Cypress && isLoadingDefaultValue) {
-      return "Loading default value...";
-    }
-
     return (
       <AbstractInput
         {...{
           ...opts,
           defaultValCount,
           ...defaultProps,
+          isLoadingDefaultValue,
           showGenerateDefaultDot:
             !inAssignDefaultsMode &&
             window.__showGenerateDefaultDot &&
@@ -1201,4 +1206,10 @@ function getOptions(options) {
       return opt;
     })
   );
+}
+
+function fakeWait() {
+  return new Promise(resolve => {
+    setTimeout(() => resolve(), 3000);
+  });
 }
