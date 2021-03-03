@@ -299,15 +299,23 @@ class DataTable extends React.Component {
       .sort();
 
     if (!rowNumbersToCopy.length) return;
-    const allRowEls = e.target.querySelectorAll(".rt-tr");
-    const rowEls = rowNumbersToCopy.map(i => allRowEls[i]);
 
-    //get row elements and call this.handleCopyRow for each const rowEls = this.getRowEls(rowNumbersToCopy)
-    const textToCopy = map(rowEls, rowEl => this.getRowCopyText(rowEl))
-      .filter(text => text)
-      .join("\n");
-    if (!textToCopy) return window.toastr.warning("No text to copy");
-    this.handleCopyHelper(textToCopy, "Selected rows copied");
+    try {
+      const allRowEls = e.target
+        .closest(".data-table-container")
+        .querySelectorAll(".rt-tr");
+      const rowEls = rowNumbersToCopy.map(i => allRowEls[i]);
+
+      //get row elements and call this.handleCopyRow for each const rowEls = this.getRowEls(rowNumbersToCopy)
+      const textToCopy = map(rowEls, rowEl => this.getRowCopyText(rowEl))
+        .filter(text => text)
+        .join("\n");
+      if (!textToCopy) return window.toastr.warning("No text to copy");
+      this.handleCopyHelper(textToCopy, "Selected rows copied");
+    } catch (error) {
+      console.error(`error:`, error);
+      window.toastr.error("Error copying rows.");
+    }
   };
 
   moveColumn = ({ oldIndex, newIndex }) => {
@@ -1149,7 +1157,8 @@ class DataTable extends React.Component {
       //compute the row here so we don't lose access to it
       const cell =
         e.target.querySelector(".tg-cell-wrapper") ||
-        e.target.closest(".tg-cell-wrapper");
+        e.target.closest(".tg-cell-wrapper") ||
+        e.target.closest(".rt-td");
       const row = cell.closest(".rt-tr");
       copyMenuItems.push(
         <MenuItem
@@ -1183,20 +1192,22 @@ class DataTable extends React.Component {
       const cellWrapper =
         e.target.querySelector(".tg-cell-wrapper") ||
         e.target.closest(".tg-cell-wrapper");
-      copyMenuItems.push(
-        <MenuItem
-          key="copyCell"
-          onClick={() => {
-            //TODOCOPY: we need to make sure that the cell copy is being used by the row copy.. right now we have 2 different things going on
-            //do we need to be able to copy hidden cells? It seems like it should just copy what's on the page..?
+      if (cellWrapper) {
+        copyMenuItems.push(
+          <MenuItem
+            key="copyCell"
+            onClick={() => {
+              //TODOCOPY: we need to make sure that the cell copy is being used by the row copy.. right now we have 2 different things going on
+              //do we need to be able to copy hidden cells? It seems like it should just copy what's on the page..?
 
-            const text = this.getCellCopyText(cellWrapper);
-            this.handleCopyHelper(text, "Cell copied");
-          }}
-          icon="clipboard"
-          text="Copy Cell to Clipboard"
-        />
-      );
+              const text = this.getCellCopyText(cellWrapper);
+              this.handleCopyHelper(text, "Cell copied");
+            }}
+            icon="clipboard"
+            text="Copy Cell to Clipboard"
+          />
+        );
+      }
     }
     const menu = (
       <Menu>
