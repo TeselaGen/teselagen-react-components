@@ -17,6 +17,7 @@ export {
 } from "./DataTable";
 export { default as Loading } from "./Loading";
 export { default as TgSelect } from "./TgSelect";
+export { default as wrapDialog } from "./wrapDialog";
 export { default as BlueprintError } from "./BlueprintError";
 export { default as DialogFooter } from "./DialogFooter";
 export { default as adHoc } from "./utils/adHoc";

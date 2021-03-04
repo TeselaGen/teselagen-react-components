@@ -67,7 +67,7 @@ export const getHotkeyProps = (def, id) => {
  *
  */
 export const withHotkeys = (hotkeys, handlers) => {
-  return ({ children, ...rest } = {}) => {
+  return ({ children } = {}) => {
     const memoedHotkeys = useMemo(
       () =>
         Object.keys(hotkeys).map(id => {
@@ -76,12 +76,12 @@ export const withHotkeys = (hotkeys, handlers) => {
             key: id,
             global: props.global !== false,
             onKeyDown: function(e) {
-              return handlers[id](e, rest);
+              return handlers[id](e);
             },
             ...props
           };
         }),
-      [rest]
+      []
     );
 
     const { handleKeyDown, handleKeyUp } = useHotkeys(memoedHotkeys);

@@ -133,7 +133,7 @@ export global {
 //   export function foo(): void;
 // }
 
-export class SimpleSelect extends React.Component<SimpleSelectProps, any> {}
+export class SimpleSelect extends React.Component<SimpleSelectProps, any> { }
 
 export interface SimpleSelectProps {
   autofocus?: boolean;
@@ -150,20 +150,20 @@ export interface SimpleSelectProps {
 export class AsyncValidateFieldSpinner extends React.Component<
   AsyncValidateFieldSpinnerProps,
   any
-> {}
+  > { }
 
 export interface AsyncValidateFieldSpinnerProps {
   validating?: boolean;
 }
 
 // BlueprintError
-export class BlueprintError extends React.Component<BlueprintErrorProps, any> {}
+export class BlueprintError extends React.Component<BlueprintErrorProps, any> { }
 
 export interface BlueprintErrorProps {
   error: string;
 }
 // BounceLoader
-export class BounceLoader extends React.Component<BounceLoaderProps, any> {}
+export class BounceLoader extends React.Component<BounceLoaderProps, any> { }
 
 export interface BounceLoaderProps {
   style: object;
@@ -233,7 +233,7 @@ export interface BounceLoaderProps {
 export class CollapsibleCard extends React.Component<
   CollapsibleCardProps,
   any
-> {}
+  > { }
 
 export interface CollapsibleCardProps {
   noCard: boolean;
@@ -243,10 +243,10 @@ export interface CollapsibleCardProps {
   initialClosed: boolean;
 }
 
-export class CmdCheckbox extends React.Component<CmdProps, any> {}
-export class CmdSwitch extends React.Component<CmdProps, any> {}
-export class CmdDiv extends React.Component<CmdProps, any> {}
-export class CmdButton extends React.Component<CmdProps, any> {}
+export class CmdCheckbox extends React.Component<CmdProps, any> { }
+export class CmdSwitch extends React.Component<CmdProps, any> { }
+export class CmdDiv extends React.Component<CmdProps, any> { }
+export class CmdButton extends React.Component<CmdProps, any> { }
 
 export interface CmdProps {
   name: string;
@@ -254,7 +254,7 @@ export interface CmdProps {
   cmd: function;
 }
 // DNALoader
-export class DNALoader extends React.Component<DNALoaderProps, any> {}
+export class DNALoader extends React.Component<DNALoaderProps, any> { }
 
 export interface DNALoaderProps {
   style: object;
@@ -297,7 +297,7 @@ export interface DNALoaderProps {
     onDoubleClick={routeDoubleClick}
   />
  */
-export class DataTable extends React.Component<DataTableProps, any> {}
+export class DataTable extends React.Component<DataTableProps, any> { }
 
 export interface DataTableProps {
   extraClasses: string;
@@ -416,7 +416,7 @@ export interface DialogFooterProps {
   noCancel: boolean;
 }
 // DownloadLink
-export class DownloadLink extends React.Component<DownloadLinkProps, any> {}
+export class DownloadLink extends React.Component<DownloadLinkProps, any> { }
 
 export interface DownloadLinkProps {
   getFileString: function;
@@ -424,7 +424,7 @@ export interface DownloadLinkProps {
   fileString: string;
 }
 // FillWindow
-export class FillWindow extends React.Component<FillWindowProps, any> {}
+export class FillWindow extends React.Component<FillWindowProps, any> { }
 
 export interface FillWindowProps {
   containerStyle: string;
@@ -482,9 +482,9 @@ export interface GenericFormFieldProps {
  * @example
  * <InputField label="Search" isRequired name="searchQuery"></InputField>
  */
-export class InputField extends React.Component<InputFieldProps, any> {}
+export class InputField extends React.Component<InputFieldProps, any> { }
 
-export interface InputFieldProps extends GenericFormFieldProps {}
+export interface InputFieldProps extends GenericFormFieldProps { }
 
 /**
  * @example
@@ -506,7 +506,7 @@ export interface InputFieldProps extends GenericFormFieldProps {}
 export class FileUploadField extends React.Component<
   FileUploadFieldProps,
   any
-> {}
+  > { }
 
 export interface FileUploadFieldProps extends GenericFormFieldProps {
   innerIcon: "string";
@@ -541,16 +541,16 @@ export interface FileUploadFieldProps extends GenericFormFieldProps {
             maxDate={new Date("12/31/2100")}
           />
  */
-export class DateInputField extends React.Component<DateInputFieldProps, any> {}
+export class DateInputField extends React.Component<DateInputFieldProps, any> { }
 
-export interface DateInputFieldProps extends GenericFormFieldProps {}
+export interface DateInputFieldProps extends GenericFormFieldProps { }
 // DateRangeInputField
 export class DateRangeInputField extends React.Component<
   DateRangeInputFieldProps,
   any
-> {}
+  > { }
 
-export interface DateRangeInputFieldProps extends GenericFormFieldProps {}
+export interface DateRangeInputFieldProps extends GenericFormFieldProps { }
 /**
  * @example 
  * <CheckboxField
@@ -566,9 +566,9 @@ export interface DateRangeInputFieldProps extends GenericFormFieldProps {}
             />
             
  */
-export class CheckboxField extends React.Component<CheckboxFieldProps, any> {}
+export class CheckboxField extends React.Component<CheckboxFieldProps, any> { }
 
-export interface CheckboxFieldProps extends GenericFormFieldProps {}
+export interface CheckboxFieldProps extends GenericFormFieldProps { }
 
 /**
  * @example 
@@ -586,9 +586,9 @@ export interface CheckboxFieldProps extends GenericFormFieldProps {}
         />
             
  */
-export class SwitchField extends React.Component<SwitchFieldProps, any> {}
+export class SwitchField extends React.Component<SwitchFieldProps, any> { }
 
-export interface SwitchFieldProps extends GenericFormFieldProps {}
+export interface SwitchFieldProps extends GenericFormFieldProps { }
 /**
  * @example 
  * <TextareaField
@@ -603,9 +603,9 @@ export interface SwitchFieldProps extends GenericFormFieldProps {}
           onFieldSubmit={this.handleFieldSubmit("description")}
         />         
  */
-export class TextareaField extends React.Component<TextareaFieldProps, any> {}
+export class TextareaField extends React.Component<TextareaFieldProps, any> { }
 
-export interface TextareaFieldProps extends GenericFormFieldProps {}
+export interface TextareaFieldProps extends GenericFormFieldProps { }
 /**
  * @example 
  * <EditableTextField
@@ -629,9 +629,9 @@ export interface TextareaFieldProps extends GenericFormFieldProps {}
 export class EditableTextField extends React.Component<
   EditableTextFieldProps,
   any
-> {}
+  > { }
 
-export interface EditableTextFieldProps extends GenericFormFieldProps {}
+export interface EditableTextFieldProps extends GenericFormFieldProps { }
 /**
  * @example 
  * <NumericInputField
@@ -646,9 +646,9 @@ export interface EditableTextFieldProps extends GenericFormFieldProps {}
 export class NumericInputField extends React.Component<
   NumericInputFieldProps,
   any
-> {}
+  > { }
 
-export interface NumericInputFieldProps extends GenericFormFieldProps {}
+export interface NumericInputFieldProps extends GenericFormFieldProps { }
 /**
  * @example
  * <RadioGroupField
@@ -682,9 +682,9 @@ export interface NumericInputFieldProps extends GenericFormFieldProps {}
 export class RadioGroupField extends React.Component<
   RadioGroupFieldProps,
   any
-> {}
+  > { }
 
-export interface RadioGroupFieldProps extends GenericFormFieldProps {}
+export interface RadioGroupFieldProps extends GenericFormFieldProps { }
 
 /**
  * @example
@@ -694,9 +694,9 @@ export interface RadioGroupFieldProps extends GenericFormFieldProps {}
     name={`username`}
   />
  */
-export class SuggestField extends React.Component<SuggestFieldProps, any> {}
+export class SuggestField extends React.Component<SuggestFieldProps, any> { }
 
-export interface SuggestFieldProps extends GenericFormFieldProps {}
+export interface SuggestFieldProps extends GenericFormFieldProps { }
 
 /**
  * @example
@@ -713,15 +713,15 @@ export interface SuggestFieldProps extends GenericFormFieldProps {}
 export class ReactSelectField extends React.Component<
   ReactSelectFieldProps,
   any
-> {}
+  > { }
 
 export interface ReactSelectFieldProps extends GenericFormFieldProps {
   multi: boolean;
 }
 // SelectField
-export class SelectField extends React.Component<SelectFieldProps, any> {}
+export class SelectField extends React.Component<SelectFieldProps, any> { }
 
-export interface SelectFieldProps extends GenericFormFieldProps {}
+export interface SelectFieldProps extends GenericFormFieldProps { }
 /**
  * @example
  * <ReactColorField
@@ -733,12 +733,12 @@ export interface SelectFieldProps extends GenericFormFieldProps {}
 export class ReactColorField extends React.Component<
   ReactColorFieldProps,
   any
-> {}
+  > { }
 
-export interface ReactColorFieldProps extends GenericFormFieldProps {}
+export interface ReactColorFieldProps extends GenericFormFieldProps { }
 
 // HotkeysDialog
-export class HotkeysDialog extends React.Component<HotkeysDialogProps, any> {}
+export class HotkeysDialog extends React.Component<HotkeysDialogProps, any> { }
 
 export interface HotkeysDialogProps {
   hotkeySets: object;
@@ -764,7 +764,7 @@ export interface HotkeysDialogProps {
   <InfoHelper isButton disabled content={"Hey I'm some helpful info!"} />
   <InfoHelper isPopover content={"Hey I'm some helpful info!"} />
  */
-export class InfoHelper extends React.Component<InfoHelperProps, any> {}
+export class InfoHelper extends React.Component<InfoHelperProps, any> { }
 
 export interface InfoHelperProps {
   className: string;
@@ -784,7 +784,7 @@ export interface InfoHelperProps {
   style: object;
 }
 // IntentText
-export class IntentText extends React.Component<IntentTextProps, any> {}
+export class IntentText extends React.Component<IntentTextProps, any> { }
 
 export interface IntentTextProps {
   intent: Blueprint.Intent;
@@ -793,7 +793,7 @@ export interface IntentTextProps {
 }
 
 // Loading
-export class Loading extends React.Component<LoadingProps, any> {}
+export class Loading extends React.Component<LoadingProps, any> { }
 
 export interface LoadingProps {
   loading: any;
@@ -807,7 +807,7 @@ export interface LoadingProps {
   inDialog: any;
 }
 // MenuBar
-export class MenuBar extends React.Component<MenuBarProps, any> {}
+export class MenuBar extends React.Component<MenuBarProps, any> { }
 
 export interface MenuBarProps {
   menu: any;
@@ -843,7 +843,7 @@ export interface MenuBarProps {
 export class ResizableDraggableDialog extends React.Component<
   ResizableDraggableDialogProps,
   any
-> {}
+  > { }
 
 export interface ResizableDraggableDialogProps {
   width: number;
@@ -851,14 +851,14 @@ export interface ResizableDraggableDialogProps {
   RndProps: object;
 }
 // ScrollToTop
-export class ScrollToTop extends React.Component<ScrollToTopProps, any> {}
+export class ScrollToTop extends React.Component<ScrollToTopProps, any> { }
 
 export interface ScrollToTopProps {
   showAt: number;
   scrollContainer: any;
 }
 // TgSelect
-export class TgSelect extends React.Component<TgSelectProps, any> {}
+export class TgSelect extends React.Component<TgSelectProps, any> { }
 
 export interface TgSelectProps {
   multi: boolean;
@@ -879,7 +879,7 @@ export interface TgSelectProps {
   isLoading: boolean;
 }
 // Timeline
-export class Timeline extends React.Component<TimelineProps, any> {}
+export class Timeline extends React.Component<TimelineProps, any> { }
 
 export interface TimelineProps {
   children: any;
@@ -947,6 +947,30 @@ interface showConfirmationDialogOpts {
 export function mergeSchemas(schema, schemaOverrides) {
   return schema;
 }
+/* 
+@example 
+wrapDialog({
+  title: "Print"
+}),
+*/
+export function wrapDialog(options: { title: string; isResizable: boolean }) {
+
+}
+
+/* 
+@example
+this.hotkeyEnabler = withHotkeys({
+  copyHotkey: {
+    global: false,
+    combo: "mod + c",
+    label: "Copy rows",
+    onKeyDown: this.handleCopyHotkey
+  }
+});
+*/
+export function withHotkeys(options: {}) {
+
+}
 
 //Todo:
 
@@ -957,11 +981,11 @@ export function mergeSchemas(schema, schemaOverrides) {
 // showConfirmationDialog
 // style
 
-export function getTagProps() {}
-export function getTagsAndTagOptions() {}
-export function getKeyedTagsAndTagOptions() {}
+export function getTagProps() { }
+export function getTagsAndTagOptions() { }
+export function getKeyedTagsAndTagOptions() { }
 
 export const TableFormTrackerContext = React.createContext({
   formNames: [],
-  pushFormName: () => {}
+  pushFormName: () => { }
 });
