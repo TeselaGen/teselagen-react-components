@@ -53,7 +53,6 @@ import defaultProps from "./defaultProps";
 import "../toastr";
 import "./style.css";
 import { getRecordsFromIdMap } from "./utils/withSelectedEntities";
-import TableFormTrackerContext from "./TableFormTrackerContext";
 
 class DataTable extends React.Component {
   state = {
@@ -166,13 +165,7 @@ class DataTable extends React.Component {
 
   componentDidMount() {
     this.updateFromProps({}, computePresets(this.props));
-    const formTracker = this.context;
-    if (
-      formTracker.isActive &&
-      !formTracker.formNames.includes(this.props.formName)
-    ) {
-      formTracker.pushFormName(this.props.formName);
-    }
+
     // const table = ReactDOM.findDOMNode(this.table);
     // let theads = table.getElementsByClassName("rt-thead");
     // let tbody = table.getElementsByClassName("rt-tbody")[0];
@@ -1338,8 +1331,6 @@ class DataTable extends React.Component {
     );
   };
 }
-
-DataTable.contextType = TableFormTrackerContext;
 
 // const CompToExport =  dataTableEnhancer(HotkeysTarget(DataTable));
 // // CompToExport.selectRecords = (form, value) => {
