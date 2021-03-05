@@ -10,14 +10,15 @@ module.exports = {
   npm: {
     umd: false
   },
-  ...(process.env.NODE_ENV !== "production" && {
-    babel: {
-      runtime: false,
-      env: {
-        targets: "defaults, not IE 11"
-      },
-    }
-  }),
+  babel: {
+    runtime: false,
+    env: {
+      targets: {
+        chrome: "78",
+        electron: "59"
+      }
+    },
+  },
   webpack: {
     aliases: {
       // **** You can comment one or more of these in to override an npm module with a local module. *****
