@@ -1,3 +1,4 @@
+import React, { useContext, useEffect } from "react";
 import { change, formValueSelector } from "redux-form";
 import { connect } from "react-redux";
 import compose from "lodash/fp/compose";
@@ -6,6 +7,7 @@ import { withRouter } from "react-router-dom";
 import { branch } from "recompose";
 
 import pureNoFunc from "../../utils/pureNoFunc";
+import TableFormTrackerContext from "../TableFormTrackerContext";
 import convertSchema from "./convertSchema";
 import { getRecordsFromReduxForm } from "./withSelectedEntities";
 import {
@@ -263,6 +265,20 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
     return allMergedProps;
   }
 
+  function addFormTracking(Component) {
+    return props => {
+      const formTracker = useContext(TableFormTrackerContext);
+      const { formName } = props;
+      useEffect(() => {
+        if (formTracker.isActive && !formTracker.formNames.includes(formName)) {
+          formTracker.pushFormName(formName);
+        }
+      }, [formTracker, formName]);
+
+      return <Component {...props} />;
+    };
+  }
+
   const toReturn = compose(
     connect((state, ownProps) => {
       if (ownProps.isTableParamsConnected) {
@@ -283,7 +299,8 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       mapDispatchToProps,
       mergeProps
     ),
-    pureNoFunc
+    pureNoFunc,
+    addFormTracking
   );
   if (Component) {
     return toReturn(Component);
