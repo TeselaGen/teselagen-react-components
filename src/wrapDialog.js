@@ -26,6 +26,7 @@ export default (topLevelDialogProps = {}) => Component => props => {
     ...dialogProps,
     ...getDialogProps(props)
   };
+
   const DialogToUse = extraDialogProps.isDraggable
     ? ResizableDraggableDialog
     : Dialog;

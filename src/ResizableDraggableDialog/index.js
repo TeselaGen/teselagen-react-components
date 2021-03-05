@@ -4,7 +4,7 @@ import { Rnd } from "react-rnd";
 import "./style.css";
 
 const defaultDialogWidth = 400;
-const defaultDialogHeight = 450;
+const defaultDialogHeight = 100;
 export default class ResizableDraggableDialog extends React.Component {
   componentDidMount() {
     window.addEventListener("resize", this.onWindowResize);

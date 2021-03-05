@@ -20,7 +20,7 @@ export default class Example extends Component {
     );
     return (
       <div>
-        {[5, 10, 20].map((n) => <Button
+        {[1, 10, 20].map((n) => <Button
         key={n}
           onClick={() => {
             this.setState({ isOpen: true });

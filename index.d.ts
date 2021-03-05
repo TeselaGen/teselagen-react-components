@@ -953,7 +953,7 @@ wrapDialog({
   title: "Print"
 }),
 */
-export function wrapDialog(options: { title: string; isResizable: boolean }) {
+export function wrapDialog(options: { title: string; isDraggable: boolean }) {
 
 }
 
