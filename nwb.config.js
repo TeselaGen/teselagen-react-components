@@ -12,12 +12,12 @@ module.exports = {
   },
   babel: {
     runtime: false,
-    env: {
-      targets: {
-        // chrome: "78",
-        chrome: "59"
-      }
-    },
+    // env: {
+    //   targets: {
+    //     // chrome: "78",
+    //     chrome: "59"
+    //   }
+    // },
   },
   webpack: {
     aliases: {
