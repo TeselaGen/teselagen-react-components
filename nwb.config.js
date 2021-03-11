@@ -14,8 +14,8 @@ module.exports = {
     runtime: false,
     env: {
       targets: {
-        chrome: "78",
-        electron: "59"
+        // chrome: "78",
+        chrome: "59"
       }
     },
   },
