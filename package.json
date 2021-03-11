@@ -29,9 +29,9 @@
     "version": "auto-changelog -p && git add CHANGELOG.md"
   },
   "dependencies": {
-    "@blueprintjs/core": "^3.40.1",
-    "@blueprintjs/datetime": "^3.21.1",
-    "@blueprintjs/select": "^3.15.7",
+    "@blueprintjs/core": "^3.41.0",
+    "@blueprintjs/datetime": "^3.21.2",
+    "@blueprintjs/select": "^3.15.8",
     "@teselagen/react-list": "^0.8.18",
     "@teselagen/react-table": "^6.10.9",
     "axios": "^0.21.1",
