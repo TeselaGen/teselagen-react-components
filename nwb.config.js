@@ -10,15 +10,15 @@ module.exports = {
   npm: {
     umd: false
   },
-  babel: {
-    runtime: false,
-    // env: {
-    //   targets: {
-    //     // chrome: "78",
-    //     chrome: "59"
-    //   }
-    // },
-  },
+  // babel: { //tnr: comment this back in once we're at a higher version of cypress on lims
+  //   runtime: false,
+  //   // env: {
+  //   //   targets: {
+  //   //     // chrome: "78",
+  //   //     chrome: "59"
+  //   //   }
+  //   // },
+  // },
   webpack: {
     aliases: {
       // **** You can comment one or more of these in to override an npm module with a local module. *****
