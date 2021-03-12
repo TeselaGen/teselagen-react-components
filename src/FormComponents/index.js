@@ -202,6 +202,8 @@ class AbstractInput extends React.Component {
       noOuterLabel,
       assignDefaultButton,
       showGenerateDefaultDot,
+      setAssignDefaultsMode,
+      startAssigningDefault,
       input,
       noFillField,
       isLoadingDefaultValue
@@ -272,9 +274,28 @@ class AbstractInput extends React.Component {
           <div
             style={{ zIndex: 10, position: "relative", height: 0, width: 0 }}
           >
-            <Tooltip content="Allows a Default to be Set. Enter Set Default Mode by pressing Shift+D">
-              <div className="generateDefaultDot"></div>
-            </Tooltip>
+            <div style={{ position: "absolute", left: "0px", top: "0px" }}>
+              <Tooltip
+                modifiers={{
+                  preventOverflow: { enabled: false },
+                  hide: {
+                    enabled: false
+                  },
+                  flip: {
+                    boundariesElement: "viewport"
+                  }
+                }}
+                content="Allows a Default to be Set. Click to Enter Set Default Mode (or press Shift+D when outside the input field)"
+              >
+                <div
+                  onClick={() => {
+                    setAssignDefaultsMode(true);
+                    startAssigningDefault();
+                  }}
+                  className="generateDefaultDot"
+                ></div>
+              </Tooltip>
+            </div>
           </div>
         )}
         {assignDefaultButton}
@@ -1046,7 +1067,9 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
     const [defaultValueFromBackend, setDefault] = useState();
     const [allowUserOverride, setUserOverride] = useState(true);
     const [isLoadingDefaultValue, setLoadingDefaultValue] = useState(false);
-    const { inAssignDefaultsMode } = useContext(AssignDefaultsModeContext);
+    const { inAssignDefaultsMode, setAssignDefaultsMode } = useContext(
+      AssignDefaultsModeContext
+    );
     const workflowParams = useContext(WorkflowDefaultParamsContext);
 
     const caresAboutToolContext = generateDefaultValue?.params?.toolName;
@@ -1132,6 +1155,19 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
     //   delete defaultProps.intentClass;
     // }
 
+    const startAssigningDefault = () =>
+      window.__showAssignDefaultValueModal &&
+      window.__showAssignDefaultValueModal({
+        ...props,
+        generateDefaultValue: {
+          ...props.generateDefaultValue,
+          customParams: customParamsToUse
+        },
+        onFinish: () => {
+          updateCount(count + 1);
+        }
+      });
+
     return (
       <AbstractInput
         {...{
@@ -1144,21 +1180,11 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
             window.__showGenerateDefaultDot &&
             window.__showGenerateDefaultDot() &&
             !!generateDefaultValue,
+          setAssignDefaultsMode,
+          startAssigningDefault,
           assignDefaultButton: inAssignDefaultsMode && generateDefaultValue && (
             <Button
-              onClick={() =>
-                window.__showAssignDefaultValueModal &&
-                window.__showAssignDefaultValueModal({
-                  ...props,
-                  generateDefaultValue: {
-                    ...props.generateDefaultValue,
-                    customParams: customParamsToUse
-                  },
-                  onFinish: () => {
-                    updateCount(count + 1);
-                  }
-                })
-              }
+              onClick={startAssigningDefault}
               small
               style={{ background: "yellow", color: "black" }}
             >

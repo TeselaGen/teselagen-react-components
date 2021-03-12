@@ -545,3 +545,7 @@ export default reduxForm({
 function onFieldSubmit(val) {
   console.info("on field submit", val);
 }
+
+window.__showGenerateDefaultDot = () => {
+  return true 
+}

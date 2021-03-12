@@ -222,14 +222,12 @@
 }
 
 .generateDefaultDot {
-  position: absolute;
+  cursor: pointer;
   border-radius: 50%;
   background: #ffca00;
   box-shadow: 0px 0px 2px black;
-  height: 5px;
-  width: 5px;
-  left: 0px;
-  top: 0px;
+  height: 8px;
+  width: 8px;
 }
 .bp3-dark .generateDefaultDot {
   background: yellow;
