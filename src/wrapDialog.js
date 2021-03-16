@@ -33,7 +33,6 @@ export default (topLevelDialogProps = {}) => Component => props => {
 
   return (
     <DialogToUse
-      canEscapeKeyClose={false}
       canOutsideClickClose={false}
       isOpen
       onClose={hideModal}
