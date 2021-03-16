@@ -8,9 +8,8 @@ describe("formComponents", () => {
   it(`ReactSelectField works for single select`, () => {
     cy.get(".tg-test-react-select-field .tg-select")
       .click()
-      .as("inputWrapper")
-      .contains("Kyle Craft")
-      .click();
+      .as("inputWrapper");
+    cy.contains(".tg-select-option", "Kyle Craft").click();
     cy.get("@inputWrapper").contains(`.bp3-tag`, "Kyle Craft");
     cy.contains("label", "disallowClear").click();
     cy.get(".tg-test-react-select-field .tg-select .bp3-icon-cross").should(
@@ -37,35 +36,31 @@ describe("formComponents", () => {
   menu pop up again`, () => {
     cy.get(".tg-test-react-select-field-multi .tg-select")
       .click()
-      .as("inputWrapper")
-      .contains("Kyle Craft")
-      .click();
+      .as("inputWrapper");
+    cy.contains(".tg-select-option", "Kyle Craft").click();
     cy.get("@inputWrapper").contains(".bp3-tag", "Kyle Craft");
-    cy.get("@inputWrapper")
-      .find(".tg-select-option")
-      .should("exist");
+    // should stay open
+    cy.get(".tg-select-option").should("exist");
+    cy.get(".bp3-multi-select-popover").should("exist");
     cy.get("@inputWrapper")
       .find(".bp3-icon-caret-up")
       .click();
-    cy.get("@inputWrapper")
-      .find(".tg-select-option")
-      .should("not.exist", { timeout: 10000 });
+    cy.get(".tg-select-option").should("not.exist", { timeout: 10000 });
+    cy.get(".bp3-multi-select-popover").should("not.exist");
     cy.get("@inputWrapper")
       .contains(".bp3-tag", "Kyle Craft")
       .should("exist")
       .find(".bp3-icon-small-cross")
       .click();
     //the select-options should not pop up again after clearing a tag
-    cy.get("@inputWrapper")
-      .find(".tg-select-option")
-      .should("not.exist");
+    cy.get(".tg-select-option").should("not.exist");
+    cy.get(".bp3-multi-select-popover").should("not.exist");
   });
   it(`ReactSelectField multi can add a tag and remove it by hitting the bulk remove button`, () => {
     cy.get(".tg-test-react-select-field-multi .tg-select")
       .click()
-      .as("inputWrapper")
-      .contains("Kyle Craft")
-      .click();
+      .as("inputWrapper");
+    cy.contains(".tg-select-option", "Kyle Craft").click();
     cy.get("@inputWrapper").contains(".bp3-tag", "Kyle Craft");
     cy.get("@inputWrapper")
       .find(".bp3-icon-cross")
@@ -86,9 +81,7 @@ describe("formComponents", () => {
       .parent()
       .contains(".bp3-tag", "Kyle Craft")
       .should("not.exist");
-    cy.get(".tg-test-react-select-field-multi .tg-select-option").should(
-      "exist"
-    );
+    cy.get(".bp3-multi-select-popover .tg-select-option").should("exist");
     cy.get("@inputWrapper").type("{enter}");
     cy.get("@inputWrapper")
       .parent()
