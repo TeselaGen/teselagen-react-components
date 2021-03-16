@@ -296,7 +296,6 @@ class TgSelect extends React.Component {
             "tg-single-select": !multi
           }),
           wrapperTagName: "div",
-          usePortal: false,
           canEscapeKeyClose: true,
           onInteraction: this.onInteraction,
           isOpen: this.state.isOpen,
