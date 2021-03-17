@@ -19,7 +19,7 @@ jobs:
         with:
           record: true
           parallel: true
-          start: yarn start
+          start: pnpm start
           wait-on: http://localhost:3333
         env:
           # pass the Dashboard record key as an environment variable

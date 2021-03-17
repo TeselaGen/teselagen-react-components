@@ -1,4 +1,4 @@
 #!/bin/sh
-cd /app && git checkout package.json && rm -rf ./app/.babelrc && yarn
+cd /app && git checkout package.json && rm -rf ./app/.babelrc && pnpm i
 git pull origin master &&
-cd /app && yarn buildWithDemo
+cd /app && pnpm buildWithDemo
