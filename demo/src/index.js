@@ -3,7 +3,7 @@ import MenuBar from "./examples/MenuBar";
 import HotkeysDialog from "./examples/HotkeysDialog";
 import DataTableExample from "./examples/DataTable";
 import FormComponents from "./DemoComponents/FormComponents";
-import WithDialog from "./examples/WithDialog";
+import WrapDialog from "./examples/WrapDialog";
 import Toastr from "./examples/Toastr";
 import showConfirmationDialogDemo from "./examples/showConfirmationDialogDemo";
 import ResizableDraggableDialogDemo from "./examples/ResizableDraggableDialog";
@@ -222,8 +222,8 @@ const demos = {
   FormComponents: {
     DemoComponent: FormComponents
   },
-  withDialog: {
-    demo: WithDialog
+  wrapDialog: {
+    demo: WrapDialog
   },
   toastr: {
     demo: Toastr
