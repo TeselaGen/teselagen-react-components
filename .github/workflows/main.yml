@@ -17,10 +17,9 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
-          install-command: pnpm install
           record: true
           parallel: true
-          start: pnpm start
+          start: yarn start
           wait-on: http://localhost:3333
         env:
           # pass the Dashboard record key as an environment variable

@@ -31,11 +31,11 @@ Demo: https://teselagen.github.io/teselagen-react-components/
 
 # Using: 
 ```
-pnpm add teselagen-react-components
+yarn add teselagen-react-components
 ```
 Add peer-dependencies: 
 ```
-pnpm add @blueprintjs/core @blueprintjs/datetime @blueprintjs/select react-addons-css-transition-group react-redux redux 
+yarn add @blueprintjs/core @blueprintjs/datetime @blueprintjs/select react-addons-css-transition-group react-redux redux 
 ```
 
 ## Enhancers:
@@ -145,26 +145,26 @@ import {
 
 //LIMS EXAMPLE: 
 cd lims/node_modules/react        //this is so we don't have 2 copies of react being used on the front-end (react will throw errors if so)
-pnpm link 
+yarn link 
 cd teselagen-react-components
-pnpm link
-pnpm link react
+yarn link
+yarn link react
 cd lims
-pnpm link teselagen-react-components
+yarn link teselagen-react-components
 
 //HDE EXAMPLE: 
 cd hde/client/node_modules/react     //this is so we don't have 2 copies of react being used on the front-end (react will throw errors if so)
-pnpm link 
+yarn link 
 cd teselagen-react-components
-pnpm link
-pnpm link react
+yarn link
+yarn link react
 cd hde/client
-pnpm link teselagen-react-components
+yarn link teselagen-react-components
 
 //ALWAYS:
 //start the auto rebuild:
 cd teselagen-react-components
-pnpm build-watch
+yarn build-watch
 ```
 
 ## Running Tests
