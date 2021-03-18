@@ -1062,7 +1062,6 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
     } = props;
     //get is assign defaults mode
     //if assign default value mode then add on to the component
-    const [count, updateCount] = React.useState(0);
     const [defaultValCount, setDefaultValCount] = React.useState(0);
     const [defaultValueFromBackend, setDefault] = useState();
     const [allowUserOverride, setUserOverride] = useState(true);
@@ -1080,8 +1079,8 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
         : {}),
       ...(generateDefaultValue ? generateDefaultValue.customParams : {})
     };
-    // if generateDefaultValue, hit the backend for that value
-    useDeepCompareEffect(() => {
+
+    async function triggerGetDefault() {
       if (!window.__triggerGetDefaultValueRequest) return;
       if (!generateDefaultValue) return;
       setLoadingDefaultValue(true);
@@ -1114,31 +1113,35 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
         );
       }
 
-      (async () => {
-        try {
-          const res = await window.__triggerGetDefaultValueRequest(
-            generateDefaultValue.code,
-            customParamsToUse
-          );
-          if (
-            ComponentToWrap === renderBlueprintCheckbox ||
-            ComponentToWrap === renderBlueprintSwitch
-          ) {
-            setDefault(res.defaultValue === "true");
-          } else {
-            setDefault(res.defaultValue);
-          }
-          setUserOverride(res.allowUserOverride);
-          setDefaultValCount(defaultValCount + 1);
-        } catch (error) {
-          console.error(`error aswf298f:`, error);
+      try {
+        const res = await window.__triggerGetDefaultValueRequest(
+          generateDefaultValue.code,
+          customParamsToUse
+        );
+        if (
+          ComponentToWrap === renderBlueprintCheckbox ||
+          ComponentToWrap === renderBlueprintSwitch
+        ) {
+          setDefault(res.defaultValue === "true");
+        } else {
+          setDefault(res.defaultValue);
         }
-        if (window.Cypress && window.Cypress.addFakeDefaultValueWait) {
-          await fakeWait();
-        }
-        setLoadingDefaultValue(false);
-      })();
-    }, [generateDefaultValue || {}, count]);
+        setUserOverride(res.allowUserOverride);
+        setDefaultValCount(defaultValCount + 1);
+      } catch (error) {
+        console.error(`error aswf298f:`, error);
+      }
+      if (window.Cypress && window.Cypress.addFakeDefaultValueWait) {
+        await fakeWait();
+      }
+      setLoadingDefaultValue(false);
+    }
+    // if generateDefaultValue, hit the backend for that value
+    useDeepCompareEffect(() => {
+      // if the input already has a value we don't want to override with the default value request
+      if (rest.input.value) return;
+      triggerGetDefault();
+    }, [generateDefaultValue || {}]);
     // const asyncValidating = props.asyncValidating;
     let defaultProps = {
       ...rest,
@@ -1164,7 +1167,7 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
           customParams: customParamsToUse
         },
         onFinish: () => {
-          updateCount(count + 1);
+          triggerGetDefault();
         }
       });
 
