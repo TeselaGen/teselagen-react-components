@@ -44,6 +44,15 @@ describe("formComponents", () => {
     cy.get(".tg-table-display-density select").select("normal");
     cy.get(".data-table-container.tg-extra-compact-table").should("not.exist");
   });
+  it(`it can copy via hotkey cmd+c`, () => {
+    cy.visit("#/DataTable");
+    //  - copying a single row (selected or not)
+    cy.get(`[data-test="tgCell_type.special"]`)
+      .first()
+      .click();
+    cy.get(".data-table-container").type("{meta}c");
+    cy.contains("Selected rows copied");
+  });
   it(`it can copy a single row, selected rows, or cells to the clipboard`, () => {
     cy.visit("#/DataTable");
     //  - copying a single row (selected or not)
