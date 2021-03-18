@@ -85,15 +85,11 @@ export const withHotkeys = (hotkeys, handlers) => {
     );
 
     const { handleKeyDown, handleKeyUp } = useHotkeys(memoedHotkeys);
-    return (
-      <div
-        className="hotkeyHandler"
-        tabIndex={0}
-        {...{ onKeyDown: handleKeyDown, onKeyUp: handleKeyUp }}
-      >
-        {children}
-      </div>
-    );
+    return React.cloneElement(children, {
+      tabIndex: 0,
+      onKeyDown: handleKeyDown,
+      onKeyUp: handleKeyUp
+    });
   };
 };
 
