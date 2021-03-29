@@ -13,7 +13,6 @@ import SimpleTable from "./examples/SimpleTable";
 import TgSelectDemo from "./examples/TgSelectDemo";
 import InfoHelper from "./examples/InfoHelper";
 import Loading from "./examples/Loading";
-import DownloadLink from "./examples/DownloadLink";
 import DemoNav from "./DemoNav";
 import DemoHeader from "./DemoHeader";
 import { DataTable } from "../../src";
@@ -196,26 +195,6 @@ const demos = {
         name: "inDialog",
         type: "boolean",
         description: "Sets a min-height of 200 and sets bounce to true"
-      }
-    ]
-  },
-  DownloadLink: {
-    demo: DownloadLink,
-    props: [
-      {
-        name: "filename",
-        description: "Name of the downloaded file",
-        type: "string"
-      },
-      {
-        name: "fileString",
-        description: "Contents of the downloaded file",
-        type: "string"
-      },
-      {
-        name: "getFileString",
-        type: "function",
-        description: "A function that will return the contents to be downloaded"
       }
     ]
   },

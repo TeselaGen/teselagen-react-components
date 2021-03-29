@@ -415,14 +415,7 @@ export interface DialogFooterProps {
   disabled: boolean;
   noCancel: boolean;
 }
-// DownloadLink
-export class DownloadLink extends React.Component<DownloadLinkProps, any> { }
 
-export interface DownloadLinkProps {
-  getFileString: function;
-  filename: string;
-  fileString: string;
-}
 // FillWindow
 export class FillWindow extends React.Component<FillWindowProps, any> { }
 
