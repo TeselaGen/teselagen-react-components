@@ -1,7 +1,10 @@
 import React from "react";
-import moment from "moment";
+import dayjs from "dayjs";
 import { Classes } from "@blueprintjs/core";
 import classNames from "classnames";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
 
 function TimelineEvent({ date, children }) {
   return (
@@ -18,7 +21,7 @@ function TimelineEvent({ date, children }) {
           style={{ marginLeft: 5 }}
           className={classNames(Classes.TEXT_SMALL, Classes.TEXT_MUTED)}
         >
-          ({moment(date).fromNow()})
+          ({dayjs(date).fromNow()})
         </div>
       </div>
     </div>

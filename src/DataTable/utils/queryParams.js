@@ -1,6 +1,5 @@
 import queryString from "qs";
 import QueryBuilder from "tg-client-query-builder";
-import moment from "moment";
 
 import {
   uniqBy,
@@ -16,6 +15,7 @@ import {
   drop,
   isEmpty
 } from "lodash";
+import dayjs from "dayjs";
 
 const defaultPageSizes = [5, 10, 15, 25, 50, 100, 200, 400];
 
@@ -328,22 +328,21 @@ function getSubFilter(
       ? qb.between(new Date(arrayFilterValue[0]), new Date(arrayFilterValue[1]))
       : fieldVal => {
           return (
-            moment(arrayFilterValue[0]).valueOf() <=
-              moment(fieldVal).valueOf() &&
-            moment(fieldVal).valueOf() <= moment(arrayFilterValue[1]).valueOf()
+            dayjs(arrayFilterValue[0]).valueOf() <= dayjs(fieldVal).valueOf() &&
+            dayjs(fieldVal).valueOf() <= dayjs(arrayFilterValue[1]).valueOf()
           );
         };
   } else if (ccSelectedFilter === "isBefore") {
     return qb
       ? qb.lessThan(new Date(filterValue))
       : fieldVal => {
-          return moment(fieldVal).valueOf() < moment(filterValue).valueOf();
+          return dayjs(fieldVal).valueOf() < dayjs(filterValue).valueOf();
         };
   } else if (ccSelectedFilter === "isAfter") {
     return qb
       ? qb.greaterThan(new Date(filterValue))
       : fieldVal => {
-          return moment(fieldVal).valueOf() > moment(filterValue).valueOf();
+          return dayjs(fieldVal).valueOf() > dayjs(filterValue).valueOf();
         };
   } else if (ccSelectedFilter === "greaterThan") {
     return qb

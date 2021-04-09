@@ -29,7 +29,7 @@ import { difference } from "lodash";
 import TgSelect from "../TgSelect";
 import TgSuggest from "../TgSuggest";
 import InfoHelper from "../InfoHelper";
-import getMomentFormatter from "../utils/getMomentFormatter";
+import getDayjsFormatter from "../utils/getDayjsFormatter";
 import AsyncValidateFieldSpinner from "../AsyncValidateFieldSpinner";
 import {
   AssignDefaultsModeContext,
@@ -309,7 +309,7 @@ export const renderBlueprintDateInput = props => {
   const { input, intent, onFieldSubmit, inputProps, ...rest } = props;
   return (
     <DateInput
-      {...getMomentFormatter("MM/DD/YYYY")}
+      {...getDayjsFormatter("MM/DD/YYYY")}
       {...removeUnwantedProps(rest)}
       intent={intent}
       inputProps={inputProps}
@@ -328,7 +328,7 @@ export const renderBlueprintDateRangeInput = props => {
 
   return (
     <DateRangeInput
-      {...getMomentFormatter("MM/DD/YYYY")}
+      {...getDayjsFormatter("MM/DD/YYYY")}
       {...removeUnwantedProps(rest)}
       intent={intent}
       inputProps={inputProps}

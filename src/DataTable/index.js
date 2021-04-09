@@ -1,7 +1,6 @@
 /* eslint react/jsx-no-bind: 0 */
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
-import moment from "moment";
 import { arrayMove } from "react-sortable-hoc";
 import copy from "copy-to-clipboard";
 import {
@@ -34,6 +33,8 @@ import scrollIntoView from "dom-scroll-into-view";
 import { SortableElement } from "react-sortable-hoc";
 import ReactTable from "@teselagen/react-table";
 import { withProps, branch, compose } from "recompose";
+import dayjs from "dayjs";
+import localizedFormat from "dayjs/plugin/localizedFormat";
 import { withHotkeys } from "../utils/hotkeyUtils";
 import InfoHelper from "../InfoHelper";
 import { getSelectedRowsFromEntities } from "./utils/selection";
@@ -51,6 +52,8 @@ import defaultProps from "./defaultProps";
 import "../toastr";
 import "./style.css";
 import { getRecordsFromIdMap } from "./utils/withSelectedEntities";
+
+dayjs.extend(localizedFormat);
 
 class DataTable extends React.Component {
   constructor(props) {
@@ -1071,7 +1074,7 @@ class DataTable extends React.Component {
         };
       } else if (column.type === "timestamp") {
         tableColumn.Cell = props => {
-          return props.value ? moment(props.value).format("lll") : "";
+          return props.value ? dayjs(props.value).format("lll") : "";
         };
       } else if (column.type === "boolean") {
         tableColumn.Cell = props => (props.value ? "True" : "False");

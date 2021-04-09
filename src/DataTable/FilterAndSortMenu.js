@@ -1,5 +1,4 @@
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
-import moment from "moment";
 import { camelCase } from "lodash";
 import classNames from "classnames";
 import React from "react";
@@ -10,7 +9,9 @@ import {
   InputGroup,
   Classes
 } from "@blueprintjs/core";
-import getMomentFormatter from "../utils/getMomentFormatter";
+import dayjs from "dayjs";
+
+import getDayjsFormatter from "../utils/getDayjsFormatter";
 import { onEnterHelper } from "../utils/handlerHelpers";
 import DialogFooter from "../DialogFooter";
 import "./style.css";
@@ -139,10 +140,10 @@ export default class FilterAndSortMenu extends React.Component {
 }
 
 const dateMinMaxHelpers = {
-  minDate: moment()
+  minDate: dayjs()
     .subtract(25, "years")
     .toDate(),
-  maxDate: moment()
+  maxDate: dayjs()
     .add(25, "years")
     .toDate()
 };
@@ -218,8 +219,8 @@ class FilterInput extends React.Component {
         inputGroup = (
           <div className="custom-menu-item">
             <DateInput
-              value={filterValue ? moment(filterValue).toDate() : undefined}
-              {...getMomentFormatter("MM/DD/YYYY")}
+              value={filterValue ? dayjs(filterValue).toDate() : undefined}
+              {...getDayjsFormatter("MM/DD/YYYY")}
               {...dateMinMaxHelpers}
               onChange={selectedDates => {
                 handleFilterValueChange(selectedDates);
