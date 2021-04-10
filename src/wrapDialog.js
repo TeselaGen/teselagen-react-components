@@ -67,6 +67,7 @@ export default (topLevelDialogProps = {}) => Component => props => {
       isOpen
       onClose={hideModal}
       {...extraDialogProps}
+      style={{ ...extraDialogProps.style }}
     >
       <div ref={r}></div>
       <Component hideModal={hideModal} {...otherProps} />
