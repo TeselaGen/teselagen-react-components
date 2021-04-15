@@ -11,6 +11,7 @@ import {
   doesSearchValMatchText
 } from "../utils/menuUtils";
 import { comboToLabel, withHotkeys } from "../utils/hotkeyUtils";
+import popoverOverflowModifiers from "../utils/popoverOverflowModifiers";
 
 class MenuBar extends React.Component {
   constructor(props) {
@@ -259,6 +260,7 @@ class MenuBar extends React.Component {
               style={{
                 transition: "none"
               }}
+              modifiers={popoverOverflowModifiers}
               inline
             >
               {button}

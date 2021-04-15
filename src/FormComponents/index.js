@@ -36,6 +36,7 @@ import {
   WorkflowDefaultParamsContext,
   workflowDefaultParamsObj
 } from "../AssignDefaultsModeContext";
+import popoverOverflowModifiers from "../utils/popoverOverflowModifiers";
 import Uploader from "./Uploader";
 import sortify from "./sortify";
 import { fieldRequired } from "./utils";
@@ -98,17 +99,6 @@ function removeUnwantedProps(props) {
   }
   return cleanedProps;
 }
-
-// will help tooltip to not get smushed
-const popoverOverflowModifiers = {
-  preventOverflow: { enabled: false },
-  hide: {
-    enabled: false
-  },
-  flip: {
-    boundariesElement: "viewport"
-  }
-};
 
 function LabelWithTooltipInfo({ label, tooltipInfo }) {
   return tooltipInfo ? (
