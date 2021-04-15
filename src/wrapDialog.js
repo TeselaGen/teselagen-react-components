@@ -12,6 +12,7 @@ export default (topLevelDialogProps = {}) => Component => props => {
       {
         combo: "enter",
         global: true,
+        allowInInput: true,
         onKeyDown: () => {
           try {
             const parentEl = r.current.closest(".bp3-dialog-container");
@@ -67,6 +68,7 @@ export default (topLevelDialogProps = {}) => Component => props => {
       isOpen
       onClose={hideModal}
       {...extraDialogProps}
+      style={{ ...extraDialogProps.style }}
     >
       <div ref={r}></div>
       <Component hideModal={hideModal} {...otherProps} />

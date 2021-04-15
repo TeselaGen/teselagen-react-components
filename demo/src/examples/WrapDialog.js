@@ -1,4 +1,4 @@
-import { Button, Classes } from "@blueprintjs/core";
+import { Button, Classes, InputGroup } from "@blueprintjs/core";
 import React, { useState } from "react";
 import { Provider } from "react-redux";
 import wrapDialog from "../../../src/wrapDialog";
@@ -7,9 +7,7 @@ import store from "../store";
 function DialogInner(p) {
   return (
     <div className={Classes.DIALOG_BODY}>
-      <form onSubmit={() => {
-        console.log(`halloooo`)
-      }}>
+      
         I am a dialog
         <div style={{ width: 450 }}>with a bunch of stuff in it</div>
         {[1, 2, 3, 4, 5, 5, 6, 6, 77, 7, 12, 2, 34].map((num, i) => {
@@ -20,7 +18,7 @@ function DialogInner(p) {
             </div>
           );
         })}
-        <input></input>
+        <InputGroup></InputGroup>
         <Button
           onClick={() => {
             console.log(`yarrrr`);
@@ -29,7 +27,6 @@ function DialogInner(p) {
         >
           Hey
         </Button>
-      </form>
     </div>
   );
 }

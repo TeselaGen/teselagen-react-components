@@ -10,6 +10,10 @@
   white-space: pre-line;
 }
 
+.bp3-dialog {
+  max-width: 100vw;
+}
+
 /* adding back in blueprint v2 default styling to all <h/> elements */
 h1 {
   line-height: 40px;

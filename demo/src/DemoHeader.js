@@ -16,7 +16,7 @@ class DemoHeader extends Component {
   componentDidUpdate() {
     const { darkTheme } = this.state;
     localStorage.setItem("darkTheme", darkTheme);
-    document.body.classList.toggle(Classes.DARK, !!darkTheme );
+    document.body.classList.toggle(Classes.DARK, !!darkTheme);
   }
 
   toggleTheme = () => {
@@ -42,7 +42,7 @@ class DemoHeader extends Component {
           </Tooltip>
         </div>
         <a
-          style={{ fontSize: 35, color: "white" }}
+          style={{ fontSize: 16, color: "white" }}
           href="https://github.com/TeselaGen/teselagen-react-components"
         >
           TeselaGen React Components <Icon icon="link" />

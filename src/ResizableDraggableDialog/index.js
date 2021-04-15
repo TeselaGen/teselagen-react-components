@@ -79,6 +79,7 @@ export default class ResizableDraggableDialog extends React.Component {
         style={{ top: 0, left: 0, position: "fixed" }}
       >
         <Rnd
+          cancel=".bp3-dialog-close-button"
           enableResizing={{
             bottomLeft: true,
             bottomRight: true,

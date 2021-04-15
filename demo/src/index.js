@@ -32,6 +32,7 @@ import { HashRouter as Router, Route, Redirect } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./store";
 import { FocusStyleManager } from "@blueprintjs/core";
+import isMobile from "is-mobile";
 
 FocusStyleManager.onlyShowFocusOnTabs();
 
@@ -330,8 +331,8 @@ const Demo = () => {
           <DemoHeader />
           <div
             style={{
-              display: "flex",
-              padding: 40,
+              display: isMobile() ? "inherit" : "flex",
+              padding: isMobile() ? 10 : 40,
               maxWidth: "100vw"
             }}
           >
