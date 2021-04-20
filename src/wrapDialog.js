@@ -14,17 +14,43 @@ export default (topLevelDialogProps = {}) => Component => props => {
         global: true,
         allowInInput: true,
         onKeyDown: () => {
+          function doNotTriggerClick() {
+            //leave this here for debugging purposes
+            // console.log(`Not triggering dialog submit`);
+          }
+
           try {
-            const parentEl = r.current.closest(".bp3-dialog-container");
-            if (!document.activeElement) return;
-            //don't do this in text areas
-            if (document.activeElement.type === "textarea") return;
+            if (!document.activeElement) return doNotTriggerClick();
             if (
-              //don't do this if the dialog doesn't have the focus
-              document.activeElement.closest(".bp3-dialog-container") ===
-              parentEl
+              !document.activeElement.closest(".tg-allow-dialog-form-enter")
             ) {
+              //don't do this if you're in any type of bp multi select by default
+              if (document.activeElement.closest(".bp3-multi-select"))
+                return doNotTriggerClick();
+              //don't do this if there is an explicit class saying not to
+              if (document.activeElement.closest(".tg-stop-dialog-form-enter"))
+                return doNotTriggerClick();
+              //don't do this in text areas
+              if (document.activeElement.type === "textarea")
+                return doNotTriggerClick();
+            }
+            const parentEl = r.current.closest(".bp3-dialog-container");
+            // eslint-disable-next-line no-inner-declarations
+            function triggerClick() {
               parentEl.querySelector(`button[type='submit']`).click();
+            }
+
+            const dialogs = document.querySelectorAll(".bp3-dialog-container");
+            const numDialogs = dialogs?.length;
+
+            if (numDialogs > 1) {
+              const topMostDialog = dialogs[numDialogs - 1];
+              if (topMostDialog === parentEl) {
+                triggerClick();
+              }
+            } else {
+              //just 1 dialog
+              triggerClick();
             }
           } catch (error) {
             console.error(`error:`, error);

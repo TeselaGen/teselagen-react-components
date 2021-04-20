@@ -47,6 +47,7 @@ const SearchBar = ({
         e.preventDefault();
         e.stopPropagation();
         setSearchTerm(reduxFormSearchInput);
+        e.nativeEvent.stopImmediatePropagation();
       })}
       rightElement={rightElement}
     />

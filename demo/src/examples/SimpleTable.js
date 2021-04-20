@@ -1,6 +1,6 @@
-import { Button } from '@blueprintjs/core';
-import React from 'react'
-import DataTable from '../../../src/DataTable';
+import { Button } from "@blueprintjs/core";
+import React from "react";
+import DataTable from "../../../src/DataTable";
 
 const schema = {
   fields: [
@@ -38,17 +38,16 @@ const entities = [
   }
 ];
 
-export default function SimpleTable() {
+export default function SimpleTable(p) {
   return (
     <DataTable
       formName="simpleTable"
       isSimple
       entities={entities}
       schema={schema}
+      {...p}
     >
       <div>hey</div>
     </DataTable>
   );
 }
-
-
