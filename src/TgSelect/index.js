@@ -292,7 +292,7 @@ class TgSelect extends React.Component {
         query={this.state.query}
         popoverProps={{
           minimal: true,
-          className: classNames("tg-select", {
+          className: classNames("tg-select", "tg-stop-dialog-form-enter", {
             "tg-single-select": !multi
           }),
           wrapperTagName: "div",
@@ -300,32 +300,6 @@ class TgSelect extends React.Component {
           onInteraction: this.onInteraction,
           isOpen: this.state.isOpen,
           ...popoverProps
-        }}
-        onKeyDown={e => {
-          const { which } = e;
-          if (which === Keys.ENTER) {
-            e.preventDefault();
-
-            e.stopPropagation(); //this prevents dialog's it is in from closing
-          }
-          if (which === Keys.ESCAPE || which === Keys.TAB) {
-            // By default the escape key will not trigger a blur on the
-            // input element. It must be done explicitly.
-            if (this.input != null) {
-              this.input.blur();
-            }
-            this.setState({ isOpen: false });
-            e.preventDefault();
-            e.stopPropagation(); //this prevents dialog's it is in from closing
-          } else if (
-            !(
-              which === Keys.BACKSPACE ||
-              which === Keys.ARROW_LEFT ||
-              which === Keys.ARROW_RIGHT
-            )
-          ) {
-            this.setState({ isOpen: true });
-          }
         }}
         onItemSelect={this.handleItemSelect}
         createNewItemFromQuery={maybeCreateNewItemFromQuery}
@@ -349,6 +323,32 @@ class TgSelect extends React.Component {
             disabled: disabled, // tg: adding isLoading will cause the input to be blurred when using generic select asReactSelect (don't do it),
             ...tagInputProps, //spread additional tag input props here
             intent: this.props.intent,
+            onKeyDown: e => {
+              const { which } = e;
+              e.persist();
+              if (which === Keys.ENTER) {
+                e.preventDefault();
+                // e.stopPropagation();
+              }
+              if (which === Keys.ESCAPE || which === Keys.TAB) {
+                // By default the escape key will not trigger a blur on the
+                // input element. It must be done explicitly.
+                if (this.input != null) {
+                  this.input.blur();
+                }
+                this.setState({ isOpen: false });
+                e.preventDefault();
+                e.stopPropagation(); //this prevents dialog's it is in from closing
+              } else if (
+                !(
+                  which === Keys.BACKSPACE ||
+                  which === Keys.ARROW_LEFT ||
+                  which === Keys.ARROW_RIGHT
+                )
+              ) {
+                this.setState({ isOpen: true });
+              }
+            },
             inputProps: {
               autoFocus: autoFocus || autoOpen,
               onBlur,

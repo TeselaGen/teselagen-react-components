@@ -45,7 +45,9 @@ const SearchBar = ({
       placeholder="Search..."
       {...onEnterHelper(e => {
         e.preventDefault();
+        e.stopPropagation();
         setSearchTerm(reduxFormSearchInput);
+        e.nativeEvent.stopImmediatePropagation();
       })}
       rightElement={rightElement}
     />
