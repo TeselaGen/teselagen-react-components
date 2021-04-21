@@ -2,7 +2,7 @@ import { Button, Classes, Icon, InputGroup } from "@blueprintjs/core";
 import classNames from "classnames";
 import React, { useState } from "react";
 import { Provider } from "react-redux";
-import { DataTable, TgSelect } from "../../../src";
+import { TgSelect } from "../../../src";
 import wrapDialog from "../../../src/wrapDialog";
 import store from "../store";
 import SimpleTable from "./SimpleTable";
