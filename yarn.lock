@@ -1064,12 +1064,12 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@blueprintjs/core@^3.41.0":
-  version "3.41.0"
-  resolved "https://registry.yarnpkg.com/@blueprintjs/core/-/core-3.41.0.tgz#06c6a3e5b8b4e7341837289ce6cd450d18da3197"
-  integrity sha512-iKH/+eTzDGw8jAGCb7NvcIjpj3AIoou9wRogezOjHHylt3Ks34alkmSBIytPwj+JxBK67c31d0y0F/ppWqSvUQ==
+"@blueprintjs/core@^3.41.0", "@blueprintjs/core@^3.44.1":
+  version "3.44.1"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/core/-/core-3.44.1.tgz#614f67142d9d12a0366d40c0a93d29164f0c0699"
+  integrity sha512-q3qPXQn9oUukgwie4Tm5t6a+ZSrbgPrav5P/NULAc5VlEHW43t4gdKnSMciniUlFk0lWnnD0bNcqaMPviyAbLw==
   dependencies:
-    "@blueprintjs/icons" "^3.25.1"
+    "@blueprintjs/icons" "^3.26.0"
     "@types/dom4" "^2.0.1"
     classnames "^2.2"
     dom4 "^2.1.5"
@@ -1092,20 +1092,20 @@
     react-lifecycles-compat "^3.0.4"
     tslib "~1.13.0"
 
-"@blueprintjs/icons@^3.25.1":
-  version "3.25.1"
-  resolved "https://registry.yarnpkg.com/@blueprintjs/icons/-/icons-3.25.1.tgz#530c06a72b759da5c3cfbb01eaf2ab987a67129d"
-  integrity sha512-AppGf5IyjjKa/Zlre4pHWbDnsI7nefurXKku8Yf/B14bDAB2a8lzP6HCoTowAW4fHryTwE5Pzp9zEJYvofkUEg==
+"@blueprintjs/icons@^3.26.0":
+  version "3.26.0"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/icons/-/icons-3.26.0.tgz#d3f0aa0d35a9ebe8648db9651af364dfcc529d9f"
+  integrity sha512-1+yhYH1Fjj5qGx8drZUL2L1R42MiN0WVHTTKYqGEV9TAzhvFHCSZgALD7WNQa+FEibw/8B4U+79IRgUPJNEjow==
   dependencies:
     classnames "^2.2"
     tslib "~1.13.0"
 
 "@blueprintjs/select@^3.15.8":
-  version "3.15.8"
-  resolved "https://registry.yarnpkg.com/@blueprintjs/select/-/select-3.15.8.tgz#20e3621789322fcdc630b9da9e3c15698853b8b6"
-  integrity sha512-PNpUolmXP/flKPsUjlMXu4p11l+otvOEsO3h7RkN3AT7Uoos2oc5WU9QZMfX8Y5/c+ecOPZlh7eJO2ZXH/5Rxw==
+  version "3.16.1"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/select/-/select-3.16.1.tgz#e6a8520d5a5ef88ce0f22bde8f02a7022e7fccd3"
+  integrity sha512-ZUkmEgvrnGEltvllMMnFo7TZmyRPL6yF51yJdy92u54sLNXJiPJB4T+D1h6+BDUcaPshQLYYSZUleoJ41TQv7g==
   dependencies:
-    "@blueprintjs/core" "^3.41.0"
+    "@blueprintjs/core" "^3.44.1"
     classnames "^2.2"
     tslib "~1.13.0"
 
