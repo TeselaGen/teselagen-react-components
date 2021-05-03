@@ -1,7 +1,7 @@
 export default function getTextFromEl(el, options = {}) {
   const { lowerCase } = options;
 
-  return el.props && el.props.children
+  return el && el.props && el.props.children
     ? (el.props.children.reduce
         ? el.props.children
         : [el.props.children]

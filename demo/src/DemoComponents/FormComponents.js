@@ -94,6 +94,7 @@ class FormComponentsDemo extends React.Component {
               threeDotMenuItems={
                 <MenuItem text="Download Example File"> </MenuItem>
               }
+              secondaryLabel="I'm a secondaryLabel"
               accept=".json"
               action={"docs.google.com/upload"}
               minimal
@@ -112,6 +113,7 @@ class FormComponentsDemo extends React.Component {
             threeDotMenuItems={
               <MenuItem text="Download Example File"> </MenuItem>
             }
+            secondaryLabel="I'm a secondaryLabel"
             innerText="Upload"
             minimal
             fileList={[
@@ -137,6 +139,7 @@ class FormComponentsDemo extends React.Component {
             name={"radioGroup"}
             inlineLabel={this.state.inlineLabels}
             label={"Radio Group Input"}
+            secondaryLabel="I'm a secondaryLabel"
             tooltipInfo="hello hello I'm tooltipInfo"
             defaultValue={"true"}
             onFieldSubmit={onFieldSubmit}

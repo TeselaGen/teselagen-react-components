@@ -11,30 +11,45 @@ const schema = {
       render: () => {
         return <Button minimal icon="circle" />;
       }
-    }
+    },
+    "type",
+    "weather",
+    "weather1",
+    "weather2",
+    "weather3",
   ]
 };
 
 const entities = [
   {
     name: "Thomas",
-    id: "1"
+    id: "1",
+    type: "new",
+    weather: "cloudy"
   },
   {
     name: "Taoh",
-    id: "2"
+    id: "2",
+    type: "old",
+    weather: "cloudy"
   },
   {
     name: "Chris",
-    id: "3"
+    id: "3",
+    type: "new",
+    weather: "rainy"
   },
   {
     name: "Sam",
-    id: "4"
+    id: "4",
+    type: "old",
+    weather: "cloudy"
   },
   {
     name: "Adam",
-    id: "5"
+    id: "5",
+    type: "new",
+    weather: "cloudy"
   }
 ];
 

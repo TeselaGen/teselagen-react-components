@@ -1,7 +1,7 @@
-import { Icon } from '@blueprintjs/core';
-import React from 'react'
-import TgSelect from '../../../src/TgSelect'
-import renderToggle from '../renderToggle';
+import { Icon } from "@blueprintjs/core";
+import React from "react";
+import TgSelect from "../../../src/TgSelect";
+import renderToggle from "../renderToggle";
 
 export default class TgSelectDemo extends React.Component {
   constructor(props) {
@@ -11,7 +11,14 @@ export default class TgSelectDemo extends React.Component {
   render() {
     // const {} = this.props;
 
-    const { multi, isTagSelect, val, creatable, disallowClear, hasError } = this.state;
+    const {
+      multi,
+      isTagSelect,
+      val,
+      creatable,
+      disallowClear,
+      hasError
+    } = this.state;
 
     return (
       <div>
@@ -41,7 +48,7 @@ export default class TgSelectDemo extends React.Component {
             { color: "green", label: "hey", value: "as1234" },
             {
               color: "yellow",
-              label: "there",
+              label: <div>There</div>,
               value: "14556"
             },
             { color: "blue", label: "my: neighbor", value: "14:11545" },

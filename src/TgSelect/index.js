@@ -173,12 +173,15 @@ class TgSelect extends React.Component {
           : [this.props.value])
       ].filter(o => {
         const { label, value } = o || {};
-        return (
-          this.state.query ===
-          (label && label.toLowerCase
+        getTextFromEl();
+        const lowerQuery = (this.state.query || "").toLowerCase();
+        const lowerLabelOrVal =
+          label && label.toLowerCase
             ? label.toLowerCase()
-            : value && value.toLowerCase && value.toLowerCase())
-        );
+            : value && value.toLowerCase && value.toLowerCase();
+        const textFromEl = getTextFromEl(label);
+
+        return lowerQuery === lowerLabelOrVal || lowerQuery === textFromEl;
       }).length > 0
     );
   };
