@@ -302,7 +302,7 @@ export class DataTable extends React.Component<DataTableProps, any> { }
 
 /**
  * @example
-<DropdownButton menu={[
+<DropdownButton menu={
   <Menu>
   <MenuItem onClick={() => {
     console.log(`Ready to Roll OUT!`)
@@ -311,7 +311,7 @@ export class DataTable extends React.Component<DataTableProps, any> { }
     console.log(`Ready to Roll OUT!`)
   }} text={"Nope"}></MenuItem>
   </Menu>
-]}></DropdownButton>
+}></DropdownButton>
  */
 export function DropdownButton({
   disabled,
