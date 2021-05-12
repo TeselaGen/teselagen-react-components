@@ -10,7 +10,7 @@ export default (topLevelDialogProps = {}) => Component => props => {
   const memoedHotkeys = useMemo(
     () => [
       {
-        combo: "enter",
+        combo: topLevelDialogProps.useCmdEnter ? "cmd+enter" : "enter",
         global: true,
         allowInInput: true,
         onKeyDown: () => {
