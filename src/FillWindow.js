@@ -49,7 +49,6 @@ export default class FillWindow extends React.Component {
           position: "fixed",
           top: 0,
           left: 0,
-          background: "white",
           ...containerStyle,
           ...styleOverrides
         }}
