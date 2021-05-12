@@ -968,7 +968,7 @@ wrapDialog({
   title: "Print"
 }),
 */
-export function wrapDialog(options: { title: string; isDraggable: boolean }) {
+export function wrapDialog(options: { title: string; useCmdEnter: boolean, isDraggable: boolean }) {
 
 }
 
