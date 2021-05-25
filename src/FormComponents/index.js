@@ -163,11 +163,13 @@ class AbstractInput extends React.Component {
       defaultValue,
       input: { name },
       meta: { dispatch, form },
-      onDefaultValChanged
+      onDefaultValChanged,
+      onFieldSubmit
     } = this.props;
     dispatch(change(form, name, defaultValue));
     onDefaultValChanged &&
       onDefaultValChanged(defaultValue, name, form, this.props);
+    onFieldSubmit && onFieldSubmit(defaultValue);
   };
 
   render() {
