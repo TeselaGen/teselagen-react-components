@@ -965,10 +965,13 @@ export function mergeSchemas(schema, schemaOverrides) {
 /* 
 @example 
 wrapDialog({
-  title: "Print"
+  title: "Print",
+  style: {
+    width: 800
+  }
 }),
 */
-export function wrapDialog(options: { title: string; useCmdEnter: boolean, isDraggable: boolean }) {
+export function wrapDialog(options: { title: string; useCmdEnter: boolean, isDraggable: boolean, style: {} }) {
 
 }
 
