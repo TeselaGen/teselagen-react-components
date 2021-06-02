@@ -409,6 +409,7 @@ class FormComponentsDemo extends React.Component {
             label="ReactSelectField Collaborators"
             placeholder="This has a long placeholder, wow, I hope it fits"
             onFieldSubmit={onFieldSubmit}
+            noResultsText="I'm custom not found text!"
             creatable={this.state.reactSelectFieldcreatable}
             options={[
               {

@@ -196,4 +196,8 @@ describe("formComponents", () => {
       "be.disabled"
     );
   });
+  it("TgSelect should have a customizable noResults text ", () => {
+    cy.get(".tg-test-react-select-field .tg-select input").type("zyta");
+    cy.contains("I'm custom not found text!");
+  });
 });
