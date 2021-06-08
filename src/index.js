@@ -45,6 +45,7 @@ export * from "./utils/handlerHelpers";
 export * from "./customIcons";
 export { default as basicHandleActionsWithFullState } from "./utils/basicHandleActionsWithFullState";
 export { default as combineReducersWithFullState } from "./utils/combineReducersWithFullState";
+export { default as withSelectTableRecords } from "./utils/withSelectTableRecords";
 export { default as pureNoFunc } from "./utils/pureNoFunc";
 export * from "./utils/tagUtils";
 export * from "./utils/hotkeyUtils";

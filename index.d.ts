@@ -976,6 +976,15 @@ export function wrapDialog(options: { title: string; useCmdEnter: boolean, isDra
 }
 
 /* 
+Adds a prop "selectTableRecords" which can be used to select rows in a table.
+selectTableRecords([{ id: "1" }])
+
+@example 
+withSelectTableRecords("myTable"),
+*/
+export function withSelectTableRecords(tableFormName: string, propName: string? = "selectTableRecords") {}
+
+/* 
 @example
 this.hotkeyEnabler = withHotkeys({
   copyHotkey: {
