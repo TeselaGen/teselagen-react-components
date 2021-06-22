@@ -220,22 +220,28 @@ function getFiltersFromSearchTerm(searchTerm, schema) {
           isOrFilter: true
         });
       } else if (type === "boolean") {
-        if ("true".replace(new RegExp("^" + searchTerm, "ig"), "") !== "true") {
-          searchTermFilters.push({
-            filterOn: nameToUse,
-            filterValue: true,
-            selectedFilter: "true",
-            isOrFilter: true
-          });
-        } else if (
-          "false".replace(new RegExp("^" + searchTerm, "ig"), "") !== "false"
-        ) {
-          searchTermFilters.push({
-            filterOn: nameToUse,
-            filterValue: false,
-            selectedFilter: "false",
-            isOrFilter: true
-          });
+        let regex;
+        try {
+          regex = new RegExp("^" + searchTerm, "ig");
+        } catch (error) {
+          //ignore
+        }
+        if (regex) {
+          if ("true".replace(regex, "") !== "true") {
+            searchTermFilters.push({
+              filterOn: nameToUse,
+              filterValue: true,
+              selectedFilter: "true",
+              isOrFilter: true
+            });
+          } else if ("false".replace(regex, "") !== "false") {
+            searchTermFilters.push({
+              filterOn: nameToUse,
+              filterValue: false,
+              selectedFilter: "false",
+              isOrFilter: true
+            });
+          }
         }
       } else if (type === "number" && !isNaN(Number(searchTerm))) {
         searchTermFilters.push({
