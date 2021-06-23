@@ -41,6 +41,7 @@ const schema = {
       path: "name",
       type: "string",
       displayName: "Name",
+      openable: true,
       render: (value /* record, index */) => {
         return (
           <span
@@ -280,6 +281,7 @@ class DataTableInstance extends React.Component {
       noSelect: false,
       withTitle: true,
       isViewable: true,
+      isOpenable: false,
       minimalStyle: false,
       withSearch: true,
       withPaging: true,
@@ -458,6 +460,11 @@ class DataTableInstance extends React.Component {
         {renderToggle({
           that: this,
           type: "isViewable",
+          description: "Make sure withCheckboxes is off when using this"
+        })}
+        {renderToggle({
+          that: this,
+          type: "isOpenable",
           description: "Make sure withCheckboxes is off when using this"
         })}
         {renderToggle({
@@ -674,6 +681,7 @@ class DataTableInstance extends React.Component {
               }
             }
             isViewable={this.state.isViewable}
+            isOpenable={this.state.isOpenable}
             minimalStyle={this.state.minimalStyle}
             withTitle={this.state.withTitle}
             noSelect={this.state.noSelect}

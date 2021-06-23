@@ -376,6 +376,7 @@ export interface DataTableProps {
   hideColumnHeader: boolean;
   subHeader: any;
   isViewable: boolean;
+  isOpenable: boolean;
   entities: any;
   children: any;
   topLeftItems: any;

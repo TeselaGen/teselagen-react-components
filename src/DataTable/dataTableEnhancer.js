@@ -10,7 +10,7 @@ import { toArray, keyBy, get } from "lodash";
 import { withProps, withState, branch, compose } from "recompose";
 import withTableParams from "../DataTable/utils/withTableParams";
 import convertSchema from "../DataTable/utils/convertSchema";
-import viewColumn from "../DataTable/viewColumn";
+import { viewColumn, openColumn } from "../DataTable/viewColumn";
 import pureNoFunc from "../utils/pureNoFunc";
 
 export default compose(
@@ -40,6 +40,7 @@ export default compose(
       upsertFieldOption,
       currentUser,
       isViewable,
+      isOpenable,
       entities = [],
       cellRenderer = {},
       showForcedHiddenColumns,
@@ -62,6 +63,9 @@ export default compose(
 
     if (isViewable) {
       schemaToUse.fields = [viewColumn, ...schemaToUse.fields];
+    }
+    if (isOpenable) {
+      schemaToUse.fields = [openColumn, ...schemaToUse.fields];
     }
     let hasOptionForForcedHidden =
       withDisplayOptions && (isSimple || isInfinite);
