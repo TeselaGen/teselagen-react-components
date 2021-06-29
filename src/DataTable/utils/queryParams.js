@@ -664,6 +664,8 @@ export function getQueryParams({
     );
     newEntities = orderEntitiesLocal(order, newEntities, schema, ownProps);
 
+    const entitiesAcrossPages = newEntities;
+
     let newEntityCount = newEntities.length;
     //calculate the sorted, filtered, paged entities for the local table
     if (!isInfinite && !ownProps.controlled_pageSize) {
@@ -671,6 +673,7 @@ export function getQueryParams({
       newEntities = take(drop(newEntities, offset), pageSize);
     }
     toReturn.entities = newEntities;
+    toReturn.entitiesAcrossPages = entitiesAcrossPages;
     toReturn.entityCount = newEntityCount;
     //if this call is being made by a local-data only connected datatable component,
     //we don't want to do the following gql stuff

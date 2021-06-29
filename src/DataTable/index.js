@@ -440,6 +440,7 @@ class DataTable extends React.Component {
       isViewable,
       minimalStyle,
       entities,
+      entitiesAcrossPages,
       children: maybeChildren,
       topLeftItems,
       currentParams,
@@ -448,7 +449,8 @@ class DataTable extends React.Component {
       searchMenuButton,
       setShowForcedHidden,
       autoFocusSearch,
-      additionalFooterButtons
+      additionalFooterButtons,
+      isEntityDisabled
     } = propPresets;
     let updateColumnVisibilityToUse = updateColumnVisibility;
     let updateTableDisplayDensityToUse = updateTableDisplayDensity;
@@ -533,6 +535,29 @@ class DataTable extends React.Component {
         onClick={this.toggleFullscreen}
       />
     );
+
+    let showSelectAll = false;
+    // we want to show select all if every row on the current page is selected
+    // and not every row across all pages are already selected.
+    if (
+      !isInfinite &&
+      entitiesAcrossPages &&
+      numRows < entitiesAcrossPages.length
+    ) {
+      // could all be disabled
+      let atLeastOneRowOnCurrentPageSelected = false;
+      const allRowsOnCurrentPageSelected = entities.every(e => {
+        const selected = idMap[e.id] || isEntityDisabled(e);
+        if (selected) atLeastOneRowOnCurrentPageSelected = true;
+        return selected;
+      });
+      if (atLeastOneRowOnCurrentPageSelected && allRowsOnCurrentPageSelected) {
+        const everyEntitySelected = entitiesAcrossPages.every(e => {
+          return idMap[e.id] || isEntityDisabled(e);
+        });
+        showSelectAll = !everyEntitySelected;
+      }
+    }
 
     const showNumSelected = !noSelect && !isSingleSelect && !hideSelectedCount;
     let selectedAndTotalMessage = "";
@@ -679,6 +704,36 @@ class DataTable extends React.Component {
             </div>
           )}
           {subHeader}
+          {showSelectAll && (
+            <div
+              style={{
+                marginTop: 5,
+                marginBottom: 5,
+                display: "flex",
+                alignItems: "center"
+              }}
+            >
+              All items on this page are selected.{" "}
+              <Button
+                small
+                minimal
+                intent="primary"
+                text={`Select all ${entitiesAcrossPages.length} items`}
+                onClick={() => {
+                  const newIdMap = cloneDeep(idMap) || {};
+                  entitiesAcrossPages.forEach((entity, i) => {
+                    if (isEntityDisabled(entity)) return;
+                    const entityId = getIdOrCodeOrIndex(entity, i);
+                    newIdMap[entityId] = { entity };
+                  });
+                  finalizeSelection({
+                    idMap: newIdMap,
+                    props: computePresets(this.props)
+                  });
+                }}
+              />
+            </div>
+          )}
           <ReactTable
             data={entities}
             ref={n => {
