@@ -1,5 +1,5 @@
 import React from "react";
-import { Icon, Button } from "@blueprintjs/core";
+import { Icon, Button, Tooltip } from "@blueprintjs/core";
 
 export const viewColumn = {
   width: 35,
@@ -15,16 +15,18 @@ export const openColumn = {
   ...viewColumn,
   render: (val, record, rowInfo, props) => {
     return (
-      <Button
-        onClick={e => {
-          e.stopPropagation();
-          props.onDoubleClick(rowInfo.original, rowInfo.index, props.history);
-        }}
-        minimal
-        small
-        className="dt-eyeIcon"
-        icon="eye-open"
-      />
+      <Tooltip content="Open">
+        <Button
+          onClick={e => {
+            e.stopPropagation();
+            props.onDoubleClick(rowInfo.original, rowInfo.index, props.history);
+          }}
+          minimal
+          small
+          className="dt-eyeIcon"
+          icon="document-open"
+        />
+      </Tooltip>
     );
   }
 };
