@@ -537,6 +537,7 @@ class DataTable extends React.Component {
     );
 
     let showSelectAll = false;
+    let showClearAll = false;
     // we want to show select all if every row on the current page is selected
     // and not every row across all pages are already selected.
     if (
@@ -547,14 +548,19 @@ class DataTable extends React.Component {
       // could all be disabled
       let atLeastOneRowOnCurrentPageSelected = false;
       const allRowsOnCurrentPageSelected = entities.every(e => {
-        const selected = idMap[e.id] || isEntityDisabled(e);
+        const rowId = getIdOrCodeOrIndex(e);
+        const selected = idMap[rowId] || isEntityDisabled(e);
         if (selected) atLeastOneRowOnCurrentPageSelected = true;
         return selected;
       });
       if (atLeastOneRowOnCurrentPageSelected && allRowsOnCurrentPageSelected) {
         const everyEntitySelected = entitiesAcrossPages.every(e => {
-          return idMap[e.id] || isEntityDisabled(e);
+          const rowId = getIdOrCodeOrIndex(e);
+          return idMap[rowId] || isEntityDisabled(e);
         });
+        if (everyEntitySelected) {
+          showClearAll = entitiesAcrossPages.length;
+        }
         showSelectAll = !everyEntitySelected;
       }
     }
@@ -728,6 +734,30 @@ class DataTable extends React.Component {
                   });
                   finalizeSelection({
                     idMap: newIdMap,
+                    props: computePresets(this.props)
+                  });
+                }}
+              />
+            </div>
+          )}
+          {showClearAll > 0 && (
+            <div
+              style={{
+                marginTop: 5,
+                marginBottom: 5,
+                display: "flex",
+                alignItems: "center"
+              }}
+            >
+              All {showClearAll} items are selected.{" "}
+              <Button
+                small
+                minimal
+                intent="primary"
+                text="Clear Selection"
+                onClick={() => {
+                  finalizeSelection({
+                    idMap: {},
                     props: computePresets(this.props)
                   });
                 }}
