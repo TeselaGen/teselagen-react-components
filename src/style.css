@@ -407,3 +407,8 @@ button[aria-label][data-balloon-pos] {
 .above-dialog {
   z-index: 100001;
 }
+
+/* .bp3-popover-content .bp3-submenu { */
+/* max-height: 99vh; */
+/* overflow-y: auto; */
+/* } */

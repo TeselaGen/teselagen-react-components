@@ -16,7 +16,7 @@ import {
   CmdDiv,
   CmdSwitch
 } from "../../../src/utils/commandControls";
-import { MenuItem } from "@blueprintjs/core";
+import { MenuItem, Button } from "@blueprintjs/core";
 
 export default class MenuBarDemo extends React.Component {
   constructor(props) {
@@ -32,6 +32,9 @@ export default class MenuBarDemo extends React.Component {
         hotkey: "mod+n",
         text: "cmdSubmenu",
         submenu: () => {
+          if (window.Cypress) {
+            window.Cypress.submenuComputed = true
+          }
           return [
             {
               text: "yay I'm a dynamic submenu",
@@ -208,12 +211,191 @@ export default class MenuBarDemo extends React.Component {
           },
           { text: "I'm disabled", disabled: true, onClick: () => {} },
           { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
+          { icon: "clipboard", cmd: "paste" },
           { divider: "" },
           {
             text: "Other",
             showInSearchMenu: true, //you can also just define an onClick handler and it will show up as well!
             submenu: [
               // no hotkeys or commands used here
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
+              {
+                text: "Not a command",
+              },
               {
                 text: "Not a command",
                 label: "Label",
@@ -270,7 +452,6 @@ export default class MenuBarDemo extends React.Component {
           }
         ]
       }
-      // { isMenuSearch: true },
     ];
 
     // Sets will normally be different routes/modules/views of an app, but any
@@ -298,6 +479,7 @@ export default class MenuBarDemo extends React.Component {
     /* eslint-enable no-undef*/
 
     this.state = {
+      count: 0,
       isChecked: false,
       showDialog: false
     };
@@ -327,6 +509,9 @@ export default class MenuBarDemo extends React.Component {
             // menuSearchHotkey="alt+/"
           />
         </div>
+        <Button onClick={()=>this.setState({count: this.state.count + 1})}>
+          Simple Counter {this.state.count}
+        </Button>
         <button
           onClick={e => {
             return showCommandContextMenu(
