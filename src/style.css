@@ -408,6 +408,10 @@ button[aria-label][data-balloon-pos] {
   z-index: 100001;
 }
 
+.bp3-submenu > * > .bp3-menu {
+  max-height: 96vh;
+  overflow: auto;
+}
 /* .bp3-popover-content .bp3-submenu { */
 /* max-height: 99vh; */
 /* overflow-y: auto; */
