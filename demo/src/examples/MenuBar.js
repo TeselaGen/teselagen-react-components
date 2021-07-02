@@ -16,7 +16,7 @@ import {
   CmdDiv,
   CmdSwitch
 } from "../../../src/utils/commandControls";
-import { MenuItem, Button } from "@blueprintjs/core";
+import { MenuItem, Button, Intent, Popover, Menu } from "@blueprintjs/core";
 
 export default class MenuBarDemo extends React.Component {
   constructor(props) {
@@ -33,7 +33,7 @@ export default class MenuBarDemo extends React.Component {
         text: "cmdSubmenu",
         submenu: () => {
           if (window.Cypress) {
-            window.Cypress.submenuComputed = true
+            window.Cypress.submenuComputed = true;
           }
           return [
             {
@@ -51,7 +51,7 @@ export default class MenuBarDemo extends React.Component {
         name: "component cmd example",
         component: topLevelProps => instanceProps => {
           //topLevelProps would be props passed to all cmds via the cmd enhancer
-          console.info(`topLevelProps:`,topLevelProps)
+          console.info(`topLevelProps:`, topLevelProps);
           return (
             <MenuItem text={instanceProps.name} {...instanceProps}></MenuItem>
           );
@@ -218,130 +218,234 @@ export default class MenuBarDemo extends React.Component {
             submenu: [
               // no hotkeys or commands used here
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
                 text: "Not a command",
+                submenu: [
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  },
+                  {
+                    text: "zoiiiiink"
+                  }
+                ]
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
-                text: "Not a command",
+                text: "Not a command"
               },
               {
                 text: "Not a command",
@@ -456,9 +560,89 @@ export default class MenuBarDemo extends React.Component {
             // menuSearchHotkey="alt+/"
           />
         </div>
-        <Button onClick={()=>this.setState({count: this.state.count + 1})}>
+        <Button onClick={() => this.setState({ count: this.state.count + 1 })}>
           Simple Counter {this.state.count}
         </Button>
+        <Popover
+          content={
+            <Menu>
+              <MenuItem text="helllo ">
+                <MenuItem text="chipmunk "></MenuItem>
+                <MenuItem text="chipmunk "></MenuItem>
+                <MenuItem text="chipmunk "></MenuItem>
+                <MenuItem text="chipmunk "></MenuItem>
+                <MenuItem text="chipmunk ">
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                  <MenuItem text="squirrel "></MenuItem>
+                </MenuItem>
+
+                <MenuItem text="chipmunk "></MenuItem>
+              </MenuItem>
+              <MenuItem text="helllo "></MenuItem>
+              <MenuItem text="helllo "></MenuItem>
+              <MenuItem text="helllo "></MenuItem>
+              <MenuItem text="helllo "></MenuItem>
+              <MenuItem text="helllo "></MenuItem>
+              <MenuItem text="helllo "></MenuItem>
+              <MenuItem text="helllo "></MenuItem>
+              <MenuItem text="helllo "></MenuItem>
+            </Menu>
+          }
+        >
+          <Button intent={Intent.PRIMARY} text="Primary" />
+        </Popover>
         <button
           onClick={e => {
             return showCommandContextMenu(
