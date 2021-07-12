@@ -35,7 +35,11 @@ class MenuBar extends React.Component {
     style: {}
   };
 
-  state = { searchVal: "", isOpen: false, openIndex: null };
+  state = {
+    isOpen: false,
+    openIndex: null,
+    helpItemQueryStringTracker: "" //we use this to track the search value and to not do all the item rendering logic until someone is actually searching
+  };
 
   handleInteraction = index => newOpenState => {
     if (!newOpenState && index !== this.state.openIndex) {
@@ -55,10 +59,10 @@ class MenuBar extends React.Component {
     }
   };
 
-  get allMenuItems() {
+  getAllMenuItems = () => {
     const { menu, enhancers, context } = this.props;
     return getAllMenuTextsAndHandlers(menu, enhancers, context);
-  }
+  };
   addHelpItemIfNecessary = (menu, i) => {
     return menu.map((item, innerIndex) => {
       const { isMenuSearch, inputProps, ...rest } = item;
@@ -72,15 +76,22 @@ class MenuBar extends React.Component {
           text: (
             <Suggest
               closeOnSelect={false}
-              items={this.allMenuItems}
+              items={
+                this.state.helpItemQueryStringTracker
+                  ? this.getAllMenuItems()
+                  : []
+              }
               itemListPredicate={filterMenuItems}
               itemDisabled={i => i.disabled}
               popoverProps={{
                 minimal: true,
                 popoverClassName: "tg-menu-search-suggestions"
               }}
+              onQueryChange={val => {
+                this.setState({ helpItemQueryStringTracker: val });
+              }}
               resetOnSelect={false}
-              resetOnClose={false}
+              resetOnClose={true}
               inputProps={{
                 inputRef: n => {
                   if (n) {
@@ -206,7 +217,7 @@ class MenuBar extends React.Component {
     return (
       <div className={"tg-menu-bar " + className} style={style}>
         <this.hotkeyEnabler></this.hotkeyEnabler>
-        {this.addHelpItemIfNecessary(menu).map((topLevelItem, i) => {
+        {menu.map((topLevelItem, i) => {
           const dataKeys = pickBy(topLevelItem, function(value, key) {
             return startsWith(key, "data-");
           });
@@ -242,6 +253,7 @@ class MenuBar extends React.Component {
               minimal
               canEscapeKeyClose
               onClosed={() => {
+                this.setState({ helpItemQueryStringTracker: "" });
                 this.props.onMenuClose && this.props.onMenuClose();
               }}
               portalClassName="tg-menu-bar-popover"

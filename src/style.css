@@ -83,6 +83,16 @@ h6.bp3-heading {
   position: relative;
   vertical-align: top;
 }
+/* this line is necessary otherwise the line above setting "position: relative;" caused nested long bp3 submenus to not appear correctly when using the fix below */
+.bp3-submenu .bp3-popover-wrapper {
+  position: unset;
+}
+/* this fixes https://github.com/palantir/blueprint/issues/4791 but requires the "position: unset;" fix above */
+.bp3-submenu > * > .bp3-menu {
+  max-height: 96vh;
+  overflow: auto;
+}
+
 /* bp3 fix https://github.com/palantir/blueprint/issues/2807 */
 span.bp3-popover-target {
   display: block;
