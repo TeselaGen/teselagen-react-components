@@ -463,6 +463,7 @@ export class renderBlueprintTextarea extends React.Component {
       onFieldSubmit,
       clickToEdit,
       onKeyDown,
+      disabled,
       ...rest
     } = this.props;
     if (clickToEdit) {
@@ -484,6 +485,7 @@ export class renderBlueprintTextarea extends React.Component {
             onKeyDown={this.onKeyDown}
           />
           {clickToEdit &&
+            !disabled &&
             (this.state.isOpen ? (
               //show okay/cancel buttons
               <div>
@@ -504,6 +506,7 @@ export class renderBlueprintTextarea extends React.Component {
       return (
         <TextArea
           {...removeUnwantedProps(rest)}
+          disabled={disabled}
           className={classNames(
             intentClass,
             inputClassName,

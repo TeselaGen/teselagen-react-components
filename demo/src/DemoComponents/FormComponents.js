@@ -372,6 +372,15 @@ class FormComponentsDemo extends React.Component {
             label="TextareaField with clickToEdit=true"
             placeholder="Enter notes..."
           />
+          <TextareaField
+            clickToEdit
+            disabled
+            name={"textAreaFieldWithClickToEditAndDisabled"}
+            inlineLabel={this.state.inlineLabels}
+            onFieldSubmit={onFieldSubmit}
+            label="TextareaField with clickToEdit=true and disabled"
+            placeholder="Enter notes..."
+          />
           <EditableTextField
             name={"editableTextField"}
             inlineLabel={this.state.inlineLabels}
