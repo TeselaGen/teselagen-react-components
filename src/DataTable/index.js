@@ -276,7 +276,7 @@ class DataTable extends React.Component {
       e.clipboardData.setData("text/plain", stringToCopy);
     };
     document.addEventListener("copy", copyHandler);
-    !window.Cypress && copy(stringToCopy); //only fire the copy event if not in a cypress test
+    copy(stringToCopy);
     document.removeEventListener("copy", copyHandler);
     window.toastr.success(message);
   };
