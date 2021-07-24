@@ -62,7 +62,7 @@
     "auto-changelog": "^2.2.1",
     "chance": "^1.1.7",
     "cypress": "3.2.0",
-    "eslint": "^6.8.0",
+    "eslint": "^7.31.0",
     "eslint-config-teselagen": "^5.0.6",
     "gh-pages": "^2.2.0",
     "husky": "^1.1.3",
