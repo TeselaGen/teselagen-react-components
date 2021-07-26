@@ -261,7 +261,13 @@ class MenuBar extends React.Component {
               isOpen={isOpen && i === openIndex}
               onInteraction={this.handleInteraction(i)}
               content={
-                <Menu>
+                <Menu
+                  style={{
+                    "max-height": "80vh",
+                    "overflow-y": "auto",
+                    "scrollbar-width": "thin"
+                  }}
+                >
                   {createDynamicMenu(
                     this.addHelpItemIfNecessary(topLevelItem.submenu, i),
                     enhancers
