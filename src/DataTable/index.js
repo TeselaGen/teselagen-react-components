@@ -276,7 +276,10 @@ class DataTable extends React.Component {
       e.clipboardData.setData("text/plain", stringToCopy);
     };
     document.addEventListener("copy", copyHandler);
-    !window.Cypress && copy(stringToCopy);
+    !window.Cypress &&
+      copy(stringToCopy, {
+        format: "text/plain"
+      });
     document.removeEventListener("copy", copyHandler);
     window.toastr.success(message);
   };
