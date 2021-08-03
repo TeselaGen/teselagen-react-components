@@ -55,6 +55,7 @@
     "redux-form": "^7.4.2",
     "shortid": "^2.2.16",
     "tg-client-query-builder": "^2.13.1",
+    "url-join": "^4.0.1",
     "use-deep-compare-effect": "^1.6.1"
   },
   "devDependencies": {

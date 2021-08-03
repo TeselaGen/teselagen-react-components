@@ -15,6 +15,8 @@ import {
   forEach,
   lowerCase
 } from "lodash";
+import joinUrl from "url-join";
+
 import {
   Button,
   Menu,
@@ -278,6 +280,7 @@ class DataTable extends React.Component {
     document.addEventListener("copy", copyHandler);
     !window.Cypress &&
       copy(stringToCopy, {
+        // keep this so that pasting into spreadsheets works.
         format: "text/plain"
       });
     document.removeEventListener("copy", copyHandler);
@@ -306,10 +309,17 @@ class DataTable extends React.Component {
       const rowEls = rowNumbersToCopy.map(i => allRowEls[i]);
 
       //get row elements and call this.handleCopyRow for each const rowEls = this.getRowEls(rowNumbersToCopy)
-      const textToCopy = map(rowEls, rowEl => this.getRowCopyText(rowEl))
+      let textToCopy = map(rowEls, rowEl => this.getRowCopyText(rowEl))
         .filter(text => text)
         .join("\n");
       if (!textToCopy) return window.toastr.warning("No text to copy");
+      const { columns } = this.state;
+      const headerRow = columns
+        .map(({ renderTitleInner, displayName, path }) => {
+          return renderTitleInner || displayName || startCase(path) || "";
+        })
+        .join("\t");
+      textToCopy = headerRow + "\n" + textToCopy;
       this.handleCopyHelper(textToCopy, "Selected rows copied");
     } catch (error) {
       console.error(`error:`, error);
@@ -1206,6 +1216,7 @@ class DataTable extends React.Component {
   };
 
   getCopyTextForCell = (val, row, column) => {
+    const { cellRenderer } = computePresets(this.props);
     // TODOCOPY we need a way to potentially omit certain columns from being added as a \t element (talk to taoh about this)
     let text = typeof val !== "string" ? row.value : val;
 
@@ -1217,9 +1228,26 @@ class DataTable extends React.Component {
       text = column.getValueToFilterOn(record, this.props);
     } else if (column.render) {
       text = column.render(row.value, record, row, this.props);
+    } else if (cellRenderer && cellRenderer[column.path]) {
+      text = cellRenderer[column.path](
+        row.value,
+        row.original,
+        row,
+        this.props
+      );
     } else if (text) {
       text = String(text);
     }
+
+    // this will convert Link elements to url strings
+    if (React.isValidElement(text) && text.props?.to) {
+      text = joinUrl(
+        window.location.origin,
+        window.frontEndConfig?.clientBasePath || "",
+        text.props.to
+      );
+    }
+
     const stringText = toString(text);
     if (stringText === "[object Object]") return "";
     return stringText;
@@ -1335,6 +1363,7 @@ class DataTable extends React.Component {
     const ccDisplayName = camelCase(displayName || path);
     let columnTitle = displayName || startCase(path);
     if (isActionColumn) columnTitle = "";
+
     const currentFilter =
       filters &&
       !!filters.length &&
