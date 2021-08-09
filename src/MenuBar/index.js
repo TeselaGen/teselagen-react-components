@@ -11,7 +11,6 @@ import {
   doesSearchValMatchText
 } from "../utils/menuUtils";
 import { comboToLabel, withHotkeys } from "../utils/hotkeyUtils";
-import popoverOverflowModifiers from "../utils/popoverOverflowModifiers";
 
 class MenuBar extends React.Component {
   constructor(props) {
@@ -233,6 +232,10 @@ class MenuBar extends React.Component {
             <Button
               {...dataKeys} //spread all data-* attributes
               key={i}
+              elementRef={n => {
+                if (!n) return;
+                this.n = n;
+              }}
               minimal
               className="tg-menu-bar-item"
               onClick={topLevelItem.onClick}
@@ -244,6 +247,13 @@ class MenuBar extends React.Component {
               {topLevelItem.text}
             </Button>
           );
+          const vh = Math.max(
+            document.documentElement.clientHeight || 0,
+            window.innerHeight || 0
+          );
+          const maxHeight =
+            vh - ((this.n && this.n.getBoundingClientRect().y + 70) || 70);
+
           return !topLevelItem.submenu ? (
             button
           ) : (
@@ -261,7 +271,7 @@ class MenuBar extends React.Component {
               isOpen={isOpen && i === openIndex}
               onInteraction={this.handleInteraction(i)}
               content={
-                <Menu>
+                <Menu style={{ maxHeight, overflow: "auto" }}>
                   {createDynamicMenu(
                     this.addHelpItemIfNecessary(topLevelItem.submenu, i),
                     enhancers
@@ -272,7 +282,6 @@ class MenuBar extends React.Component {
               style={{
                 transition: "none"
               }}
-              modifiers={popoverOverflowModifiers}
               inline
             >
               {button}
