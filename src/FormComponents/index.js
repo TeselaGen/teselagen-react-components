@@ -1051,7 +1051,9 @@ export function generateField(component, opts) {
 export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
   return props => {
     const {
+      massageDefaultIdValue,
       generateDefaultValue,
+      defaultValueByIdOverride,
       defaultValue: defaultValueFromProps,
       ...rest
     } = props;
@@ -1076,52 +1078,65 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
     };
 
     async function triggerGetDefault() {
-      if (!window.__triggerGetDefaultValueRequest) return;
-      if (!generateDefaultValue) return;
-      setLoadingDefaultValue(true);
-      //custom params should match params keys. if not throw an error
-      const doParamsMatch = isEqual(
-        Object.keys({
-          ...(caresAboutToolContext ? workflowDefaultParamsObj : {}), //we don't want to compare these keys so we just spread them here
-          ...(generateDefaultValue.params || {})
-        }).sort(),
-        Object.keys(customParamsToUse).sort()
-      );
-      if (!doParamsMatch) {
-        console.warn(
-          `Issue with generateDefaultValue. customParams don't match params`
+      if (!defaultValueByIdOverride) {
+        //if defaultValueByIdOverride is passed, we can skip over getting the value from the backend straight to massaging the default value
+        if (!window.__triggerGetDefaultValueRequest) return;
+        if (!generateDefaultValue) return;
+        setLoadingDefaultValue(true);
+        //custom params should match params keys. if not throw an error
+        const doParamsMatch = isEqual(
+          Object.keys({
+            ...(caresAboutToolContext ? workflowDefaultParamsObj : {}), //we don't want to compare these keys so we just spread them here
+            ...(generateDefaultValue.params || {})
+          }).sort(),
+          Object.keys(customParamsToUse).sort()
         );
-        console.warn(
-          `generateDefaultValue.params:`,
-          generateDefaultValue.params
-        );
-        console.warn(`generateDefaultValue.customParams:`, customParamsToUse);
-        throw new Error(
-          `Issue with generateDefaultValue code=${
-            generateDefaultValue.code
-          }: Difference detected with: ${difference(
-            Object.keys(generateDefaultValue.params || {}),
-            Object.keys(customParamsToUse || {})
-          ).join(
-            ", "
-          )}. customParams passed into the field should match params (as defined in defaultValueConstants.js). See console for more details.`
-        );
+        if (!doParamsMatch) {
+          console.warn(
+            `Issue with generateDefaultValue. customParams don't match params`
+          );
+          console.warn(
+            `generateDefaultValue.params:`,
+            generateDefaultValue.params
+          );
+          console.warn(`generateDefaultValue.customParams:`, customParamsToUse);
+          throw new Error(
+            `Issue with generateDefaultValue code=${
+              generateDefaultValue.code
+            }: Difference detected with: ${difference(
+              Object.keys(generateDefaultValue.params || {}),
+              Object.keys(customParamsToUse || {})
+            ).join(
+              ", "
+            )}. customParams passed into the field should match params (as defined in defaultValueConstants.js). See console for more details.`
+          );
+        }
       }
 
       try {
-        const res = await window.__triggerGetDefaultValueRequest(
-          generateDefaultValue.code,
-          customParamsToUse
-        );
+        let { defaultValue, allowUserOverride } = defaultValueByIdOverride
+          ? { defaultValue: defaultValueByIdOverride }
+          : await window.__triggerGetDefaultValueRequest(
+              generateDefaultValue.code,
+              customParamsToUse
+            );
+        if (massageDefaultIdValue) {
+          const massagedRes = await massageDefaultIdValue({
+            defaultValueById: defaultValue
+          });
+          if (massagedRes.defaultValue) {
+            defaultValue = massagedRes.defaultValue;
+          }
+        }
         if (
           ComponentToWrap === renderBlueprintCheckbox ||
           ComponentToWrap === renderBlueprintSwitch
         ) {
-          setDefault(res.defaultValue === "true");
+          setDefault(defaultValue === "true");
         } else {
-          setDefault(res.defaultValue);
+          setDefault(defaultValue);
         }
-        setUserOverride(res.allowUserOverride);
+        setUserOverride(allowUserOverride);
         setDefaultValCount(defaultValCount + 1);
       } catch (error) {
         console.error(`error aswf298f:`, error);
