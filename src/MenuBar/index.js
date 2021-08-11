@@ -1,9 +1,9 @@
 import React from "react";
 import { pickBy, isNumber, startsWith, flatMap, take, flatten } from "lodash";
 import { Suggest } from "@blueprintjs/select";
-
 import "./style.css";
 import { Popover, Position, Menu, Button } from "@blueprintjs/core";
+import { some } from "lodash";
 import {
   createDynamicMenu,
   DynamicMenuItem,
@@ -271,7 +271,13 @@ class MenuBar extends React.Component {
               isOpen={isOpen && i === openIndex}
               onInteraction={this.handleInteraction(i)}
               content={
-                <Menu style={{ maxHeight, overflow: "auto" }}>
+                <Menu
+                  style={
+                    some(topLevelItem.submenu, n => n.isMenuSearch) //tnrbp4upgrade - I added this logic to prevent the Search Suggest component popover from covering the suggest. Remove this once we're on bp4 (shouldn't be necessary according to https://github.com/palantir/blueprint/issues/4552)
+                      ? {}
+                      : { maxHeight, overflow: "auto" }
+                  }
+                >
                   {createDynamicMenu(
                     this.addHelpItemIfNecessary(topLevelItem.submenu, i),
                     enhancers
