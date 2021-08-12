@@ -1127,6 +1127,9 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
           if (massagedRes.defaultValue) {
             defaultValue = massagedRes.defaultValue;
           }
+          if (massagedRes.preventUserOverrideFromBeingDisabled) {
+            allowUserOverride = true;
+          }
         }
         if (
           ComponentToWrap === renderBlueprintCheckbox ||
