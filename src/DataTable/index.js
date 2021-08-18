@@ -950,9 +950,9 @@ class DataTable extends React.Component {
         }
       ),
       "data-test-id": dataId,
-      onDoubleClick: () => {
+      onDoubleClick: e => {
         if (rowDisabled) return;
-        onDoubleClick(rowInfo.original, rowInfo.index, history);
+        onDoubleClick(rowInfo.original, rowInfo.index, history, e);
       }
     };
   };
