@@ -39,6 +39,7 @@ import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import { withHotkeys } from "../utils/hotkeyUtils";
 import InfoHelper from "../InfoHelper";
+import getTextFromEl from "../utils/getTextFromEl";
 import { getSelectedRowsFromEntities } from "./utils/selection";
 import rowClick, { finalizeSelection } from "./utils/rowClick";
 import PagingTool from "./PagingTool";
@@ -51,6 +52,7 @@ import SortableColumns from "./SortableColumns";
 import computePresets from "./utils/computePresets";
 import dataTableEnhancer from "./dataTableEnhancer";
 import defaultProps from "./defaultProps";
+
 import "../toastr";
 import "./style.css";
 import { getRecordsFromIdMap } from "./utils/withSelectedEntities";
@@ -1238,14 +1240,17 @@ class DataTable extends React.Component {
     } else if (text) {
       text = String(text);
     }
-
-    // this will convert Link elements to url strings
-    if (React.isValidElement(text) && text.props?.to) {
-      text = joinUrl(
-        window.location.origin,
-        window.frontEndConfig?.clientBasePath || "",
-        text.props.to
-      );
+    if (React.isValidElement(text)) {
+      if (text.props?.to) {
+        // this will convert Link elements to url strings
+        text = joinUrl(
+          window.location.origin,
+          window.frontEndConfig?.clientBasePath || "",
+          text.props.to
+        );
+      } else {
+        text = getTextFromEl(text);
+      }
     }
 
     const stringText = toString(text);
