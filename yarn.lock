@@ -9065,7 +9065,7 @@ readdirp@~3.5.0:
   dependencies:
     picomatch "^2.2.1"
 
-"recompose@npm:react-recompose":
+"recompose@npm:react-recompose@0.31.1":
   version "0.31.1"
   resolved "https://registry.yarnpkg.com/react-recompose/-/react-recompose-0.31.1.tgz#8946fd499634183a6b0fa3adbf42e2342debe08b"
   integrity sha512-FzKNgEO9aDfW4NWqKv/0QhmXXDr6qHEZRo3oyahNdJjWRSGo06KVGcvSCBZQckIcxP9o2f91eIfQmtyjwiuSGQ==
