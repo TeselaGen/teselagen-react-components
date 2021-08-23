@@ -731,12 +731,18 @@ export function getQueryParams({
     }
 
     let errorParsingUrlString;
+
+    let additionalFilterToUse = additionalFilter(qb, currentParams);
+    let additionalOrFilterToUse = additionalOrFilter(qb, currentParams);
+    if (additionalOrFilterToUse && additionalOrFilterToUse.ignoreSearchTerm) {
+      searchTerm = "";
+      additionalOrFilterToUse = additionalOrFilterToUse.additionalOrFilterToUse;
+    }
+
     const allFilters = getAllFilters(filters, searchTerm, schema);
     const { andFilters, orFilters, otherOrFilters } = getAndAndOrFilters(
       allFilters
     );
-    const additionalFilterToUse = additionalFilter(qb, currentParams);
-    const additionalOrFilterToUse = additionalOrFilter(qb, currentParams);
     try {
       const orFiltersObject = getQueries(orFilters, qb, ccFields);
       let allOrFilters = [
