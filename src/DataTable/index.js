@@ -68,6 +68,12 @@ class DataTable extends React.Component {
         combo: "mod + c",
         label: "Copy rows",
         onKeyDown: this.handleCopyHotkey
+      },
+      selectAllRows: {
+        global: false,
+        combo: "mod + a",
+        label: "Select rows",
+        onKeyDown: this.handleSelectAllRows
       }
     });
   }
@@ -248,6 +254,21 @@ class DataTable extends React.Component {
       getRecordsFromIdMap(reduxFormSelectedEntityIdMap),
       e
     );
+  };
+  handleSelectAllRows = e => {
+    e.preventDefault();
+    const { isEntityDisabled, entities } = computePresets(this.props);
+    const newIdMap = {};
+
+    entities.forEach((entity, i) => {
+      if (isEntityDisabled(entity)) return;
+      const entityId = getIdOrCodeOrIndex(entity, i);
+      newIdMap[entityId] = { entity };
+    });
+    finalizeSelection({
+      idMap: newIdMap,
+      props: computePresets(this.props)
+    });
   };
 
   getCellCopyText = cellWrapper => {
