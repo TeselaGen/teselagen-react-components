@@ -256,8 +256,11 @@ class DataTable extends React.Component {
     );
   };
   handleSelectAllRows = e => {
+    const { isEntityDisabled, entities, isSingleSelect } = computePresets(
+      this.props
+    );
+    if (isSingleSelect) return;
     e.preventDefault();
-    const { isEntityDisabled, entities } = computePresets(this.props);
     const newIdMap = {};
 
     entities.forEach((entity, i) => {
@@ -746,7 +749,7 @@ class DataTable extends React.Component {
             </div>
           )}
           {subHeader}
-          {showSelectAll && (
+          {showSelectAll && !isSingleSelect && (
             <div
               style={{
                 marginTop: 5,
