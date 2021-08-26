@@ -94,7 +94,7 @@ class FormComponentsDemo extends React.Component {
               threeDotMenuItems={
                 <MenuItem text="Download Example File"> </MenuItem>
               }
-              secondaryLabel="I'm a secondaryLabel"
+              secondaryLabel="<Uploader/> I'm a secondaryLabel"
               accept=".json"
               action={"docs.google.com/upload"}
               minimal
@@ -132,13 +132,13 @@ class FormComponentsDemo extends React.Component {
               );
             }}
             action={"//jsonplaceholder.typicode.com/posts/"}
-            name={"uploadfield"}
+            name={"<FileUploadField/> uploadfield"}
             inlineLabel={this.state.inlineLabels}
           />
           <RadioGroupField
             name={"radioGroup"}
             inlineLabel={this.state.inlineLabels}
-            label={"Radio Group Input"}
+            label={"<RadioGroupField/> Radio Group Input"}
             secondaryLabel="I'm a secondaryLabel"
             tooltipInfo="hello hello I'm tooltipInfo"
             defaultValue={"true"}
@@ -160,7 +160,7 @@ class FormComponentsDemo extends React.Component {
             name={"numericInput"}
             tooltipInfo="hello hello I'm tooltipInfo"
             inlineLabel={this.state.inlineLabels}
-            label="Numeric Input"
+            label="<NumericInputField/> Numeric Input"
             placeholder="0"
             onFieldSubmit={onFieldSubmit}
           />
@@ -168,7 +168,7 @@ class FormComponentsDemo extends React.Component {
             threeDotMenuItems={
               <MenuItem text="Download Example File"> </MenuItem>
             }
-            label="Upload component"
+            label="<FileUploadField/> Upload component"
             tooltipInfo="hello hello I'm tooltipInfo"
             onFieldSubmit={function(fileList) {
               console.info(
@@ -183,7 +183,7 @@ class FormComponentsDemo extends React.Component {
           <InputField
             name={"inputFieldWithDefaultValue"}
             inlineLabel={this.state.inlineLabels}
-            label="Input With Default"
+            label="<InputField defaultValue/>  With Default"
             defaultValue={"Default Value Here!"}
             placeholder="Enter input..."
             onFieldSubmit={onFieldSubmit}
@@ -197,7 +197,7 @@ class FormComponentsDemo extends React.Component {
               position: "top"
             }}
             onFieldSubmit={onFieldSubmit}
-            label="Input"
+            label="<InputField/> "
             placeholder="Enter input..."
           />
           <SelectField
@@ -206,7 +206,7 @@ class FormComponentsDemo extends React.Component {
             options={["hey", "you", "guys"]}
             name={"selectField"}
             inlineLabel={this.state.inlineLabels}
-            label="Select Simple"
+            label="<SelectField/>"
           />
           <InputField
             name={"inlineinputFieldWithTooltipError"}
@@ -224,7 +224,7 @@ class FormComponentsDemo extends React.Component {
             options={["hey", "you", "guys"]}
             name={"inlineselectField"}
             inlineLabel={this.state.inlineLabels}
-            label="Select Simple with inlineLabel = true"
+            label="<SelectField/> with inlineLabel = true"
           />
           {"<BPSelect onChange value /> component (not redux form connected):"}
           <BPSelect
@@ -245,14 +245,14 @@ class FormComponentsDemo extends React.Component {
             options={["hey", "you", "guys"]}
             name={"inlineselectField"}
             inlineLabel={this.state.inlineLabels}
-            label="minimal Select Simple with inlineLabel = true"
+            label="minimal <BPSelect/> with inlineLabel = true"
           />
           <SelectField
             onFieldSubmit={onFieldSubmit}
             options={[1, 2, 4]}
             name={"selectFieldWithNumbers"}
             inlineLabel={this.state.inlineLabels}
-            label="Select Simple with number values passed in simplified options obj"
+            label="<SelectField/> with number values passed in simplified options obj"
           />
           <SelectField
             onFieldSubmit={onFieldSubmit}
@@ -261,7 +261,7 @@ class FormComponentsDemo extends React.Component {
             inlineLabel={this.state.inlineLabels}
             defaultValue={"you"}
             disabled
-            label="Select Simple with defaultValue"
+            label="<SelectField/> with defaultValue"
           />
           <SelectField
             onFieldSubmit={onFieldSubmit}
@@ -270,7 +270,7 @@ class FormComponentsDemo extends React.Component {
             inlineLabel={this.state.inlineLabels}
             defaultValue={defaultSelectValue}
             placeholder="Choose one of the following..."
-            label="Select Simple with initially unset defaultValue and a placeholder"
+            label="<SelectField/> with initially unset defaultValue and a placeholder"
           />
           <Button
             text="Set default"
@@ -284,7 +284,7 @@ class FormComponentsDemo extends React.Component {
             inlineLabel={this.state.inlineLabels}
             onFieldSubmit={onFieldSubmit}
             placeholder={"Please choose..."}
-            label="Select Simple With Placeholder"
+            label="<SelectField/> Simple With Placeholder"
           />
           <SelectField
             options={["hey", "you", "guys"]}
@@ -293,7 +293,7 @@ class FormComponentsDemo extends React.Component {
             onFieldSubmit={onFieldSubmit}
             showErrorIfUntouched
             placeholder={"Please choose..."}
-            label="Select With Untouched Errors"
+            label="<SelectField/> With Untouched Errors"
           />
           <SelectField
             onFieldSubmit={onFieldSubmit}
@@ -311,19 +311,19 @@ class FormComponentsDemo extends React.Component {
             ]}
             name={"selectFieldWithLabelAndValue"}
             inlineLabel={this.state.inlineLabels}
-            label="Select with name and value, supporting json values"
+            label="<SelectField/> with name and value, supporting json values"
           />
           <DateInputField
             name={"dateInputField"}
             inlineLabel={this.state.inlineLabels}
-            label="Date Input"
+            label="Date Input <DateInputField/>"
             onFieldSubmit={onFieldSubmit}
             defaultValue={new Date()}
           />
           <DateRangeInputField
             name={"dateRangeInputField"}
             inlineLabel={this.state.inlineLabels}
-            label="Date Range Input"
+            label="Date Range Input <DateRangeInputField/>"
             onFieldSubmit={onFieldSubmit}
             minDate={new Date()}
             maxDate={
@@ -336,7 +336,7 @@ class FormComponentsDemo extends React.Component {
             tooltipInfo={"I am some info!"}
             name={"CheckboxField"}
             inlineLabel={this.state.inlineLabels}
-            label="CheckboxField"
+            label="<CheckboxField/>"
           />
           <CheckboxField
             onFieldSubmit={onFieldSubmit}
@@ -354,7 +354,7 @@ class FormComponentsDemo extends React.Component {
             defaultValue
             name={"SwitchField"}
             inlineLabel={this.state.inlineLabels}
-            label="I'm a SwitchField"
+            label="I'm a <SwitchField/>"
           />
           <TextareaField
             isRequired
@@ -378,14 +378,14 @@ class FormComponentsDemo extends React.Component {
             name={"textAreaFieldWithClickToEditAndDisabled"}
             inlineLabel={this.state.inlineLabels}
             onFieldSubmit={onFieldSubmit}
-            label="TextareaField with clickToEdit=true and disabled"
+            label="<TextareaField/> with clickToEdit=true and disabled"
             placeholder="Enter notes..."
           />
           <EditableTextField
             name={"editableTextField"}
             inlineLabel={this.state.inlineLabels}
             onFieldSubmit={onFieldSubmit}
-            label="EditableTextField"
+            label="<EditableTextField/>"
             placeholder="Enter new text..."
           />
           <SuggestField
@@ -468,7 +468,7 @@ class FormComponentsDemo extends React.Component {
           <ReactSelectField
             name="reactSelectFieldMulti"
             inlineLabel={this.state.inlineLabels}
-            label="ReactSelectField Collaborators Multi"
+            label="<ReactSelectField/> Collaborators Multi"
             onFieldSubmit={onFieldSubmit}
             resetOnSelect
             creatable={this.state.reactSelectFieldcreatable}
