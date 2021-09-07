@@ -72,19 +72,6 @@ export default function rowClick(e, rowInfo, entities, props) {
       });
 
       if (mostRecentlySelectedIndex !== -1) {
-        // clear out other selections in current group
-        for (let i = mostRecentlySelectedIndex + 1; i < entities.length; i++) {
-          const entityId = getIdOrCodeOrIndex(entities[i], i);
-          if (!oldIdMap[entityId]) break;
-          delete oldIdMap[entityId];
-        }
-
-        for (let i = mostRecentlySelectedIndex - 1; i >= 0; i--) {
-          const entityId = getIdOrCodeOrIndex(entities[i], i);
-          if (!oldIdMap[entityId]) break;
-          delete oldIdMap[entityId];
-        }
-
         const highRange =
           rowInfo.index < mostRecentlySelectedIndex
             ? mostRecentlySelectedIndex - 1

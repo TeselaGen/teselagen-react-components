@@ -50,6 +50,18 @@ const entities = [
     id: "5",
     type: "new",
     weather: "cloudy"
+  },
+  {
+    name: "Kyle",
+    id: "6",
+    type: "old",
+    weather: "cloudy"
+  },
+  {
+    name: "Tiff",
+    id: "7",
+    type: "new",
+    weather: "cloudy"
   }
 ];
 
