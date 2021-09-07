@@ -78,6 +78,7 @@ class FormComponentsDemo extends React.Component {
               ></MenuItem>
             }
             action={"docs.google.com/upload"}
+            accept=".gb"
             fileList={[
               {
                 uid: 1, //you must set a unique id for this to work properly

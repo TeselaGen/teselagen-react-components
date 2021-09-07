@@ -222,8 +222,8 @@ class Uploader extends Component {
             })}
             multiple={fileLimit !== 1}
             activeClassName="tg-dropzone-active"
-            rejectClassName="tg-dropzone-reject"
-            acceptClassName="tg-dropzone-accept"
+            rejectClassName="tg-dropzone-active" // tnr: the acceptClassName/rejectClassName doesn't work with file extensions (only mimetypes are supported when dragging). Thus we'll just always turn the drop area blue when dragging and let the filtering occur on drop. See https://github.com/react-dropzone/react-dropzone/issues/888#issuecomment-773938074
+            acceptClassName="tg-dropzone-active"
             disabledClassName="tg-dropzone-disabled"
             accept={acceptToUse}
             {...{
