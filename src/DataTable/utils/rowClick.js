@@ -22,7 +22,7 @@ export default function rowClick(e, rowInfo, entities, props) {
   const rowSelected = oldIdMap[rowId];
   let newIdMap = {
     [rowId]: {
-      time: new Date(),
+      time: Date.now(),
       entity
     }
   };
@@ -45,7 +45,8 @@ export default function rowClick(e, rowInfo, entities, props) {
   } else if (e.shiftKey && !isEmpty(oldIdMap)) {
     newIdMap = {
       [rowId]: {
-        entity
+        entity,
+        time: Date.now()
       }
     };
     const currentlySelectedRowIndices = getSelectedRowsFromEntities(
@@ -95,12 +96,17 @@ export default function rowClick(e, rowInfo, entities, props) {
         range(lowRange, highRange + 1).forEach(i => {
           const recordId = entities[i] && getIdOrCodeOrIndex(entities[i], i);
           if (recordId || recordId === 0)
-            newIdMap[recordId] = { entity: entities[i] };
+            // newIdMap[recordId] = { entity: entities[i] };
+            newIdMap[recordId] = { entity: entities[i], time: Date.now() };
         });
         newIdMap = {
           ...oldIdMap,
           ...newIdMap
         };
+        if (newIdMap[rowId]) {
+          //the entity we just clicked on should have the "freshest" time
+          newIdMap[rowId].time = Date.now() + 1;
+        }
       }
     }
   }

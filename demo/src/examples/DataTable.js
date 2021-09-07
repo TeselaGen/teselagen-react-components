@@ -4,7 +4,8 @@ import {
   Classes,
   Dialog,
   Icon,
-  MenuItem
+  MenuItem,
+  NumericInput
 } from "@blueprintjs/core";
 import { Chance } from "chance";
 import { times } from "lodash";
@@ -327,8 +328,7 @@ class DataTableInstance extends React.Component {
   //   localStorage.tableState = JSON.stringify(this.state);
   // }
 
-  changeNumEntities(e) {
-    const numOfEntities = parseInt(e.target.value, 10);
+  changeNumEntities(numOfEntities) {
     this.setState({
       numOfEntities,
       entities: generateFakeRows(numOfEntities)
@@ -388,10 +388,10 @@ class DataTableInstance extends React.Component {
             "Filters can be added by passing an additionalFilters prop. You can even filter on non-displayed fields"
         })}
         Set number of entities:{" "}
-        <input
-          type="number"
+        <NumericInput
+          onValueChange={this.changeNumEntities}
           value={numOfEntities}
-          onChange={this.changeNumEntities}
+          // onChange={this.changeNumEntities}
         />
         <br />
         Select records by ids (a single number or numbers separated by ","):{" "}
