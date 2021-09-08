@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Switch, Button } from "@blueprintjs/core";
-import InfoHelper from '../../src/InfoHelper';
+import InfoHelper from "../../src/InfoHelper";
 import { lifecycle, mapProps } from "recompose";
 import { omit } from "lodash";
 import ReactMarkdown from "react-markdown";
@@ -13,9 +13,24 @@ const EnhancedSwitch = lifecycle({
   }
 })(_Switch);
 
-export default function renderToggle({
+export default function renderToggle({ that, type, ...rest }) {
+  const setToggle = val =>
+    that.setState({
+      [type]: val
+    });
+  const isToggledOn = (that.state || {})[type];
+  return renderToggleInner({
+    type,
+    setToggle,
+    isToggledOn,
+    ...rest
+  });
+}
+
+export function renderToggleInner({
   isButton,
-  that,
+  setToggle,
+  isToggledOn,
   type,
   label,
   onClick,
@@ -48,14 +63,12 @@ export default function renderToggle({
         {...{
           ...sharedProps,
           didMount: () => {
-            hook && hook(!!(that.state || {})[type]);
+            hook && hook(!!isToggledOn);
           },
-          checked: (that.state || {})[type],
+          checked: isToggledOn,
           onChange: () => {
-            hook && hook(!(that.state || {})[type]);
-            that.setState({
-              [type]: !(that.state || {})[type]
-            });
+            hook && hook(!isToggledOn);
+            setToggle(!isToggledOn);
           }
         }}
       />
@@ -85,4 +98,15 @@ export default function renderToggle({
       {toggleOrButton}
     </div>
   );
+}
+
+export function useToggle({ type, ...rest }) {
+  const [isToggledOn, setToggle] = useState(false);
+  const comp = renderToggleInner({
+    type,
+    setToggle,
+    isToggledOn,
+    ...rest
+  });
+  return [isToggledOn, comp];
 }

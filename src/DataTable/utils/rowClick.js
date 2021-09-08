@@ -22,7 +22,7 @@ export default function rowClick(e, rowInfo, entities, props) {
   const rowSelected = oldIdMap[rowId];
   let newIdMap = {
     [rowId]: {
-      time: new Date(),
+      time: Date.now(),
       entity
     }
   };
@@ -45,7 +45,8 @@ export default function rowClick(e, rowInfo, entities, props) {
   } else if (e.shiftKey && !isEmpty(oldIdMap)) {
     newIdMap = {
       [rowId]: {
-        entity
+        entity,
+        time: Date.now()
       }
     };
     const currentlySelectedRowIndices = getSelectedRowsFromEntities(
@@ -71,19 +72,6 @@ export default function rowClick(e, rowInfo, entities, props) {
       });
 
       if (mostRecentlySelectedIndex !== -1) {
-        // clear out other selections in current group
-        for (let i = mostRecentlySelectedIndex + 1; i < entities.length; i++) {
-          const entityId = getIdOrCodeOrIndex(entities[i], i);
-          if (!oldIdMap[entityId]) break;
-          delete oldIdMap[entityId];
-        }
-
-        for (let i = mostRecentlySelectedIndex - 1; i >= 0; i--) {
-          const entityId = getIdOrCodeOrIndex(entities[i], i);
-          if (!oldIdMap[entityId]) break;
-          delete oldIdMap[entityId];
-        }
-
         const highRange =
           rowInfo.index < mostRecentlySelectedIndex
             ? mostRecentlySelectedIndex - 1
@@ -93,14 +81,22 @@ export default function rowClick(e, rowInfo, entities, props) {
             ? mostRecentlySelectedIndex + 1
             : rowInfo.index;
         range(lowRange, highRange + 1).forEach(i => {
+          if (isEntityDisabled && isEntityDisabled(entities[i])) {
+            return;
+          }
           const recordId = entities[i] && getIdOrCodeOrIndex(entities[i], i);
           if (recordId || recordId === 0)
-            newIdMap[recordId] = { entity: entities[i] };
+            // newIdMap[recordId] = { entity: entities[i] };
+            newIdMap[recordId] = { entity: entities[i], time: Date.now() };
         });
         newIdMap = {
           ...oldIdMap,
           ...newIdMap
         };
+        if (newIdMap[rowId]) {
+          //the entity we just clicked on should have the "freshest" time
+          newIdMap[rowId].time = Date.now() + 1;
+        }
       }
     }
   }

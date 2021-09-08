@@ -12,6 +12,7 @@ import {
   isEqual,
   cloneDeep,
   keyBy,
+  omit,
   forEach,
   lowerCase
 } from "lodash";
@@ -63,6 +64,30 @@ class DataTable extends React.Component {
   constructor(props) {
     super(props);
     this.hotkeyEnabler = withHotkeys({
+      moveUpARow: {
+        global: false,
+        combo: "up",
+        label: "Move Up a Row",
+        onKeyDown: this.handleRowMove("up")
+      },
+      moveDownARow: {
+        global: false,
+        combo: "down",
+        label: "Move Down a Row",
+        onKeyDown: this.handleRowMove("down")
+      },
+      moveUpARowShift: {
+        global: false,
+        combo: "up+shift",
+        label: "Move Up a Row",
+        onKeyDown: this.handleRowMove("up", true)
+      },
+      moveDownARowShift: {
+        global: false,
+        combo: "down+shift",
+        label: "Move Down a Row",
+        onKeyDown: this.handleRowMove("down", true)
+      },
       copyHotkey: {
         global: false,
         combo: "mod + c",
@@ -132,7 +157,7 @@ class DataTable extends React.Component {
       if (selectAllByDefault) {
         change("reduxFormSelectedEntityIdMap", {
           ...(entities || []).reduce((acc, entity) => {
-            acc[entity.id] = { entity };
+            acc[entity.id || entity.code] = { entity, time: Date.now() };
             return acc;
           }, {}),
           ...(reduxFormSelectedEntityIdMap || {})
@@ -141,7 +166,7 @@ class DataTable extends React.Component {
       if (expandAllByDefault) {
         change("reduxFormExpandedEntityIdMap", {
           ...(entities || []).reduce((acc, e) => {
-            acc[e.id] = true;
+            acc[e.id || e.code] = true;
             return acc;
           }, {}),
           ...(reduxFormExpandedEntityIdMap || {})
@@ -248,6 +273,73 @@ class DataTable extends React.Component {
     // );
   }
 
+  handleRowMove = (type, shiftHeld) => e => {
+    e.preventDefault();
+    e.stopPropagation();
+    const props = computePresets(this.props);
+    const {
+      noSelect,
+      entities,
+      reduxFormSelectedEntityIdMap: idMap,
+      isEntityDisabled
+    } = props;
+    let newIdMap = {};
+    const lastSelectedEnt = getLastSelectedEntity(idMap);
+
+    if (noSelect) return;
+
+    if (lastSelectedEnt) {
+      const lastSelectedIndex = entities.findIndex(
+        ent => ent === lastSelectedEnt
+      );
+
+      if (lastSelectedIndex === -1) {
+        entities.findIndex(
+          ent =>
+            ent.id === lastSelectedEnt.id || ent.code === lastSelectedEnt.code
+        );
+      }
+      if (lastSelectedIndex === -1) {
+        return;
+      }
+      const newEntToSelect = getNewEntToSelect({
+        type,
+        lastSelectedIndex,
+        entities,
+        isEntityDisabled
+      });
+
+      if (!newEntToSelect) return;
+      if (shiftHeld) {
+        if (idMap[newEntToSelect.id || newEntToSelect.code]) {
+          //the entity being moved to has already been selected
+          newIdMap = omit(idMap, [lastSelectedEnt.id || lastSelectedEnt.code]);
+          newIdMap[newEntToSelect.id || newEntToSelect.code].time =
+            Date.now() + 1;
+        } else {
+          //the entity being moved to has NOT been selected yet
+          newIdMap = {
+            ...idMap,
+            [newEntToSelect.id || newEntToSelect.code]: {
+              entity: newEntToSelect,
+              time: Date.now()
+            }
+          };
+        }
+      } else {
+        //no shiftHeld
+        newIdMap[newEntToSelect.id || newEntToSelect.code] = {
+          entity: newEntToSelect,
+          time: Date.now()
+        };
+      }
+    }
+
+    finalizeSelection({
+      idMap: newIdMap,
+      props
+    });
+  };
   handleCopyHotkey = e => {
     const { reduxFormSelectedEntityIdMap } = this.props;
     this.handleCopySelectedRows(
@@ -1547,4 +1639,42 @@ function ColumnFilterMenu({
       />
     </Popover>
   );
+}
+
+function getLastSelectedEntity(idMap) {
+  let lastSelectedEnt;
+  let latestTime;
+  forEach(idMap, ({ time, entity }) => {
+    if (!latestTime || time > latestTime) {
+      lastSelectedEnt = entity;
+      latestTime = time;
+    }
+  });
+  return lastSelectedEnt;
+}
+
+function getNewEntToSelect({
+  type,
+  lastSelectedIndex,
+  entities,
+  isEntityDisabled
+}) {
+  let newIndexToSelect;
+  if (type === "up") {
+    newIndexToSelect = lastSelectedIndex - 1;
+  } else {
+    newIndexToSelect = lastSelectedIndex + 1;
+  }
+  const newEntToSelect = entities[newIndexToSelect];
+  if (!newEntToSelect) return;
+  if (isEntityDisabled && isEntityDisabled(newEntToSelect)) {
+    return getNewEntToSelect({
+      type,
+      lastSelectedIndex: newIndexToSelect,
+      entities,
+      isEntityDisabled
+    });
+  } else {
+    return newEntToSelect;
+  }
 }
