@@ -81,6 +81,9 @@ export default function rowClick(e, rowInfo, entities, props) {
             ? mostRecentlySelectedIndex + 1
             : rowInfo.index;
         range(lowRange, highRange + 1).forEach(i => {
+          if (isEntityDisabled && isEntityDisabled(entities[i])) {
+            return;
+          }
           const recordId = entities[i] && getIdOrCodeOrIndex(entities[i], i);
           if (recordId || recordId === 0)
             // newIdMap[recordId] = { entity: entities[i] };

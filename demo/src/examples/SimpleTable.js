@@ -1,6 +1,7 @@
 import { Button } from "@blueprintjs/core";
 import React from "react";
 import DataTable from "../../../src/DataTable";
+import { useToggle } from "../renderToggle";
 
 const schema = {
   fields: [
@@ -16,7 +17,7 @@ const schema = {
     "weather",
     "weather1",
     "weather2",
-    "weather3",
+    "weather3"
   ]
 };
 
@@ -66,15 +67,31 @@ const entities = [
 ];
 
 export default function SimpleTable(p) {
+  const [isEntityDisabled, isEntityDisabledComp] = useToggle({
+    type: "isEntityDisabled"
+  });
+  const [withCheckboxes, withCheckboxesComp] = useToggle({
+    type: "withCheckboxes"
+  });
   return (
-    <DataTable
-      formName="simpleTable"
-      isSimple
-      entities={entities}
-      schema={schema}
-      {...p}
-    >
-      <div>hey</div>
-    </DataTable>
+    <div>
+      {isEntityDisabledComp}
+      {withCheckboxesComp}
+      <DataTable
+        formName="simpleTable"
+        isSimple
+        withCheckboxes={withCheckboxes}
+        entities={entities}
+        schema={schema}
+        isEntityDisabled={
+          isEntityDisabled
+            ? ent => ent.name === "Chris" || ent.name === "Sam"
+            : undefined
+        }
+        {...p}
+      >
+        <div>hey</div>
+      </DataTable>
+    </div>
   );
 }

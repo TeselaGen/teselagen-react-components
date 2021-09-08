@@ -277,11 +277,19 @@ class DataTable extends React.Component {
     e.preventDefault();
     e.stopPropagation();
     const props = computePresets(this.props);
-    const { entities, reduxFormSelectedEntityIdMap: idMap } = props;
+    const {
+      noSelect,
+      entities,
+      reduxFormSelectedEntityIdMap: idMap,
+      isEntityDisabled
+    } = props;
     let newIdMap = {};
     const lastSelectedEnt = getLastSelectedEntity(idMap);
+
+    if (noSelect) return;
+
     if (lastSelectedEnt) {
-      let lastSelectedIndex = entities.findIndex(
+      const lastSelectedIndex = entities.findIndex(
         ent => ent === lastSelectedEnt
       );
 
@@ -294,13 +302,13 @@ class DataTable extends React.Component {
       if (lastSelectedIndex === -1) {
         return;
       }
-      let newIndexToSelect;
-      if (type === "up") {
-        newIndexToSelect = lastSelectedIndex - 1;
-      } else {
-        newIndexToSelect = lastSelectedIndex + 1;
-      }
-      const newEntToSelect = entities[newIndexToSelect];
+      const newEntToSelect = getNewEntToSelect({
+        type,
+        lastSelectedIndex,
+        entities,
+        isEntityDisabled
+      });
+
       if (!newEntToSelect) return;
       if (shiftHeld) {
         if (idMap[newEntToSelect.id || newEntToSelect.code]) {
@@ -319,6 +327,7 @@ class DataTable extends React.Component {
           };
         }
       } else {
+        //no shiftHeld
         newIdMap[newEntToSelect.id || newEntToSelect.code] = {
           entity: newEntToSelect,
           time: Date.now()
@@ -1642,4 +1651,30 @@ function getLastSelectedEntity(idMap) {
     }
   });
   return lastSelectedEnt;
+}
+
+function getNewEntToSelect({
+  type,
+  lastSelectedIndex,
+  entities,
+  isEntityDisabled
+}) {
+  let newIndexToSelect;
+  if (type === "up") {
+    newIndexToSelect = lastSelectedIndex - 1;
+  } else {
+    newIndexToSelect = lastSelectedIndex + 1;
+  }
+  const newEntToSelect = entities[newIndexToSelect];
+  if (!newEntToSelect) return;
+  if (isEntityDisabled && isEntityDisabled(newEntToSelect)) {
+    return getNewEntToSelect({
+      type,
+      lastSelectedIndex: newIndexToSelect,
+      entities,
+      isEntityDisabled
+    });
+  } else {
+    return newEntToSelect;
+  }
 }
