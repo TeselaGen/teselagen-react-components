@@ -194,7 +194,11 @@ function getEntitiesForGivenFilter(entities, filter, ccFields, ownProps) {
   const { filterOn, filterValue, selectedFilter } = filter;
   const field = ccFields[filterOn];
   const { path, getValueToFilterOn } = field;
-  const subFilter = getSubFilter(false, selectedFilter, filterValue);
+  const subFilter = getSubFilter(
+    false,
+    selectedFilter,
+    field.type === "number" ? Number(filterValue) : filterValue
+  );
   entities = entities.filter(entity => {
     const fieldVal = getValueToFilterOn
       ? getValueToFilterOn(entity, ownProps)
@@ -302,11 +306,11 @@ function getSubFilter(
       ? qb.inList(arrayFilterValue) //filter using qb (aka we're backend connected)
       : fieldVal => {
           //filter using plain old javascript (aka we've got a local table that isn't backend connected)
-          if (!fieldVal || !fieldVal.toLowerCase) return false;
+          if (!fieldValue?.toString) return false;
           return (
             arrayFilterValue
               .map(val => val && val.toLowerCase())
-              .indexOf(fieldVal.toLowerCase()) > -1
+              .indexOf(fieldVal.toString().toLowerCase()) > -1
           );
         };
   } else if (ccSelectedFilter === "isExactly") {
