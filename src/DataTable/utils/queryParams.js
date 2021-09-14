@@ -306,7 +306,7 @@ function getSubFilter(
       ? qb.inList(arrayFilterValue) //filter using qb (aka we're backend connected)
       : fieldVal => {
           //filter using plain old javascript (aka we've got a local table that isn't backend connected)
-          if (!fieldVal || !fieldVal.toString) return false;
+          if (!fieldValue?.toString) return false;
           return (
             arrayFilterValue
               .map(val => val && val.toLowerCase())
