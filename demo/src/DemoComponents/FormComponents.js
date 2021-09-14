@@ -155,16 +155,18 @@ class FormComponentsDemo extends React.Component {
               }
             ]}
           />
-          <NumericInputField
-            generateDefaultValue={{}} //just here to see the css
-            secondaryLabel="(optional)"
-            name={"numericInput"}
-            tooltipInfo="hello hello I'm tooltipInfo"
-            inlineLabel={this.state.inlineLabels}
-            label="<NumericInputField/> Numeric Input"
-            placeholder="0"
-            onFieldSubmit={onFieldSubmit}
-          />
+          <div style={{ display: "flex" }}>
+            <NumericInputField
+              generateDefaultValue={{}} //just here to see the css
+              secondaryLabel="(optional)"
+              name={"numericInput"}
+              tooltipInfo="hello hello I'm tooltipInfo"
+              inlineLabel={this.state.inlineLabels}
+              label="<NumericInputField/> Numeric Input"
+              placeholder="0"
+              onFieldSubmit={onFieldSubmit}
+            />
+          </div>
           <FileUploadField
             threeDotMenuItems={
               <MenuItem text="Download Example File"> </MenuItem>
@@ -190,17 +192,26 @@ class FormComponentsDemo extends React.Component {
             onFieldSubmit={onFieldSubmit}
             containerStyle={{ background: "black", height: 200 }}
           />
-          <InputField
-            name={"inputFieldWithTooltipError"}
-            inlineLabel={this.state.inlineLabels}
-            tooltipError
-            tooltipProps={{
-              position: "top"
-            }}
-            onFieldSubmit={onFieldSubmit}
-            label="<InputField/> "
-            placeholder="Enter input..."
-          />
+          <div style={{ display: "flex" }}>
+            <InputField
+              name={"inputFieldWithTooltipError"}
+              inlineLabel={this.state.inlineLabels}
+              tooltipError
+              tooltipProps={{
+                position: "top"
+              }}
+              onFieldSubmit={onFieldSubmit}
+              label="<InputField/> "
+              placeholder="Enter input..."
+            />
+            &nbsp;
+            <ReactColorField
+              name="reactColorField"
+              inlineLabel={this.state.inlineLabels}
+              label="ReactColorField"
+              onFieldSubmit={onFieldSubmit}
+            />
+          </div>
           <SelectField
             tooltipInfo="hello hello I'm tooltipInfo"
             onFieldSubmit={onFieldSubmit}
@@ -561,5 +572,5 @@ function onFieldSubmit(val) {
 }
 
 window.__showGenerateDefaultDot = () => {
-  return true 
-}
+  return true;
+};

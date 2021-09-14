@@ -49,6 +49,7 @@
 }
 .data-table-header {
   min-height: 30px;
+  flex-shrink: 0;
 }
 .data-table-footer {
   min-height: 18px;
