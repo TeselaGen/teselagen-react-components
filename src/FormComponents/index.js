@@ -68,7 +68,7 @@ function getIntentClass(...args) {
 }
 
 function removeUnwantedProps(props) {
-  let cleanedProps = { ...props };
+  const cleanedProps = { ...props };
   delete cleanedProps.className;
   delete cleanedProps.units;
   delete cleanedProps.inlineLabel;
@@ -565,7 +565,7 @@ export const renderReactSelect = props => {
     ...rest
   } = props;
 
-  let optionsPassed = options;
+  const optionsPassed = options;
 
   const optsToUse = getOptions(optionsPassed);
   let valueToUse;
@@ -885,7 +885,8 @@ export class RenderReactColorPicker extends React.Component {
         >
           <div
             style={{
-              padding: "5px",
+              padding: "7px",
+              margin: "1px",
               background: "#fff",
               borderRadius: "1px",
               boxShadow: "0 0 0 1px rgba(0,0,0,.1)",
@@ -1025,9 +1026,9 @@ export function generateField(component, opts) {
     // asyncValidate,
     ...rest
   }) {
-    let component = compWithDefaultVal;
+    const component = compWithDefaultVal;
 
-    let props = {
+    const props = {
       onFieldSubmit,
       name,
       component,
@@ -1156,7 +1157,7 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
       triggerGetDefault();
     }, [generateDefaultValue || {}]);
     // const asyncValidating = props.asyncValidating;
-    let defaultProps = {
+    const defaultProps = {
       ...rest,
       defaultValue: defaultValueFromBackend || defaultValueFromProps,
       disabled: props.disabled || allowUserOverride === false,
