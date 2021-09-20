@@ -16,6 +16,7 @@ export {
   ConnectedPagingTool as PagingTool
 } from "./DataTable";
 export { default as Loading } from "./Loading";
+export { default as AdvancedOptions } from "./AdvancedOptions";
 export { default as TgSelect } from "./TgSelect";
 export { default as wrapDialog } from "./wrapDialog";
 export { default as BlueprintError } from "./BlueprintError";

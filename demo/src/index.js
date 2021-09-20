@@ -33,6 +33,7 @@ import { Provider } from "react-redux";
 import store from "./store";
 import { FocusStyleManager } from "@blueprintjs/core";
 import isMobile from "is-mobile";
+import AdvancedOptionsDemo from "./examples/AdvancedOptionsDemo";
 
 FocusStyleManager.onlyShowFocusOnTabs();
 
@@ -232,6 +233,9 @@ const demos = {
   },
   Timeline: {
     demo: TimelineDemo
+  },
+  AdvancedOptions: {
+    demo: AdvancedOptionsDemo
   },
   IntentText: {
     demo: IntentTextDemo

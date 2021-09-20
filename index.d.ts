@@ -321,6 +321,22 @@ export function DropdownButton({
 
 }
 
+/**
+ * @example
+<AdvancedOptions isOpenByDefault={true} content={
+  <div>more options here</div>
+}></AdvancedOptions>
+ */
+export function AdvancedOptions({
+  isOpenByDefault,
+  content,
+  children
+  label
+}) {
+
+}
+
+
 export interface DataTableProps {
   extraClasses: string;
   className: string;

@@ -100,9 +100,9 @@ function removeUnwantedProps(props) {
   return cleanedProps;
 }
 
-function LabelWithTooltipInfo({ label, tooltipInfo }) {
+function LabelWithTooltipInfo({ label, tooltipInfo, labelStyle }) {
   return tooltipInfo ? (
-    <div style={{ display: "flex", alignItems: "center" }}>
+    <div style={{ display: "flex", alignItems: "center", ...labelStyle }}>
       {label}{" "}
       <InfoHelper
         style={{ marginLeft: "5px", marginTop: "-6px" }}
@@ -191,6 +191,7 @@ class AbstractInput extends React.Component {
       containerStyle,
       leftEl,
       rightEl,
+      labelStyle,
       noOuterLabel,
       assignDefaultButton,
       showGenerateDefaultDot,
@@ -255,7 +256,11 @@ class AbstractInput extends React.Component {
         label={
           !isLabelTooltip &&
           !noOuterLabel && (
-            <LabelWithTooltipInfo label={label} tooltipInfo={tooltipInfo} />
+            <LabelWithTooltipInfo
+              labelStyle={labelStyle}
+              label={label}
+              tooltipInfo={tooltipInfo}
+            />
           )
         }
         inline={inlineLabel}
