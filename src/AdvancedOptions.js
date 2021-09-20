@@ -22,7 +22,7 @@ export default function AdvancedOptions({
         {label || "Advanced"}{" "}
         <Icon icon={isOpen ? "caret-up" : "caret-down"}></Icon>
       </div>
-      {isOpen && <div>{content || children}</div>}
+      {isOpen && <div style={{ marginTop: 10 }}>{content || children}</div>}
     </div>
   );
 }
