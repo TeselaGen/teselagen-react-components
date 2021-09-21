@@ -26,7 +26,7 @@ const schema = {
       type: "string",
       displayName: "Not Displayed"
     },
-    { path: "hungerLevel", type: "string" },
+    { path: "hungerLevel", type: "number" },
     { path: "type.special", type: "lookup", displayName: "Special Type" },
 
     {
@@ -252,6 +252,7 @@ const generateFakeRows = num => {
       id: index,
       notDisplayedField: chance.name(),
       name: chance.name(),
+      hungerLevel: chance.integer(),
       isShared: chance.pickone([true, false]),
       user: {
         lastName: chance.name(),

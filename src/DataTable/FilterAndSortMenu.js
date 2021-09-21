@@ -7,7 +7,8 @@ import {
   Intent,
   MenuDivider,
   InputGroup,
-  Classes
+  Classes,
+  NumericInput
 } from "@blueprintjs/core";
 import dayjs from "dayjs";
 
@@ -178,15 +179,14 @@ class FilterInput extends React.Component {
       case "number":
         inputGroup = (
           <div className="custom-menu-item">
-            <InputGroup
+            <NumericInput
               placeholder="Value"
-              onChange={function(e) {
-                handleFilterValueChange(e.target.value);
+              onValueChange={function(numVal) {
+                handleFilterValueChange(numVal);
               }}
               autoFocus
               {...onEnterHelper(handleFilterSubmit)}
               value={filterValue}
-              type="number"
             />
           </div>
         );
@@ -194,23 +194,21 @@ class FilterInput extends React.Component {
       case "numberRange":
         inputGroup = (
           <div className="custom-menu-item">
-            <InputGroup
-              placeholder="Value"
-              onChange={function(e) {
-                handleFilterValueChange([e.target.value, filterValue[1]]);
+            <NumericInput
+              placeholder="Low"
+              onValueChange={function(numVal) {
+                handleFilterValueChange([numVal, filterValue[1]]);
               }}
               {...onEnterHelper(handleFilterSubmit)}
               value={filterValue && filterValue[0]}
-              type="number"
             />
-            <InputGroup
-              placeholder="Value"
-              onChange={function(e) {
-                handleFilterValueChange([filterValue[0], e.target.value]);
+            <NumericInput
+              placeholder="High"
+              onValueChange={function(numVal) {
+                handleFilterValueChange([filterValue[0], numVal]);
               }}
               {...onEnterHelper(handleFilterSubmit)}
               value={filterValue && filterValue[1]}
-              type="number"
             />
           </div>
         );
