@@ -94,6 +94,11 @@ const schema = {
       path: "user.lastName",
       type: "string",
       displayName: "Added By"
+    },
+    {
+      type: "number",
+      path: "user.age",
+      displayName: "User Age"
     }
   ]
 };
@@ -255,6 +260,7 @@ const generateFakeRows = num => {
       hungerLevel: chance.integer(),
       isShared: chance.pickone([true, false]),
       user: {
+        age: chance.d100(),
         lastName: chance.name(),
         status: {
           name: chance.pickone(["pending", "added", "confirmed"])
