@@ -1,14 +1,12 @@
 /* eslint-disable no-unreachable*/
 
 import * as React from "react";
-import * as Blueprint from "@blueprintjs/core";
-import { Intent, Button, Classes } from "@blueprintjs/core";
-import { noop } from "lodash";
+
+import { Intent, Button, Classes, IMenuItemProps, MenuItem } from "@blueprintjs/core";
 
 /*~ If this module has methods, export them as functions like so.
  */
 
-export function noop(): void;
 
 interface showDialogOnDocBodyOptions {
   /**
@@ -32,7 +30,7 @@ interface WithTableParamsOptions {
   /**
    * @property The data table schema or a function returning it. The function wll be called with props as the argument.
    */
-  schema: Object | Function;
+  schema: Object | (() => {});
   /**
    * @property whether the table should connect to/update the URL
    */
@@ -94,7 +92,7 @@ interface ToastrFuncOptions {
   key: string;
 }
 
-export global {
+declare global {
   interface Window {
     toastr: {
       success: ToastrFunc;
@@ -135,6 +133,7 @@ export global {
 
 export class SimpleSelect extends React.Component<SimpleSelectProps, any> { }
 
+type OptionValue = string | { value: any, label: any }
 export interface SimpleSelectProps {
   autofocus?: boolean;
   cancelKeyboardEventOnSelection?: boolean;
@@ -145,6 +144,7 @@ export interface SimpleSelectProps {
   disabled?: boolean;
   // ...
 }
+
 
 // AsyncValidateFieldSpinner
 export class AsyncValidateFieldSpinner extends React.Component<
@@ -251,7 +251,7 @@ export class CmdButton extends React.Component<CmdProps, any> { }
 export interface CmdProps {
   name: string;
   prefix: string;
-  cmd: function;
+  cmd: () => {};
 }
 // DNALoader
 export class DNALoader extends React.Component<DNALoaderProps, any> { }
@@ -330,10 +330,26 @@ export function DropdownButton({
 export function AdvancedOptions({
   isOpenByDefault,
   content,
-  children
+  children,
   label
 }) {
 
+}
+
+
+
+interface MenuItemWithTooltipProps extends IMenuItemProps {
+  tooltip: string
+}
+
+
+/**
+ * @example
+<MenuItemWithTooltip tooltip={"tooltip content"} text="hello squirrel"  /> 
+ */
+export function MenuItemWithTooltip({
+}: MenuItemWithTooltipProps) {
+  return
 }
 
 
@@ -345,8 +361,8 @@ export interface DataTableProps {
   isLoading: boolean;
   searchTerm: string;
   noRowsFoundMessage: string;
-  setSearchTerm: function;
-  clearFilters: function;
+  setSearchTerm: () => {};
+  clearFilters: () => {};
   hidePageSizeWhenPossible: boolean;
   doNotShowEmptyRows: boolean;
   withTitle: boolean;
@@ -363,10 +379,10 @@ export interface DataTableProps {
   withDisplayOptions: boolean;
   resized: boolean;
   resizePersist: boolean;
-  updateColumnVisibility: function;
-  updateTableDisplayDensity: function;
+  updateColumnVisibility: () => {};
+  updateTableDisplayDensity: () => {};
   syncDisplayOptionsToDb: boolean;
-  resetDefaultVisibility: function;
+  resetDefaultVisibility: () => {};
   maxHeight: number;
   style: object;
   pageSize: number;
@@ -399,7 +415,7 @@ export interface DataTableProps {
   hasOptionForForcedHidden: boolean;
   showForcedHiddenColumns: boolean;
   searchMenuButton: any;
-  setShowForcedHidden: function;
+  setShowForcedHidden: () => {};
 }
 
 /**
@@ -438,12 +454,12 @@ export function DialogFooter({
 }
 
 export interface DialogFooterProps {
-  hideModal: function;
+  hideModal: () => {};
   loading: boolean;
   submitting: boolean;
-  onClick: function;
+  onClick: () => {};
   error: string;
-  secondaryAction: function;
+  secondaryAction: () => {};
   intent: Blueprint.Intent;
   secondaryIntent: Blueprint.Intent;
   secondaryText: string;
@@ -481,12 +497,12 @@ export function fieldRequired(value: string | Array): string | undefined;
 export interface GenericFormFieldProps {
   name: string;
   isRequired: boolean;
-  onFieldSubmit: function;
+  onFieldSubmit: () => {};
   leftEl: any;
   rightEl: any;
   children: any;
   defaultValue: any;
-  onDefaultValChanged: function;
+  onDefaultValChanged: () => {};
   generateDefaultValue: any;
   tooltipProps: any;
   tooltipError: any;
@@ -502,7 +518,7 @@ export interface GenericFormFieldProps {
   containerStyle: object;
   noOuterLabel: boolean;
   noFillField: boolean;
-  asyncValidate: function;
+  asyncValidate: () => {};
   validateOnChange: boolean;
   touchOnChange: boolean;
 }
@@ -544,15 +560,15 @@ export interface FileUploadFieldProps extends GenericFormFieldProps {
   innerIcon: "string";
   innerText: "string";
   threeDotMenuItems: any;
-  accept: string | array;
-  contentOverride: function;
+  accept: string | [string];
+  contentOverride: () => {};
   action: string;
   className: string;
-  fileLimit: integer;
+  fileLimit: number;
   readBeforeUpload: boolean;
   showUploadList: boolean;
-  fileListItemRenderer: function;
-  onFileClick: function;
+  fileListItemRenderer: () => {};
+  onFileClick: () => {};
   dropzoneProps: object;
   showFilesCount: boolean;
   axiosInstance: object;
@@ -809,7 +825,7 @@ export interface InfoHelperProps {
   isPopover: boolean;
   isInline: boolean;
   isButton: boolean;
-  size: integer;
+  size: number;
   popoverProps: object;
   disabled: boolean;
   displayToSide: boolean;
@@ -843,7 +859,6 @@ export class MenuBar extends React.Component<MenuBarProps, any> { }
 
 export interface MenuBarProps {
   menu: any;
-  enhancers: any;
   context: any;
   enhancers: any;
   menuSearchHotkey: any;
@@ -963,7 +978,9 @@ export function showAppSpinner();
  * if (confirm) {
  * }
  */
-export function showConfirmationDialog(showConfirmationDialogOpts): Promise;
+export function showConfirmationDialog(showConfirmationDialogOpts) {
+
+};
 
 interface showConfirmationDialogOpts {
   text: string;
@@ -999,7 +1016,7 @@ selectTableRecords([{ id: "1" }])
 @example 
 withSelectTableRecords("myTable"),
 */
-export function withSelectTableRecords(tableFormName: string, propName: string? = "selectTableRecords") {}
+export function withSelectTableRecords(tableFormName: string, propName: string?= "selectTableRecords") { }
 
 /* 
 @example
@@ -1033,10 +1050,4 @@ export const TableFormTrackerContext = React.createContext({
   formNames: [],
   pushFormName: () => { }
 });
-
-
-export function DropdownButton({ disabled, menu, className, ...rest }) {
-
-}
-
 

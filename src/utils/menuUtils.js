@@ -393,3 +393,11 @@ export function doesSearchValMatchText(searchVal, justText) {
     justText ? justText.toLowerCase() : ""
   );
 }
+
+export const MenuItemWithTooltip = ({ tooltip, ...rest }) => {
+  let out = <MenuItem {...rest}></MenuItem>;
+  if (tooltip) {
+    out = <Tooltip content={tooltip}>{out}</Tooltip>;
+  }
+  return out;
+};
