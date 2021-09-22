@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import { Intent, Button, Classes, IMenuItemProps, MenuItem } from "@blueprintjs/core";
+import { Intent, Button, Classes, IMenuItemProps, MenuItem, IAnchorButtonProps } from "@blueprintjs/core";
 
 /*~ If this module has methods, export them as functions like so.
  */
@@ -300,6 +300,13 @@ export interface DNALoaderProps {
 export class DataTable extends React.Component<DataTableProps, any> { }
 
 
+
+
+interface DropdownButtonProps extends IAnchorButtonProps {
+  disabled: boolean,
+  menu: any,
+  className: string
+}
 /**
  * @example
 <DropdownButton menu={
@@ -314,10 +321,7 @@ export class DataTable extends React.Component<DataTableProps, any> { }
 }></DropdownButton>
  */
 export function DropdownButton({
-  disabled,
-  menu,
-  className
-}) {
+}: DropdownButtonProps) {
 
 }
 
