@@ -112,7 +112,7 @@ describe("formComponents", () => {
     cy.get(`[data-test="Hunger Level"]`)
       .find(".tg-filter-menu-button")
       .click({ force: true });
-    cy.get(".bp3-popover input").type("hello");
+    cy.get(".bp3-popover input").type("989");
     cy.get(".bp3-popover")
       .contains("Filter")
       .click();
