@@ -15,9 +15,9 @@ const schema = {
     },
     "type",
     "weather",
-    "weather1",
-    "weather2",
-    "weather3"
+    "other",
+    "something",
+    "nothing"
   ]
 };
 

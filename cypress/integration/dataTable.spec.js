@@ -139,4 +139,22 @@ describe("formComponents", () => {
     cy.contains(".rt-td", "row 4").should("not.exist");
     cy.contains(".rt-td", "row 17");
   });
+
+  it("Can drag columns to reorder", () => {
+    cy.visit("#/DataTable/SimpleTable");
+    const checkIndices = type => {
+      cy.get(".rt-th:contains(Name)")
+        .invoke("index")
+        .then(nameIndex => {
+          cy.get(".rt-th:contains(Weather)")
+            .invoke("index")
+            .then(weatherIndex => {
+              expect(nameIndex).to.be[type](weatherIndex);
+            });
+        });
+    };
+    checkIndices("lessThan");
+    cy.dragBetween(".rt-th:contains(Name)", ".rt-th:contains(Weather)");
+    checkIndices("greaterThan");
+  });
 });
