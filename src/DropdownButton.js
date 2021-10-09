@@ -3,11 +3,13 @@
 import React from "react";
 import { Button, Popover, Position } from "@blueprintjs/core";
 import classnames from "classnames";
+import popoverOverflowModifiers from "./utils/popoverOverflowModifiers";
 
 function DropdownButton({ disabled, menu, className, ...rest }) {
   return (
     <Popover
       minimal
+      modifiers={popoverOverflowModifiers}
       disabled={disabled}
       autoFocus={false}
       content={menu}
