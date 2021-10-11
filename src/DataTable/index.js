@@ -513,6 +513,22 @@ class DataTable extends React.Component {
     </div>
   ));
 
+  addEntitiesToSelection = entities => {
+    const propPresets = computePresets(this.props);
+    const { isEntityDisabled, reduxFormSelectedEntityIdMap } = propPresets;
+    const idMap = reduxFormSelectedEntityIdMap || {};
+    const newIdMap = cloneDeep(idMap) || {};
+    entities.forEach((entity, i) => {
+      if (isEntityDisabled(entity)) return;
+      const entityId = getIdOrCodeOrIndex(entity, i);
+      newIdMap[entityId] = { entity };
+    });
+    finalizeSelection({
+      idMap: newIdMap,
+      props: propPresets
+    });
+  };
+
   render() {
     const { fullscreen } = this.state;
     const propPresets = computePresets(this.props);
@@ -581,8 +597,17 @@ class DataTable extends React.Component {
       setShowForcedHidden,
       autoFocusSearch,
       additionalFooterButtons,
-      isEntityDisabled
+      isEntityDisabled,
+      isLocalCall,
+      withSelectAll,
+      variables,
+      fragment,
+      safeQuery
     } = propPresets;
+
+    if (withSelectAll && !safeQuery) {
+      throw new Error("safeQuery is needed for selecting all table records");
+    }
     let updateColumnVisibilityToUse = updateColumnVisibility;
     let updateTableDisplayDensityToUse = updateTableDisplayDensity;
     let resetDefaultVisibilityToUse = resetDefaultVisibility;
@@ -671,28 +696,42 @@ class DataTable extends React.Component {
     let showClearAll = false;
     // we want to show select all if every row on the current page is selected
     // and not every row across all pages are already selected.
-    if (
-      !isInfinite &&
-      entitiesAcrossPages &&
-      numRows < entitiesAcrossPages.length
-    ) {
-      // could all be disabled
-      let atLeastOneRowOnCurrentPageSelected = false;
-      const allRowsOnCurrentPageSelected = entities.every(e => {
-        const rowId = getIdOrCodeOrIndex(e);
-        const selected = idMap[rowId] || isEntityDisabled(e);
-        if (selected) atLeastOneRowOnCurrentPageSelected = true;
-        return selected;
-      });
-      if (atLeastOneRowOnCurrentPageSelected && allRowsOnCurrentPageSelected) {
-        const everyEntitySelected = entitiesAcrossPages.every(e => {
+    if (!isInfinite) {
+      const canShowSelectAll =
+        withSelectAll ||
+        (entitiesAcrossPages && numRows < entitiesAcrossPages.length);
+      if (canShowSelectAll) {
+        // could all be disabled
+        let atLeastOneRowOnCurrentPageSelected = false;
+        const allRowsOnCurrentPageSelected = entities.every(e => {
           const rowId = getIdOrCodeOrIndex(e);
-          return idMap[rowId] || isEntityDisabled(e);
+          const selected = idMap[rowId] || isEntityDisabled(e);
+          if (selected) atLeastOneRowOnCurrentPageSelected = true;
+          return selected;
         });
-        if (everyEntitySelected) {
-          showClearAll = entitiesAcrossPages.length;
+        if (
+          atLeastOneRowOnCurrentPageSelected &&
+          allRowsOnCurrentPageSelected
+        ) {
+          let everyEntitySelected;
+          if (isLocalCall) {
+            everyEntitySelected = entitiesAcrossPages.every(e => {
+              const rowId = getIdOrCodeOrIndex(e);
+              return idMap[rowId] || isEntityDisabled(e);
+            });
+          } else {
+            everyEntitySelected = entityCount <= Object.keys(idMap).length;
+          }
+          if (everyEntitySelected) {
+            if (isLocalCall) {
+              showClearAll = entitiesAcrossPages.length;
+            } else {
+              showClearAll = entityCount > 0;
+            }
+          }
+          // only show if not all selected
+          showSelectAll = !everyEntitySelected;
         }
-        showSelectAll = !everyEntitySelected;
       }
     }
 
@@ -855,18 +894,33 @@ class DataTable extends React.Component {
                 small
                 minimal
                 intent="primary"
-                text={`Select all ${entitiesAcrossPages.length} items`}
-                onClick={() => {
-                  const newIdMap = cloneDeep(idMap) || {};
-                  entitiesAcrossPages.forEach((entity, i) => {
-                    if (isEntityDisabled(entity)) return;
-                    const entityId = getIdOrCodeOrIndex(entity, i);
-                    newIdMap[entityId] = { entity };
-                  });
-                  finalizeSelection({
-                    idMap: newIdMap,
-                    props: computePresets(this.props)
-                  });
+                text={`Select all ${entityCount ||
+                  entitiesAcrossPages.length} items`}
+                loading={this.state.selectingAll}
+                onClick={async () => {
+                  if (withSelectAll) {
+                    // this will be by querying for everything
+                    this.setState({
+                      selectingAll: true
+                    });
+                    try {
+                      const allEntities = await safeQuery(fragment, {
+                        variables: {
+                          filter: variables.filter,
+                          sort: variables.sort
+                        }
+                      });
+                      this.addEntitiesToSelection(allEntities);
+                    } catch (error) {
+                      console.error(`error:`, error);
+                      window.toastr.error("Error selecting all constructs");
+                    }
+                    this.setState({
+                      selectingAll: false
+                    });
+                  } else {
+                    this.addEntitiesToSelection(entitiesAcrossPages);
+                  }
                 }}
               />
             </div>

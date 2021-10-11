@@ -46,11 +46,21 @@ interface WithTableParamsOptions {
   /**
    * @property tableParam defaults such as pageSize, filter, etc
    */
-  defaults: object;
+  defaults: tableParamDefaults;
   /**
    * @property won't console an error if an order is not found on schema
    */
   noOrderError: boolean;
+  /**
+   * @property extra filter for query
+   */
+  additionalFilter: (props: object, qb: Function, currentParams: object) => {}
+}
+
+interface tableParamDefaults {
+  pageSize: number;
+  page: number;
+  order: Array<string>;
 }
 
 /**
@@ -420,6 +430,13 @@ export interface DataTableProps {
   showForcedHiddenColumns: boolean;
   searchMenuButton: any;
   setShowForcedHidden: () => {};
+  /**
+   * Caution: this will be slow for large data sets
+   * can be passed (along with safeQuery) to a query connected table to add the select all button. When
+   * clicked it will query for all items across all pages and select them. 
+   */
+  withSelectAll: boolean;
+  safeQuery(): Promise;
 }
 
 /**
