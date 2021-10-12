@@ -197,7 +197,7 @@ function getEntitiesForGivenFilter(entities, filter, ccFields, ownProps) {
   const subFilter = getSubFilter(
     false,
     selectedFilter,
-    field.type === "number" ? Number(filterValue) : filterValue
+    filterValue
   );
   entities = entities.filter(entity => {
     const fieldVal = getValueToFilterOn
