@@ -24,6 +24,8 @@
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
+const { isString } = require("lodash");
+
 Cypress.Commands.add("tgToggle", (type, onOrOff = true) => {
   /* eslint-disable no-unexpected-multiline*/
 
@@ -31,4 +33,20 @@ Cypress.Commands.add("tgToggle", (type, onOrOff = true) => {
     .get(`[data-test="${type}"]`)
     [onOrOff ? "check" : "uncheck"]({ force: true });
   /* eslint-enable no-unexpected-multiline*/
+});
+
+Cypress.Commands.add("dragBetween", (dragSelector, dropSelector) => {
+  const getOrWrap = selector =>
+    isString(selector)
+      ? cy.get(selector).then(el => {
+          return el.first();
+        })
+      : cy.wrap(selector);
+
+  getOrWrap(dragSelector)
+    .trigger("mousedown")
+    .trigger("mousemove", 10, 10, { force: true });
+  getOrWrap(dropSelector)
+    .trigger("mousemove", { force: true })
+    .trigger("mouseup", { force: true });
 });

@@ -1143,6 +1143,10 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
         ) {
           setDefault(defaultValue === "true");
         } else {
+          if (typeof defaultValue === "string") {
+            // remove double spaces and leading/trailing
+            defaultValue = defaultValue.replace(/\s+/g, " ").trim();
+          }
           setDefault(defaultValue);
         }
         setUserOverride(allowUserOverride);

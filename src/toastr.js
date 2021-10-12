@@ -10,6 +10,11 @@ const BottomToaster = Toaster.create({
   position: Position.BOTTOM
 });
 
+window.__tgClearAllToasts = () => {
+  TopToaster.clear();
+  BottomToaster.clear();
+};
+
 let counter = 5000;
 const generateToast = intent => (message, options) => {
   options = options || {};

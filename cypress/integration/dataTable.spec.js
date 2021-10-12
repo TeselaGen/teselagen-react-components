@@ -112,7 +112,7 @@ describe("formComponents", () => {
     cy.get(`[data-test="Hunger Level"]`)
       .find(".tg-filter-menu-button")
       .click({ force: true });
-    cy.get(".bp3-popover input").type("hello");
+    cy.get(".bp3-popover input").type("989");
     cy.get(".bp3-popover")
       .contains("Filter")
       .click();
@@ -138,5 +138,23 @@ describe("formComponents", () => {
       .type("4{enter}");
     cy.contains(".rt-td", "row 4").should("not.exist");
     cy.contains(".rt-td", "row 17");
+  });
+
+  it("Can drag columns to reorder", () => {
+    cy.visit("#/DataTable/SimpleTable");
+    const checkIndices = type => {
+      cy.get(".rt-th:contains(Name)")
+        .invoke("index")
+        .then(nameIndex => {
+          cy.get(".rt-th:contains(Weather)")
+            .invoke("index")
+            .then(weatherIndex => {
+              expect(nameIndex).to.be[type](weatherIndex);
+            });
+        });
+    };
+    checkIndices("lessThan");
+    cy.dragBetween(".rt-th:contains(Name)", ".rt-th:contains(Weather)");
+    checkIndices("greaterThan");
   });
 });

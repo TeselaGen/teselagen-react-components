@@ -212,16 +212,20 @@ function getEntitiesForGivenFilter(entities, filter, ccFields, ownProps) {
 function getFiltersFromSearchTerm(searchTerm, schema) {
   const searchTermFilters = [];
   if (searchTerm) {
+    const sharedFields = {
+      isOrFilter: true,
+      isSearchTermFilter: true
+    };
     schema.fields.forEach(field => {
       const { type, displayName, path, searchDisabled } = field;
       if (searchDisabled || field.filterDisabled) return;
       const nameToUse = camelCase(displayName || path);
       if (type === "string" || type === "lookup") {
         searchTermFilters.push({
+          ...sharedFields,
           filterOn: nameToUse,
           filterValue: searchTerm,
-          selectedFilter: "contains",
-          isOrFilter: true
+          selectedFilter: "contains"
         });
       } else if (type === "boolean") {
         let regex;
@@ -233,26 +237,26 @@ function getFiltersFromSearchTerm(searchTerm, schema) {
         if (regex) {
           if ("true".replace(regex, "") !== "true") {
             searchTermFilters.push({
+              ...sharedFields,
               filterOn: nameToUse,
               filterValue: true,
-              selectedFilter: "true",
-              isOrFilter: true
+              selectedFilter: "true"
             });
           } else if ("false".replace(regex, "") !== "false") {
             searchTermFilters.push({
+              ...sharedFields,
               filterOn: nameToUse,
               filterValue: false,
-              selectedFilter: "false",
-              isOrFilter: true
+              selectedFilter: "false"
             });
           }
         }
       } else if (type === "number" && !isNaN(Number(searchTerm))) {
         searchTermFilters.push({
+          ...sharedFields,
           filterOn: nameToUse,
           filterValue: Number(searchTerm),
-          selectedFilter: "equalTo",
-          isOrFilter: true
+          selectedFilter: "equalTo"
         });
       }
     });
@@ -773,6 +777,14 @@ export function getQueryParams({
       if (allOrFilters.length) {
         qb.andWhereAny(...allOrFilters);
       }
+      const columnCustomFilters = getColumnCustomFilters(
+        andFilters,
+        qb,
+        ccFields
+      );
+      if (columnCustomFilters.length) {
+        qb.whereAll(...columnCustomFilters);
+      }
     } catch (e) {
       if (urlConnected) {
         errorParsingUrlString = e;
@@ -808,41 +820,94 @@ export function getQueryParams({
   }
 }
 
-function getQueries(filters, qb, ccFields) {
-  const subQueries = filters.reduce((acc, filter) => {
-    if (!filter) {
-      console.warn("We should always have a filter object!");
-      return acc;
-    }
-    const { selectedFilter, filterValue, filterOn } = filter;
-    const fieldSchema = ccFields[filterOn];
-    let filterValueToUse = filterValue;
-    if (fieldSchema && fieldSchema.normalizeFilter) {
+function getSubFilterAndPath(filter, qb, ccFields) {
+  const { selectedFilter, filterValue, filterOn } = filter;
+  const fieldSchema = ccFields[filterOn];
+  let filterValueToUse = filterValue;
+
+  if (fieldSchema) {
+    if (fieldSchema.normalizeFilter) {
       filterValueToUse = fieldSchema.normalizeFilter(
         filterValue,
         selectedFilter,
         filterOn
       );
     }
-    const subFilter = getSubFilter(qb, selectedFilter, filterValueToUse);
-    if (fieldSchema) {
-      const { path, reference } = fieldSchema;
-      if (reference) {
-        acc[reference.sourceField] = buildRef(
-          qb,
-          reference,
-          last(path.split(".")),
-          subFilter
-        );
-      } else {
-        acc[path] = subFilter;
-      }
-    } else if (filterOn === "id") {
-      acc[filterOn] = subFilter;
+  }
+  const subFilter = getSubFilter(qb, selectedFilter, filterValueToUse);
+
+  let filterField;
+  let subFilterToUse = subFilter;
+  if (fieldSchema) {
+    const { path, reference } = fieldSchema;
+    if (reference) {
+      filterField = reference.sourceField;
+      subFilterToUse = buildRef(
+        qb,
+        reference,
+        last(path.split(".")),
+        subFilter
+      );
     } else {
-      console.error("Trying to filter on unknown field");
+      filterField = path;
     }
+  } else if (filterOn === "id") {
+    filterField = filterOn;
+  } else {
+    console.error("Trying to filter on unknown field");
+  }
+
+  return {
+    path: filterField,
+    subFilter: subFilterToUse
+  };
+}
+
+function getQueries(filters, qb, ccFields) {
+  const subQueries = filters.reduce((acc, filter) => {
+    if (!filter) {
+      console.warn("We should always have a filter object!");
+      return acc;
+    }
+    const { filterOn } = filter;
+    const fieldSchema = ccFields[filterOn];
+    // will be handled below
+    if (!filter.isSearchTermFilter && fieldSchema?.additionalColumnFilter)
+      return acc;
+    const { path, subFilter } = getSubFilterAndPath(filter, qb, ccFields);
+    acc[path] = subFilter;
     return acc;
   }, {});
+  return subQueries;
+}
+
+function getColumnCustomFilters(filters, qb, ccFields) {
+  const subQueries = filters.reduce((acc, filter) => {
+    if (!filter) {
+      console.warn("We should always have a filter object!");
+      return acc;
+    }
+    const { filterOn } = filter;
+    const fieldSchema = ccFields[filterOn];
+    if (filter.isSearchTermFilter || !fieldSchema?.additionalColumnFilter) {
+      return acc;
+    }
+    const { path, subFilter } = getSubFilterAndPath(filter, qb, ccFields);
+    /* the column filters need to have access to this sub filter but also be able to add additional
+     filter logic.
+    ex.
+    qb.whereAny({
+      id: qb.related("extendedStringValueView.buildSampleId").whereAll({
+          value: "something",
+          extendedPropertyId: "myId"
+        })
+      ...
+      })
+
+      is possible because the returned accumulator will be passed to whereAny
+  */
+    acc.push(fieldSchema.additionalColumnFilter(qb, subFilter, path));
+    return acc;
+  }, []);
   return subQueries;
 }
