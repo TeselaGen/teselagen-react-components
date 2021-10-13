@@ -8,6 +8,7 @@ import classNames from "classnames";
 import "./style.css";
 import getTextFromEl from "../utils/getTextFromEl";
 import { getTagColorStyle, getTagProps } from "../utils/tagUtils";
+import popoverOverflowModifiers from "../utils/popoverOverflowModifiers";
 
 class TgSelect extends React.Component {
   constructor(props) {
@@ -204,11 +205,12 @@ class TgSelect extends React.Component {
       onRemove: multi && !disabled ? this.handleTagRemove : null
     };
   };
+
   getOptionRenderer = () => {
     const { isTagSelect, optionRenderer, multi } = this.props;
 
     if (isTagSelect && multi) {
-      return tgSelectOptionRenderer;
+      return tagOptionRender;
     }
     return optionRenderer;
   };
@@ -302,6 +304,7 @@ class TgSelect extends React.Component {
           canEscapeKeyClose: true,
           onInteraction: this.onInteraction,
           isOpen: this.state.isOpen,
+          modifiers: popoverOverflowModifiers,
           ...popoverProps
         }}
         onItemSelect={this.handleItemSelect}
@@ -405,6 +408,7 @@ export const singleItemPredicate = (queryString, item, isSimpleSearch) =>
 function simplesearch(needle, haystack) {
   return (haystack || "").indexOf(needle) !== -1;
 }
-function tgSelectOptionRenderer(vals) {
+function tagOptionRender(vals) {
+  if (vals.noTagStyle) return vals.label;
   return <Tag {...getTagProps(vals)}></Tag>;
 }
