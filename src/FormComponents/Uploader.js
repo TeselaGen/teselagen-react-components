@@ -1,6 +1,13 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { Button, Icon, Menu, Popover, Position } from "@blueprintjs/core";
+import {
+  Button,
+  Classes,
+  Icon,
+  Menu,
+  Popover,
+  Position
+} from "@blueprintjs/core";
 import Dropzone from "react-dropzone";
 // import { first } from "lodash";
 import classnames from "classnames";
@@ -207,6 +214,7 @@ class Uploader extends Component {
     const self = this;
     let acceptToUse = Array.isArray(accept) ? accept.join(", ") : accept;
     let fileListToUse = fileList ? fileList : [];
+
     return (
       <div
         style={{
@@ -216,6 +224,12 @@ class Uploader extends Component {
         }}
       >
         <div style={{ width: "100%", height: "fit-content" }}>
+          <div
+            className={Classes.TEXT_MUTED}
+            style={{ fontSize: 11, marginBottom: 5 }}
+          >
+            Accepts {acceptToUse}
+          </div>
           <Dropzone
             className={classnames("tg-dropzone", className, {
               "tg-dropzone-minimal": minimal
