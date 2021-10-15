@@ -103,6 +103,8 @@ span.bp3-popover-target {
 }
 .bp3-switch {
   width: fit-content;
+  display: flex;
+  align-items: center;
 }
 
 .Select {

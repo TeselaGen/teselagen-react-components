@@ -364,6 +364,7 @@ class FormComponentsDemo extends React.Component {
           <SwitchField
             onFieldSubmit={onFieldSubmit}
             defaultValue
+            tooltipInfo="zooonk i'm some helper info!"
             name={"SwitchField"}
             inlineLabel={this.state.inlineLabels}
             label="I'm a <SwitchField/>"
