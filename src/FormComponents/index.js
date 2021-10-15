@@ -3,7 +3,7 @@ import { SketchPicker } from "react-color";
 import { isNumber, noop, kebabCase, isPlainObject, isEqual } from "lodash";
 import mathExpressionEvaluator from "math-expression-evaluator";
 import React, { useContext, useState } from "react";
-import { Field, touch, change } from "redux-form";
+import { Field, change } from "redux-form";
 
 import "./style.css";
 import {
@@ -92,7 +92,6 @@ function removeUnwantedProps(props) {
   // delete cleanedProps.asyncValidating;
   // delete cleanedProps.validateOnChange;
   delete cleanedProps.hasCustomError;
-  delete cleanedProps.touchOnChange;
   if (cleanedProps.inputClassName) {
     cleanedProps.className = cleanedProps.inputClassName;
     delete cleanedProps.inputClassName;
@@ -136,12 +135,10 @@ class AbstractInput extends React.Component {
       defaultValCount: oldDefaultValCount
     } = oldProps;
     const {
-      touchOnChange,
-      meta: { touched, dispatch, form },
       defaultValue,
       defaultValCount,
       enableReinitialize,
-      input: { name, value }
+      input: { value }
     } = this.props;
 
     if (
@@ -151,10 +148,6 @@ class AbstractInput extends React.Component {
       !isEqual(defaultValue, oldDefaultValue)
     ) {
       this.updateDefaultValue();
-    }
-
-    if (touchOnChange && !touched && value !== oldProps.input.value) {
-      dispatch(touch(form, name));
     }
   }
 
