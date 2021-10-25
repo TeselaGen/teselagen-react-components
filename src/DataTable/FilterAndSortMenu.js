@@ -286,7 +286,7 @@ function getFilterMenuItems(dataType) {
     filterMenuItems = ["Contains", "Starts with", "Ends with", "Is exactly"];
   } else if (dataType === "boolean") {
     filterMenuItems = ["True", "False"];
-  } else if (dataType === "number") {
+  } else if (dataType === "number" || dataType === "integer") {
     // else if (dataType === "lookup") {
     //   filterMenuItems = ["None"];
     // }

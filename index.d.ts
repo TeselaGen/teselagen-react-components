@@ -7,6 +7,22 @@ import { Intent, Button, Classes, IMenuItemProps, MenuItem, IAnchorButtonProps }
 /*~ If this module has methods, export them as functions like so.
  */
 
+interface schemaField {
+  displayName?: string;
+  path?: string;
+  type?: "string" | "number" | "integer" | "boolean" | "timestamp" | "lookup" | "action";
+  filterDisabled?: boolean;
+  sortDisabled?: boolean;
+  isHidden?: boolean;
+  isForcedHidden?: boolean
+}
+
+interface objectSchema {
+  model: string;
+  fields: schemaField[]
+}
+
+type dataTableSchema = schemaField[] | objectSchema
 
 interface showDialogOnDocBodyOptions {
   /**
@@ -30,7 +46,7 @@ interface WithTableParamsOptions {
   /**
    * @property The data table schema or a function returning it. The function wll be called with props as the argument.
    */
-  schema: Object | (() => {});
+  schema: dataTableSchema | (() => {});
   /**
    * @property whether the table should connect to/update the URL
    */
@@ -401,7 +417,7 @@ export interface DataTableProps {
   style: object;
   pageSize: number;
   formName: string;
-  schema: object;
+  schema: dataTableSchema;
   filters: object;
   userSpecifiedCompact: boolean;
   hideDisplayOptionsIcon: boolean;

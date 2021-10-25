@@ -13,7 +13,8 @@ import {
   orderBy,
   take,
   drop,
-  isEmpty
+  isEmpty,
+  isInteger
 } from "lodash";
 import dayjs from "dayjs";
 
@@ -190,15 +191,20 @@ function filterEntitiesLocal(
   return entities;
 }
 
+function cleanFilterValue(_filterValue, type) {
+  let filterValue = _filterValue;
+  if (type === "number" || type === "integer") {
+    filterValue = Number(filterValue);
+  }
+  return filterValue;
+}
+
 function getEntitiesForGivenFilter(entities, filter, ccFields, ownProps) {
-  const { filterOn, filterValue, selectedFilter } = filter;
+  const { filterOn, filterValue: _filterValue, selectedFilter } = filter;
   const field = ccFields[filterOn];
   const { path, getValueToFilterOn } = field;
-  const subFilter = getSubFilter(
-    false,
-    selectedFilter,
-    field.type === "number" ? Number(filterValue) : filterValue
-  );
+  let filterValue = cleanFilterValue(_filterValue, field.type);
+  const subFilter = getSubFilter(false, selectedFilter, filterValue);
   entities = entities.filter(entity => {
     const fieldVal = getValueToFilterOn
       ? getValueToFilterOn(entity, ownProps)
@@ -220,6 +226,7 @@ function getFiltersFromSearchTerm(searchTerm, schema) {
       const { type, displayName, path, searchDisabled } = field;
       if (searchDisabled || field.filterDisabled) return;
       const nameToUse = camelCase(displayName || path);
+      const filterValue = cleanFilterValue(searchTerm, type);
       if (type === "string" || type === "lookup") {
         searchTermFilters.push({
           ...sharedFields,
@@ -251,11 +258,17 @@ function getFiltersFromSearchTerm(searchTerm, schema) {
             });
           }
         }
-      } else if (type === "number" && !isNaN(Number(searchTerm))) {
+      } else if (
+        (type === "number" || type === "integer") &&
+        !isNaN(filterValue)
+      ) {
+        if (type === "integer" && !isInteger(filterValue)) {
+          return;
+        }
         searchTermFilters.push({
           ...sharedFields,
           filterOn: nameToUse,
-          filterValue: Number(searchTerm),
+          filterValue: filterValue,
           selectedFilter: "equalTo"
         });
       }
