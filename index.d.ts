@@ -22,7 +22,7 @@ interface objectSchema {
   fields: schemaField[]
 }
 
-type dataTableSchema = schemaField[] | objectSchema
+export type dataTableSchema = schemaField[] | objectSchema
 
 interface showDialogOnDocBodyOptions {
   /**
@@ -445,6 +445,7 @@ export interface DataTableProps {
   hasOptionForForcedHidden: boolean;
   showForcedHiddenColumns: boolean;
   searchMenuButton: any;
+  isEntityDisabled: function;
   setShowForcedHidden: () => {};
   /**
    * Caution: this will be slow for large data sets
@@ -872,7 +873,7 @@ export interface InfoHelperProps {
 export class IntentText extends React.Component<IntentTextProps, any> { }
 
 export interface IntentTextProps {
-  intent: Blueprint.Intent;
+  intent: Intent;
   text: string;
   children: any;
 }

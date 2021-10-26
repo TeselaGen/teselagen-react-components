@@ -287,6 +287,14 @@
   background: lightblue !important;
 }
 
+.ReactTable .rt-tr-group.disabled {
+  opacity: 0.6;
+}
+
+.ReactTable .rt-tr-group.disabled .rt-td {
+  cursor: not-allowed;
+}
+
 .dt-isViewable .ReactTable .rt-tr-group.selected .dt-eyeIcon {
   color: #137cbd;
   transform: scale(1.2);

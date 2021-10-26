@@ -1118,6 +1118,7 @@ class DataTable extends React.Component {
         "with-row-data",
         getRowClassName && getRowClassName(rowInfo, state, this.props),
         {
+          disabled: rowDisabled,
           selected: rowSelected && !withCheckboxes
         }
       ),
