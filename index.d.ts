@@ -1023,6 +1023,7 @@ export function showConfirmationDialog(showConfirmationDialogOpts) {
 interface showConfirmationDialogOpts {
   text: string;
   intent: string;
+  noCancelButton: boolean;
   confirmButtonText: string;
   cancelButtonText: string;
   canEscapeKeyCancel: boolean;

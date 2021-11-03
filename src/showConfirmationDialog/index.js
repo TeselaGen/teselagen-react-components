@@ -28,6 +28,7 @@ class AlertWrapper extends Component {
       handleClose,
       text,
       resolve,
+      noCancelButton,
       content,
       cancelButtonText = "Cancel",
       intent = Intent.PRIMARY,
@@ -46,6 +47,10 @@ class AlertWrapper extends Component {
         onCancel={cancelButtonText ? () => doClose(false) : undefined}
         onConfirm={() => doClose(true)}
         {...rest}
+        {...(noCancelButton && {
+          onCancel: undefined,
+          cancelButtonText: undefined
+        })}
       >
         {content}
         {text && <p style={{ marginBottom: 10 }}>{text}</p>}
