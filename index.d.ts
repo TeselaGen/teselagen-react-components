@@ -331,7 +331,8 @@ export class DataTable extends React.Component<DataTableProps, any> { }
 interface DropdownButtonProps extends IAnchorButtonProps {
   disabled: boolean,
   menu: any,
-  className: string
+  className: string,
+  noRightIcon: boolean,
 }
 /**
  * @example

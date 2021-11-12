@@ -5,7 +5,7 @@ import { Button, Popover, Position } from "@blueprintjs/core";
 import classnames from "classnames";
 import popoverOverflowModifiers from "./utils/popoverOverflowModifiers";
 
-function DropdownButton({ disabled, menu, className, ...rest }) {
+function DropdownButton({ disabled, menu, noRightIcon, className, ...rest }) {
   return (
     <Popover
       minimal
@@ -19,7 +19,7 @@ function DropdownButton({ disabled, menu, className, ...rest }) {
         {...rest}
         disabled={disabled}
         className={classnames(className, "dropdown-button")}
-        rightIcon="caret-down"
+        rightIcon={noRightIcon ? undefined : "caret-down"}
       />
     </Popover>
   );
