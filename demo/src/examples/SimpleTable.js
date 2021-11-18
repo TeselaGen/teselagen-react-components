@@ -5,6 +5,7 @@ import { useToggle } from "../renderToggle";
 
 const schema = {
   fields: [
+    { path: "url", type: "markdown" },
     { path: "name" },
     {
       path: "id",
@@ -23,42 +24,50 @@ const schema = {
 
 const entities = [
   {
+    url: '[Duck Duck Go](https://duckduckgo.com)',
     name: "Thomas",
     id: "1",
     type: "new",
     weather: "cloudy"
   },
   {
+    url: 'https://froogle.com',
     name: "Taoh",
     id: "2",
     type: "old",
     weather: "cloudy"
   },
   {
+    url: 'https://google.com',
     name: "Chris",
     id: "3",
     type: "new",
     weather: "rainy"
   },
   {
+    url: `*I'm some markdown* 
+#### ayy`,
     name: "Sam",
     id: "4",
     type: "old",
     weather: "cloudy"
   },
   {
+    url: '**more markdown**',
     name: "Adam",
     id: "5",
     type: "new",
     weather: "cloudy"
   },
   {
+    url: '# https://google.com',
     name: "Kyle",
     id: "6",
     type: "old",
     weather: "cloudy"
   },
   {
+    url: 'https://google.com',
     name: "Tiff",
     id: "7",
     type: "new",

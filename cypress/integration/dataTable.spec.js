@@ -1,4 +1,4 @@
-describe("formComponents", () => {
+describe("dataTable.spec", () => {
   it("can click the first row of a table that has a scroll bar (aka cypress should not incorrectly scroll the top row under the header)", () => {
     cy.visit("#/DataTable?pageSize=100");
     cy.get(`.rt-tr-group[data-test-id="1"] .rt-tr .rt-td`)

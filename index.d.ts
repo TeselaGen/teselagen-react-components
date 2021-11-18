@@ -10,7 +10,7 @@ import { Intent, Button, Classes, IMenuItemProps, MenuItem, IAnchorButtonProps }
 interface schemaField {
   displayName?: string;
   path?: string;
-  type?: "string" | "number" | "integer" | "boolean" | "timestamp" | "lookup" | "action";
+  type?: "string" | "number" | "integer" | "boolean" | "timestamp" | "lookup" | "action" | "markdown";
   filterDisabled?: boolean;
   sortDisabled?: boolean;
   isHidden?: boolean;

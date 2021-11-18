@@ -38,6 +38,7 @@ import ReactTable from "@teselagen/react-table";
 import { withProps, branch, compose } from "recompose";
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
+import ReactMarkdown from "react-markdown";
 import { withHotkeys } from "../utils/hotkeyUtils";
 import InfoHelper from "../InfoHelper";
 import getTextFromEl from "../utils/getTextFromEl";
@@ -1349,6 +1350,10 @@ class DataTable extends React.Component {
         };
       } else if (column.type === "boolean") {
         tableColumn.Cell = props => (props.value ? "True" : "False");
+      } else if (column.type === "markdown") {
+        tableColumn.Cell = props => (
+          <ReactMarkdown>{props.value}</ReactMarkdown>
+        );
       } else {
         tableColumn.Cell = props => props.value;
       }
