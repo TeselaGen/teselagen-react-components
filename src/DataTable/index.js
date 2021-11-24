@@ -1675,7 +1675,7 @@ function ColumnFilterMenu({
       }}
       isOpen={columnFilterMenuOpen}
       modifiers={{
-        preventOverflow: { enabled: false },
+        preventOverflow: { enabled: true },
         hide: { enabled: false },
         flip: { enabled: false }
       }}
