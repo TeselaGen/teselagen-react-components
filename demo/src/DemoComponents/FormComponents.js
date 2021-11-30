@@ -87,7 +87,7 @@ class FormComponentsDemo extends React.Component {
               }
             ]}
           />
-          Importer with minimal=true
+          <h6>Importer with minimal=true</h6>
           <div style={{ display: "flex" }}>
             <Button>Hey there</Button>
             &nbsp;
@@ -109,7 +109,7 @@ class FormComponentsDemo extends React.Component {
             />
             &nbsp;
           </div>
-          FileUploadField with minimal=true
+          <h6>FileUploadField with minimal=true</h6>
           <FileUploadField
             threeDotMenuItems={
               <MenuItem text="Download Example File"> </MenuItem>
