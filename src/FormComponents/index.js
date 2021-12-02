@@ -200,7 +200,6 @@ class AbstractInput extends React.Component {
     const showError =
       (touched || showErrorIfUntouched) && error && !asyncValidating;
     const showWarning = (touched || showErrorIfUntouched) && warning;
-
     let componentToWrap =
       isLabelTooltip || tooltipError ? (
         <Tooltip
@@ -241,7 +240,8 @@ class AbstractInput extends React.Component {
       <FormGroup
         className={classNames(className, testClassName, {
           "tg-flex-form-content": leftEl || rightEl,
-          "tg-tooltipError": tooltipError
+          "tg-tooltipError": tooltipError,
+          "tg-has-error": showError && error
         })}
         disabled={disabled}
         helperText={helperText}
