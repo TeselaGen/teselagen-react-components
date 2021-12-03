@@ -9,7 +9,12 @@ export default () => {
   return (
     <div>
       {disabledToggleComp}
-      <Uploader disabled={disabled}></Uploader>
+      <Uploader
+        onChange={() => {
+          window.toastr.success("File uploaded!");
+        }}
+        disabled={disabled}
+      ></Uploader>
     </div>
   );
 };

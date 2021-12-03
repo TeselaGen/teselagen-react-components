@@ -1,5 +1,5 @@
 describe("upload", () => {
-  it(`Uploader component should be able to upload`, () => {
+  it(`Uploader component should be able to upload (the file list won't get updated because there is no state backing that, redux or otherwise)`, () => {
     cy.visit("#/Uploader");
 
     cy.uploadFile(
@@ -8,7 +8,8 @@ describe("upload", () => {
       "text/csv",
       true
     );
-    cy.get(".tg-upload-file-list-item").should("exist");
+    cy.contains("File uploaded!");
+    // cy.get(".tg-upload-file-list-item").should("exist");
   });
   it(`Uploader component should be able to be disabled`, () => {
     cy.visit("#/Uploader");
