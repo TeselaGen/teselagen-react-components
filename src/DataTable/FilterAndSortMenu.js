@@ -182,7 +182,7 @@ class FilterInput extends React.Component {
             <NumericInput
               placeholder="Value"
               onValueChange={function(numVal) {
-                handleFilterValueChange(numVal);
+                handleFilterValueChange(isNaN(numVal) ? 0 : numVal);
               }}
               autoFocus
               {...onEnterHelper(handleFilterSubmit)}
@@ -197,7 +197,10 @@ class FilterInput extends React.Component {
             <NumericInput
               placeholder="Low"
               onValueChange={function(numVal) {
-                handleFilterValueChange([numVal, filterValue[1]]);
+                handleFilterValueChange([
+                  isNaN(numVal) ? 0 : numVal,
+                  filterValue[1]
+                ]);
               }}
               {...onEnterHelper(handleFilterSubmit)}
               value={filterValue && filterValue[0]}
@@ -205,7 +208,10 @@ class FilterInput extends React.Component {
             <NumericInput
               placeholder="High"
               onValueChange={function(numVal) {
-                handleFilterValueChange([filterValue[0], numVal]);
+                handleFilterValueChange([
+                  filterValue[0],
+                  isNaN(numVal) ? 0 : numVal
+                ]);
               }}
               {...onEnterHelper(handleFilterSubmit)}
               value={filterValue && filterValue[1]}
