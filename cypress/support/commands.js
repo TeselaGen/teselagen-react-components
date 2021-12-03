@@ -96,7 +96,7 @@ function dropFile({
       } else {
         testFile = new win.File([blob], name, { type });
       }
-      const event = { dataTransfer: { files: [testFile] } };
+      const event = { dataTransfer: { files: [testFile], types: ["Files"] } };
       // return subject
       return cy.get(selector).trigger("drop", event);
     })

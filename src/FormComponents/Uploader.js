@@ -212,8 +212,8 @@ class Uploader extends Component {
     }
 
     const self = this;
-    let acceptToUse = Array.isArray(accept) ? accept.join(", ") : accept;
-    let fileListToUse = fileList ? fileList : [];
+    const acceptToUse = Array.isArray(accept) ? accept.join(", ") : accept;
+    const fileListToUse = fileList ? fileList : [];
 
     return (
       <div
@@ -231,9 +231,7 @@ class Uploader extends Component {
             Accepts {acceptToUse}
           </div>
           <Dropzone
-            className={classnames("tg-dropzone", className, {
-              "tg-dropzone-minimal": minimal
-            })}
+            onClick={evt => evt.preventDefault()}
             multiple={fileLimit !== 1}
             activeClassName="tg-dropzone-active"
             rejectClassName="tg-dropzone-active" // tnr: the acceptClassName/rejectClassName doesn't work with file extensions (only mimetypes are supported when dragging). Thus we'll just always turn the drop area blue when dragging and let the filtering occur on drop. See https://github.com/react-dropzone/react-dropzone/issues/888#issuecomment-773938074
@@ -266,7 +264,7 @@ class Uploader extends Component {
                   acceptedFiles = await Promise.all(
                     acceptedFiles.map(file => {
                       return new Promise((resolve, reject) => {
-                        let reader = new FileReader();
+                        const reader = new FileReader();
                         reader.readAsText(file, "UTF-8");
                         reader.onload = evt => {
                           file.parsedString = evt.target.result;
@@ -390,25 +388,39 @@ class Uploader extends Component {
             }}
             {...dropzoneProps}
           >
-            {showFilesCount ? (
-              <div className="tg-upload-file-list-counter">
-                Files: {fileList ? fileList.length : 0}
-              </div>
-            ) : null}
-            {contentOverride || (
-              <div
-                title={
-                  acceptToUse
-                    ? "Accepts only the following file types: " + acceptToUse
-                    : "Accepts any file input"
-                }
-                className="tg-upload-inner"
-              >
-                {innerIcon || (
-                  <Icon icon="upload" iconSize={minimal ? 15 : 30} />
-                )}
-                {innerText || (minimal ? "Upload" : "Click or drag to upload")}
-              </div>
+            {({ getRootProps, getInputProps }) => (
+              <section>
+                <div
+                  {...getRootProps()}
+                  className={classnames("tg-dropzone", className, {
+                    "tg-dropzone-minimal": minimal
+                  })}
+                >
+                  <input {...getInputProps()} />
+                  {contentOverride || (
+                    <div
+                      title={
+                        acceptToUse
+                          ? "Accepts only the following file types: " +
+                            acceptToUse
+                          : "Accepts any file input"
+                      }
+                      className="tg-upload-inner"
+                    >
+                      {innerIcon || (
+                        <Icon icon="upload" iconSize={minimal ? 15 : 30} />
+                      )}
+                      {innerText ||
+                        (minimal ? "Upload" : "Click or drag to upload")}
+                    </div>
+                  )}
+                </div>
+                {showFilesCount ? (
+                  <div className="tg-upload-file-list-counter">
+                    Files: {fileList ? fileList.length : 0}
+                  </div>
+                ) : null}
+              </section>
             )}
           </Dropzone>
 

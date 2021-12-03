@@ -93,7 +93,7 @@ class FormComponentsDemo extends React.Component {
             &nbsp;
             <Uploader
               threeDotMenuItems={
-                <MenuItem text="Download Example File"> </MenuItem>
+                <MenuItem text="Download Example File"></MenuItem>
               }
               secondaryLabel="<Uploader/> I'm a secondaryLabel"
               accept=".json"
@@ -112,9 +112,9 @@ class FormComponentsDemo extends React.Component {
           <h6>FileUploadField with minimal=true</h6>
           <FileUploadField
             threeDotMenuItems={
-              <MenuItem text="Download Example File"> </MenuItem>
+              <MenuItem text="Download Example File"></MenuItem>
             }
-            className={'minimal-file-upload-field'}
+            className={"minimal-file-upload-field"}
             secondaryLabel="I'm a secondaryLabel"
             innerText="Upload"
             minimal
@@ -170,9 +170,9 @@ class FormComponentsDemo extends React.Component {
           </div>
           <FileUploadField
             threeDotMenuItems={
-              <MenuItem text="Download Example File"> </MenuItem>
+              <MenuItem text="Download Example File"></MenuItem>
             }
-            className={'fileUploadZoink'}
+            className={"fileUploadZoink"}
             label="<FileUploadField/> Upload component"
             tooltipInfo="hello hello I'm tooltipInfo"
             onFieldSubmit={function(fileList) {
