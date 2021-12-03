@@ -3,6 +3,23 @@
 declare namespace Cypress {
   interface Chainable<Subject = any> {
     /**
+     * uploadFile
+     * uploads a file to a dropzone uploader
+     * @param selector - cypress selector class for drop element
+     * @param fileUrl - file url relative to the fixtures folder
+     * @param type - file type
+     * @param noFileList - whether the upload doesn't have a file list (custom render), this will ignore the checks for file loading
+     * @example
+     * cy.uploadFile(".tg-dropzone", "tubes.csv", "text/csv")
+     */
+    uploadFile(
+      selector: string,
+      fileUrl: string,
+      type?: string,
+      noFileList?: boolean
+    ): void;
+    
+    /**
      * tgToggle
      * toggle a demo switch
      * @example

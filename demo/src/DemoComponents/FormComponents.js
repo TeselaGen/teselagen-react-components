@@ -114,6 +114,7 @@ class FormComponentsDemo extends React.Component {
             threeDotMenuItems={
               <MenuItem text="Download Example File"> </MenuItem>
             }
+            className={'minimal-file-upload-field'}
             secondaryLabel="I'm a secondaryLabel"
             innerText="Upload"
             minimal
@@ -171,6 +172,7 @@ class FormComponentsDemo extends React.Component {
             threeDotMenuItems={
               <MenuItem text="Download Example File"> </MenuItem>
             }
+            className={'fileUploadZoink'}
             label="<FileUploadField/> Upload component"
             tooltipInfo="hello hello I'm tooltipInfo"
             onFieldSubmit={function(fileList) {
