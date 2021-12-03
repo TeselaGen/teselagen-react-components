@@ -62,7 +62,8 @@
   border-color: rgb(221, 106, 98);
 }
 .tg-dropzone-disabled {
-  border-color: rgb(136, 133, 132);
+  border-color: rgb(136, 133, 132) !important;
+  opacity: 0.8;
 }
 .tg-upload-file-list-item {
   display: flex;

@@ -200,6 +200,7 @@ class Uploader extends Component {
       onFileClick, // called when a file link in the filelist is clicked
       dropzoneProps = {},
       overflowList,
+      disabled,
       showFilesCount,
       threeDotMenuItems,
       onPreviewClick,
@@ -231,12 +232,9 @@ class Uploader extends Component {
             Accepts {acceptToUse}
           </div>
           <Dropzone
+            disabled={disabled}
             onClick={evt => evt.preventDefault()}
             multiple={fileLimit !== 1}
-            activeClassName="tg-dropzone-active"
-            rejectClassName="tg-dropzone-active" // tnr: the acceptClassName/rejectClassName doesn't work with file extensions (only mimetypes are supported when dragging). Thus we'll just always turn the drop area blue when dragging and let the filtering occur on drop. See https://github.com/react-dropzone/react-dropzone/issues/888#issuecomment-773938074
-            acceptClassName="tg-dropzone-active"
-            disabledClassName="tg-dropzone-disabled"
             accept={acceptToUse}
             {...{
               onDrop: async (acceptedFiles, rejectedFiles) => {
@@ -388,12 +386,25 @@ class Uploader extends Component {
             }}
             {...dropzoneProps}
           >
-            {({ getRootProps, getInputProps }) => (
+            {({
+              getRootProps,
+              getInputProps,
+              isDragAccept,
+              isDragReject,
+              isDragActive
+              // isDragActive
+              // isDragReject
+              // isDragAccept
+            }) => (
               <section>
                 <div
                   {...getRootProps()}
                   className={classnames("tg-dropzone", className, {
-                    "tg-dropzone-minimal": minimal
+                    "tg-dropzone-minimal": minimal,
+                    "tg-dropzone-active": isDragActive,
+                    "tg-dropzone-reject": isDragReject, // tnr: the acceptClassName/rejectClassName doesn't work with file extensions (only mimetypes are supported when dragging). Thus we'll just always turn the drop area blue when dragging and let the filtering occur on drop. See https://github.com/react-dropzone/react-dropzone/issues/888#issuecomment-773938074
+                    "tg-dropzone-accept": isDragAccept,
+                    "tg-dropzone-disabled": disabled
                   })}
                 >
                   <input {...getInputProps()} />

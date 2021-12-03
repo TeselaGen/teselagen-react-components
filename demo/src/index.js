@@ -20,6 +20,7 @@ import { DataTable } from "../../src";
 import FillWindowExample from "./examples/FillWindow";
 
 import TimelineDemo from "./examples/TimelineDemo";
+import UploaderDemo from "./examples/UploaderDemo";
 import IntentTextDemo from "./examples/IntentText";
 import ScrollToTopDemo from "./examples/ScrollToTop";
 
@@ -233,6 +234,9 @@ const demos = {
   },
   Timeline: {
     demo: TimelineDemo
+  },
+  Uploader: {
+    demo: UploaderDemo
   },
   AdvancedOptions: {
     demo: AdvancedOptionsDemo
