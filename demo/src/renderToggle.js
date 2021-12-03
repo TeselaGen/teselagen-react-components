@@ -4,6 +4,7 @@ import InfoHelper from "../../src/InfoHelper";
 import { lifecycle, mapProps } from "recompose";
 import { omit } from "lodash";
 import ReactMarkdown from "react-markdown";
+import { popoverOverflowModifiers } from "../../src";
 
 const omitProps = keys => mapProps(props => omit(props, keys));
 const _Switch = omitProps(["didMount"])(Switch);
@@ -80,15 +81,7 @@ export function renderToggleInner({
         <InfoHelper
           isPopover
           popoverProps={{
-            modifiers: {
-              preventOverflow: { enabled: false },
-              hide: {
-                enabled: false
-              },
-              flip: {
-                boundariesElement: "viewport"
-              }
-            }
+            modifiers: popoverOverflowModifiers
           }}
           style={{ marginRight: -15, marginTop: 5, marginLeft: 5 }}
         >

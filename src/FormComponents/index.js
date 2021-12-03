@@ -266,15 +266,7 @@ class AbstractInput extends React.Component {
           >
             <div style={{ position: "absolute", left: "0px", top: "0px" }}>
               <Tooltip
-                modifiers={{
-                  preventOverflow: { enabled: false },
-                  hide: {
-                    enabled: false
-                  },
-                  flip: {
-                    boundariesElement: "viewport"
-                  }
-                }}
+                modifiers={popoverOverflowModifiers}
                 content="Allows a Default to be Set. Click to Enter Set Default Mode (or press Shift+D when outside the input field)"
               >
                 <div
@@ -863,15 +855,7 @@ export class RenderReactColorPicker extends React.Component {
         <Popover
           position="bottom-right"
           minimal
-          modifiers={{
-            preventOverflow: { enabled: false },
-            hide: {
-              enabled: false
-            },
-            flip: {
-              boundariesElement: "viewport"
-            }
-          }}
+          modifiers={popoverOverflowModifiers}
           content={
             <SketchPicker
               className="tg-color-picker-selector"

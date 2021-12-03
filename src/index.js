@@ -24,6 +24,7 @@ export { default as DropdownButton } from "./DropdownButton";
 export { default as DialogFooter } from "./DialogFooter";
 export { default as adHoc } from "./utils/adHoc";
 export { default as IntentText } from "./IntentText";
+export { default as popoverOverflowModifiers } from "./utils/popoverOverflowModifiers";
 export { default as withTableParams } from "./DataTable/utils/withTableParams";
 export { default as InfoHelper } from "./InfoHelper";
 export { default as showConfirmationDialog } from "./showConfirmationDialog";
