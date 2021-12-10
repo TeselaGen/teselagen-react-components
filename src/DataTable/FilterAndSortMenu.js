@@ -18,6 +18,12 @@ import DialogFooter from "../DialogFooter";
 import "./style.css";
 import "../toastr";
 
+const isInvalidFilterValue = value => {
+  if (Array.isArray(value)) {
+    return value.some(item => isInvalidFilterValue(item));
+  }
+  return value === "" || value === undefined;
+};
 export default class FilterAndSortMenu extends React.Component {
   constructor(props) {
     super(props);
@@ -44,7 +50,7 @@ export default class FilterAndSortMenu extends React.Component {
       filterValToUse = ccSelectedFilter;
     }
     const { filterOn, addFilters, removeSingleFilter } = this.props;
-    if (!filterValToUse) {
+    if (isInvalidFilterValue(filterValToUse)) {
       return removeSingleFilter(filterOn);
     }
     addFilters([
