@@ -53,7 +53,7 @@ class AlertWrapper extends Component {
         })}
       >
         {content}
-        {text && <p style={{ marginBottom: 10 }}>{text}</p>}
+        {text && <div style={{ marginBottom: 10 }}>{text}</div>}
       </Alert>
     );
   }

@@ -176,12 +176,11 @@ function FormComponentsDemo({ handleSubmit }) {
           threeDotMenuItems={<MenuItem text="Download Example File"></MenuItem>}
           disabled={disableFileUploadField}
           className={"fileUploadZoink"}
-          label="<FileUploadField/> Upload component"
+          label="<FileUploadField/> Upload component 123"
           tooltipInfo="hello hello I'm tooltipInfo"
           onFieldSubmit={function(fileList) {
             console.info("do something with the finished file list:", fileList);
           }}
-          action={"//jsonplaceholder.typicode.com/posts/"}
           name={"uploadfield"}
           inlineLabel={inlineLabels}
         />
