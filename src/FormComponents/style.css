@@ -85,8 +85,8 @@
 }
 
 .tg-upload-file-list-item a {
+  display: block;
   width: 100%;
-  max-width: 250px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

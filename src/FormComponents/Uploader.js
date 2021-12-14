@@ -218,13 +218,17 @@ class Uploader extends Component {
 
     return (
       <div
+        className="tg-uploader-outer"
         style={{
           width: minimal ? undefined : "100%",
           display: "flex",
           height: "fit-content"
         }}
       >
-        <div style={{ width: "100%", height: "fit-content" }}>
+        <div
+          className="tg-uploader-inner"
+          style={{ width: "100%", height: "fit-content", minWidth: 0 }}
+        >
           <div
             className={Classes.TEXT_MUTED}
             style={{ fontSize: 11, marginBottom: 5 }}
@@ -467,8 +471,12 @@ class Uploader extends Component {
                 return fileListItemRenderer ? (
                   fileListItemRenderer(file, self)
                 ) : (
-                  <div key={index} className="tg-upload-file-list-item">
-                    <div>
+                  <div
+                    key={index}
+                    className="tg-upload-file-list-item"
+                    style={{ display: "flex", width: "100%" }}
+                  >
+                    <div style={{ display: "flex", width: "100%" }}>
                       <Icon
                         className={classnames({
                           "tg-spin": loading,

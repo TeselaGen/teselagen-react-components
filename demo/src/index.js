@@ -335,20 +335,22 @@ const Demo = () => {
   return (
     <Provider store={store}>
       <Router>
-        <div>
+        <div style={{ width: "100%" }}>
           <DemoHeader />
           <div
             style={{
               display: isMobile() ? "inherit" : "flex",
               padding: isMobile() ? 10 : 40,
-              maxWidth: "100vw"
+              maxWidth: "100%",
+              minWidth: 0,
+              width: "100%"
             }}
           >
             <DemoNav demos={demos} />
             <div
               style={{
-                overflow: "auto",
-                padding: 10
+                padding: 10,
+                minWidth: 0
               }}
             >
               <Route
