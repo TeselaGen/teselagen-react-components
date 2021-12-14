@@ -229,12 +229,14 @@ class Uploader extends Component {
           className="tg-uploader-inner"
           style={{ width: "100%", height: "fit-content", minWidth: 0 }}
         >
-          <div
-            className={Classes.TEXT_MUTED}
-            style={{ fontSize: 11, marginBottom: 5 }}
-          >
-            Accepts {acceptToUse}
-          </div>
+          {acceptToUse && (
+            <div
+              className={Classes.TEXT_MUTED}
+              style={{ fontSize: 11, marginBottom: 5 }}
+            >
+              Accepts {acceptToUse}
+            </div>
+          )}
           <Dropzone
             disabled={disabled}
             onClick={evt => evt.preventDefault()}
