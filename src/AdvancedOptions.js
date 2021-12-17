@@ -18,6 +18,7 @@ export default function AdvancedOptions({
           setOpen(!isOpen);
         }}
         style={{ cursor: "pointer" }}
+        className="tg-toggle-advanced-options"
       >
         {label || "Advanced"}{" "}
         <Icon icon={isOpen ? "caret-up" : "caret-down"}></Icon>
