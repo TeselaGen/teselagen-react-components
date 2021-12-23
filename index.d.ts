@@ -1083,6 +1083,8 @@ export function withHotkeys(options: {}) {
 // style
 
 export function getTagProps() { }
+export function tgFormValues() { }
+export function withStore() { }
 export function getTagsAndTagOptions() { }
 export function getKeyedTagsAndTagOptions() { }
 
