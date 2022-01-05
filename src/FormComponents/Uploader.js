@@ -509,22 +509,22 @@ class Uploader extends Component {
                         {" "}
                         {name || originalName}{" "}
                       </a>
+                      {!loading && (
+                        <Icon
+                          onClick={() => {
+                            onRemove(file, index, fileList);
+                            onChange(
+                              fileList.filter((file, index2) => {
+                                return index2 !== index;
+                              })
+                            );
+                          }}
+                          iconSize={16}
+                          icon="cross"
+                          className="tg-upload-file-list-item-close"
+                        />
+                      )}
                     </div>
-                    {!loading && (
-                      <Icon
-                        onClick={() => {
-                          onRemove(file, index, fileList);
-                          onChange(
-                            fileList.filter((file, index2) => {
-                              return index2 !== index;
-                            })
-                          );
-                        }}
-                        iconSize={16}
-                        icon="cross"
-                        className="tg-upload-file-list-item-close"
-                      />
-                    )}
                   </div>
                 );
               })}
