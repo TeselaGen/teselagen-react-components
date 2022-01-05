@@ -71,9 +71,47 @@ Cypress.Commands.add(
   }
 );
 
+/**
+ * Uploads a file string to an input
+ * @memberOf Cypress.Chainable#
+ * @name uploadBlobFile
+ * @function
+ * @param {String} selector - element to target
+ * @param {String} fileUrl - The file url to upload
+ * @param {String} type - content type of the uploaded file
+ */
+
+Cypress.Commands.add(
+  "uploadBlobFile",
+  (selector, string, filename, type = "", noFileList) => {
+    return cy.window().then(win => {
+      //papaparse was doing an instanceOf window.File check that was failing so we needed
+      //https://github.com/cypress-io/cypress/issues/170#issuecomment-411289023
+      const blob = new win.Blob([string], {
+        type: "plain/text"
+      });
+      return dropFile({ blob, selector, filename, type, noFileList });
+    });
+  }
+);
+
+Cypress.Commands.add("uploadBlobFiles", (selector, files, noFileList) => {
+  return cy.window().then(win => {
+    const fileObjects = files.map(file => {
+      const blob = new win.Blob([file.contents], {
+        type: "plain/text"
+      });
+      return new win.File([blob], file.name, { type: file.type });
+    });
+
+    return dropFile({ fileObjects, selector, noFileList });
+  });
+});
+
 function dropFile({
   file,
   blob,
+  fileObjects,
   selector,
   fileUrl,
   filename,
@@ -85,18 +123,24 @@ function dropFile({
     .then(win => {
       //papaparse was doing an instanceOf window.File check that was failing so we needed
       //https://github.com/cypress-io/cypress/issues/170#issuecomment-411289023
-      let name = filename;
-      if (!name) {
-        const nameSegments = fileUrl.split("/");
-        name = nameSegments[nameSegments.length - 1];
-      }
-      let testFile;
-      if (file) {
-        testFile = file;
+      let files;
+      if (fileObjects) {
+        files = fileObjects;
       } else {
-        testFile = new win.File([blob], name, { type });
+        let name = filename;
+        if (!name) {
+          const nameSegments = fileUrl.split("/");
+          name = nameSegments[nameSegments.length - 1];
+        }
+        let testFile;
+        if (file) {
+          testFile = file;
+        } else {
+          testFile = new win.File([blob], name, { type });
+        }
+        files = [testFile];
       }
-      const event = { dataTransfer: { files: [testFile], types: ["Files"] } };
+      const event = { dataTransfer: { files, types: ["Files"] } };
       // return subject
       return cy.get(selector).trigger("drop", event);
     })

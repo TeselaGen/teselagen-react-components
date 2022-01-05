@@ -45,4 +45,34 @@ describe("upload", () => {
       ".bp3-form-group:has(.fileUploadZoink.tg-dropzone) .tg-upload-file-list-item"
     ).should("not.exist");
   });
+
+  it("FileUploadField will properly handle file limit and file type errors", () => {
+    cy.visit("#/FormComponents");
+    cy.uploadBlobFile(
+      ".fileUploadLimitAndType.tg-dropzone",
+      "test,test",
+      "test.csv",
+      "text/csv",
+      true
+    );
+
+    cy.contains("type must be .json");
+    cy.uploadBlobFiles(
+      ".fileUploadLimitAndType.tg-dropzone",
+      [
+        {
+          name: "test.json",
+          contents: "oijwef",
+          type: "application/json"
+        },
+        {
+          name: "test2.json",
+          contents: "oijwef",
+          type: "application/json"
+        }
+      ],
+      true
+    );
+    cy.contains("Too many files");
+  });
 });
