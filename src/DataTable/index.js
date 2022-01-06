@@ -721,14 +721,10 @@ class DataTable extends React.Component {
               return idMap[rowId] || isEntityDisabled(e);
             });
           } else {
-            everyEntitySelected = entityCount <= Object.keys(idMap).length;
+            everyEntitySelected = entityCount <= selectedRowCount;
           }
           if (everyEntitySelected) {
-            if (isLocalCall) {
-              showClearAll = entitiesAcrossPages.length;
-            } else {
-              showClearAll = entityCount > 0;
-            }
+            showClearAll = selectedRowCount;
           }
           // only show if not all selected
           showSelectAll = !everyEntitySelected;
