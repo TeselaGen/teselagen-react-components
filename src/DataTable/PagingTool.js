@@ -57,7 +57,10 @@ class PagingTool extends React.Component {
   };
 
   setPageSize = e => {
-    this.props.setPageSize(parseInt(e.target.value, 10));
+    const { setPageSize, persistPageSize = noop } = this.props;
+    const pageSize = parseInt(e.target.value, 10);
+    setPageSize(pageSize);
+    persistPageSize(pageSize);
   };
 
   pageBack = () => {
