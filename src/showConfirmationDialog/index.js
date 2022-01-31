@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import { Alert, Intent } from "@blueprintjs/core";
+import { Button, Dialog, Intent } from "@blueprintjs/core";
 import { renderOnDoc } from "../utils/renderOnDoc";
+import DialogFooter from "../DialogFooter";
 
 // usage
 // const doAction = await showConfirmationDialog({
@@ -12,6 +13,12 @@ import { renderOnDoc } from "../utils/renderOnDoc";
 //     canEscapeKeyCancel: true //this is false by default
 // });
 // console.info("doAction:", doAction);
+
+// const doAction = await showConfirmationDialog({
+//   thirdButtonText: 'Click me'
+//   thirdButtonIntent: 'primary'
+// });
+// console.info("doAction:", doAction); //logs thirdButtonClicked
 //returns a promise that resolves with true or false depending on if the user cancels or not!
 export default function showConfirmationDialog(opts) {
   return new Promise(resolve => {
@@ -30,6 +37,11 @@ class AlertWrapper extends Component {
       resolve,
       noCancelButton,
       content,
+      className,
+      thirdButtonText,
+      thirdButtonIntent,
+      canEscapeKeyCancel,
+      confirmButtonText,
       cancelButtonText = "Cancel",
       intent = Intent.PRIMARY,
       ...rest
@@ -40,7 +52,8 @@ class AlertWrapper extends Component {
       resolve(confirm);
     };
     return (
-      <Alert
+      <Dialog
+        className={`bp3-alert ${className || ""}`}
         isOpen={this.state.isOpen}
         intent={intent}
         cancelButtonText={cancelButtonText}
@@ -52,9 +65,32 @@ class AlertWrapper extends Component {
           cancelButtonText: undefined
         })}
       >
-        {content}
-        {text && <div style={{ marginBottom: 10 }}>{text}</div>}
-      </Alert>
+        <div className="bp3-dialog-body">
+          {content}
+          {text && <div style={{ marginBottom: 10 }}>{text}</div>}
+        </div>
+        <DialogFooter
+          {...{
+            onBackClick: cancelButtonText ? () => doClose(false) : undefined,
+            onClick: () => doClose(true),
+            noCancel: true,
+            additionalButtons: thirdButtonText ? (
+              <Button
+                intent={thirdButtonIntent}
+                text={thirdButtonText}
+                onClick={() => {
+                  doClose("thirdButtonClicked");
+                }}
+              ></Button>
+            ) : (
+              undefined
+            ),
+            backText: noCancelButton ? "" : cancelButtonText,
+            text: confirmButtonText,
+            intent
+          }}
+        ></DialogFooter>
+      </Dialog>
     );
   }
 }

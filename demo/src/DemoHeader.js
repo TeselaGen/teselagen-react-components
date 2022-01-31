@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Icon, Tooltip, Button, Classes } from "@blueprintjs/core";
 import classNames from "classnames";
 import "./style.css";
+import VersionSwitcher from "./VersionSwitcher";
 
 class DemoHeader extends Component {
   constructor(props) {
@@ -29,6 +30,7 @@ class DemoHeader extends Component {
     const { darkTheme } = this.state;
     return (
       <div className="demo-header">
+        <VersionSwitcher></VersionSwitcher>
         <div style={{ position: "fixed", top: 10, right: 10 }}>
           <Tooltip
             content={darkTheme ? "Light Theme" : "Dark Theme"}
@@ -41,6 +43,7 @@ class DemoHeader extends Component {
             />
           </Tooltip>
         </div>
+        
         <a
           style={{ fontSize: 16, color: "white" }}
           href="https://github.com/TeselaGen/teselagen-react-components"
