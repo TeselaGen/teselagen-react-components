@@ -12,6 +12,7 @@ import withTableParams from "../DataTable/utils/withTableParams";
 import convertSchema from "../DataTable/utils/convertSchema";
 import { viewColumn, openColumn } from "../DataTable/viewColumn";
 import pureNoFunc from "../utils/pureNoFunc";
+import getTableConfigFromStorage from "./utils/getTableConfigFromStorage";
 
 export default compose(
   //connect to withTableParams here in the dataTable component so that, in the case that the table is not manually connected,
@@ -54,9 +55,9 @@ export default compose(
     let tableConfig = {};
     let resetDefaultVisibility;
     let updateColumnVisibility;
+    let persistPageSize;
     let moveColumnPersist;
     let resizePersist;
-    let resized;
     let updateTableDisplayDensity;
     let compactToUse = !!compact;
     let extraCompactToUse = !!extraCompact;
@@ -67,14 +68,13 @@ export default compose(
     if (isOpenable) {
       schemaToUse.fields = [openColumn, ...schemaToUse.fields];
     }
-    let hasOptionForForcedHidden =
+    const hasOptionForForcedHidden =
       withDisplayOptions && (isSimple || isInfinite);
     if (withDisplayOptions) {
       if (syncDisplayOptionsToDb) {
         tableConfig = tableConfigurations && tableConfigurations[0];
       } else {
-        tableConfig = window.localStorage.getItem(formName);
-        tableConfig = tableConfig && JSON.parse(tableConfig);
+        tableConfig = getTableConfigFromStorage(formName);
       }
       if (!tableConfig) {
         tableConfig = {
@@ -176,6 +176,10 @@ export default compose(
           }
         };
       } else {
+        const syncStorage = () => {
+          window.localStorage.setItem(formName, JSON.stringify(tableConfig));
+        };
+
         //sync display options with localstorage
         resetDefaultVisibility = function() {
           window.localStorage.removeItem(formName);
@@ -184,16 +188,20 @@ export default compose(
           const newFieldOpts = {
             ...fieldOptsByPath
           };
-          let pathsToUse = paths ? paths : [path];
+          const pathsToUse = paths ? paths : [path];
           pathsToUse.forEach(path => {
             newFieldOpts[path] = { path, isHidden: !shouldShow };
           });
           tableConfig.fieldOptions = toArray(newFieldOpts);
-          window.localStorage.setItem(formName, JSON.stringify(tableConfig));
+          syncStorage();
         };
         updateTableDisplayDensity = function(density) {
           tableConfig.density = density;
-          window.localStorage.setItem(formName, JSON.stringify(tableConfig));
+          syncStorage();
+        };
+        persistPageSize = function(pageSize) {
+          tableConfig.userSetPageSize = pageSize;
+          syncStorage();
         };
         moveColumnPersist = function({ oldIndex, newIndex }) {
           // we might already have an array of the fields [path1, path2, ..etc]
@@ -206,15 +214,15 @@ export default compose(
             oldIndex,
             newIndex
           );
-          window.localStorage.setItem(formName, JSON.stringify(tableConfig));
+          syncStorage();
         };
         resizePersist = function(newResized) {
           tableConfig.resized = newResized;
-          window.localStorage.setItem(formName, JSON.stringify(tableConfig));
+          syncStorage();
         };
       }
     }
-    resized = tableConfig.resized;
+    const resized = tableConfig.resized;
     return {
       ...propsToUse,
       schema: schemaToUse,
@@ -223,6 +231,7 @@ export default compose(
       resized,
       resetDefaultVisibility,
       updateColumnVisibility,
+      persistPageSize,
       updateTableDisplayDensity,
       resizePersist,
       moveColumnPersist,

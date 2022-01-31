@@ -18,7 +18,42 @@ declare namespace Cypress {
       type?: string,
       noFileList?: boolean
     ): void;
-    
+
+    /**
+     * uploadBlobFile
+     * uploads a string to a dropzone uploader by converting it to a browser file
+     * @param selector - cypress selector class for drop element
+     * @param stringContent - file contents
+     * @param filename - file name
+     * @param type - file type
+     * @param noFileList - whether the upload doesn't have a file list (custom render), this will ignore the checks for file loading
+     * @example
+     * cy.uploadBlobFile(".tg-dropzone", "contents of file", "tubes.csv", "text/csv")
+     */
+    uploadBlobFile(
+      selector: string,
+      stringContent: string,
+      filename: string,
+      type?: string,
+      noFileList?: boolean
+    ): void;
+    /**
+     * uploadBlobFiles
+     * uploads a string to a dropzone uploader by converting it to a browser file
+     * @param selector - cypress selector class for drop element
+     * @param stringContent - file contents
+     * @param filename - file name
+     * @param type - file type
+     * @param noFileList - whether the upload doesn't have a file list (custom render), this will ignore the checks for file loading
+     * @example
+     * cy.uploadBlobFiles(".tg-dropzone", [{ name: "test.csv", contents: "oj,oij", type: "text/csv"}, { name: "test2.csv", contents: "oj,oij", type: "text/csv"}])
+     */
+    uploadBlobFiles(
+      selector: string,
+      files: object[],
+      noFileList?: boolean
+    ): void;
+
     /**
      * tgToggle
      * toggle a demo switch

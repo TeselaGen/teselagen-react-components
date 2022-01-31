@@ -157,4 +157,19 @@ describe("dataTable.spec", () => {
     cy.dragBetween(".rt-th:contains(Name)", ".rt-th:contains(Weather)");
     checkIndices("greaterThan");
   });
+
+  it("page size will persist on reload", () => {
+    cy.visit("#/DataTable");
+    cy.get(".data-table-container .paging-page-size").should("have.value", "5");
+    cy.get(".data-table-container .paging-page-size").select("50");
+    cy.get(".data-table-container .paging-page-size").should(
+      "have.value",
+      "50"
+    );
+    cy.reload();
+    cy.get(".data-table-container .paging-page-size").should(
+      "have.value",
+      "50"
+    );
+  });
 });

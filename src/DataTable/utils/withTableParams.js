@@ -17,6 +17,7 @@ import {
   getMergedOpts,
   getCurrentParamsFromUrl
 } from "./queryParams";
+import getTableConfigFromStorage from "./getTableConfigFromStorage";
 
 /**
  *  Note all these options can be passed at Design Time or at Runtime (like reduxForm())
@@ -51,6 +52,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       withSelectedEntities,
       formName,
       formNameFromWithTPCall,
+      syncDisplayOptionsToDb,
       defaults,
       isInfinite,
       isSimple,
@@ -108,6 +110,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       }
     }
 
+    const tableConfig = getTableConfigFromStorage(formName);
     const formSelector = formValueSelector(formName);
     const currentParams =
       (urlConnected
@@ -126,12 +129,22 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       typeof additionalOrFilter === "function"
         ? additionalOrFilter.bind(this, ownProps)
         : () => additionalOrFilter;
+
+    let defaultsToUse = defaults;
+
+    // make user set page size persist
+    const userSetPageSize =
+      tableConfig?.userSetPageSize && parseInt(tableConfig.userSetPageSize, 10);
+    if (!syncDisplayOptionsToDb && userSetPageSize) {
+      defaultsToUse = defaultsToUse || {};
+      defaultsToUse.pageSize = userSetPageSize;
+    }
     const mapStateProps = {
       history,
       urlConnected,
       withSelectedEntities,
       formName,
-      defaults,
+      defaults: defaultsToUse,
       isInfinite,
       isSimple,
       withPaging,
@@ -150,7 +163,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
         currentParams,
         entities: mergedOpts.entities, // for local table
         urlConnected,
-        defaults,
+        defaults: defaultsToUse,
         schema: convertSchema(schema),
         isInfinite: isInfinite || (isSimple && !withPaging),
         isLocalCall,
@@ -226,7 +239,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       return ownProps;
     }
     const { currentParams, formName } = stateProps;
-    let boundDispatchProps = {};
+    const boundDispatchProps = {};
     //bind currentParams to actions
     Object.keys(dispatchProps.bindThese).forEach(function(key) {
       const action = dispatchProps.bindThese[key];
@@ -294,11 +307,7 @@ export default function withTableParams(compOrOpts, pTopLevelOpts) {
       //don't use withRouter if noRouter is passed!
       return !props.noRouter;
     }, withRouter),
-    connect(
-      mapStateToProps,
-      mapDispatchToProps,
-      mergeProps
-    ),
+    connect(mapStateToProps, mapDispatchToProps, mergeProps),
     pureNoFunc,
     addFormTracking
   );

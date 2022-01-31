@@ -556,6 +556,7 @@ class DataTable extends React.Component {
       resized,
       resizePersist,
       updateColumnVisibility,
+      persistPageSize,
       updateTableDisplayDensity,
       change,
       syncDisplayOptionsToDb,
@@ -610,22 +611,20 @@ class DataTable extends React.Component {
       throw new Error("safeQuery is needed for selecting all table records");
     }
     let updateColumnVisibilityToUse = updateColumnVisibility;
+    let persistPageSizeToUse = persistPageSize;
     let updateTableDisplayDensityToUse = updateTableDisplayDensity;
     let resetDefaultVisibilityToUse = resetDefaultVisibility;
     if (withDisplayOptions && !syncDisplayOptionsToDb) {
       //little hack to make localstorage changes get reflected in UI (we force an update to get the enhancers to run again :)
-      updateColumnVisibilityToUse = (...args) => {
-        updateColumnVisibility(...args);
+
+      const wrapUpdate = fn => (...args) => {
+        fn(...args);
         change("localStorageForceUpdate", Math.random());
       };
-      updateTableDisplayDensityToUse = (...args) => {
-        updateTableDisplayDensity(...args);
-        change("localStorageForceUpdate", Math.random());
-      };
-      resetDefaultVisibilityToUse = (...args) => {
-        resetDefaultVisibility(...args);
-        change("localStorageForceUpdate", Math.random());
-      };
+      updateColumnVisibilityToUse = wrapUpdate(updateColumnVisibility);
+      updateTableDisplayDensityToUse = wrapUpdate(updateTableDisplayDensity);
+      resetDefaultVisibilityToUse = wrapUpdate(resetDefaultVisibility);
+      persistPageSizeToUse = wrapUpdate(persistPageSize);
     }
     let compactClassName = "";
     if (compactPaging) {
@@ -721,14 +720,10 @@ class DataTable extends React.Component {
               return idMap[rowId] || isEntityDisabled(e);
             });
           } else {
-            everyEntitySelected = entityCount <= Object.keys(idMap).length;
+            everyEntitySelected = entityCount <= selectedRowCount;
           }
           if (everyEntitySelected) {
-            if (isLocalCall) {
-              showClearAll = entitiesAcrossPages.length;
-            } else {
-              showClearAll = entityCount > 0;
-            }
+            showClearAll = selectedRowCount;
           }
           // only show if not all selected
           showSelectAll = !everyEntitySelected;
@@ -1036,7 +1031,12 @@ class DataTable extends React.Component {
                     schema={schema}
                   />
                 )}
-                {shouldShowPaging && <PagingTool {...propPresets} />}
+                {shouldShowPaging && (
+                  <PagingTool
+                    {...propPresets}
+                    persistPageSize={persistPageSizeToUse}
+                  />
+                )}
               </div>
             </div>
           )}

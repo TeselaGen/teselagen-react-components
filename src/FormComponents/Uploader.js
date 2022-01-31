@@ -245,11 +245,17 @@ class Uploader extends Component {
             {...{
               onDrop: async (acceptedFiles, rejectedFiles) => {
                 if (rejectedFiles.length) {
-                  const fileNames = rejectedFiles.map(f => f.name);
+                  let msg = "";
+                  rejectedFiles.forEach(file => {
+                    if (msg) msg += "\n";
+                    msg +=
+                      `${file.file.name}: ` +
+                      file.errors.map(err => err.message).join(", ");
+                  });
                   window.toastr &&
-                    window.toastr
-                      .warning(`This uploader accepts ${acceptToUse}. These files were rejected because they \
-                do not have the proper extension: ${fileNames.join(", ")}`);
+                    window.toastr.warning(
+                      <div className="preserve-newline">{msg}</div>
+                    );
                 }
                 if (!acceptedFiles.length) return;
                 this.setState({
@@ -503,22 +509,22 @@ class Uploader extends Component {
                         {" "}
                         {name || originalName}{" "}
                       </a>
+                      {!loading && (
+                        <Icon
+                          onClick={() => {
+                            onRemove(file, index, fileList);
+                            onChange(
+                              fileList.filter((file, index2) => {
+                                return index2 !== index;
+                              })
+                            );
+                          }}
+                          iconSize={16}
+                          icon="cross"
+                          className="tg-upload-file-list-item-close"
+                        />
+                      )}
                     </div>
-                    {!loading && (
-                      <Icon
-                        onClick={() => {
-                          onRemove(file, index, fileList);
-                          onChange(
-                            fileList.filter((file, index2) => {
-                              return index2 !== index;
-                            })
-                          );
-                        }}
-                        iconSize={16}
-                        icon="cross"
-                        className="tg-upload-file-list-item-close"
-                      />
-                    )}
                   </div>
                 );
               })}

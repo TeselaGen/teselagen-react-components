@@ -140,6 +140,19 @@ function FormComponentsDemo({ handleSubmit }) {
           name={"<FileUploadField/> uploadfield"}
           inlineLabel={inlineLabels}
         />
+        <h6>FileUploadField with file limit</h6>
+        <FileUploadField
+          label="File limit and type"
+          onFieldSubmit={function(fileList) {
+            console.info("do something with the finished file list:", fileList);
+          }}
+          className={"fileUploadLimitAndType"}
+          accept={[".json"]}
+          action={"//jsonplaceholder.typicode.com/posts/"}
+          name={"<FileUploadField/> uploadfield"}
+          fileLimit={1}
+          inlineLabel={inlineLabels}
+        />
         <RadioGroupField
           name={"radioGroup"}
           inlineLabel={inlineLabels}
