@@ -19,7 +19,7 @@ jobs:
           record: true
           parallel: true
           start: yarn start
-          wait-on: http://localhost:3344
+          wait-on: http://localhost:3333
         env:
           WITH_COVERAGE: true
           # pass the Dashboard record key as an environment variable

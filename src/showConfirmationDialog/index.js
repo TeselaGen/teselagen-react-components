@@ -65,7 +65,7 @@ class AlertWrapper extends Component {
           cancelButtonText: undefined
         })}
       >
-        <div className="bp3-dialog-body">
+        <div style={{ padding: 5 }}>
           {content}
           {text && <div style={{ marginBottom: 10 }}>{text}</div>}
         </div>
