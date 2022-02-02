@@ -98,6 +98,10 @@ interface ToastrFunc {
    *    you can also chain them using a unique key
    *    window.toastr.info("Sequence Saving", {key: "seqSave"})
    *    window.toastr.success("Sequence Saved!", {key: "seqSave"})
+   *    window.toastr.info("Sequence Saving", { 
+   *        link: modelNameToLink("oligo", seq.id),
+   *        linkText: "Open Oligo"
+   *    })
    *    window.toastr.success("Sequence Saved!", {timeout: 10000}) //wait longer or shorter to clear the toast
    *    window.toastr.success("Sequence Saved!", {icon: "chat"})
    */
@@ -1003,19 +1007,21 @@ export function showAppSpinner();
  *
  * @example
  * const confirm = await showConfirmationDialog({
- *   text:
- *     selectedCount > 1
- *       ? `Are you sure you want to delete these custom icons?
- *           You cannot undo this action.`
- *       : `Are you sure you want to delete this custom icon?
- *           You cannot undo this action.`,
- *   intent: Intent.DANGER,
+ *   text: "Are you sure you want to delete these custom icons? You cannot undo this action"
+ *   intent: "danger",
  *   confirmButtonText: "Delete",
  *   cancelButtonText: "Cancel",
  *   canEscapeKeyCancel: true
  * });
  * if (confirm) {
  * }
+ * 
+ * @example 
+ * const confirm = await showConfirmationDialog({
+ *   thirdButtonText: 'Click me'
+ *   thirdButtonIntent: 'primary'
+ * });
+ * console.info("confirm:", confirm); //logs "thirdButtonClicked" if the third button is clicked
  */
 export function showConfirmationDialog(showConfirmationDialogOpts) {
 
