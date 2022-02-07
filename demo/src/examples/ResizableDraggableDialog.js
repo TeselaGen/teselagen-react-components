@@ -3,6 +3,7 @@ import React from 'react'
 import { Component } from 'react';
 import renderToggle from '../renderToggle';
 import ResizableDraggableDialog from '../../../src/ResizableDraggableDialog';
+import { AdvancedOptions } from '../../../src';
 
 
 export default class Example extends Component {
@@ -54,6 +55,14 @@ export default class Example extends Component {
           <div className={Classes.DIALOG_BODY}>
             I am a dialog
             <div>with a bunch of stuff in it</div>
+            <AdvancedOptions>
+              <button>hey</button>
+              <br></br>
+              <button>hey</button>
+              <br></br>
+              <button>hey</button>
+              <button>hey</button>
+            </AdvancedOptions>
             {arrayOfLength.map((num, i) => {
               return (
                 <div key={i} style={{ height: 40, background: Math.random() }}>

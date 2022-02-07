@@ -5,6 +5,7 @@ export default function AdvancedOptions({
   children,
   content,
   label,
+  style,
   isOpenByDefault
 }) {
   const [isOpen, setOpen] = useState(isOpenByDefault);
@@ -12,7 +13,7 @@ export default function AdvancedOptions({
     return null;
   }
   return (
-    <div style={{ marginTop: 5 }}>
+    <div style={{ marginTop: 5, ...style }}>
       <div
         onClick={() => {
           setOpen(!isOpen);
@@ -21,7 +22,7 @@ export default function AdvancedOptions({
         className="tg-toggle-advanced-options"
       >
         {label || "Advanced"}{" "}
-        <Icon icon={isOpen ? "caret-up" : "caret-down"}></Icon>
+        <Icon icon={isOpen ? "caret-down" : "caret-right"}></Icon>
       </div>
       {isOpen && <div style={{ marginTop: 10 }}>{content || children}</div>}
     </div>

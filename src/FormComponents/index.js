@@ -186,6 +186,7 @@ class AbstractInput extends React.Component {
       rightEl,
       labelStyle,
       noOuterLabel,
+      noMarginBottom,
       assignDefaultButton,
       showGenerateDefaultDot,
       setAssignDefaultsMode,
@@ -258,7 +259,10 @@ class AbstractInput extends React.Component {
         }
         inline={inlineLabel}
         labelInfo={secondaryLabel}
-        style={containerStyle}
+        style={{
+          ...(noMarginBottom && { marginBottom: 0 }),
+          ...containerStyle
+        }}
       >
         {showGenerateDefaultDot && (
           <div

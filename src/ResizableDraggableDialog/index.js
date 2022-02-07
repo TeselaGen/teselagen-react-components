@@ -11,6 +11,18 @@ export default class ResizableDraggableDialog extends React.Component {
     this.setDefaults();
     setTimeout(() => {
       this.setDefaults();
+      try {
+        const el = this.containerEl.querySelector(".bp3-dialog-body");
+        this.resizeObs = new ResizeObserver(() => {
+          this.setDefaults({ doNotSetX: true });
+        });
+        this.resizeObs.observe(el);
+      } catch (e) {
+        console.warn(
+          `1214124599 Error setting up resize observer on dialog :`,
+          e
+        );
+      }
     }, 0);
   }
   state = {
@@ -20,7 +32,7 @@ export default class ResizableDraggableDialog extends React.Component {
     height: defaultDialogHeight
   };
 
-  setDefaults = () => {
+  setDefaults = ({ doNotSetX } = {}) => {
     const { width, height } = this.props;
     const { windowWidth, windowHeight } = this.getWindowWidthAndHeight();
 
@@ -44,7 +56,9 @@ export default class ResizableDraggableDialog extends React.Component {
     }
 
     this.setState({
-      x: Math.round(Math.max((windowWidth - widthToUse) / 2, 0)),
+      ...(doNotSetX
+        ? {}
+        : { x: Math.round(Math.max((windowWidth - widthToUse) / 2, 0)) }),
       y: Math.round(Math.max((windowHeight - heightToUse) / 2, 0)),
       width: Math.min(widthToUse, windowWidth),
       height: Math.min(Math.max(defaultDialogHeight, heightToUse), windowHeight)
@@ -54,6 +68,7 @@ export default class ResizableDraggableDialog extends React.Component {
     this.setDefaults();
   };
   componentWillUnmount() {
+    this.resizeObs && this.resizeObs.disconnect();
     window.removeEventListener("resize", this.onWindowResize);
   }
 
@@ -75,6 +90,9 @@ export default class ResizableDraggableDialog extends React.Component {
     const { windowWidth, windowHeight } = this.getWindowWidthAndHeight();
     return (
       <div
+        ref={el => {
+          if (el) this.containerEl = el;
+        }}
         className="tg-bp3-dialog-resizable-draggable"
         style={{ top: 0, left: 0, position: "fixed" }}
       >

@@ -543,6 +543,7 @@ export interface GenericFormFieldProps {
   onFieldSubmit: () => {};
   leftEl: any;
   rightEl: any;
+  noMarginBottom: boolean;
   children: any;
   defaultValue: any;
   onDefaultValChanged: () => {};

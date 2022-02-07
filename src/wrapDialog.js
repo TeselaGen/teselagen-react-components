@@ -5,6 +5,7 @@ import { Dialog, useHotkeys } from "@blueprintjs/core";
 import { noop, isFunction } from "lodash";
 import { ResizableDraggableDialog } from ".";
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default (topLevelDialogProps = {}) => Component => props => {
   const r = useRef();
   const memoedHotkeys = useMemo(
