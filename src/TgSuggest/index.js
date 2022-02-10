@@ -3,6 +3,7 @@ import { Keys } from "@blueprintjs/core";
 import React from "react";
 import fuzzysearch from "fuzzysearch";
 import classNames from "classnames";
+import { simplesearch } from "../TgSelect";
 
 class TgSuggest extends React.Component {
   static defaultProps = {
@@ -124,7 +125,3 @@ export const singleItemPredicate = (queryString, item = "", isSimpleSearch) =>
     queryString.toLowerCase(),
     item.toLowerCase() || ""
   );
-
-function simplesearch(needle, haystack) {
-  return (haystack || "").indexOf(needle) !== -1;
-}

@@ -14,7 +14,7 @@ export default class ResizableDraggableDialog extends React.Component {
       try {
         const el = this.containerEl.querySelector(".bp3-dialog-body");
         this.resizeObs = new ResizeObserver(() => {
-          this.setDefaults({ doNotSetX: true });
+          this.setDefaults({ doNotSetXOrWidth: true });
         });
         this.resizeObs.observe(el);
       } catch (e) {
@@ -32,7 +32,7 @@ export default class ResizableDraggableDialog extends React.Component {
     height: defaultDialogHeight
   };
 
-  setDefaults = ({ doNotSetX } = {}) => {
+  setDefaults = ({ doNotSetXOrWidth } = {}) => {
     const { width, height } = this.props;
     const { windowWidth, windowHeight } = this.getWindowWidthAndHeight();
 
@@ -56,11 +56,13 @@ export default class ResizableDraggableDialog extends React.Component {
     }
 
     this.setState({
-      ...(doNotSetX
+      ...(doNotSetXOrWidth
         ? {}
-        : { x: Math.round(Math.max((windowWidth - widthToUse) / 2, 0)) }),
+        : {
+            x: Math.round(Math.max((windowWidth - widthToUse) / 2, 0)),
+            width: Math.min(widthToUse, windowWidth)
+          }),
       y: Math.round(Math.max((windowHeight - heightToUse) / 2, 0)),
-      width: Math.min(widthToUse, windowWidth),
       height: Math.min(Math.max(defaultDialogHeight, heightToUse), windowHeight)
     });
   };

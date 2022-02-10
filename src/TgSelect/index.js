@@ -405,7 +405,7 @@ export const singleItemPredicate = (queryString, item, isSimpleSearch) =>
       : (item.value && item.value.toLowerCase && item.value.toLowerCase()) || ""
   );
 
-function simplesearch(needle, haystack) {
+export function simplesearch(needle, haystack) {
   return (haystack || "").indexOf(needle) !== -1;
 }
 function tagOptionRender(vals) {
