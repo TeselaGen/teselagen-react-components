@@ -41,7 +41,7 @@ class AlertWrapper extends Component {
       thirdButtonText,
       thirdButtonIntent,
       canEscapeKeyCancel,
-      confirmButtonText,
+      confirmButtonText = "OK",
       cancelButtonText = "Cancel",
       intent = Intent.PRIMARY,
       ...rest
