@@ -65,7 +65,7 @@ class AlertWrapper extends Component {
           cancelButtonText: undefined
         })}
       >
-        <div style={{ padding: 5 }}>
+        <div className="bp3-alert-contents" style={{ padding: 5 }}>
           {content}
           {text && <div style={{ marginBottom: 10 }}>{text}</div>}
         </div>
@@ -85,6 +85,7 @@ class AlertWrapper extends Component {
             ) : (
               undefined
             ),
+            containerClassname: "bp3-alert-footer",
             backText: noCancelButton ? "" : cancelButtonText,
             text: confirmButtonText,
             intent

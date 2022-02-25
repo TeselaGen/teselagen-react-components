@@ -3,6 +3,7 @@
 import React from "react";
 import { Intent, Button, Classes } from "@blueprintjs/core";
 import { noop } from "lodash";
+import classNames from "classnames";
 
 function DialogFooter({
   hideModal = noop,
@@ -20,10 +21,11 @@ function DialogFooter({
   secondaryClassName = "",
   text = "Submit",
   disabled,
+  containerClassname,
   noCancel
 }) {
   return (
-    <div className={Classes.DIALOG_FOOTER}>
+    <div className={classNames(Classes.DIALOG_FOOTER, containerClassname)}>
       <div className={Classes.DIALOG_FOOTER_ACTIONS}>
         {onBackClick && (
           <Button
