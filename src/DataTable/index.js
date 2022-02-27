@@ -406,6 +406,26 @@ class DataTable extends React.Component {
     window.toastr.success(message);
   };
 
+  handleCopyTable = e => {
+    try {
+      const allRowEls = e.target
+        .closest(".data-table-container")
+        .querySelectorAll(".rt-tr");
+      if (!allRowEls || !allRowEls.length) {
+        return;
+      }
+      //get row elements and call this.handleCopyRow for each
+      const textToCopy = map(allRowEls, rowEl => this.getRowCopyText(rowEl))
+        .filter(text => text)
+        .join("\n");
+      if (!textToCopy) return window.toastr.warning("No text to copy");
+
+      this.handleCopyHelper(textToCopy, "Table copied");
+    } catch (error) {
+      console.error(`error:`, error);
+      window.toastr.error("Error copying rows.");
+    }
+  };
   handleCopySelectedRows = (selectedRecords, e) => {
     const { entities = [] } = computePresets(this.props);
     const idToIndex = entities.reduce((acc, e, i) => {
@@ -420,7 +440,7 @@ class DataTable extends React.Component {
       .sort();
 
     if (!rowNumbersToCopy.length) return;
-
+    rowNumbersToCopy.unshift(0); //add in the header row
     try {
       const allRowEls = e.target
         .closest(".data-table-container")
@@ -428,17 +448,11 @@ class DataTable extends React.Component {
       const rowEls = rowNumbersToCopy.map(i => allRowEls[i]);
 
       //get row elements and call this.handleCopyRow for each const rowEls = this.getRowEls(rowNumbersToCopy)
-      let textToCopy = map(rowEls, rowEl => this.getRowCopyText(rowEl))
+      const textToCopy = map(rowEls, rowEl => this.getRowCopyText(rowEl))
         .filter(text => text)
         .join("\n");
       if (!textToCopy) return window.toastr.warning("No text to copy");
-      const { columns } = this.state;
-      const headerRow = columns
-        .map(({ renderTitleInner, displayName, path }) => {
-          return renderTitleInner || displayName || startCase(path) || "";
-        })
-        .join("\t");
-      textToCopy = headerRow + "\n" + textToCopy;
+
       this.handleCopyHelper(textToCopy, "Selected rows copied");
     } catch (error) {
       console.error(`error:`, error);
@@ -1443,45 +1457,10 @@ class DataTable extends React.Component {
     });
     if (!itemsToRender && !isCopyable) return null;
     const copyMenuItems = [];
-    if (
-      isCopyable &&
-      (selectedRecords.length === 0 || selectedRecords.length === 1)
-    ) {
-      //compute the row here so we don't lose access to it
-      const cell =
-        e.target.querySelector(".tg-cell-wrapper") ||
-        e.target.closest(".tg-cell-wrapper") ||
-        e.target.closest(".rt-td");
-      const row = cell.closest(".rt-tr");
-      copyMenuItems.push(
-        <MenuItem
-          key="copySelectedRows"
-          onClick={() => {
-            this.handleCopyRow(row);
-            // loop through each cell in the row
-          }}
-          icon="clipboard"
-          text="Copy Row to Clipboard"
-        />
-      );
-    }
-    if (isCopyable && selectedRecords.length > 1) {
-      copyMenuItems.push(
-        <MenuItem
-          key="copySelectedRows"
-          onClick={() => {
-            this.handleCopySelectedRows(selectedRecords, e);
-            // loop through each cell in the row
-          }}
-          icon="clipboard"
-          text="Copy Selected Rows to Clipboard"
-        />
-      );
-    }
+
     e.persist();
     if (isCopyable) {
       //compute the cellWrapper here so we don't lose access to it
-
       const cellWrapper =
         e.target.querySelector(".tg-cell-wrapper") ||
         e.target.closest(".tg-cell-wrapper");
@@ -1496,16 +1475,58 @@ class DataTable extends React.Component {
               const text = this.getCellCopyText(cellWrapper);
               this.handleCopyHelper(text, "Cell copied");
             }}
-            icon="clipboard"
-            text="Copy Cell to Clipboard"
+            text="Cell"
           />
         );
       }
+      if (selectedRecords.length === 0 || selectedRecords.length === 1) {
+        //compute the row here so we don't lose access to it
+        const cell =
+          e.target.querySelector(".tg-cell-wrapper") ||
+          e.target.closest(".tg-cell-wrapper") ||
+          e.target.closest(".rt-td");
+        const row = cell.closest(".rt-tr");
+        copyMenuItems.push(
+          <MenuItem
+            key="copySelectedRows"
+            onClick={() => {
+              this.handleCopyRow(row);
+              // loop through each cell in the row
+            }}
+            text="Row"
+          />
+        );
+      } else if (selectedRecords.length > 1) {
+        copyMenuItems.push(
+          <MenuItem
+            key="copySelectedRows"
+            onClick={() => {
+              this.handleCopySelectedRows(selectedRecords, e);
+              // loop through each cell in the row
+            }}
+            text="Rows"
+          />
+        );
+      }
+      copyMenuItems.push(
+        <MenuItem
+          key="copyFullTableRows"
+          onClick={() => {
+            this.handleCopyTable(e);
+            // loop through each cell in the row
+          }}
+          text="Table"
+        />
+      );
     }
     const menu = (
       <Menu>
         {itemsToRender}
-        {copyMenuItems}
+        {copyMenuItems.length && (
+          <MenuItem icon="clipboard" key="copyOpts" text="Copy">
+            {copyMenuItems}
+          </MenuItem>
+        )}
       </Menu>
     );
     ContextMenu.show(menu, { left: e.clientX, top: e.clientY });
@@ -1624,6 +1645,7 @@ class DataTable extends React.Component {
     return (
       <div
         data-test={displayName || startCase(path)}
+        data-copy-text={displayName || startCase(path)}
         className={classNames("tg-react-table-column-header", {
           "sort-active": sortUp || sortDown
         })}
