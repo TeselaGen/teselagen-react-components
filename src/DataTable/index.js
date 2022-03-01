@@ -288,17 +288,20 @@ class DataTable extends React.Component {
     const lastSelectedEnt = getLastSelectedEntity(idMap);
 
     if (noSelect) return;
-
     if (lastSelectedEnt) {
-      const lastSelectedIndex = entities.findIndex(
+      let lastSelectedIndex = entities.findIndex(
         ent => ent === lastSelectedEnt
       );
-
       if (lastSelectedIndex === -1) {
-        entities.findIndex(
-          ent =>
-            ent.id === lastSelectedEnt.id || ent.code === lastSelectedEnt.code
-        );
+        if (lastSelectedEnt.id !== undefined) {
+          lastSelectedIndex = entities.findIndex(
+            ent => ent.id === lastSelectedEnt.id
+          );
+        } else if (lastSelectedEnt.code !== undefined) {
+          lastSelectedIndex = entities.findIndex(
+            ent => ent.code === lastSelectedEnt.code
+          );
+        }
       }
       if (lastSelectedIndex === -1) {
         return;
