@@ -1023,6 +1023,12 @@ export function showAppSpinner();
  *   thirdButtonIntent: 'primary'
  * });
  * console.info("confirm:", confirm); //logs "thirdButtonClicked" if the third button is clicked
+ * @example 
+ * const confirm = await showConfirmationDialog({
+ *   fourthButtonText: 'Click me'
+ *   fourthButtonIntent: 'danger'
+ * });
+ * console.info("confirm:", confirm); //logs "fourthButtonClicked" if the fourth button is clicked
  */
 export function showConfirmationDialog(showConfirmationDialogOpts) {
 
@@ -1034,6 +1040,10 @@ interface showConfirmationDialogOpts {
   noCancelButton: boolean;
   confirmButtonText: string;
   cancelButtonText: string;
+  thirdButtonText: string;
+  thirdButtonIntent: string;
+  fourthButtonText: string;
+  fourthButtonIntent: string;
   canEscapeKeyCancel: boolean;
 }
 

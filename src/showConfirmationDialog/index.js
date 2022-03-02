@@ -40,6 +40,8 @@ class AlertWrapper extends Component {
       className,
       thirdButtonText,
       thirdButtonIntent,
+      fourthButtonText,
+      fourthButtonIntent,
       canEscapeKeyCancel,
       confirmButtonText = "OK",
       cancelButtonText = "Cancel",
@@ -71,20 +73,37 @@ class AlertWrapper extends Component {
         </div>
         <DialogFooter
           {...{
-            onBackClick: cancelButtonText ? () => doClose(false) : undefined,
+            onBackClick:
+              cancelButtonText && !noCancelButton
+                ? () => doClose(false)
+                : undefined,
             onClick: () => doClose(true),
             noCancel: true,
-            additionalButtons: thirdButtonText ? (
-              <Button
-                intent={thirdButtonIntent}
-                text={thirdButtonText}
-                onClick={() => {
-                  doClose("thirdButtonClicked");
-                }}
-              ></Button>
-            ) : (
-              undefined
-            ),
+            additionalButtons:
+              thirdButtonText || fourthButtonText ? (
+                <React.Fragment>
+                  {!!fourthButtonText && (
+                    <Button
+                      intent={fourthButtonIntent}
+                      text={fourthButtonText}
+                      onClick={() => {
+                        doClose("fourthButtonClicked");
+                      }}
+                    ></Button>
+                  )}
+                  {!!thirdButtonText && (
+                    <Button
+                      intent={thirdButtonIntent}
+                      text={thirdButtonText}
+                      onClick={() => {
+                        doClose("thirdButtonClicked");
+                      }}
+                    ></Button>
+                  )}
+                </React.Fragment>
+              ) : (
+                undefined
+              ),
             containerClassname: "bp3-alert-footer",
             backText: noCancelButton ? "" : cancelButtonText,
             text: confirmButtonText,

@@ -12,10 +12,15 @@ export default function Demo() {
     type: "withThirdButton",
     label: "With Third Button"
   });
+  const [withFourth, withFourthComp] = useToggle({
+    type: "withFourthButton",
+    label: "With Fourth Button"
+  });
   return (
     <div>
       {noCancelComp}
       {withThirdComp}
+      {withFourthComp}
       <br></br>
       <br></br>
 
@@ -25,6 +30,10 @@ export default function Demo() {
             ...(withThird && {
               thirdButtonText: "Third Button",
               thirdButtonIntent: "primary"
+            }),
+            ...(withFourth && {
+              fourthButtonText: "Fourth Button",
+              fourthButtonIntent: "primary"
             }),
             noCancelButton: noCancel,
             text:
