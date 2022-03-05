@@ -585,6 +585,7 @@ export interface InputFieldProps extends GenericFormFieldProps { }
           innerText="Upload Sequences to Align (.ab1, .fasta, .gb)"
           accept={[".ab1", ".fasta", ".fa", ".gb", ".zip"]}
           style={{ maxWidth: 400 }}
+          readBeforeUpload //if passed file.parsedString will show up if the read is successful
           beforeUpload={async (files, onChange) => {...}}
         />
  * <FileUploadField accept={[".csv", ".xlsx"]} name="oligoFiles" />
