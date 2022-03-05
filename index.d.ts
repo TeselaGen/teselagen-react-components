@@ -586,7 +586,13 @@ export interface InputFieldProps extends GenericFormFieldProps { }
           accept={[".ab1", ".fasta", ".fa", ".gb", ".zip"]}
           style={{ maxWidth: 400 }}
           readBeforeUpload //if passed file.parsedString will show up if the read is successful
-          beforeUpload={async (files, onChange) => {...}}
+          beforeUpload={async (files, onChange) => {
+            try {
+              console.log(`files[0].parsedString:`,files[0].parsedString)
+            } catch (error) {
+              
+            }
+          }}
         />
  * <FileUploadField accept={[".csv", ".xlsx"]} name="oligoFiles" />
  * <FileUploadField
