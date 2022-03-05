@@ -589,8 +589,9 @@ export interface InputFieldProps extends GenericFormFieldProps { }
           beforeUpload={async (files, onChange) => {
             try {
               console.log(`files[0].parsedString:`,files[0].parsedString)
-            } catch (error) {
-              
+            } catch (e) {
+              console.error(`e:`,e)
+              window.toastr.error("Something went wrong with the file upload. Check the dev console for more details.")
             }
           }}
         />
