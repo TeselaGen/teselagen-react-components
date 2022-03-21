@@ -1,5 +1,6 @@
 /* eslint react/jsx-no-bind: 0 */
 import React, { useState } from "react";
+import { flatMap } from "lodash";
 import ReactDOM from "react-dom";
 import { arrayMove } from "react-sortable-hoc";
 import copy from "copy-to-clipboard";
@@ -383,13 +384,32 @@ class DataTable extends React.Component {
     if (!text) return window.toastr.warning("No text to copy");
     this.handleCopyHelper(text, "Row Copied");
   };
+  handleCopyColumn = (e, cellWrapper) => {
+    const cellType = cellWrapper.getAttribute("data-test");
+    const allRowEls = getAllRows(e);
+    if (!allRowEls) return;
+    const textToCopy = map(allRowEls, rowEl =>
+      this.getRowCopyText(rowEl, { cellType })
+    )
+      .filter(text => text)
+      .join("\n");
+    if (!textToCopy) return window.toastr.warning("No text to copy");
 
-  getRowCopyText = rowEl => {
+    this.handleCopyHelper(textToCopy, "Column copied");
+  };
+
+  getRowCopyText = (rowEl, { cellType } = {}) => {
     //takes in a row element
     if (!rowEl) return;
-    return map(rowEl.children, cellEl => {
+    return flatMap(rowEl.children, cellEl => {
       const cellChild = cellEl.querySelector(`[data-copy-text]`);
-      if (!cellChild) return;
+      if (!cellChild) {
+        if (cellType) return []; //strip it
+        return; //just leave it blank
+      }
+      if (cellType && cellChild.getAttribute("data-test") !== cellType) {
+        return [];
+      }
       return this.getCellCopyText(cellChild);
     }).join("\t");
   };
@@ -411,12 +431,8 @@ class DataTable extends React.Component {
 
   handleCopyTable = e => {
     try {
-      const allRowEls = e.target
-        .closest(".data-table-container")
-        .querySelectorAll(".rt-tr");
-      if (!allRowEls || !allRowEls.length) {
-        return;
-      }
+      const allRowEls = getAllRows(e);
+      if (!allRowEls) return;
       //get row elements and call this.handleCopyRow for each
       const textToCopy = map(allRowEls, rowEl => this.getRowCopyText(rowEl))
         .filter(text => text)
@@ -445,9 +461,8 @@ class DataTable extends React.Component {
     if (!rowNumbersToCopy.length) return;
     rowNumbersToCopy.unshift(0); //add in the header row
     try {
-      const allRowEls = e.target
-        .closest(".data-table-container")
-        .querySelectorAll(".rt-tr");
+      const allRowEls = getAllRows(e);
+      if (!allRowEls) return;
       const rowEls = rowNumbersToCopy.map(i => allRowEls[i]);
 
       //get row elements and call this.handleCopyRow for each const rowEls = this.getRowEls(rowNumbersToCopy)
@@ -1102,6 +1117,9 @@ class DataTable extends React.Component {
         } else if (mustClickCheckboxToSelect) {
           return;
         }
+        if (e.detail > 1) {
+          return; //cancel multiple quick clicks
+        }
         rowClick(e, rowInfo, entities, computePresets(this.props));
       },
       onContextMenu: e => {
@@ -1143,7 +1161,9 @@ class DataTable extends React.Component {
       "data-test-id": dataId,
       onDoubleClick: e => {
         if (rowDisabled) return;
-        onDoubleClick(rowInfo.original, rowInfo.index, history, e);
+        this.dblClickTriggered = true;
+        onDoubleClick &&
+          onDoubleClick(rowInfo.original, rowInfo.index, history, e);
       }
     };
   };
@@ -1474,11 +1494,19 @@ class DataTable extends React.Component {
             onClick={() => {
               //TODOCOPY: we need to make sure that the cell copy is being used by the row copy.. right now we have 2 different things going on
               //do we need to be able to copy hidden cells? It seems like it should just copy what's on the page..?
-
               const text = this.getCellCopyText(cellWrapper);
               this.handleCopyHelper(text, "Cell copied");
             }}
             text="Cell"
+          />
+        );
+        copyMenuItems.push(
+          <MenuItem
+            key="copyColumn"
+            onClick={() => {
+              this.handleCopyColumn(e, cellWrapper);
+            }}
+            text="Column"
           />
         );
       }
@@ -1762,4 +1790,14 @@ function getNewEntToSelect({
   } else {
     return newEntToSelect;
   }
+}
+
+function getAllRows(e) {
+  const allRowEls = e.target
+    .closest(".data-table-container")
+    .querySelectorAll(".rt-tr");
+  if (!allRowEls || !allRowEls.length) {
+    return;
+  }
+  return allRowEls;
 }

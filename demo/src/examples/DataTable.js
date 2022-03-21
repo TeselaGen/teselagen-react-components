@@ -471,6 +471,10 @@ class DataTableInstance extends React.Component {
         })}
         {renderToggle({
           that: this,
+          type: "onDoubleClick",
+        })}
+        {renderToggle({
+          that: this,
           type: "isOpenable",
           description: "Make sure withCheckboxes is off when using this"
         })}
@@ -646,12 +650,16 @@ class DataTableInstance extends React.Component {
             {...tableParams}
             entities={entitiesToPass}
             entityCount={entities.length}
-            onDoubleClick={function() {
-              console.info("double clicked");
-            }}
+            onDoubleClick={
+              this.state.onDoubleClick
+                ? function() {
+                    window.toastr.info("double clicked");
+                  }
+                : undefined
+            }
             shouldShowSubComponent={r => r.id !== 1}
             topLeftItems={<Button>I'm in topLeftItems</Button>}
-            SubComponent={this.state.withSubComponent ? SubComp : null}
+            SubComponent={this.state.withSubComponent ? SubComp : undefined}
             cellRenderer={{
               isShared: value => {
                 return (

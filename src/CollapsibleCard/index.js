@@ -74,7 +74,11 @@ export default class CollapsibleCard extends Component {
           <div>
             <Button
               icon={open ? "minimize" : "maximize"}
-              className={classNames(Classes.MINIMAL, "info-btn")}
+              className={classNames(
+                Classes.MINIMAL,
+                "info-btn",
+                "tg-collapse-toggle"
+              )}
               onClick={this.toggleCardInfo}
             />
           </div>

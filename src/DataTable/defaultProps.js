@@ -1,5 +1,6 @@
 import { noop } from "lodash";
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default {
   //NOTE: DO NOT SET DEFAULTS HERE FOR PROPS THAT GET COMPUTED AS PART OF PRESET GROUPS IN computePresets
   addFilters: noop,
@@ -20,7 +21,6 @@ export default {
   noSelect: false,
   noUserSelect: false,
   onDeselect: noop,
-  onDoubleClick: noop,
   onMultiRowSelect: noop,
   onRowClick: noop,
   onRowSelect: noop,

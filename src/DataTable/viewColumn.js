@@ -19,7 +19,12 @@ export const openColumn = {
         <Button
           onClick={e => {
             e.stopPropagation();
-            props.onDoubleClick(rowInfo.original, rowInfo.index, props.history);
+            props.onDoubleClick &&
+              props.onDoubleClick(
+                rowInfo.original,
+                rowInfo.index,
+                props.history
+              );
           }}
           minimal
           small
