@@ -710,8 +710,9 @@ export function getQueryParams({
       graphqlQueryParams.pageSize = 999;
       graphqlQueryParams.pageNumber = 1;
     } else {
-      graphqlQueryParams.pageNumber = page;
-      graphqlQueryParams.pageSize = ownProps.controlled_pageSize || pageSize;
+      graphqlQueryParams.pageNumber = Number(page);
+      graphqlQueryParams.pageSize =
+        ownProps.controlled_pageSize || Number(pageSize);
     }
 
     const { model } = schema;
