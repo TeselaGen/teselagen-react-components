@@ -815,7 +815,7 @@ export class ReactSelectField extends React.Component<
   any
 > { }
 
-export interface ReactSelectFieldProps extends GenericFormFieldProps {
+export interface ReactSelectFieldProps extends GenericFormFieldProps, TgSelectProps {
   multi: boolean;
 }
 // SelectField
