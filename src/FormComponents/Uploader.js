@@ -36,7 +36,14 @@ class Uploader extends Component {
       fileSetId: null
     };
   }
+  componentWillUnmount() {
+    this.cleanupFiles();
+  }
 
+  filesToClean = [];
+  cleanupFiles = () => {
+    this.filesToClean.forEach(file => URL.revokeObjectURL(file.preview));
+  };
   /* componentDidUpdate(prevProps) {
     if (prevProps.startUpload !== this.props.startUpload) {
       if (this.props.startUpload) {
@@ -244,6 +251,7 @@ class Uploader extends Component {
             accept={acceptToUse}
             {...{
               onDrop: async (acceptedFiles, rejectedFiles) => {
+                this.cleanupFiles();
                 if (rejectedFiles.length) {
                   let msg = "";
                   rejectedFiles.forEach(file => {
@@ -264,11 +272,14 @@ class Uploader extends Component {
                 if (fileLimit) {
                   acceptedFiles = acceptedFiles.slice(0, fileLimit);
                 }
+
                 acceptedFiles.forEach(file => {
+                  file.preview = URL.createObjectURL(file);
                   file.loading = true;
                   if (!file.id) {
                     file.id = shortid();
                   }
+                  this.filesToClean.push(file);
                 });
                 if (readBeforeUpload) {
                   acceptedFiles = await Promise.all(
