@@ -1,7 +1,9 @@
 var gql = require("graphql-tag");
 
-var a = awef;
-
+const a = ''
+if (a == 'asdf') {
+  
+}
 var frag = gql`
   fragment test on user {
     idawef
