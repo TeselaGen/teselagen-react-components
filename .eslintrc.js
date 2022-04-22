@@ -1,3 +1,12 @@
 module.exports = {
-	extends: "teselagen/react" 
-}
+  overrides: [
+    {
+      files: ["*.js"],
+      processor: "@graphql-eslint/graphql",
+      plugins: ["@graphql-eslint"],
+      parserOptions: {
+        schema: "../../server/src/graphql-lims/schema/schema.gql",
+      },
+    },
+  ],
+};
