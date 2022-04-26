@@ -1401,8 +1401,6 @@ class DataTable extends React.Component {
         const val = oldFunc(...args);
         const text = this.getCopyTextForCell(val, row, column);
 
-        let oldTitle = typeof val !== "string" ? args[0].value : val;
-        if (oldTitle) oldTitle = String(oldTitle);
         //wrap the original tableColumn.Cell function in another div in order to add a title attribute
         let title = text;
         if (getCellHoverText) title = getCellHoverText(...args);
@@ -1453,17 +1451,29 @@ class DataTable extends React.Component {
     } else if (text) {
       text = String(text);
     }
-    if (React.isValidElement(text)) {
-      if (text.props?.to) {
-        // this will convert Link elements to url strings
-        text = joinUrl(
-          window.location.origin,
-          window.frontEndConfig?.clientBasePath || "",
-          text.props.to
-        );
+    const getTextFromElementOrLink = text => {
+      if (React.isValidElement(text)) {
+        if (text.props?.to) {
+          // this will convert Link elements to url strings
+          return joinUrl(
+            window.location.origin,
+            window.frontEndConfig?.clientBasePath || "",
+            text.props.to
+          );
+        } else {
+          return getTextFromEl(text);
+        }
       } else {
-        text = getTextFromEl(text);
+        return text;
       }
+    };
+    text = getTextFromElementOrLink(text);
+
+    if (Array.isArray(text)) {
+      let arrText = text.map(getTextFromElementOrLink).join(", ");
+      // because we sometimes insert commas after links when mapping over an array of elements we will have double ,'s
+      arrText = arrText.replace(/, ,/g, ",");
+      text = arrText;
     }
 
     const stringText = toString(text);
