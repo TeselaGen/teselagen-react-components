@@ -6,6 +6,7 @@ import fuzzysearch from "fuzzysearch";
 import classNames from "classnames";
 // import Tag from "../Tag";
 import "./style.css";
+import { withProps } from "recompose";
 import getTextFromEl from "../utils/getTextFromEl";
 import { getTagColorStyle, getTagProps } from "../utils/tagUtils";
 import popoverOverflowModifiers from "../utils/popoverOverflowModifiers";
@@ -128,17 +129,13 @@ class TgSelect extends React.Component {
   };
 
   itemPredicate = (queryString, item) => {
-    const { value, multi, isSimpleSearch } = this.props;
-    if (multi) {
-      const valArray = getValueArray(value);
+    // this will hide an option if it returns false
+    // each item is an individual option item
+    const { isSimpleSearch } = this.props;
 
-      const filteredVals = filter(value, obj =>
-        !obj ? false : !isEqual(obj.value, item.value)
-      );
-      if (filteredVals.length !== valArray.length) return false;
-    }
     return singleItemPredicate(queryString, item, isSimpleSearch);
   };
+
   onQueryChange = query => {
     const { onInputChange = () => {} } = this.props;
     this.setState({
@@ -314,6 +311,7 @@ class TgSelect extends React.Component {
         onQueryChange={this.onQueryChange}
         itemRenderer={this.itemRenderer}
         itemPredicate={this.itemPredicate}
+        itemListPredicate={this.itemListPredicate}
         {...{
           selectedItems,
           tagRenderer: this.tagRenderer,
@@ -367,7 +365,25 @@ class TgSelect extends React.Component {
     );
   }
 }
-export default TgSelect;
+export default withProps(props => {
+  const { multi, value, options } = props;
+  let optionsToRet = options;
+  // based on incoming value hide those selected options from the option list
+  if (multi && value) {
+    const valArray = getValueArray(value);
+    optionsToRet = options.filter(op => {
+      const isOptionSelected = valArray.some(val => {
+        if (!val) return false;
+        const matching = isEqual(val.value, op.value);
+        return matching;
+      });
+      return !isOptionSelected;
+    });
+  }
+  return {
+    options: optionsToRet
+  };
+})(TgSelect);
 
 const itemDisabled = i => i.disabled;
 const noResultsDefault = <div>No Results...</div>;

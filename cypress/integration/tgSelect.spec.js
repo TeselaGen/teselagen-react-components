@@ -33,4 +33,16 @@ describe("tgSelect", () => {
     cy.get(".tg-select input").type("a");
     cy.contains(".bp3-menu-item", `Create "heya"`).should("exist");
   });
+
+  it("passing in static options should still render and filter list correctly", () => {
+    cy.tgToggle("withStaticOptions");
+    cy.tgToggle("multi");
+    cy.get(".tg-select input").type("op");
+    cy.contains(".tg-select-option", "option 1").click();
+    cy.contains(".tg-select-option", "option 2");
+    cy.contains(".tg-select-option", "option 1").should("not.exist");
+    cy.contains(".tg-select-option", "option 2").click();
+    cy.contains(".tg-select-option", "option 1").should("not.exist");
+    cy.contains(".tg-select-option", "option 2").should("not.exist");
+  });
 });
