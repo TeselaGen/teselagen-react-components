@@ -26,6 +26,7 @@ class TgSelect extends React.Component {
   static defaultProps = {
     onChange: () => {},
     options: [],
+    unfilteredOptions: [],
     value: undefined
   };
 
@@ -216,6 +217,7 @@ class TgSelect extends React.Component {
     const {
       multi,
       options,
+      unfilteredOptions,
       value,
       creatable,
       optionRenderer, //pull this one out here so it doesn't get passsed along
@@ -275,7 +277,8 @@ class TgSelect extends React.Component {
     const selectedItems = getValueArray(value).map(value => {
       if (value && value.label) return value; //if the value has a label, just use that
       //if not, look for an existing option to use that value
-      return options.find(
+      // unfilteredOptions will have every option included selected ones
+      return unfilteredOptions.find(
         opt => opt && opt.value === ((value && value.value) || value)
       );
     });
@@ -381,6 +384,8 @@ export default withProps(props => {
     });
   }
   return {
+    // unfilteredOptions is needed for finding selected items
+    unfilteredOptions: options,
     options: optionsToRet
   };
 })(TgSelect);
