@@ -89,6 +89,7 @@ class MenuBar extends React.Component {
               onQueryChange={val => {
                 this.setState({ helpItemQueryStringTracker: val });
               }}
+              className="tg-menu-bar-help-search"
               resetOnSelect={false}
               resetOnClose={true}
               inputProps={{
