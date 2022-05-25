@@ -1284,6 +1284,9 @@ class DataTable extends React.Component {
               <InfoHelper
                 content={showCollapseAll ? "Collapse All" : "Expand All"}
                 isButton
+                minimal
+                small
+                style={{ padding: 2 }}
                 popoverProps={{
                   modifiers: {
                     preventOverflow: { enabled: false },
@@ -1301,11 +1304,7 @@ class DataTable extends React.Component {
                         }, {})
                       );
                 }}
-                className={classNames(
-                  "tg-expander-all",
-                  Classes.MINIMAL,
-                  Classes.SMALL
-                )}
+                className={classNames("tg-expander-all")}
                 icon={showCollapseAll ? "chevron-down" : "chevron-right"}
               />
             );
