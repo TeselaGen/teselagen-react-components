@@ -401,6 +401,7 @@
 
 .ReactTable .rt-noData {
   z-index: unset;
+  margin-top: 5px;
 }
 
 /* dark styles */
