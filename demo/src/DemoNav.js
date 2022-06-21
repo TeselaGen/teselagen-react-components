@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import isMobile from "is-mobile";
-
 import "./style.css";
 import { Button } from "@blueprintjs/core";
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default ({ demos }) => {
   const [isOpen, setIsOpen] = useState(!isMobile());
 

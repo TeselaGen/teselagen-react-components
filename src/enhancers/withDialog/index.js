@@ -3,7 +3,7 @@ import { Dialog } from "@blueprintjs/core";
 import { connect } from "react-redux";
 import { lifecycle, compose } from "recompose";
 import { camelCase } from "lodash";
-import shortid from "shortid";
+import { nanoid } from "nanoid";
 import ResizableDraggableDialog from "../../ResizableDraggableDialog";
 
 /**
@@ -139,7 +139,7 @@ export default function withDialog(topLevelDialogProps) {
     lifecycle({
       componentWillMount: function() {
         const { dispatch, dialogName } = this.props;
-        const uniqueName = shortid();
+        const uniqueName = nanoid();
         const nameToUse = dialogName || uniqueName;
         this.setState({
           nameToUse,

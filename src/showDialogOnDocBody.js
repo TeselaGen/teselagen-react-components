@@ -2,13 +2,13 @@ import ReactDOM from "react-dom";
 import React from "react";
 // import withDialog from "./enhancers/withDialog";
 import { Dialog } from "@blueprintjs/core";
-import shortid from "shortid";
+import { nanoid } from "nanoid";
 
 //this is only really useful for unconnected standalone simple dialogs
 //remember to pass usePortal={false} to the <Dialog/> component so it will close properly
 export default function showDialogOnDocBody(DialogComp, options = {}) {
   const dialogHolder = document.createElement("div");
-  const className = "myDialog" + shortid();
+  const className = "myDialog" + nanoid();
   dialogHolder.className = className;
   document.body.appendChild(dialogHolder);
   const onClose = () => {
@@ -18,12 +18,7 @@ export default function showDialogOnDocBody(DialogComp, options = {}) {
   if (options.addDialogContainer) {
     DialogCompToUse = props => {
       return (
-        <Dialog
-          usePortal={false}
-          title={"pass a {title} prop"}
-          isOpen
-          {...props}
-        >
+        <Dialog usePortal={false} title="pass a {title} prop" isOpen {...props}>
           <DialogComp
             {...props}
             hideModal={onClose}
