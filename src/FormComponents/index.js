@@ -193,6 +193,7 @@ class AbstractInput extends React.Component {
       startAssigningDefault,
       input,
       noFillField,
+      isRequired,
       isLoadingDefaultValue
     } = this.props;
     const { touched, error, warning } = meta;
@@ -237,6 +238,12 @@ class AbstractInput extends React.Component {
       return "Loading default value...";
     }
 
+    let labelInfo = secondaryLabel;
+
+    if (isRequired && !labelInfo) {
+      labelInfo = "(required)";
+    }
+
     return (
       <FormGroup
         className={classNames(className, testClassName, {
@@ -258,7 +265,7 @@ class AbstractInput extends React.Component {
           )
         }
         inline={inlineLabel}
-        labelInfo={secondaryLabel}
+        labelInfo={labelInfo}
         style={{
           ...(noMarginBottom && { marginBottom: 0 }),
           ...containerStyle
@@ -1019,6 +1026,7 @@ export function generateField(component, opts) {
       name,
       component,
       ...(isRequired && { validate: fieldRequired }),
+      isRequired,
       ...rest
     };
 
