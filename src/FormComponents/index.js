@@ -240,7 +240,8 @@ class AbstractInput extends React.Component {
 
     let labelInfo = secondaryLabel;
 
-    if (isRequired && !labelInfo) {
+    const hasOuterLabel = !noOuterLabel && !isLabelTooltip;
+    if (isRequired && hasOuterLabel && label && !labelInfo) {
       labelInfo = "(required)";
     }
 
@@ -255,8 +256,7 @@ class AbstractInput extends React.Component {
         helperText={helperText}
         intent={intent}
         label={
-          !isLabelTooltip &&
-          !noOuterLabel && (
+          hasOuterLabel && (
             <LabelWithTooltipInfo
               labelStyle={labelStyle}
               label={label}
