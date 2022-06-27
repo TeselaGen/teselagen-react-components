@@ -1050,6 +1050,7 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
       generateDefaultValue,
       defaultValueByIdOverride,
       defaultValue: defaultValueFromProps,
+      isRequired,
       ...rest
     } = props;
     //get is assign defaults mode
@@ -1191,6 +1192,7 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
         {...{
           ...opts,
           defaultValCount,
+          isRequired,
           ...defaultProps,
           isLoadingDefaultValue,
           showGenerateDefaultDot:
