@@ -8,7 +8,7 @@ import Toastr from "./examples/Toastr";
 import showConfirmationDialogDemo from "./examples/showConfirmationDialogDemo";
 import ResizableDraggableDialogDemo from "./examples/ResizableDraggableDialog";
 import CustomIcons from "./examples/CustomIcons";
-import CSSOnlyToolTip from "./examples/CSSOnlyToolTip";
+import EllipsizedTextAutoTooltip from "./examples/EllipsizedTextAutoTooltip";
 import SimpleTable from "./examples/SimpleTable";
 import TgSelectDemo from "./examples/TgSelectDemo";
 import InfoHelper from "./examples/InfoHelper";
@@ -226,8 +226,8 @@ const demos = {
   customIcons: {
     demo: CustomIcons
   },
-  "CSS-Only ToolTip": {
-    demo: CSSOnlyToolTip
+  "Ellipsized Text Auto-Tooltip": {
+    demo: EllipsizedTextAutoTooltip
   },
   FillWindow: {
     demo: FillWindowExample
@@ -309,12 +309,14 @@ function DemoComponentWrapper(
       <React.Fragment>
         <div
           style={{
-            display: "flex",
             marginBottom: 20,
-            justifyContent: "space-between"
+            justifyContent: "space-between",
+            width: "100%",
+            display: 'flex'
           }}
         >
           <h4>{demoTitle}</h4>
+          <br></br>
           <a
             href={
               "https://github.com/TeselaGen/teselagen-react-components/tree/master/src"
@@ -350,7 +352,8 @@ const Demo = () => {
             <div
               style={{
                 padding: 10,
-                minWidth: 0
+                minWidth: 0,
+                width: "100%"
               }}
             >
               <Route

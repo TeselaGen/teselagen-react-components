@@ -471,7 +471,7 @@ class DataTableInstance extends React.Component {
         })}
         {renderToggle({
           that: this,
-          type: "onDoubleClick",
+          type: "onDoubleClick"
         })}
         {renderToggle({
           that: this,

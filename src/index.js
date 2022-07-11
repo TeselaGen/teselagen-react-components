@@ -1,4 +1,5 @@
 import "./style.css";
+import "./autoTooltip";
 export * from "./AssignDefaultsModeContext";
 export { default as Uploader } from "./FormComponents/Uploader";
 export { mergeSchemas } from "./DataTable/utils/convertSchema";
