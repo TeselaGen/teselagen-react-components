@@ -9868,9 +9868,10 @@ text-table@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
 
-tg-client-query-builder@^2.13.1:
-  version "2.13.1"
-  resolved "https://registry.yarnpkg.com/tg-client-query-builder/-/tg-client-query-builder-2.13.1.tgz#f5e2bf5238fcf49038b962f2ec2cad93853154a9"
+tg-client-query-builder@^2.14.2:
+  version "2.14.2"
+  resolved "https://registry.yarnpkg.com/tg-client-query-builder/-/tg-client-query-builder-2.14.2.tgz#47c0cc7eaf67f68773b059228537e8c2f8f092ef"
+  integrity sha512-gYDXwZj1lc9T4qF5l04+zLVpOGsNEDQbttjbIEhyRMV0bPM4f7XdLMNod86XBZw/4fpbePpzrgYQbCycxA5vFw==
   dependencies:
     lodash "^4.17.4"
 

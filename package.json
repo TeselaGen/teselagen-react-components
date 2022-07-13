@@ -48,7 +48,7 @@
     "react-transition-group": "^2.4.0",
     "recompose": "npm:react-recompose@0.31.1",
     "redux-form": "^8.3.8",
-    "tg-client-query-builder": "^2.13.1",
+    "tg-client-query-builder": "^2.14.2",
     "tippy.js": "^6.3.7",
     "url-join": "^4.0.1",
     "use-deep-compare-effect": "^1.6.1"
