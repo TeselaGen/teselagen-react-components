@@ -27,12 +27,12 @@ import ScrollToTopDemo from "./examples/ScrollToTop";
 import showAppSpinnerDemo from "./examples/showAppSpinnerDemo";
 
 import "./style.css";
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { render } from "react-dom";
 import { HashRouter as Router, Route, Redirect } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./store";
-import { FocusStyleManager } from "@blueprintjs/core";
+import { Card, Classes, Colors, FocusStyleManager } from "@blueprintjs/core";
 import isMobile from "is-mobile";
 import AdvancedOptionsDemo from "./examples/AdvancedOptionsDemo";
 
@@ -87,15 +87,7 @@ const demos = {
     ]
   },
   TgSelect: {
-    demo: TgSelectDemo,
-    props: [
-      {
-        name: "className",
-        description:
-          "The CSS class name passed to the Button (if Popover) or Tooltip",
-        type: "string"
-      }
-    ]
+    demo: TgSelectDemo
   },
   CollapsibleCard: {
     demo: CollapsibleCard,
@@ -312,7 +304,7 @@ function DemoComponentWrapper(
             marginBottom: 20,
             justifyContent: "space-between",
             width: "100%",
-            display: 'flex'
+            display: "flex"
           }}
         >
           <h4>{demoTitle}</h4>
@@ -342,7 +334,7 @@ const Demo = () => {
           <div
             style={{
               display: isMobile() ? "inherit" : "flex",
-              padding: isMobile() ? 10 : 40,
+              paddingTop: 50, // add header
               maxWidth: "100%",
               minWidth: 0,
               width: "100%"
@@ -350,8 +342,10 @@ const Demo = () => {
           >
             <DemoNav demos={demos} />
             <div
+              className="demo-area-container"
               style={{
-                padding: 10,
+                overflow: "auto",
+                padding: 40,
                 minWidth: 0,
                 width: "100%"
               }}

@@ -29,27 +29,33 @@ class DemoHeader extends Component {
   render() {
     const { darkTheme } = this.state;
     return (
-      <div className="demo-header">
-        <VersionSwitcher></VersionSwitcher>
-        <div style={{ position: "fixed", top: 10, right: 10 }}>
-          <Tooltip
-            content={darkTheme ? "Light Theme" : "Dark Theme"}
-            key="theme"
-          >
-            <Button
-              icon={darkTheme ? "flash" : "moon"}
-              className={classNames(Classes.MINIMAL, "tg-dark-theme-button")}
-              onClick={() => this.toggleTheme()}
-            />
-          </Tooltip>
-        </div>
-        
+      <div
+        className="demo-header"
+        style={{
+          position: "fixed",
+          display: "flex",
+          justifyContent: "space-between",
+          padding: "5px 20px",
+          height: 50,
+          zIndex:20,
+          alignItems: "center"
+        }}
+      >
+        <VersionSwitcher />
+
         <a
           style={{ fontSize: 16, color: "white" }}
           href="https://github.com/TeselaGen/teselagen-react-components"
         >
           TeselaGen React Components <Icon icon="link" />
         </a>
+        <Tooltip content={darkTheme ? "Light Theme" : "Dark Theme"} key="theme">
+          <Button
+            icon={darkTheme ? "flash" : "moon"}
+            className={classNames(Classes.MINIMAL, "tg-dark-theme-button")}
+            onClick={() => this.toggleTheme()}
+          />
+        </Tooltip>
       </div>
     );
   }

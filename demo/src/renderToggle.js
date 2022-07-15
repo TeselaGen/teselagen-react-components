@@ -44,7 +44,7 @@ export function renderToggleInner({
   const labelOrText = label ? <span>{label}</span> : type;
   const sharedProps = {
     "data-test": type || label,
-    style: { margin: "0px 30px", marginTop: 4 },
+    style: { marginTop: 4 },
     label: labelOrText,
     text: labelOrText,
     ...rest
@@ -77,6 +77,7 @@ export function renderToggleInner({
   }
   return (
     <div style={{ display: "flex" }} className="toggle-button-holder">
+      {toggleOrButton}
       {(description || info) && (
         <InfoHelper
           isPopover
@@ -88,7 +89,6 @@ export function renderToggleInner({
           <ReactMarkdown source={description || info} />
         </InfoHelper>
       )}
-      {toggleOrButton}
     </div>
   );
 }

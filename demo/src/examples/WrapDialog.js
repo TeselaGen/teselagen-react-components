@@ -16,7 +16,6 @@ function DialogInner(p) {
   return (
     <form
       onSubmit={e => {
-        
         e.preventDefault();
         setSubmitting(true);
         setTimeout(() => {
@@ -121,12 +120,15 @@ export default function WrapDialogDemo() {
   return (
     <Provider store={store}>
       <div>
-        <MyDialog
-          hideModal={() => {
-            setOpen(false);
-          }}
-          isOpen={isOpen}
-        ></MyDialog>
+        <Button text="Open Dialog" onClick={() => setOpen(true)} />
+        {isOpen && (
+          <MyDialog
+            hideModal={() => {
+              setOpen(false);
+            }}
+            isOpen={isOpen}
+          ></MyDialog>
+        )}
       </div>
     </Provider>
   );

@@ -18,10 +18,11 @@ import {
   proteinIcon,
   tubeIcon
 } from "../../../src/customIcons";
+import DemoWrapper from "../DemoWrapper";
 
 export default function CustomIconsDemo() {
   return (
-    <div>
+    <DemoWrapper>
       <h3>Instuctions for adding more icons:</h3>
       <h4>
         open `src/customIcons.js` and add a new exported svg with a name of
@@ -47,7 +48,6 @@ export default function CustomIconsDemo() {
       <Button icon={sharedDriveIcon} text="sharedDriveIcon" />
       <Button icon={proteinIcon} text="proteinIcon" />
       <Button icon={tubeIcon} text="tubeIcon" />
-    </div>
+    </DemoWrapper>
   );
 }
-

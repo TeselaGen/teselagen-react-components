@@ -29,8 +29,9 @@ import "tippy.js/dist/tippy.css";
       let dataTip;
       let el = element;
       for (let index = 0; index < levels; index++) {
+        if (!el) continue;
         dataTip = el.getAttribute("data-tip");
-        if (dataTip || !el) continue;
+        if (dataTip) continue;
         el = element.parentElement;
       }
       if (dataTip) {

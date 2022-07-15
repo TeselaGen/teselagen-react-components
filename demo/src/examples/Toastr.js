@@ -1,10 +1,11 @@
 import { Button } from "@blueprintjs/core";
 import React from "react";
+import DemoWrapper from "../DemoWrapper";
 
 let showFirst = true;
 export default function Demo() {
   return (
-    <div>
+    <DemoWrapper>
       There is a one time set up to get the window.toastr object. All you need
       to do is add
       <br></br>
@@ -58,9 +59,7 @@ export default function Demo() {
         }}
         text="Click me once and click again to see that toast updated"
       ></Button>
-      <div style={{ marginTop: 4000 }}>
-        scroll
-      </div>
-    </div>
+      <div style={{ marginTop: 4000 }}>scroll</div>
+    </DemoWrapper>
   );
 }

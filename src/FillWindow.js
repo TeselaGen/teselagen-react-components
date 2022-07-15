@@ -21,7 +21,7 @@ export default class FillWindow extends React.Component {
   // }
 
   render() {
-    let w = window,
+    const w = window,
       d = document,
       e = d.documentElement,
       g = d.getElementsByTagName("body")[0],
@@ -41,7 +41,7 @@ export default class FillWindow extends React.Component {
     if (this.props.disabled) return this.props.children(windowDimensions);
     return (
       <div
-        className={"tg-fillWindow " + className || ""}
+        className={"tg-fillWindow " + (className || "")}
         style={{
           ...style,
           width,

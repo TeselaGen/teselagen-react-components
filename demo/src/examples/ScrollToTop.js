@@ -1,8 +1,11 @@
 import React from "react";
 import ScrollToTop from "../../../src/ScrollToTop";
 
-export default () => (
-  <div style={{ height: "400vh" }}>
-    <ScrollToTop />
-  </div>
-);
+export default function ScrollToTopDemo() {
+  return (
+    <div style={{ height: "400vh" }}>
+      scroll down to show
+      <ScrollToTop scrollContainer={document.getElementsByClassName("demo-area-container")[0]} />
+    </div>
+  );
+}

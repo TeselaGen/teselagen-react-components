@@ -1,6 +1,8 @@
 import { Button, Intent } from "@blueprintjs/core";
 import React from "react";
 import showConfirmationDialog from "../../../src/showConfirmationDialog";
+import DemoWrapper from "../DemoWrapper";
+import OptionsSection from "../OptionsSection";
 import { useToggle } from "../renderToggle";
 
 export default function Demo() {
@@ -18,37 +20,39 @@ export default function Demo() {
   });
   return (
     <div>
-      {noCancelComp}
-      {withThirdComp}
-      {withFourthComp}
-      <br></br>
-      <br></br>
+      <OptionsSection>
+        {noCancelComp}
+        {withThirdComp}
+        {withFourthComp}
+      </OptionsSection>
 
-      <Button
-        onClick={async function handleClick() {
-          const confirm = await showConfirmationDialog({
-            ...(withThird && {
-              thirdButtonText: "Third Button",
-              thirdButtonIntent: "primary"
-            }),
-            ...(withFourth && {
-              fourthButtonText: "Fourth Button",
-              fourthButtonIntent: "primary"
-            }),
-            noCancelButton: noCancel,
-            text:
-              "Are you sure you want to re-run this tool? Downstream tools with linked outputs will need to be re-run as well!",
-            intent: Intent.DANGER, //applied to the right most confirm button
-            confirmButtonText: "Yep!",
-            cancelButtonText: "Nope", //pass null to make the cancel button disappear
-            // cancelButtonText: null, //pass null to make the cancel button disappear
-            canEscapeKeyCancel: true //this is false by default
-          });
-          console.info("confirm:", confirm);
-          window.toastr.success(`confirm =  ${confirm}`);
-        }}
-        text="Do some action"
-      />
+      <DemoWrapper>
+        <Button
+          onClick={async function handleClick() {
+            const confirm = await showConfirmationDialog({
+              ...(withThird && {
+                thirdButtonText: "Third Button",
+                thirdButtonIntent: "primary"
+              }),
+              ...(withFourth && {
+                fourthButtonText: "Fourth Button",
+                fourthButtonIntent: "primary"
+              }),
+              noCancelButton: noCancel,
+              text:
+                "Are you sure you want to re-run this tool? Downstream tools with linked outputs will need to be re-run as well!",
+              intent: Intent.DANGER, //applied to the right most confirm button
+              confirmButtonText: "Yep!",
+              cancelButtonText: "Nope", //pass null to make the cancel button disappear
+              // cancelButtonText: null, //pass null to make the cancel button disappear
+              canEscapeKeyCancel: true //this is false by default
+            });
+            console.info("confirm:", confirm);
+            window.toastr.success(`confirm =  ${confirm}`);
+          }}
+          text="Do some action"
+        />
+      </DemoWrapper>
     </div>
   );
 }

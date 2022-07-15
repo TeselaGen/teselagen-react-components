@@ -2,11 +2,13 @@ body {
   margin: 0;
   padding: 0;
   width: 100%;
+  overflow: hidden;
 }
 #demo {
   width: 100%;
 }
 html {
+  margin: 0;
   width: 100%;
 }
 
@@ -36,12 +38,6 @@ h6 {
 /* .toggle-button-holder span {
   margin-left: 30px;
 } */
-
-.demo-nav-container {
-  display: flex;
-  flex-direction: column;
-  width: 350px;
-}
 
 .demo-nav-popover {
   padding: 12px;
@@ -95,4 +91,48 @@ h6 {
   overflow: auto;
   max-height: 600px;
   margin-left: 60px;
+}
+
+.demo-area-container {
+  background: #f6f7f9;
+  height: calc(100vh - 50px);
+  overflow: auto;
+}
+
+.bp3-dark .demo-area-container {
+  background: #2f343c;
+}
+
+.demo-nav-container {
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 rgb(17 20 24 / 15%);
+  height: calc(100vh - 50px);
+  overflow-y: auto;
+}
+
+.bp3-dark .demo-nav-container {
+  background: #383e47;
+}
+
+.options-section {
+  background: #edeff2;
+  padding: 15px 30px 10px 30px;
+  margin-bottom: 20px;
+  display: table;
+  border-radius: 4px;
+}
+
+.bp3-dark .options-section {
+  background: #383e47;
+}
+
+.demo-wrapper {
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.bp3-dark .demo-wrapper {
+  background: #252a31;
 }

@@ -1,6 +1,8 @@
 import { Button } from "@blueprintjs/core";
 import React from "react";
 import DataTable from "../../../src/DataTable";
+import DemoWrapper from "../DemoWrapper";
+import OptionsSection from "../OptionsSection";
 import { useToggle } from "../renderToggle";
 
 const schema = {
@@ -24,21 +26,21 @@ const schema = {
 
 const entities = [
   {
-    url: '[Duck Duck Go](https://duckduckgo.com)',
+    url: "[Duck Duck Go](https://duckduckgo.com)",
     name: "Thomas",
     id: "1",
     type: "new",
     weather: "cloudy"
   },
   {
-    url: 'https://froogle.com',
+    url: "https://froogle.com",
     name: "Taoh",
     id: "2",
     type: "old",
     weather: "cloudy"
   },
   {
-    url: 'https://google.com',
+    url: "https://google.com",
     name: "Chris",
     id: "3",
     type: "new",
@@ -53,21 +55,21 @@ const entities = [
     weather: "cloudy"
   },
   {
-    url: '**more markdown**',
+    url: "**more markdown**",
     name: "Adam",
     id: "5",
     type: "new",
     weather: "cloudy"
   },
   {
-    url: '# https://google.com',
+    url: "# https://google.com",
     name: "Kyle",
     id: "6",
     type: "old",
     weather: "cloudy"
   },
   {
-    url: 'https://google.com',
+    url: "https://google.com",
     name: "Tiff",
     id: "7",
     type: "new",
@@ -84,23 +86,27 @@ export default function SimpleTable(p) {
   });
   return (
     <div>
-      {isEntityDisabledComp}
-      {withCheckboxesComp}
-      <DataTable
-        formName="simpleTable"
-        isSimple
-        withCheckboxes={withCheckboxes}
-        entities={entities}
-        schema={schema}
-        isEntityDisabled={
-          isEntityDisabled
-            ? ent => ent.name === "Chris" || ent.name === "Sam"
-            : undefined
-        }
-        {...p}
-      >
-        <div>hey</div>
-      </DataTable>
+      <OptionsSection>
+        {isEntityDisabledComp}
+        {withCheckboxesComp}
+      </OptionsSection>
+      <DemoWrapper>
+        <DataTable
+          formName="simpleTable"
+          isSimple
+          withCheckboxes={withCheckboxes}
+          entities={entities}
+          schema={schema}
+          isEntityDisabled={
+            isEntityDisabled
+              ? ent => ent.name === "Chris" || ent.name === "Sam"
+              : undefined
+          }
+          {...p}
+        >
+          <div>hey, I am the child</div>
+        </DataTable>
+      </DemoWrapper>
     </div>
   );
 }

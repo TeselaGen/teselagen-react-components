@@ -46,13 +46,14 @@ export default function VersionSwitcher() {
   }, []);
 
   const inner = options.length ? (
-    <div>
+    <div style={{ color: "#f5f8fa" }}>
       <div style={{ height: "100%", display: "inline-block" }}>Version:</div>{" "}
       <HTMLSelect
         small
         minimal
+        style={{ color: "#f5f8fa" }}
         onChange={function onChange(e) {
-          window.location.href = `https://teselagen.github.io/teselagen-react-components/version/${e.currentTarget.value}/#/Editor`;
+          window.location.href = `https://teselagen.github.io/teselagen-react-components/version/${e.currentTarget.value}`;
         }}
         value={pjson.version}
         options={options}
@@ -62,5 +63,5 @@ export default function VersionSwitcher() {
     //fallback to just showing the version
     <div style={{}}>Version: {pjson.version}</div>
   );
-  return <div style={{ position: "fixed", top: 10, left: 20 }}>{inner}</div>;
+  return <div>{inner}</div>;
 }
