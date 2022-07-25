@@ -64,6 +64,7 @@ export default class MenuBarDemo extends React.Component {
           // console.log(`ret:`,ret)
           // return ret
         },
+        // hiddenButSearchableText: "I'm hidden but searchable",
         handler: () => {
           this.setState({ isChecked: !this.state.isChecked });
         }
@@ -170,6 +171,7 @@ export default class MenuBarDemo extends React.Component {
           },
           {
             shouldDismissPopover: false,
+            hiddenButSearchableText: "I'm hidden but searchable",
             cmd: "cmdWithTicks"
           },
           {
@@ -733,22 +735,25 @@ export default class MenuBarDemo extends React.Component {
         />
         <br />
         <p>
-          The <code>menu</code> prop must be an array of objects with{" "}
-          <code>text</code> and
-          <code>submenu</code> properties. Each <code>submenu</code> is itself
-          an array of item descriptor objects or <code>MenuItem</code> elements.
-          Item descriptors may contain several properties, namely{" "}
-          <code>text</code>,<code>icon</code>, <code>label</code>,{" "}
-          <code>hotkey</code>, <code>onClick</code>,<code>tooltip</code>,{" "}
-          <code>key</code>, <code>divider</code>, <code>navTo</code>,
-          <code>href</code>, <code>target</code> and <code>submenu</code>. You
-          may also include custom fields and have custom menu enhancers derive
-          other props from them. For example, the <code>cmd</code> property can
-          be used in combination with the <code>commandMenuEnhancer</code> to
-          link menu items with commands, wiring not only the handler, but also
-          the hotkeys, icon, disabled and active states, name, etc. Check the{" "}
-          <code>DynamicMenuItem</code> component and
-          <code>commandMenuEnhancer()</code> util for more details.
+          <div className={"noCodeNewline"}>
+            The <code>menu</code> prop must be an array of objects with{" "}
+            <code>text</code> and
+            <code>submenu</code> properties. Each <code>submenu</code> is itself
+            an array of item descriptor objects or <code>MenuItem</code>{" "}
+            elements. Item descriptors may contain several properties, namely{" "}
+            <code>
+              text icon label hotkey onClick tooltip key divider navTo hiddenButSearchableText
+            </code>
+            <code> href target</code> and <code>submenu</code>.<br></br><br></br>
+            You may also include custom fields and have custom menu enhancers
+            derive other props from them. For example, the <code>cmd</code>{" "}
+            property can be used in combination with the{" "}
+            <code>commandMenuEnhancer</code> to link menu items with commands,
+            wiring not only the handler, but also the hotkeys, icon, disabled
+            and active states, name, etc. Check the <code>DynamicMenuItem</code>{" "}
+            component and
+            <code>commandMenuEnhancer()</code> util for more details.
+          </div>
         </p>
       </div>
     );

@@ -36,6 +36,11 @@ describe("MenuBar", () => {
       `.bp3-menu-item:contains(component cmd example):contains(File) .bp3-key-combo`
     );
   });
+  it(`hiddenButSearchable text in a menubar can be searched!`, () => {
+    cy.contains(".bp3-button-text", "Help").click();
+    cy.focused().type("hidden but");
+    cy.get(`.bp3-menu-item:contains(Cmd With Ticks)`);
+  });
   it(`menubar can be searched!`, () => {
     //
     cy.contains(".bp3-button-text", "Help").click();

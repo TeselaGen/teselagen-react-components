@@ -136,3 +136,7 @@ h6 {
 .bp3-dark .demo-wrapper {
   background: #252a31;
 }
+.noCodeNewline code {
+  display: inline;
+  white-space: unset;
+}

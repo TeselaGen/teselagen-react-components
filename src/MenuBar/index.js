@@ -333,9 +333,11 @@ const filterMenuItems = (searchVal, items) => {
       onClick,
       hidden,
       hideFromMenuSearch,
+      hiddenButSearchableText,
       showInSearchMenu,
       component
     } = item;
+
     if (
       !showInSearchMenu &&
       !component &&
@@ -354,7 +356,15 @@ const filterMenuItems = (searchVal, items) => {
         return [];
       }
     }
-    if (doesSearchValMatchText(searchVal, justText)) {
+
+    if (
+      doesSearchValMatchText(
+        searchVal,
+        hiddenButSearchableText
+          ? `${justText} ${hiddenButSearchableText}`
+          : justText
+      )
+    ) {
       return {
         ...item,
         justText,
@@ -381,7 +391,7 @@ function highlight(query, text, opts) {
   }
 
   const offset = text.toLowerCase().indexOf(query[0].toLowerCase());
-  if (offset === -1) return null;
+  if (offset === -1) return text;
 
   let last = 0;
   for (let i = 1; i < query.length; i++) {
