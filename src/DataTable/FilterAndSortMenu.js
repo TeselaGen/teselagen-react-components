@@ -48,6 +48,9 @@ export default class FilterAndSortMenu extends React.Component {
     if (ccSelectedFilter === "true" || ccSelectedFilter === "false") {
       //manually set the filterValue because none is set when type=boolean
       filterValToUse = ccSelectedFilter;
+    } else if (ccSelectedFilter === "notEmpty") {
+      // manually set filter value (nothing is selected by user)
+      filterValToUse = true;
     }
     const { filterOn, addFilters, removeSingleFilter } = this.props;
     if (isInvalidFilterValue(filterValToUse)) {
@@ -81,6 +84,7 @@ export default class FilterAndSortMenu extends React.Component {
       endsWith: "text",
       contains: "text",
       isExactly: "text",
+      notEmpty: "text",
       inList: "text",
       true: "boolean",
       false: "boolean",
@@ -125,6 +129,7 @@ export default class FilterAndSortMenu extends React.Component {
             handleFilterSubmit={handleFilterSubmit}
             filterValue={filterValue}
             handleFilterValueChange={handleFilterValueChange}
+            filterSubType={camelCase(selectedFilter)}
             filterType={filterTypesDictionary[camelCase(selectedFilter)]}
           />
         </div>
@@ -161,6 +166,7 @@ class FilterInput extends React.Component {
       handleFilterValueChange,
       handleFilterSubmit,
       filterValue,
+      filterSubType,
       filterType
     } = this.props;
     //Options: Text, Single number (before, after, equals), 2 numbers (range),
@@ -168,19 +174,22 @@ class FilterInput extends React.Component {
     let inputGroup = <div />;
     switch (filterType) {
       case "text":
-        inputGroup = (
-          <div className="custom-menu-item">
-            <InputGroup
-              placeholder="Value"
-              onChange={function(e) {
-                handleFilterValueChange(e.target.value);
-              }}
-              autoFocus
-              {...onEnterHelper(handleFilterSubmit)}
-              value={filterValue}
-            />
-          </div>
-        );
+        inputGroup =
+          filterSubType === "notEmpty" ? (
+            <div />
+          ) : (
+            <div className="custom-menu-item">
+              <InputGroup
+                placeholder="Value"
+                onChange={function(e) {
+                  handleFilterValueChange(e.target.value);
+                }}
+                autoFocus
+                {...onEnterHelper(handleFilterSubmit)}
+                value={filterValue}
+              />
+            </div>
+          );
         break;
       case "number":
         inputGroup = (
@@ -292,7 +301,8 @@ function getFilterMenuItems(dataType) {
       "Starts with",
       "Ends with",
       "Is exactly",
-      "In List"
+      "In List",
+      "Not empty"
     ];
   } else if (dataType === "lookup") {
     filterMenuItems = ["Contains", "Starts with", "Ends with", "Is exactly"];

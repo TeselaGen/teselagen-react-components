@@ -17,6 +17,7 @@ import {
   isInteger
 } from "lodash";
 import dayjs from "dayjs";
+import { flatMap } from "lodash";
 
 const defaultPageSizes = [5, 10, 15, 25, 50, 100, 200, 400];
 
@@ -331,6 +332,12 @@ function getSubFilter(
               .map(val => val && val.toLowerCase())
               .indexOf(fieldVal.toString().toLowerCase()) > -1
           );
+        };
+  } else if (ccSelectedFilter === "notEmpty") {
+    return qb
+      ? [qb.notNull(), qb.notEquals("")]
+      : fieldVal => {
+          return !!fieldVal;
         };
   } else if (ccSelectedFilter === "isExactly") {
     return qb
@@ -768,23 +775,28 @@ export function getQueryParams({
       allFilters
     );
     try {
+      const flattenFilters = filterObj => {
+        return flatMap(Object.keys(filterObj), key => {
+          return filterObj[key].map(filter => ({
+            [key]: filter
+          }));
+        });
+      };
+
       const orFiltersObject = getQueries(orFilters, qb, ccFields);
-      let allOrFilters = [
-        ...Object.keys(orFiltersObject).map(key => ({
-          [key]: orFiltersObject[key]
-        }))
-      ];
+      let allOrFilters = flattenFilters(orFiltersObject);
+
       otherOrFilters.forEach(orFilters => {
         const otherOrFiltersObject = getQueries(orFilters, qb, ccFields);
         allOrFilters = allOrFilters.concat(
-          Object.keys(otherOrFiltersObject).map(key => ({
-            [key]: otherOrFiltersObject[key]
-          }))
+          flattenFilters(otherOrFiltersObject)
         );
       });
       allOrFilters.push(additionalOrFilterToUse);
       allOrFilters = allOrFilters.filter(obj => !isEmpty(obj));
-      let allAndFilters = [getQueries(andFilters, qb, ccFields)];
+
+      const unflattenedAndQueries = getQueries(andFilters, qb, ccFields);
+      let allAndFilters = flattenFilters(unflattenedAndQueries);
       allAndFilters.push(additionalFilterToUse);
       allAndFilters = allAndFilters.filter(obj => !isEmpty(obj));
       if (allAndFilters.length) {
@@ -838,7 +850,7 @@ export function getQueryParams({
   }
 }
 
-function getSubFilterAndPath(filter, qb, ccFields) {
+function getSubFiltersAndPath(filter, qb, ccFields) {
   const { selectedFilter, filterValue, filterOn } = filter;
   const fieldSchema = ccFields[filterOn];
   let filterValueToUse = filterValue;
@@ -852,20 +864,13 @@ function getSubFilterAndPath(filter, qb, ccFields) {
       );
     }
   }
-  const subFilter = getSubFilter(qb, selectedFilter, filterValueToUse);
+  const _subFilters = getSubFilter(qb, selectedFilter, filterValueToUse);
 
   let filterField;
-  let subFilterToUse = subFilter;
   if (fieldSchema) {
     const { path, reference } = fieldSchema;
     if (reference) {
       filterField = reference.sourceField;
-      subFilterToUse = buildRef(
-        qb,
-        reference,
-        last(path.split(".")),
-        subFilter
-      );
     } else {
       filterField = path;
     }
@@ -874,10 +879,27 @@ function getSubFilterAndPath(filter, qb, ccFields) {
   } else {
     console.error("Trying to filter on unknown field");
   }
+  const subFiltersToUse = [];
+  const subFilters = Array.isArray(_subFilters) ? _subFilters : [_subFilters];
+  subFilters.forEach(subFilter => {
+    let subFilterToUse = subFilter;
+    if (fieldSchema) {
+      const { path, reference } = fieldSchema;
+      if (reference) {
+        subFilterToUse = buildRef(
+          qb,
+          reference,
+          last(path.split(".")),
+          subFilter
+        );
+      }
+    }
+    subFiltersToUse.push(subFilterToUse);
+  });
 
   return {
     path: filterField,
-    subFilter: subFilterToUse
+    subFilters: subFiltersToUse
   };
 }
 
@@ -892,8 +914,8 @@ function getQueries(filters, qb, ccFields) {
     // will be handled below
     if (!filter.isSearchTermFilter && fieldSchema?.additionalColumnFilter)
       return acc;
-    const { path, subFilter } = getSubFilterAndPath(filter, qb, ccFields);
-    acc[path] = subFilter;
+    const { path, subFilters } = getSubFiltersAndPath(filter, qb, ccFields);
+    acc[path] = subFilters;
     return acc;
   }, {});
   return subQueries;
@@ -910,7 +932,7 @@ function getColumnCustomFilters(filters, qb, ccFields) {
     if (filter.isSearchTermFilter || !fieldSchema?.additionalColumnFilter) {
       return acc;
     }
-    const { path, subFilter } = getSubFilterAndPath(filter, qb, ccFields);
+    const { path, subFilters } = getSubFiltersAndPath(filter, qb, ccFields);
     /* the column filters need to have access to this sub filter but also be able to add additional
      filter logic.
     ex.
@@ -924,7 +946,9 @@ function getColumnCustomFilters(filters, qb, ccFields) {
 
       is possible because the returned accumulator will be passed to whereAny
   */
-    acc.push(fieldSchema.additionalColumnFilter(qb, subFilter, path));
+    subFilters.forEach(subFilter => {
+      acc.push(fieldSchema.additionalColumnFilter(qb, subFilter, path));
+    });
     return acc;
   }, []);
   return subQueries;
