@@ -59,7 +59,15 @@ export default function Demo() {
         }}
         text="Click me once and click again to see that toast updated"
       ></Button>
-      <div style={{ marginTop: 4000 }}>scroll</div>
+      <div style={{ marginTop: 4000 }}>
+        <Button
+          intent="success"
+          onClick={() => {
+            window.toastr.success("i am still visible");
+          }}
+          text="show toast while scrolled"
+        />
+      </div>
     </DemoWrapper>
   );
 }

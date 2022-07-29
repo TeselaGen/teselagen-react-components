@@ -73,9 +73,7 @@ export default class TgSelectDemo extends React.Component {
             // type: "reactSelectFieldcreatable"
           })}
         </OptionsSection>
-        <DemoWrapper>
-          Default:
-          <br />
+        <DemoWrapper style={{ maxWidth: 300 }}>
           <TgSelect
             onChange={val => {
               this.setState({ val });

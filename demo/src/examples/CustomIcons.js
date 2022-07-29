@@ -34,6 +34,7 @@ export default function CustomIconsDemo() {
       </h4>
       <Button intent={"primary"} icon={flaskIcon} text="flaskIcon" />
       <Button icon={orfIcon} text="orfIcon" />
+      <Button icon="add" text="orfIcon" />
       <Button icon={featureIcon} text="featureIcon" />
       <Button icon={dnaIcon} text="dnaIcon" />
       <Button icon={workqueueIcon} text="workqueueIcon" />

@@ -17,6 +17,7 @@ import {
   CmdSwitch
 } from "../../../src/utils/commandControls";
 import { MenuItem, Button, Intent, Popover, Menu } from "@blueprintjs/core";
+import DemoWrapper from "../DemoWrapper";
 
 export default class MenuBarDemo extends React.Component {
   constructor(props) {
@@ -573,188 +574,133 @@ export default class MenuBarDemo extends React.Component {
   render() {
     return (
       <div>
-        <div
-          style={{
-            // backgroundColor: "#f8f8f8",
-            height: "300px",
-            border: "1px solid #eee"
-          }}
-        >
-          <MenuBar
-            menu={this.menu}
-            enhancers={this.menuEnhancers}
-            // menuSearchHotkey="alt+/"
-          />
-        </div>
-        <Button onClick={() => this.setState({ count: this.state.count + 1 })}>
-          Simple Counter {this.state.count}
-        </Button>
-        <Popover
-          content={
-            <Menu>
-              <MenuItem text="helllo ">
-                <MenuItem text="chipmunk "></MenuItem>
-                <MenuItem text="chipmunk "></MenuItem>
-                <MenuItem text="chipmunk "></MenuItem>
-                <MenuItem text="chipmunk "></MenuItem>
-                <MenuItem text="chipmunk ">
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                  <MenuItem text="squirrel "></MenuItem>
-                </MenuItem>
-
-                <MenuItem text="chipmunk "></MenuItem>
-              </MenuItem>
-              <MenuItem text="helllo "></MenuItem>
-              <MenuItem text="helllo "></MenuItem>
-              <MenuItem text="helllo "></MenuItem>
-              <MenuItem text="helllo "></MenuItem>
-              <MenuItem text="helllo "></MenuItem>
-              <MenuItem text="helllo "></MenuItem>
-              <MenuItem text="helllo "></MenuItem>
-              <MenuItem text="helllo "></MenuItem>
-            </Menu>
-          }
-        >
-          <Button intent={Intent.PRIMARY} text="Primary" />
-        </Popover>
-        <button
-          onClick={e => {
-            return showCommandContextMenu(
-              /* eslint-enable no-undef*/
-              this.menu[0].submenu,
-              this.commands,
-              {
-                useTicks: true
-              },
-              e,
-              () => {
-                console.info(`closin 2`);
-              },
-              {}
-            );
-          }}
-        >
-          config.useTicks config.omitIcons config.forceIconAlignment Click to
-          see a menu created using the imperative showCommandContextMenu
-        </button>
-        <button
-          onClick={e => {
-            showContextMenu(
-              /* eslint-enable no-undef*/
-              [
-                { text: "hey" },
-                undefined,
-                {
-                  text: "you",
-                  submenu: [
-                    {
-                      text: "yup",
-                      willUnmount: () => {
-                        console.info("hellllo");
-                      },
-                      didMount: () => {
-                        console.info("yaaa");
-                      }
-                    }
-                  ]
-                }
-              ], //the "undefined" will be filtered out
-              undefined,
-              e,
-              () => {
-                console.info("closin");
-              }
-            );
-          }}
-        >
-          Click to see a menu created using the imperative showContextMenu(menu,
-          undefined, event)
-        </button>
-        <h3>Examples of using CmdCheckbox, CmdSwitch, CmdDiv, CmdButton</h3>
-        <CmdCheckbox cmd={this.commands.fakeCmd1} />
-        <CmdSwitch cmd={this.commands.fakeCmd1} />
-        <CmdDiv cmd={this.commands.fakeCmd2} />
-        <CmdButton cmd={this.commands.fakeCmd2} />
-        <this.hotkeyEnabler />
-        <HotkeysDialog
-          hotkeySets={this.hotkeySets}
-          isOpen={this.state.showDialog}
-          onClose={this.hideDialog}
-        />
-        <br />
-        <p>
-          <div className={"noCodeNewline"}>
-            The <code>menu</code> prop must be an array of objects with{" "}
-            <code>text</code> and
-            <code>submenu</code> properties. Each <code>submenu</code> is itself
-            an array of item descriptor objects or <code>MenuItem</code>{" "}
-            elements. Item descriptors may contain several properties, namely{" "}
-            <code>
-              text icon label hotkey onClick tooltip key divider navTo hiddenButSearchableText
-            </code>
-            <code> href target</code> and <code>submenu</code>.<br></br><br></br>
-            You may also include custom fields and have custom menu enhancers
-            derive other props from them. For example, the <code>cmd</code>{" "}
-            property can be used in combination with the{" "}
-            <code>commandMenuEnhancer</code> to link menu items with commands,
-            wiring not only the handler, but also the hotkeys, icon, disabled
-            and active states, name, etc. Check the <code>DynamicMenuItem</code>{" "}
-            component and
-            <code>commandMenuEnhancer()</code> util for more details.
+        <DemoWrapper>
+          Classic usage as a top menu bar component with dropdown menus and
+          help:
+          <br />
+          <div
+            style={{
+              // backgroundColor: "#f8f8f8",
+              height: "300px",
+              border: "1px solid #eee"
+            }}
+          >
+            <MenuBar
+              menu={this.menu}
+              enhancers={this.menuEnhancers}
+              // menuSearchHotkey="alt+/"
+            />
           </div>
-        </p>
+        </DemoWrapper>
+        <DemoWrapper style={{ marginTop: 15 }}>
+          Can also be used as a context menu or shown at a specific position on
+          button click:
+          <br />
+          <br />
+          <code>config.useTicks</code>
+          <code>config.omitIcons</code>
+          <code>config.forceIconAlignment</code>
+          <br />
+          <button
+            onClick={e => {
+              return showCommandContextMenu(
+                /* eslint-enable no-undef*/
+                this.menu[0].submenu,
+                this.commands,
+                {
+                  useTicks: true
+                },
+                e,
+                () => {
+                  console.info(`closin 2`);
+                },
+                {}
+              );
+            }}
+          >
+            Menu using the imperative showCommandContextMenu
+          </button>
+        </DemoWrapper>
+        <DemoWrapper style={{ marginTop: 15 }}>
+          Menu created using the imperative showContextMenu(menu, undefined,
+          event)
+          <button
+            onClick={e => {
+              showContextMenu(
+                /* eslint-enable no-undef*/
+                [
+                  { text: "hey" },
+                  undefined,
+                  {
+                    text: "you",
+                    submenu: [
+                      {
+                        text: "yup",
+                        willUnmount: () => {
+                          console.info("hellllo");
+                        },
+                        didMount: () => {
+                          console.info("yaaa");
+                        }
+                      }
+                    ]
+                  }
+                ], //the "undefined" will be filtered out
+                undefined,
+                e,
+                () => {
+                  console.info("closin");
+                }
+              );
+            }}
+          >
+            show menu
+          </button>
+        </DemoWrapper>
+        <div style={{ marginTop: 20 }} />
+        <DemoWrapper>
+          <h3>Examples of using CmdCheckbox, CmdSwitch, CmdDiv, CmdButton</h3>
+          <CmdCheckbox cmd={this.commands.fakeCmd1} />
+          <CmdSwitch cmd={this.commands.fakeCmd1} />
+          <CmdDiv cmd={this.commands.fakeCmd2} />
+          <CmdButton cmd={this.commands.fakeCmd2} />
+          <br />
+          <code>{"<CmdButton cmd={this.commands.showHotkeys} />"}</code>
+          <CmdButton cmd={this.commands.showHotkeys} />
+          <this.hotkeyEnabler />
+          <HotkeysDialog
+            hotkeySets={this.hotkeySets}
+            isOpen={this.state.showDialog}
+            onClose={this.hideDialog}
+          />
+          <br />
+          <p>
+            <div className={"noCodeNewline"}>
+              The <code>menu</code> prop must be an array of objects with{" "}
+              <code>text</code> and
+              <code>submenu</code> properties. Each <code>submenu</code> is
+              itself an array of item descriptor objects or{" "}
+              <code>MenuItem</code> elements. Item descriptors may contain
+              several properties, namely{" "}
+              <code>
+                text icon label hotkey onClick tooltip key divider navTo
+                hiddenButSearchableText
+              </code>
+              <code> href target</code> and <code>submenu</code>.<br></br>
+              <br></br>
+              You may also include custom fields and have custom menu enhancers
+              derive other props from them. For example, the <code>
+                cmd
+              </code>{" "}
+              property can be used in combination with the{" "}
+              <code>commandMenuEnhancer</code> to link menu items with commands,
+              wiring not only the handler, but also the hotkeys, icon, disabled
+              and active states, name, etc. Check the{" "}
+              <code>DynamicMenuItem</code> component and
+              <code>commandMenuEnhancer()</code> util for more details.
+            </div>
+          </p>
+        </DemoWrapper>
       </div>
     );
   }
