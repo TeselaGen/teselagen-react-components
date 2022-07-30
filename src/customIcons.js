@@ -1,7 +1,7 @@
 import React from "react";
 import { Classes } from "@blueprintjs/core";
 
-const ptIconWrapper = (path, viewboxDefault = 24) => {
+const ptIconWrapper = (path, viewboxDefault = 24, rest) => {
   return (
     <span className="bp3-icon">
       <svg
@@ -14,6 +14,7 @@ const ptIconWrapper = (path, viewboxDefault = 24) => {
         width="16px"
         height="16px"
         viewBox={`0 0 ${viewboxDefault} ${viewboxDefault}`}
+        {...rest}
       >
         {path}
       </svg>
@@ -48,6 +49,14 @@ export const orfIcon = ptIconWrapper(
 );
 
 export const featureIcon = ptIconWrapper(<path d="M17 5h-17v14h17l7-7z" />);
+export const reverseFeatureIcon = ptIconWrapper(
+  <path d="M17 5h-17v14h17l7-7z" />,
+  undefined,
+  { transform: "rotate(180)" }
+);
+export const bluntFeatureIcon = ptIconWrapper(
+  <rect y={5} height={15} width={20} />
+);
 
 export const dnaIcon = ptIconWrapper(
   <path

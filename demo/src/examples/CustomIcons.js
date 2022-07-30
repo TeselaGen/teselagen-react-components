@@ -16,7 +16,9 @@ import {
   driveIcon,
   sharedDriveIcon,
   proteinIcon,
-  tubeIcon
+  tubeIcon,
+  reverseFeatureIcon,
+  bluntFeatureIcon
 } from "../../../src/customIcons";
 import DemoWrapper from "../DemoWrapper";
 
@@ -36,6 +38,8 @@ export default function CustomIconsDemo() {
       <Button icon={orfIcon} text="orfIcon" />
       <Button icon="add" text="orfIcon" />
       <Button icon={featureIcon} text="featureIcon" />
+      <Button icon={reverseFeatureIcon} text="reverseFeatureIcon" />
+      <Button icon={bluntFeatureIcon} text="bluntFeatureIcon" />
       <Button icon={dnaIcon} text="dnaIcon" />
       <Button icon={workqueueIcon} text="workqueueIcon" />
       <Button icon={inventoryIcon} text="inventoryIcon" />
