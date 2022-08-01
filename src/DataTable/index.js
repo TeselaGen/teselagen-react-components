@@ -283,7 +283,8 @@ class DataTable extends React.Component {
       noSelect,
       entities,
       reduxFormSelectedEntityIdMap: idMap,
-      isEntityDisabled
+      isEntityDisabled,
+      isSingleSelect
     } = props;
     let newIdMap = {};
     const lastSelectedEnt = getLastSelectedEntity(idMap);
@@ -315,7 +316,7 @@ class DataTable extends React.Component {
       });
 
       if (!newEntToSelect) return;
-      if (shiftHeld) {
+      if (shiftHeld && !isSingleSelect) {
         if (idMap[newEntToSelect.id || newEntToSelect.code]) {
           //the entity being moved to has already been selected
           newIdMap = omit(idMap, [lastSelectedEnt.id || lastSelectedEnt.code]);

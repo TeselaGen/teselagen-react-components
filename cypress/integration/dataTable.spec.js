@@ -52,7 +52,7 @@ describe("dataTable.spec", () => {
       .click();
     //tnr: typing both so that the hotkey is triggered even when running on tests on linux in CI (maybe it will be solved some day https://github.com/cypress-io/cypress/issues/8961)
     cy.get(".data-table-container").type("{meta}c");
-    cy.get(".data-table-container").type("{ctrl}c");
+    // cy.get(".data-table-container").type("{ctrl}c");
     cy.contains("Selected rows copied");
   });
   it(`it can copy a single row, selected rows, or cells to the clipboard`, () => {
@@ -178,5 +178,23 @@ describe("dataTable.spec", () => {
       "have.value",
       "50"
     );
+  });
+
+  it("can use the keyboard to move up/down and select rows", () => {
+    cy.visit("#/DataTable");
+    cy.contains("label", "withCheckboxes").click();
+    cy.contains(".rt-td", "row 3").click();
+    cy.get(".rt-tr-group.selected").should("have.length", 1);
+    cy.get(".data-table-container").type("{shift}{downArrow}");
+    cy.get(".rt-tr-group.selected").should("have.length", 2);
+    cy.get(".data-table-container").type("{shift}{downArrow}");
+    cy.get(".rt-tr-group.selected").should("have.length", 3);
+    cy.contains(".rt-td", "row 2").click();
+    cy.get(".rt-tr-group.selected").should("have.length", 1);
+    cy.contains("label", "isSingleSelect").click();
+    cy.get(".data-table-container").type("{shift}{downArrow}");
+    cy.get(".rt-tr-group.selected").should("have.length", 1);
+    cy.get(".rt-tr-group:contains(row 2)").should("not.have.class", "selected");
+    cy.get(".rt-tr-group:contains(row 3)").should("not.have.class", "selected");
   });
 });
