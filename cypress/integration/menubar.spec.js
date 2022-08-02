@@ -58,6 +58,12 @@ describe("MenuBar", () => {
     );
     cy.contains(".bp3-menu-item", "XXXXX").click();
 
+    const closeToasts = () => {
+      cy.get(".bp3-toast .bp3-icon-cross").each(el => {
+        el.click();
+      });
+    };
+    closeToasts();
     cy.contains(".bp3-button-text", "Help").click();
 
     // it should only show the first 10 items by default
@@ -88,6 +94,7 @@ describe("MenuBar", () => {
     cy.contains(".bp3-toast", "Fired ReactText!");
 
     //it can get the File > ReactText path correctly
+    closeToasts();
     cy.contains(".bp3-button-text", "Help").click();
     cy.focused().type("{selectall}hel");
     cy.contains(".bp3-menu-item", "File > ReactText");

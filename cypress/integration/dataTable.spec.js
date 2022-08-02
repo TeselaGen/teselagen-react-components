@@ -132,7 +132,7 @@ describe("dataTable.spec", () => {
     cy.visit("#/DataTable");
     cy.get(`[data-test="tgCell_type.special"]`)
       .eq(3) //get the third cell just for kicks
-      .should("be.visible");
+      .should("exist");
   });
 
   it("can use paging input to change pages", () => {
