@@ -52,7 +52,7 @@ describe("dataTable.spec", () => {
       .click();
     //tnr: typing both so that the hotkey is triggered even when running on tests on linux in CI (maybe it will be solved some day https://github.com/cypress-io/cypress/issues/8961)
     cy.get(".data-table-container").type("{meta}c");
-    // cy.get(".data-table-container").type("{ctrl}c");
+    cy.get(".data-table-container").type("{ctrl}c");
     cy.contains("Selected rows copied");
   });
   it(`it can copy a single row, selected rows, or cells to the clipboard`, () => {
