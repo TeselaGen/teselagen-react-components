@@ -17,7 +17,7 @@
     "clean": "nwb clean-module && npm clean-demo",
     "start": "nwb serve-react-demo --port 3333",
     "analyze-build": "ANALYZE_BUNDLE=1 yarn buildWithDemo && webpack-bundle-analyzer demo/dist/stats.json build",
-    "c": "yarn cypress open",
+    "c": "yarn cypress open --e2e --browser chrome",
     "test": "yarn cypress run",
     "changelog": "auto-changelog -p && git add CHANGELOG.md"
   },
