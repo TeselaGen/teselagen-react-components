@@ -14,6 +14,11 @@ interface schemaField {
   type?: "string" | "number" | "integer" | "boolean" | "timestamp" | "lookup" | "action" | "markdown";
   filterDisabled?: boolean;
   sortDisabled?: boolean;
+  /**
+   * sometimes you need to have the paths of multiple columns be the same to get filters working.
+   * Here is a place to still give the columns unique paths so that column ordering will still work
+   */
+  placementPath?: string;
   isHidden?: boolean;
   isForcedHidden?: boolean
 }
