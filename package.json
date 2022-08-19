@@ -1,6 +1,6 @@
 {
   "name": "teselagen-react-components",
-  "version": "30.10.3",
+  "version": "30.10.4",
   "description": "Teselagen React Component Library",
   "main": "lib/index.js",
   "types": "./index.d.ts",
@@ -41,7 +41,7 @@
     "qs": "^6.9.6",
     "react-color": "^2.19.3",
     "react-dropzone": "^11.4.2",
-    "react-markdown": "4.1.0",
+    "react-markdown": "4.0.6",
     "react-rnd": "^10.2.4",
     "react-router-dom": "^4.3.1",
     "react-sortable-hoc": "^0.6.8",
