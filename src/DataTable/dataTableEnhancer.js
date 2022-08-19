@@ -68,6 +68,14 @@ export default compose(
     if (isOpenable) {
       schemaToUse.fields = [openColumn, ...schemaToUse.fields];
     }
+    // this must come before handling orderings.
+    schemaToUse.fields = schemaToUse.fields.map(field => {
+      if (field.placementPath) {
+        return { ...field, path: field.placementPath };
+      } else {
+        return field;
+      }
+    });
     const hasOptionForForcedHidden =
       withDisplayOptions && (isSimple || isInfinite);
     if (withDisplayOptions) {
@@ -141,6 +149,7 @@ export default compose(
             );
           })
           .concat(fieldsWithoutOrder);
+        tableConfig.columnOrderings = schemaToUse.fields.map(f => f.path);
       }
 
       if (syncDisplayOptionsToDb) {
