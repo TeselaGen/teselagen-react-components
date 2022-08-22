@@ -460,7 +460,7 @@ function FormComponentsDemo({ handleSubmit }) {
             options={[
               {
                 label:
-                  "Rodrigo Pavez aoiwjefoiawjfiojawe faowijefoiajwefoijawf woaiefjawoie",
+                  <div style={{display: 'flex'}}>Rodrigo Pavez aoiwjefoiawjfiojawe faowijefoiajwefoijawf woaiefjawoie <div>I'm a reallllly long label.. doh</div></div>,
                 value: { name: "Rodrigo Pavez", id: "123" }
               },
               { label: "Ximena Morales", value: "Ximena Morales" },

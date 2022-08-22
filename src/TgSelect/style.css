@@ -5,9 +5,9 @@
 .tg-select input {
   font-size: 14px;
 }
-.tg-select-option {
-  max-width: 400px;
-}
+/* .tg-select-option {
+  width: fit-content;
+} */
 /* Fix cutoff placeholder */
 .tg-select .bp3-input-ghost {
   width: 60%;
@@ -26,7 +26,13 @@
   opacity: 0.6;
 }
 .bp3-multi-select-popover .bp3-menu {
-  max-width: 400px;
+  /* max-width: 400px; */
   max-height: 300px;
   overflow: auto;
 }
+/* 
+.bp3-menu {
+  max-width: 400px;
+  max-height: 300px;
+  overflow: auto;
+} */
