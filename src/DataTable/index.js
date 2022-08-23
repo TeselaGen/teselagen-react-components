@@ -148,6 +148,8 @@ class DataTable extends React.Component {
         : [];
       this.setState({ columns });
     }
+    let selectedIdsToUse = selectedIds;
+    let newIdMap;
     //handle selecting all or expanding all
     if (
       (selectAllByDefault || expandAllByDefault) &&
@@ -157,13 +159,14 @@ class DataTable extends React.Component {
       )
     ) {
       if (selectAllByDefault) {
-        change("reduxFormSelectedEntityIdMap", {
+        newIdMap = {
           ...(entities || []).reduce((acc, entity) => {
             acc[entity.id || entity.code] = { entity, time: Date.now() };
             return acc;
           }, {}),
           ...(reduxFormSelectedEntityIdMap || {})
-        });
+        };
+        selectedIdsToUse = map(newIdMap, (a, key) => key);
       }
       if (expandAllByDefault) {
         change("reduxFormExpandedEntityIdMap", {
@@ -178,15 +181,19 @@ class DataTable extends React.Component {
 
     // handle programmatic selection and scrolling
     const { selectedIds: oldSelectedIds } = oldProps;
-    if (isEqual(selectedIds, oldSelectedIds)) return;
-    const idArray = Array.isArray(selectedIds) ? selectedIds : [selectedIds];
+    if (isEqual(selectedIdsToUse, oldSelectedIds)) return;
+    const idArray = Array.isArray(selectedIdsToUse)
+      ? selectedIdsToUse
+      : [selectedIdsToUse];
     const selectedEntities = entities.filter(
       e => idArray.indexOf(getIdOrCodeOrIndex(e)) > -1 && !isEntityDisabled(e)
     );
-    const newIdMap = selectedEntities.reduce((acc, entity) => {
-      acc[getIdOrCodeOrIndex(entity)] = { entity };
-      return acc;
-    }, {});
+    newIdMap =
+      newIdMap ||
+      selectedEntities.reduce((acc, entity) => {
+        acc[getIdOrCodeOrIndex(entity)] = { entity };
+        return acc;
+      }, {});
     change("reduxFormExpandedEntityIdMap", newIdMap);
     finalizeSelection({ idMap: newIdMap, props: newProps });
     const idToScrollTo = idArray[0];
