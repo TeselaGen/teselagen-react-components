@@ -158,7 +158,13 @@ class DataTable extends React.Component {
         oldProps.entities && oldProps.entities.map(({ id }) => id)
       )
     ) {
-      if (selectAllByDefault) {
+      if (
+        selectAllByDefault &&
+        !this.alreadySelected &&
+        entities &&
+        entities.length
+      ) {
+        this.alreadySelected = true;
         newIdMap = {
           ...(entities || []).reduce((acc, entity) => {
             acc[entity.id || entity.code] = { entity, time: Date.now() };
