@@ -7,6 +7,7 @@
 }
 .tg-select-option {
   width: fit-content;
+  min-width: 100%;
 }
 /* Fix cutoff placeholder */
 .tg-select .bp3-input-ghost {
