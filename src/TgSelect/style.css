@@ -5,9 +5,9 @@
 .tg-select input {
   font-size: 14px;
 }
-/* .tg-select-option {
+.tg-select-option {
   width: fit-content;
-} */
+}
 /* Fix cutoff placeholder */
 .tg-select .bp3-input-ghost {
   width: 60%;
@@ -25,14 +25,9 @@
 .tg-single-select .bp3-popover-open .bp3-tag {
   opacity: 0.6;
 }
-.bp3-multi-select-popover .bp3-menu {
-  /* max-width: 400px; */
-  max-height: 300px;
-  overflow: auto;
-}
-/* 
-.bp3-menu {
+.bp3-multi-select-popover .bp3-menu,
+.bp3-select-popover .bp3-menu {
   max-width: 400px;
   max-height: 300px;
   overflow: auto;
-} */
+}
