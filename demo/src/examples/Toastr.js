@@ -25,6 +25,13 @@ export default function Demo() {
         text="show success toast"
       />
       <Button
+        intent="success"
+        onClick={() => {
+          window.toastr.success("heyy", { className: "no-close-button" });
+        }}
+        text="show success toast without button to close"
+      />
+      <Button
         intent="primary"
         onClick={() => {
           window.toastr.info("heyy");

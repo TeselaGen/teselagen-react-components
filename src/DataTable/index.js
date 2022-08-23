@@ -950,7 +950,8 @@ class DataTable extends React.Component {
                         variables: {
                           filter: variables.filter,
                           sort: variables.sort
-                        }
+                        },
+                        canCancel: true
                       });
                       this.addEntitiesToSelection(allEntities);
                     } catch (error) {

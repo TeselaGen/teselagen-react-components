@@ -2,7 +2,7 @@
 import React from "react";
 import { ProgressBar } from "@blueprintjs/core";
 
-export default (message, value, key) => {
+export default (message, value, key, opts) => {
   return window.toastr.default(
     <div>
       <div style={{ marginBottom: 10 }}>{message}</div>
@@ -15,7 +15,8 @@ export default (message, value, key) => {
     </div>,
     {
       timeout: value >= 1 ? 3000 : 100000,
-      key
+      key,
+      ...opts
     }
   );
 };

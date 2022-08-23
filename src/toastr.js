@@ -37,7 +37,8 @@ const generateToast = intent => (message, options) => {
       message,
       timeout: options.timeout || updatedTimeout,
       action: options.action,
-      icon: options.icon
+      icon: options.icon,
+      className: options.className
     },
     options.key
   );
