@@ -11,7 +11,7 @@
 }
 /* Fix cutoff placeholder */
 .tg-select .bp3-input-ghost {
-  width: 60%;
+  width: 80%;
   text-overflow: ellipsis;
 }
 
