@@ -13,6 +13,7 @@ function DialogInner(p) {
   const [val, setVal] = useState(false);
   const [is2ndDialogOpen, set2ndDialogOpen] = useState(false);
   const [isDatatablePresent, setDatatablePresent] = useState(false);
+
   return (
     <form
       onSubmit={e => {
@@ -39,12 +40,22 @@ function DialogInner(p) {
             </div>
           );
         })}
+        <div>
+        Prompt Unsaved Changes: {p.unsavedChanges ? "TRUE" : "FALSE"}
+        </div>
         <Button
           onClick={() => {
             set2ndDialogOpen(true);
           }}
         >
           Open another Dialog
+        </Button>
+        <Button
+          onClick={() => {
+            p.onChangePrompt(!p.unsavedChanges);
+          }}
+          >
+          Alternate Prompt
         </Button>
         {is2ndDialogOpen && (
           <MyDialog
@@ -117,6 +128,8 @@ const MyDialog = wrapDialog({ title: "Dialog Demo" })(DialogInner);
 
 export default function WrapDialogDemo() {
   const [isOpen, setOpen] = useState(true);
+  const [promptUnsavedChanges, setPromptUnsavedChanges] = useState(false);
+  
   return (
     <Provider store={store}>
       <div>
@@ -125,7 +138,10 @@ export default function WrapDialogDemo() {
           <MyDialog
             hideModal={() => {
               setOpen(false);
+              setPromptUnsavedChanges(false);
             }}
+            onChangePrompt={setPromptUnsavedChanges}
+            unsavedChanges={promptUnsavedChanges}
             isOpen={isOpen}
           ></MyDialog>
         )}

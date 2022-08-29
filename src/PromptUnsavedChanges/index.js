@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { Prompt } from "react-router-dom";
 
-const defaultMessagge =
+export const defaultMessagge =
   "Are you sure you want to leave? There are unsaved changes.";
 
 const warnBeforeLeave = e => {
@@ -17,7 +17,10 @@ const warnBeforeLeave = e => {
   return defaultMessagge; //Webkit, Safari, Chrome
 };
 
-function PromptUnsavedChanges({ message = defaultMessagge, when = false }) {
+export function PromptUnsavedChanges({
+  message = defaultMessagge,
+  when = false
+}) {
   useEffect(() => {
     if (when) {
       window.addEventListener("beforeunload", warnBeforeLeave);
