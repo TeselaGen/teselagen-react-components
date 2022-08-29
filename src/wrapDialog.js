@@ -3,6 +3,7 @@
 import React, { useMemo, useRef } from "react";
 import { Dialog, useHotkeys } from "@blueprintjs/core";
 import { noop, isFunction } from "lodash";
+import PromptUnsavedChanges from "./PromptUnsavedChanges";
 import { ResizableDraggableDialog } from ".";
 
 // eslint-disable-next-line import/no-anonymous-default-export
@@ -85,6 +86,12 @@ export default (topLevelDialogProps = {}) => Component => props => {
     ...getDialogProps(props)
   };
 
+  const promptUnsavedChanges =
+    (extraDialogProps.unsavedChanges
+      ? extraDialogProps.unsavedChanges
+      : false) ||
+    (otherProps.unsavedChanges ? otherProps.unsavedChanges : false);
+
   const DialogToUse = extraDialogProps.isDraggable
     ? ResizableDraggableDialog
     : Dialog;
@@ -98,6 +105,7 @@ export default (topLevelDialogProps = {}) => Component => props => {
       style={{ ...extraDialogProps.style }}
     >
       <div ref={r}></div>
+      <PromptUnsavedChanges when={promptUnsavedChanges} />
       <Component hideModal={hideModal} {...otherProps} />
     </DialogToUse>
   );
