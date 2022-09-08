@@ -56,7 +56,7 @@ describe("MenuBar", () => {
     cy.contains(".tg-menu-search-suggestions .bp3-menu-item", "Other").trigger(
       "mouseover"
     );
-    cy.contains(".bp3-menu-item", "XXXXX").click();
+    cy.contains(".bp3-menu-item", "XXXXX").click({ force: true });
 
     const closeToasts = () => {
       cy.get(".bp3-toast .bp3-icon-cross").each(el => {
