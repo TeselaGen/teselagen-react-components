@@ -10,7 +10,7 @@
   min-width: 100%;
 }
 /* Fix cutoff placeholder */
-.tg-select .bp3-input-ghost {
+.tg-select .bp3-input-ghost[placeholder] {
   width: 80%;
   text-overflow: ellipsis;
 }
