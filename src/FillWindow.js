@@ -1,5 +1,6 @@
 import React from "react";
 import { isFunction } from "lodash";
+import reactDom from "react-dom";
 import rerenderOnWindowResize from "./rerenderOnWindowResize";
 import "./FillWindow.css";
 
@@ -36,12 +37,15 @@ export default class FillWindow extends React.Component {
       style,
       styleOverrides,
       className,
+      asPortal,
       ...rest
     } = this.props;
     if (this.props.disabled) return this.props.children(windowDimensions);
-    return (
+    const inner = (
       <div
-        className={"tg-fillWindow " + (className || "")}
+        className={
+          "tg-fillWindow " + (asPortal ? "bp3-portal " : "") + (className || "")
+        }
         style={{
           ...style,
           width,
@@ -59,5 +63,7 @@ export default class FillWindow extends React.Component {
           : this.props.children}
       </div>
     );
+    if (asPortal) return reactDom.createPortal(inner, window.document.body);
+    return inner;
   }
 }

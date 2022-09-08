@@ -1,8 +1,12 @@
-import { Button } from "@blueprintjs/core";
-import React from "react";
+import { Button, Classes } from "@blueprintjs/core";
+import classNames from "classnames";
+import React, { useState } from "react";
+import { wrapDialog } from "../../../src";
 import DemoWrapper from "../DemoWrapper";
 
 export default function EllipsizedTextAutoTooltip() {
+  const [isOpen, setOpen] = useState(false);
+
   return (
     <div>
       <DemoWrapper>
@@ -10,6 +14,15 @@ export default function EllipsizedTextAutoTooltip() {
 
         <code>{`<Button data-tip="I'm a tooltip">`}</code>
         <Button data-tip="I'm a tooltip">Hover me!</Button>
+        <Button text="Open Dialog" onClick={() => setOpen(true)} />
+        {isOpen && (
+          <MyDialog
+            hideModal={() => {
+              setOpen(false);
+            }}
+            isOpen={isOpen}
+          ></MyDialog>
+        )}
       </DemoWrapper>
       <br></br>
       <DemoWrapper>
@@ -54,3 +67,25 @@ textOverflow: "ellipsis"`}
     </div>
   );
 }
+
+function DialogInner(p) {
+  return (
+    <div>
+      <Button data-tip="I'm a tooltip">Hover me!</Button>
+      <div
+        style={{
+          width: 190,
+          overflow: "hidden",
+          whiteSpace: "nowrap",
+          textOverflow: "ellipsis"
+        }}
+      >
+        Hover me, I'm some long ellipsized text lalasdlfasdflkajsdfl I'm some
+        long ellipsized text lalasdlfasdflkajsdflI'm some long ellipsized text
+        lalasdlfasdflkajsdflI'm some long ellipsized text
+        lalasdlfasdflkajsdflI'm some long ellipsized text lalasdlfasdflkajsdfl
+      </div>
+    </div>
+  );
+}
+const MyDialog = wrapDialog({ title: "Dialog Demo" })(DialogInner);

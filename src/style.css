@@ -146,3 +146,7 @@ code {
 .bp3-toast.no-close-button [aria-label="Close"] {
   display: none;
 }
+
+[data-tippy-root] {
+  z-index: 100000 !important;
+}
