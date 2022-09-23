@@ -39,21 +39,4 @@ describe("WrapDialog", () => {
     cy.get(`[data-test-id="2"]`).should("not.exist"); //row 2 should be hidden after the search
     cy.contains("Form Has Submitted").should("not.exist"); //the form should not have submitted
   });
-
-  it(`wrapDialog will prompt when there are unsaved changes`, () => {
-    cy.contains("Alternate Prompt").click();
-    cy.get(".bp3-dialog-close-button").click();
-    let text;
-    cy.on("window:confirm", t => {
-      text = t;
-      return false;
-    }).then(() => {
-      expect(text).to.contains(
-        "Are you sure you want to leave? There are unsaved changes."
-      );
-    });
-    cy.contains("Alternate Prompt").click();
-    cy.get(".bp3-dialog-close-button").click();
-    cy.contains("Alternate Prompt").should("not.exist");
-  });
 });

@@ -13,6 +13,7 @@ import SimpleTable from "./examples/SimpleTable";
 import TgSelectDemo from "./examples/TgSelectDemo";
 import InfoHelper from "./examples/InfoHelper";
 import Loading from "./examples/Loading";
+import PromptUnsavedChanges from "./examples/PromptUnsavedChanges";
 import DemoNav from "./DemoNav";
 import DemoHeader from "./DemoHeader";
 import { DataTable } from "../../src";
@@ -238,7 +239,10 @@ const demos = {
   },
   ScrollToTop: {
     demo: ScrollToTopDemo
-  }
+  },
+  PromptUnsavedChanges: {
+    demo: PromptUnsavedChanges
+  },
   // fonticons: {
   //   demo: FontIconsDemo,
   // }
