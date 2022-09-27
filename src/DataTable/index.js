@@ -1649,7 +1649,7 @@ class DataTable extends React.Component {
       withSort && !disableSorting && !isActionColumn ? (
         <div className="tg-sort-arrow-container">
           <Icon
-            title="Sort Z-A (Hold shift to sort multiple columns)"
+            data-tip="Sort Z-A (Hold shift to sort multiple columns)"
             icon="chevron-up"
             className={classNames({
               active: sortUp
@@ -1661,7 +1661,7 @@ class DataTable extends React.Component {
             }}
           />
           <Icon
-            title="Sort A-Z (Hold shift to sort multiple columns)"
+            data-tip="Sort A-Z (Hold shift to sort multiple columns)"
             icon="chevron-down"
             className={classNames({
               active: sortDown
