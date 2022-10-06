@@ -99,6 +99,7 @@ export default class TgSelectDemo extends React.Component {
                       ),
                       value: "123y4"
                     },
+                    { color: "green", label: "haeaya", value: "1f1" },
                     { color: "green", label: "hey", value: "as1234" },
                     {
                       color: "yellow",

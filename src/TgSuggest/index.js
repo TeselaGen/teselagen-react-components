@@ -1,9 +1,8 @@
 import { Suggest } from "@blueprintjs/select";
 import { Keys } from "@blueprintjs/core";
 import React from "react";
-import fuzzysearch from "fuzzysearch";
 import classNames from "classnames";
-import { simplesearch } from "../TgSelect";
+import { itemListPredicate } from "../TgSelect";
 
 class TgSuggest extends React.Component {
   static defaultProps = {
@@ -34,9 +33,9 @@ class TgSuggest extends React.Component {
     return onChange(item);
   };
 
-  itemPredicate = (queryString, item) => {
+  itemListPredicate = (queryString, item) => {
     const { isSimpleSearch } = this.props;
-    return singleItemPredicate(queryString, item, isSimpleSearch);
+    return itemListPredicate(queryString, item, isSimpleSearch);
   };
 
   onQueryChange = query => {
@@ -100,7 +99,7 @@ class TgSuggest extends React.Component {
           resetOnSelect: false,
           onQueryChange: this.onQueryChange,
           itemRenderer: this.itemRenderer,
-          itemPredicate: this.itemPredicate,
+          itemListPredicate: this.itemListPredicate,
           selectedItem: value,
           inputValueRenderer: this.renderInputValue,
           inputProps: {
@@ -119,9 +118,3 @@ class TgSuggest extends React.Component {
   }
 }
 export default TgSuggest;
-
-export const singleItemPredicate = (queryString, item = "", isSimpleSearch) =>
-  (isSimpleSearch ? simplesearch : fuzzysearch)(
-    queryString.toLowerCase(),
-    item.toLowerCase() || ""
-  );

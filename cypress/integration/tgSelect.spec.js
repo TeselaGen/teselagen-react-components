@@ -15,6 +15,13 @@ describe("tgSelect", () => {
     cy.get(".tg-select input").type("i'm some{enter}");
     cy.contains(".tg-select-value", "hey I'm some");
   });
+  it(`It should order based on exact match, include match, all other fuzzy matches`, () => {
+    cy.get(".tg-select input").type("hey");
+    cy.get(`.tg-select-option:first:contains(hey)`);
+    cy.get(`.tg-select-option:first:contains(some)`).should("not.exist");
+    cy.get(`.tg-select-option:eq(1):contains(some)`).should("exist");
+    cy.get(`.tg-select-option:eq(2):contains(haeaya)`).should("exist");
+  });
   it(`creatable won't allow for making duplicates`, () => {
     cy.tgToggle("creatable");
     cy.get(".tg-select input").type("tHEr");

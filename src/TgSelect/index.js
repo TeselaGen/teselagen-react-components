@@ -2,11 +2,10 @@ import { MultiSelect, getCreateNewItem } from "@blueprintjs/select";
 import { Keys, Button, MenuItem, Tag } from "@blueprintjs/core";
 import React from "react";
 import { filter, isEqual } from "lodash";
-import fuzzysearch from "fuzzysearch";
 import classNames from "classnames";
-// import Tag from "../Tag";
 import "./style.css";
 import { withProps } from "recompose";
+import fuzzysearch from "fuzzysearch";
 import getTextFromEl from "../utils/getTextFromEl";
 import { getTagColorStyle, getTagProps } from "../utils/tagUtils";
 import popoverOverflowModifiers from "../utils/popoverOverflowModifiers";
@@ -129,12 +128,12 @@ class TgSelect extends React.Component {
     this.input.focus();
   };
 
-  itemPredicate = (queryString, item) => {
+  itemListPredicate = (queryString, item) => {
     // this will hide an option if it returns false
     // each item is an individual option item
     const { isSimpleSearch } = this.props;
 
-    return singleItemPredicate(queryString, item, isSimpleSearch);
+    return itemListPredicate(queryString, item, isSimpleSearch);
   };
 
   onQueryChange = query => {
@@ -313,7 +312,6 @@ class TgSelect extends React.Component {
         noResults={noResultsText || noResults}
         onQueryChange={this.onQueryChange}
         itemRenderer={this.itemRenderer}
-        itemPredicate={this.itemPredicate}
         itemListPredicate={this.itemListPredicate}
         {...{
           selectedItems,
@@ -416,15 +414,31 @@ function getValueArray(value) {
 }
 
 //we export this here for use in createGenericSelect
-export const singleItemPredicate = (queryString, item, isSimpleSearch) =>
-  (isSimpleSearch ? simplesearch : fuzzysearch)(
-    queryString.toLowerCase(),
-    item.label
-      ? item.label.toLowerCase
-        ? item.label.toLowerCase()
-        : getTextFromEl(item.label).toLowerCase()
-      : (item.value && item.value.toLowerCase && item.value.toLowerCase()) || ""
+export const itemListPredicate = (_queryString = "", items, isSimpleSearch) => {
+  const queryString = _queryString.toLowerCase();
+  const toSearchArr = (items || []).map(item => {
+    return {
+      item,
+      text: item.toLowerCase
+        ? item.toLowerCase()
+        : item.label
+        ? item.label.toLowerCase
+          ? item.label.toLowerCase()
+          : getTextFromEl(item.label).toLowerCase()
+        : (item.value && item.value.toLowerCase && item.value.toLowerCase()) ||
+          ""
+    };
+  });
+  let toRet = toSearchArr.filter(({ text }) =>
+    (isSimpleSearch ? simplesearch : fuzzysearch)(queryString, text)
   );
+  toRet = toRet.sort(({ text }, { text: text2 }) => {
+    return getSort(text, queryString) - getSort(text2, queryString);
+  });
+
+  toRet = toRet.map(({ item }) => item);
+  return toRet;
+};
 
 export function simplesearch(needle, haystack) {
   return (haystack || "").indexOf(needle) !== -1;
@@ -432,4 +446,12 @@ export function simplesearch(needle, haystack) {
 function tagOptionRender(vals) {
   if (vals.noTagStyle) return vals.label;
   return <Tag {...getTagProps(vals)}></Tag>;
+}
+
+function getSort(text, queryString) {
+  let ret;
+  if (text === queryString) ret = 0;
+  else if (text.includes(queryString)) ret = 0.9;
+  else ret = 1;
+  return ret;
 }
