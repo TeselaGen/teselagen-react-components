@@ -71,7 +71,13 @@ export default compose(
     // this must come before handling orderings.
     schemaToUse.fields = schemaToUse.fields.map(field => {
       if (field.placementPath) {
-        return { ...field, path: field.placementPath };
+        return {
+          ...field,
+          sortDisabled:
+            field.sortDisabled ||
+            (typeof field.path === "string" && field.path.includes(".")),
+          path: field.placementPath
+        };
       } else {
         return field;
       }
