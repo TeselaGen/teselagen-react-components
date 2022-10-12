@@ -26,6 +26,7 @@ import {
 import { DateInput, DateRangeInput } from "@blueprintjs/datetime";
 import useDeepCompareEffect from "use-deep-compare-effect";
 import { difference } from "lodash";
+import { set } from "lodash";
 import TgSelect from "../TgSelect";
 import TgSuggest from "../TgSuggest";
 import InfoHelper from "../InfoHelper";
@@ -379,33 +380,66 @@ export const renderBlueprintInput = props => {
 };
 
 export const renderBlueprintCheckbox = props => {
-  const { input, label, tooltipInfo, onFieldSubmit, ...rest } = props;
+  const {
+    input,
+    label,
+    tooltipInfo,
+    beforeOnChange,
+    onFieldSubmit,
+    ...rest
+  } = props;
   return (
     <Checkbox
       {...removeUnwantedProps(rest)}
       {...input}
       checked={input.value}
       label={<LabelWithTooltipInfo label={label} tooltipInfo={tooltipInfo} />}
-      onChange={function(e, val) {
-        input.onChange(e, val);
-        onFieldSubmit(e.target ? e.target.checked : val);
-      }}
+      onChange={getCheckboxOrSwitchOnChange({
+        beforeOnChange,
+        input,
+        onFieldSubmit
+      })}
     />
   );
 };
 
+const getCheckboxOrSwitchOnChange = ({
+  beforeOnChange,
+  input,
+  onFieldSubmit
+}) =>
+  async function(e, val) {
+    const v = e.target ? e.target.checked : val;
+    if (beforeOnChange) {
+      const { stopEarly } = (await beforeOnChange(v, e)) || {};
+      if (stopEarly) return;
+      set(e, "target.checked", v);
+    }
+    input.onChange(e, val);
+    onFieldSubmit(v);
+  };
+
 export const renderBlueprintSwitch = props => {
-  const { input, label, tooltipInfo, onFieldSubmit, ...rest } = props;
+  const {
+    input,
+    label,
+    tooltipInfo,
+    onFieldSubmit,
+    beforeOnChange,
+    ...rest
+  } = props;
+
   return (
     <Switch
       {...removeUnwantedProps(rest)}
       {...input}
       checked={input.value}
       label={<LabelWithTooltipInfo label={label} tooltipInfo={tooltipInfo} />}
-      onChange={function(e, val) {
-        input.onChange(e, val);
-        onFieldSubmit(e.target ? e.target.checked : val);
-      }}
+      onChange={getCheckboxOrSwitchOnChange({
+        beforeOnChange,
+        input,
+        onFieldSubmit
+      })}
     />
   );
 };
@@ -1053,6 +1087,7 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
       isRequired,
       ...rest
     } = props;
+
     //get is assign defaults mode
     //if assign default value mode then add on to the component
     const [defaultValCount, setDefaultValCount] = React.useState(0);

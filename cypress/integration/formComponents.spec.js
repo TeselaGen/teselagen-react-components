@@ -5,6 +5,19 @@ describe("formComponents", () => {
   it(`a disabled SelectField should not be able to be interacted with`, () => {
     cy.get(`[label="<SelectField/> with defaultValue"]`).should("be.disabled");
   });
+  it(`switch field with beforeOnChange should work showing a confirmation dialog`, () => {
+    cy.contains(`W/ Confirmation`).click();
+    cy.contains("Are you sure???");
+    cy.contains(".bp3-dialog button", "OK").click();
+    cy.contains(`W/ Confirmation`).click();
+    cy.get(".bp3-dialog").should("not.exist");
+    cy.contains("Are you sure???").should("not.exist");
+    cy.contains(`W/ Confirmation`).click();
+    cy.contains("Are you sure???");
+    cy.contains(".bp3-dialog button", "Cancel").click();
+    cy.contains(`W/ Confirmation`).click();
+    cy.contains("Are you sure???");
+  });
   it(`ReactSelectField works for single select`, () => {
     cy.get(".tg-test-react-select-field .tg-select")
       .click()

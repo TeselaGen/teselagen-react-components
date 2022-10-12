@@ -22,7 +22,8 @@ import {
   ReactSelectField,
   ReactColorField,
   SuggestField,
-  InfoHelper
+  InfoHelper,
+  showConfirmationDialog
 } from "../../../src";
 import { useToggle } from "../renderToggle";
 import OptionsSection from "../OptionsSection";
@@ -390,6 +391,24 @@ function FormComponentsDemo({ handleSubmit }) {
           <SwitchField
             onFieldSubmit={onFieldSubmit}
             defaultValue
+            tooltipInfo="pass a beforeOnChange prop to do work before allowing a change (also works for checkboxes)"
+            name={"SwitchFieldwconf"}
+            beforeOnChange={async val => {
+              if (!val) {
+                const keepGoing = await showConfirmationDialog({
+                  text: "Are you sure???",
+                  intent: "danger" //applied to the right most confirm button
+                });
+                return { stopEarly: !keepGoing };
+              }
+              return;
+            }}
+            inlineLabel={inlineLabels}
+            label="W/ Confirmation"
+          />
+          <SwitchField
+            onFieldSubmit={onFieldSubmit}
+            defaultValue
             tooltipInfo="zooonk i'm some helper info!"
             name={"SwitchField"}
             inlineLabel={inlineLabels}
@@ -459,8 +478,20 @@ function FormComponentsDemo({ handleSubmit }) {
             creatable={reactSelectFieldcreatable}
             options={[
               {
-                label:
-                  <div style={{display: 'flex'}}>Rodrigo Pavez aoiwjefoiawjfiojawe faowijefoiajwefoijawf woaiefjawoieRodrigo Pavez aoiwjefoiawjfiojawe faowijefoiajwefoijawf woaiefjawoieRodrigo Pavez aoiwjefoiawjfiojawe faowijefoiajwefoijawf woaiefjawoieRodrigo Pavez aoiwjefoiawjfiojawe faowijefoiajwefoijawf woaiefjawoieRodrigo Pavez aoiwjefoiawjfiojawe faowijefoiajwefoijawf woaiefjawoieRodrigo Pavez aoiwjefoiawjfiojawe faowijefoiajwefoijawf woaiefjawoie <div>I'm a reallllly long label.. doh</div></div>,
+                label: (
+                  <div style={{ display: "flex" }}>
+                    Rodrigo Pavez aoiwjefoiawjfiojawe faowijefoiajwefoijawf
+                    woaiefjawoieRodrigo Pavez aoiwjefoiawjfiojawe
+                    faowijefoiajwefoijawf woaiefjawoieRodrigo Pavez
+                    aoiwjefoiawjfiojawe faowijefoiajwefoijawf
+                    woaiefjawoieRodrigo Pavez aoiwjefoiawjfiojawe
+                    faowijefoiajwefoijawf woaiefjawoieRodrigo Pavez
+                    aoiwjefoiawjfiojawe faowijefoiajwefoijawf
+                    woaiefjawoieRodrigo Pavez aoiwjefoiawjfiojawe
+                    faowijefoiajwefoijawf woaiefjawoie{" "}
+                    <div>I'm a reallllly long label.. doh</div>
+                  </div>
+                ),
                 value: { name: "Rodrigo Pavez", id: "123" }
               },
               { label: "Ximena Morales", value: "Ximena Morales" },

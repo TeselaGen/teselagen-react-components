@@ -674,7 +674,9 @@ export interface DateRangeInputFieldProps extends GenericFormFieldProps { }
  */
 export class CheckboxField extends React.Component<CheckboxFieldProps, any> { }
 
-export interface CheckboxFieldProps extends GenericFormFieldProps { }
+export interface CheckboxFieldProps extends GenericFormFieldProps { 
+  beforeOnChange: function
+}
 
 /**
  * @example 
@@ -683,6 +685,16 @@ export interface CheckboxFieldProps extends GenericFormFieldProps { }
           label="Only Show Pending Worklists"
           name="onlyShowPending"
           defaultValue={true}
+          beforeOnChange={async val => {
+              if (!val) {
+                const keepGoing = await showConfirmationDialog({
+                  text: "Are you sure???",
+                  intent: "danger" //applied to the right most confirm button
+                });
+                return { stopEarly: !keepGoing };
+              }
+              return;
+            }}
           onFieldSubmit={() => {
             setNewParams({
               ...currentParams,
@@ -694,7 +706,9 @@ export interface CheckboxFieldProps extends GenericFormFieldProps { }
  */
 export class SwitchField extends React.Component<SwitchFieldProps, any> { }
 
-export interface SwitchFieldProps extends GenericFormFieldProps { }
+export interface SwitchFieldProps extends GenericFormFieldProps { 
+  beforeOnChange: function
+}
 /**
  * @example 
  * <TextareaField
