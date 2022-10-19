@@ -31,8 +31,7 @@ import {
   Popover,
   Intent,
   Callout,
-  Tooltip,
-  InputGroup
+  Tooltip
 } from "@blueprintjs/core";
 import classNames from "classnames";
 import scrollIntoView from "dom-scroll-into-view";
@@ -1934,7 +1933,12 @@ function getAllRows(e) {
 function EditableCell({ initialValue, finishEdit }) {
   const [v, setV] = useState(initialValue);
   return (
-    <InputGroup
+    <input
+      style={{
+        border: 0,
+        width: "95%",
+        background: "none"
+      }}
       value={v}
       autoFocus
       onKeyDown={e => {
@@ -1948,7 +1952,7 @@ function EditableCell({ initialValue, finishEdit }) {
       onChange={e => {
         setV(e.target.value);
       }}
-    ></InputGroup>
+    ></input>
   );
 }
 
