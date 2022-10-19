@@ -308,10 +308,13 @@
   border: 1px solid transparent;
 }
 
-.ReactTable .rt-tbody .rt-td.selected {
+.ReactTable .rt-tbody .rt-td.isSelectedCell {
   border: 1px solid rgb(75, 137, 255);
-  /* box-shadow: inset 0 0 5px #6099cf, inset 0 0 5px #6099cf,
-    inset 0 0 5px #6099cf; */
+  overflow: visible;
+  z-index: 1;
+}
+.ReactTable .rt-tbody .rt-td.isBooleanCell {
+  overflow: visible;
 }
 .ReactTable .rt-tbody .rt-td.selectedForUpdate {
   border: 1px dashed rgb(75, 137, 255);

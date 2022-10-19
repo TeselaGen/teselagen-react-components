@@ -1211,7 +1211,7 @@ class DataTable extends React.Component {
     const rowDisabled = isEntityDisabled(entity);
 
     const className = classNames({
-      selected: reduxFormSelectedCells[cellId]
+      isSelectedCell: reduxFormSelectedCells[cellId]
     });
     return {
       onDoubleClick: () => {
@@ -1546,15 +1546,17 @@ class DataTable extends React.Component {
         let title = text;
         if (getCellHoverText) title = getCellHoverText(...args);
         else if (column.getTitleAttr) title = column.getTitleAttr(...args);
+        const isSelectedCell = reduxFormSelectedCells?.[cellId];
 
         return (
           <>
             <div
-              style={
-                noEllipsis
-                  ? {}
-                  : { textOverflow: "ellipsis", overflow: "hidden" }
-              }
+              style={{
+                ...(!noEllipsis && {
+                  textOverflow: "ellipsis",
+                  overflow: "hidden"
+                })
+              }}
               data-test={"tgCell_" + column.path}
               className="tg-cell-wrapper"
               data-copy-text={text}
@@ -1562,7 +1564,7 @@ class DataTable extends React.Component {
             >
               {val}
             </div>
-            {reduxFormSelectedCells?.[cellId] && (
+            {isSelectedCell && (
               <CellDragHandle
                 thisTable={this.table}
                 cellId={cellId}

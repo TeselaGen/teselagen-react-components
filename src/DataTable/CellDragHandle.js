@@ -19,7 +19,7 @@ export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
       const selectedY = selectedTr.getBoundingClientRect().y;
       const cursorY = e.clientY;
       const isCursorBelow = cursorY > selectedY;
-
+      rowsToSelect.current = [];
       forEach(trs, (tr, index) => {
         let isSelectedForUpdate;
         const rowId = tr.dataset.testId;
