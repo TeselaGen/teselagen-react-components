@@ -4,7 +4,6 @@ import ReactDOM from "react-dom";
 
 export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
   const xStart = useRef(0);
-
   const rowsToSelect = useRef();
   const resize = useRef(e => {
     const table = ReactDOM.findDOMNode(thisTable);

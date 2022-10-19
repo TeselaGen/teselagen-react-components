@@ -1984,7 +1984,7 @@ function getAllRows(e) {
   return allRowEls;
 }
 
-function EditableCell({ initialValue, finishEdit }) {
+function EditableCell({ initialValue, finishEdit, isNumeric }) {
   const [v, setV] = useState(initialValue);
   return (
     <input
@@ -1994,6 +1994,7 @@ function EditableCell({ initialValue, finishEdit }) {
         fontSize: 12,
         background: "none"
       }}
+      type={isNumeric ? "numeric" : undefined}
       value={v}
       autoFocus
       onKeyDown={e => {
