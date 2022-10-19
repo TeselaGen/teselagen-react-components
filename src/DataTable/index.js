@@ -1191,7 +1191,11 @@ class DataTable extends React.Component {
   };
 
   getTableCellProps = (state, rowInfo, column) => {
-    const { change, reduxFormSelectedCells = {} } = computePresets(this.props);
+    const {
+      change,
+      reduxFormSelectedCells = {},
+      reduxFormEditingCell
+    } = computePresets(this.props);
     const entity = rowInfo.original;
     const rowId = getIdOrCodeOrIndex(entity, rowInfo.index);
 
@@ -1199,11 +1203,16 @@ class DataTable extends React.Component {
 
     return {
       onDoubleClick: () => {
+        const newSelectedCells = { ...reduxFormSelectedCells };
+        newSelectedCells[cellId] = true;
+        change("reduxFormSelectedCells", newSelectedCells);
         change("reduxFormEditingCell", cellId);
       },
       onClick: () => {
         const newSelectedCells = { ...reduxFormSelectedCells };
         if (newSelectedCells[cellId]) {
+          // don't deselect if editing
+          if (reduxFormEditingCell === cellId) return;
           delete newSelectedCells[cellId];
         } else {
           newSelectedCells[cellId] = true;
@@ -1321,6 +1330,11 @@ class DataTable extends React.Component {
         }
       })
     );
+  };
+
+  cancelCellEdit = () => {
+    const { change } = computePresets(this.props);
+    change("reduxFormEditingCell", null);
   };
 
   renderColumns = () => {
@@ -1467,30 +1481,32 @@ class DataTable extends React.Component {
         const [row] = args;
         const rowId = getIdOrCodeOrIndex(row.original, row.index);
         const cellId = `${rowId}:${row.column.path}`;
+        const val = oldFunc(...args);
+        const text = this.getCopyTextForCell(val, row, column);
+
         if (reduxFormEditingCell === cellId) {
           const isDropdown = column.type === "dropdown";
           if (isDropdown) {
             return (
               <DropdownCell
-                initialValue="thomas"
+                initialValue={text}
                 options={["one", "option 2"]}
                 finishEdit={newVal => {
                   this.finishCellEdit(cellId, newVal);
                 }}
+                cancelEdit={this.cancelCellEdit}
               ></DropdownCell>
             );
           }
           return (
             <EditableCell
-              initialValue="thomas"
+              initialValue={text}
               finishEdit={newVal => {
                 this.finishCellEdit(cellId, newVal);
               }}
             ></EditableCell>
           );
         }
-        const val = oldFunc(...args);
-        const text = this.getCopyTextForCell(val, row, column);
 
         //wrap the original tableColumn.Cell function in another div in order to add a title attribute
         let title = text;
@@ -1929,18 +1945,30 @@ function DropdownCell({ options, initialValue, finishEdit }) {
     <Popover
       isOpen={true}
       minimal
+      usePortal
+      position="bottom-left"
       content={
         <TgSelect
           small
           value={initialValue}
           onChange={val => {
-            finishEdit(val);
+            finishEdit(val.value);
           }}
+          // onBlur={cancelEdit}
           options={options.map(value => ({ label: value, value }))}
         ></TgSelect>
       }
     >
-      <div style={{ height: "100%", width: "100%" }}></div>
+      <div
+        style={{
+          height: 30,
+          width: "100%",
+          display: "flex",
+          alignItems: "center"
+        }}
+      >
+        {initialValue}
+      </div>
     </Popover>
   );
 }
