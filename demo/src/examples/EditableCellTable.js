@@ -6,7 +6,17 @@ import { useToggle } from "../renderToggle";
 
 const schema = {
   fields: [
-    { path: "name", isEditable: true },
+    {
+      path: "name",
+      isEditable: true,
+      validate: newVal => {
+        if (!newVal || !newVal.includes("t"))
+          return { error: "Must include the letter 't'" };
+      },
+      format: newVal => {
+        return newVal + "_zooonk";
+      }
+    },
     {
       path: "type",
       isEditable: true,
@@ -16,17 +26,20 @@ const schema = {
     {
       path: "weather",
       isEditable: true,
+      //should auto validate against list of accepted values, should auto format to try to coerce input values into accepted
       type: "dropdown",
       values: ["cloudy", "rainy"]
     },
     {
       path: "howMany",
       isEditable: true,
+      //should auto validate to make sure the type is numeric, should auto format (I think this already works..) to try to coerce input values into accepted
       type: "numeric"
     },
     {
       path: "isProtein",
       isEditable: true,
+      //should auto validate to coerce Yes -> true "true"->true, should auto format to try to coerce input values into accepted
       type: "boolean"
     }
   ]
