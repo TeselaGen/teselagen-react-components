@@ -1,6 +1,6 @@
 import Fuse from "fuse.js";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Provider } from "react-redux";
 import { reduxForm } from "redux-form";
 import { Button, Callout, Card } from "@blueprintjs/core";
@@ -20,8 +20,6 @@ import {
   parseCsvOrExcelFile,
   parseCsvString
 } from "../../../src/utils/parserUtils";
-
-import { ReactGrid } from "@silevis/reactgrid";
 import "./UploadCsvWizard.css";
 
 import "@silevis/reactgrid/styles.css";
@@ -31,35 +29,40 @@ import { max } from "lodash";
 import { compose } from "recompose";
 import SimpleStepViz from "./SimpleStepViz";
 import { toString } from "lodash";
+import { HotTable } from "@handsontable/react";
+import { registerAllModules } from "handsontable/registry";
+import "handsontable/dist/handsontable.full.min.css";
+registerAllModules();
 
 const validateAgainstSchema = {
   headers: [
-    { header: "name", type: "string" },
-    { header: "description", type: "string", allowEmpty: true },
-    { header: "sequence", type: "string" },
+    { header: "name" },
+    { header: "description", allowEmpty: true },
+    { header: "sequence" },
     {
       header: "isRegex",
-      type: "boolean",
+      type: "checkbox",
       defaultValue: false,
       allowEmpty: true
     },
     {
       header: "matchType",
       type: "dropdown",
-      values: ["dna", "protein"],
+      source: ["dna", "protein"],
       defaultValue: "dna",
       allowEmpty: true
     },
     {
       header: "type",
       type: "dropdown",
-      values: ["misc_feature", "CDS", "rbs"],
-      defaultValue: "misc_feature"
+      source: ["misc_feature", "CDS", "rbs"],
+      defaultValue: "misc_feature1",
+      validator: "dropdown"
     }
   ],
   exampleData: []
 };
-const csvStr = `Name,Feature,Type,Color,Match type
+const csvStr = `Name,Sequence,Type,Color,Match type
 15 long linker based on the one I designed,APGSGTGGGSGSAPG,,#85DAE9,protein
 20 aa linker based on the one I designed,APGGSGGGTGGGSGGGSAPG,,#C7B0E3,protein
 22 aa linker,GPGSGGGGSGGGGSGGGGSGPG,,#f58a5e,protein
@@ -120,66 +123,6 @@ const getSchema = data => ({
   }),
   exampleData: data
 });
-
-const getColumns = validateAgainstSchema =>
-  validateAgainstSchema.headers.map(({ header }) => {
-    return { columnId: header, width: 150 };
-  });
-
-const getRows = ({ validateAgainstSchema, people }) => [
-  {
-    rowId: "header",
-    cells: validateAgainstSchema.headers.map(({ header }) => ({
-      type: "header",
-      text: header
-    }))
-  },
-  ...people.map((p, i) => {
-    const cells = [];
-    forEach(p, (val, key) => {
-      const schemaForCell = validateAgainstSchema.headers.find(
-        ({ header }) => header === key
-      );
-
-      if (schemaForCell.type === "boolean") {
-        cells.push({
-          type: "dropdown",
-          values: [
-            { label: "true", value: "true" },
-            { label: "false", value: "false" }
-          ]
-        });
-      } else if (schemaForCell.type === "dropdown") {
-        cells.push({
-          type: "dropdown",
-          values: schemaForCell.values.map(v => ({ label: v, value: v }))
-        });
-      } else {
-        cells.push({
-          type: "text",
-          text:
-            val ||
-            (schemaForCell.defaultValue !== undefined
-              ? toString(schemaForCell.defaultValue)
-              : "")
-        });
-      }
-    });
-    return {
-      rowId: i,
-      cells
-    };
-  })
-];
-
-const applyChangesToPeople = (changes, prevPeople) => {
-  changes.forEach(change => {
-    const personIndex = change.rowId;
-    const fieldName = change.columnId;
-    prevPeople[personIndex][fieldName] = change.newCell.text;
-  });
-  return [...prevPeople];
-};
 
 function tryToMatchHeaders(userSchema, officialSchema) {
   const options = {
@@ -267,7 +210,7 @@ const UploadHelper = compose(
 
   wrapDialog({ title: "Upload Helper", style: { width: "fit-content" } })
 )(({ handleSubmit, onlyShowRowsWErrors }) => {
-  const [hasSubmitted, setSubmitted] = useState(true);
+  const [hasSubmitted, setSubmitted] = useState();
   const [steps, setSteps] = useState([
     { text: "Set Headers", active: true },
     { text: "Review Data", active: false }
@@ -449,59 +392,76 @@ const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
   validateAgainstSchema,
   userSchema
 }) {
-  console.log(`~ onlyShowRowsWErrors`, onlyShowRowsWErrors);
-  console.log(`matchedHeaders:`, matchedHeaders);
-  const [people, setPeople] = React.useState(
+  const [loading, setLoading] = useState(true);
+  const hotRef = useRef(null);
+  useEffect(() => {
+    // simulate layout change outside of React lifecycle
+    setTimeout(() => {
+      setLoading(false);
+    }, 400);
+  }, []);
+
+  const data =
     userSchema.exampleData &&
-      userSchema.exampleData.length &&
-      userSchema.exampleData.map(row => {
-        const toRet = {};
-        validateAgainstSchema.headers.forEach(({ header }, i) => {
-          const matchingKey = matchedHeaders[i];
-          if (!matchingKey) toRet[header] = "";
+    userSchema.exampleData.length &&
+    userSchema.exampleData.map(row => {
+      const toRet = {};
+      validateAgainstSchema.headers.forEach(({ header, defaultValue }, i) => {
+        const matchingKey = matchedHeaders[i];
 
+        if (!matchingKey) {
+          toRet[header] = defaultValue === undefined ? defaultValue : "";
+        } else {
           toRet[header] = row[matchingKey];
-        });
-        return toRet;
-      })
-
-    // validateAgainstSchema.exampleData &&
-    //   validateAgainstSchema.exampleData.length
-    //   ? validateAgainstSchema.exampleData
-    //   : [1, 2, 3, 4].map(() => {
-    //       const toRet = {};
-    //       validateAgainstSchema.headers.forEach(({ header }) => {
-    //         toRet[header] = "";
-    //       });
-    //       return toRet;
-    //     })
-  );
-
-  const handleChanges = changes => {
-    setPeople(prevPeople => applyChangesToPeople(changes, prevPeople));
-  };
-
-  const rows = getRows({ validateAgainstSchema, people });
-  const columns = getColumns(validateAgainstSchema);
+        }
+        if (toRet[header] === undefined || toRet[header] === "") {
+          toRet[header] = defaultValue || "";
+        }
+      });
+      return toRet;
+    });
 
   return (
-    <div style={{ width: "100%" }}>
-      <h5>Does this data look correct?</h5>
+    <div style={{}}>
+      <h5>Does this data look correct? Edit it as needed.</h5>
       <SwitchField
         name={"onlyShowRowsWErrors"}
         inlineLabel={true}
         label="Only Show Rows With Errors"
       />
-      <ReactGrid
-        stickyTopRows={1}
-        style={{ maxHeight: 500 }}
-        enableFillHandle
-        enableRangeSelection
-        // enableRowSelection
-        onCellsChanged={handleChanges}
-        rows={rows}
-        columns={columns}
-      />
+      <div style={{ height: 400, width: 600 }}>
+        {loading ? (
+          "...loading"
+        ) : (
+          <HotTable
+            rowHeaders={true}
+            colWidths={100}
+            manualColumnResize
+            ref={hotRef}
+            afterLoadData={() => {
+              setTimeout(() => {
+                hotRef.current.hotInstance.validateCells()
+              }, 0);
+            }}
+            // autoColumnSize={{
+            //   // when calculating column widths, use column headers
+            //   useHeaders: true
+            // }}
+            width="100%"
+            height={"100%"}
+            data={data}
+            colHeaders={validateAgainstSchema.headers.map(
+              ({ header }) => header
+            )}
+            columns={validateAgainstSchema.headers.map(h => ({
+              ...h,
+              data: h.header,
+              wordWrap: false
+            }))}
+            licenseKey="non-commercial-and-evaluation"
+          />
+        )}
+      </div>
     </div>
   );
 });
