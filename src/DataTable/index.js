@@ -1211,7 +1211,8 @@ class DataTable extends React.Component {
     const rowDisabled = isEntityDisabled(entity);
 
     const className = classNames({
-      isSelectedCell: reduxFormSelectedCells[cellId]
+      isSelectedCell: reduxFormSelectedCells[cellId],
+      "no-data-tip": reduxFormSelectedCells[cellId]
     });
     return {
       onDoubleClick: () => {
@@ -1532,6 +1533,7 @@ class DataTable extends React.Component {
             } else {
               return (
                 <EditableCell
+                  isNumeric={column.type === "numeric"}
                   initialValue={text}
                   finishEdit={newVal => {
                     this.finishCellEdit(cellId, newVal);
@@ -1994,7 +1996,7 @@ function EditableCell({ initialValue, finishEdit, isNumeric }) {
         fontSize: 12,
         background: "none"
       }}
-      type={isNumeric ? "numeric" : undefined}
+      type={isNumeric ? "number" : undefined}
       value={v}
       autoFocus
       onKeyDown={e => {
