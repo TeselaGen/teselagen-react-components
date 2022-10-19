@@ -63,6 +63,7 @@ import defaultProps from "./defaultProps";
 import "../toastr";
 import "./style.css";
 import { getRecordsFromIdMap } from "./utils/withSelectedEntities";
+import { CellDragHandle } from "./CellDragHandle";
 
 dayjs.extend(localizedFormat);
 
@@ -654,7 +655,8 @@ class DataTable extends React.Component {
       withSelectAll,
       variables,
       fragment,
-      safeQuery
+      safeQuery,
+      isCellEditable
     } = propPresets;
 
     if (withSelectAll && !safeQuery) {
@@ -1002,6 +1004,7 @@ class DataTable extends React.Component {
               if (n) this.table = n;
             }}
             className={classNames({
+              isCellEditable,
               "tg-table-loading": isLoading,
               "tg-table-disabled": disabled
             })}
@@ -1109,7 +1112,7 @@ class DataTable extends React.Component {
       isEntityDisabled,
       change,
       getRowClassName,
-      isCellSelect
+      isCellEditable
     } = computePresets(this.props);
     if (!rowInfo) {
       return {
@@ -1124,7 +1127,7 @@ class DataTable extends React.Component {
     const dataId = entity.id || entity.code;
     return {
       onClick: e => {
-        if (isCellSelect) return;
+        if (isCellEditable) return;
         // if checkboxes are activated or row expander is clicked don't select row
         if (e.target.matches(".tg-expander, .tg-expander *")) {
           change("reduxFormExpandedEntityIdMap", {
@@ -1193,9 +1196,11 @@ class DataTable extends React.Component {
   getTableCellProps = (state, rowInfo, column) => {
     const {
       change,
-      reduxFormSelectedCells = {},
-      reduxFormEditingCell
+      reduxFormEditingCell,
+      isCellEditable,
+      reduxFormSelectedCells = {}
     } = computePresets(this.props);
+    if (!isCellEditable) return; //only allow cell selection to do stuff here
     const entity = rowInfo.original;
     const rowId = getIdOrCodeOrIndex(entity, rowInfo.index);
 
@@ -1209,7 +1214,7 @@ class DataTable extends React.Component {
         change("reduxFormEditingCell", cellId);
       },
       onClick: () => {
-        const newSelectedCells = { ...reduxFormSelectedCells };
+        const newSelectedCells = {};
         if (newSelectedCells[cellId]) {
           // don't deselect if editing
           if (reduxFormEditingCell === cellId) return;
@@ -1217,6 +1222,7 @@ class DataTable extends React.Component {
         } else {
           newSelectedCells[cellId] = true;
         }
+
         change("reduxFormSelectedCells", newSelectedCells);
       },
       className: classNames({
@@ -1348,6 +1354,7 @@ class DataTable extends React.Component {
       withExpandAndCollapseAllButton,
       reduxFormExpandedEntityIdMap,
       change,
+      reduxFormSelectedCells,
       reduxFormEditingCell
     } = computePresets(this.props);
     const { columns } = this.state;
@@ -1514,19 +1521,24 @@ class DataTable extends React.Component {
         else if (column.getTitleAttr) title = column.getTitleAttr(...args);
 
         return (
-          <div
-            style={
-              column.noEllipsis
-                ? {}
-                : { textOverflow: "ellipsis", overflow: "hidden" }
-            }
-            data-test={"tgCell_" + column.path}
-            className="tg-cell-wrapper"
-            data-copy-text={text}
-            title={title || undefined}
-          >
-            {val}
-          </div>
+          <>
+            <div
+              style={
+                column.noEllipsis
+                  ? {}
+                  : { textOverflow: "ellipsis", overflow: "hidden" }
+              }
+              data-test={"tgCell_" + column.path}
+              className="tg-cell-wrapper"
+              data-copy-text={text}
+              title={title || undefined}
+            >
+              {val}
+            </div>
+            {reduxFormSelectedCells?.[cellId] && (
+              <CellDragHandle></CellDragHandle>
+            )}
+          </>
         );
       };
 

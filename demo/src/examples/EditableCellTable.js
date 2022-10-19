@@ -102,7 +102,7 @@ export default function SimpleTable(p) {
         <DataTable
           formName="editableCellTable"
           isSimple
-          isCellSelect
+          isCellEditable
           entities={entities}
           schema={schema}
           isEntityDisabled={

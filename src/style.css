@@ -150,3 +150,16 @@ code {
 [data-tippy-root] {
   z-index: 100000 !important;
 }
+
+.isCellEditable .rt-td {
+  position: relative;
+}
+.cellDragHandle {
+  height: 5px;
+  width: 5px;
+  cursor: crosshair;
+  background-color: rgb(76, 107, 171);
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
