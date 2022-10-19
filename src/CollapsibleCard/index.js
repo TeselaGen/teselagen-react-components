@@ -46,6 +46,8 @@ export default class CollapsibleCard extends Component {
       className,
       style
     } = this.props;
+
+    // blueprintjs card will match our table color. which looks really bad when a table is in a card.
     return (
       <div
         className={classNames({ "tg-card": !noCard, open }, className)}

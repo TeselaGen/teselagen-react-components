@@ -1,10 +1,11 @@
 /* eslint react/jsx-no-bind: 0 */
 import React, { useState } from "react";
-import { flatMap } from "lodash";
 import ReactDOM from "react-dom";
 import { arrayMove } from "react-sortable-hoc";
 import copy from "copy-to-clipboard";
 import {
+  flatMap,
+  set,
   map,
   toString,
   camelCase,
@@ -30,7 +31,8 @@ import {
   Popover,
   Intent,
   Callout,
-  Tooltip
+  Tooltip,
+  InputGroup
 } from "@blueprintjs/core";
 import classNames from "classnames";
 import scrollIntoView from "dom-scroll-into-view";
@@ -40,6 +42,8 @@ import { withProps, branch, compose } from "recompose";
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import ReactMarkdown from "react-markdown";
+import immer from "immer";
+import TgSelect from "../TgSelect";
 import { withHotkeys } from "../utils/hotkeyUtils";
 import InfoHelper from "../InfoHelper";
 import getTextFromEl from "../utils/getTextFromEl";
@@ -1032,6 +1036,7 @@ class DataTable extends React.Component {
             TheadComponent={this.getTheadComponent}
             ThComponent={this.getThComponent}
             getTrGroupProps={this.getTableRowProps}
+            getTdProps={this.getTableCellProps}
             NoDataComponent={({ children }) =>
               isLoading ? null : (
                 <div className="rt-noData">
@@ -1103,7 +1108,8 @@ class DataTable extends React.Component {
       entities,
       isEntityDisabled,
       change,
-      getRowClassName
+      getRowClassName,
+      isCellSelect
     } = computePresets(this.props);
     if (!rowInfo) {
       return {
@@ -1118,6 +1124,7 @@ class DataTable extends React.Component {
     const dataId = entity.id || entity.code;
     return {
       onClick: e => {
+        if (isCellSelect) return;
         // if checkboxes are activated or row expander is clicked don't select row
         if (e.target.matches(".tg-expander, .tg-expander *")) {
           change("reduxFormExpandedEntityIdMap", {
@@ -1180,6 +1187,32 @@ class DataTable extends React.Component {
         onDoubleClick &&
           onDoubleClick(rowInfo.original, rowInfo.index, history, e);
       }
+    };
+  };
+
+  getTableCellProps = (state, rowInfo, column) => {
+    const { change, reduxFormSelectedCells = {} } = computePresets(this.props);
+    const entity = rowInfo.original;
+    const rowId = getIdOrCodeOrIndex(entity, rowInfo.index);
+
+    const cellId = `${rowId}:${column.path}`;
+
+    return {
+      onDoubleClick: () => {
+        change("reduxFormEditingCell", cellId);
+      },
+      onClick: () => {
+        const newSelectedCells = { ...reduxFormSelectedCells };
+        if (newSelectedCells[cellId]) {
+          delete newSelectedCells[cellId];
+        } else {
+          newSelectedCells[cellId] = true;
+        }
+        change("reduxFormSelectedCells", newSelectedCells);
+      },
+      className: classNames({
+        selected: reduxFormSelectedCells[cellId]
+      })
     };
   };
 
@@ -1271,6 +1304,25 @@ class DataTable extends React.Component {
     );
   };
 
+  finishCellEdit = (cellId, newVal) => {
+    const { entities = [], change } = computePresets(this.props);
+    change("reduxFormEditingCell", null);
+    const [rowId, path] = cellId.split(":");
+    // const entityTo
+
+    change(
+      "reduxFormEntities",
+      immer(entities, entities => {
+        const entityToUpdate = entities.find((e, i) => {
+          return getIdOrCodeOrIndex(e, i) === rowId;
+        });
+        if (entityToUpdate) {
+          set(entityToUpdate, path, newVal);
+        }
+      })
+    );
+  };
+
   renderColumns = () => {
     const {
       cellRenderer,
@@ -1281,7 +1333,8 @@ class DataTable extends React.Component {
       getCellHoverText,
       withExpandAndCollapseAllButton,
       reduxFormExpandedEntityIdMap,
-      change
+      change,
+      reduxFormEditingCell
     } = computePresets(this.props);
     const { columns } = this.state;
     if (!columns.length) {
@@ -1412,6 +1465,30 @@ class DataTable extends React.Component {
 
       tableColumn.Cell = (...args) => {
         const [row] = args;
+        const rowId = getIdOrCodeOrIndex(row.original, row.index);
+        const cellId = `${rowId}:${row.column.path}`;
+        if (reduxFormEditingCell === cellId) {
+          const isDropdown = column.type === "dropdown";
+          if (isDropdown) {
+            return (
+              <DropdownCell
+                initialValue="thomas"
+                options={["one", "option 2"]}
+                finishEdit={newVal => {
+                  this.finishCellEdit(cellId, newVal);
+                }}
+              ></DropdownCell>
+            );
+          }
+          return (
+            <EditableCell
+              initialValue="thomas"
+              finishEdit={newVal => {
+                this.finishCellEdit(cellId, newVal);
+              }}
+            ></EditableCell>
+          );
+        }
         const val = oldFunc(...args);
         const text = this.getCopyTextForCell(val, row, column);
 
@@ -1824,4 +1901,46 @@ function getAllRows(e) {
     return;
   }
   return allRowEls;
+}
+
+function EditableCell({ initialValue, finishEdit }) {
+  const [v, setV] = useState(initialValue);
+  return (
+    <InputGroup
+      value={v}
+      autoFocus
+      onKeyDown={e => {
+        if (e.key === "Enter") {
+          finishEdit(v);
+        }
+      }}
+      onBlur={() => {
+        finishEdit(v);
+      }}
+      onChange={e => {
+        setV(e.target.value);
+      }}
+    ></InputGroup>
+  );
+}
+
+function DropdownCell({ options, initialValue, finishEdit }) {
+  return (
+    <Popover
+      isOpen={true}
+      minimal
+      content={
+        <TgSelect
+          small
+          value={initialValue}
+          onChange={val => {
+            finishEdit(val);
+          }}
+          options={options.map(value => ({ label: value, value }))}
+        ></TgSelect>
+      }
+    >
+      <div style={{ height: "100%", width: "100%" }}></div>
+    </Popover>
+  );
 }

@@ -259,8 +259,18 @@ export default compose(
     "reduxFormQueryParams",
     "reduxFormSearchInput",
     "reduxFormSelectedEntityIdMap",
-    "reduxFormExpandedEntityIdMap"
+    "reduxFormExpandedEntityIdMap",
+    "reduxFormSelectedCells",
+    "reduxFormEditingCell",
+    "reduxFormCellIdToEditValue",
+    "reduxFormEntities"
   ),
+  withProps(props => {
+    const entities = props.reduxFormEntities || props.entities;
+    return {
+      entities
+    };
+  }),
   // withFields({
   //   names: [
   //     "localStorageForceUpdate",
