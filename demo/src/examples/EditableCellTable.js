@@ -92,9 +92,7 @@ export default function SimpleTable(p) {
               : undefined
           }
           {...p}
-        >
-          <div>hey, I am the child</div>
-        </DataTable>
+        ></DataTable>
       </DemoWrapper>
     </div>
   );

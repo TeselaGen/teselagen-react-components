@@ -1197,7 +1197,8 @@ class DataTable extends React.Component {
       change,
       reduxFormEditingCell,
       isCellEditable,
-      reduxFormSelectedCells = {}
+      reduxFormSelectedCells = {},
+      isEntityDisabled
     } = computePresets(this.props);
     if (!isCellEditable) return; //only allow cell selection to do stuff here
     const entity = rowInfo.original;
@@ -1205,14 +1206,18 @@ class DataTable extends React.Component {
 
     const cellId = `${rowId}:${column.path}`;
 
+    const rowDisabled = isEntityDisabled(entity);
+
     return {
       onDoubleClick: () => {
+        if (rowDisabled) return;
         const newSelectedCells = { ...reduxFormSelectedCells };
         newSelectedCells[cellId] = true;
         change("reduxFormSelectedCells", newSelectedCells);
         change("reduxFormEditingCell", cellId);
       },
       onClick: () => {
+        if (rowDisabled) return;
         const newSelectedCells = {};
         if (newSelectedCells[cellId]) {
           // don't deselect if editing
@@ -1350,6 +1355,7 @@ class DataTable extends React.Component {
       SubComponent,
       shouldShowSubComponent,
       entities,
+      isEntityDisabled,
       getCellHoverText,
       withExpandAndCollapseAllButton,
       reduxFormExpandedEntityIdMap,
@@ -1494,6 +1500,7 @@ class DataTable extends React.Component {
         if (isCellEditable && column.type === "boolean") {
           return (
             <Checkbox
+              disabled={isEntityDisabled(row.original)}
               className="tg-cell-edit-boolean-checkbox"
               checked={val === "True"}
               onChange={e => {
