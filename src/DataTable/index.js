@@ -16,7 +16,8 @@ import {
   keyBy,
   omit,
   forEach,
-  lowerCase
+  lowerCase,
+  get
 } from "lodash";
 import joinUrl from "url-join";
 
@@ -1183,6 +1184,7 @@ class DataTable extends React.Component {
         }
       ),
       "data-test-id": dataId,
+      "data-index": rowInfo.index,
       onDoubleClick: e => {
         if (rowDisabled) return;
         this.dblClickTriggered = true;
@@ -1200,7 +1202,7 @@ class DataTable extends React.Component {
       reduxFormSelectedCells = {},
       isEntityDisabled
     } = computePresets(this.props);
-    if (!isCellEditable) return; //only allow cell selection to do stuff here
+    if (!isCellEditable) return {}; //only allow cell selection to do stuff here
     const entity = rowInfo.original;
     const rowId = getIdOrCodeOrIndex(entity, rowInfo.index);
 
@@ -1208,6 +1210,9 @@ class DataTable extends React.Component {
 
     const rowDisabled = isEntityDisabled(entity);
 
+    const className = classNames({
+      selected: reduxFormSelectedCells[cellId]
+    });
     return {
       onDoubleClick: () => {
         if (rowDisabled) return;
@@ -1229,9 +1234,7 @@ class DataTable extends React.Component {
 
         change("reduxFormSelectedCells", newSelectedCells);
       },
-      className: classNames({
-        selected: reduxFormSelectedCells[cellId]
-      })
+      className
     };
   };
 
@@ -1445,6 +1448,7 @@ class DataTable extends React.Component {
         }
       });
     }
+
     columns.forEach(column => {
       const tableColumn = {
         ...column,
@@ -1457,6 +1461,7 @@ class DataTable extends React.Component {
           columnindex: column.columnIndex
         })
       };
+      let noEllipsis = column.noEllipsis;
       if (column.width) {
         tableColumn.width = column.width;
       }
@@ -1494,43 +1499,46 @@ class DataTable extends React.Component {
         const [row] = args;
         const rowId = getIdOrCodeOrIndex(row.original, row.index);
         const cellId = `${rowId}:${row.column.path}`;
-        const val = oldFunc(...args);
+        let val = oldFunc(...args);
         const text = this.getCopyTextForCell(val, row, column);
 
         if (isCellEditable && column.type === "boolean") {
-          return (
+          const oldVal = val;
+          val = (
             <Checkbox
               disabled={isEntityDisabled(row.original)}
               className="tg-cell-edit-boolean-checkbox"
-              checked={val === "True"}
+              checked={oldVal === "True"}
               onChange={e => {
                 const checked = e.target.checked;
                 this.finishCellEdit(cellId, checked);
               }}
             />
           );
-        }
-        if (reduxFormEditingCell === cellId) {
-          if (column.type === "dropdown") {
-            return (
-              <DropdownCell
-                initialValue={text}
-                options={["one", "option 2"]}
-                finishEdit={newVal => {
-                  this.finishCellEdit(cellId, newVal);
-                }}
-                cancelEdit={this.cancelCellEdit}
-              ></DropdownCell>
-            );
-          } else {
-            return (
-              <EditableCell
-                initialValue={text}
-                finishEdit={newVal => {
-                  this.finishCellEdit(cellId, newVal);
-                }}
-              ></EditableCell>
-            );
+          noEllipsis = true;
+        } else {
+          if (reduxFormEditingCell === cellId) {
+            if (column.type === "dropdown") {
+              return (
+                <DropdownCell
+                  initialValue={text}
+                  options={["one", "option 2"]}
+                  finishEdit={newVal => {
+                    this.finishCellEdit(cellId, newVal);
+                  }}
+                  cancelEdit={this.cancelCellEdit}
+                ></DropdownCell>
+              );
+            } else {
+              return (
+                <EditableCell
+                  initialValue={text}
+                  finishEdit={newVal => {
+                    this.finishCellEdit(cellId, newVal);
+                  }}
+                ></EditableCell>
+              );
+            }
           }
         }
 
@@ -1543,7 +1551,7 @@ class DataTable extends React.Component {
           <>
             <div
               style={
-                column.noEllipsis
+                noEllipsis
                   ? {}
                   : { textOverflow: "ellipsis", overflow: "hidden" }
               }
@@ -1555,7 +1563,31 @@ class DataTable extends React.Component {
               {val}
             </div>
             {reduxFormSelectedCells?.[cellId] && (
-              <CellDragHandle></CellDragHandle>
+              <CellDragHandle
+                thisTable={this.table}
+                cellId={cellId}
+                onDragEnd={cellsToSelect => {
+                  const [rowId, path] = cellId.split(":");
+                  const selectedEnt = entities.find((e, i) => {
+                    return getIdOrCodeOrIndex(e, i) === rowId;
+                  });
+                  const selectedCellVal = get(selectedEnt, path, "");
+                  change(
+                    "reduxFormEntities",
+                    immer(entities, entities => {
+                      cellsToSelect.forEach(cellId => {
+                        const [rowId, path] = cellId.split(":");
+                        const entityToUpdate = entities.find((e, i) => {
+                          return getIdOrCodeOrIndex(e, i) === rowId;
+                        });
+                        if (entityToUpdate) {
+                          set(entityToUpdate, path, selectedCellVal);
+                        }
+                      });
+                    })
+                  );
+                }}
+              ></CellDragHandle>
             )}
           </>
         );

@@ -1,4 +1,3 @@
-import { Button } from "@blueprintjs/core";
 import React from "react";
 import DataTable from "../../../src/DataTable";
 import DemoWrapper from "../DemoWrapper";
@@ -32,44 +31,198 @@ const entities = [
     name: "Thomas",
     id: "1",
     type: "new",
+    isProtein: true,
     weather: "cloudy"
   },
   {
     name: "Taoh",
     id: "2",
     type: "old",
+    isProtein: "true",
     weather: "cloudy"
   },
   {
     name: "Chris",
     id: "3",
     type: "new",
+    isProtein: false,
     weather: "rainy"
   },
   {
     name: "Sam",
     id: "4",
     type: "old",
+    isProtein: false,
     weather: "cloudy"
   },
   {
     name: "Adam",
     id: "5",
     type: "new",
+    isProtein: true,
     weather: "cloudy"
   },
   {
     name: "Kyle",
     id: "6",
     type: "old",
+    isProtein: "TRue",
     weather: "cloudy"
   },
   {
     name: "Tiff",
     id: "7",
     type: "new",
+    isProtein: "False",
     weather: "cloudy"
-  }
+  },
+  {
+    name: "Thomas",
+    id: "1*2",
+    type: "new",
+    isProtein: "false",
+    weather: "cloudy"
+  },
+  {
+    name: "Taoh",
+    id: "2*2",
+    type: "old",
+    isProtein: true,
+    weather: "cloudy"
+  },
+  {
+    name: "Chris",
+    id: "3*2",
+    type: "new",
+    isProtein: true,
+    weather: "rainy"
+  },
+  {
+    name: "Sam",
+    id: "4*2",
+    type: "old",
+    isProtein: true,
+    weather: "cloudy"
+  },
+  {
+    name: "Adam",
+    id: "5*2",
+    type: "new",
+    isProtein: true,
+    weather: "cloudy"
+  },
+  {
+    name: "Kyle",
+    id: "6*2",
+    type: "old",
+    isProtein: true,
+    weather: "cloudy"
+  },
+  {
+    name: "Tiff",
+    id: "7*2",
+    type: "new",
+    isProtein: true,
+    weather: "cloudy"
+  },
+  {
+    name: "Thomas",
+    id: "1+1",
+    type: "new",
+    isProtein: true,
+    weather: "cloudy"
+  },
+  {
+    name: "Taoh",
+    id: "1+2",
+    type: "old",
+    isProtein: true,
+    weather: "cloudy"
+  },
+  {
+    name: "Chris",
+    id: "1+3",
+    type: "new",
+    isProtein: true,
+    weather: "rainy"
+  },
+  {
+    name: "Sam",
+    id: "1+4",
+    type: "old",
+    isProtein: true,
+    weather: "cloudy"
+  },
+  {
+    name: "Adam",
+    id: "1+5",
+    type: "new",
+    isProtein: true,
+    weather: "cloudy"
+  },
+  {
+    name: "Kyle",
+    id: "1+6",
+    type: "old",
+    isProtein: true,
+    weather: "cloudy"
+  },
+  {
+    name: "Tiff",
+    id: "1+7",
+    type: "new",
+    isProtein: true,
+    weather: "cloudy"
+  },
+  {
+    name: "Thomas",
+    id: "1+1*2",
+    type: "new",
+    isProtein: true,
+    weather: "cloudy"
+  },
+  {
+    name: "Taoh",
+    id: "1+2*2",
+    type: "old",
+    isProtein: true,
+    weather: "cloudy"
+  },
+  {
+    name: "Chris",
+    id: "1+3*2",
+    type: "new",
+    isProtein: true,
+    weather: "rainy"
+  },
+  {
+    name: "Sam",
+    id: "1+4*2",
+    type: "old",
+    isProtein: true,
+    weather: "cloudy"
+  },
+  {
+    name: "Adam",
+    id: "1+5*2",
+    type: "new",
+    isProtein: true,
+    weather: "cloudy"
+  },
+  {
+    name: "Kyle",
+    id: "1+6*2",
+    type: "old",
+    isProtein: true,
+    weather: "cloudy"
+  },
+  {
+    name: "Tiff",
+    id: "1+7*2",
+    type: "new",
+    isProtein: true,
+    weather: "cloudy"
+  },
 ];
 
 export default function SimpleTable(p) {

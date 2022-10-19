@@ -313,6 +313,9 @@
   /* box-shadow: inset 0 0 5px #6099cf, inset 0 0 5px #6099cf,
     inset 0 0 5px #6099cf; */
 }
+.ReactTable .rt-tbody .rt-td.selectedForUpdate {
+  border: 1px dashed rgb(75, 137, 255);
+}
 
 .tg-compact-table .rt-tbody .rt-td {
   padding: 4px 4px;
