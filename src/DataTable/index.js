@@ -1946,11 +1946,12 @@ function DropdownCell({ options, initialValue, finishEdit, cancelEdit }) {
       isOpen={true}
       minimal
       usePortal
-      position="bottom-left"
+      position="right"
       onClose={cancelEdit}
       content={
         <TgSelect
           small
+          autoOpen
           value={initialValue}
           onChange={val => {
             finishEdit(val.value);
@@ -1962,14 +1963,10 @@ function DropdownCell({ options, initialValue, finishEdit, cancelEdit }) {
     >
       <div
         style={{
-          height: 30,
-          width: "100%",
-          display: "flex",
-          alignItems: "center"
+          height: "100%",
+          width: "100%"
         }}
-      >
-        {initialValue}
-      </div>
+      ></div>
     </Popover>
   );
 }
