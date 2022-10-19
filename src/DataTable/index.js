@@ -1940,13 +1940,14 @@ function EditableCell({ initialValue, finishEdit }) {
   );
 }
 
-function DropdownCell({ options, initialValue, finishEdit }) {
+function DropdownCell({ options, initialValue, finishEdit, cancelEdit }) {
   return (
     <Popover
       isOpen={true}
       minimal
       usePortal
       position="bottom-left"
+      onClose={cancelEdit}
       content={
         <TgSelect
           small
