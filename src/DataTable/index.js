@@ -1194,6 +1194,18 @@ class DataTable extends React.Component {
     };
   };
 
+  startCellEdit = cellId => {
+    const {
+      change,
+
+      reduxFormSelectedCells = {}
+    } = computePresets(this.props);
+    const newSelectedCells = { ...reduxFormSelectedCells };
+    newSelectedCells[cellId] = true;
+    change("reduxFormSelectedCells", newSelectedCells);
+    change("reduxFormEditingCell", cellId);
+  };
+
   getTableCellProps = (state, rowInfo, column) => {
     const {
       change,
@@ -1217,10 +1229,7 @@ class DataTable extends React.Component {
     return {
       onDoubleClick: () => {
         if (rowDisabled) return;
-        const newSelectedCells = { ...reduxFormSelectedCells };
-        newSelectedCells[cellId] = true;
-        change("reduxFormSelectedCells", newSelectedCells);
-        change("reduxFormEditingCell", cellId);
+        this.startCellEdit(cellId);
       },
       onClick: () => {
         if (rowDisabled) return;
@@ -1566,6 +1575,19 @@ class DataTable extends React.Component {
             >
               {val}
             </div>
+            {isCellEditable && column.type === "dropdown" && (
+              <Icon
+                icon="caret-down"
+                style={{
+                  position: "absolute",
+                  right: 5,
+                  opacity: 0.3
+                }}
+                onClick={() => {
+                  this.startCellEdit(cellId);
+                }}
+              />
+            )}
             {isSelectedCell && (
               <CellDragHandle
                 thisTable={this.table}
@@ -2016,31 +2038,19 @@ function EditableCell({ initialValue, finishEdit, isNumeric }) {
 
 function DropdownCell({ options, initialValue, finishEdit, cancelEdit }) {
   return (
-    <Popover
-      isOpen={true}
-      minimal
-      usePortal
-      position="right"
-      onClose={cancelEdit}
-      content={
-        <TgSelect
-          small
-          autoOpen
-          value={initialValue}
-          onChange={val => {
-            finishEdit(val.value);
-          }}
-          // onBlur={cancelEdit}
-          options={options.map(value => ({ label: value, value }))}
-        ></TgSelect>
-      }
-    >
-      <div
-        style={{
-          height: "100%",
-          width: "100%"
+    <div className="tg-dropdown-cell-edit-container">
+      <TgSelect
+        small
+        autoOpen
+        value={initialValue}
+        onChange={val => {
+          finishEdit(val ? val.value : null);
         }}
-      ></div>
-    </Popover>
+        popoverProps={{
+          onClose: cancelEdit
+        }}
+        options={options.map(value => ({ label: value, value }))}
+      ></TgSelect>
+    </div>
   );
 }
