@@ -154,10 +154,16 @@ code {
 .isCellEditable .rt-td {
   position: relative;
 }
+
+.ReactTable .tg-cell-edit-boolean-checkbox {
+  margin-bottom: 0;
+}
+
 .cellDragHandle {
-  height: 5px;
-  width: 5px;
+  height: 8px;
+  width: 8px;
   cursor: crosshair;
+  border: 1px solid rgb(255, 255, 255);
   background-color: rgb(76, 107, 171);
   position: absolute;
   bottom: 0;

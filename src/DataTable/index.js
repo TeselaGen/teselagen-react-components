@@ -1344,6 +1344,7 @@ class DataTable extends React.Component {
 
   renderColumns = () => {
     const {
+      isCellEditable,
       cellRenderer,
       withCheckboxes,
       SubComponent,
@@ -1490,9 +1491,20 @@ class DataTable extends React.Component {
         const val = oldFunc(...args);
         const text = this.getCopyTextForCell(val, row, column);
 
+        if (isCellEditable && column.type === "boolean") {
+          return (
+            <Checkbox
+              className="tg-cell-edit-boolean-checkbox"
+              checked={val === "True"}
+              onChange={e => {
+                const checked = e.target.checked;
+                this.finishCellEdit(cellId, checked);
+              }}
+            />
+          );
+        }
         if (reduxFormEditingCell === cellId) {
-          const isDropdown = column.type === "dropdown";
-          if (isDropdown) {
+          if (column.type === "dropdown") {
             return (
               <DropdownCell
                 initialValue={text}
@@ -1503,15 +1515,16 @@ class DataTable extends React.Component {
                 cancelEdit={this.cancelCellEdit}
               ></DropdownCell>
             );
+          } else {
+            return (
+              <EditableCell
+                initialValue={text}
+                finishEdit={newVal => {
+                  this.finishCellEdit(cellId, newVal);
+                }}
+              ></EditableCell>
+            );
           }
-          return (
-            <EditableCell
-              initialValue={text}
-              finishEdit={newVal => {
-                this.finishCellEdit(cellId, newVal);
-              }}
-            ></EditableCell>
-          );
         }
 
         //wrap the original tableColumn.Cell function in another div in order to add a title attribute
@@ -1937,6 +1950,7 @@ function EditableCell({ initialValue, finishEdit }) {
       style={{
         border: 0,
         width: "95%",
+        fontSize: 12,
         background: "none"
       }}
       value={v}
