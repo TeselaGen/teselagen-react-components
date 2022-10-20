@@ -125,6 +125,9 @@
 .ReactTable.ReactTable .rt-tbody .rt-tr-group {
   border-bottom: 1px solid rgb(233, 233, 233);
 }
+.ReactTable.ReactTable.isCellEditable .rt-tbody .rt-tr-group {
+  border-bottom: none;
+}
 
 /* tgreen: we don't want the border for rows that don't have any data */
 .ReactTable.ReactTable .rt-tbody .rt-tr-group.no-row-data {
@@ -305,13 +308,16 @@
 }
 
 .ReactTable.isCellEditable .rt-td {
-  border: 1px solid transparent;
+  border: 1px solid rgba(212, 212, 212, 0.671);
 }
 
 .ReactTable .rt-tbody .rt-td.isSelectedCell {
   border: 1px solid rgb(75, 137, 255);
   overflow: visible;
   z-index: 1;
+}
+.ReactTable .rt-tbody .rt-td.hasCellError {
+  background-color: rgba(226, 50, 50, 0.61);
 }
 .ReactTable .rt-tbody .rt-td.isBooleanCell {
   overflow: visible;
@@ -508,5 +514,5 @@
 }
 
 .cell-edit-dropdown:hover {
-  color:rgb(75, 137, 255)
+  color: rgb(75, 137, 255);
 }

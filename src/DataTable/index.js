@@ -1,4 +1,6 @@
 /* eslint react/jsx-no-bind: 0 */
+import { isNumber } from "lodash";
+import { toNumber } from "lodash";
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import { arrayMove } from "react-sortable-hoc";
@@ -229,8 +231,34 @@ class DataTable extends React.Component {
         });
     }, 0);
   };
+  formatAndValidateTable = () => {
+    const { entities, schema, change } = this.props;
+    const editableFields = schema.fields.filter(f => f.isEditable);
+    const validationErrors = {};
+
+    const newEnts = immer(entities, entities => {
+      entities.forEach((e, index) => {
+        editableFields.forEach(columnSchema => {
+          //mutative
+          const { error } = editCellHelper({
+            entity: e,
+            columnSchema,
+            newVal: e[columnSchema.path]
+          });
+          if (error) {
+            const rowId = getIdOrCodeOrIndex(e, index);
+            validationErrors[`${rowId}:${columnSchema.path}`] = error;
+          }
+        });
+      });
+    });
+    change("reduxFormEntities", newEnts);
+    change("reduxFormCellValidation", validationErrors);
+  };
+  validateCell = () => {};
 
   componentDidMount() {
+    this.props.isCellEditable && this.formatAndValidateTable();
     this.updateFromProps({}, computePresets(this.props));
 
     // const table = ReactDOM.findDOMNode(this.table);
@@ -1211,6 +1239,7 @@ class DataTable extends React.Component {
       change,
       reduxFormEditingCell,
       isCellEditable,
+      reduxFormCellValidation,
       reduxFormSelectedCells = {},
       isEntityDisabled
     } = computePresets(this.props);
@@ -1221,16 +1250,22 @@ class DataTable extends React.Component {
     const cellId = `${rowId}:${column.path}`;
 
     const rowDisabled = isEntityDisabled(entity);
-
+    const err = reduxFormCellValidation[cellId];
     const className = classNames({
       isSelectedCell: reduxFormSelectedCells[cellId],
+      hasCellError: !!err,
       "no-data-tip": reduxFormSelectedCells[cellId]
+      // ...(!err && {
+      // })
     });
     return {
       onDoubleClick: () => {
         if (rowDisabled) return;
         this.startCellEdit(cellId);
       },
+      ...(err && {
+        "data-tip": err
+      }),
       onClick: () => {
         if (rowDisabled) return;
         const newSelectedCells = {};
@@ -1337,20 +1372,30 @@ class DataTable extends React.Component {
   };
 
   finishCellEdit = (cellId, newVal) => {
-    const { entities = [], change } = computePresets(this.props);
-    change("reduxFormEditingCell", null);
+    const {
+      entities = [],
+      change,
+      schema,
+      reduxFormCellValidation
+    } = computePresets(this.props);
     const [rowId, path] = cellId.split(":");
-    // const entityTo
-
+    change("reduxFormEditingCell", null);
     change(
       "reduxFormEntities",
       immer(entities, entities => {
-        const entityToUpdate = entities.find((e, i) => {
+        const entity = entities.find((e, i) => {
           return getIdOrCodeOrIndex(e, i) === rowId;
         });
-        if (entityToUpdate) {
-          set(entityToUpdate, path, newVal);
-        }
+        const { error } = editCellHelper({
+          entity,
+          path,
+          schema,
+          newVal
+        });
+        change("reduxFormCellValidation", {
+          ...reduxFormCellValidation,
+          [cellId]: error
+        });
       })
     );
   };
@@ -1532,7 +1577,7 @@ class DataTable extends React.Component {
               return (
                 <DropdownCell
                   initialValue={text}
-                  options={["one", "option 2"]}
+                  options={column.values}
                   finishEdit={newVal => {
                     this.finishCellEdit(cellId, newVal);
                   }}
@@ -2082,3 +2127,53 @@ function isTruthy(v) {
   }
   return true;
 }
+
+//(mutative) responsible for formatting and then validating the
+const editCellHelper = ({ entity, path, schema, columnSchema, newVal }) => {
+  let nv = newVal;
+
+  const colSchema =
+    columnSchema || schema?.fields?.find(({ path: p }) => p === path) || {};
+  path = path || colSchema.path;
+  const { format, validate, type } = colSchema;
+  let error;
+  if (format) {
+    nv = format(nv, colSchema);
+  }
+  if (defaultFormatters[type]) {
+    nv = defaultFormatters[type](nv, colSchema);
+  }
+  if (validate) {
+    error = validate(nv, colSchema);
+  }
+  if (!error && defaultValidators[type]) {
+    error = defaultValidators[type](nv, colSchema);
+  }
+
+  set(entity, path, nv);
+  return { entity, error };
+};
+
+const defaultFormatters = {
+  boolean: newVal => {
+    return isTruthy(newVal);
+  },
+  // dropdown: (newVal, field) => {
+  //   return { newVal };
+  // },
+  numeric: newVal => {
+    return toNumber(newVal);
+  }
+};
+const defaultValidators = {
+  dropdown: (newVal, field) => {
+    if (!field.values.includes(newVal)) {
+      return "Please choose one of the accepted values";
+    }
+  },
+  numeric: newVal => {
+    if (!isNumber(newVal)) {
+      return "Must be a number";
+    }
+  }
+};

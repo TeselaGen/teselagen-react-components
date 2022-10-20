@@ -10,8 +10,10 @@ const schema = {
       path: "name",
       isEditable: true,
       validate: newVal => {
-        if (!newVal || !newVal.includes("t"))
-          return { error: "Must include the letter 't'" };
+        console.log(`newVal:`, newVal);
+        console.log(`newVal.includes("a"):`, newVal.includes("a"));
+        if (!newVal || !newVal.includes("a"))
+          return "Must include the letter 'a'";
       },
       format: newVal => {
         return newVal + "_zooonk";
@@ -37,7 +39,7 @@ const schema = {
       type: "numeric",
       //should be able to pass additional validation/formatting
       validate: newVal => {
-        if (!newVal < 20) return { error: "This val is toooo high" };
+        if (newVal > 20) return "This val is toooo high";
       },
       format: newVal => {
         return newVal + 1;
@@ -82,7 +84,7 @@ const entities = [
     type: "old",
     howMany: 300,
     isProtein: false,
-    weather: "cloudy"
+    weather: "Cloudy"
   },
   {
     name: "Adam",
@@ -290,7 +292,7 @@ export default function SimpleTable(p) {
           formName="editableCellTable"
           isSimple
           isCellEditable
-          entities={entities.slice(0, 7)}
+          entities={entities}
           schema={schema}
           isEntityDisabled={
             isEntityDisabled
