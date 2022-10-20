@@ -1510,10 +1510,12 @@ class DataTable extends React.Component {
         const rowId = getIdOrCodeOrIndex(row.original, row.index);
         const cellId = `${rowId}:${row.column.path}`;
         let val = oldFunc(...args);
+        const oldVal = val;
+        if (row.index === 0 && row.column.path === "isProtein")
+          console.log(`oldVal top`, oldVal);
         const text = this.getCopyTextForCell(val, row, column);
-
-        if (isCellEditable && column.type === "boolean") {
-          const oldVal = val;
+        const isBool = column.type === "boolean";
+        if (isCellEditable && isBool) {
           val = (
             <Checkbox
               disabled={isEntityDisabled(row.original)}
@@ -1558,6 +1560,13 @@ class DataTable extends React.Component {
         if (getCellHoverText) title = getCellHoverText(...args);
         else if (column.getTitleAttr) title = column.getTitleAttr(...args);
         const isSelectedCell = reduxFormSelectedCells?.[cellId];
+        // if (isSelectedCell) {
+        //   const [rowId2, path] = cellId.split(":");
+        //   const selectedEnt = entities.find((e, i) => {
+        //     return getIdOrCodeOrIndex(e, i) === rowId2;
+        //   });
+        //   console.log(`selectedEnt`, selectedEnt);
+        // }
 
         return (
           <>
@@ -1583,6 +1592,7 @@ class DataTable extends React.Component {
                   right: 5,
                   opacity: 0.3
                 }}
+                className={"cell-edit-dropdown"}
                 onClick={() => {
                   this.startCellEdit(cellId);
                 }}
@@ -1597,7 +1607,15 @@ class DataTable extends React.Component {
                   const selectedEnt = entities.find((e, i) => {
                     return getIdOrCodeOrIndex(e, i) === rowId;
                   });
-                  const selectedCellVal = get(selectedEnt, path, "");
+                  // console.log(`selectedEnt`, selectedEnt);
+                  // let selectedCellVal = val
+                  let selectedCellVal = get(selectedEnt, path, "");
+                  if (isBool) {
+                    selectedCellVal = oldVal;
+                    console.log(`oldVal`, oldVal);
+                    selectedCellVal = isTruthy(selectedCellVal);
+                  }
+                  console.log(`selectedCellVal:`, selectedCellVal);
                   change(
                     "reduxFormEntities",
                     immer(entities, entities => {
@@ -2053,4 +2071,17 @@ function DropdownCell({ options, initialValue, finishEdit, cancelEdit }) {
       ></TgSelect>
     </div>
   );
+}
+
+function isTruthy(v) {
+  if (!v) return false;
+  if (typeof v === "string") {
+    if (v.toLowerCase() === "false") {
+      return false;
+    }
+    if (v.toLowerCase() === "no") {
+      return false;
+    }
+  }
+  return true;
 }

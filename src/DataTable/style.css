@@ -506,3 +506,7 @@
 .bp3-dark .tg-dropdown-cell-edit-container .bp3-input {
   background: rgb(48, 64, 77) !important;
 }
+
+.cell-edit-dropdown:hover {
+  color:rgb(75, 137, 255)
+}
