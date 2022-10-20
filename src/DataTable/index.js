@@ -1511,8 +1511,6 @@ class DataTable extends React.Component {
         const cellId = `${rowId}:${row.column.path}`;
         let val = oldFunc(...args);
         const oldVal = val;
-        if (row.index === 0 && row.column.path === "isProtein")
-          console.log(`oldVal top`, oldVal);
         const text = this.getCopyTextForCell(val, row, column);
         const isBool = column.type === "boolean";
         if (isCellEditable && isBool) {
@@ -1592,7 +1590,7 @@ class DataTable extends React.Component {
                   right: 5,
                   opacity: 0.3
                 }}
-                className={"cell-edit-dropdown"}
+                className="cell-edit-dropdown"
                 onClick={() => {
                   this.startCellEdit(cellId);
                 }}
@@ -1612,10 +1610,9 @@ class DataTable extends React.Component {
                   let selectedCellVal = get(selectedEnt, path, "");
                   if (isBool) {
                     selectedCellVal = oldVal;
-                    console.log(`oldVal`, oldVal);
                     selectedCellVal = isTruthy(selectedCellVal);
                   }
-                  console.log(`selectedCellVal:`, selectedCellVal);
+
                   change(
                     "reduxFormEntities",
                     immer(entities, entities => {

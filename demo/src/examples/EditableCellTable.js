@@ -290,7 +290,7 @@ export default function SimpleTable(p) {
           formName="editableCellTable"
           isSimple
           isCellEditable
-          entities={entities}
+          entities={entities.slice(0, 7)}
           schema={schema}
           isEntityDisabled={
             isEntityDisabled

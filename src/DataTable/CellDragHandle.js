@@ -41,7 +41,7 @@ export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
       });
     }
   });
-  const mouseup = useRef(() => {
+  const mouseup = useRef(onDragEnd => {
     const table = ReactDOM.findDOMNode(thisTable);
     const trs = table.querySelectorAll(`.rt-tr-group.with-row-data`);
     const [, path] = cellId.split(":");
@@ -62,7 +62,11 @@ export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
         rowsToSelect.current = [];
         xStart.current = e.clientX;
         document.addEventListener("mousemove", resize.current, false);
-        document.addEventListener("mouseup", mouseup.current, false);
+        document.addEventListener(
+          "mouseup",
+          () => mouseup.current(onDragEnd),
+          false
+        );
       }}
       className="cellDragHandle"
     ></div>
