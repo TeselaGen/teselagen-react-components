@@ -34,7 +34,14 @@ const schema = {
       path: "howMany",
       isEditable: true,
       //should auto validate to make sure the type is numeric, should auto format (I think this already works..) to try to coerce input values into accepted
-      type: "numeric"
+      type: "numeric",
+      //should be able to pass additional validation/formatting
+      validate: newVal => {
+        if (!newVal < 20) return { error: "This val is toooo high" };
+      },
+      format: newVal => {
+        return newVal + 1;
+      }
     },
     {
       path: "isProtein",
