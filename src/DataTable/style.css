@@ -125,6 +125,9 @@
 .ReactTable.ReactTable .rt-tbody .rt-tr-group {
   border-bottom: 1px solid rgb(233, 233, 233);
 }
+.ReactTable.ReactTable.isCellEditable .rt-tbody .rt-tr-group {
+  border-bottom: none;
+}
 
 /* tgreen: we don't want the border for rows that don't have any data */
 .ReactTable.ReactTable .rt-tbody .rt-tr-group.no-row-data {
@@ -248,7 +251,7 @@
   position: sticky;
   top: 0px;
   background: #ebf1f5;
-  z-index: 1;
+  z-index: 2;
 }
 /* tnr: this is a hack to make cypress be able to correctly click the table without the sticky header getting in the way. remove me once https://github.com/cypress-io/cypress/issues/871 is fixed */
 .in_cypress_test .ReactTable .rt-thead {
@@ -302,6 +305,65 @@
 
 .ReactTable .rt-tbody .rt-td {
   padding: 8px 8px;
+}
+:root {
+  --cell-border-width: 1px;
+  --cell-no-border: var(--cell-border-width) solid rgba(212, 212, 212, 0.07);
+  --cell-border-color: rgb(75, 137, 255);
+}
+
+.ReactTable.isCellEditable .rt-td {
+  border: var(--cell-border-width) solid rgba(212, 212, 212, 0.2);
+}
+
+.ReactTable .rt-tbody .rt-td.isSelectedCell {
+  overflow: visible;
+  z-index: 1;
+  background: #005eff1e;
+}
+
+.ReactTable .rt-tbody .rt-td.isSelectedCell.isPrimarySelected {
+  border: var(--cell-border-width) solid var(--cell-border-color);
+  box-shadow: 0 0 0 1px rgb(75 137 255);
+}
+
+.ReactTable .rt-tbody .rt-td.isSelectedCell.isSecondarySelected {
+  border: var(--cell-border-width) solid var(--cell-border-color);
+}
+
+.ReactTable
+  .rt-tbody
+  .rt-td.isSelectedCell.isSecondarySelected.noSelectedTopBorder {
+  border-top: var(--cell-no-border);
+}
+.ReactTable
+  .rt-tbody
+  .rt-td.isSelectedCell.isSecondarySelected.noSelectedRightBorder {
+  border-right: var(--cell-no-border);
+}
+.ReactTable
+  .rt-tbody
+  .rt-td.isSelectedCell.isSecondarySelected.noSelectedBottomBorder {
+  border-bottom: var(--cell-no-border);
+}
+.ReactTable
+  .rt-tbody
+  .rt-td.isSelectedCell.isSecondarySelected.noSelectedLeftBorder {
+  border-left: var(--cell-no-border);
+}
+
+.ReactTable .rt-tbody .rt-td.isSelectedCell.isDropdownCell {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+.ReactTable .rt-tbody .rt-td.hasCellError {
+  background-color: rgba(226, 50, 50, 0.61);
+}
+.ReactTable .rt-tbody .rt-td.isBooleanCell {
+  overflow: visible;
+}
+.ReactTable .rt-tbody .rt-td.selectedForUpdate {
+  border: var(--cell-border-width) dashed var(--cell-border-color);
 }
 
 .tg-compact-table .rt-tbody .rt-td {
@@ -366,6 +428,38 @@
 .-pagination,
 .rt-body {
   flex: 1 0 auto;
+}
+
+.tg-dropdown-cell-edit-container {
+  width: 100%;
+}
+
+.rt-td.isDropdownCell {
+  transition: 0s;
+}
+.rt-td.isEditingCell.isDropdownCell {
+  padding: 0;
+  max-height: 24px;
+}
+
+.tg-dropdown-cell-edit-container .bp3-tag-input .bp3-button {
+  margin: 0;
+}
+.tg-dropdown-cell-edit-container .bp3-tag-input .bp3-tag-input-values > * {
+  margin-bottom: 0;
+}
+.tg-dropdown-cell-edit-container .bp3-tag-input {
+  min-height: 0;
+  max-height: 22px;
+}
+.tg-dropdown-cell-edit-container .bp3-tag-input-values {
+  margin-top: 0;
+  margin-right: 0;
+}
+
+.tg-dropdown-cell-edit-container .bp3-input {
+  background: #f7f7f7 !important;
+  box-shadow: none !important;
 }
 
 .ReactTable .rt-thead .rt-th {
@@ -475,4 +569,12 @@
 }
 .dt-minimalStyle .ReactTable * {
   border-color: transparent !important ;
+}
+
+.bp3-dark .tg-dropdown-cell-edit-container .bp3-input {
+  background: rgb(48, 64, 77) !important;
+}
+
+.cell-edit-dropdown:hover {
+  color: var(--cell-border-color);
 }

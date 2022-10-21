@@ -411,14 +411,24 @@ function getSubFilter(
   );
 }
 
-export function getCurrentParamsFromUrl(location) {
-  const { search } = location;
+export function getCurrentParamsFromUrl(location, isSimple) {
+  let { search } = location;
+  if (isSimple) {
+    search = window.location.href.split("?")[1] || "";
+  }
+
   return parseFilters(queryString.parse(search, { ignoreQueryPrefix: true }));
 }
-export function setCurrentParamsOnUrl(newParams, replace) {
+export function setCurrentParamsOnUrl(newParams, replace, isSimple) {
   const stringifiedFilters = stringifyFilters(newParams);
+  const search = `?${queryString.stringify(stringifiedFilters)}`;
+  if (isSimple) {
+    return window.location.replace(
+      `${window.location.href.split("?")[0]}${search}`
+    );
+  }
   replace({
-    search: `?${queryString.stringify(stringifiedFilters)}`
+    search
   });
 }
 

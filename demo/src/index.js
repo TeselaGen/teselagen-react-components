@@ -26,14 +26,14 @@ import IntentTextDemo from "./examples/IntentText";
 import ScrollToTopDemo from "./examples/ScrollToTop";
 
 import showAppSpinnerDemo from "./examples/showAppSpinnerDemo";
-
+import EditableCellTable from "./examples/EditableCellTable";
 import "./style.css";
-import React, { useCallback, useEffect, useState } from "react";
+import React from "react";
 import { render } from "react-dom";
 import { HashRouter as Router, Route, Redirect } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./store";
-import { Card, Classes, Colors, FocusStyleManager } from "@blueprintjs/core";
+import { FocusStyleManager } from "@blueprintjs/core";
 import isMobile from "is-mobile";
 import AdvancedOptionsDemo from "./examples/AdvancedOptionsDemo";
 
@@ -45,6 +45,9 @@ const demos = {
     childLinks: {
       SimpleTable: {
         demo: SimpleTable
+      },
+      EditableCellTable: {
+        demo: EditableCellTable
       }
     },
     noLiveCode: true
@@ -242,7 +245,7 @@ const demos = {
   },
   PromptUnsavedChanges: {
     demo: PromptUnsavedChanges
-  },
+  }
   // fonticons: {
   //   demo: FontIconsDemo,
   // }
