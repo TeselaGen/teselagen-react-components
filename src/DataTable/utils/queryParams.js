@@ -413,6 +413,7 @@ function getSubFilter(
 
 export function getCurrentParamsFromUrl(location) {
   const { search } = location;
+
   return parseFilters(queryString.parse(search, { ignoreQueryPrefix: true }));
 }
 export function setCurrentParamsOnUrl(newParams, replace) {

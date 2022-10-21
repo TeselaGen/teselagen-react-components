@@ -269,6 +269,7 @@ export default compose(
   withProps(props => {
     const entities = props.reduxFormEntities || props.entities;
     return {
+      _origEntities: props.entities,
       entities
     };
   }),
