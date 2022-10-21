@@ -308,11 +308,11 @@
 }
 
 .ReactTable.isCellEditable .rt-td {
-  border: 1px solid rgba(212, 212, 212, 0.671);
+  border: 0.5px solid rgba(212, 212, 212, 0.2);
 }
 
 .ReactTable .rt-tbody .rt-td.isSelectedCell {
-  border: 1px solid rgb(75, 137, 255);
+  border: 0.5px solid rgb(75, 137, 255);
   overflow: visible;
   z-index: 1;
 }
@@ -323,7 +323,7 @@
   overflow: visible;
 }
 .ReactTable .rt-tbody .rt-td.selectedForUpdate {
-  border: 1px dashed rgb(75, 137, 255);
+  border: 0.5px dashed rgb(75, 137, 255);
 }
 
 .tg-compact-table .rt-tbody .rt-td {
@@ -392,7 +392,29 @@
 
 .tg-dropdown-cell-edit-container {
   width: 100%;
-  height: 30px;
+}
+
+.rt-td.isDropdownCell {
+  transition: 0s;
+}
+.rt-td.isEditingCell.isDropdownCell {
+  padding: 0;
+  max-height: 24px;
+}
+
+.tg-dropdown-cell-edit-container .bp3-tag-input .bp3-button {
+  margin: 0;
+}
+.tg-dropdown-cell-edit-container .bp3-tag-input .bp3-tag-input-values > * {
+  margin-bottom: 0;
+}
+.tg-dropdown-cell-edit-container .bp3-tag-input {
+  min-height: 0;
+  max-height: 22px;
+}
+.tg-dropdown-cell-edit-container .bp3-tag-input-values {
+  margin-top: 0;
+  margin-right: 0;
 }
 
 .tg-dropdown-cell-edit-container .bp3-input {
