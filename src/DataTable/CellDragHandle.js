@@ -4,7 +4,10 @@ import ReactDOM from "react-dom";
 
 export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
   const xStart = useRef(0);
+  const timeoutkey = useRef();
+  // const lastUserY = useRef();
   const rowsToSelect = useRef();
+
   const handleDrag = useRef(e => {
     const table = ReactDOM.findDOMNode(thisTable).querySelector(".rt-table");
     const trs = table.querySelectorAll(`.rt-tr-group.with-row-data`);
@@ -18,12 +21,21 @@ export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
     if (selectedTr && trs.length) {
       const selectedY = selectedTr.getBoundingClientRect().y;
       const cursorY = e.clientY;
-      const { y, height } = table.getBoundingClientRect();
-      if (cursorY < y) {
-        table.scrollBy(0, -5);
-      } else if (cursorY > y + height) {
-        table.scrollBy(0, 5);
+      clearTimeout(timeoutkey.current);
+      // eslint-disable-next-line no-inner-declarations
+      function updateScrollIfNecessary() {
+        const { y, height } = table.getBoundingClientRect();
+        if (cursorY < y) {
+          table.scrollBy(0, -5);
+        } else if (cursorY > y + height) {
+          table.scrollBy(0, 5);
+        }
       }
+      updateScrollIfNecessary();
+      timeoutkey.current = setInterval(() => {
+        updateScrollIfNecessary();
+      }, 10);
+
       const isCursorBelow = cursorY > selectedY;
       rowsToSelect.current = [];
       forEach(trs, (tr, index) => {
@@ -49,6 +61,7 @@ export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
     }
   });
   const mouseup = useRef(onDragEnd => {
+    clearTimeout(timeoutkey.current);
     const table = ReactDOM.findDOMNode(thisTable);
     const trs = table.querySelectorAll(`.rt-tr-group.with-row-data`);
     const [, path] = cellId.split(":");

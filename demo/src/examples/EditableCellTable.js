@@ -1,10 +1,10 @@
 import { Chance } from "chance";
 import { times } from "lodash";
 import { nanoid } from "nanoid";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import DataTable from "../../../src/DataTable";
 import DemoWrapper from "../DemoWrapper";
-import { useToggle } from "../renderToggle";
+import { useToggle } from "../useToggle";
 import OptionsSection from "../OptionsSection";
 import { toNumber } from "lodash";
 
@@ -44,7 +44,8 @@ const schema = {
         if (newVal > 20) return "This val is toooo high";
       },
       format: newVal => {
-        return newVal + 1;
+
+        return toNumber(newVal) + 1;
       }
     },
     {
@@ -57,12 +58,13 @@ const schema = {
 };
 const chance = new Chance();
 function getEnts(num, opts) {
-  return times(num).map(() => {
+  return times(num).map(i => {
     return {
-      name: chance.name(),
+      name: i === 0 ? "Tom" : chance.name(),
       id: nanoid(),
-      type: chance.pickone(["new", "old"]),
-      howMany: chance.pickone(["3", 40, 2, 5, "fail"]),
+      type: i === 0 ? "fail" : chance.pickone(["new", "old"]),
+      howMany:
+        i === 0 ? "fail" : i === 1 ? "15" : chance.pickone(["3", 40, 2, 5]),
       isProtein: true,
       weather: chance.pickone(["rainy", "cloudy", "HOT"])
     };
@@ -75,25 +77,24 @@ export default function SimpleTable(p) {
     type: "num",
     label: "Number of Entities",
     isSelect: true,
+    defaultValue: 50,
     hook: v => {
       key.current++;
-
       setEnts(getEnts(toNumber(v)));
     },
     options: [20, 50, 100]
   });
-  const [entities, setEnts] = useState();
-
+  const [entities, setEnts] = useState([]);
   return (
     <div>
       <OptionsSection>{numComp}</OptionsSection>
       <DemoWrapper>
         <DataTable
-          // key={key.current}
+          key={key.current}
           formName="editableCellTable"
           isSimple
           isCellEditable
-          entities={ getEnts(50)}
+          entities={entities}
           schema={schema}
           // isEntityDisabled={
           //   isEntityDisabled

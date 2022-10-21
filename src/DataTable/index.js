@@ -1323,7 +1323,7 @@ class DataTable extends React.Component {
       reduxFormSelectedCells = {}
     } = computePresets(this.props);
     const newSelectedCells = { ...reduxFormSelectedCells };
-    newSelectedCells[cellId] = true;
+    newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
     change("reduxFormSelectedCells", newSelectedCells);
     change("reduxFormEditingCell", cellId);
   };
@@ -1783,6 +1783,7 @@ class DataTable extends React.Component {
             } else {
               return (
                 <EditableCell
+                  cancelEdit={this.cancelCellEdit}
                   isNumeric={column.type === "numeric"}
                   initialValue={text}
                   finishEdit={newVal => {
@@ -2271,7 +2272,7 @@ function getAllRows(e) {
   return allRowEls;
 }
 
-function EditableCell({ initialValue, finishEdit, isNumeric }) {
+function EditableCell({ initialValue, finishEdit, cancelEdit, isNumeric }) {
   const [v, setV] = useState(initialValue);
   return (
     <input
@@ -2287,6 +2288,8 @@ function EditableCell({ initialValue, finishEdit, isNumeric }) {
       onKeyDown={e => {
         if (e.key === "Enter") {
           finishEdit(v);
+        } else if (e.key === "Escape") {
+          cancelEdit();
         }
       }}
       onBlur={() => {
@@ -2304,6 +2307,11 @@ function DropdownCell({ options, initialValue, finishEdit, cancelEdit }) {
     <div className="tg-dropdown-cell-edit-container">
       <TgSelect
         small
+        // onKeyDown={e => {
+        //   if (e.key === "Esc") {
+        //     cancelEdit();
+        //   }
+        // }}
         autoOpen
         value={initialValue}
         onChange={val => {
@@ -2375,7 +2383,7 @@ const defaultValidators = {
     }
   },
   numeric: newVal => {
-    if (!isNumber(newVal)) {
+    if (isNaN(newVal) || !isNumber(newVal)) {
       return "Must be a number";
     }
   }

@@ -25,7 +25,7 @@ import {
   InfoHelper,
   showConfirmationDialog
 } from "../../../src";
-import { useToggle } from "../renderToggle";
+import { useToggle } from "../useToggle";
 import OptionsSection from "../OptionsSection";
 import DemoWrapper from "../DemoWrapper";
 
