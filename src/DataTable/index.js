@@ -22,7 +22,8 @@ import {
   omit,
   forEach,
   lowerCase,
-  get
+  get,
+  times
 } from "lodash";
 import joinUrl from "url-join";
 
@@ -398,29 +399,55 @@ class DataTable extends React.Component {
     });
   };
   handleCopyHotkey = e => {
-    const { reduxFormSelectedEntityIdMap } = this.props;
-    this.handleCopySelectedRows(
-      getRecordsFromIdMap(reduxFormSelectedEntityIdMap),
-      e
-    );
-  };
-  handleSelectAllRows = e => {
-    const { isEntityDisabled, entities, isSingleSelect } = computePresets(
+    const { isCellEditable, reduxFormSelectedEntityIdMap } = computePresets(
       this.props
     );
+
+    if (isCellEditable) {
+      this.handleCopySelectedCells(e);
+    } else {
+      this.handleCopySelectedRows(
+        getRecordsFromIdMap(reduxFormSelectedEntityIdMap),
+        e
+      );
+    }
+  };
+  handleSelectAllRows = e => {
+    const {
+      change,
+      isEntityDisabled,
+      entities,
+      isSingleSelect,
+      isCellEditable,
+      schema
+    } = computePresets(this.props);
     if (isSingleSelect) return;
     e.preventDefault();
-    const newIdMap = {};
 
-    entities.forEach((entity, i) => {
-      if (isEntityDisabled(entity)) return;
-      const entityId = getIdOrCodeOrIndex(entity, i);
-      newIdMap[entityId] = { entity };
-    });
-    finalizeSelection({
-      idMap: newIdMap,
-      props: computePresets(this.props)
-    });
+    if (isCellEditable) {
+      const schemaPaths = schema.fields.map(f => f.path);
+      const newSelectedCells = {};
+      entities.forEach((entity, i) => {
+        if (isEntityDisabled(entity)) return;
+        const entityId = getIdOrCodeOrIndex(entity, i);
+        schemaPaths.forEach(p => {
+          newSelectedCells[`${entityId}:${p}`] = true;
+        });
+      });
+      change("reduxFormSelectedCells", newSelectedCells);
+    } else {
+      const newIdMap = {};
+
+      entities.forEach((entity, i) => {
+        if (isEntityDisabled(entity)) return;
+        const entityId = getIdOrCodeOrIndex(entity, i);
+        newIdMap[entityId] = { entity };
+      });
+      finalizeSelection({
+        idMap: newIdMap,
+        props: computePresets(this.props)
+      });
+    }
   };
 
   getCellCopyText = cellWrapper => {
@@ -497,6 +524,68 @@ class DataTable extends React.Component {
       window.toastr.error("Error copying rows.");
     }
   };
+  handleCopySelectedCells = e => {
+    const { entities = [], reduxFormSelectedCells, schema } = computePresets(
+      this.props
+    );
+    // if the current selection is consecutive cells then copy with
+    // tabs between. if not then just select primary selected cell
+    if (isEmpty(reduxFormSelectedCells)) return;
+    const pathToIndex = getFieldPathToIndex(schema);
+    const entityIdToEntity = {};
+    entities.forEach((e, i) => {
+      entityIdToEntity[getIdOrCodeOrIndex(e, i)] = { e, i };
+    });
+    const selectionGrid = [];
+    let firstRowIndex;
+    let firstCellIndex;
+    Object.keys(reduxFormSelectedCells).forEach(key => {
+      const [rowId, path] = key.split(":");
+      const eInfo = entityIdToEntity[rowId];
+      if (eInfo) {
+        if (firstRowIndex === undefined || eInfo.i < firstRowIndex) {
+          firstRowIndex = eInfo.i;
+        }
+        if (!selectionGrid[eInfo.i]) {
+          selectionGrid[eInfo.i] = [];
+        }
+        const cellIndex = pathToIndex[path];
+        if (firstCellIndex === undefined || cellIndex < firstCellIndex) {
+          firstCellIndex = cellIndex;
+        }
+        selectionGrid[eInfo.i][cellIndex] = true;
+      }
+    });
+    if (!firstRowIndex) return;
+    const allRows = getAllRows(e);
+    let fullCellText = "";
+    times(selectionGrid.length, i => {
+      const row = selectionGrid[i];
+      if (!row) {
+        if (fullCellText) {
+          fullCellText += "\n";
+        }
+        return;
+      } else {
+        if (fullCellText) {
+          fullCellText += "\n";
+        }
+        // ignore header
+        const rowCopyText = this.getRowCopyText(allRows[i + 1]).split("\t");
+        times(row.length, i => {
+          const cell = row[i];
+          if (cell) {
+            fullCellText += rowCopyText[i];
+          }
+          if (i !== row.length - 1) fullCellText += "\t";
+        });
+      }
+    });
+    if (!fullCellText) return window.toastr.warning("No text to copy");
+
+    this.handleCopyHelper(fullCellText, "Selected cells copied");
+  };
+
   handleCopySelectedRows = (selectedRecords, e) => {
     const { entities = [] } = computePresets(this.props);
     const idToIndex = entities.reduce((acc, e, i) => {
@@ -1341,9 +1430,8 @@ class DataTable extends React.Component {
               const primaryRowIndex = entities.findIndex((e, i) => {
                 return getIdOrCodeOrIndex(e, i) === rowId;
               });
-              const primaryColIndex = schema.fields.findIndex(
-                f => f.path === colPath
-              );
+              const fieldToIndex = getFieldPathToIndex(schema);
+              const primaryColIndex = fieldToIndex[colPath];
 
               if (primaryRowIndex === -1 || primaryColIndex === -1) {
                 newSelectedCells = {};
@@ -2292,3 +2380,11 @@ const defaultValidators = {
     }
   }
 };
+
+function getFieldPathToIndex(schema) {
+  const fieldToIndex = {};
+  schema.fields.forEach((f, i) => {
+    fieldToIndex[f.path] = i;
+  });
+  return fieldToIndex;
+}
