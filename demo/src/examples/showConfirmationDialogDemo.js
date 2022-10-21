@@ -3,7 +3,7 @@ import React from "react";
 import showConfirmationDialog from "../../../src/showConfirmationDialog";
 import DemoWrapper from "../DemoWrapper";
 import OptionsSection from "../OptionsSection";
-import { useToggle } from "../renderToggle";
+import { useToggle } from "../useToggle";
 
 export default function Demo() {
   const [noCancel, noCancelComp] = useToggle({

@@ -1,10 +1,10 @@
 import { Chance } from "chance";
 import { times } from "lodash";
 import { nanoid } from "nanoid";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import DataTable from "../../../src/DataTable";
 import DemoWrapper from "../DemoWrapper";
-import { useToggle } from "../renderToggle";
+import { useToggle } from "../useToggle";
 import OptionsSection from "../OptionsSection";
 import { toNumber } from "lodash";
 
@@ -75,25 +75,24 @@ export default function SimpleTable(p) {
     type: "num",
     label: "Number of Entities",
     isSelect: true,
+    defaultValue: 50,
     hook: v => {
       key.current++;
-
       setEnts(getEnts(toNumber(v)));
     },
     options: [20, 50, 100]
   });
-  const [entities, setEnts] = useState();
-
+  const [entities, setEnts] = useState([]);
   return (
     <div>
       <OptionsSection>{numComp}</OptionsSection>
       <DemoWrapper>
         <DataTable
-          // key={key.current}
+          key={key.current}
           formName="editableCellTable"
           isSimple
           isCellEditable
-          entities={ getEnts(50)}
+          entities={entities}
           schema={schema}
           // isEntityDisabled={
           //   isEntityDisabled
