@@ -251,7 +251,7 @@
   position: sticky;
   top: 0px;
   background: #ebf1f5;
-  z-index: 1;
+  z-index: 2;
 }
 /* tnr: this is a hack to make cypress be able to correctly click the table without the sticky header getting in the way. remove me once https://github.com/cypress-io/cypress/issues/871 is fixed */
 .in_cypress_test .ReactTable .rt-thead {
@@ -308,13 +308,18 @@
 }
 
 .ReactTable.isCellEditable .rt-td {
-  border: 1px solid rgba(212, 212, 212, 0.671);
+  border: 1px solid rgba(212, 212, 212, 0.2);
 }
 
 .ReactTable .rt-tbody .rt-td.isSelectedCell {
   border: 1px solid rgb(75, 137, 255);
   overflow: visible;
   z-index: 1;
+}
+
+.ReactTable .rt-tbody .rt-td.isSelectedCell.isDropdownCell {
+  padding-top: 0px;
+  padding-bottom: 0px;
 }
 .ReactTable .rt-tbody .rt-td.hasCellError {
   background-color: rgba(226, 50, 50, 0.61);

@@ -5,18 +5,25 @@ import ReactDOM from "react-dom";
 export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
   const xStart = useRef(0);
   const rowsToSelect = useRef();
-  const resize = useRef(e => {
-    const table = ReactDOM.findDOMNode(thisTable);
+  const handleDrag = useRef(e => {
+    const table = ReactDOM.findDOMNode(thisTable).querySelector(".rt-table");
     const trs = table.querySelectorAll(`.rt-tr-group.with-row-data`);
     const [rowId, path] = cellId.split(":");
     const selectedTr = table.querySelector(
       `.rt-tr-group.with-row-data[data-test-id="${rowId}"]`
     );
+
     const selectedIndex = selectedTr.dataset.index;
 
     if (selectedTr && trs.length) {
       const selectedY = selectedTr.getBoundingClientRect().y;
       const cursorY = e.clientY;
+      const { y, height } = table.getBoundingClientRect();
+      if (cursorY < y) {
+        table.scrollBy(0, -5);
+      } else if (cursorY > y + height) {
+        table.scrollBy(0, 5);
+      }
       const isCursorBelow = cursorY > selectedY;
       rowsToSelect.current = [];
       forEach(trs, (tr, index) => {
@@ -51,7 +58,7 @@ export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
         `[data-test="tgCell_${path}"]`
       ).parentNode.classList.remove("selectedForUpdate");
     });
-    document.removeEventListener("mousemove", resize.current, false);
+    document.removeEventListener("mousemove", handleDrag.current, false);
     document.removeEventListener("mousemove", mouseup.current, false);
     onDragEnd(rowsToSelect.current.map(id => `${id}:${path}`));
   });
@@ -61,7 +68,7 @@ export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
       onMouseDown={e => {
         rowsToSelect.current = [];
         xStart.current = e.clientX;
-        document.addEventListener("mousemove", resize.current, false);
+        document.addEventListener("mousemove", handleDrag.current, false);
         document.addEventListener(
           "mouseup",
           () => mouseup.current(onDragEnd),

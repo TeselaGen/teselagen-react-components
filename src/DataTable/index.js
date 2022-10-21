@@ -232,7 +232,7 @@ class DataTable extends React.Component {
     }, 0);
   };
   formatAndValidateTable = () => {
-    const { entities, schema, change } = this.props;
+    const { _origEntities: entities, schema, change } = this.props;
     const editableFields = schema.fields.filter(f => f.isEditable);
     const validationErrors = {};
 
@@ -1244,6 +1244,7 @@ class DataTable extends React.Component {
       isEntityDisabled
     } = computePresets(this.props);
     if (!isCellEditable) return {}; //only allow cell selection to do stuff here
+    if (!rowInfo) return {};
     const entity = rowInfo.original;
     const rowId = getIdOrCodeOrIndex(entity, rowInfo.index);
 
@@ -1253,10 +1254,9 @@ class DataTable extends React.Component {
     const err = reduxFormCellValidation[cellId];
     const className = classNames({
       isSelectedCell: reduxFormSelectedCells[cellId],
+      isDropdownCell: column.type === "dropdown",
       hasCellError: !!err,
       "no-data-tip": reduxFormSelectedCells[cellId]
-      // ...(!err && {
-      // })
     });
     return {
       onDoubleClick: () => {
