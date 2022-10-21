@@ -66,6 +66,7 @@ import "../toastr";
 import "./style.css";
 import { getRecordsFromIdMap } from "./utils/withSelectedEntities";
 import { CellDragHandle } from "./CellDragHandle";
+import { isEmpty } from "lodash";
 
 dayjs.extend(localizedFormat);
 
@@ -1237,6 +1238,8 @@ class DataTable extends React.Component {
   getTableCellProps = (state, rowInfo, column) => {
     const {
       change,
+      entities,
+      schema,
       reduxFormEditingCell,
       isCellEditable,
       reduxFormCellValidation,
@@ -1246,6 +1249,8 @@ class DataTable extends React.Component {
     if (!isCellEditable) return {}; //only allow cell selection to do stuff here
     const entity = rowInfo.original;
     const rowId = getIdOrCodeOrIndex(entity, rowInfo.index);
+    const columnIndex = schema.fields.indexOf(column);
+    console.log(`columnIndex:`, columnIndex)
 
     const cellId = `${rowId}:${column.path}`;
 
@@ -1253,6 +1258,8 @@ class DataTable extends React.Component {
     const err = reduxFormCellValidation[cellId];
     const className = classNames({
       isSelectedCell: reduxFormSelectedCells[cellId],
+      isPrimarySelected: reduxFormSelectedCells[cellId] === "primary",
+      isSecondarySelected: reduxFormSelectedCells[cellId] === true,
       isDropdownCell: column.type === "dropdown",
       isEditingCell: reduxFormEditingCell === cellId,
       hasCellError: !!err,
@@ -1268,15 +1275,34 @@ class DataTable extends React.Component {
       ...(err && {
         "data-tip": err
       }),
-      onClick: () => {
+      onClick: e => {
+        const {
+          change,
+          reduxFormEditingCell,
+          reduxFormSelectedCells = {}
+        } = computePresets(this.props);
+        const shift = e.shiftKey;
+        const meta = e.metaKey;
         if (rowDisabled) return;
-        const newSelectedCells = {};
+        let newSelectedCells = {
+          ...reduxFormSelectedCells
+        };
         if (newSelectedCells[cellId]) {
           // don't deselect if editing
           if (reduxFormEditingCell === cellId) return;
           delete newSelectedCells[cellId];
         } else {
-          newSelectedCells[cellId] = true;
+          if (meta) {
+            if (isEmpty(newSelectedCells)) {
+              newSelectedCells[cellId] = "primary";
+            } else {
+              newSelectedCells[cellId] = true;
+            }
+          } else if (shift) {
+          } else {
+            newSelectedCells = {};
+            newSelectedCells[cellId] = "primary";
+          }
         }
 
         change("reduxFormSelectedCells", newSelectedCells);
@@ -1643,7 +1669,8 @@ class DataTable extends React.Component {
                 }}
               />
             )}
-            {isSelectedCell && (
+
+            {isSelectedCell && isSelectedCell === "primary" && (
               <CellDragHandle
                 thisTable={this.table}
                 cellId={cellId}

@@ -308,14 +308,24 @@
 }
 
 .ReactTable.isCellEditable .rt-td {
-  border: 0.5px solid rgba(212, 212, 212, 0.2);
+  outline: 1px solid rgba(212, 212, 212, 0.2);
 }
 
 .ReactTable .rt-tbody .rt-td.isSelectedCell {
-  border: 0.5px solid rgb(75, 137, 255);
   overflow: visible;
   z-index: 1;
+  background: #005eff1e;
 }
+
+.ReactTable .rt-tbody .rt-td.isSelectedCell.isPrimarySelected {
+  outline: 1px solid rgb(75, 137, 255);
+  box-shadow: 0 0 0 1px rgb(75 137 255);
+}
+
+.ReactTable .rt-tbody .rt-td.isSelectedCell.isSecondarySelected {
+  outline: 1px solid rgb(75, 137, 255);
+}
+
 .ReactTable .rt-tbody .rt-td.hasCellError {
   background-color: rgba(226, 50, 50, 0.61);
 }
