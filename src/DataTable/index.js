@@ -1303,6 +1303,7 @@ class DataTable extends React.Component {
         "data-tip": err
       }),
       onClick: e => {
+        // cell click, cellclick
         const {
           change,
           reduxFormEditingCell,
@@ -1323,16 +1324,18 @@ class DataTable extends React.Component {
             newSelectedCells = {};
           }
         } else {
+          const primarySelectedCellId = Object.keys(
+            reduxFormSelectedCells
+          ).find(c => reduxFormSelectedCells[c] === PRIMARY_SELECTED_VAL);
           if (meta) {
             if (isEmpty(newSelectedCells)) {
               newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
             } else {
-              newSelectedCells[cellId] = true;
+              newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
+              if (primarySelectedCellId)
+                newSelectedCells[primarySelectedCellId] = true;
             }
           } else if (shift) {
-            const primarySelectedCellId = Object.keys(
-              reduxFormSelectedCells
-            ).find(c => reduxFormSelectedCells[c] === PRIMARY_SELECTED_VAL);
             if (primarySelectedCellId) {
               const [rowId, colPath] = primarySelectedCellId.split(":");
               const primaryRowIndex = entities.findIndex((e, i) => {
@@ -1369,6 +1372,8 @@ class DataTable extends React.Component {
                       newSelectedCells[cellId] = true;
                   });
                 });
+                newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
+                newSelectedCells[primarySelectedCellId] = true;
               }
             } else {
               newSelectedCells = {};
