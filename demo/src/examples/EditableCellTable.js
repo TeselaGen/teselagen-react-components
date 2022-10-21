@@ -44,7 +44,8 @@ const schema = {
         if (newVal > 20) return "This val is toooo high";
       },
       format: newVal => {
-        return newVal + 1;
+
+        return toNumber(newVal) + 1;
       }
     },
     {
@@ -57,12 +58,13 @@ const schema = {
 };
 const chance = new Chance();
 function getEnts(num, opts) {
-  return times(num).map(() => {
+  return times(num).map(i => {
     return {
-      name: chance.name(),
+      name: i === 0 ? "Tom" : chance.name(),
       id: nanoid(),
-      type: chance.pickone(["new", "old"]),
-      howMany: chance.pickone(["3", 40, 2, 5, "fail"]),
+      type: i === 0 ? "fail" : chance.pickone(["new", "old"]),
+      howMany:
+        i === 0 ? "fail" : i === 1 ? "15" : chance.pickone(["3", 40, 2, 5]),
       isProtein: true,
       weather: chance.pickone(["rainy", "cloudy", "HOT"])
     };

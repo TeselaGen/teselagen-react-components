@@ -87,10 +87,7 @@ export function useToggle({
   const defaultValue = _defaultValue || options[0]?.value || options[0];
   useEffect(() => {
     const demoState = getDemoState();
-    console.log(`demoState`, demoState);
     const toSet = demoState[type] || defaultValue;
-    console.log(`defaultValue`, defaultValue);
-    console.log(`toSet`, toSet);
     _setVal(toSet);
     hook(toSet);
     // eslint-disable-next-line react-hooks/exhaustive-deps
