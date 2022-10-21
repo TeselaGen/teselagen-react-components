@@ -82,18 +82,18 @@ export default function SimpleTable(p) {
     },
     options: [20, 50, 100]
   });
-  const [entities, setEnts] = useState([]);
+  const [entities, setEnts] = useState();
 
   return (
     <div>
       <OptionsSection>{numComp}</OptionsSection>
       <DemoWrapper>
         <DataTable
-          key={key.current}
+          // key={key.current}
           formName="editableCellTable"
           isSimple
           isCellEditable
-          entities={entities}
+          entities={ getEnts(50)}
           schema={schema}
           // isEntityDisabled={
           //   isEntityDisabled
