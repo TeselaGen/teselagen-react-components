@@ -1255,6 +1255,7 @@ class DataTable extends React.Component {
     const className = classNames({
       isSelectedCell: reduxFormSelectedCells[cellId],
       isDropdownCell: column.type === "dropdown",
+      isEditingCell: reduxFormEditingCell === cellId,
       hasCellError: !!err,
       "no-data-tip": reduxFormSelectedCells[cellId]
     });
