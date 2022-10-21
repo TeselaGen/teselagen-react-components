@@ -1,11 +1,14 @@
 /* eslint react/jsx-no-bind: 0 */
-import { isNumber } from "lodash";
-import { toNumber } from "lodash";
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import { arrayMove } from "react-sortable-hoc";
 import copy from "copy-to-clipboard";
 import {
+  isNumber,
+  toNumber,
+  isEmpty,
+  min,
+  max,
   flatMap,
   set,
   map,
@@ -66,7 +69,8 @@ import "../toastr";
 import "./style.css";
 import { getRecordsFromIdMap } from "./utils/withSelectedEntities";
 import { CellDragHandle } from "./CellDragHandle";
-import { isEmpty } from "lodash";
+
+const PRIMARY_SELECTED_VAL = "main_cell";
 
 dayjs.extend(localizedFormat);
 
@@ -1237,7 +1241,6 @@ class DataTable extends React.Component {
 
   getTableCellProps = (state, rowInfo, column) => {
     const {
-      change,
       entities,
       schema,
       reduxFormEditingCell,
@@ -1249,18 +1252,43 @@ class DataTable extends React.Component {
     if (!isCellEditable) return {}; //only allow cell selection to do stuff here
     if (!rowInfo) return {};
     const entity = rowInfo.original;
-    const rowId = getIdOrCodeOrIndex(entity, rowInfo.index);
-    const columnIndex = schema.fields.indexOf(column);
-    console.log(`columnIndex:`, columnIndex)
+    const rowIndex = rowInfo.index;
+    const rowId = getIdOrCodeOrIndex(entity, rowIndex);
+    const columnIndex = column.columnIndex;
+    const cellIdToLeft = `${rowId}:${schema.fields[columnIndex - 1]?.path}`;
+    const cellIdToRight = `${rowId}:${schema.fields[columnIndex + 1]?.path}`;
+    const rowAboveId =
+      entities[rowInfo.index - 1] &&
+      getIdOrCodeOrIndex(entities[rowInfo.index - 1], rowInfo.index - 1);
+    const rowBelowId =
+      entities[rowInfo.index + 1] &&
+      getIdOrCodeOrIndex(entities[rowInfo.index + 1], rowInfo.index + 1);
+    const cellIdAbove = `${rowAboveId}:${column.path}`;
+    const cellIdBelow = `${rowBelowId}:${column.path}`;
 
     const cellId = `${rowId}:${column.path}`;
 
     const rowDisabled = isEntityDisabled(entity);
     const err = reduxFormCellValidation[cellId];
+    let selectedTopBorder,
+      selectedRightBorder,
+      selectedBottomBorder,
+      selectedLeftBorder;
+    if (reduxFormSelectedCells[cellId]) {
+      selectedTopBorder = !reduxFormSelectedCells[cellIdAbove];
+      selectedRightBorder = !reduxFormSelectedCells[cellIdToRight];
+      selectedBottomBorder = !reduxFormSelectedCells[cellIdBelow];
+      selectedLeftBorder = !reduxFormSelectedCells[cellIdToLeft];
+    }
     const className = classNames({
       isSelectedCell: reduxFormSelectedCells[cellId],
-      isPrimarySelected: reduxFormSelectedCells[cellId] === "primary",
+      isPrimarySelected:
+        reduxFormSelectedCells[cellId] === PRIMARY_SELECTED_VAL,
       isSecondarySelected: reduxFormSelectedCells[cellId] === true,
+      noSelectedTopBorder: !selectedTopBorder,
+      noSelectedRightBorder: !selectedRightBorder,
+      noSelectedBottomBorder: !selectedBottomBorder,
+      noSelectedLeftBorder: !selectedLeftBorder,
       isDropdownCell: column.type === "dropdown",
       isEditingCell: reduxFormEditingCell === cellId,
       hasCellError: !!err,
@@ -1286,21 +1314,69 @@ class DataTable extends React.Component {
         let newSelectedCells = {
           ...reduxFormSelectedCells
         };
-        if (newSelectedCells[cellId]) {
+        if (newSelectedCells[cellId] && !shift) {
           // don't deselect if editing
           if (reduxFormEditingCell === cellId) return;
-          delete newSelectedCells[cellId];
+          if (meta) {
+            delete newSelectedCells[cellId];
+          } else {
+            newSelectedCells = {};
+          }
         } else {
           if (meta) {
             if (isEmpty(newSelectedCells)) {
-              newSelectedCells[cellId] = "primary";
+              newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
             } else {
               newSelectedCells[cellId] = true;
             }
           } else if (shift) {
+            const primarySelectedCellId = Object.keys(
+              reduxFormSelectedCells
+            ).find(c => reduxFormSelectedCells[c] === PRIMARY_SELECTED_VAL);
+            if (primarySelectedCellId) {
+              const [rowId, colPath] = primarySelectedCellId.split(":");
+              const primaryRowIndex = entities.findIndex((e, i) => {
+                return getIdOrCodeOrIndex(e, i) === rowId;
+              });
+              const primaryColIndex = schema.fields.findIndex(
+                f => f.path === colPath
+              );
+
+              if (primaryRowIndex === -1 || primaryColIndex === -1) {
+                newSelectedCells = {};
+                newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
+              } else {
+                const minRowIndex = min([primaryRowIndex, rowIndex]);
+                const minColIndex = min([primaryColIndex, columnIndex]);
+                const maxRowIndex = max([primaryRowIndex, rowIndex]);
+                const maxColIndex = max([primaryColIndex, columnIndex]);
+                const entitiesBetweenRows = entities.slice(
+                  minRowIndex,
+                  maxRowIndex + 1
+                );
+                const fieldsBetweenCols = schema.fields.slice(
+                  minColIndex,
+                  maxColIndex + 1
+                );
+                newSelectedCells = {
+                  [primarySelectedCellId]: PRIMARY_SELECTED_VAL
+                };
+                entitiesBetweenRows.forEach(e => {
+                  const rowId = getIdOrCodeOrIndex(e, entities.indexOf(e));
+                  fieldsBetweenCols.forEach(f => {
+                    const cellId = `${rowId}:${f.path}`;
+                    if (!newSelectedCells[cellId])
+                      newSelectedCells[cellId] = true;
+                  });
+                });
+              }
+            } else {
+              newSelectedCells = {};
+              newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
+            }
           } else {
             newSelectedCells = {};
-            newSelectedCells[cellId] = "primary";
+            newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
           }
         }
 
@@ -1669,7 +1745,7 @@ class DataTable extends React.Component {
               />
             )}
 
-            {isSelectedCell && isSelectedCell === "primary" && (
+            {isSelectedCell && isSelectedCell === PRIMARY_SELECTED_VAL && (
               <CellDragHandle
                 thisTable={this.table}
                 cellId={cellId}
@@ -1686,10 +1762,14 @@ class DataTable extends React.Component {
                     selectedCellVal = isTruthy(selectedCellVal);
                   }
 
+                  const newReduxFormSelectedCells = {
+                    [cellId]: PRIMARY_SELECTED_VAL
+                  };
                   change(
                     "reduxFormEntities",
                     immer(entities, entities => {
                       cellsToSelect.forEach(cellId => {
+                        newReduxFormSelectedCells[cellId] = true;
                         const [rowId, path] = cellId.split(":");
                         const entityToUpdate = entities.find((e, i) => {
                           return getIdOrCodeOrIndex(e, i) === rowId;
@@ -1700,6 +1780,8 @@ class DataTable extends React.Component {
                       });
                     })
                   );
+                  // select the new cells
+                  change("reduxFormSelectedCells", newReduxFormSelectedCells);
                 }}
               ></CellDragHandle>
             )}

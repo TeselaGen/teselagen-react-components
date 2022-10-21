@@ -306,9 +306,14 @@
 .ReactTable .rt-tbody .rt-td {
   padding: 8px 8px;
 }
+:root {
+  --cell-border-width: 1px;
+  --cell-no-border: var(--cell-border-width) solid rgba(212, 212, 212, 0.07);
+  --cell-border-color: rgb(75, 137, 255);
+}
 
 .ReactTable.isCellEditable .rt-td {
-  outline: 1px solid rgba(212, 212, 212, 0.2);
+  border: var(--cell-border-width) solid rgba(212, 212, 212, 0.2);
 }
 
 .ReactTable .rt-tbody .rt-td.isSelectedCell {
@@ -318,12 +323,33 @@
 }
 
 .ReactTable .rt-tbody .rt-td.isSelectedCell.isPrimarySelected {
-  outline: 1px solid rgb(75, 137, 255);
+  border: var(--cell-border-width) solid var(--cell-border-color);
   box-shadow: 0 0 0 1px rgb(75 137 255);
 }
 
 .ReactTable .rt-tbody .rt-td.isSelectedCell.isSecondarySelected {
-  outline: 1px solid rgb(75, 137, 255);
+  border: var(--cell-border-width) solid var(--cell-border-color);
+}
+
+.ReactTable
+  .rt-tbody
+  .rt-td.isSelectedCell.isSecondarySelected.noSelectedTopBorder {
+  border-top: var(--cell-no-border);
+}
+.ReactTable
+  .rt-tbody
+  .rt-td.isSelectedCell.isSecondarySelected.noSelectedRightBorder {
+  border-right: var(--cell-no-border);
+}
+.ReactTable
+  .rt-tbody
+  .rt-td.isSelectedCell.isSecondarySelected.noSelectedBottomBorder {
+  border-bottom: var(--cell-no-border);
+}
+.ReactTable
+  .rt-tbody
+  .rt-td.isSelectedCell.isSecondarySelected.noSelectedLeftBorder {
+  border-left: var(--cell-no-border);
 }
 
 .ReactTable .rt-tbody .rt-td.isSelectedCell.isDropdownCell {
@@ -337,7 +363,7 @@
   overflow: visible;
 }
 .ReactTable .rt-tbody .rt-td.selectedForUpdate {
-  border: 0.5px dashed rgb(75, 137, 255);
+  border: var(--cell-border-width) dashed var(--cell-border-color);
 }
 
 .tg-compact-table .rt-tbody .rt-td {
@@ -550,5 +576,5 @@
 }
 
 .cell-edit-dropdown:hover {
-  color: rgb(75, 137, 255);
+  color: var(--cell-border-color);
 }
