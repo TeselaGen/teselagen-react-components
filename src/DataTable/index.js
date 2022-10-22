@@ -4,6 +4,7 @@ import ReactDOM from "react-dom";
 import { arrayMove } from "react-sortable-hoc";
 import copy from "copy-to-clipboard";
 import {
+  invert,
   isNumber,
   toNumber,
   isEmpty,
@@ -266,6 +267,7 @@ class DataTable extends React.Component {
   componentDidMount() {
     this.props.isCellEditable && this.formatAndValidateTable();
     this.updateFromProps({}, computePresets(this.props));
+    document.addEventListener("paste", this.handlePaste);
 
     // const table = ReactDOM.findDOMNode(this.table);
     // let theads = table.getElementsByClassName("rt-thead");
@@ -325,6 +327,10 @@ class DataTable extends React.Component {
     //   ([key, val]) =>
     //     oldProps[key] !== val && console.info(`Prop '${key}' changed`)
     // );
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener("paste", this.handlePaste);
   }
 
   handleRowMove = (type, shiftHeld) => e => {
@@ -410,6 +416,115 @@ class DataTable extends React.Component {
         getRecordsFromIdMap(reduxFormSelectedEntityIdMap),
         e
       );
+    }
+  };
+
+  handlePaste = e => {
+    const {
+      isCellEditable,
+      reduxFormSelectedCells,
+      reduxFormCellValidation,
+      change,
+      schema,
+      entities
+    } = computePresets(this.props);
+
+    if (isCellEditable) {
+      if (isEmpty(reduxFormSelectedCells)) return;
+      try {
+        let pasteData = [];
+        if (window.clipboardData && window.clipboardData.getData) {
+          // IE
+          pasteData = defaultParsePaste(window.clipboardData.getData("Text"));
+        } else if (e.clipboardData && e.clipboardData.getData) {
+          pasteData = defaultParsePaste(e.clipboardData.getData("text/plain"));
+        }
+        if (!pasteData || !pasteData.length) return;
+        if (pasteData.length === 1 && pasteData[0].length === 1) {
+          const newCellValidate = {
+            ...reduxFormCellValidation
+          };
+          // single paste value, fill all cells with value
+          const newVal = pasteData[0][0];
+          change(
+            "reduxFormEntities",
+            immer(entities, entities => {
+              const entityIdToEntity = getEntityIdToEntity(entities);
+              Object.keys(reduxFormSelectedCells).forEach(cellId => {
+                const [rowId, path] = cellId.split(":");
+                const entity = entityIdToEntity[rowId].e;
+                const { error } = editCellHelper({
+                  entity,
+                  path,
+                  schema,
+                  newVal
+                });
+                if (error) {
+                  newCellValidate[cellId] = error;
+                }
+              });
+            })
+          );
+          change("reduxFormCellValidation", newCellValidate);
+        } else {
+          // handle paste in same format
+          let primarySelectedCell;
+          Object.keys(reduxFormSelectedCells).forEach(k => {
+            if (reduxFormSelectedCells[k] === PRIMARY_SELECTED_VAL) {
+              primarySelectedCell = k;
+            }
+          });
+          if (primarySelectedCell) {
+            const newCellValidate = {
+              ...reduxFormCellValidation
+            };
+
+            change(
+              "reduxFormEntities",
+              immer(entities, entities => {
+                const entityIdToEntity = getEntityIdToEntity(entities);
+                const [rowId, primaryCellPath] = primarySelectedCell.split(":");
+                const primaryEntityInfo = entityIdToEntity[rowId];
+                const entitiesToManipulate = entities.slice(
+                  primaryEntityInfo.i,
+                  primaryEntityInfo.i + pasteData.length
+                );
+                const pathToIndex = getFieldPathToIndex(schema);
+                const indexToPath = invert(pathToIndex);
+                const startIndex = pathToIndex[primaryCellPath];
+                pasteData.forEach((row, i) => {
+                  row.forEach((cell, j) => {
+                    if (cell) {
+                      const cellIndexToChange = startIndex + j;
+                      const entity = entitiesToManipulate[i];
+                      if (entity) {
+                        const path = indexToPath[cellIndexToChange];
+                        if (path) {
+                          const { error } = editCellHelper({
+                            entity,
+                            path,
+                            schema,
+                            newVal: cell
+                          });
+                          if (error) {
+                            const cellId = `${getIdOrCodeOrIndex(
+                              entity
+                            )}:${path}`;
+                            newCellValidate[cellId] = error;
+                          }
+                        }
+                      }
+                    }
+                  });
+                });
+              })
+            );
+            change("reduxFormCellValidation", newCellValidate);
+          }
+        }
+      } catch (error) {
+        console.error(`error:`, error);
+      }
     }
   };
   handleSelectAllRows = e => {
@@ -532,10 +647,7 @@ class DataTable extends React.Component {
     // tabs between. if not then just select primary selected cell
     if (isEmpty(reduxFormSelectedCells)) return;
     const pathToIndex = getFieldPathToIndex(schema);
-    const entityIdToEntity = {};
-    entities.forEach((e, i) => {
-      entityIdToEntity[getIdOrCodeOrIndex(e, i)] = { e, i };
-    });
+    const entityIdToEntity = getEntityIdToEntity(entities);
     const selectionGrid = [];
     let firstRowIndex;
     let firstCellIndex;
@@ -556,20 +668,17 @@ class DataTable extends React.Component {
         selectionGrid[eInfo.i][cellIndex] = true;
       }
     });
-    if (!firstRowIndex) return;
+    if (firstRowIndex === undefined) return;
     const allRows = getAllRows(e);
     let fullCellText = "";
     times(selectionGrid.length, i => {
       const row = selectionGrid[i];
+      if (fullCellText) {
+        fullCellText += "\n";
+      }
       if (!row) {
-        if (fullCellText) {
-          fullCellText += "\n";
-        }
         return;
       } else {
-        if (fullCellText) {
-          fullCellText += "\n";
-        }
         // ignore header
         const rowCopyText = this.getRowCopyText(allRows[i + 1]).split("\t");
         times(row.length, i => {
@@ -577,7 +686,7 @@ class DataTable extends React.Component {
           if (cell) {
             fullCellText += rowCopyText[i];
           }
-          if (i !== row.length - 1) fullCellText += "\t";
+          if (i !== row.length - 1 && i >= firstCellIndex) fullCellText += "\t";
         });
       }
     });
@@ -2395,4 +2504,16 @@ function getFieldPathToIndex(schema) {
     fieldToIndex[f.path] = i;
   });
   return fieldToIndex;
+}
+
+const defaultParsePaste = str => {
+  return str.split(/\r\n|\n|\r/).map(row => row.split("\t"));
+};
+
+function getEntityIdToEntity(entities) {
+  const entityIdToEntity = {};
+  entities.forEach((e, i) => {
+    entityIdToEntity[getIdOrCodeOrIndex(e, i)] = { e, i };
+  });
+  return entityIdToEntity;
 }
