@@ -479,6 +479,7 @@ class DataTable extends React.Component {
               ...reduxFormCellValidation
             };
 
+            const newSelectedCells = { ...reduxFormSelectedCells };
             change(
               "reduxFormEntities",
               immer(entities, entities => {
@@ -506,10 +507,13 @@ class DataTable extends React.Component {
                             schema,
                             newVal: cell
                           });
+                          const cellId = `${getIdOrCodeOrIndex(
+                            entity
+                          )}:${path}`;
+                          if (!newSelectedCells[cellId]) {
+                            newSelectedCells[cellId] = true;
+                          }
                           if (error) {
-                            const cellId = `${getIdOrCodeOrIndex(
-                              entity
-                            )}:${path}`;
                             newCellValidate[cellId] = error;
                           }
                         }
@@ -520,6 +524,7 @@ class DataTable extends React.Component {
               })
             );
             change("reduxFormCellValidation", newCellValidate);
+            change("reduxFormSelectedCells", newSelectedCells);
           }
         }
       } catch (error) {
