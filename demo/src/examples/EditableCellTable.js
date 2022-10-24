@@ -18,7 +18,7 @@ const schema = {
           return "Must include the letter 'a'";
       },
       format: newVal => {
-        return newVal.toLowerCase();
+        return newVal?.toLowerCase();
       }
     },
     {
@@ -32,19 +32,20 @@ const schema = {
       isEditable: true,
       //should auto validate against list of accepted values, should auto format to try to coerce input values into accepted
       type: "dropdown",
-      values: ["cloudy", "rainy"]
+      defaultValue: "sunny",
+      values: ["cloudy", "rainy", "sunny", "overcast"]
     },
     {
       path: "howMany",
       isEditable: true,
       //should auto validate to make sure the type is numeric, should auto format (I think this already works..) to try to coerce input values into accepted
       type: "numeric",
+      defaultValue: 1,
       //should be able to pass additional validation/formatting
       validate: newVal => {
         if (newVal > 20) return "This val is toooo high";
       },
       format: newVal => {
-
         return toNumber(newVal) + 1;
       }
     },
@@ -52,12 +53,13 @@ const schema = {
       path: "isProtein",
       isEditable: true,
       //should auto validate to coerce Yes -> true "true"->true, should auto format to try to coerce input values into accepted
-      type: "boolean"
+      type: "boolean",
+      defaultValue: true
     }
   ]
 };
 const chance = new Chance();
-function getEnts(num, opts) {
+function getEnts(num) {
   return times(num).map(i => {
     return {
       name: i === 0 ? "Tom" : chance.name(),

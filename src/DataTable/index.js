@@ -102,6 +102,13 @@ class DataTable extends React.Component {
         onKeyDown: this.handleRowMove("up", true)
       },
       ...(props.isCellEditable && {
+        enter: {
+          global: false,
+          combo: "enter",
+          label: "Enter -> Start Cell Edit",
+          onKeyDown: this.handleEnterStartCellEdit
+        },
+
         undo: {
           global: false,
           combo: "mod+z",
@@ -147,6 +154,9 @@ class DataTable extends React.Component {
       fullscreen: !this.state.fullscreen
     });
   };
+  handleEnterStartCellEdit = () => {
+    this.startCellEdit(this.getPrimarySelectedCellId());
+  };
   handleUndo = () => {
     const {
       change,
@@ -161,7 +171,11 @@ class DataTable extends React.Component {
           reduxFormEntitiesUndoRedoStack.currentVersion
         ].inversePatches
       );
-      change("reduxFormEntities", nextState);
+      const { newEnts, validationErrors } = this.formatAndValidateEntities(
+        nextState
+      );
+      change("reduxFormEntities", newEnts);
+      change("reduxFormCellValidation", validationErrors);
       change("reduxFormEntitiesUndoRedoStack", {
         ...reduxFormEntitiesUndoRedoStack,
         currentVersion: reduxFormEntitiesUndoRedoStack.currentVersion - 1
@@ -181,8 +195,11 @@ class DataTable extends React.Component {
         entities,
         reduxFormEntitiesUndoRedoStack[nextV].patches
       );
-      change("reduxFormEntities", nextState);
-
+      const { newEnts, validationErrors } = this.formatAndValidateEntities(
+        nextState
+      );
+      change("reduxFormEntities", newEnts);
+      change("reduxFormCellValidation", validationErrors);
       change("reduxFormEntitiesUndoRedoStack", {
         ...reduxFormEntitiesUndoRedoStack,
         currentVersion: nextV
@@ -296,8 +313,8 @@ class DataTable extends React.Component {
         });
     }, 0);
   };
-  formatAndValidateTableInitial = () => {
-    const { _origEntities: entities, schema, change } = this.props;
+  formatAndValidateEntities = entities => {
+    const { schema } = this.props;
     const editableFields = schema.fields.filter(f => f.isEditable);
     const validationErrors = {};
 
@@ -317,6 +334,16 @@ class DataTable extends React.Component {
         });
       });
     });
+    return {
+      newEnts,
+      validationErrors
+    };
+  };
+  formatAndValidateTableInitial = () => {
+    const { _origEntities: entities, change } = this.props;
+    const { newEnts, validationErrors } = this.formatAndValidateEntities(
+      entities
+    );
     change("reduxFormEntities", newEnts);
     change("reduxFormCellValidation", validationErrors);
   };
@@ -1545,7 +1572,6 @@ class DataTable extends React.Component {
     const cellIdBelow = `${rowBelowId}:${column.path}`;
 
     const cellId = `${rowId}:${column.path}`;
-
     const rowDisabled = isEntityDisabled(entity);
     const err = reduxFormCellValidation[cellId];
     let selectedTopBorder,
@@ -1578,6 +1604,7 @@ class DataTable extends React.Component {
         if (rowDisabled) return;
         this.startCellEdit(cellId);
       },
+
       ...(err && {
         "data-tip": err
       }),
@@ -2153,6 +2180,8 @@ class DataTable extends React.Component {
       isCopyable,
       isCellEditable,
       entities = [],
+      reduxFormCellValidation,
+      change,
       reduxFormSelectedCells = {}
     } = computePresets(this.props);
     let selectedRecords;
@@ -2252,7 +2281,15 @@ class DataTable extends React.Component {
           return getIdOrCodeOrIndex(e, i) === rowId;
         });
         const insertIndex = above ? indexToInsert : indexToInsert + 1;
-        entities.splice(insertIndex, 0, newEntity);
+        const { newEnts, validationErrors } = this.formatAndValidateEntities([
+          newEntity
+        ]);
+        change("reduxFormCellValidation", {
+          ...reduxFormCellValidation,
+          ...validationErrors
+        });
+
+        entities.splice(insertIndex, 0, newEnts[0]);
       });
       this.refocusTable();
     };
@@ -2630,6 +2667,9 @@ const editCellHelper = ({ entity, path, schema, columnSchema, newVal }) => {
   path = path || colSchema.path;
   const { format, validate, type } = colSchema;
   let error;
+  if (nv === undefined && colSchema.defaultValue !== undefined)
+    nv = colSchema.defaultValue;
+
   if (format) {
     nv = format(nv, colSchema);
   }
