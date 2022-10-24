@@ -84,12 +84,12 @@ export function useToggle({
   searchInput,
   ...rest
 }) {
-  const defaultValue = _defaultValue || options[0]?.value || options[0];
+  const defaultValue = _defaultValue || options?.[0]?.value || options?.[0];
   useEffect(() => {
     const demoState = getDemoState();
     const toSet = demoState[type] || defaultValue;
     _setVal(toSet);
-    hook(toSet);
+    hook?.(toSet);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
