@@ -72,6 +72,7 @@ import "../toastr";
 import "./style.css";
 import { getRecordsFromIdMap } from "./utils/withSelectedEntities";
 import { CellDragHandle } from "./CellDragHandle";
+import { nanoid } from "nanoid";
 enablePatches();
 
 const PRIMARY_SELECTED_VAL = "main_cell";
@@ -366,7 +367,7 @@ class DataTable extends React.Component {
     // }
 
     // if switching pages or searching the table we want to reset the scrollbar
-    if (tableScrollElement.scrollTop > 0) {
+    if (tableScrollElement.scrollTop > 0 && !this.props.isCellEditable) {
       const { entities = [] } = this.props;
       const { entities: oldEntities = [] } = oldProps;
       const reloaded = oldProps.isLoading && !this.props.isLoading;
@@ -476,6 +477,15 @@ class DataTable extends React.Component {
     }
   };
 
+  getPrimarySelectedCellId = () => {
+    const { reduxFormSelectedCells = {} } = this.props;
+    for (const k of Object.keys(reduxFormSelectedCells)) {
+      if (reduxFormSelectedCells[k] === PRIMARY_SELECTED_VAL) {
+        return k;
+      }
+    }
+  };
+
   handlePaste = e => {
     const {
       isCellEditable,
@@ -522,12 +532,7 @@ class DataTable extends React.Component {
           change("reduxFormCellValidation", newCellValidate);
         } else {
           // handle paste in same format
-          let primarySelectedCell;
-          Object.keys(reduxFormSelectedCells).forEach(k => {
-            if (reduxFormSelectedCells[k] === PRIMARY_SELECTED_VAL) {
-              primarySelectedCell = k;
-            }
-          });
+          const primarySelectedCell = this.getPrimarySelectedCellId();
           if (primarySelectedCell) {
             const newCellValidate = {
               ...reduxFormCellValidation
@@ -1478,7 +1483,7 @@ class DataTable extends React.Component {
             props: computePresets(this.props)
           });
         }
-        this.showContextMenu(newIdMap, e, entity);
+        this.showContextMenu(e, newIdMap);
       },
       className: classNames(
         "with-row-data",
@@ -1519,7 +1524,8 @@ class DataTable extends React.Component {
       isCellEditable,
       reduxFormCellValidation,
       reduxFormSelectedCells = {},
-      isEntityDisabled
+      isEntityDisabled,
+      change
     } = computePresets(this.props);
     if (!isCellEditable) return {}; //only allow cell selection to do stuff here
     if (!rowInfo) return {};
@@ -1552,10 +1558,11 @@ class DataTable extends React.Component {
       selectedBottomBorder = !reduxFormSelectedCells[cellIdBelow];
       selectedLeftBorder = !reduxFormSelectedCells[cellIdToLeft];
     }
+    const isPrimarySelected =
+      reduxFormSelectedCells[cellId] === PRIMARY_SELECTED_VAL;
     const className = classNames({
       isSelectedCell: reduxFormSelectedCells[cellId],
-      isPrimarySelected:
-        reduxFormSelectedCells[cellId] === PRIMARY_SELECTED_VAL,
+      isPrimarySelected,
       isSecondarySelected: reduxFormSelectedCells[cellId] === true,
       noSelectedTopBorder: !selectedTopBorder,
       noSelectedRightBorder: !selectedRightBorder,
@@ -1574,8 +1581,17 @@ class DataTable extends React.Component {
       ...(err && {
         "data-tip": err
       }),
-      onContextMenu: () => {
-        this.showContextMenu();
+      onContextMenu: e => {
+        if (!isPrimarySelected) {
+          const primaryCellId = this.getPrimarySelectedCellId();
+          const newSelectedCells = { ...reduxFormSelectedCells };
+          if (primaryCellId) {
+            newSelectedCells[primaryCellId] = true;
+          }
+          newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
+          change("reduxFormSelectedCells", newSelectedCells);
+        }
+        this.showContextMenu(e);
       },
       onClick: e => {
         // cell click, cellclick
@@ -1599,9 +1615,7 @@ class DataTable extends React.Component {
             newSelectedCells = {};
           }
         } else {
-          const primarySelectedCellId = Object.keys(
-            reduxFormSelectedCells
-          ).find(c => reduxFormSelectedCells[c] === PRIMARY_SELECTED_VAL);
+          const primarySelectedCellId = this.getPrimarySelectedCellId();
           if (meta) {
             if (isEmpty(newSelectedCells)) {
               newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
@@ -2132,11 +2146,26 @@ class DataTable extends React.Component {
     return stringText;
   };
 
-  showContextMenu = (idMap, e) => {
-    const { history, contextMenu, isCopyable, isCellEditable } = computePresets(
-      this.props
-    );
-    const selectedRecords = getRecordsFromIdMap(idMap);
+  showContextMenu = (e, idMap) => {
+    const {
+      history,
+      contextMenu,
+      isCopyable,
+      isCellEditable,
+      entities = [],
+      reduxFormSelectedCells = {}
+    } = computePresets(this.props);
+    let selectedRecords;
+    if (isCellEditable) {
+      const rowIds = {};
+      Object.keys(reduxFormSelectedCells).forEach(cellKey => {
+        const [rowId] = cellKey.split(":");
+        rowIds[rowId] = true;
+      });
+      selectedRecords = entities.filter(e => rowIds[getIdOrCodeOrIndex(e)]);
+    } else {
+      selectedRecords = getRecordsFromIdMap(idMap);
+    }
     const itemsToRender = contextMenu({
       selectedRecords,
       history
@@ -2213,6 +2242,20 @@ class DataTable extends React.Component {
         />
       );
     }
+    const insertRow = above => {
+      const primaryCellId = this.getPrimarySelectedCellId();
+      const [rowId] = primaryCellId.split(":");
+      this.updateEntitiesHelper(entities, entities => {
+        const newEntity = { id: nanoid() };
+
+        const indexToInsert = entities.findIndex((e, i) => {
+          return getIdOrCodeOrIndex(e, i) === rowId;
+        });
+        const insertIndex = above ? indexToInsert : indexToInsert + 1;
+        entities.splice(insertIndex, 0, newEntity);
+      });
+      this.refocusTable();
+    };
     const menu = (
       <Menu>
         {itemsToRender}
@@ -2228,14 +2271,42 @@ class DataTable extends React.Component {
               text="Add Row Above"
               key="addRowAbove"
               onClick={() => {
-                this.getPrimarySelectedCellId();
+                insertRow(true);
               }}
             ></MenuItem>
             <MenuItem
-              icon="remove-row"
+              icon="add-row-top"
+              text="Add Row Below"
+              key="addRowBelow"
+              onClick={() => {
+                insertRow();
+              }}
+            ></MenuItem>
+            <MenuItem
+              icon="remove"
               text="Remove Row(s)"
               key="removeRow"
-              onClick={() => {}}
+              onClick={() => {
+                const selectedRowIds = Object.keys(reduxFormSelectedCells).map(
+                  cellId => {
+                    const [rowId] = cellId.split(":");
+                    return rowId;
+                  }
+                );
+                const primaryCellId = this.getPrimarySelectedCellId();
+                const [rowId] = primaryCellId.split(":");
+
+                this.updateEntitiesHelper(entities, entities => {
+                  const indexToInsert = entities.findIndex((e, i) => {
+                    return getIdOrCodeOrIndex(e, i) === rowId;
+                  });
+                  entities.splice(indexToInsert, 0);
+                  return entities.filter(
+                    e => !selectedRowIds.includes(getIdOrCodeOrIndex(e))
+                  );
+                });
+                this.refocusTable();
+              }}
             ></MenuItem>
           </>
         )}
