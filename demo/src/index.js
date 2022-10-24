@@ -25,7 +25,7 @@ import IntentTextDemo from "./examples/IntentText";
 import ScrollToTopDemo from "./examples/ScrollToTop";
 
 import showAppSpinnerDemo from "./examples/showAppSpinnerDemo";
-
+import EditableCellTable from "./examples/EditableCellTable";
 import "./style.css";
 import React from "react";
 import { render } from "react-dom";
@@ -46,6 +46,9 @@ const demos = {
     childLinks: {
       SimpleTable: {
         demo: SimpleTable
+      },
+      EditableCellTable: {
+        demo: EditableCellTable
       }
     },
     noLiveCode: true
@@ -246,7 +249,7 @@ const demos = {
   },
   PromptUnsavedChanges: {
     demo: PromptUnsavedChanges
-  },
+  }
   // fonticons: {
   //   demo: FontIconsDemo,
   // }

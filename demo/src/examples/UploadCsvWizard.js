@@ -1,6 +1,6 @@
 import Fuse from "fuse.js";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { reduxForm } from "redux-form";
 import { Button, Callout, Card } from "@blueprintjs/core";
@@ -8,6 +8,7 @@ import immer from "immer";
 
 import store from "../store";
 import {
+  DataTable,
   DialogFooter,
   FileUploadField,
   ReactSelectField,
@@ -28,36 +29,31 @@ import { flatMap } from "lodash";
 import { max } from "lodash";
 import { compose } from "recompose";
 import SimpleStepViz from "./SimpleStepViz";
-import { toString } from "lodash";
-import { HotTable } from "@handsontable/react";
-import { registerAllModules } from "handsontable/registry";
-import "handsontable/dist/handsontable.full.min.css";
-registerAllModules();
 
 const validateAgainstSchema = {
-  headers: [
-    { header: "name" },
-    { header: "description", allowEmpty: true },
-    { header: "sequence" },
+  fields: [
+    { isEditable: true, path: "name" },
+    { isEditable: true, path: "description", allowEmpty: true },
+    { isEditable: true, path: "sequence" },
     {
-      header: "isRegex",
-      type: "checkbox",
-      defaultValue: false,
-      allowEmpty: true
+      isEditable: true,
+      path: "isRegex",
+      type: "boolean",
+      defaultValue: false
     },
     {
-      header: "matchType",
+      isEditable: true,
+      path: "matchType",
       type: "dropdown",
-      source: ["dna", "protein"],
-      defaultValue: "dna",
-      allowEmpty: true
+      values: ["dna", "protein"],
+      defaultValue: "dna"
     },
     {
-      header: "type",
+      isEditable: true,
+      path: "type",
       type: "dropdown",
-      source: ["misc_feature", "CDS", "rbs"],
-      defaultValue: "misc_feature1",
-      validator: "dropdown"
+      values: ["misc_feature", "CDS", "rbs"],
+      defaultValue: "misc_feature"
     }
   ],
   exampleData: []
@@ -65,13 +61,13 @@ const validateAgainstSchema = {
 const csvStr = `Name,Sequence,Type,Color,Match type
 15 long linker based on the one I designed,APGSGTGGGSGSAPG,,#85DAE9,protein
 20 aa linker based on the one I designed,APGGSGGGTGGGSGGGSAPG,,#C7B0E3,protein
-22 aa linker,GPGSGGGGSGGGGSGGGGSGPG,,#f58a5e,protein
+22 aa linker,GPGSGGGGSGGGGSGGGGSGPG,misc_protein,#f58a5e,protein
 38 aa lkong linker,APGGSGGGSGGGSGGGSGGGSGGGTGGGSGGGSAGSPG,,#75C6A9,protein
 3d6 variable domain LC,YVVMTQTPLTLSVTIGQPASISCKSSQSLLDSDGKTYLNWLLQRPGQSPKRLIYLVSKLDSGVPDRFTGSGSGTDFTLKISRIEAEDLGLYYCWQGTHFPRTFGGGTKLEIK,,#ff9ccd,protein
 3d6 variable HC,EVKLVESGGGLVKPGASLKLSCAASGFTFSNYGMSWVRQNSDKRLEWVASIRSGGGRTYYSDNVKGRFTISRENAKNTLYLQMSSLKSEDTALYYCVRYDHYSGSSDYWGQGTTVTVS,,#f58a5e,protein
 15 long linker based on the one I designed,APGSGTGGGSGSAPG,,#85DAE9,protein
 20 aa linker based on the one I designed,APGGSGGGTGGGSGGGSAPG,,#C7B0E3,protein
-22 aa linker,GPGSGGGGSGGGGSGGGGSGPG,,#f58a5e,protein
+22 aa linker,GPGSGGGGSGGGGSGGGGSGPG,misc_feat1,#f58a5e,protein
 38 aa lkong linker,APGGSGGGSGGGSGGGSGGGSGGGTGGGSGGGSAGSPG,,#75C6A9,protein
 3d6 variable domain LC,YVVMTQTPLTLSVTIGQPASISCKSSQSLLDSDGKTYLNWLLQRPGQSPKRLIYLVSKLDSGVPDRFTGSGSGTDFTLKISRIEAEDLGLYYCWQGTHFPRTFGGGTKLEIK,,#ff9ccd,protein
 3d6 variable HC,EVKLVESGGGLVKPGASLKLSCAASGFTFSNYGMSWVRQNSDKRLEWVASIRSGGGRTYYSDNVKGRFTISRENAKNTLYLQMSSLKSEDTALYYCVRYDHYSGSSDYWGQGTTVTVS,,#f58a5e,protein
@@ -118,22 +114,22 @@ const { data } = parseCsvString(csvStr, {
 });
 
 const getSchema = data => ({
-  headers: map(data[0], (val, header) => {
-    return { header, type: "string" };
+  fields: map(data[0], (val, path) => {
+    return { path, type: "string" };
   }),
   exampleData: data
 });
 
-function tryToMatchHeaders(userSchema, officialSchema) {
+function tryToMatchFields(userSchema, officialSchema) {
   const options = {
     includeScore: true,
-    keys: ["header"]
+    keys: ["path", "displayName"]
   };
   let hasIssues = false;
   officialSchema.forEach(h => {
     let hasMatch = false;
     userSchema.forEach(uh => {
-      if (uh.header.toLowerCase() === h.header.toLowerCase()) {
+      if (uh.path.toLowerCase() === h.path.toLowerCase()) {
         hasMatch = true;
       }
     });
@@ -146,7 +142,7 @@ function tryToMatchHeaders(userSchema, officialSchema) {
   const fuse = new Fuse(userSchema, options);
 
   officialSchema.forEach(h => {
-    const result = fuse.search(h.header);
+    const result = fuse.search(h.path);
     h.matches = result;
   });
   return { searchResults: officialSchema, hasIssues: true };
@@ -198,9 +194,9 @@ reduxForm({
 })(FormComponentsDemo);
 
 const userSchema = getSchema(data);
-const { /* hasIssues, */ searchResults } = tryToMatchHeaders(
-  userSchema.headers,
-  validateAgainstSchema.headers
+const { /* hasIssues, */ searchResults } = tryToMatchFields(
+  userSchema.fields,
+  validateAgainstSchema.fields
 );
 
 const UploadHelper = compose(
@@ -218,23 +214,23 @@ const UploadHelper = compose(
   const incomingHeadersToScores = {};
   searchResults.forEach(r => {
     r.matches.forEach(match => {
-      incomingHeadersToScores[match.item.header] =
-        incomingHeadersToScores[match.item.header] || [];
-      incomingHeadersToScores[match.item.header].push(match.score);
+      incomingHeadersToScores[match.item.path] =
+        incomingHeadersToScores[match.item.path] || [];
+      incomingHeadersToScores[match.item.path].push(match.score);
     });
   });
   searchResults.forEach(r => {
     for (const match of r.matches) {
-      if (!incomingHeadersToScores[match.item.header]) continue;
-      const maxScore = max(incomingHeadersToScores[match.item.header]);
+      if (!incomingHeadersToScores[match.item.path]) continue;
+      const maxScore = max(incomingHeadersToScores[match.item.path]);
       if (maxScore === match.score) {
-        r.topMatch = match.item.header;
+        r.topMatch = match.item.path;
         r.matches.forEach(match => {
-          if (!incomingHeadersToScores[match.item.header]) return;
-          const arr = incomingHeadersToScores[match.item.header];
+          if (!incomingHeadersToScores[match.item.path]) return;
+          const arr = incomingHeadersToScores[match.item.path];
           arr.splice(arr.indexOf(match.score), 1);
         });
-        delete incomingHeadersToScores[match.item.header];
+        delete incomingHeadersToScores[match.item.path];
         break;
       }
     }
@@ -275,53 +271,60 @@ const UploadHelper = compose(
           mappings below.
         </Callout>
         <br></br>
-        {searchResults.map(({ header, allowEmpty }, i) => {
+        {searchResults.map(({ path, allowEmpty, defaultValue }, i) => {
           return (
             <Card style={{ padding: 2 }} key={i}>
               <table>
-                <tr style={{ display: "flex", minHeight: 50 }}>
+                <tr
+                  style={{
+                    display: "flex",
+                    minHeight: 50,
+                    alignItems: "center",
+                    justifyContent: "space-between"
+                  }}
+                >
                   {/* <td style={{ marginRight: 10 }}>
                 {String.fromCharCode(i + 65)}
               </td> */}
                   <td
                     style={{
                       width: 200,
-                      display: "flex",
-                      justifyContent: "space-between"
+                      display: "flex"
                     }}
                   >
                     <div
-                      style={{ paddingTop: 2, paddingLeft: 3, fontSize: 15 }}
+                      style={{ paddingTop: 2, marginLeft: 15, fontSize: 15 }}
                     >
-                      {header}
+                      {path}
                     </div>
                   </td>
                   <td style={{ width: 200 }}>
                     <ReactSelectField
+                      noMarginBottom
                       tooltipError
                       onChange={val => {
                         setMatchedHeaders({ ...matchedHeaders, [i]: val });
                       }}
-                      name={header}
-                      isRequired={!allowEmpty}
+                      name={path}
+                      isRequired={!allowEmpty && (defaultValue === undefined)}
                       defaultValue={matchedHeaders[i]}
-                      options={flatMap(userSchema.headers, ({ header }) => {
+                      options={flatMap(userSchema.fields, ({ path }) => {
                         if (
-                          header !== matchedHeaders[i] &&
-                          flippedMatchedHeaders[header]
+                          path !== matchedHeaders[i] &&
+                          flippedMatchedHeaders[path]
                         ) {
                           return [];
                         }
                         return {
-                          value: header,
-                          label: header
+                          value: path,
+                          label: path
                         };
                       }).sort((a, b) => {
                         const ra = searchResults[i].matches
-                          .map(m => m.item.header)
+                          .map(m => m.item.path)
                           .indexOf(a.value);
                         const rb = searchResults[i].matches
-                          .map(m => m.item.header)
+                          .map(m => m.item.path)
                           .indexOf(b.value);
                         if (!ra) return -1;
                         if (!rb) return 1;
@@ -335,7 +338,9 @@ const UploadHelper = compose(
                       fontSize: 10 /* color: Colors.RED1 */
                     }}
                   >
-                    {!allowEmpty && "(Required)"}
+                    {!allowEmpty &&
+                      (defaultValue === undefined) &&
+                      "(Required)"}
                   </div>
                 </tr>
               </table>
@@ -392,30 +397,29 @@ const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
   validateAgainstSchema,
   userSchema
 }) {
-  const [loading, setLoading] = useState(true);
-  const hotRef = useRef(null);
-  useEffect(() => {
-    // simulate layout change outside of React lifecycle
-    setTimeout(() => {
-      setLoading(false);
-    }, 400);
-  }, []);
+  // const [loading, setLoading] = useState(true);
+  // useEffect(() => {
+  //   // simulate layout change outside of React lifecycle
+  //   setTimeout(() => {
+  //     setLoading(false);
+  //   }, 400);
+  // }, []);
 
   const data =
     userSchema.exampleData &&
     userSchema.exampleData.length &&
     userSchema.exampleData.map(row => {
       const toRet = {};
-      validateAgainstSchema.headers.forEach(({ header, defaultValue }, i) => {
+      validateAgainstSchema.fields.forEach(({ path, defaultValue }, i) => {
         const matchingKey = matchedHeaders[i];
 
         if (!matchingKey) {
-          toRet[header] = defaultValue === undefined ? defaultValue : "";
+          toRet[path] = defaultValue === undefined ? defaultValue : "";
         } else {
-          toRet[header] = row[matchingKey];
+          toRet[path] = row[matchingKey];
         }
-        if (toRet[header] === undefined || toRet[header] === "") {
-          toRet[header] = defaultValue || "";
+        if (toRet[path] === undefined || toRet[path] === "") {
+          toRet[path] = defaultValue || "";
         }
       });
       return toRet;
@@ -429,39 +433,15 @@ const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
         inlineLabel={true}
         label="Only Show Rows With Errors"
       />
-      <div style={{ height: 400, width: 600 }}>
-        {loading ? (
-          "...loading"
-        ) : (
-          <HotTable
-            rowHeaders={true}
-            colWidths={100}
-            manualColumnResize
-            ref={hotRef}
-            afterLoadData={() => {
-              setTimeout(() => {
-                hotRef.current.hotInstance.validateCells()
-              }, 0);
-            }}
-            // autoColumnSize={{
-            //   // when calculating column widths, use column headers
-            //   useHeaders: true
-            // }}
-            width="100%"
-            height={"100%"}
-            data={data}
-            colHeaders={validateAgainstSchema.headers.map(
-              ({ header }) => header
-            )}
-            columns={validateAgainstSchema.headers.map(h => ({
-              ...h,
-              data: h.header,
-              wordWrap: false
-            }))}
-            licenseKey="non-commercial-and-evaluation"
-          />
-        )}
-      </div>
+      <DataTable
+        maxWidth={800}
+        maxHeight={500}
+        formName="editableCellTable"
+        isSimple
+        isCellEditable
+        entities={data}
+        schema={validateAgainstSchema}
+      ></DataTable>
     </div>
   );
 });

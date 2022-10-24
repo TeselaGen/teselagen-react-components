@@ -4,7 +4,8 @@
  * @property {boolean} isPlural Are we searching for 1 thing or many?
  * @property {string} queryName What the props come back on ( by default = modelName + 'Query')
  */
-import { reduxForm, formValues } from "redux-form";
+import { reduxForm } from "redux-form";
+
 import { arrayMove } from "react-sortable-hoc";
 import { toArray, keyBy, get } from "lodash";
 import { withProps, withState, branch, compose } from "recompose";
@@ -12,6 +13,7 @@ import withTableParams from "../DataTable/utils/withTableParams";
 import convertSchema from "../DataTable/utils/convertSchema";
 import { viewColumn, openColumn } from "../DataTable/viewColumn";
 import pureNoFunc from "../utils/pureNoFunc";
+import tgFormValues from "../utils/tgFormValues";
 import getTableConfigFromStorage from "./utils/getTableConfigFromStorage";
 
 export default compose(
@@ -254,13 +256,26 @@ export default compose(
     };
   }),
   branch(props => !props.noForm, reduxForm({})), //the formName is passed via withTableParams and is often user overridden
-  formValues(
+  tgFormValues(
     "localStorageForceUpdate",
     "reduxFormQueryParams",
     "reduxFormSearchInput",
     "reduxFormSelectedEntityIdMap",
-    "reduxFormExpandedEntityIdMap"
+    "reduxFormExpandedEntityIdMap",
+    "reduxFormSelectedCells",
+    "reduxFormEditingCell",
+    "reduxFormCellIdToEditValue",
+    "reduxFormEntities",
+    "reduxFormCellValidation",
+    "reduxFormEntitiesUndoRedoStack"
   ),
+  withProps(props => {
+    const entities = props.reduxFormEntities || props.entities;
+    return {
+      _origEntities: props.entities,
+      entities
+    };
+  }),
   // withFields({
   //   names: [
   //     "localStorageForceUpdate",

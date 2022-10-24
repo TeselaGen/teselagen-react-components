@@ -45,7 +45,8 @@ let tippys = [];
         } else if (
           whiteSpace === "nowrap" &&
           textOverflow === "ellipsis" &&
-          el.offsetWidth < el.scrollWidth
+          el.offsetWidth < el.scrollWidth &&
+          !el.classList.contains("no-data-tip")
         ) {
           inner(el.textContent, el);
           continue;

@@ -150,3 +150,22 @@ code {
 [data-tippy-root] {
   z-index: 100000 !important;
 }
+
+.isCellEditable .rt-td {
+  position: relative;
+}
+
+.ReactTable .tg-cell-edit-boolean-checkbox {
+  margin-bottom: 0;
+}
+
+.cellDragHandle {
+  height: 8px;
+  width: 8px;
+  cursor: crosshair;
+  border: 1px solid rgb(255, 255, 255);
+  background-color: rgb(76, 107, 171);
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+}

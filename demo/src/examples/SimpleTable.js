@@ -3,7 +3,7 @@ import React from "react";
 import DataTable from "../../../src/DataTable";
 import DemoWrapper from "../DemoWrapper";
 import OptionsSection from "../OptionsSection";
-import { useToggle } from "../renderToggle";
+import { useToggle } from "../useToggle";
 
 const schema = {
   fields: [
