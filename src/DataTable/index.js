@@ -651,6 +651,7 @@ class DataTable extends React.Component {
       reduxFormEntitiesUndoRedoStack = { currentVersion: 0 }
     } = this.props;
     const [nextState, patches, inversePatches] = produceWithPatches(ents, fn);
+    if (!inversePatches.length) return;
     change("reduxFormEntities", nextState);
     change("reduxFormEntitiesUndoRedoStack", {
       ...omitBy(reduxFormEntitiesUndoRedoStack, (v, k) => {
@@ -1450,9 +1451,10 @@ class DataTable extends React.Component {
         }
         rowClick(e, rowInfo, entities, computePresets(this.props));
       },
+      //row right click
       onContextMenu: e => {
         e.preventDefault();
-        if (rowId === undefined || rowDisabled) return;
+        if (rowId === undefined || rowDisabled || isCellEditable) return;
         const oldIdMap = cloneDeep(reduxFormSelectedEntityIdMap) || {};
         let newIdMap;
         if (withCheckboxes) {
@@ -1572,6 +1574,9 @@ class DataTable extends React.Component {
       ...(err && {
         "data-tip": err
       }),
+      onContextMenu: () => {
+        this.showContextMenu();
+      },
       onClick: e => {
         // cell click, cellclick
         const {
@@ -2029,6 +2034,7 @@ class DataTable extends React.Component {
 
             {isSelectedCell && isSelectedCell === PRIMARY_SELECTED_VAL && (
               <CellDragHandle
+                key={cellId}
                 thisTable={this.table}
                 cellId={cellId}
                 onDragEnd={cellsToSelect => {
@@ -2127,7 +2133,9 @@ class DataTable extends React.Component {
   };
 
   showContextMenu = (idMap, e) => {
-    const { history, contextMenu, isCopyable } = computePresets(this.props);
+    const { history, contextMenu, isCopyable, isCellEditable } = computePresets(
+      this.props
+    );
     const selectedRecords = getRecordsFromIdMap(idMap);
     const itemsToRender = contextMenu({
       selectedRecords,
@@ -2212,6 +2220,24 @@ class DataTable extends React.Component {
           <MenuItem icon="clipboard" key="copyOpts" text="Copy">
             {copyMenuItems}
           </MenuItem>
+        )}
+        {isCellEditable && (
+          <>
+            <MenuItem
+              icon="add-row-top"
+              text="Add Row Above"
+              key="addRowAbove"
+              onClick={() => {
+                this.getPrimarySelectedCellId();
+              }}
+            ></MenuItem>
+            <MenuItem
+              icon="remove-row"
+              text="Remove Row(s)"
+              key="removeRow"
+              onClick={() => {}}
+            ></MenuItem>
+          </>
         )}
       </Menu>
     );
