@@ -24,6 +24,7 @@ import {
   forEach,
   lowerCase,
   get,
+  omitBy,
   times
 } from "lodash";
 import joinUrl from "url-join";
@@ -49,7 +50,7 @@ import { withProps, branch, compose } from "recompose";
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import ReactMarkdown from "react-markdown";
-import immer from "immer";
+import immer, { produceWithPatches, enablePatches, applyPatches } from "immer";
 import TgSelect from "../TgSelect";
 import { withHotkeys } from "../utils/hotkeyUtils";
 import InfoHelper from "../InfoHelper";
@@ -71,6 +72,7 @@ import "../toastr";
 import "./style.css";
 import { getRecordsFromIdMap } from "./utils/withSelectedEntities";
 import { CellDragHandle } from "./CellDragHandle";
+enablePatches();
 
 const PRIMARY_SELECTED_VAL = "main_cell";
 
@@ -98,6 +100,20 @@ class DataTable extends React.Component {
         label: "Move Up a Row",
         onKeyDown: this.handleRowMove("up", true)
       },
+      ...(props.isCellEditable && {
+        undo: {
+          global: false,
+          combo: "mod+z",
+          label: "Undo",
+          onKeyDown: this.handleUndo
+        },
+        redo: {
+          global: false,
+          combo: "mod+shift+z",
+          label: "Redo",
+          onKeyDown: this.handleRedo
+        }
+      }),
       moveDownARowShift: {
         global: false,
         combo: "down+shift",
@@ -130,7 +146,48 @@ class DataTable extends React.Component {
       fullscreen: !this.state.fullscreen
     });
   };
+  handleUndo = () => {
+    const {
+      change,
+      entities,
+      reduxFormEntitiesUndoRedoStack = { currentVersion: 0 }
+    } = this.props;
 
+    if (reduxFormEntitiesUndoRedoStack.currentVersion > 0) {
+      const nextState = applyPatches(
+        entities,
+        reduxFormEntitiesUndoRedoStack[
+          reduxFormEntitiesUndoRedoStack.currentVersion
+        ].inversePatches
+      );
+      change("reduxFormEntities", nextState);
+      change("reduxFormEntitiesUndoRedoStack", {
+        ...reduxFormEntitiesUndoRedoStack,
+        currentVersion: reduxFormEntitiesUndoRedoStack.currentVersion - 1
+      });
+    }
+  };
+  handleRedo = () => {
+    const {
+      change,
+      entities,
+      reduxFormEntitiesUndoRedoStack = { currentVersion: 0 }
+    } = this.props;
+
+    const nextV = reduxFormEntitiesUndoRedoStack.currentVersion + 1;
+    if (reduxFormEntitiesUndoRedoStack[nextV]) {
+      const nextState = applyPatches(
+        entities,
+        reduxFormEntitiesUndoRedoStack[nextV].patches
+      );
+      change("reduxFormEntities", nextState);
+
+      change("reduxFormEntitiesUndoRedoStack", {
+        ...reduxFormEntitiesUndoRedoStack,
+        currentVersion: nextV
+      });
+    }
+  };
   updateFromProps = (oldProps, newProps) => {
     const {
       selectedIds,
@@ -238,7 +295,7 @@ class DataTable extends React.Component {
         });
     }, 0);
   };
-  formatAndValidateTable = () => {
+  formatAndValidateTableInitial = () => {
     const { _origEntities: entities, schema, change } = this.props;
     const editableFields = schema.fields.filter(f => f.isEditable);
     const validationErrors = {};
@@ -265,7 +322,7 @@ class DataTable extends React.Component {
   validateCell = () => {};
 
   componentDidMount() {
-    this.props.isCellEditable && this.formatAndValidateTable();
+    this.props.isCellEditable && this.formatAndValidateTableInitial();
     this.updateFromProps({}, computePresets(this.props));
     document.addEventListener("paste", this.handlePaste);
 
@@ -446,25 +503,22 @@ class DataTable extends React.Component {
           };
           // single paste value, fill all cells with value
           const newVal = pasteData[0][0];
-          change(
-            "reduxFormEntities",
-            immer(entities, entities => {
-              const entityIdToEntity = getEntityIdToEntity(entities);
-              Object.keys(reduxFormSelectedCells).forEach(cellId => {
-                const [rowId, path] = cellId.split(":");
-                const entity = entityIdToEntity[rowId].e;
-                const { error } = editCellHelper({
-                  entity,
-                  path,
-                  schema,
-                  newVal
-                });
-                if (error) {
-                  newCellValidate[cellId] = error;
-                }
+          this.updateEntitiesHelper(entities, entities => {
+            const entityIdToEntity = getEntityIdToEntity(entities);
+            Object.keys(reduxFormSelectedCells).forEach(cellId => {
+              const [rowId, path] = cellId.split(":");
+              const entity = entityIdToEntity[rowId].e;
+              const { error } = editCellHelper({
+                entity,
+                path,
+                schema,
+                newVal
               });
-            })
-          );
+              if (error) {
+                newCellValidate[cellId] = error;
+              }
+            });
+          });
           change("reduxFormCellValidation", newCellValidate);
         } else {
           // handle paste in same format
@@ -480,49 +534,44 @@ class DataTable extends React.Component {
             };
 
             const newSelectedCells = { ...reduxFormSelectedCells };
-            change(
-              "reduxFormEntities",
-              immer(entities, entities => {
-                const entityIdToEntity = getEntityIdToEntity(entities);
-                const [rowId, primaryCellPath] = primarySelectedCell.split(":");
-                const primaryEntityInfo = entityIdToEntity[rowId];
-                const entitiesToManipulate = entities.slice(
-                  primaryEntityInfo.i,
-                  primaryEntityInfo.i + pasteData.length
-                );
-                const pathToIndex = getFieldPathToIndex(schema);
-                const indexToPath = invert(pathToIndex);
-                const startIndex = pathToIndex[primaryCellPath];
-                pasteData.forEach((row, i) => {
-                  row.forEach((cell, j) => {
-                    if (cell) {
-                      const cellIndexToChange = startIndex + j;
-                      const entity = entitiesToManipulate[i];
-                      if (entity) {
-                        const path = indexToPath[cellIndexToChange];
-                        if (path) {
-                          const { error } = editCellHelper({
-                            entity,
-                            path,
-                            schema,
-                            newVal: cell
-                          });
-                          const cellId = `${getIdOrCodeOrIndex(
-                            entity
-                          )}:${path}`;
-                          if (!newSelectedCells[cellId]) {
-                            newSelectedCells[cellId] = true;
-                          }
-                          if (error) {
-                            newCellValidate[cellId] = error;
-                          }
+            this.updateEntitiesHelper(entities, entities => {
+              const entityIdToEntity = getEntityIdToEntity(entities);
+              const [rowId, primaryCellPath] = primarySelectedCell.split(":");
+              const primaryEntityInfo = entityIdToEntity[rowId];
+              const entitiesToManipulate = entities.slice(
+                primaryEntityInfo.i,
+                primaryEntityInfo.i + pasteData.length
+              );
+              const pathToIndex = getFieldPathToIndex(schema);
+              const indexToPath = invert(pathToIndex);
+              const startIndex = pathToIndex[primaryCellPath];
+              pasteData.forEach((row, i) => {
+                row.forEach((cell, j) => {
+                  if (cell) {
+                    const cellIndexToChange = startIndex + j;
+                    const entity = entitiesToManipulate[i];
+                    if (entity) {
+                      const path = indexToPath[cellIndexToChange];
+                      if (path) {
+                        const { error } = editCellHelper({
+                          entity,
+                          path,
+                          schema,
+                          newVal: cell
+                        });
+                        const cellId = `${getIdOrCodeOrIndex(entity)}:${path}`;
+                        if (!newSelectedCells[cellId]) {
+                          newSelectedCells[cellId] = true;
+                        }
+                        if (error) {
+                          newCellValidate[cellId] = error;
                         }
                       }
                     }
-                  });
+                  }
                 });
-              })
-            );
+              });
+            });
             change("reduxFormCellValidation", newCellValidate);
             change("reduxFormSelectedCells", newSelectedCells);
           }
@@ -595,6 +644,24 @@ class DataTable extends React.Component {
     if (!textToCopy) return window.toastr.warning("No text to copy");
 
     this.handleCopyHelper(textToCopy, "Column copied");
+  };
+  updateEntitiesHelper = (ents, fn) => {
+    const {
+      change,
+      reduxFormEntitiesUndoRedoStack = { currentVersion: 0 }
+    } = this.props;
+    const [nextState, patches, inversePatches] = produceWithPatches(ents, fn);
+    change("reduxFormEntities", nextState);
+    change("reduxFormEntitiesUndoRedoStack", {
+      ...omitBy(reduxFormEntitiesUndoRedoStack, (v, k) => {
+        return toNumber(k) > reduxFormEntitiesUndoRedoStack.currentVersion + 1;
+      }),
+      currentVersion: reduxFormEntitiesUndoRedoStack.currentVersion + 1,
+      [reduxFormEntitiesUndoRedoStack.currentVersion + 1]: {
+        inversePatches,
+        patches
+      }
+    });
   };
 
   getRowCopyText = (rowEl, { cellType } = {}) => {
@@ -1690,29 +1757,36 @@ class DataTable extends React.Component {
     } = computePresets(this.props);
     const [rowId, path] = cellId.split(":");
     change("reduxFormEditingCell", null);
-    change(
-      "reduxFormEntities",
-      immer(entities, entities => {
-        const entity = entities.find((e, i) => {
-          return getIdOrCodeOrIndex(e, i) === rowId;
-        });
-        const { error } = editCellHelper({
-          entity,
-          path,
-          schema,
-          newVal
-        });
-        change("reduxFormCellValidation", {
-          ...reduxFormCellValidation,
-          [cellId]: error
-        });
-      })
-    );
+    this.updateEntitiesHelper(entities, entities => {
+      const entity = entities.find((e, i) => {
+        return getIdOrCodeOrIndex(e, i) === rowId;
+      });
+      const { error } = editCellHelper({
+        entity,
+        path,
+        schema,
+        newVal
+      });
+      change("reduxFormCellValidation", {
+        ...reduxFormCellValidation,
+        [cellId]: error
+      });
+    });
+    this.refocusTable();
   };
 
   cancelCellEdit = () => {
     const { change } = computePresets(this.props);
     change("reduxFormEditingCell", null);
+    this.refocusTable();
+  };
+  refocusTable = () => {
+    setTimeout(() => {
+      const table = ReactDOM.findDOMNode(this.table).closest(
+        ".data-table-container"
+      );
+      table.focus();
+    }, 0);
   };
 
   renderColumns = () => {
@@ -1973,21 +2047,18 @@ class DataTable extends React.Component {
                   const newReduxFormSelectedCells = {
                     [cellId]: PRIMARY_SELECTED_VAL
                   };
-                  change(
-                    "reduxFormEntities",
-                    immer(entities, entities => {
-                      cellsToSelect.forEach(cellId => {
-                        newReduxFormSelectedCells[cellId] = true;
-                        const [rowId, path] = cellId.split(":");
-                        const entityToUpdate = entities.find((e, i) => {
-                          return getIdOrCodeOrIndex(e, i) === rowId;
-                        });
-                        if (entityToUpdate) {
-                          set(entityToUpdate, path, selectedCellVal);
-                        }
+                  this.updateEntitiesHelper(entities, entities => {
+                    cellsToSelect.forEach(cellId => {
+                      newReduxFormSelectedCells[cellId] = true;
+                      const [rowId, path] = cellId.split(":");
+                      const entityToUpdate = entities.find((e, i) => {
+                        return getIdOrCodeOrIndex(e, i) === rowId;
                       });
-                    })
-                  );
+                      if (entityToUpdate) {
+                        set(entityToUpdate, path, selectedCellVal);
+                      }
+                    });
+                  });
                   // select the new cells
                   change("reduxFormSelectedCells", newReduxFormSelectedCells);
                 }}
@@ -2522,3 +2593,27 @@ function getEntityIdToEntity(entities) {
   });
   return entityIdToEntity;
 }
+
+// const [nextState, patches, inversePatches] = produceWithPatches(
+//   {
+//     age: 33
+//   },
+//   draft => {
+//     draft.age++;
+//   }
+// );
+
+/**
+ * Generate the exact opposite of a given patch
+ */
+// export function generateInversePatch(patch) {
+//   let { path } = patch;
+//   if (patch.op == "add") return { op: "remove", path, origValue: patch.value };
+//   if (patch.op == "remove") return { op: "add", path, value: patch.origValue };
+//   return {
+//     op: "replace",
+//     path,
+//     value: patch.origValue,
+//     origValue: patch.value
+//   };
+// }

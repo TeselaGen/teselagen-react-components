@@ -266,7 +266,8 @@ export default compose(
     "reduxFormEditingCell",
     "reduxFormCellIdToEditValue",
     "reduxFormEntities",
-    "reduxFormCellValidation"
+    "reduxFormCellValidation",
+    "reduxFormEntitiesUndoRedoStack"
   ),
   withProps(props => {
     const entities = props.reduxFormEntities || props.entities;
