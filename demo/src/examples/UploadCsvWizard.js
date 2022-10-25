@@ -1,6 +1,6 @@
 import Fuse from "fuse.js";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Provider } from "react-redux";
 import { reduxForm } from "redux-form";
 import { Button, Callout, Card } from "@blueprintjs/core";
@@ -29,6 +29,7 @@ import { flatMap } from "lodash";
 import { max } from "lodash";
 import { compose } from "recompose";
 import SimpleStepViz from "./SimpleStepViz";
+import { nanoid } from "nanoid";
 
 const validateAgainstSchema = {
   fields: [
@@ -56,7 +57,7 @@ const validateAgainstSchema = {
       defaultValue: "misc_feature"
     }
   ],
-  exampleData: []
+  userData: []
 };
 const csvStr = `Name,Sequence,Type,Color,Match type
 15 long linker based on the one I designed,APGSGTGGGSGSAPG,,#85DAE9,protein
@@ -117,7 +118,15 @@ const getSchema = data => ({
   fields: map(data[0], (val, path) => {
     return { path, type: "string" };
   }),
-  exampleData: data
+  userData: map(data, d => {
+    if (!d.id) {
+      return {
+        ...d,
+        id: nanoid()
+      };
+    }
+    return d;
+  })
 });
 
 function tryToMatchFields(userSchema, officialSchema) {
@@ -306,7 +315,7 @@ const UploadHelper = compose(
                         setMatchedHeaders({ ...matchedHeaders, [i]: val });
                       }}
                       name={path}
-                      isRequired={!allowEmpty && (defaultValue === undefined)}
+                      isRequired={!allowEmpty && defaultValue === undefined}
                       defaultValue={matchedHeaders[i]}
                       options={flatMap(userSchema.fields, ({ path }) => {
                         if (
@@ -338,9 +347,7 @@ const UploadHelper = compose(
                       fontSize: 10 /* color: Colors.RED1 */
                     }}
                   >
-                    {!allowEmpty &&
-                      (defaultValue === undefined) &&
-                      "(Required)"}
+                    {!allowEmpty && defaultValue === undefined && "(Required)"}
                   </div>
                 </tr>
               </table>
@@ -406,9 +413,9 @@ const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
   // }, []);
 
   const data =
-    userSchema.exampleData &&
-    userSchema.exampleData.length &&
-    userSchema.exampleData.map(row => {
+    userSchema.userData &&
+    userSchema.userData.length &&
+    userSchema.userData.map(row => {
       const toRet = {};
       validateAgainstSchema.fields.forEach(({ path, defaultValue }, i) => {
         const matchingKey = matchedHeaders[i];
@@ -422,6 +429,11 @@ const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
           toRet[path] = defaultValue || "";
         }
       });
+      if (row.id === undefined) {
+        toRet.id = nanoid();
+      } else {
+        toRet.id = row.id;
+      }
       return toRet;
     });
 

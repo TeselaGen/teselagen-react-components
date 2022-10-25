@@ -684,6 +684,7 @@ class DataTable extends React.Component {
     } = this.props;
     const [nextState, patches, inversePatches] = produceWithPatches(ents, fn);
     if (!inversePatches.length) return;
+
     change("reduxFormEntities", nextState);
     change("reduxFormEntitiesUndoRedoStack", {
       ...omitBy(reduxFormEntitiesUndoRedoStack, (v, k) => {
@@ -1848,6 +1849,8 @@ class DataTable extends React.Component {
       withExpandAndCollapseAllButton,
       reduxFormExpandedEntityIdMap,
       change,
+      schema,
+      reduxFormCellValidation,
       reduxFormSelectedCells,
       reduxFormEditingCell
     } = computePresets(this.props);
@@ -2094,19 +2097,30 @@ class DataTable extends React.Component {
                   const newReduxFormSelectedCells = {
                     [cellId]: PRIMARY_SELECTED_VAL
                   };
+                  const newCellValidate = {
+                    ...reduxFormCellValidation
+                  };
                   this.updateEntitiesHelper(entities, entities => {
                     cellsToSelect.forEach(cellId => {
                       newReduxFormSelectedCells[cellId] = true;
                       const [rowId, path] = cellId.split(":");
+
                       const entityToUpdate = entities.find((e, i) => {
                         return getIdOrCodeOrIndex(e, i) === rowId;
                       });
                       if (entityToUpdate) {
-                        set(entityToUpdate, path, selectedCellVal);
+                        const { error } = editCellHelper({
+                          entity: entityToUpdate,
+                          path,
+                          schema,
+                          newVal: selectedCellVal
+                        });
+                        newCellValidate[cellId] = error;
                       }
                     });
                   });
                   // select the new cells
+                  change("reduxFormCellValidation", newCellValidate);
                   change("reduxFormSelectedCells", newReduxFormSelectedCells);
                 }}
               ></CellDragHandle>
@@ -2365,7 +2379,8 @@ class DataTable extends React.Component {
       isLocalCall,
       setNewParams,
       compact,
-      extraCompact
+      extraCompact,
+      entities
     } = computePresets(this.props);
     const {
       displayName,
@@ -2375,6 +2390,8 @@ class DataTable extends React.Component {
       renderTitleInner,
       filterIsActive = noop,
       noTitle,
+      isEditable,
+      type,
       path
     } = column;
     const disableSorting =
@@ -2461,7 +2478,41 @@ class DataTable extends React.Component {
           extraCompact={extraCompact}
         />
       ) : null;
-
+    let maybeCheckbox;
+    if (isEditable && type === "boolean") {
+      let isIndeterminate;
+      let isChecked = !!entities.length;
+      let hasFalse;
+      let hasTrue;
+      entities.some(e => {
+        if (!get(e, path)) {
+          isChecked = false;
+          hasFalse = true;
+        } else {
+          hasTrue = true;
+        }
+        if (hasFalse && hasTrue) {
+          isIndeterminate = true;
+          return true;
+        }
+        return false;
+      });
+      console.log(`isIndeterminate:`, isIndeterminate);
+      maybeCheckbox = (
+        <Checkbox
+          style={{ marginBottom: 0 }}
+          onChange={() => {
+            this.updateEntitiesHelper(entities, ents => {
+              ents.forEach(e => {
+                set(e, path, isIndeterminate ? true : !isChecked);
+              });
+            });
+          }}
+          indeterminate={isIndeterminate}
+          checked={isChecked}
+        ></Checkbox>
+      );
+    }
     return (
       <div
         data-test={displayName || startCase(path)}
@@ -2471,8 +2522,13 @@ class DataTable extends React.Component {
         })}
       >
         {(displayName || startCase(path)) && !noTitle && (
-          <span title={columnTitle} className="tg-react-table-name">
-            {renderTitleInner ? renderTitleInner : columnTitle}
+          <span
+            title={columnTitle}
+            className="tg-react-table-name"
+            style={{ display: "flex" }}
+          >
+            {maybeCheckbox}
+            {renderTitleInner ? renderTitleInner : columnTitle}{" "}
           </span>
         )}
         <div
