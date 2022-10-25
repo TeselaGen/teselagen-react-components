@@ -2,7 +2,7 @@ import Fuse from "fuse.js";
 
 import React, { useState } from "react";
 import { Provider } from "react-redux";
-import { reduxForm } from "redux-form";
+import { formValueSelector, reduxForm } from "redux-form";
 import { Button, Callout, Card } from "@blueprintjs/core";
 import immer from "immer";
 
@@ -30,6 +30,8 @@ import { max } from "lodash";
 import { compose } from "recompose";
 import SimpleStepViz from "./SimpleStepViz";
 import { nanoid } from "nanoid";
+import { tgFormValueSelector } from "../../../src/utils/tgFormValues";
+import { some } from "lodash";
 
 const validateAgainstSchema = {
   fields: [
@@ -198,9 +200,12 @@ function FormComponentsDemo({ handleSubmit }) {
 //   return errors;
 // };
 
-reduxForm({
-  form: "demoForm"
-})(FormComponentsDemo);
+// compose(
+//   reduxForm({
+//     form: "demoForm"
+//   }),
+
+// )(FormComponentsDemo);
 
 const userSchema = getSchema(data);
 const { /* hasIssues, */ searchResults } = tryToMatchFields(
@@ -212,189 +217,209 @@ const UploadHelper = compose(
   reduxForm({
     form: "correctCSVHeadersForm"
   }),
-
-  wrapDialog({ title: "Upload Helper", style: { width: "fit-content" } })
-)(({ handleSubmit, onlyShowRowsWErrors }) => {
-  const [hasSubmitted, setSubmitted] = useState();
-  const [steps, setSteps] = useState([
-    { text: "Set Headers", active: true },
-    { text: "Review Data", active: false }
-  ]);
-  const incomingHeadersToScores = {};
-  searchResults.forEach(r => {
-    r.matches.forEach(match => {
-      incomingHeadersToScores[match.item.path] =
-        incomingHeadersToScores[match.item.path] || [];
-      incomingHeadersToScores[match.item.path].push(match.score);
+  wrapDialog({ title: "Upload Helper", style: { width: "fit-content" } }),
+  tgFormValueSelector(
+    "editableCellTable",
+    "reduxFormEntities",
+    "reduxFormCellValidation"
+  )
+)(
+  ({
+    handleSubmit,
+    onlyShowRowsWErrors,
+    reduxFormEntities,
+    reduxFormCellValidation
+  }) => {
+    const [hasSubmitted, setSubmitted] = useState();
+    const [steps, setSteps] = useState([
+      { text: "Set Headers", active: true },
+      { text: "Review Data", active: false }
+    ]);
+    const incomingHeadersToScores = {};
+    searchResults.forEach(r => {
+      r.matches.forEach(match => {
+        incomingHeadersToScores[match.item.path] =
+          incomingHeadersToScores[match.item.path] || [];
+        incomingHeadersToScores[match.item.path].push(match.score);
+      });
     });
-  });
-  searchResults.forEach(r => {
-    for (const match of r.matches) {
-      if (!incomingHeadersToScores[match.item.path]) continue;
-      const maxScore = max(incomingHeadersToScores[match.item.path]);
-      if (maxScore === match.score) {
-        r.topMatch = match.item.path;
-        r.matches.forEach(match => {
-          if (!incomingHeadersToScores[match.item.path]) return;
-          const arr = incomingHeadersToScores[match.item.path];
-          arr.splice(arr.indexOf(match.score), 1);
-        });
-        delete incomingHeadersToScores[match.item.path];
-        break;
+    searchResults.forEach(r => {
+      for (const match of r.matches) {
+        if (!incomingHeadersToScores[match.item.path]) continue;
+        const maxScore = max(incomingHeadersToScores[match.item.path]);
+        if (maxScore === match.score) {
+          r.topMatch = match.item.path;
+          r.matches.forEach(match => {
+            if (!incomingHeadersToScores[match.item.path]) return;
+            const arr = incomingHeadersToScores[match.item.path];
+            arr.splice(arr.indexOf(match.score), 1);
+          });
+          delete incomingHeadersToScores[match.item.path];
+          break;
+        }
       }
-    }
-  });
-  const initialMatchedHeaders = {};
-  searchResults.forEach((r, i) => {
-    if (r.topMatch) {
-      initialMatchedHeaders[i] = r.topMatch;
-    }
-  });
+    });
+    const initialMatchedHeaders = {};
+    searchResults.forEach((r, i) => {
+      if (r.topMatch) {
+        initialMatchedHeaders[i] = r.topMatch;
+      }
+    });
 
-  const flippedMatchedHeaders = {};
+    const flippedMatchedHeaders = {};
 
-  const [matchedHeaders, setMatchedHeaders] = React.useState(
-    initialMatchedHeaders
-  );
-  forEach(matchedHeaders, (v, k) => {
-    if (v) flippedMatchedHeaders[v] = k;
-  });
-  let inner;
-  if (hasSubmitted) {
-    inner = (
-      <PreviewCsvData
-        {...{
-          matchedHeaders,
-          onlyShowRowsWErrors,
-          validateAgainstSchema,
-          userSchema
-        }}
-      ></PreviewCsvData>
+    const [matchedHeaders, setMatchedHeaders] = React.useState(
+      initialMatchedHeaders
     );
-  } else {
-    inner = (
-      <div style={{ maxWidth: 500 }}>
-        <Callout style={{ width: "fit-content" }} intent="warning">
-          It looks like some of the headers in your uploaded file do not match
-          the expected headers. Please look over and correct any issues with the
-          mappings below.
-        </Callout>
-        <br></br>
-        {searchResults.map(({ path, allowEmpty, defaultValue }, i) => {
-          return (
-            <Card style={{ padding: 2 }} key={i}>
-              <table>
-                <tr
-                  style={{
-                    display: "flex",
-                    minHeight: 50,
-                    alignItems: "center",
-                    justifyContent: "space-between"
-                  }}
-                >
-                  {/* <td style={{ marginRight: 10 }}>
+    forEach(matchedHeaders, (v, k) => {
+      if (v) flippedMatchedHeaders[v] = k;
+    });
+    let inner;
+    if (hasSubmitted) {
+      inner = (
+        <PreviewCsvData
+          {...{
+            matchedHeaders,
+            onlyShowRowsWErrors,
+            validateAgainstSchema,
+            userSchema
+          }}
+        ></PreviewCsvData>
+      );
+    } else {
+      inner = (
+        <div style={{ maxWidth: 500 }}>
+          <Callout style={{ width: "fit-content" }} intent="warning">
+            It looks like some of the headers in your uploaded file do not match
+            the expected headers. Please look over and correct any issues with
+            the mappings below.
+          </Callout>
+          <br></br>
+          {searchResults.map(({ path, allowEmpty, defaultValue }, i) => {
+            return (
+              <Card style={{ padding: 2 }} key={i}>
+                <table>
+                  <tr
+                    style={{
+                      display: "flex",
+                      minHeight: 50,
+                      alignItems: "center",
+                      justifyContent: "space-between"
+                    }}
+                  >
+                    {/* <td style={{ marginRight: 10 }}>
                 {String.fromCharCode(i + 65)}
               </td> */}
-                  <td
-                    style={{
-                      width: 200,
-                      display: "flex"
-                    }}
-                  >
-                    <div
-                      style={{ paddingTop: 2, marginLeft: 15, fontSize: 15 }}
-                    >
-                      {path}
-                    </div>
-                  </td>
-                  <td style={{ width: 200 }}>
-                    <ReactSelectField
-                      noMarginBottom
-                      tooltipError
-                      onChange={val => {
-                        setMatchedHeaders({ ...matchedHeaders, [i]: val });
+                    <td
+                      style={{
+                        width: 200,
+                        display: "flex"
                       }}
-                      name={path}
-                      isRequired={!allowEmpty && defaultValue === undefined}
-                      defaultValue={matchedHeaders[i]}
-                      options={flatMap(userSchema.fields, ({ path }) => {
-                        if (
-                          path !== matchedHeaders[i] &&
-                          flippedMatchedHeaders[path]
-                        ) {
-                          return [];
-                        }
-                        return {
-                          value: path,
-                          label: path
-                        };
-                      }).sort((a, b) => {
-                        const ra = searchResults[i].matches
-                          .map(m => m.item.path)
-                          .indexOf(a.value);
-                        const rb = searchResults[i].matches
-                          .map(m => m.item.path)
-                          .indexOf(b.value);
-                        if (!ra) return -1;
-                        if (!rb) return 1;
-                        return rb - ra;
-                      })}
-                    ></ReactSelectField>
-                  </td>
-                  <div
-                    style={{
-                      marginLeft: 20,
-                      fontSize: 10 /* color: Colors.RED1 */
-                    }}
-                  >
-                    {!allowEmpty && defaultValue === undefined && "(Required)"}
-                  </div>
-                </tr>
-              </table>
-            </Card>
-          );
-        })}
+                    >
+                      <div
+                        style={{ paddingTop: 2, marginLeft: 15, fontSize: 15 }}
+                      >
+                        {path}
+                      </div>
+                    </td>
+                    <td style={{ width: 200 }}>
+                      <ReactSelectField
+                        noMarginBottom
+                        tooltipError
+                        onChange={val => {
+                          setMatchedHeaders({ ...matchedHeaders, [i]: val });
+                        }}
+                        name={path}
+                        isRequired={!allowEmpty && defaultValue === undefined}
+                        defaultValue={matchedHeaders[i]}
+                        options={flatMap(userSchema.fields, ({ path }) => {
+                          if (
+                            path !== matchedHeaders[i] &&
+                            flippedMatchedHeaders[path]
+                          ) {
+                            return [];
+                          }
+                          return {
+                            value: path,
+                            label: path
+                          };
+                        }).sort((a, b) => {
+                          const ra = searchResults[i].matches
+                            .map(m => m.item.path)
+                            .indexOf(a.value);
+                          const rb = searchResults[i].matches
+                            .map(m => m.item.path)
+                            .indexOf(b.value);
+                          if (!ra) return -1;
+                          if (!rb) return 1;
+                          return rb - ra;
+                        })}
+                      ></ReactSelectField>
+                    </td>
+                    <div
+                      style={{
+                        marginLeft: 20,
+                        fontSize: 10 /* color: Colors.RED1 */
+                      }}
+                    >
+                      {!allowEmpty &&
+                        defaultValue === undefined &&
+                        "(Required)"}
+                    </div>
+                  </tr>
+                </table>
+              </Card>
+            );
+          })}
+        </div>
+      );
+    }
+
+    return (
+      <div style={{ width: "fit-content" }}>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <SimpleStepViz style={{ marginTop: 8 }} steps={steps}></SimpleStepViz>
+        </div>
+        <div className={"bp3-dialog-body"}>{inner}</div>
+        <DialogFooter
+          text="Next"
+          disabled={hasSubmitted && some(reduxFormCellValidation, v => v)}
+          {...(hasSubmitted && {
+            onBackClick: () => {
+              setSteps(
+                immer(steps, draft => {
+                  draft[0].active = true;
+                  draft[0].completed = false;
+                  draft[1].active = false;
+                })
+              );
+              setSubmitted(false);
+            }
+          })}
+          onClick={handleSubmit(async function() {
+            if (!hasSubmitted) {
+              //step 1 submit
+              setSteps(
+                immer(steps, draft => {
+                  draft[0].active = false;
+                  draft[0].completed = true;
+                  draft[1].active = true;
+                })
+              );
+              setSubmitted(true);
+            } else {
+              //step 2 submit
+
+              console.log(`reduxFormEntities`, reduxFormEntities);
+              console.log(`reduxFormCellValidation`, reduxFormCellValidation);
+            }
+          })}
+          style={{ alignSelf: "end" }}
+        ></DialogFooter>
       </div>
     );
   }
-
-  return (
-    <div style={{ width: "fit-content" }}>
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <SimpleStepViz style={{ marginTop: 8 }} steps={steps}></SimpleStepViz>
-      </div>
-      <div className={"bp3-dialog-body"}>{inner}</div>
-      <DialogFooter
-        text="Next"
-        {...(hasSubmitted && {
-          onBackClick: () => {
-            setSteps(
-              immer(steps, draft => {
-                draft[0].active = true;
-                draft[0].completed = false;
-                draft[1].active = false;
-              })
-            );
-            setSubmitted(false);
-          }
-        })}
-        onClick={handleSubmit(async function() {
-          if (!hasSubmitted) {
-            setSteps(
-              immer(steps, draft => {
-                draft[0].active = false;
-                draft[0].completed = true;
-                draft[1].active = true;
-              })
-            );
-            setSubmitted(true);
-          }
-        })}
-        style={{ alignSelf: "end" }}
-      ></DialogFooter>
-    </div>
-  );
-});
+);
 
 export default UploadHelper;
 

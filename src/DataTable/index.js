@@ -1412,6 +1412,7 @@ class DataTable extends React.Component {
             SubComponent={SubComponentToUse}
             {...ReactTableProps}
           />
+
           {!noFooter && (
             <div
               className="data-table-footer"
@@ -2751,8 +2752,14 @@ const editCellHelper = ({ entity, path, schema, columnSchema, newVal }) => {
   if (validate) {
     error = validate(nv, colSchema);
   }
-  if (!error && defaultValidators[type]) {
-    error = defaultValidators[type](nv, colSchema);
+  if (!error) {
+    const validator =
+      defaultValidators[type] ||
+      type === "string" ||
+      (type === undefined && defaultValidators.string);
+    if (validator) {
+      error = validator(nv, colSchema);
+    }
   }
 
   set(entity, path, nv);
@@ -2780,6 +2787,10 @@ const defaultValidators = {
     if (isNaN(newVal) || !isNumber(newVal)) {
       return "Must be a number";
     }
+  },
+  string: (newVal, field) => {
+    if (field.allowEmpty) return false;
+    if (!newVal) return "Please enter a value here";
   }
 };
 
@@ -2802,27 +2813,3 @@ function getEntityIdToEntity(entities) {
   });
   return entityIdToEntity;
 }
-
-// const [nextState, patches, inversePatches] = produceWithPatches(
-//   {
-//     age: 33
-//   },
-//   draft => {
-//     draft.age++;
-//   }
-// );
-
-/**
- * Generate the exact opposite of a given patch
- */
-// export function generateInversePatch(patch) {
-//   let { path } = patch;
-//   if (patch.op == "add") return { op: "remove", path, origValue: patch.value };
-//   if (patch.op == "remove") return { op: "add", path, value: patch.origValue };
-//   return {
-//     op: "replace",
-//     path,
-//     value: patch.origValue,
-//     origValue: patch.value
-//   };
-// }

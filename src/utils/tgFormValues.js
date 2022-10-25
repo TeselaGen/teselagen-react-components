@@ -24,3 +24,9 @@ const tgFormValues = (...fieldNames) => Component => props => {
   );
 };
 export default tgFormValues;
+
+export const tgFormValueSelector = (formName, ...fields) => {
+  return connect(state => {
+    return formValueSelector(formName)(state, ...fields);
+  });
+};

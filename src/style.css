@@ -2,6 +2,16 @@
 @import url(~@blueprintjs/datetime/lib/css/blueprint-datetime.css);
 @import url(~@blueprintjs/icons/lib/css/blueprint-icons.css);
 
+:root {
+  --base1: #ffffff;
+  --base2: #cdcdcd;
+}
+
+body.bp3-dark {
+  --base1: #393a3a;
+  --base2: #293742;
+}
+
 .bp3-dark .tg-card {
   background: #394b59 !important;
 }
