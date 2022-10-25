@@ -450,6 +450,7 @@ const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
         maxHeight={500}
         formName="editableCellTable"
         isSimple
+        onlyShowRowsWErrors={onlyShowRowsWErrors}
         isCellEditable
         entities={data}
         schema={validateAgainstSchema}

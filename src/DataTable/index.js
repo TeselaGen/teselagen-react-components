@@ -977,6 +977,8 @@ class DataTable extends React.Component {
       isViewable,
       minimalStyle,
       entities,
+      onlyShowRowsWErrors,
+      reduxFormCellValidation,
       entitiesAcrossPages,
       children: maybeChildren,
       topLeftItems,
@@ -1193,6 +1195,21 @@ class DataTable extends React.Component {
         </div>
       );
     }
+    let filteredEnts = entities;
+
+    if (onlyShowRowsWErrors) {
+      const rowToErrorMap = {};
+      forEach(reduxFormCellValidation, (err, cellId) => {
+        if (err) {
+          const [rowId] = cellId.split(":");
+          rowToErrorMap[rowId] = true;
+        }
+      });
+      filteredEnts = entities.filter(e => {
+        return rowToErrorMap[e.id];
+      });
+    }
+
     return (
       <this.hotkeyEnabler>
         <div
@@ -1336,7 +1353,7 @@ class DataTable extends React.Component {
             </div>
           )}
           <ReactTable
-            data={entities}
+            data={filteredEnts}
             ref={n => {
               if (n) this.table = n;
             }}
@@ -2480,7 +2497,7 @@ class DataTable extends React.Component {
       ) : null;
     let maybeCheckbox;
     if (isEditable && type === "boolean") {
-      let isIndeterminate;
+      let isIndeterminate = false;
       let isChecked = !!entities.length;
       let hasFalse;
       let hasTrue;
@@ -2497,7 +2514,6 @@ class DataTable extends React.Component {
         }
         return false;
       });
-      console.log(`isIndeterminate:`, isIndeterminate);
       maybeCheckbox = (
         <Checkbox
           style={{ marginBottom: 0 }}

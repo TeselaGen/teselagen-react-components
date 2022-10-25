@@ -25,7 +25,6 @@
     "@blueprintjs/core": "3.52.0",
     "@blueprintjs/datetime": "3.23.19",
     "@blueprintjs/select": "3.18.11",
-    "@silevis/reactgrid": "^4.0.4",
     "@teselagen/react-list": "^0.8.18",
     "@teselagen/react-table": "^6.10.9",
     "axios": "^0.21.1",
