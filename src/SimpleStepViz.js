@@ -22,11 +22,3 @@ export default function SimpleStepViz({ steps, ...rest }) {
     </ul>
   );
 }
-
-// function Step({ title, completed, active }) {
-//   return (
-//     <div style={{ fontWeight: active ? "bold" : "" }}>
-//       {/* <Icon icon={}></Icon> {title} */}
-//     </div>
-//   );
-// }
