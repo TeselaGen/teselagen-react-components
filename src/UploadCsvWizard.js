@@ -1,15 +1,12 @@
-import Fuse from "fuse.js";
-
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { reduxForm } from "redux-form";
 import { Callout, Card } from "@blueprintjs/core";
 import immer from "immer";
 
 import "./UploadCsvWizard.css";
 
-import { forEach, map } from "lodash";
+import { forEach } from "lodash";
 import { flatMap } from "lodash";
-import { max } from "lodash";
 import { compose } from "recompose";
 import SimpleStepViz from "./SimpleStepViz";
 import { nanoid } from "nanoid";
@@ -21,50 +18,7 @@ import DialogFooter from "./DialogFooter";
 import DataTable from "./DataTable";
 import wrapDialog from "./wrapDialog";
 
-const getSchema = data => ({
-  fields: map(data[0], (val, path) => {
-    return { path, type: "string" };
-  }),
-  userData: map(data, d => {
-    if (!d.id) {
-      return {
-        ...d,
-        id: nanoid()
-      };
-    }
-    return d;
-  })
-});
-
-function tryToMatchFields(userSchema, officialSchema) {
-  const options = {
-    includeScore: true,
-    keys: ["path", "displayName"]
-  };
-  let hasIssues = false;
-  officialSchema.forEach(h => {
-    let hasMatch = false;
-    userSchema.forEach(uh => {
-      if (uh.path.toLowerCase() === h.path.toLowerCase()) {
-        hasMatch = true;
-      }
-    });
-    if (!hasMatch) hasIssues = true;
-  });
-  if (!hasIssues) {
-    return { hasIssues };
-  }
-
-  const fuse = new Fuse(userSchema, options);
-
-  officialSchema.forEach(h => {
-    const result = fuse.search(h.path);
-    h.matches = result;
-  });
-  return { searchResults: officialSchema, hasIssues: true };
-}
-
-const UploadHelper = compose(
+const UploadCsvWizardDialog = compose(
   reduxForm({
     form: "correctCSVHeadersForm"
   }),
@@ -76,11 +30,15 @@ const UploadHelper = compose(
   )
 )(
   ({
-    incomingData,
     validateAgainstSchema,
+    initialMatchedHeaders,
+    userSchema,
+    searchResults,
+    onFinishDialog, //from
+    //fromRedux:
     handleSubmit,
     onlyShowRowsWErrors,
-    // reduxFormEntities,
+    reduxFormEntities,
     reduxFormCellValidation
   }) => {
     const [hasSubmitted, setSubmitted] = useState();
@@ -88,51 +46,6 @@ const UploadHelper = compose(
       { text: "Set Headers", active: true },
       { text: "Review Data", active: false }
     ]);
-
-    const _userSchema = useRef(() => {
-      return getSchema(incomingData);
-    });
-    const userSchema = _userSchema.current;
-
-    const _searchResults = useRef(() => {
-      const res = tryToMatchFields(
-        userSchema.fields,
-        validateAgainstSchema.fields
-      );
-      return res.searchResults;
-    });
-    const searchResults = _searchResults;
-
-    const incomingHeadersToScores = {};
-    searchResults.forEach(r => {
-      r.matches.forEach(match => {
-        incomingHeadersToScores[match.item.path] =
-          incomingHeadersToScores[match.item.path] || [];
-        incomingHeadersToScores[match.item.path].push(match.score);
-      });
-    });
-    searchResults.forEach(r => {
-      for (const match of r.matches) {
-        if (!incomingHeadersToScores[match.item.path]) continue;
-        const maxScore = max(incomingHeadersToScores[match.item.path]);
-        if (maxScore === match.score) {
-          r.topMatch = match.item.path;
-          r.matches.forEach(match => {
-            if (!incomingHeadersToScores[match.item.path]) return;
-            const arr = incomingHeadersToScores[match.item.path];
-            arr.splice(arr.indexOf(match.score), 1);
-          });
-          delete incomingHeadersToScores[match.item.path];
-          break;
-        }
-      }
-    });
-    const initialMatchedHeaders = {};
-    searchResults.forEach((r, i) => {
-      if (r.topMatch) {
-        initialMatchedHeaders[i] = r.topMatch;
-      }
-    });
 
     const flippedMatchedHeaders = {};
 
@@ -163,7 +76,7 @@ const UploadHelper = compose(
             the mappings below.
           </Callout>
           <br></br>
-          {searchResults.map(({ path, allowEmpty, defaultValue }, i) => {
+          {searchResults.map(({ path /* allowEmpty, defaultValue */ }, i) => {
             return (
               <Card style={{ padding: 2 }} key={i}>
                 <table>
@@ -198,7 +111,7 @@ const UploadHelper = compose(
                           setMatchedHeaders({ ...matchedHeaders, [i]: val });
                         }}
                         name={path}
-                        isRequired={!allowEmpty && defaultValue === undefined}
+                        // isRequired={!allowEmpty && defaultValue === undefined}
                         defaultValue={matchedHeaders[i]}
                         options={flatMap(userSchema.fields, ({ path }) => {
                           if (
@@ -230,9 +143,9 @@ const UploadHelper = compose(
                         fontSize: 10 /* color: Colors.RED1 */
                       }}
                     >
-                      {!allowEmpty &&
+                      {/* {!allowEmpty &&
                         defaultValue === undefined &&
-                        "(Required)"}
+                        "(Required)"} */}
                     </div>
                   </tr>
                 </table>
@@ -251,7 +164,11 @@ const UploadHelper = compose(
         <div className="bp3-dialog-body">{inner}</div>
         <DialogFooter
           text="Next"
-          disabled={hasSubmitted && some(reduxFormCellValidation, v => v)}
+          disabled={
+            hasSubmitted &&
+            (!reduxFormEntities?.length ||
+              some(reduxFormCellValidation, v => v))
+          }
           {...(hasSubmitted && {
             onBackClick: () => {
               setSteps(
@@ -277,6 +194,9 @@ const UploadHelper = compose(
               setSubmitted(true);
             } else {
               //step 2 submit
+              onFinishDialog({
+                newEntities: reduxFormEntities
+              });
               // console.log(`reduxFormEntities`, reduxFormEntities);
               // console.log(`reduxFormCellValidation`, reduxFormCellValidation);
             }
@@ -288,7 +208,7 @@ const UploadHelper = compose(
   }
 );
 
-export default UploadHelper;
+export default UploadCsvWizardDialog;
 
 export const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
   matchedHeaders,
@@ -354,16 +274,32 @@ export const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
   );
 });
 
-export const SimpleInsertData = wrapDialog({
-  title: "Insert Data",
-  style: { width: "fit-content" }
-})(function SimpleInsertData({ ...r }) {
+export const SimpleInsertDataDialog = compose(
+  wrapDialog({
+    title: "Insert Data",
+    style: { width: "fit-content" }
+  }),
+  tgFormValueSelector(
+    "editableCellTable",
+    "reduxFormEntities",
+    "reduxFormCellValidation"
+  )
+)(function SimpleInsertDataDialog({
+  reduxFormEntities,
+  reduxFormCellValidation,
+  ...r
+}) {
   return (
     <>
       <div className="bp3-dialog-body">
         <PreviewCsvData {...r}></PreviewCsvData>
       </div>
-      <DialogFooter text="Add File"></DialogFooter>
+      <DialogFooter
+        disabled={
+          !reduxFormEntities?.length || some(reduxFormCellValidation, e => e)
+        }
+        text="Add File"
+      ></DialogFooter>
     </>
   );
 });

@@ -6,7 +6,9 @@ import { noop } from "lodash";
 import classNames from "classnames";
 
 function DialogFooter({
-  hideModal = noop,
+  hideModal = () => {
+    document.querySelector(".bp3-dialog-close-button")?.click();
+  },
   loading,
   submitting,
   onBackClick,

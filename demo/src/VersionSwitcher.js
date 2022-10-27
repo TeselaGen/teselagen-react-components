@@ -49,7 +49,6 @@ export default function VersionSwitcher() {
     <div style={{ color: "#f5f8fa" }}>
       <div style={{ height: "100%", display: "inline-block" }}>Version:</div>{" "}
       <HTMLSelect
-        small
         minimal
         style={{ color: "#f5f8fa" }}
         onChange={function onChange(e) {

@@ -26,7 +26,7 @@
     "@blueprintjs/datetime": "3.23.19",
     "@blueprintjs/select": "3.18.11",
     "@teselagen/react-list": "^0.8.18",
-    "@teselagen/react-table": "^6.10.9",
+    "@teselagen/react-table": "^6.10.11",
     "axios": "^0.21.1",
     "browser-or-node": "^2.0.0",
     "classnames": "^2.2.6",

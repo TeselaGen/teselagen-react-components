@@ -570,17 +570,21 @@ class DataTable extends React.Component {
               const entityIdToEntity = getEntityIdToEntity(entities);
               const [rowId, primaryCellPath] = primarySelectedCell.split(":");
               const primaryEntityInfo = entityIdToEntity[rowId];
-              const entitiesToManipulate = entities.slice(
-                primaryEntityInfo.i,
-                primaryEntityInfo.i + pasteData.length
-              );
+              const startIndex = primaryEntityInfo.i;
+              const endIndex = primaryEntityInfo.i + pasteData.length;
+              for (let i = startIndex; i < endIndex; i++) {
+                if (!entities[i]) {
+                  entities[i] = { id: nanoid() };
+                }
+              }
+              const entitiesToManipulate = entities.slice(startIndex, endIndex);
               const pathToIndex = getFieldPathToIndex(schema);
               const indexToPath = invert(pathToIndex);
-              const startIndex = pathToIndex[primaryCellPath];
+              const startCellIndex = pathToIndex[primaryCellPath];
               pasteData.forEach((row, i) => {
                 row.forEach((cell, j) => {
                   if (cell) {
-                    const cellIndexToChange = startIndex + j;
+                    const cellIndexToChange = startCellIndex + j;
                     const entity = entitiesToManipulate[i];
                     if (entity) {
                       const path = indexToPath[cellIndexToChange];
@@ -995,7 +999,8 @@ class DataTable extends React.Component {
       variables,
       fragment,
       safeQuery,
-      isCellEditable
+      isCellEditable,
+      addMoreRowsButton
     } = propPresets;
 
     if (withSelectAll && !safeQuery) {
@@ -1357,6 +1362,20 @@ class DataTable extends React.Component {
             ref={n => {
               if (n) this.table = n;
             }}
+            additionalBodyEl={
+              isCellEditable &&
+              !addMoreRowsButton && (
+                <Button
+                  style={{ marginTop: "auto" }}
+                  onClick={() => {
+                    this.insertRows({ numRows: 10, appendToBottom: true });
+                  }}
+                  minimal
+                >
+                  Add 10 More Rows
+                </Button>
+              )
+            }
             className={classNames({
               isCellEditable,
               "tg-table-loading": isLoading,
@@ -1369,6 +1388,9 @@ class DataTable extends React.Component {
                 ? itemSizeEstimators.normal
                 : itemSizeEstimators.comfortable
             }
+            TfootComponent={() => {
+              return <button>hasdfasdf</button>;
+            }}
             columns={this.renderColumns()}
             pageSize={rowsToShow}
             expanded={expandedRows}
@@ -1637,7 +1659,10 @@ class DataTable extends React.Component {
           newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
           change("reduxFormSelectedCells", newSelectedCells);
         }
-        this.showContextMenu(e);
+        setTimeout(() => {
+          //need a timeout so reduxFormSelectedCells is up to date in the context menu
+          this.showContextMenu(e);
+        }, 0);
       },
       onClick: e => {
         // cell click, cellclick
@@ -2205,6 +2230,37 @@ class DataTable extends React.Component {
     return stringText;
   };
 
+  insertRows = ({ above, numRows = 1, appendToBottom } = {}) => {
+    const { entities = [], reduxFormCellValidation, change } = computePresets(
+      this.props
+    );
+
+    const primaryCellId = this.getPrimarySelectedCellId();
+    const [rowId] = primaryCellId?.split(":") || [];
+    this.updateEntitiesHelper(entities, entities => {
+      const newEntities = times(numRows).map(() => ({ id: nanoid() }));
+
+      const indexToInsert = entities.findIndex((e, i) => {
+        return getIdOrCodeOrIndex(e, i) === rowId;
+      });
+      const insertIndex = above ? indexToInsert : indexToInsert + 1;
+      const { newEnts, validationErrors } = this.formatAndValidateEntities(
+        newEntities
+      );
+      change("reduxFormCellValidation", {
+        ...reduxFormCellValidation,
+        ...validationErrors
+      });
+
+      entities.splice(
+        appendToBottom ? entities.length : insertIndex,
+        0,
+        ...newEnts
+      );
+    });
+    this.refocusTable();
+  };
+
   showContextMenu = (e, idMap) => {
     const {
       history,
@@ -2212,8 +2268,6 @@ class DataTable extends React.Component {
       isCopyable,
       isCellEditable,
       entities = [],
-      reduxFormCellValidation,
-      change,
       reduxFormSelectedCells = {}
     } = computePresets(this.props);
     let selectedRecords;
@@ -2227,6 +2281,7 @@ class DataTable extends React.Component {
     } else {
       selectedRecords = getRecordsFromIdMap(idMap);
     }
+
     const itemsToRender = contextMenu({
       selectedRecords,
       history
@@ -2303,28 +2358,7 @@ class DataTable extends React.Component {
         />
       );
     }
-    const insertRow = above => {
-      const primaryCellId = this.getPrimarySelectedCellId();
-      const [rowId] = primaryCellId.split(":");
-      this.updateEntitiesHelper(entities, entities => {
-        const newEntity = { id: nanoid() };
 
-        const indexToInsert = entities.findIndex((e, i) => {
-          return getIdOrCodeOrIndex(e, i) === rowId;
-        });
-        const insertIndex = above ? indexToInsert : indexToInsert + 1;
-        const { newEnts, validationErrors } = this.formatAndValidateEntities([
-          newEntity
-        ]);
-        change("reduxFormCellValidation", {
-          ...reduxFormCellValidation,
-          ...validationErrors
-        });
-
-        entities.splice(insertIndex, 0, newEnts[0]);
-      });
-      this.refocusTable();
-    };
     const menu = (
       <Menu>
         {itemsToRender}
@@ -2340,7 +2374,7 @@ class DataTable extends React.Component {
               text="Add Row Above"
               key="addRowAbove"
               onClick={() => {
-                insertRow(true);
+                this.insertRows({ above: true });
               }}
             ></MenuItem>
             <MenuItem
@@ -2348,7 +2382,7 @@ class DataTable extends React.Component {
               text="Add Row Below"
               key="addRowBelow"
               onClick={() => {
-                insertRow();
+                this.insertRows({});
               }}
             ></MenuItem>
             <MenuItem
@@ -2356,22 +2390,27 @@ class DataTable extends React.Component {
               text="Remove Row(s)"
               key="removeRow"
               onClick={() => {
+                const {
+                  entities = [],
+                  reduxFormCellValidation,
+                  change,
+                  reduxFormSelectedCells = {}
+                } = computePresets(this.props);
                 const selectedRowIds = Object.keys(reduxFormSelectedCells).map(
                   cellId => {
                     const [rowId] = cellId.split(":");
                     return rowId;
                   }
                 );
-                const primaryCellId = this.getPrimarySelectedCellId();
-                const [rowId] = primaryCellId.split(":");
-
                 this.updateEntitiesHelper(entities, entities => {
-                  const indexToInsert = entities.findIndex((e, i) => {
-                    return getIdOrCodeOrIndex(e, i) === rowId;
-                  });
-                  entities.splice(indexToInsert, 0);
+                  change(
+                    "reduxFormCellValidation",
+                    omitBy(reduxFormCellValidation, (v, cellId) =>
+                      selectedRowIds.includes(cellId.split(":")[0])
+                    )
+                  );
                   return entities.filter(
-                    e => !selectedRowIds.includes(getIdOrCodeOrIndex(e))
+                    (e, i) => !selectedRowIds.includes(getIdOrCodeOrIndex(e, i))
                   );
                 });
                 this.refocusTable();

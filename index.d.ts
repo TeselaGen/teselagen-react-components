@@ -625,7 +625,6 @@ export interface FileUploadFieldProps extends GenericFormFieldProps {
   fileLimit: number;
   readBeforeUpload: boolean;
   showUploadList: boolean;
-  fileListItemRenderer: () => {};
   onFileClick: () => {};
   dropzoneProps: object;
   showFilesCount: boolean;

@@ -1164,22 +1164,16 @@
   dependencies:
     any-observable "^0.3.0"
 
-"@silevis/reactgrid@^4.0.4":
-  version "4.0.4"
-  resolved "https://registry.yarnpkg.com/@silevis/reactgrid/-/reactgrid-4.0.4.tgz#20092d8a8f27e5b48d9683beebb1b5921a4bbac7"
-  integrity sha512-kP6w5zPv5xUMRJwcvMph8fFaNpXybm4EqZ68O0h2D5AqGvwt0H3Y8zsstqT/4nYcuGidCemX7gU65vjMkRF/3g==
-  dependencies:
-    tslib "^2.3.1"
-
 "@teselagen/react-list@0.8.18", "@teselagen/react-list@^0.8.18":
   version "0.8.18"
   resolved "https://registry.yarnpkg.com/@teselagen/react-list/-/react-list-0.8.18.tgz#f8ad4dbd37c4e20c721688fdfff55c3f58ce35a6"
   dependencies:
     prop-types "15"
 
-"@teselagen/react-table@^6.10.9":
-  version "6.10.9"
-  resolved "https://registry.yarnpkg.com/@teselagen/react-table/-/react-table-6.10.9.tgz#9b361b16a41612c7e75addf7f41459bdef520c28"
+"@teselagen/react-table@^6.10.11":
+  version "6.10.11"
+  resolved "https://registry.yarnpkg.com/@teselagen/react-table/-/react-table-6.10.11.tgz#8574b82e1d90996bb46b1be8132fe826df4b749f"
+  integrity sha512-gQ7BMLQhhC+N6rLkL4VPnXgAhGgcHtMTrIE+n6DJ1OXkoWmM3Z05mbF7TiQGFNi30Al0sCxcl+rQE/haL0nxVg==
   dependencies:
     "@teselagen/react-list" "0.8.18"
     classnames "^2.2.5"
@@ -9926,11 +9920,6 @@ tslib@^1.8.1, tslib@^1.9.0:
 tslib@^2.0.3:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.1.0.tgz#da60860f1c2ecaa5703ab7d39bc05b6bf988b97a"
-
-tslib@^2.3.1:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.0.tgz#7cecaa7f073ce680a05847aa77be941098f36dc3"
-  integrity sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==
 
 tslib@~1.13.0:
   version "1.13.0"
