@@ -33,7 +33,7 @@ export const useDialog = ({ ModalComponent, ...rest }) => {
   const toggleDialog = () => {
     setOpen(!isOpen);
   };
-  async function showDialogPromise(moreProps = {}) {
+  async function showDialogPromise(handlerName, moreProps = {}) {
     return new Promise(resolve => {
       //return a promise that can be awaited
       setAdditionalProps({
@@ -42,9 +42,9 @@ export const useDialog = ({ ModalComponent, ...rest }) => {
           setOpen(false);
           resolve({});
         },
-        onFinishDialog: r => {
+        [handlerName]: r => {
           setOpen(false);
-          resolve(r);
+          resolve(r || {});
         },
         //pass any additional props to the dialog
         ...moreProps

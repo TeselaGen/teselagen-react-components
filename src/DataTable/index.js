@@ -51,6 +51,8 @@ import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import ReactMarkdown from "react-markdown";
 import immer, { produceWithPatches, enablePatches, applyPatches } from "immer";
+import papaparse from "papaparse";
+
 import TgSelect from "../TgSelect";
 import { withHotkeys } from "../utils/hotkeyUtils";
 import InfoHelper from "../InfoHelper";
@@ -154,8 +156,20 @@ class DataTable extends React.Component {
       fullscreen: !this.state.fullscreen
     });
   };
-  handleEnterStartCellEdit = () => {
+  handleEnterStartCellEdit = e => {
+    e.stopPropagation();
     this.startCellEdit(this.getPrimarySelectedCellId());
+  };
+  flashTableBorder = () => {
+    try {
+      const table = ReactDOM.findDOMNode(this.table);
+      table.classList.add("tgBorderBlue");
+      setTimeout(() => {
+        table.classList.remove("tgBorderBlue");
+      }, 300);
+    } catch (e) {
+      console.error(`err when flashing table border:`, e);
+    }
   };
   handleUndo = () => {
     const {
@@ -165,6 +179,7 @@ class DataTable extends React.Component {
     } = this.props;
 
     if (reduxFormEntitiesUndoRedoStack.currentVersion > 0) {
+      this.flashTableBorder();
       const nextState = applyPatches(
         entities,
         reduxFormEntitiesUndoRedoStack[
@@ -191,6 +206,7 @@ class DataTable extends React.Component {
 
     const nextV = reduxFormEntitiesUndoRedoStack.currentVersion + 1;
     if (reduxFormEntitiesUndoRedoStack[nextV]) {
+      this.flashTableBorder();
       const nextState = applyPatches(
         entities,
         reduxFormEntitiesUndoRedoStack[nextV].patches
@@ -527,13 +543,30 @@ class DataTable extends React.Component {
       if (isEmpty(reduxFormSelectedCells)) return;
       try {
         let pasteData = [];
+        let toPaste;
         if (window.clipboardData && window.clipboardData.getData) {
           // IE
-          pasteData = defaultParsePaste(window.clipboardData.getData("Text"));
+          toPaste = window.clipboardData.getData("Text");
         } else if (e.clipboardData && e.clipboardData.getData) {
-          pasteData = defaultParsePaste(e.clipboardData.getData("text/plain"));
+          toPaste = e.clipboardData.getData("text/plain");
         }
+        if (toPaste.includes(",")) {
+          //try papaparsing it out as a csv if it contains commas
+          try {
+            const { data, errors } = papaparse.parse(toPaste, {
+              header: false
+            });
+            if (data?.length && !errors?.length) {
+              pasteData = data;
+            }
+          } catch (error) {
+            console.error(`error p982qhgpf9qh`, error);
+          }
+        }
+        pasteData = pasteData.length ? pasteData : defaultParsePaste(toPaste);
+
         if (!pasteData || !pasteData.length) return;
+
         if (pasteData.length === 1 && pasteData[0].length === 1) {
           const newCellValidate = {
             ...reduxFormCellValidation
@@ -553,6 +586,8 @@ class DataTable extends React.Component {
               });
               if (error) {
                 newCellValidate[cellId] = error;
+              } else {
+                delete newCellValidate[cellId];
               }
             });
           });
@@ -601,6 +636,8 @@ class DataTable extends React.Component {
                         }
                         if (error) {
                           newCellValidate[cellId] = error;
+                        } else {
+                          delete newCellValidate[cellId];
                         }
                       }
                     }
@@ -1000,7 +1037,7 @@ class DataTable extends React.Component {
       fragment,
       safeQuery,
       isCellEditable,
-      addMoreRowsButton
+      noAddMoreRowsButton
     } = propPresets;
 
     if (withSelectAll && !safeQuery) {
@@ -1364,15 +1401,16 @@ class DataTable extends React.Component {
             }}
             additionalBodyEl={
               isCellEditable &&
-              !addMoreRowsButton && (
+              !noAddMoreRowsButton && (
                 <Button
+                  icon="add"
                   style={{ marginTop: "auto" }}
                   onClick={() => {
                     this.insertRows({ numRows: 10, appendToBottom: true });
                   }}
                   minimal
                 >
-                  Add 10 More Rows
+                  Add 10 Rows
                 </Button>
               )
             }
@@ -2719,6 +2757,7 @@ function EditableCell({ initialValue, finishEdit, cancelEdit, isNumeric }) {
       onKeyDown={e => {
         if (e.key === "Enter") {
           finishEdit(v);
+          e.stopPropagation();
         } else if (e.key === "Escape") {
           cancelEdit();
         }

@@ -15,12 +15,13 @@ import { nanoid } from "nanoid";
 
 import papaparse from "papaparse";
 
+import downloadjs from "downloadjs";
+
 import UploadCsvWizardDialog, {
   SimpleInsertDataDialog
 } from "../UploadCsvWizard";
 import { useDialog } from "../useDialog";
 import {
-  getExt,
   isCsvOrExcelFile,
   parseCsvOrExcelFile,
   removeExt
@@ -63,8 +64,14 @@ function Uploader({
   const [loading, setLoading] = useState(false);
   const filesToClean = useRef([]);
 
-  const { showDialogPromise, comp } = useDialog({
+  const { showDialogPromise: showUploadCsvWizardDialog, comp } = useDialog({
     ModalComponent: UploadCsvWizardDialog
+  });
+  const {
+    showDialogPromise: showSimpleInsertDataDialog,
+    comp: comp2
+  } = useDialog({
+    ModalComponent: SimpleInsertDataDialog
   });
 
   function cleanupFiles() {
@@ -85,6 +92,90 @@ function Uploader({
   const acceptToUse = Array.isArray(accept) ? accept.join(", ") : accept;
   const fileListToUse = fileList ? fileList : [];
 
+  async function handleSecondHalfOfUpload({ acceptedFiles, cleanedFileList }) {
+    onChange(cleanedFileList);
+
+    const keepGoing = beforeUpload
+      ? await beforeUpload(cleanedFileList, onChange)
+      : true;
+    if (!keepGoing) return;
+
+    if (action) {
+      if (uploadInBulk) {
+        //tnr: not yet implemented
+        /* const config = {
+        onUploadProgress: function(progressEvent) {
+          let percentCompleted = Math.round(
+            progressEvent.loaded * 100 / progressEvent.total
+          );
+        }
+      };
+
+      axios
+        .post(action, data, config)
+        .then(function(res) {
+          onChange(res.data);
+        })
+        .catch(function(err) {
+        }); */
+      } else {
+        const responses = [];
+
+        await Promise.all(
+          acceptedFiles.map(fileToUpload => {
+            const data = new FormData();
+            data.append("file", fileToUpload);
+
+            return axiosInstance
+              .post(action, data)
+              .then(function(res) {
+                responses.push(res.data && res.data[0]);
+                onFileSuccess(res.data[0]).then(() => {
+                  cleanedFileList = cleanedFileList.map(file => {
+                    const fileToReturn = {
+                      ...file,
+                      ...res.data[0]
+                    };
+                    if (fileToReturn.id === fileToUpload.id) {
+                      fileToReturn.loading = false;
+                    }
+                    return fileToReturn;
+                  });
+                  onChange(cleanedFileList);
+                });
+              })
+              .catch(function(err) {
+                console.error("Error uploading file:", err);
+                responses.push({
+                  ...fileToUpload,
+                  error: err && err.msg ? err.msg : err
+                });
+                cleanedFileList = cleanedFileList.map(file => {
+                  const fileToReturn = { ...file };
+                  if (fileToReturn.id === fileToUpload.id) {
+                    fileToReturn.loading = false;
+                    fileToReturn.error = true;
+                  }
+                  return fileToReturn;
+                });
+                onChange(cleanedFileList);
+              });
+          })
+        );
+        onFieldSubmit(responses);
+      }
+    } else {
+      onChange(
+        cleanedFileList.map(function(file) {
+          return {
+            ...file,
+            loading: false
+          };
+        })
+      );
+    }
+    setLoading(false);
+  }
   return (
     <div
       className="tg-uploader-outer"
@@ -95,6 +186,7 @@ function Uploader({
       }}
     >
       {comp}
+      {comp2}
       <div
         className="tg-uploader-inner"
         style={{ width: "100%", height: "fit-content", minWidth: 0 }}
@@ -162,7 +254,7 @@ function Uploader({
                 );
               }
 
-              let cleanedFileList = [
+              const cleanedFileList = [
                 ...acceptedFiles.map(file => {
                   return {
                     originFileObj: file,
@@ -211,22 +303,25 @@ function Uploader({
                   const { file, ...rest } = filesWIssues[0];
 
                   //just handle the 1st file for now
-                  const { newEntities } = await showDialogPromise({
-                    ...rest,
-                    validateAgainstSchema
-                  });
+                  const { newEntities } = await showUploadCsvWizardDialog(
+                    "onUploadWizardFinish",
+                    {
+                      ...rest,
+                      validateAgainstSchema
+                    }
+                  );
 
                   if (!newEntities) {
                     window.toastr.warning(`File Upload Aborted`);
                     return;
                   } else {
-                    const newFileName =
-                      removeExt(file.name) + `_updated.` + getExt(file.name);
+                    const newFileName = removeExt(file.name) + `_updated.csv`;
                     //swap out file with a new csv file
                     const newFile = new File(
                       [papaparse.unparse(newEntities)],
                       newFileName
                     );
+
                     file.name = newFileName;
                     file.originFileObj = newFile;
                     file.originalFileObj = newFile;
@@ -238,88 +333,7 @@ function Uploader({
                 }
               }
 
-              onChange(cleanedFileList);
-
-              const keepGoing = beforeUpload
-                ? await beforeUpload(cleanedFileList, onChange)
-                : true;
-              if (!keepGoing) return;
-
-              if (action) {
-                if (uploadInBulk) {
-                  //tnr: not yet implemented
-                  /* const config = {
-                  onUploadProgress: function(progressEvent) {
-                    let percentCompleted = Math.round(
-                      progressEvent.loaded * 100 / progressEvent.total
-                    );
-                  }
-                };
-
-                axios
-                  .post(action, data, config)
-                  .then(function(res) {
-                    onChange(res.data);
-                  })
-                  .catch(function(err) {
-                  }); */
-                } else {
-                  const responses = [];
-
-                  await Promise.all(
-                    acceptedFiles.map(fileToUpload => {
-                      const data = new FormData();
-                      data.append("file", fileToUpload);
-
-                      return axiosInstance
-                        .post(action, data)
-                        .then(function(res) {
-                          responses.push(res.data && res.data[0]);
-                          onFileSuccess(res.data[0]).then(() => {
-                            cleanedFileList = cleanedFileList.map(file => {
-                              const fileToReturn = {
-                                ...file,
-                                ...res.data[0]
-                              };
-                              if (fileToReturn.id === fileToUpload.id) {
-                                fileToReturn.loading = false;
-                              }
-                              return fileToReturn;
-                            });
-                            onChange(cleanedFileList);
-                          });
-                        })
-                        .catch(function(err) {
-                          console.error("Error uploading file:", err);
-                          responses.push({
-                            ...fileToUpload,
-                            error: err && err.msg ? err.msg : err
-                          });
-                          cleanedFileList = cleanedFileList.map(file => {
-                            const fileToReturn = { ...file };
-                            if (fileToReturn.id === fileToUpload.id) {
-                              fileToReturn.loading = false;
-                              fileToReturn.error = true;
-                            }
-                            return fileToReturn;
-                          });
-                          onChange(cleanedFileList);
-                        });
-                    })
-                  );
-                  onFieldSubmit(responses);
-                }
-              } else {
-                onChange(
-                  cleanedFileList.map(function(file) {
-                    return {
-                      ...file,
-                      loading: false
-                    };
-                  })
-                );
-              }
-              setLoading(false);
+              handleSecondHalfOfUpload({ acceptedFiles, cleanedFileList });
             }
           }}
           {...dropzoneProps}
@@ -374,9 +388,46 @@ function Uploader({
         </Dropzone>
         {/* {validateAgainstSchema && <CsvWizardHelper bindToggle={{}} validateAgainstSchema={validateAgainstSchema}></CsvWizardHelper>} */}
         {validateAgainstSchema && (
-          <ManuallyEnterData
-            validateAgainstSchema={validateAgainstSchema}
-          ></ManuallyEnterData>
+          <div
+            style={{ marginBottom: 10 }}
+            onClick={async () => {
+              const { newEntities } = await showSimpleInsertDataDialog(
+                "onSimpleInsertDialogFinish",
+                {
+                  validateAgainstSchema
+                }
+              );
+              if (!newEntities) {
+                return;
+              } else {
+                const newFileName = `manual_data_entry.csv`;
+                const newFile = new File(
+                  [papaparse.unparse(newEntities)],
+                  newFileName
+                );
+                const file = {
+                  ...newFile,
+                  name: newFileName,
+                  originFileObj: newFile,
+                  originalFileObj: newFile,
+                  id: nanoid()
+                };
+
+                const cleanedFileList = [file, ...fileListToUse].slice(
+                  0,
+                  fileLimit ? fileLimit : undefined
+                );
+                handleSecondHalfOfUpload({
+                  acceptedFiles: cleanedFileList,
+                  cleanedFileList
+                });
+                window.toastr.success(`File added`);
+              }
+            }}
+            className="link-button"
+          >
+            .. or manually enter data
+          </div>
         )}
 
         {fileList && showUploadList && !minimal && !!fileList.length && (
@@ -432,7 +483,16 @@ function Uploader({
                       name={name || originalName}
                       {...(url && !onFileClick ? { href: url } : {})}
                       /* eslint-disable react/jsx-no-bind*/
-                      onClick={() => onFileClick && onFileClick(file)}
+                      onClick={() => {
+                        if (onFileClick) {
+                          onFileClick(file);
+                        } else {
+                          //handle default download
+                          if (file.originFileObj) {
+                            downloadjs(file.originFileObj, file.name);
+                          }
+                        }
+                      }}
                       /* eslint-enable react/jsx-no-bind*/
                       {...(downloadName ? { download: downloadName } : {})}
                     >
@@ -478,25 +538,3 @@ function Uploader({
 }
 
 export default Uploader;
-
-function ManuallyEnterData({ validateAgainstSchema, ...rest }) {
-  const { toggleDialog, comp } = useDialog({
-    ModalComponent: SimpleInsertDataDialog,
-    validateAgainstSchema,
-    headerMessage: "Add your data here",
-    ...rest
-  });
-  return (
-    <>
-      <div
-        onClick={() => {
-          toggleDialog();
-        }}
-        className="link-button"
-      >
-        .. or manually enter data
-      </div>
-      {comp}
-    </>
-  );
-}

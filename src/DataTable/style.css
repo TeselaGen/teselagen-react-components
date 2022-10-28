@@ -581,3 +581,6 @@
 .cell-edit-dropdown:hover {
   color: var(--cell-border-color);
 }
+.tgBorderBlue {
+  outline: 1px solid rgb(75, 149, 210);
+}

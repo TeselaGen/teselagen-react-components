@@ -27,6 +27,9 @@ export default function tryToMatchSchemas({
     userSchema.fields,
     validateAgainstSchema.fields
   );
+  if (!hasIssues) {
+    return { hasIssues };
+  }
 
   const incomingHeadersToScores = {};
 

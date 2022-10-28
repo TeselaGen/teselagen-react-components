@@ -9,9 +9,9 @@ import { reduxForm } from "redux-form";
 
 const validateAgainstSchema = {
   fields: [
-    { isEditable: true, path: "name" },
+    { allowEmpty: true, isEditable: true, path: "name" },
     { isEditable: true, path: "description", allowEmpty: true },
-    { isEditable: true, path: "sequence" },
+    { allowEmpty: true, isEditable: true, path: "sequence" },
     {
       isEditable: true,
       path: "isRegex",
