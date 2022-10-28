@@ -128,6 +128,9 @@
 .ReactTable.ReactTable.isCellEditable .rt-tbody .rt-tr-group {
   border-bottom: none;
 }
+.ReactTable.ReactTable.isCellEditable .rt-tbody {
+  border-right: 4px solid var(--base1);
+}
 
 /* tgreen: we don't want the border for rows that don't have any data */
 .ReactTable.ReactTable .rt-tbody .rt-tr-group.no-row-data {
@@ -577,4 +580,7 @@
 
 .cell-edit-dropdown:hover {
   color: var(--cell-border-color);
+}
+.tgBorderBlue {
+  outline: 1px solid rgb(75, 149, 210);
 }

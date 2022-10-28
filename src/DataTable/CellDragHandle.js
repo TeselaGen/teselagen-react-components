@@ -15,7 +15,6 @@ export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
     const selectedTr = table.querySelector(
       `.rt-tr-group.with-row-data[data-test-id="${rowId}"]`
     );
-
     const selectedIndex = selectedTr.dataset.index;
 
     if (selectedTr && trs.length) {
@@ -68,9 +67,8 @@ export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
     const [, path] = cellId.split(":");
     //remove the dashed borders
     forEach(trs, tr => {
-      tr.querySelector(
-        `[data-test="tgCell_${path}"]`
-      ).parentNode.classList.remove("selectedForUpdate");
+      const el = tr.querySelector(`[data-test="tgCell_${path}"]`);
+      el.parentNode.classList.remove("selectedForUpdate");
     });
     document.removeEventListener("mousemove", handleDrag.current, false);
     document.removeEventListener("mouseup", fun, false);

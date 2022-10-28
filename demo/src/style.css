@@ -13,9 +13,8 @@ html {
 }
 
 body.bp3-dark {
-  background-color: #293742;
+  background-color: --baseColor1;
 }
-
 h1,
 h4,
 h6 {

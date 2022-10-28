@@ -2,7 +2,6 @@ import CollapsibleCard from "./examples/CollapsibleCard";
 import MenuBar from "./examples/MenuBar";
 import HotkeysDialog from "./examples/HotkeysDialog";
 import DataTableExample from "./examples/DataTable";
-import FormComponents from "./DemoComponents/FormComponents";
 import WrapDialog from "./examples/WrapDialog";
 import Toastr from "./examples/Toastr";
 import showConfirmationDialogDemo from "./examples/showConfirmationDialogDemo";
@@ -36,6 +35,8 @@ import store from "./store";
 import { FocusStyleManager } from "@blueprintjs/core";
 import isMobile from "is-mobile";
 import AdvancedOptionsDemo from "./examples/AdvancedOptionsDemo";
+import FormComponents from "./examples/FormComponents";
+import UploadCsvWizard from "./examples/UploadCsvWizard";
 
 FocusStyleManager.onlyShowFocusOnTabs();
 
@@ -199,6 +200,9 @@ const demos = {
   },
   FormComponents: {
     DemoComponent: FormComponents
+  },
+  UploadCsvWizard: {
+    DemoComponent: UploadCsvWizard
   },
   wrapDialog: {
     demo: WrapDialog

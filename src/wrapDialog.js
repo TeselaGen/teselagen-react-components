@@ -35,10 +35,10 @@ export default (topLevelDialogProps = {}) => Component => props => {
               if (document.activeElement.type === "textarea")
                 return doNotTriggerClick();
             }
-            const parentEl = r.current.closest(".bp3-dialog-container");
+            const parentEl = r.current?.closest(".bp3-dialog-container");
             // eslint-disable-next-line no-inner-declarations
             function triggerClick() {
-              parentEl.querySelector(`button[type='submit']`).click();
+              parentEl?.querySelector(`button[type='submit']`).click();
             }
 
             const dialogs = document.querySelectorAll(".bp3-dialog-container");
@@ -84,7 +84,6 @@ export default (topLevelDialogProps = {}) => Component => props => {
     ...dialogProps,
     ...getDialogProps(props)
   };
-
   const DialogToUse = extraDialogProps.isDraggable
     ? ResizableDraggableDialog
     : Dialog;
