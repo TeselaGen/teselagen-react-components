@@ -12,7 +12,6 @@ const schema = {
   fields: [
     {
       path: "name",
-      isEditable: true,
       validate: newVal => {
         if (!newVal || !newVal.includes("a"))
           return "Must include the letter 'a'";
@@ -23,13 +22,11 @@ const schema = {
     },
     {
       path: "type",
-      isEditable: true,
       type: "dropdown",
       values: ["old", "new"]
     },
     {
       path: "weather",
-      isEditable: true,
       //should auto validate against list of accepted values, should auto format to try to coerce input values into accepted
       type: "dropdown",
       defaultValue: "sunny",
@@ -37,7 +34,6 @@ const schema = {
     },
     {
       path: "howMany",
-      isEditable: true,
       //should auto validate to make sure the type is numeric, should auto format (I think this already works..) to try to coerce input values into accepted
       type: "numeric",
       defaultValue: 1,
@@ -51,7 +47,6 @@ const schema = {
     },
     {
       path: "isProtein",
-      isEditable: true,
       //should auto validate to coerce Yes -> true "true"->true, should auto format to try to coerce input values into accepted
       type: "boolean",
       defaultValue: true
