@@ -36,6 +36,9 @@ jobs:
       - name: Update Changelog
         run: npm run changelog
         if: steps.check.outputs.changed == 'true'
+      
+      - name: Pull Remote Changes # make sure we are up to date before auto commit
+        run: git pull
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         if: steps.check.outputs.changed == 'true'
