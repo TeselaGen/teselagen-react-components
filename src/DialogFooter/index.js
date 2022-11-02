@@ -49,8 +49,8 @@ function DialogFooter({
               hideModal ||
               function() {
                 r.current
-                  .closest(".bp3-dialog")
-                  .querySelector(".bp3-dialog-close-button")
+                  ?.closest(".bp3-dialog")
+                  ?.querySelector(".bp3-dialog-close-button")
                   ?.click();
               }
             }
