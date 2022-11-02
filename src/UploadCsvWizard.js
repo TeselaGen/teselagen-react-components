@@ -80,120 +80,118 @@ const UploadCsvWizardDialog = compose(
           </Callout>
           <br></br>
 
-          {searchResults.map(
-            ({ path, type /* allowEmpty, defaultValue */ }, i) => {
-              const userMatchedHeader = matchedHeaders[i];
-              return (
-                <Card style={{ padding: 2 }} key={i}>
-                  <table>
-                    <tr
+          {searchResults.map(({ path, type }, i) => {
+            const userMatchedHeader = matchedHeaders[i];
+            return (
+              <Card style={{ padding: 2 }} key={i}>
+                <table>
+                  <tr
+                    style={{
+                      display: "flex",
+                      minHeight: 50,
+                      alignItems: "center",
+                      justifyContent: "space-between"
+                    }}
+                  >
+                    <td
                       style={{
-                        display: "flex",
-                        minHeight: 50,
-                        alignItems: "center",
-                        justifyContent: "space-between"
+                        width: 200,
+                        display: "flex"
                       }}
                     >
-                      <td
+                      <div
                         style={{
-                          width: 200,
-                          display: "flex"
+                          paddingTop: 2,
+                          marginLeft: 15,
+                          fontSize: 15
                         }}
                       >
-                        <div
-                          style={{
-                            paddingTop: 2,
-                            marginLeft: 15,
-                            fontSize: 15
-                          }}
+                        <span
+                          data-tip={`Column Type: ${typeToCommonType[
+                            type || "string"
+                          ] || type}`}
                         >
-                          <span
-                            data-tip={`Column Type: ${typeToCommonType[
-                              type || "string"
-                            ] || type}`}
-                          >
-                            {path}
-                          </span>
-                          {/*  <div
+                          {path}
+                        </span>
+                        {/*  <div
                             style={{ opacity: 0.5, marginTop: 3, fontSize: 8 }}
                           >
                             
                           </div> */}
-                        </div>
-                      </td>
-                      <td style={{ width: 200 }}>
-                        <ReactSelectField
-                          noMarginBottom
-                          tooltipError
-                          onChange={val => {
-                            setMatchedHeaders({ ...matchedHeaders, [i]: val });
-                          }}
-                          name={path}
-                          // isRequired={!allowEmpty && defaultValue === undefined}
-                          defaultValue={matchedHeaders[i]}
-                          options={flatMap(userSchema.fields, ({ path }) => {
-                            if (
-                              path !== matchedHeaders[i] &&
-                              flippedMatchedHeaders[path]
-                            ) {
-                              return [];
-                            }
-                            return {
-                              value: path,
-                              label: path
-                            };
-                          }).sort((a, b) => {
-                            const ra = searchResults[i].matches
-                              .map(m => m.item.path)
-                              .indexOf(a.value);
-                            const rb = searchResults[i].matches
-                              .map(m => m.item.path)
-                              .indexOf(b.value);
-                            if (!ra) return -1;
-                            if (!rb) return 1;
-                            return rb - ra;
-                          })}
-                        ></ReactSelectField>
-                      </td>
-                      <div
-                        style={{
-                          marginTop: 10,
-                          marginBottom: 10,
-                          marginLeft: 20,
-                          fontSize: 10 /* color: Colors.RED1 */
+                      </div>
+                    </td>
+                    <td style={{ width: 200 }}>
+                      <ReactSelectField
+                        noMarginBottom
+                        tooltipError
+                        onChange={val => {
+                          setMatchedHeaders({ ...matchedHeaders, [i]: val });
                         }}
-                      >
-                        {userMatchedHeader &&
-                          [
-                            { [userMatchedHeader]: "Preview:" },
-                            ...userSchema.userData?.slice(0, 3)
-                            // { [userMatchedHeader]: "..." }
-                          ].map((row, i) => {
-                            return (
-                              <div
-                                style={{
-                                  ...(i === 0 && { fontWeight: "bold" }),
-                                  maxWidth: 70,
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  whiteSpace: "nowrap"
-                                }}
-                                key={i}
-                              >
-                                {row?.[userMatchedHeader]}
-                              </div>
-                            );
-                          })}
-                        {/* {!allowEmpty &&
+                        name={path}
+                        // isRequired={!allowEmpty && defaultValue === undefined}
+                        defaultValue={matchedHeaders[i]}
+                        options={flatMap(userSchema.fields, ({ path }) => {
+                          if (
+                            path !== matchedHeaders[i] &&
+                            flippedMatchedHeaders[path]
+                          ) {
+                            return [];
+                          }
+                          return {
+                            value: path,
+                            label: path
+                          };
+                        }).sort((a, b) => {
+                          const ra = searchResults[i].matches
+                            .map(m => m.item.path)
+                            .indexOf(a.value);
+                          const rb = searchResults[i].matches
+                            .map(m => m.item.path)
+                            .indexOf(b.value);
+                          if (!ra) return -1;
+                          if (!rb) return 1;
+                          return rb - ra;
+                        })}
+                      ></ReactSelectField>
+                    </td>
+                    <div
+                      style={{
+                        marginTop: 10,
+                        marginBottom: 10,
+                        marginLeft: 20,
+                        fontSize: 10 /* color: Colors.RED1 */
+                      }}
+                    >
+                      {userMatchedHeader &&
+                        [
+                          { [userMatchedHeader]: "Preview:" },
+                          ...userSchema.userData?.slice(0, 3)
+                          // { [userMatchedHeader]: "..." }
+                        ].map((row, i) => {
+                          return (
+                            <div
+                              style={{
+                                ...(i === 0 && { fontWeight: "bold" }),
+                                maxWidth: 70,
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap"
+                              }}
+                              key={i}
+                            >
+                              {row?.[userMatchedHeader]}
+                            </div>
+                          );
+                        })}
+                      {/* {!allowEmpty &&
                         defaultValue === undefined &&
                         "(Required)"} */}
-                      </div>
-                    </tr>
-                  </table>
-                </Card>
-              );
-            }
-          )}
+                    </div>
+                  </tr>
+                </table>
+              </Card>
+            );
+          })}
         </div>
       );
     }

@@ -328,9 +328,7 @@ function Uploader({
                     file.originFileObj = newFile;
                     file.originalFileObj = newFile;
 
-                    window.toastr.success(
-                      `Uploaded Fixed Up File ${newFileName}`
-                    );
+                    window.toastr.success(`Added Fixed Up File ${newFileName}`);
                   }
                 }
               }

@@ -2874,7 +2874,7 @@ const defaultValidators = {
     }
   },
   string: (newVal, field) => {
-    if (field.allowEmpty) return false;
+    if (!field.isRequired) return false;
     if (!newVal) return "Please enter a value here";
   }
 };
