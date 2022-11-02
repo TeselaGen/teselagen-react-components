@@ -139,9 +139,13 @@ span.bp3-popover-target {
   border: none;
   padding: 0 !important;
   font-family: arial, sans-serif;
-  color: #069;
-  text-decoration: underline;
+  color: rgb(0, 151, 227);
+  /* text-decoration: underline; */
   cursor: pointer;
+}
+.link-button:hover {
+  color: rgb(98, 198, 248);
+  text-decoration: underline;
 }
 
 .above-dialog {

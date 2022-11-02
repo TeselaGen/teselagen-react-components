@@ -2,6 +2,7 @@ import { map } from "lodash";
 import { nanoid } from "nanoid";
 import Fuse from "fuse.js";
 import { max } from "lodash";
+import { editCellHelper } from "../DataTable";
 
 const getSchema = data => ({
   fields: map(data[0], (val, path) => {
@@ -23,12 +24,14 @@ export default function tryToMatchSchemas({
   validateAgainstSchema
 }) {
   const userSchema = getSchema(incomingData);
-  const { searchResults, hasIssues } = matchSchemas(
-    userSchema.fields,
-    validateAgainstSchema.fields
-  );
-  if (!hasIssues) {
-    return { hasIssues };
+
+  const { searchResults, csvValidationIssue } = matchSchemas({
+    userSchema,
+    officialSchema: validateAgainstSchema
+  });
+
+  if (!csvValidationIssue) {
+    return { csvValidationIssue };
   }
 
   const incomingHeadersToScores = {};
@@ -40,6 +43,7 @@ export default function tryToMatchSchemas({
       incomingHeadersToScores[match.item.path].push(match.score);
     });
   });
+
   searchResults.forEach(r => {
     for (const match of r.matches) {
       if (!incomingHeadersToScores[match.item.path]) continue;
@@ -64,37 +68,80 @@ export default function tryToMatchSchemas({
   });
 
   return {
-    hasIssues,
+    csvValidationIssue,
     initialMatchedHeaders,
     userSchema,
     searchResults
   };
 }
 
-function matchSchemas(userSchema, officialSchema) {
+function matchSchemas({ userSchema, officialSchema }) {
   const options = {
     includeScore: true,
     keys: ["path", "displayName"]
   };
-  let hasIssues = false;
-  officialSchema.forEach(h => {
+  let csvValidationIssue = false;
+  const fuse = new Fuse(userSchema.fields, options);
+
+  officialSchema.fields.forEach(h => {
     let hasMatch = false;
-    userSchema.forEach(uh => {
-      if (uh.path.toLowerCase() === h.path.toLowerCase()) {
+    //run fuse search for results
+    let result = fuse.search(h.path) || [];
+
+    //if there are any exact matches, push them onto the results array
+    userSchema.fields.forEach((uh, i) => {
+      if (
+        uh.path.toLowerCase().replace(/ /g, "") ===
+        h.path.toLowerCase().replace(/ /g, "")
+      ) {
+        result = result.filter(({ path }) => path === uh.path);
+        //add a fake perfect match result to make sure we get the match
+        result.unshift({
+          item: {
+            path: uh.path,
+            type: h.type
+          },
+          refIndex: i,
+          score: 0
+        });
         hasMatch = true;
       }
     });
-    if (!hasMatch) hasIssues = true;
+    h.matches = result;
+
+    if (!hasMatch)
+      csvValidationIssue =
+        "It looks like some of the headers in your uploaded file do not match the expected headers. Please look over and correct any issues with the mappings below.";
   });
-  if (!hasIssues) {
-    return { hasIssues };
+
+  const editableFields = officialSchema.fields.filter(f => !f.isNotEditable);
+  const hasErr =
+    !csvValidationIssue &&
+    userSchema.userData.some(e => {
+      return editableFields.some(columnSchema => {
+        //mutative
+        const { error } = editCellHelper({
+          entity: e,
+          columnSchema,
+          newVal: e[columnSchema.matches[0].item.path]
+        });
+        if (error) {
+          return true;
+        }
+        return false;
+      });
+    });
+
+  if (hasErr) {
+    csvValidationIssue = `Some of the data doesn't look quite right. Do these header mappings look correct?`;
+  }
+  if (!csvValidationIssue) {
+    //all the headers match up as does the actual data
+    return { csvValidationIssue };
   }
 
-  const fuse = new Fuse(userSchema, options);
-
-  officialSchema.forEach(h => {
-    const result = fuse.search(h.path);
-    h.matches = result;
-  });
-  return { searchResults: officialSchema, hasIssues: true };
+  return {
+    searchResults: officialSchema.fields,
+    csvValidationIssue
+  };
 }

@@ -1,14 +1,12 @@
 /* Copyright (C) 2018 TeselaGen Biotechnology, Inc. */
 
-import React from "react";
+import React, { useRef } from "react";
 import { Intent, Button, Classes } from "@blueprintjs/core";
 import { noop } from "lodash";
 import classNames from "classnames";
 
 function DialogFooter({
-  hideModal = () => {
-    document.querySelector(".bp3-dialog-close-button")?.click();
-  },
+  hideModal,
   loading,
   submitting,
   onBackClick,
@@ -26,8 +24,12 @@ function DialogFooter({
   containerClassname,
   noCancel
 }) {
+  const r = useRef();
   return (
-    <div className={classNames(Classes.DIALOG_FOOTER, containerClassname)}>
+    <div
+      ref={r}
+      className={classNames(Classes.DIALOG_FOOTER, containerClassname)}
+    >
       <div className={Classes.DIALOG_FOOTER_ACTIONS}>
         {onBackClick && (
           <Button
@@ -42,7 +44,16 @@ function DialogFooter({
             intent={secondaryIntent}
             className={Classes.MINIMAL + " " + secondaryClassName}
             text={secondaryText}
-            onClick={secondaryAction || hideModal}
+            onClick={
+              secondaryAction ||
+              hideModal ||
+              function() {
+                r.current
+                  .closest(".bp3-dialog")
+                  .querySelector(".bp3-dialog-close-button")
+                  ?.click();
+              }
+            }
           />
         )}
         {additionalButtons}

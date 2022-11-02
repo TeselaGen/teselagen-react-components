@@ -39,6 +39,7 @@ const UploadCsvWizardDialog = compose(
     userSchema,
     searchResults,
     onUploadWizardFinish,
+    csvValidationIssue,
     //fromRedux:
     handleSubmit,
     onlyShowRowsWErrors,
@@ -75,14 +76,12 @@ const UploadCsvWizardDialog = compose(
       inner = (
         <div style={{ maxWidth: 500 }}>
           <Callout style={{ width: "fit-content" }} intent="warning">
-            It looks like some of the headers in your uploaded file do not match
-            the expected headers. Please look over and correct any issues with
-            the mappings below.
+            {csvValidationIssue}
           </Callout>
           <br></br>
 
           {searchResults.map(
-            ({ path /* type */ /* allowEmpty, defaultValue */ }, i) => {
+            ({ path, type /* allowEmpty, defaultValue */ }, i) => {
               const userMatchedHeader = matchedHeaders[i];
               return (
                 <Card style={{ padding: 2 }} key={i}>
@@ -108,11 +107,17 @@ const UploadCsvWizardDialog = compose(
                             fontSize: 15
                           }}
                         >
-                          {path}
+                          <span
+                            data-tip={`Column Type: ${typeToCommonType[
+                              type || "string"
+                            ] || type}`}
+                          >
+                            {path}
+                          </span>
                           {/*  <div
                             style={{ opacity: 0.5, marginTop: 3, fontSize: 8 }}
                           >
-                            {typeToCommonType[type || "string"] || type}
+                            
                           </div> */}
                         </div>
                       </td>
@@ -170,7 +175,8 @@ const UploadCsvWizardDialog = compose(
                                   ...(i === 0 && { fontWeight: "bold" }),
                                   maxWidth: 70,
                                   overflow: "hidden",
-                                  textOverflow: "ellipsis"
+                                  textOverflow: "ellipsis",
+                                  whiteSpace: "nowrap"
                                 }}
                                 key={i}
                               >
@@ -199,7 +205,7 @@ const UploadCsvWizardDialog = compose(
         </div>
         <div className="bp3-dialog-body">{inner}</div>
         <DialogFooter
-          text="Next"
+          text={!hasSubmitted ? "Review and Edit Data" : "Add File"}
           disabled={
             hasSubmitted &&
             (!reduxFormEntities?.length ||
@@ -348,9 +354,9 @@ export const SimpleInsertDataDialog = compose(
   );
 });
 
-// const typeToCommonType = {
-//   string: "Text",
-//   number: "Number",
-//   boolean: "True/False",
-//   dropdown: "Select One"
-// };
+const typeToCommonType = {
+  string: "Text",
+  number: "Number",
+  boolean: "True/False",
+  dropdown: "Select One"
+};

@@ -281,7 +281,7 @@ function Uploader({
                   if (isCsvOrExcelFile(file)) {
                     const parsedF = await parseCsvOrExcelFile(file);
                     const {
-                      hasIssues,
+                      csvValidationIssue,
                       initialMatchedHeaders,
                       userSchema,
                       searchResults
@@ -289,9 +289,10 @@ function Uploader({
                       incomingData: parsedF.data,
                       validateAgainstSchema
                     });
-                    if (hasIssues) {
+                    if (csvValidationIssue) {
                       filesWIssues.push({
                         file,
+                        csvValidationIssue,
                         initialMatchedHeaders,
                         userSchema,
                         searchResults
@@ -300,13 +301,14 @@ function Uploader({
                   }
                 }
                 if (filesWIssues.length) {
-                  const { file, ...rest } = filesWIssues[0];
+                  const { file, csvValidationIssue, ...rest } = filesWIssues[0];
 
                   //just handle the 1st file for now
                   const { newEntities } = await showUploadCsvWizardDialog(
                     "onUploadWizardFinish",
                     {
                       ...rest,
+                      csvValidationIssue,
                       validateAgainstSchema
                     }
                   );
@@ -378,6 +380,54 @@ function Uploader({
                   </div>
                 )}
               </div>
+              {validateAgainstSchema && (
+                <div
+                  style={{
+                    textAlign: "center",
+                    fontSize: 18,
+                    marginTop: 7,
+                    marginBottom: 5
+                  }}
+                  onClick={async e => {
+                    e.stopPropagation();
+                    const { newEntities } = await showSimpleInsertDataDialog(
+                      "onSimpleInsertDialogFinish",
+                      {
+                        validateAgainstSchema
+                      }
+                    );
+                    if (!newEntities) {
+                      return;
+                    } else {
+                      const newFileName = `manual_data_entry.csv`;
+                      const newFile = new File(
+                        [papaparse.unparse(newEntities)],
+                        newFileName
+                      );
+                      const file = {
+                        ...newFile,
+                        name: newFileName,
+                        originFileObj: newFile,
+                        originalFileObj: newFile,
+                        id: nanoid()
+                      };
+
+                      const cleanedFileList = [file, ...fileListToUse].slice(
+                        0,
+                        fileLimit ? fileLimit : undefined
+                      );
+                      handleSecondHalfOfUpload({
+                        acceptedFiles: cleanedFileList,
+                        cleanedFileList
+                      });
+                      window.toastr.success(`File added`);
+                    }
+                  }}
+                  className="link-button"
+                >
+                  .. or manually enter data
+                </div>
+              )}
               {showFilesCount ? (
                 <div className="tg-upload-file-list-counter">
                   Files: {fileList ? fileList.length : 0}
@@ -387,48 +437,6 @@ function Uploader({
           )}
         </Dropzone>
         {/* {validateAgainstSchema && <CsvWizardHelper bindToggle={{}} validateAgainstSchema={validateAgainstSchema}></CsvWizardHelper>} */}
-        {validateAgainstSchema && (
-          <div
-            style={{ marginBottom: 10 }}
-            onClick={async () => {
-              const { newEntities } = await showSimpleInsertDataDialog(
-                "onSimpleInsertDialogFinish",
-                {
-                  validateAgainstSchema
-                }
-              );
-              if (!newEntities) {
-                return;
-              } else {
-                const newFileName = `manual_data_entry.csv`;
-                const newFile = new File(
-                  [papaparse.unparse(newEntities)],
-                  newFileName
-                );
-                const file = {
-                  ...newFile,
-                  name: newFileName,
-                  originFileObj: newFile,
-                  originalFileObj: newFile,
-                  id: nanoid()
-                };
-
-                const cleanedFileList = [file, ...fileListToUse].slice(
-                  0,
-                  fileLimit ? fileLimit : undefined
-                );
-                handleSecondHalfOfUpload({
-                  acceptedFiles: cleanedFileList,
-                  cleanedFileList
-                });
-                window.toastr.success(`File added`);
-              }
-            }}
-            className="link-button"
-          >
-            .. or manually enter data
-          </div>
-        )}
 
         {fileList && showUploadList && !minimal && !!fileList.length && (
           <div

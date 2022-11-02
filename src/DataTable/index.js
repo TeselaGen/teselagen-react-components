@@ -331,7 +331,7 @@ class DataTable extends React.Component {
   };
   formatAndValidateEntities = entities => {
     const { schema } = this.props;
-    const editableFields = schema.fields.filter(f => f.isEditable);
+    const editableFields = schema.fields.filter(f => !f.isNotEditable);
     const validationErrors = {};
 
     const newEnts = immer(entities, entities => {
@@ -2474,6 +2474,7 @@ class DataTable extends React.Component {
       isLocalCall,
       setNewParams,
       compact,
+      isCellEditable,
       extraCompact,
       entities
     } = computePresets(this.props);
@@ -2485,7 +2486,7 @@ class DataTable extends React.Component {
       renderTitleInner,
       filterIsActive = noop,
       noTitle,
-      isEditable,
+      isNotEditable,
       type,
       path
     } = column;
@@ -2574,7 +2575,7 @@ class DataTable extends React.Component {
         />
       ) : null;
     let maybeCheckbox;
-    if (isEditable && type === "boolean") {
+    if (isCellEditable && !isNotEditable && type === "boolean") {
       let isIndeterminate = false;
       let isChecked = !!entities.length;
       let hasFalse;
@@ -2810,7 +2811,13 @@ function isTruthy(v) {
 }
 
 //(mutative) responsible for formatting and then validating the
-const editCellHelper = ({ entity, path, schema, columnSchema, newVal }) => {
+export const editCellHelper = ({
+  entity,
+  path,
+  schema,
+  columnSchema,
+  newVal
+}) => {
   let nv = newVal;
 
   const colSchema =

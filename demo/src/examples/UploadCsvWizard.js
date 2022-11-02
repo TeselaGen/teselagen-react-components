@@ -9,31 +9,28 @@ import { reduxForm } from "redux-form";
 
 const validateAgainstSchema = {
   fields: [
-    { allowEmpty: true, isEditable: true, path: "name" },
-    { isEditable: true, path: "description", allowEmpty: true },
-    { allowEmpty: true, isEditable: true, path: "sequence" },
+    { isRequired: true, path: "name", description: "The Sequence Name" },
+    { path: "description" },
+    { isRequired: true, path: "sequence" },
     {
-      isEditable: true,
       path: "isRegex",
       type: "boolean",
       defaultValue: false
     },
     {
-      isEditable: true,
       path: "matchType",
       type: "dropdown",
       values: ["dna", "protein"],
       defaultValue: "dna"
     },
     {
-      isEditable: true,
       path: "type",
       type: "dropdown",
       values: ["misc_feature", "CDS", "rbs"],
       defaultValue: "misc_feature"
     }
-  ],
-  userData: []
+  ]
+  // userData: []
 };
 const csvStr = `Name,Sequence,Type,Color,Match type
 15 long linker based on the one I designed,APGSGTGGGSGSAPG,,#85DAE9,protein
