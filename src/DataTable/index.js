@@ -122,6 +122,12 @@ class DataTable extends React.Component {
           combo: "mod+shift+z",
           label: "Redo",
           onKeyDown: this.handleRedo
+        },
+        deleteCell: {
+          global: false,
+          combo: "backspace",
+          label: "Delete Cell",
+          onKeyDown: this.handleDeleteCell
         }
       }),
       moveDownARowShift: {
@@ -689,6 +695,42 @@ class DataTable extends React.Component {
         idMap: newIdMap,
         props: computePresets(this.props)
       });
+    }
+  };
+
+  handleDeleteCell = () => {
+    const {
+      isCellEditable,
+      reduxFormSelectedCells,
+      reduxFormCellValidation,
+      change,
+      schema,
+      entities
+    } = computePresets(this.props);
+    if (isCellEditable) {
+      const newCellValidate = {
+        ...reduxFormCellValidation
+      };
+      if (isEmpty(reduxFormSelectedCells)) return;
+      this.updateEntitiesHelper(entities, entities => {
+        const entityIdToEntity = getEntityIdToEntity(entities);
+        Object.keys(reduxFormSelectedCells).forEach(cellId => {
+          const [rowId, path] = cellId.split(":");
+          const entity = entityIdToEntity[rowId].e;
+          const { error } = editCellHelper({
+            entity,
+            path,
+            schema,
+            newVal: ""
+          });
+          if (error) {
+            newCellValidate[cellId] = error;
+          } else {
+            delete newCellValidate[cellId];
+          }
+        });
+      });
+      change("reduxFormCellValidation", newCellValidate);
     }
   };
 
