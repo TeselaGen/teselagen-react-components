@@ -111,6 +111,12 @@ class DataTable extends React.Component {
           onKeyDown: this.handleEnterStartCellEdit
         },
 
+        cut: {
+          global: false,
+          combo: "mod+x",
+          label: "Cut",
+          onKeyDown: this.handleCut
+        },
         undo: {
           global: false,
           combo: "mod+z",
@@ -700,38 +706,40 @@ class DataTable extends React.Component {
 
   handleDeleteCell = () => {
     const {
-      isCellEditable,
       reduxFormSelectedCells,
       reduxFormCellValidation,
       change,
       schema,
       entities
     } = computePresets(this.props);
-    if (isCellEditable) {
-      const newCellValidate = {
-        ...reduxFormCellValidation
-      };
-      if (isEmpty(reduxFormSelectedCells)) return;
-      this.updateEntitiesHelper(entities, entities => {
-        const entityIdToEntity = getEntityIdToEntity(entities);
-        Object.keys(reduxFormSelectedCells).forEach(cellId => {
-          const [rowId, path] = cellId.split(":");
-          const entity = entityIdToEntity[rowId].e;
-          const { error } = editCellHelper({
-            entity,
-            path,
-            schema,
-            newVal: ""
-          });
-          if (error) {
-            newCellValidate[cellId] = error;
-          } else {
-            delete newCellValidate[cellId];
-          }
+    const newCellValidate = {
+      ...reduxFormCellValidation
+    };
+    if (isEmpty(reduxFormSelectedCells)) return;
+    this.updateEntitiesHelper(entities, entities => {
+      const entityIdToEntity = getEntityIdToEntity(entities);
+      Object.keys(reduxFormSelectedCells).forEach(cellId => {
+        const [rowId, path] = cellId.split(":");
+        const entity = entityIdToEntity[rowId].e;
+        const { error } = editCellHelper({
+          entity,
+          path,
+          schema,
+          newVal: ""
         });
+        if (error) {
+          newCellValidate[cellId] = error;
+        } else {
+          delete newCellValidate[cellId];
+        }
       });
-      change("reduxFormCellValidation", newCellValidate);
-    }
+    });
+    change("reduxFormCellValidation", newCellValidate);
+  };
+
+  handleCut = e => {
+    this.handleDeleteCell();
+    this.handleCopyHotkey(e);
   };
 
   getCellCopyText = cellWrapper => {
