@@ -28,6 +28,7 @@ import {
 } from "../utils/parserUtils";
 import tryToMatchSchemas from "./tryToMatchSchemas";
 
+
 function noop() {}
 // wink wink
 const emptyPromise = Promise.resolve.bind(Promise);
@@ -301,13 +302,23 @@ function Uploader({
                   }
                 }
                 if (filesWIssues.length) {
-                  const { file, csvValidationIssue, ...rest } = filesWIssues[0];
+                  const {
+                    file,
+                    name,
+                    csvValidationIssue,
+                    ...rest
+                  } = filesWIssues[0];
 
                   //just handle the 1st file for now
                   const { newEntities } = await showUploadCsvWizardDialog(
                     "onUploadWizardFinish",
                     {
                       ...rest,
+                      dialogProps: {
+                        title: `Fix Up File ${
+                          file.name ? `"${file.name}"` : ""
+                        }`
+                      },
                       csvValidationIssue,
                       validateAgainstSchema
                     }
@@ -398,6 +409,7 @@ function Uploader({
                       return;
                     } else {
                       const newFileName = `manual_data_entry.csv`;
+                      console.log(`newEntities:`, newEntities);
                       const newFile = new File(
                         [papaparse.unparse(newEntities)],
                         newFileName
@@ -418,7 +430,7 @@ function Uploader({
                         acceptedFiles: cleanedFileList,
                         cleanedFileList
                       });
-                      window.toastr.success(`File added`);
+                      window.toastr.success(`File Added`);
                     }
                   }}
                   className="link-button"

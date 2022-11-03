@@ -16,6 +16,9 @@ import React, { useState } from "react";
 export const useDialog = ({ ModalComponent, ...rest }) => {
   const [isOpen, setOpen] = useState(false);
   const [additionalProps, setAdditionalProps] = useState(false);
+  console.log(`additionalProps`, additionalProps)
+  console.log(`isOpen:`, isOpen);
+  console.log(`rest,:`,rest,)
   const comp = (
     <ModalComponent
       hideModal={() => {

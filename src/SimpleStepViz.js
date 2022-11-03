@@ -4,7 +4,7 @@ import React from "react";
 
 export default function SimpleStepViz({ steps, ...rest }) {
   return (
-    <ul class="bp3-breadcrumbs" {...rest}>
+    <ul className="bp3-breadcrumbs" {...rest}>
       {steps.map(({ completed, active, text }, i) => {
         return (
           <li key={i}>

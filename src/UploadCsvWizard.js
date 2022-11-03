@@ -17,6 +17,7 @@ import { ReactSelectField, SwitchField } from "./FormComponents";
 import DialogFooter from "./DialogFooter";
 import DataTable from "./DataTable";
 import wrapDialog from "./wrapDialog";
+import { omit } from "lodash";
 
 const UploadCsvWizardDialog = compose(
   reduxForm({
@@ -85,109 +86,111 @@ const UploadCsvWizardDialog = compose(
             return (
               <Card style={{ padding: 2 }} key={i}>
                 <table>
-                  <tr
-                    style={{
-                      display: "flex",
-                      minHeight: 50,
-                      alignItems: "center",
-                      justifyContent: "space-between"
-                    }}
-                  >
-                    <td
+                  <tbody>
+                    <tr
                       style={{
-                        width: 200,
-                        display: "flex"
+                        display: "flex",
+                        minHeight: 50,
+                        alignItems: "center",
+                        justifyContent: "space-between"
                       }}
                     >
-                      <div
+                      <td
                         style={{
-                          paddingTop: 2,
-                          marginLeft: 15,
-                          fontSize: 15
+                          width: 200,
+                          display: "flex"
                         }}
                       >
-                        <span
-                          data-tip={`Column Type: ${typeToCommonType[
-                            type || "string"
-                          ] || type}`}
+                        <div
+                          style={{
+                            paddingTop: 2,
+                            marginLeft: 15,
+                            fontSize: 15
+                          }}
                         >
-                          {path}
-                        </span>
-                        {/*  <div
+                          <span
+                            data-tip={`Column Type: ${typeToCommonType[
+                              type || "string"
+                            ] || type}`}
+                          >
+                            {path}
+                          </span>
+                          {/*  <div
                             style={{ opacity: 0.5, marginTop: 3, fontSize: 8 }}
                           >
                             
                           </div> */}
-                      </div>
-                    </td>
-                    <td style={{ width: 200 }}>
-                      <ReactSelectField
-                        noMarginBottom
-                        tooltipError
-                        onChange={val => {
-                          setMatchedHeaders({ ...matchedHeaders, [i]: val });
+                        </div>
+                      </td>
+                      <td style={{ width: 200 }}>
+                        <ReactSelectField
+                          noMarginBottom
+                          tooltipError
+                          onChange={val => {
+                            setMatchedHeaders({ ...matchedHeaders, [i]: val });
+                          }}
+                          name={path}
+                          // isRequired={!allowEmpty && defaultValue === undefined}
+                          defaultValue={matchedHeaders[i]}
+                          options={flatMap(userSchema.fields, ({ path }) => {
+                            if (
+                              path !== matchedHeaders[i] &&
+                              flippedMatchedHeaders[path]
+                            ) {
+                              return [];
+                            }
+                            return {
+                              value: path,
+                              label: path
+                            };
+                          }).sort((a, b) => {
+                            const ra = searchResults[i].matches
+                              .map(m => m.item.path)
+                              .indexOf(a.value);
+                            const rb = searchResults[i].matches
+                              .map(m => m.item.path)
+                              .indexOf(b.value);
+                            if (!ra) return -1;
+                            if (!rb) return 1;
+                            return rb - ra;
+                          })}
+                        ></ReactSelectField>
+                      </td>
+                      <td
+                        style={{
+                          marginTop: 10,
+                          marginBottom: 10,
+                          marginLeft: 20,
+                          fontSize: 10 /* color: Colors.RED1 */
                         }}
-                        name={path}
-                        // isRequired={!allowEmpty && defaultValue === undefined}
-                        defaultValue={matchedHeaders[i]}
-                        options={flatMap(userSchema.fields, ({ path }) => {
-                          if (
-                            path !== matchedHeaders[i] &&
-                            flippedMatchedHeaders[path]
-                          ) {
-                            return [];
-                          }
-                          return {
-                            value: path,
-                            label: path
-                          };
-                        }).sort((a, b) => {
-                          const ra = searchResults[i].matches
-                            .map(m => m.item.path)
-                            .indexOf(a.value);
-                          const rb = searchResults[i].matches
-                            .map(m => m.item.path)
-                            .indexOf(b.value);
-                          if (!ra) return -1;
-                          if (!rb) return 1;
-                          return rb - ra;
-                        })}
-                      ></ReactSelectField>
-                    </td>
-                    <div
-                      style={{
-                        marginTop: 10,
-                        marginBottom: 10,
-                        marginLeft: 20,
-                        fontSize: 10 /* color: Colors.RED1 */
-                      }}
-                    >
-                      {userMatchedHeader &&
-                        [
-                          { [userMatchedHeader]: "Preview:" },
-                          ...userSchema.userData?.slice(0, 3)
-                          // { [userMatchedHeader]: "..." }
-                        ].map((row, i) => {
-                          return (
-                            <div
-                              style={{
-                                ...(i === 0 && { fontWeight: "bold" }),
-                                maxWidth: 70,
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                whiteSpace: "nowrap"
-                              }}
-                              key={i}
-                            >
-                              {row?.[userMatchedHeader]}
-                            </div>
-                          );
-                        })}
-                      {/* {!allowEmpty &&
+                      >
+                        {userMatchedHeader &&
+                          [
+                            { [userMatchedHeader]: "Preview:" },
+                            ...userSchema.userData?.slice(0, 3)
+                            // { [userMatchedHeader]: "..." }
+                          ].map((row, i) => {
+                            return (
+                              <div
+                                style={{
+                                  ...(i === 0 && { fontWeight: "bold" }),
+                                  maxWidth: 70,
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  whiteSpace: "nowrap"
+                                }}
+                                key={i}
+                              >
+                                {row?.[userMatchedHeader]}
+                              </div>
+                            );
+                          })}
+                        {/* {!allowEmpty &&
                         defaultValue === undefined &&
                         "(Required)"} */}
-                    </div>
-                  </tr>
+                      </td>
+                    </tr>
+                  </tbody>
                 </table>
               </Card>
             );
@@ -235,7 +238,10 @@ const UploadCsvWizardDialog = compose(
             } else {
               //step 2 submit
               onUploadWizardFinish({
-                newEntities: reduxFormEntities
+                newEntities: maybeStripIdFromEntities(
+                  reduxFormEntities,
+                  validateAgainstSchema
+                )
               });
               // console.log(`reduxFormEntities`, reduxFormEntities);
               // console.log(`reduxFormCellValidation`, reduxFormCellValidation);
@@ -330,17 +336,21 @@ export const SimpleInsertDataDialog = compose(
   onSimpleInsertDialogFinish,
   reduxFormEntities,
   reduxFormCellValidation,
+  validateAgainstSchema,
   ...r
 }) {
   return (
     <>
       <div className="bp3-dialog-body">
-        <PreviewCsvData {...r}></PreviewCsvData>
+        <PreviewCsvData {...{ ...r, validateAgainstSchema }}></PreviewCsvData>
       </div>
       <DialogFooter
         onClick={() => {
           onSimpleInsertDialogFinish({
-            newEntities: reduxFormEntities
+            newEntities: maybeStripIdFromEntities(
+              reduxFormEntities,
+              validateAgainstSchema
+            )
           });
         }}
         disabled={
@@ -358,3 +368,12 @@ const typeToCommonType = {
   boolean: "True/False",
   dropdown: "Select One"
 };
+function maybeStripIdFromEntities(ents, validateAgainstSchema) {
+  if (validateAgainstSchema?.fields?.some(({ path }) => path === "id")) {
+    return ents;
+  } else {
+    // if the schema we're validating against itself didn't have an id field,
+    // we don't want to include it in the returned entities
+    return ents?.map(e => omit(e, ["id"]));
+  }
+}

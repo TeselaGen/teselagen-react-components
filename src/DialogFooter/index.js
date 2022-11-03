@@ -48,10 +48,14 @@ function DialogFooter({
               secondaryAction ||
               hideModal ||
               function() {
-                r.current
-                  ?.closest(".bp3-dialog")
-                  ?.querySelector(".bp3-dialog-close-button")
-                  ?.click();
+                try {
+                  r.current
+                    .closest(".bp3-dialog")
+                    .querySelector(".bp3-dialog-close-button")
+                    .click();
+                } catch (error) {
+                  console.error(`error closing dialog:`, error);
+                }
               }
             }
           />
