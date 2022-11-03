@@ -24,6 +24,7 @@ import {
   forEach,
   lowerCase,
   get,
+  padStart,
   omitBy,
   times
 } from "lodash";
@@ -2214,9 +2215,8 @@ class DataTable extends React.Component {
                 cellId={cellId}
                 onDragEnd={cellsToSelect => {
                   const [rowId, path] = cellId.split(":");
-                  const selectedEnt = entities.find((e, i) => {
-                    return getIdOrCodeOrIndex(e, i) === rowId;
-                  });
+                  const entityMap = getEntityIdToEntity(entities);
+                  const selectedEnt = entityMap[rowId]?.e;
                   // console.log(`selectedEnt`, selectedEnt);
                   // let selectedCellVal = val
                   let selectedCellVal = get(selectedEnt, path, "");
@@ -2231,20 +2231,62 @@ class DataTable extends React.Component {
                   const newCellValidate = {
                     ...reduxFormCellValidation
                   };
+                  let incrementStart;
+                  let incrementPrefix;
+                  let incrementPad = 0;
+                  if (column.type === "string" || column.type === "number") {
+                    const cellNumStr = getNumberStrAtEnd(selectedCellVal);
+                    const cellNum = Number(cellNumStr);
+                    const entityAbovePrimaryCell =
+                      entities[entityMap[rowId].i - 1];
+
+                    if (entityAbovePrimaryCell && !isNaN(cellNum)) {
+                      const cellAboveVal = get(
+                        entityAbovePrimaryCell,
+                        path,
+                        ""
+                      );
+                      const cellAboveNumStr = getNumberStrAtEnd(cellAboveVal);
+                      const cellAboveNum = Number(cellAboveNumStr);
+                      if (!isNaN(cellAboveNum)) {
+                        const isIncremental = cellNum - cellAboveNum === 1;
+                        if (isIncremental) {
+                          const cellTextNoNum = stripNumberAtEnd(
+                            selectedCellVal
+                          );
+                          const sameText =
+                            stripNumberAtEnd(cellAboveVal) === cellTextNoNum;
+                          if (sameText) {
+                            incrementStart = cellNum + 1;
+                            incrementPrefix = cellTextNoNum || "";
+                            if (cellNumStr.startsWith("0")) {
+                              incrementPad = cellNumStr.length;
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
                   this.updateEntitiesHelper(entities, entities => {
                     cellsToSelect.forEach(cellId => {
                       newReduxFormSelectedCells[cellId] = true;
                       const [rowId, path] = cellId.split(":");
-
-                      const entityToUpdate = entities.find((e, i) => {
-                        return getIdOrCodeOrIndex(e, i) === rowId;
-                      });
+                      const entityMap = getEntityIdToEntity(entities);
+                      const entityToUpdate = entityMap[rowId]?.e;
                       if (entityToUpdate) {
+                        let newVal;
+                        if (incrementStart !== undefined) {
+                          const num = incrementStart++;
+                          newVal =
+                            incrementPrefix + padStart(num, incrementPad, "0");
+                        } else {
+                          newVal = selectedCellVal;
+                        }
                         const { error } = editCellHelper({
                           entity: entityToUpdate,
                           path,
                           schema,
-                          newVal: selectedCellVal
+                          newVal
                         });
                         newCellValidate[cellId] = error;
                       }
@@ -2947,4 +2989,20 @@ function getEntityIdToEntity(entities) {
     entityIdToEntity[getIdOrCodeOrIndex(e, i)] = { e, i };
   });
   return entityIdToEntity;
+}
+
+function endsWithNumber(str) {
+  return /[0-9]+$/.test(str);
+}
+
+function getNumberStrAtEnd(str) {
+  if (endsWithNumber(str)) {
+    return str.match(/[0-9]+$/)[0];
+  }
+
+  return null;
+}
+
+function stripNumberAtEnd(str) {
+  return str.replace(getNumberStrAtEnd(str), "");
 }

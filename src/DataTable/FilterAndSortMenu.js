@@ -239,7 +239,7 @@ class FilterInput extends React.Component {
           <div className="custom-menu-item">
             <DateInput
               value={filterValue ? dayjs(filterValue).toDate() : undefined}
-              {...getDayjsFormatter("MM/DD/YYYY")}
+              {...getDayjsFormatter("L")}
               {...dateMinMaxHelpers}
               onChange={selectedDates => {
                 handleFilterValueChange(selectedDates);

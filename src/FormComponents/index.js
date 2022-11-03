@@ -303,7 +303,7 @@ export const renderBlueprintDateInput = props => {
   const { input, intent, onFieldSubmit, inputProps, ...rest } = props;
   return (
     <DateInput
-      {...getDayjsFormatter("MM/DD/YYYY")}
+      {...getDayjsFormatter("L")}
       {...removeUnwantedProps(rest)}
       intent={intent}
       inputProps={inputProps}
@@ -322,7 +322,7 @@ export const renderBlueprintDateRangeInput = props => {
 
   return (
     <DateRangeInput
-      {...getDayjsFormatter("MM/DD/YYYY")}
+      {...getDayjsFormatter("L")}
       {...removeUnwantedProps(rest)}
       intent={intent}
       inputProps={inputProps}
