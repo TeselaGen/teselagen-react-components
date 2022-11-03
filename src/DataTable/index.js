@@ -612,10 +612,33 @@ class DataTable extends React.Component {
               ...reduxFormCellValidation
             };
 
+            console.log(`pasteData:`, pasteData);
+
             const newSelectedCells = { ...reduxFormSelectedCells };
             this.updateEntitiesHelper(entities, entities => {
               const entityIdToEntity = getEntityIdToEntity(entities);
               const [rowId, primaryCellPath] = primarySelectedCell.split(":");
+              const pathToIndex = getFieldPathToIndex(schema);
+              const indexToPath = invert(pathToIndex);
+
+              // first check if format of selected cells is the exact same as the paste data
+              // if it is then paste in that format
+              // otherwise just start from the primary selected cell
+              const selectedCellMatrix = [];
+              for (const cellKey of Object.keys(reduxFormSelectedCells)) {
+                const [rowId, cellPath] = cellKey.split(":");
+                const { e, i } = entityIdToEntity[rowId];
+                const cellIndex = pathToIndex[cellPath];
+                if (!e || cellIndex === undefined) {
+                  break;
+                }
+                if (!selectedCellMatrix[i]) {
+                  selectedCellMatrix[i] = [];
+                }
+                selectedCellMatrix[i][cellIndex] = cellKey;
+              }
+              console.log(`selectedCellMatrix:`, selectedCellMatrix);
+
               const primaryEntityInfo = entityIdToEntity[rowId];
               const startIndex = primaryEntityInfo.i;
               const endIndex = primaryEntityInfo.i + pasteData.length;
@@ -625,8 +648,7 @@ class DataTable extends React.Component {
                 }
               }
               const entitiesToManipulate = entities.slice(startIndex, endIndex);
-              const pathToIndex = getFieldPathToIndex(schema);
-              const indexToPath = invert(pathToIndex);
+
               const startCellIndex = pathToIndex[primaryCellPath];
               pasteData.forEach((row, i) => {
                 row.forEach((cell, j) => {
