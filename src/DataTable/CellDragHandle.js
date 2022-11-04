@@ -59,8 +59,9 @@ export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
       });
     }
   });
-  const fun = () => mouseup.current(onDragEnd);
-  const mouseup = useRef(onDragEnd => {
+  // const fun = () => mouseup.current(onDragEnd);
+
+  const mouseup = useRef(() => {
     clearTimeout(timeoutkey.current);
     const table = ReactDOM.findDOMNode(thisTable);
     const trs = table.querySelectorAll(`.rt-tr-group.with-row-data`);
@@ -71,7 +72,7 @@ export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
       el.parentNode.classList.remove("selectedForUpdate");
     });
     document.removeEventListener("mousemove", handleDrag.current, false);
-    document.removeEventListener("mouseup", fun, false);
+    document.removeEventListener("mouseup", mouseup.current, false);
     onDragEnd(rowsToSelect.current.map(id => `${id}:${path}`));
   });
 
@@ -81,7 +82,7 @@ export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
         rowsToSelect.current = [];
         xStart.current = e.clientX;
         document.addEventListener("mousemove", handleDrag.current, false);
-        document.addEventListener("mouseup", fun, false);
+        document.addEventListener("mouseup", mouseup.current, false);
       }}
       className="cellDragHandle"
     ></div>

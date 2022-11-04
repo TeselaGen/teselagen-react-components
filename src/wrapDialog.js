@@ -88,7 +88,6 @@ export default (topLevelDialogProps = {}) => Component => props => {
     ? ResizableDraggableDialog
     : Dialog;
 
-    console.log(`extraDialogProps`, extraDialogProps)
   return (
     <DialogToUse
       canOutsideClickClose={false}

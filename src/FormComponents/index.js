@@ -597,6 +597,7 @@ export const renderReactSelect = props => {
     intent,
     options,
     onFieldSubmit,
+    beforeOnChange,
     ...rest
   } = props;
 
@@ -642,7 +643,7 @@ export const renderReactSelect = props => {
     options: optsToUse,
     value: valueToUse,
     // closeOnSelect: !rest.multi,
-    onChange(valOrVals, ...rest2) {
+    async onChange(valOrVals, ...rest2) {
       let valToPass;
       if (Array.isArray(valOrVals)) {
         valToPass = valOrVals.map(function(val) {
@@ -663,6 +664,10 @@ export const renderReactSelect = props => {
       if (props.cancelSubmit && props.cancelSubmit(valToPass)) {
         //allow the user to cancel the submit
         return;
+      }
+      if (beforeOnChange) {
+        const { stopEarly } = (await beforeOnChange(valToPass, ...rest2)) || {};
+        if (stopEarly) return;
       }
       onChange(valToPass, ...rest2);
       if (!rest.submitOnBlur) onFieldSubmit(valToPass);

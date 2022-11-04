@@ -62,7 +62,6 @@ export default class MenuBarDemo extends React.Component {
         isActive: () => {
           return this.state.isChecked;
           // const ret = Math.round(Math.random())
-          // console.log(`ret:`,ret)
           // return ret
         },
         // hiddenButSearchableText: "I'm hidden but searchable",

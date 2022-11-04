@@ -185,7 +185,6 @@ class TgSelect extends React.Component {
   };
 
   getTagProps = label => {
-    // console.log(`label:`,label)
     const { multi, value = [], disabled: _disabled } = this.props;
     const val = Array.isArray(value) ? value : [value];
     const matchingVal = val.find(op => op.label === label);

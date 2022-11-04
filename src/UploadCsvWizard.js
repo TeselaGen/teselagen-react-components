@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { reduxForm } from "redux-form";
-import { Callout, Card } from "@blueprintjs/core";
+import { reduxForm, change } from "redux-form";
+import { Callout, Card, Intent } from "@blueprintjs/core";
 import immer from "immer";
 
 import "./UploadCsvWizard.css";
@@ -18,11 +18,14 @@ import DialogFooter from "./DialogFooter";
 import DataTable from "./DataTable";
 import wrapDialog from "./wrapDialog";
 import { omit } from "lodash";
+import showConfirmationDialog from "./showConfirmationDialog";
+import { connect } from "react-redux";
 
 const UploadCsvWizardDialog = compose(
   reduxForm({
     form: "correctCSVHeadersForm"
   }),
+  connect(undefined, { changeForm: change }),
   wrapDialog({
     canEscapeKeyClose: false,
     title: "Upload Helper",
@@ -33,226 +36,251 @@ const UploadCsvWizardDialog = compose(
     "reduxFormEntities",
     "reduxFormCellValidation"
   )
-)(
-  ({
-    validateAgainstSchema,
-    initialMatchedHeaders,
-    userSchema,
-    searchResults,
-    onUploadWizardFinish,
-    csvValidationIssue,
-    //fromRedux:
-    handleSubmit,
-    onlyShowRowsWErrors,
-    reduxFormEntities,
-    reduxFormCellValidation
-  }) => {
-    const [hasSubmitted, setSubmitted] = useState();
-    const [steps, setSteps] = useState([
-      { text: "Set Headers", active: true },
-      { text: "Review Data", active: false }
-    ]);
+)(function UploadCsvWizardDialog({
+  validateAgainstSchema,
+  initialMatchedHeaders,
+  userSchema,
+  searchResults,
+  onUploadWizardFinish,
+  csvValidationIssue,
+  //fromRedux:
+  handleSubmit,
+  onlyShowRowsWErrors,
+  reduxFormEntities,
+  reduxFormCellValidation,
+  changeForm
+}) {
+  const [hasSubmitted, setSubmitted] = useState();
+  const [steps, setSteps] = useState([
+    { text: "Set Headers", active: true },
+    { text: "Review Data", active: false }
+  ]);
 
-    const flippedMatchedHeaders = {};
+  const flippedMatchedHeaders = {};
 
-    const [matchedHeaders, setMatchedHeaders] = React.useState(
-      initialMatchedHeaders
+  const [matchedHeaders, setMatchedHeaders] = React.useState(
+    initialMatchedHeaders
+  );
+  forEach(matchedHeaders, (v, k) => {
+    if (v) flippedMatchedHeaders[v] = k;
+  });
+  let inner;
+  if (hasSubmitted) {
+    inner = (
+      <PreviewCsvData
+        {...{
+          initialEntities: reduxFormEntities,
+          matchedHeaders,
+          onlyShowRowsWErrors,
+          validateAgainstSchema,
+          userSchema
+        }}
+      ></PreviewCsvData>
     );
-    forEach(matchedHeaders, (v, k) => {
-      if (v) flippedMatchedHeaders[v] = k;
-    });
-    let inner;
-    if (hasSubmitted) {
-      inner = (
-        <PreviewCsvData
-          {...{
-            matchedHeaders,
-            onlyShowRowsWErrors,
-            validateAgainstSchema,
-            userSchema
-          }}
-        ></PreviewCsvData>
-      );
-    } else {
-      inner = (
-        <div style={{ maxWidth: 500 }}>
-          <Callout style={{ width: "fit-content" }} intent="warning">
-            {csvValidationIssue}
-          </Callout>
-          <br></br>
+  } else {
+    inner = (
+      <div style={{ maxWidth: 500 }}>
+        <Callout style={{ width: "fit-content" }} intent="warning">
+          {csvValidationIssue}
+        </Callout>
+        <br></br>
 
-          {searchResults.map(({ path, type }, i) => {
-            const userMatchedHeader = matchedHeaders[i];
-            return (
-              <Card style={{ padding: 2 }} key={i}>
-                <table>
-                  <tbody>
-                    <tr
+        {searchResults.map(({ path, type }, i) => {
+          const userMatchedHeader = matchedHeaders[i];
+          return (
+            <Card style={{ padding: 2 }} key={i}>
+              <table>
+                <tbody>
+                  <tr
+                    style={{
+                      display: "flex",
+                      minHeight: 50,
+                      alignItems: "center",
+                      justifyContent: "space-between"
+                    }}
+                  >
+                    <td
                       style={{
-                        display: "flex",
-                        minHeight: 50,
-                        alignItems: "center",
-                        justifyContent: "space-between"
+                        width: 200,
+                        display: "flex"
                       }}
                     >
-                      <td
+                      <div
                         style={{
-                          width: 200,
-                          display: "flex"
+                          paddingTop: 2,
+                          marginLeft: 15,
+                          fontSize: 15
                         }}
                       >
-                        <div
-                          style={{
-                            paddingTop: 2,
-                            marginLeft: 15,
-                            fontSize: 15
-                          }}
+                        <span
+                          data-tip={`Column Type: ${typeToCommonType[
+                            type || "string"
+                          ] || type}`}
                         >
-                          <span
-                            data-tip={`Column Type: ${typeToCommonType[
-                              type || "string"
-                            ] || type}`}
-                          >
-                            {path}
-                          </span>
-                          {/*  <div
+                          {path}
+                        </span>
+                        {/*  <div
                             style={{ opacity: 0.5, marginTop: 3, fontSize: 8 }}
                           >
                             
                           </div> */}
-                        </div>
-                      </td>
-                      <td style={{ width: 200 }}>
-                        <ReactSelectField
-                          noMarginBottom
-                          tooltipError
-                          onChange={val => {
-                            setMatchedHeaders({ ...matchedHeaders, [i]: val });
-                          }}
-                          name={path}
-                          // isRequired={!allowEmpty && defaultValue === undefined}
-                          defaultValue={matchedHeaders[i]}
-                          options={flatMap(userSchema.fields, ({ path }) => {
-                            if (
-                              path !== matchedHeaders[i] &&
-                              flippedMatchedHeaders[path]
-                            ) {
-                              return [];
+                      </div>
+                    </td>
+                    <td style={{ width: 200 }}>
+                      <ReactSelectField
+                        noMarginBottom
+                        tooltipError
+                        beforeOnChange={async () => {
+                          if (reduxFormEntities && reduxFormEntities.isDirty) {
+                            const doAction = await showConfirmationDialog({
+                              text:
+                                "Are you sure you want to edit the columm mapping? This will clear any changes you've already made on the subsequent page.",
+                              intent: Intent.DANGER, //applied to the right most confirm button
+                              confirmButtonText: "Yes",
+                              cancelButtonText: "No"
+                              // canEscapeKeyCancel: true //this is false by default
+                            });
+                            if (doAction) {
+                              changeForm(
+                                "editableCellTable",
+                                "reduxFormEntities",
+                                null
+                              );
+                            } else {
+                              return { stopEarly: true };
                             }
-                            return {
-                              value: path,
-                              label: path
-                            };
-                          }).sort((a, b) => {
-                            const ra = searchResults[i].matches
-                              .map(m => m.item.path)
-                              .indexOf(a.value);
-                            const rb = searchResults[i].matches
-                              .map(m => m.item.path)
-                              .indexOf(b.value);
-                            if (!ra) return -1;
-                            if (!rb) return 1;
-                            return rb - ra;
-                          })}
-                        ></ReactSelectField>
-                      </td>
-                      <td
-                        style={{
-                          marginTop: 10,
-                          marginBottom: 10,
-                          marginLeft: 20,
-                          fontSize: 10 /* color: Colors.RED1 */
-                        }}
-                      >
-                        {userMatchedHeader &&
-                          [
-                            { [userMatchedHeader]: "Preview:" },
-                            ...userSchema.userData?.slice(0, 3)
-                            // { [userMatchedHeader]: "..." }
-                          ].map((row, i) => {
-                            return (
-                              <div
-                                style={{
-                                  ...(i === 0 && { fontWeight: "bold" }),
-                                  maxWidth: 70,
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  whiteSpace: "nowrap"
-                                }}
-                                key={i}
-                              >
-                                {row?.[userMatchedHeader]}
-                              </div>
+                          } else if (reduxFormEntities) {
+                            changeForm(
+                              "editableCellTable",
+                              "reduxFormEntities",
+                              null
                             );
-                          })}
-                        {/* {!allowEmpty &&
+                          }
+                        }}
+                        onChange={async val => {
+                          //when the column mapping changes, update the column in reduxFormEntities (if reduxFormEntities exists)
+                          setMatchedHeaders({ ...matchedHeaders, [i]: val });
+                        }}
+                        name={path}
+                        // isRequired={!allowEmpty && defaultValue === undefined}
+                        defaultValue={matchedHeaders[i]}
+                        options={flatMap(userSchema.fields, ({ path }) => {
+                          if (
+                            path !== matchedHeaders[i] &&
+                            flippedMatchedHeaders[path]
+                          ) {
+                            return [];
+                          }
+                          return {
+                            value: path,
+                            label: path
+                          };
+                        }).sort((a, b) => {
+                          const ra = searchResults[i].matches
+                            .map(m => m.item.path)
+                            .indexOf(a.value);
+                          const rb = searchResults[i].matches
+                            .map(m => m.item.path)
+                            .indexOf(b.value);
+                          if (!ra) return -1;
+                          if (!rb) return 1;
+                          return rb - ra;
+                        })}
+                      ></ReactSelectField>
+                    </td>
+                    <td
+                      style={{
+                        marginTop: 10,
+                        marginBottom: 10,
+                        marginLeft: 20,
+                        fontSize: 10 /* color: Colors.RED1 */
+                      }}
+                    >
+                      {userMatchedHeader &&
+                        [
+                          { [userMatchedHeader]: "Preview:" },
+                          ...userSchema.userData?.slice(0, 3)
+                          // { [userMatchedHeader]: "..." }
+                        ].map((row, i) => {
+                          return (
+                            <div
+                              style={{
+                                ...(i === 0 && { fontWeight: "bold" }),
+                                maxWidth: 70,
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap"
+                              }}
+                              key={i}
+                            >
+                              {row?.[userMatchedHeader]}
+                            </div>
+                          );
+                        })}
+                      {/* {!allowEmpty &&
                         defaultValue === undefined &&
                         "(Required)"} */}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </Card>
-            );
-          })}
-        </div>
-      );
-    }
-
-    return (
-      <div style={{ width: "fit-content" }}>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <SimpleStepViz style={{ marginTop: 8 }} steps={steps}></SimpleStepViz>
-        </div>
-        <div className="bp3-dialog-body">{inner}</div>
-        <DialogFooter
-          text={!hasSubmitted ? "Review and Edit Data" : "Add File"}
-          disabled={
-            hasSubmitted &&
-            (!reduxFormEntities?.length ||
-              some(reduxFormCellValidation, v => v))
-          }
-          {...(hasSubmitted && {
-            onBackClick: () => {
-              setSteps(
-                immer(steps, draft => {
-                  draft[0].active = true;
-                  draft[0].completed = false;
-                  draft[1].active = false;
-                })
-              );
-              setSubmitted(false);
-            }
-          })}
-          onClick={handleSubmit(async function() {
-            if (!hasSubmitted) {
-              //step 1 submit
-              setSteps(
-                immer(steps, draft => {
-                  draft[0].active = false;
-                  draft[0].completed = true;
-                  draft[1].active = true;
-                })
-              );
-              setSubmitted(true);
-            } else {
-              //step 2 submit
-              onUploadWizardFinish({
-                newEntities: maybeStripIdFromEntities(
-                  reduxFormEntities,
-                  validateAgainstSchema
-                )
-              });
-              // console.log(`reduxFormEntities`, reduxFormEntities);
-              // console.log(`reduxFormCellValidation`, reduxFormCellValidation);
-            }
-          })}
-          style={{ alignSelf: "end" }}
-        ></DialogFooter>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </Card>
+          );
+        })}
       </div>
     );
   }
-);
+
+  return (
+    <div style={{ width: "fit-content" }}>
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <SimpleStepViz style={{ marginTop: 8 }} steps={steps}></SimpleStepViz>
+      </div>
+      <div className="bp3-dialog-body">{inner}</div>
+      <DialogFooter
+        text={!hasSubmitted ? "Review and Edit Data" : "Add File"}
+        disabled={
+          hasSubmitted &&
+          (!reduxFormEntities?.length || some(reduxFormCellValidation, v => v))
+        }
+        {...(hasSubmitted && {
+          onBackClick: () => {
+            setSteps(
+              immer(steps, draft => {
+                draft[0].active = true;
+                draft[0].completed = false;
+                draft[1].active = false;
+              })
+            );
+            setSubmitted(false);
+          }
+        })}
+        onClick={handleSubmit(async function() {
+          if (!hasSubmitted) {
+            //step 1 submit
+            setSteps(
+              immer(steps, draft => {
+                draft[0].active = false;
+                draft[0].completed = true;
+                draft[1].active = true;
+              })
+            );
+            setSubmitted(true);
+          } else {
+            //step 2 submit
+            onUploadWizardFinish({
+              newEntities: maybeStripIdFromEntities(
+                reduxFormEntities,
+                validateAgainstSchema
+              )
+            });
+          }
+        })}
+        style={{ alignSelf: "end" }}
+      ></DialogFooter>
+    </div>
+  );
+});
 
 export default UploadCsvWizardDialog;
 
@@ -261,7 +289,8 @@ export const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
   headerMessage,
   onlyShowRowsWErrors,
   validateAgainstSchema,
-  userSchema = { userData: times(5) }
+  userSchema = { userData: times(5) },
+  initialEntities
 }) {
   // const [loading, setLoading] = useState(true);
   // useEffect(() => {
@@ -309,6 +338,8 @@ export const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
       <DataTable
         maxWidth={800}
         maxHeight={500}
+        initialEntities={initialEntities}
+        destroyOnUnmount={false}
         formName="editableCellTable"
         isSimple
         noAddMoreRowsButton={onlyShowRowsWErrors}

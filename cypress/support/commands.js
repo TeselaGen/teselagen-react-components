@@ -108,6 +108,25 @@ Cypress.Commands.add("uploadBlobFiles", (selector, files, noFileList) => {
   });
 });
 
+Cypress.Commands.add(
+  "paste",
+  { prevSubject: true },
+  (selector, pastePayload) => {
+    // https://developer.mozilla.org/en-US/docs/Web/API/Element/paste_event
+    cy.wrap(selector).then($destination => {
+      const pasteEvent = Object.assign(
+        new Event("paste", { bubbles: true, cancelable: true }),
+        {
+          clipboardData: {
+            getData: () => pastePayload
+          }
+        }
+      );
+      $destination[0].dispatchEvent(pasteEvent);
+    });
+  }
+);
+
 function dropFile({
   file,
   blob,

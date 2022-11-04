@@ -1,6 +1,6 @@
-name,description,sequence,isRegex,matchType,type,id
-a,,g,false,dna,misc_feature,R1eqkYTAbfW_lmfGvqCAD
-a,,g,false,dna,misc_feature,_jtnvPFYR-Sa8Vbsti2h-
-a,,g,false,dna,misc_feature,tD-VBJLX9GbhsluwxhUd2
-a,,g,false,dna,misc_feature,q1HXTC6Gjk8IwasC_h3Gp
-a,,g,false,dna,misc_feature,5tX3z1aPEWIXH56OjkQMz
+name,description,sequence,isRegex,matchType,type
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature

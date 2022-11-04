@@ -28,7 +28,6 @@ import {
 } from "../utils/parserUtils";
 import tryToMatchSchemas from "./tryToMatchSchemas";
 
-
 function noop() {}
 // wink wink
 const emptyPromise = Promise.resolve.bind(Promise);
@@ -409,7 +408,6 @@ function Uploader({
                       return;
                     } else {
                       const newFileName = `manual_data_entry.csv`;
-                      console.log(`newEntities:`, newEntities);
                       const newFile = new File(
                         [papaparse.unparse(newEntities)],
                         newFileName

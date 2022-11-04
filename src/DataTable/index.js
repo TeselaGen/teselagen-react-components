@@ -369,14 +369,13 @@ class DataTable extends React.Component {
     };
   };
   formatAndValidateTableInitial = () => {
-    const { _origEntities: entities, change } = this.props;
+    const { _origEntities: entities, initialEntities, change } = this.props;
     const { newEnts, validationErrors } = this.formatAndValidateEntities(
-      entities
+      initialEntities || entities
     );
     change("reduxFormEntities", newEnts);
     change("reduxFormCellValidation", validationErrors);
   };
-  validateCell = () => {};
 
   componentDidMount() {
     this.props.isCellEditable && this.formatAndValidateTableInitial();
@@ -776,8 +775,9 @@ class DataTable extends React.Component {
     } = this.props;
     const [nextState, patches, inversePatches] = produceWithPatches(ents, fn);
     if (!inversePatches.length) return;
-
-    change("reduxFormEntities", nextState);
+    const thatNewNew = [...nextState];
+    thatNewNew.isDirty = true;
+    change("reduxFormEntities", thatNewNew);
     change("reduxFormEntitiesUndoRedoStack", {
       ...omitBy(reduxFormEntitiesUndoRedoStack, (v, k) => {
         return toNumber(k) > reduxFormEntitiesUndoRedoStack.currentVersion + 1;
@@ -1731,6 +1731,7 @@ class DataTable extends React.Component {
     });
     return {
       onDoubleClick: () => {
+        // cell double click
         if (rowDisabled) return;
         this.startCellEdit(cellId);
       },
@@ -1981,8 +1982,6 @@ class DataTable extends React.Component {
       withExpandAndCollapseAllButton,
       reduxFormExpandedEntityIdMap,
       change,
-      schema,
-      reduxFormCellValidation,
       reduxFormSelectedCells,
       reduxFormEditingCell
     } = computePresets(this.props);
@@ -2174,7 +2173,6 @@ class DataTable extends React.Component {
         //   const selectedEnt = entities.find((e, i) => {
         //     return getIdOrCodeOrIndex(e, i) === rowId2;
         //   });
-        //   console.log(`selectedEnt`, selectedEnt);
         // }
 
         return (
@@ -2213,89 +2211,7 @@ class DataTable extends React.Component {
                 key={cellId}
                 thisTable={this.table}
                 cellId={cellId}
-                onDragEnd={cellsToSelect => {
-                  const [rowId, path] = cellId.split(":");
-                  const entityMap = getEntityIdToEntity(entities);
-                  const selectedEnt = entityMap[rowId]?.e;
-                  // console.log(`selectedEnt`, selectedEnt);
-                  // let selectedCellVal = val
-                  let selectedCellVal = get(selectedEnt, path, "");
-                  if (isBool) {
-                    selectedCellVal = oldVal;
-                    selectedCellVal = isTruthy(selectedCellVal);
-                  }
-
-                  const newReduxFormSelectedCells = {
-                    [cellId]: PRIMARY_SELECTED_VAL
-                  };
-                  const newCellValidate = {
-                    ...reduxFormCellValidation
-                  };
-                  let incrementStart;
-                  let incrementPrefix;
-                  let incrementPad = 0;
-                  if (column.type === "string" || column.type === "number") {
-                    const cellNumStr = getNumberStrAtEnd(selectedCellVal);
-                    const cellNum = Number(cellNumStr);
-                    const entityAbovePrimaryCell =
-                      entities[entityMap[rowId].i - 1];
-
-                    if (entityAbovePrimaryCell && !isNaN(cellNum)) {
-                      const cellAboveVal = get(
-                        entityAbovePrimaryCell,
-                        path,
-                        ""
-                      );
-                      const cellAboveNumStr = getNumberStrAtEnd(cellAboveVal);
-                      const cellAboveNum = Number(cellAboveNumStr);
-                      if (!isNaN(cellAboveNum)) {
-                        const isIncremental = cellNum - cellAboveNum === 1;
-                        if (isIncremental) {
-                          const cellTextNoNum = stripNumberAtEnd(
-                            selectedCellVal
-                          );
-                          const sameText =
-                            stripNumberAtEnd(cellAboveVal) === cellTextNoNum;
-                          if (sameText) {
-                            incrementStart = cellNum + 1;
-                            incrementPrefix = cellTextNoNum || "";
-                            if (cellNumStr.startsWith("0")) {
-                              incrementPad = cellNumStr.length;
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                  this.updateEntitiesHelper(entities, entities => {
-                    cellsToSelect.forEach(cellId => {
-                      newReduxFormSelectedCells[cellId] = true;
-                      const [rowId, path] = cellId.split(":");
-                      const entityMap = getEntityIdToEntity(entities);
-                      const entityToUpdate = entityMap[rowId]?.e;
-                      if (entityToUpdate) {
-                        let newVal;
-                        if (incrementStart !== undefined) {
-                          const num = incrementStart++;
-                          newVal =
-                            incrementPrefix + padStart(num, incrementPad, "0");
-                        } else {
-                          newVal = selectedCellVal;
-                        }
-                        const { error } = editCellHelper({
-                          entity: entityToUpdate,
-                          path,
-                          schema,
-                          newVal
-                        });
-                        newCellValidate[cellId] = error;
-                      }
-                    });
-                  });
-                  // select the new cells
-                  change("reduxFormCellValidation", newCellValidate);
-                  change("reduxFormSelectedCells", newReduxFormSelectedCells);
-                }}
+                onDragEnd={this.onDragEnd}
               ></CellDragHandle>
             )}
           </>
@@ -2307,6 +2223,84 @@ class DataTable extends React.Component {
     return columnsToRender;
   };
 
+  onDragEnd = cellsToSelect => {
+    const { entities, schema, reduxFormCellValidation, change } = this.props;
+    const cellId = this.getPrimarySelectedCellId();
+    const [rowId, path] = cellId.split(":");
+    const column = schema?.fields?.find(({ path: p }) => p === path);
+
+    const isBool = column.type === "boolean";
+
+    const entityMap = getEntityIdToEntity(entities);
+    const selectedEnt = entityMap[rowId]?.e;
+    let selectedCellVal = get(selectedEnt, path, "");
+    if (isBool) {
+      selectedCellVal = selectedCellVal === "True";
+      selectedCellVal = isTruthy(selectedCellVal);
+    }
+
+    const newReduxFormSelectedCells = {
+      [cellId]: PRIMARY_SELECTED_VAL
+    };
+    const newCellValidate = {
+      ...reduxFormCellValidation
+    };
+    let incrementStart;
+    let incrementPrefix;
+    let incrementPad = 0;
+    if (column.type === "string" || column.type === "number") {
+      const cellNumStr = getNumberStrAtEnd(selectedCellVal);
+      const cellNum = Number(cellNumStr);
+      const entityAbovePrimaryCell = entities[entityMap[rowId].i - 1];
+
+      if (entityAbovePrimaryCell && !isNaN(cellNum)) {
+        const cellAboveVal = get(entityAbovePrimaryCell, path, "");
+        const cellAboveNumStr = getNumberStrAtEnd(cellAboveVal);
+        const cellAboveNum = Number(cellAboveNumStr);
+        if (!isNaN(cellAboveNum)) {
+          const isIncremental = cellNum - cellAboveNum === 1;
+          if (isIncremental) {
+            const cellTextNoNum = stripNumberAtEnd(selectedCellVal);
+            const sameText = stripNumberAtEnd(cellAboveVal) === cellTextNoNum;
+            if (sameText) {
+              incrementStart = cellNum + 1;
+              incrementPrefix = cellTextNoNum || "";
+              if (cellNumStr.startsWith("0")) {
+                incrementPad = cellNumStr.length;
+              }
+            }
+          }
+        }
+      }
+    }
+    this.updateEntitiesHelper(entities, entities => {
+      cellsToSelect.forEach(cellId => {
+        newReduxFormSelectedCells[cellId] = true;
+        const [rowId, path] = cellId.split(":");
+        const entityMap = getEntityIdToEntity(entities);
+        const entityToUpdate = entityMap[rowId]?.e;
+        if (entityToUpdate) {
+          let newVal;
+          if (incrementStart !== undefined) {
+            const num = incrementStart++;
+            newVal = incrementPrefix + padStart(num, incrementPad, "0");
+          } else {
+            newVal = selectedCellVal;
+          }
+          const { error } = editCellHelper({
+            entity: entityToUpdate,
+            path,
+            schema,
+            newVal
+          });
+          newCellValidate[cellId] = error;
+        }
+      });
+    });
+    // select the new cells
+    change("reduxFormCellValidation", newCellValidate);
+    change("reduxFormSelectedCells", newReduxFormSelectedCells);
+  };
   getCopyTextForCell = (val, row, column) => {
     const { cellRenderer } = computePresets(this.props);
     // TODOCOPY we need a way to potentially omit certain columns from being added as a \t element (talk to taoh about this)
@@ -2488,6 +2482,10 @@ class DataTable extends React.Component {
         />
       );
     }
+    const selectedRowIds = Object.keys(reduxFormSelectedCells).map(cellId => {
+      const [rowId] = cellId.split(":");
+      return rowId;
+    });
 
     const menu = (
       <Menu>
@@ -2517,7 +2515,7 @@ class DataTable extends React.Component {
             ></MenuItem>
             <MenuItem
               icon="remove"
-              text="Remove Row(s)"
+              text={`Remove Row${selectedRowIds.length > 1 ? "s" : ""}`}
               key="removeRow"
               onClick={() => {
                 const {

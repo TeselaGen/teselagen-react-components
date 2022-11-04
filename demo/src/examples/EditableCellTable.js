@@ -57,13 +57,14 @@ const chance = new Chance();
 function getEnts(num) {
   return times(num).map(i => {
     return {
-      name: i === 0 ? "Tom" : chance.name(),
+      name: i === 0 ? "Tom88" : i === 1 ? "Tom89" : chance.name(),
       id: nanoid(),
-      type: i === 0 ? "fail" : chance.pickone(["new", "old"]),
+      type: i === 0 ? "fail" : i === 1 ? 'too old': chance.pickone(["new", "old"]),
       howMany:
         i === 0 ? "fail" : i === 1 ? "15" : chance.pickone(["3", 40, 2, 5]),
       isProtein: true,
-      weather: chance.pickone(["rainy", "cloudy", "HOT"])
+      weather:
+        i === 0 ? "WAY TOO HOT" : chance.pickone(["rainy", "cloudy", "HOT"])
     };
   });
 }
