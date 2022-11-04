@@ -127,6 +127,17 @@ Cypress.Commands.add(
   }
 );
 
+Cypress.Commands.add(
+  "modclick",
+  { prevSubject: "element" },
+  (subject, modifier) => {
+    cy.get("body").type(modifier, { release: false });
+    cy.wrap(subject).click();
+    // make sure to release key otherwise it will still be held during test
+    cy.get("body").type(modifier, { release: true });
+  }
+);
+
 function dropFile({
   file,
   blob,

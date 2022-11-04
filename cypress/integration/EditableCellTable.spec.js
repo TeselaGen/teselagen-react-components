@@ -41,6 +41,56 @@ describe("EditableCellTable.spec", () => {
     cy.get(`.rt-tr:contains(tom137):contains(too old)`);
   });
 
+  it(`drag should be repeating down`, () => {
+    cy.visit("#/DataTable/EditableCellTable");
+    const makeSureInitialRowsAreCorrect = () => {
+      cy.get(".rt-tr-group")
+        .eq(5)
+        .should("contain", "tom93");
+      cy.get(".rt-tr-group")
+        .eq(6)
+        .should("contain", "tom94");
+    };
+    makeSureInitialRowsAreCorrect();
+    cy.get(`.rt-td:contains(tom93)`).click();
+    cy.get(`.rt-td:contains(tom94)`).modclick("{meta}");
+    cy.dragBetween(`.cellDragHandle`, `.rt-td:contains(tom99)`);
+    makeSureInitialRowsAreCorrect();
+    const overwrittenRows = [7, 8, 9, 10, 11];
+    overwrittenRows.forEach(index => {
+      cy.get(".rt-tr-group")
+        .eq(index)
+        .should("contain", index % 2 === 0 ? "tom94" : "tom93");
+    });
+  });
+
+  it(`drag should be repeating up`, () => {
+    cy.visit("#/DataTable/EditableCellTable");
+    const makeSureInitialRowsAreCorrect = () => {
+      cy.get(".rt-tr-group")
+        .eq(15)
+        .should("contain", "tom103");
+      cy.get(".rt-tr-group")
+        .eq(16)
+        .should("contain", "tom104");
+      cy.get(".rt-tr-group")
+        .eq(17)
+        .should("contain", "tom105");
+    };
+    cy.get(`.rt-td:contains(tom103)`).click();
+    cy.get(`.rt-td:contains(tom104)`).modclick("{meta}");
+    cy.get(`.rt-td:contains(tom105)`).modclick("{meta}");
+    cy.dragBetween(`.cellDragHandle`, `.rt-td:contains(tom90)`);
+    makeSureInitialRowsAreCorrect();
+    const overwrittenRows = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    const vals = ["tom105", "tom103", "tom104"];
+    overwrittenRows.forEach((rowIndex, i) => {
+      cy.get(".rt-tr-group")
+        .eq(rowIndex)
+        .should("contain", vals[i % 3]);
+    });
+  });
+
   it(`should be able to edit numeric inputs correctly`, () => {
     cy.visit("#/DataTable/EditableCellTable");
     cy.get(
