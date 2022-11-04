@@ -11,7 +11,6 @@ export function CellDragHandle({
 }) {
   const xStart = useRef(0);
   const timeoutkey = useRef();
-  // const lastUserY = useRef();
   const rowsToSelect = useRef();
   const rectangleCellPaths = useRef();
 
@@ -80,7 +79,6 @@ export function CellDragHandle({
       });
     }
   });
-  // const fun = () => mouseup.current(onDragEnd);
 
   const mouseup = useRef(() => {
     clearTimeout(timeoutkey.current);

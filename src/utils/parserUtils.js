@@ -3,7 +3,6 @@ import { camelCase, flatMap, remove, startsWith } from "lodash";
 import { loadAsync } from "jszip";
 import Promise from "bluebird";
 import { parse, unparse } from "papaparse";
-import { isBrowser } from "browser-or-node";
 import { snakeCase } from "lodash";
 
 const logDebug = (...args) => {
@@ -178,34 +177,6 @@ export const parseCsvString = (csvString, parserOptions = {}) => {
   return parse(csvString, opts);
 };
 
-export async function parseExcelToCsv(file) {
-  try {
-    if (isBrowser) {
-      const data = new FormData();
-      data.append("file", file);
-      const res = await window.api.request({
-        method: "POST",
-        headers: {
-          "Content-Type": "multipart/form-data"
-        },
-        url: "/parseExcelToCsv",
-        responseType: "blob",
-        data
-      });
-      const files = await extractZipFiles([res.data]);
-      if (!files[0] || !isCsvFile(files[0])) {
-        throw new Error("No CSV file found");
-      }
-      return files[0];
-    } else {
-      throw new Error("Should not be hitting this function from the server");
-    }
-  } catch (error) {
-    console.error("error:", error);
-    return { error: "Error parsing excel file." };
-  }
-}
-
 export async function parseCsvOrExcelFile(
   fileOrFiles,
   { csvParserOptions } = {}
@@ -226,11 +197,15 @@ export async function parseCsvOrExcelFile(
 
   if (!csvFile && !excelFile) csvFile = txtFile;
 
-  if (!csvFile && excelFile) {
-    csvFile = await parseExcelToCsv(excelFile.originFileObj || excelFile);
+  if (!csvFile && excelFile && window.parseExcelToCsv) {
+    csvFile = await window.parseExcelToCsv(
+      excelFile.originFileObj || excelFile
+    );
     if (csvFile.error) {
       throw new Error(csvFile.error);
     }
+  } else {
+    throw new Error("Excel Parser not initialized on the window");
   }
   const parsedCsv = await parseCsvFile(csvFile, csvParserOptions);
   parsedCsv.originalFile = csvFile;
