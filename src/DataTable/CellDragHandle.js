@@ -5,7 +5,6 @@ import ReactDOM from "react-dom";
 export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
   const xStart = useRef(0);
   const timeoutkey = useRef();
-  // const lastUserY = useRef();
   const rowsToSelect = useRef();
 
   const handleDrag = useRef(e => {
@@ -59,7 +58,6 @@ export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
       });
     }
   });
-  // const fun = () => mouseup.current(onDragEnd);
 
   const mouseup = useRef(() => {
     clearTimeout(timeoutkey.current);
