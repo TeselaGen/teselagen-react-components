@@ -1969,6 +1969,76 @@ class DataTable extends React.Component {
     }, 0);
   };
 
+  isSelectionARectangleWithPrimaryInCorner = () => {
+    const { entities, reduxFormSelectedCells, schema } = computePresets(
+      this.props
+    );
+    if (Object.keys(reduxFormSelectedCells).length > 1) {
+      const pathToIndex = getFieldPathToIndex(schema);
+      const entityMap = getEntityIdToEntity(entities);
+      let primaryCellId;
+      let selectionGrid = [];
+      let firstCellIndex;
+      let lastCellIndex;
+      let lastRowIndex;
+      let firstRowIndex;
+      const selectedPaths = [];
+      Object.keys(reduxFormSelectedCells).forEach(key => {
+        if (reduxFormSelectedCells[key] === PRIMARY_SELECTED_VAL) {
+          primaryCellId = key;
+        }
+        const [rowId, cellPath] = key.split(":");
+        if (!selectedPaths.includes(cellPath)) selectedPaths.push(cellPath);
+        const cellIndex = pathToIndex[cellPath];
+        const { i } = entityMap[rowId];
+        if (firstRowIndex === undefined || i < firstRowIndex) {
+          firstRowIndex = i;
+        }
+        if (lastRowIndex === undefined || i > lastRowIndex) {
+          lastRowIndex = i;
+        }
+        if (!selectionGrid[i]) selectionGrid[i] = [];
+        selectionGrid[i][cellIndex] = true;
+        if (firstCellIndex === undefined || cellIndex < firstCellIndex) {
+          firstCellIndex = cellIndex;
+        }
+        if (lastCellIndex === undefined || cellIndex > lastCellIndex) {
+          lastCellIndex = i;
+        }
+      });
+      selectionGrid = selectionGrid.slice(firstRowIndex);
+      let isRectangle = true;
+      for (let i = 0; i < selectionGrid.length; i++) {
+        const row = selectionGrid[i];
+        if (!row) {
+          isRectangle = false;
+          break;
+        } else {
+          for (let j = firstCellIndex; j < row.length; j++) {
+            if (!row[j]) {
+              isRectangle = false;
+              break;
+            }
+          }
+        }
+      }
+      if (isRectangle) {
+        // primary cell must be in a corner for this to happen
+        const [rowId, cellPath] = primaryCellId.split(":");
+        const { i } = entityMap[rowId];
+        const cellIndex = pathToIndex[cellPath];
+        const isTopLeft = i === firstRowIndex && cellIndex === firstCellIndex;
+        const isTopRight = i === firstRowIndex && cellIndex === lastCellIndex;
+        const isBottomLeft = i === lastRowIndex && cellIndex === firstCellIndex;
+        const isBottomRight = i === lastRowIndex && cellIndex === lastCellIndex;
+        if (isTopLeft || isTopRight || isBottomLeft || isBottomRight) {
+          return { selectedPaths };
+        }
+      }
+    }
+    return false;
+  };
+
   renderColumns = () => {
     const {
       isCellEditable,
@@ -2211,6 +2281,9 @@ class DataTable extends React.Component {
                 key={cellId}
                 thisTable={this.table}
                 cellId={cellId}
+                isSelectionARectangleWithPrimaryInCorner={
+                  this.isSelectionARectangleWithPrimaryInCorner
+                }
                 onDragEnd={this.onDragEnd}
               ></CellDragHandle>
             )}
@@ -2224,82 +2297,126 @@ class DataTable extends React.Component {
   };
 
   onDragEnd = cellsToSelect => {
-    const { entities, schema, reduxFormCellValidation, change } = this.props;
-    const cellId = this.getPrimarySelectedCellId();
-    const [rowId, path] = cellId.split(":");
-    const column = schema?.fields?.find(({ path: p }) => p === path);
-
-    const isBool = column.type === "boolean";
-
-    const entityMap = getEntityIdToEntity(entities);
-    const selectedEnt = entityMap[rowId]?.e;
-    let selectedCellVal = get(selectedEnt, path, "");
-    if (isBool) {
-      selectedCellVal = selectedCellVal === "True";
-      selectedCellVal = isTruthy(selectedCellVal);
+    const {
+      entities,
+      schema,
+      reduxFormCellValidation,
+      change,
+      reduxFormSelectedCells
+    } = this.props;
+    const primaryCellId = this.getPrimarySelectedCellId();
+    const [primaryRowId, primaryCellPath] = primaryCellId.split(":");
+    const pathToField = getFieldPathToField(schema);
+    const { selectedPaths } =
+      this.isSelectionARectangleWithPrimaryInCorner() || {};
+    let allSelectedPaths = selectedPaths;
+    if (!allSelectedPaths) {
+      allSelectedPaths = [primaryCellPath];
     }
 
-    const newReduxFormSelectedCells = {
-      [cellId]: PRIMARY_SELECTED_VAL
-    };
-    const newCellValidate = {
-      ...reduxFormCellValidation
-    };
-    let incrementStart;
-    let incrementPrefix;
-    let incrementPad = 0;
-    if (column.type === "string" || column.type === "number") {
-      const cellNumStr = getNumberStrAtEnd(selectedCellVal);
-      const cellNum = Number(cellNumStr);
-      const entityAbovePrimaryCell = entities[entityMap[rowId].i - 1];
+    this.updateEntitiesHelper(entities, entities => {
+      let newReduxFormSelectedCells;
+      if (selectedPaths) {
+        newReduxFormSelectedCells = {
+          ...reduxFormSelectedCells
+        };
+      } else {
+        newReduxFormSelectedCells = {
+          [primaryCellId]: PRIMARY_SELECTED_VAL
+        };
+      }
 
-      if (entityAbovePrimaryCell && !isNaN(cellNum)) {
-        const cellAboveVal = get(entityAbovePrimaryCell, path, "");
-        const cellAboveNumStr = getNumberStrAtEnd(cellAboveVal);
-        const cellAboveNum = Number(cellAboveNumStr);
-        if (!isNaN(cellAboveNum)) {
-          const isIncremental = cellNum - cellAboveNum === 1;
-          if (isIncremental) {
-            const cellTextNoNum = stripNumberAtEnd(selectedCellVal);
-            const sameText = stripNumberAtEnd(cellAboveVal) === cellTextNoNum;
-            if (sameText) {
-              incrementStart = cellNum + 1;
-              incrementPrefix = cellTextNoNum || "";
-              if (cellNumStr.startsWith("0")) {
-                incrementPad = cellNumStr.length;
+      const newCellValidate = {
+        ...reduxFormCellValidation
+      };
+      const entityMap = getEntityIdToEntity(entities);
+      const { e: selectedEnt, i: primaryRowIndex } = entityMap[primaryRowId];
+      let newPrimaryRowIndex = primaryRowIndex;
+      let newPrimaryCellId;
+      allSelectedPaths.forEach(selectedPath => {
+        const column = pathToField[selectedPath];
+        const isBool = column.type === "boolean";
+
+        let selectedCellVal = get(selectedEnt, selectedPath, "");
+        if (isBool) {
+          selectedCellVal = selectedCellVal === "True";
+          selectedCellVal = isTruthy(selectedCellVal);
+        }
+
+        let incrementStart;
+        let incrementPrefix;
+        let incrementPad = 0;
+        if (column.type === "string" || column.type === "number") {
+          const cellNumStr = getNumberStrAtEnd(selectedCellVal);
+          const cellNum = Number(cellNumStr);
+          const entityAbovePrimaryCell =
+            entities[entityMap[primaryRowId].i - 1];
+
+          if (entityAbovePrimaryCell && !isNaN(cellNum)) {
+            const cellAboveVal = get(entityAbovePrimaryCell, selectedPath, "");
+            const cellAboveNumStr = getNumberStrAtEnd(cellAboveVal);
+            const cellAboveNum = Number(cellAboveNumStr);
+            if (!isNaN(cellAboveNum)) {
+              const isIncremental = cellNum - cellAboveNum === 1;
+              if (isIncremental) {
+                const cellTextNoNum = stripNumberAtEnd(selectedCellVal);
+                const sameText =
+                  stripNumberAtEnd(cellAboveVal) === cellTextNoNum;
+                if (sameText) {
+                  incrementStart = cellNum + 1;
+                  incrementPrefix = cellTextNoNum || "";
+                  if (cellNumStr.startsWith("0")) {
+                    incrementPad = cellNumStr.length;
+                  }
+                }
               }
             }
           }
         }
-      }
-    }
-    this.updateEntitiesHelper(entities, entities => {
-      cellsToSelect.forEach(cellId => {
-        newReduxFormSelectedCells[cellId] = true;
-        const [rowId, path] = cellId.split(":");
-        const entityMap = getEntityIdToEntity(entities);
-        const entityToUpdate = entityMap[rowId]?.e;
-        if (entityToUpdate) {
-          let newVal;
-          if (incrementStart !== undefined) {
-            const num = incrementStart++;
-            newVal = incrementPrefix + padStart(num, incrementPad, "0");
-          } else {
-            newVal = selectedCellVal;
+
+        cellsToSelect.forEach(cellId => {
+          const [rowId, cellPath] = cellId.split(":");
+          if (cellPath !== selectedPath) return;
+          newReduxFormSelectedCells[cellId] = true;
+          const entityMap = getEntityIdToEntity(entities);
+          const { e: entityToUpdate, i: eIndex } = entityMap[rowId] || {};
+          if (entityToUpdate) {
+            // if this is the entity at the new bottom/top of the drag in the primary column it should now
+            // be primary. This ensures primary is always at the corner of the rectangle
+            const isNewBottom =
+              eIndex > primaryRowIndex && eIndex > newPrimaryRowIndex;
+            const isNewTop =
+              eIndex < primaryRowIndex && eIndex < newPrimaryRowIndex;
+            if (cellPath === primaryCellPath && (isNewBottom || isNewTop)) {
+              newPrimaryRowIndex = eIndex;
+              newPrimaryCellId = cellId;
+            }
+            let newVal;
+            if (incrementStart !== undefined) {
+              const num = incrementStart++;
+              newVal = incrementPrefix + padStart(num, incrementPad, "0");
+            } else {
+              newVal = selectedCellVal;
+            }
+            const { error } = editCellHelper({
+              entity: entityToUpdate,
+              path: cellPath,
+              schema,
+              newVal
+            });
+            newCellValidate[cellId] = error;
           }
-          const { error } = editCellHelper({
-            entity: entityToUpdate,
-            path,
-            schema,
-            newVal
-          });
-          newCellValidate[cellId] = error;
-        }
+        });
       });
+
+      // select the new cells
+      change("reduxFormCellValidation", newCellValidate);
+      if (newPrimaryCellId) {
+        newReduxFormSelectedCells[primaryCellId] = true;
+        newReduxFormSelectedCells[newPrimaryCellId] = PRIMARY_SELECTED_VAL;
+      }
+      change("reduxFormSelectedCells", newReduxFormSelectedCells);
     });
-    // select the new cells
-    change("reduxFormCellValidation", newCellValidate);
-    change("reduxFormSelectedCells", newReduxFormSelectedCells);
   };
   getCopyTextForCell = (val, row, column) => {
     const { cellRenderer } = computePresets(this.props);
@@ -2975,6 +3092,14 @@ function getFieldPathToIndex(schema) {
     fieldToIndex[f.path] = i;
   });
   return fieldToIndex;
+}
+
+function getFieldPathToField(schema) {
+  const fieldPathToField = {};
+  schema.fields.forEach(f => {
+    fieldPathToField[f.path] = f;
+  });
+  return fieldPathToField;
 }
 
 const defaultParsePaste = str => {

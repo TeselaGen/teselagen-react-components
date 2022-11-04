@@ -1,12 +1,19 @@
+import { flatMap } from "lodash";
 import { forEach } from "lodash";
 import React, { useRef } from "react";
 import ReactDOM from "react-dom";
 
-export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
+export function CellDragHandle({
+  thisTable,
+  onDragEnd,
+  cellId,
+  isSelectionARectangleWithPrimaryInCorner
+}) {
   const xStart = useRef(0);
   const timeoutkey = useRef();
   // const lastUserY = useRef();
   const rowsToSelect = useRef();
+  const rectangleCellPaths = useRef();
 
   const handleDrag = useRef(e => {
     const table = ReactDOM.findDOMNode(thisTable).querySelector(".rt-table");
@@ -40,21 +47,35 @@ export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
       forEach(trs, (tr, index) => {
         let isSelectedForUpdate;
         const rowId = tr.dataset.testId;
+        const changeDashedBorder = (path, on) => {
+          tr.querySelector(`[data-test="tgCell_${path}"]`).parentNode.classList[
+            on ? "add" : "remove"
+          ]("selectedForUpdate");
+        };
         if (isCursorBelow ? index > selectedIndex : index < selectedIndex) {
           const { y, height } = tr.getBoundingClientRect();
           if (isCursorBelow ? y < cursorY : y + height > cursorY) {
             rowsToSelect.current.push(rowId);
             isSelectedForUpdate = true;
             //add dashed borders
-            tr.querySelector(
-              `[data-test="tgCell_${path}"]`
-            ).parentNode.classList.add("selectedForUpdate");
+
+            if (rectangleCellPaths.current) {
+              rectangleCellPaths.current.forEach(path => {
+                changeDashedBorder(path, true);
+              });
+            } else {
+              changeDashedBorder(path, true);
+            }
           }
         }
         if (!isSelectedForUpdate) {
-          tr.querySelector(
-            `[data-test="tgCell_${path}"]`
-          ).parentNode.classList.remove("selectedForUpdate");
+          if (rectangleCellPaths.current) {
+            rectangleCellPaths.current.forEach(path => {
+              changeDashedBorder(path, false);
+            });
+          } else {
+            changeDashedBorder(path, false);
+          }
         }
       });
     }
@@ -68,12 +89,29 @@ export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
     const [, path] = cellId.split(":");
     //remove the dashed borders
     forEach(trs, tr => {
-      const el = tr.querySelector(`[data-test="tgCell_${path}"]`);
-      el.parentNode.classList.remove("selectedForUpdate");
+      if (rectangleCellPaths.current) {
+        rectangleCellPaths.current.forEach(path => {
+          const el = tr.querySelector(`[data-test="tgCell_${path}"]`);
+          el.parentNode.classList.remove("selectedForUpdate");
+        });
+      } else {
+        const el = tr.querySelector(`[data-test="tgCell_${path}"]`);
+        el.parentNode.classList.remove("selectedForUpdate");
+      }
     });
     document.removeEventListener("mousemove", handleDrag.current, false);
     document.removeEventListener("mouseup", mouseup.current, false);
-    onDragEnd(rowsToSelect.current.map(id => `${id}:${path}`));
+    onDragEnd(
+      flatMap(rowsToSelect.current, id => {
+        if (rectangleCellPaths.current) {
+          return rectangleCellPaths.current.map(path => {
+            return `${id}:${path}`;
+          });
+        } else {
+          return `${id}:${path}`;
+        }
+      })
+    );
   });
 
   return (
@@ -81,6 +119,10 @@ export function CellDragHandle({ thisTable, onDragEnd, cellId }) {
       onMouseDown={e => {
         rowsToSelect.current = [];
         xStart.current = e.clientX;
+        const isRect = isSelectionARectangleWithPrimaryInCorner();
+        if (isRect) {
+          rectangleCellPaths.current = isRect.selectedPaths;
+        }
         document.addEventListener("mousemove", handleDrag.current, false);
         document.addEventListener("mouseup", mouseup.current, false);
       }}
