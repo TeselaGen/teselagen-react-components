@@ -30,7 +30,7 @@ describe("EditableCellTable.spec", () => {
     cy.dragBetween(`.cellDragHandle`, `button:contains(Add 10 Rows)`);
     cy.contains("tom137");
   });
-  it.skip(`smart increment + multi column drag should work`, () => {
+  it(`smart increment + multi column drag should work`, () => {
     cy.visit("#/DataTable/EditableCellTable");
     cy.get(`.rt-td:contains(tom89)`).click();
     cy.get(`.rt-tr:contains(tom89) .rt-td:contains(too old)`).click({
@@ -38,7 +38,7 @@ describe("EditableCellTable.spec", () => {
     });
 
     cy.dragBetween(`.cellDragHandle`, `button:contains(Add 10 Rows)`);
-    cy.contains("tom137");
+    cy.get(`.rt-tr:contains(tom137):contains(too old)`);
   });
 
   it(`should be able to edit numeric inputs correctly`, () => {
@@ -60,11 +60,11 @@ describe("EditableCellTable.spec", () => {
     cy.get(`.rt-td:contains(tasty55)`).dblclick();
     cy.focused().type("{selectall}delishhh{enter}");
     cy.get(`.rt-td:contains(delishhh)`);
-    cy.focused().type("{cmd}z");
-    cy.focused().type("{cmd}z");
+    cy.focused().type("{meta}z");
+    cy.focused().type("{meta}z");
     cy.get(`.rt-td:contains(tom88)`);
-    cy.focused().type("{cmd}{shift}z");
-    cy.focused().type("{cmd}{shift}z");
+    cy.focused().type("{meta}{shift}z");
+    cy.focused().type("{meta}{shift}z");
     cy.get(`.rt-td:contains(delishhh)`);
   });
   it(`deleting should work, default val should get reapplied`, () => {
