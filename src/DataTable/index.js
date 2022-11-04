@@ -1998,7 +1998,7 @@ class DataTable extends React.Component {
           lastRowIndex = i;
         }
         if (!selectionGrid[i]) selectionGrid[i] = [];
-        selectionGrid[i][cellIndex] = true;
+        selectionGrid[i][cellIndex] = { cellId: key, rowIndex: i, cellIndex };
         if (firstCellIndex === undefined || cellIndex < firstCellIndex) {
           firstCellIndex = cellIndex;
         }
@@ -2023,6 +2023,10 @@ class DataTable extends React.Component {
         }
       }
       if (isRectangle) {
+        selectionGrid.forEach(row => {
+          // remove undefineds from start of row
+          while (row[0] === undefined && row.length) row.shift();
+        });
         // primary cell must be in a corner for this to happen
         const [rowId, cellPath] = primaryCellId.split(":");
         const { i } = entityMap[rowId];
@@ -2032,7 +2036,7 @@ class DataTable extends React.Component {
         const isBottomLeft = i === lastRowIndex && cellIndex === firstCellIndex;
         const isBottomRight = i === lastRowIndex && cellIndex === lastCellIndex;
         if (isTopLeft || isTopRight || isBottomLeft || isBottomRight) {
-          return { selectedPaths };
+          return { selectedPaths, selectionGrid };
         }
       }
     }
@@ -2307,7 +2311,7 @@ class DataTable extends React.Component {
     const primaryCellId = this.getPrimarySelectedCellId();
     const [primaryRowId, primaryCellPath] = primaryCellId.split(":");
     const pathToField = getFieldPathToField(schema);
-    const { selectedPaths } =
+    const { selectedPaths, selectionGrid } =
       this.isSelectionARectangleWithPrimaryInCorner() || {};
     let allSelectedPaths = selectedPaths;
     if (!allSelectedPaths) {
@@ -2333,15 +2337,11 @@ class DataTable extends React.Component {
       const { e: selectedEnt, i: primaryRowIndex } = entityMap[primaryRowId];
       let newPrimaryRowIndex = primaryRowIndex;
       let newPrimaryCellId;
+
       allSelectedPaths.forEach(selectedPath => {
         const column = pathToField[selectedPath];
-        const isBool = column.type === "boolean";
 
-        let selectedCellVal = get(selectedEnt, selectedPath, "");
-        if (isBool) {
-          selectedCellVal = selectedCellVal === "True";
-          selectedCellVal = isTruthy(selectedCellVal);
-        }
+        const selectedCellVal = getCellVal(selectedEnt, selectedPath, column);
 
         let incrementStart;
         let incrementPrefix;
@@ -2374,21 +2374,22 @@ class DataTable extends React.Component {
           }
         }
 
+        const pathToIndex = getFieldPathToIndex(schema);
+
         cellsToSelect.forEach(cellId => {
           const [rowId, cellPath] = cellId.split(":");
           if (cellPath !== selectedPath) return;
           newReduxFormSelectedCells[cellId] = true;
-          const entityMap = getEntityIdToEntity(entities);
-          const { e: entityToUpdate, i: eIndex } = entityMap[rowId] || {};
+          const { e: entityToUpdate, i: rowIndex } = entityMap[rowId] || {};
           if (entityToUpdate) {
             // if this is the entity at the new bottom/top of the drag in the primary column it should now
             // be primary. This ensures primary is always at the corner of the rectangle
             const isNewBottom =
-              eIndex > primaryRowIndex && eIndex > newPrimaryRowIndex;
+              rowIndex > primaryRowIndex && rowIndex > newPrimaryRowIndex;
             const isNewTop =
-              eIndex < primaryRowIndex && eIndex < newPrimaryRowIndex;
+              rowIndex < primaryRowIndex && rowIndex < newPrimaryRowIndex;
             if (cellPath === primaryCellPath && (isNewBottom || isNewTop)) {
-              newPrimaryRowIndex = eIndex;
+              newPrimaryRowIndex = rowIndex;
               newPrimaryCellId = cellId;
             }
             let newVal;
@@ -2396,7 +2397,37 @@ class DataTable extends React.Component {
               const num = incrementStart++;
               newVal = incrementPrefix + padStart(num, incrementPad, "0");
             } else {
-              newVal = selectedCellVal;
+              if (selectionGrid && selectionGrid.length > 1) {
+                // if there are multiple cells selected then we want to copy them repeating
+                // ex: if we have 1,2,3 selected and we drag for 5 more rows we want it to
+                // be 1,2,3,1,2 for the new row cells in this column
+                const draggingDown = rowIndex > selectionGrid[0][0].rowIndex;
+                const cellIndex = pathToIndex[cellPath];
+                let cellIdToCopy;
+                if (draggingDown) {
+                  const firstIndexInGrid = selectionGrid[0][0].rowIndex;
+                  const { cellId } = selectionGrid[
+                    (rowIndex - firstIndexInGrid) % selectionGrid.length
+                  ].find(g => g.cellIndex === cellIndex);
+                  cellIdToCopy = cellId;
+                } else {
+                  const lastIndexInGrid =
+                    selectionGrid[selectionGrid.length - 1][0].rowIndex;
+                  const { cellId } = selectionGrid[
+                    (rowIndex + lastIndexInGrid + 1) % selectionGrid.length
+                  ].find(g => g.cellIndex === cellIndex);
+                  cellIdToCopy = cellId;
+                }
+
+                const [rowIdToCopy, cellPathToCopy] = cellIdToCopy.split(":");
+                newVal = getCellVal(
+                  entityMap[rowIdToCopy].e,
+                  cellPathToCopy,
+                  pathToField[cellPathToCopy]
+                );
+              } else {
+                newVal = selectedCellVal;
+              }
             }
             const { error } = editCellHelper({
               entity: entityToUpdate,
@@ -3129,3 +3160,13 @@ function getNumberStrAtEnd(str) {
 function stripNumberAtEnd(str) {
   return str.replace(getNumberStrAtEnd(str), "");
 }
+
+const getCellVal = (ent, path, col) => {
+  const isBool = col.type === "boolean";
+  let selectedCellVal = get(ent, path, "");
+  if (isBool) {
+    selectedCellVal = selectedCellVal === "True";
+    selectedCellVal = isTruthy(selectedCellVal);
+  }
+  return selectedCellVal;
+};
