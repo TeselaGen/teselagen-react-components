@@ -2003,7 +2003,7 @@ class DataTable extends React.Component {
           firstCellIndex = cellIndex;
         }
         if (lastCellIndex === undefined || cellIndex > lastCellIndex) {
-          lastCellIndex = i;
+          lastCellIndex = cellIndex;
         }
       });
       selectionGrid = selectionGrid.slice(firstRowIndex);
