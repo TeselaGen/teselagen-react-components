@@ -57,10 +57,19 @@ const chance = new Chance();
 function getEnts(num) {
   return times(num).map(i => {
     return {
-      name: "Tom" + (88 + i) + (i % 5 !== 0 ? " a" : ""),
+      name:
+        i < 20
+          ? "Tom" + (88 + i) + (i % 5 !== 0 ? " a" : "")
+          : i < 25
+          ? "Nancy" + (88 + i)
+          : chance.name(),
       id: nanoid(),
       type:
-        i === 0 ? "fail" : i === 1 ? "too old" : chance.pickone(["new", "old"]),
+        i === 0
+          ? "fail"
+          : i === 1 || i === 22
+          ? "too old"
+          : chance.pickone(["new", "old"]),
       howMany:
         i === 0 ? "fail" : i === 1 ? "15" : chance.pickone(["3", 40, 2, 5]),
       isProtein: true,

@@ -26,19 +26,19 @@ describe("EditableCellTable.spec", () => {
   });
   it(`smart increment should work`, () => {
     cy.visit("#/DataTable/EditableCellTable");
-    cy.get(`.rt-td:contains(tom89)`).click();
+    cy.get(`.rt-td:contains(nancy110)`).click();
     cy.dragBetween(`.cellDragHandle`, `button:contains(Add 10 Rows)`);
-    cy.contains("tom137");
+    cy.contains("nancy137");
   });
   it(`smart increment + multi column drag should work`, () => {
     cy.visit("#/DataTable/EditableCellTable");
-    cy.get(`.rt-td:contains(tom89)`).click();
-    cy.get(`.rt-tr:contains(tom89) .rt-td:contains(too old)`).click({
+    cy.get(`.rt-td:contains(nancy110)`).click();
+    cy.get(`.rt-tr:contains(nancy110) .rt-td:contains(too old)`).click({
       shiftKey: true
     });
 
     cy.dragBetween(`.cellDragHandle`, `button:contains(Add 10 Rows)`);
-    cy.get(`.rt-tr:contains(tom137):contains(too old)`);
+    cy.get(`.rt-tr:contains(nancy137):contains(too old)`);
   });
 
   it(`drag should be repeating down`, () => {
