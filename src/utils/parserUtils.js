@@ -204,7 +204,7 @@ export async function parseCsvOrExcelFile(
     if (csvFile.error) {
       throw new Error(csvFile.error);
     }
-  } else {
+  } else if (excelFile) {
     throw new Error("Excel Parser not initialized on the window");
   }
   const parsedCsv = await parseCsvFile(csvFile, csvParserOptions);
