@@ -378,10 +378,20 @@ class DataTable extends React.Component {
   };
 
   componentDidMount() {
-    this.props.isCellEditable && this.formatAndValidateTableInitial();
+    const {
+      isCellEditable,
+      entities = [],
+      isLoading,
+      showForcedHiddenColumns,
+      setShowForcedHidden
+    } = this.props;
+    isCellEditable && this.formatAndValidateTableInitial();
     this.updateFromProps({}, computePresets(this.props));
     document.addEventListener("paste", this.handlePaste);
 
+    if (!entities.length && !isLoading && !showForcedHiddenColumns) {
+      setShowForcedHidden(true);
+    }
     // const table = ReactDOM.findDOMNode(this.table);
     // let theads = table.getElementsByClassName("rt-thead");
     // let tbody = table.getElementsByClassName("rt-tbody")[0];
