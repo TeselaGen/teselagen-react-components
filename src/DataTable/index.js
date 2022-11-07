@@ -72,6 +72,7 @@ import dataTableEnhancer from "./dataTableEnhancer";
 import defaultProps from "./defaultProps";
 
 import "../toastr";
+import "@teselagen/react-table/react-table.css";
 import "./style.css";
 import { getRecordsFromIdMap } from "./utils/withSelectedEntities";
 import { CellDragHandle } from "./CellDragHandle";
