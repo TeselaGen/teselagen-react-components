@@ -2187,6 +2187,22 @@ class DataTable extends React.Component {
         tableColumn.Cell = props => {
           return props.value ? dayjs(props.value).format("lll") : "";
         };
+      } else if (column.type === "color") {
+        tableColumn.Cell = props => {
+          return props.value ? (
+            <div
+              style={{
+                height: 20,
+                width: 40,
+                background: props.value,
+                border: "1px solid #182026",
+                borderRadius: 5
+              }}
+            />
+          ) : (
+            ""
+          );
+        };
       } else if (column.type === "boolean") {
         tableColumn.Cell = props => (props.value ? "True" : "False");
       } else if (column.type === "markdown") {
@@ -2738,11 +2754,18 @@ class DataTable extends React.Component {
       type,
       path
     } = column;
-    const disableSorting =
-      sortDisabled ||
-      (!isLocalCall && typeof path === "string" && path.includes("."));
     const columnDataType = column.type;
     const isActionColumn = columnDataType === "action";
+    const disableSorting =
+      sortDisabled ||
+      isActionColumn ||
+      (!isLocalCall && typeof path === "string" && path.includes(".")) ||
+      columnDataType === "color";
+    const disableFiltering =
+      filterDisabled ||
+      columnDataType === "color" ||
+      isActionColumn ||
+      columnFilterDisabled;
     const ccDisplayName = camelCase(displayName || path);
     let columnTitle = displayName || startCase(path);
     if (isActionColumn) columnTitle = "";
@@ -2772,7 +2795,7 @@ class DataTable extends React.Component {
     const sortDown = ordering && ordering === "asc";
     const sortUp = ordering && !sortDown;
     const sortComponent =
-      withSort && !disableSorting && !isActionColumn ? (
+      withSort && !disableSorting ? (
         <div className="tg-sort-arrow-container">
           <Icon
             data-tip="Sort Z-A (Hold shift to sort multiple columns)"
@@ -2803,10 +2826,7 @@ class DataTable extends React.Component {
     const FilterMenu = column.FilterMenu || FilterAndSortMenu;
 
     const filterMenu =
-      withFilter &&
-      !isActionColumn &&
-      !filterDisabled &&
-      !columnFilterDisabled ? (
+      withFilter && !disableFiltering ? (
         <ColumnFilterMenu
           FilterMenu={FilterMenu}
           filterActiveForColumn={filterActiveForColumn}

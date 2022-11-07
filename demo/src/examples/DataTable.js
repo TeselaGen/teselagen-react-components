@@ -62,12 +62,18 @@ const schema = {
         </span>
       )
     },
+
     { path: "createdAt", type: "timestamp", displayName: "Date Created" },
     { path: "updatedAt", type: "timestamp", displayName: "Last Edited" },
     {
       type: "lookup",
       displayName: "User Status",
       path: "user.status.name"
+    },
+    {
+      path: "color",
+      type: "color",
+      displayName: "Color"
     },
     { path: "createdAt", type: "timestamp", displayName: "Date Created" },
     { path: "updatedAt", type: "timestamp", displayName: "Last Edited" },
@@ -260,6 +266,7 @@ const generateFakeRows = num => {
       id: index,
       notDisplayedField: chance.name(),
       name: chance.name(),
+      color: chance.color(),
       hungerLevel: chance.integer(),
       isShared: chance.pickone([true, false]),
       user: {

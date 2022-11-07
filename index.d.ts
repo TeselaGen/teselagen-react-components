@@ -11,7 +11,7 @@ interface schemaField {
   displayName?: string;
   path?: string;
   width?: number;
-  type?: "string" | "number" | "integer" | "boolean" | "timestamp" | "lookup" | "action" | "markdown";
+  type?: "string" | "number" | "integer" | "boolean" | "timestamp" | "lookup" | "action" | "markdown" | "color";
   filterDisabled?: boolean;
   sortDisabled?: boolean;
   /**
