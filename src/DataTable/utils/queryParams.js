@@ -89,8 +89,19 @@ function orderEntitiesLocal(orderArray, entities, schema, ownProps) {
         );
       }
       const { path, getValueToFilterOn, sortFn } = field;
+      if (field.type === "timestamp") {
+        //with the timestamp logic below, make sure empty dates always end up on the bottom of the stack
+        ascOrDescArray.push("desc");
+      }
       ascOrDescArray.push(ccDisplayName === order ? "asc" : "desc");
       //push the actual sorting function
+      if (field.type === "timestamp") {
+        //with the timestamp logic above, make sure empty dates always end up on the bottom of the stack
+        orderFuncs.push(r => {
+          const val = get(r, path);
+          return !!val;
+        });
+      }
       if (path && endsWith(path.toLowerCase(), "id")) {
         orderFuncs.push(o => {
           return parseInt(get(o, path), 10);
