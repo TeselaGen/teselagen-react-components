@@ -231,6 +231,7 @@ class TgSelect extends React.Component {
       onBlur,
       disabled,
       popoverProps,
+      additionalRightEl,
       resetOnSelect = true,
       ...rest
     } = this.props;
@@ -243,6 +244,7 @@ class TgSelect extends React.Component {
       <Button loading minimal />
     ) : (
       <span>
+        {additionalRightEl}
         {hasValue && !disallowClear && !disabled && (
           <Button
             className="tg-select-clear-all"
