@@ -14,6 +14,11 @@ export default function EllipsizedTextAutoTooltip() {
 
         <code>{`<Button data-tip="I'm a tooltip">`}</code>
         <Button data-tip="I'm a tooltip">Hover me!</Button>
+        <Button
+          data-tip={`<strong>Bolded content</strong> <br></br><br></br><br></br> more content`}
+        >
+          Custom Html
+        </Button>
         <Button text="Open Dialog" onClick={() => setOpen(true)} />
         {isOpen && (
           <MyDialog

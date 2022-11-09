@@ -20,7 +20,8 @@ let tippys = [];
 
         el.classList.add(id);
         const inst = tippy(`.${id}`, {
-          content
+          content,
+          allowHTML: true
         });
         inst.forEach(i => {
           i.show();

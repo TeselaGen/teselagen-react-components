@@ -2897,7 +2897,9 @@ class DataTable extends React.Component {
             title={columnTitle}
             className="tg-react-table-name"
             {...(description && {
-              "data-tip": description
+              "data-tip": `<div>
+              <strong>${columnTitle}:</strong> <br>
+              ${description}</div>`
             })}
             style={{ display: "inline-block" }}
           >
