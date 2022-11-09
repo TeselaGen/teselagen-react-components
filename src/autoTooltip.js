@@ -13,7 +13,6 @@ let tippys = [];
       const id = "tippyEllipsizedEl";
       let innerRun = false;
       const inner = (content, el) => {
-        if (!content || content?.trim?.().length === 0) return;
         innerRun = true;
         document.querySelectorAll(`.${id}`).forEach(elem => {
           elem.classList.remove(id);
@@ -48,10 +47,10 @@ let tippys = [];
           continue;
         } else if (
           isEllipsized &&
-          index === 0 &&
-          el.offsetWidth < el.scrollWidth &&
+          el.offsetWidth < el.scrollWidth - 4 && //the -4 is adding a teeny bit of tolerance to fix issues with the column headers getting tooltips even when fully visible
+          !el.classList.contains("no-data-tip") &&
           el.textContent &&
-          !el.classList.contains("no-data-tip")
+          el.textContent?.trim?.().length !== 0
         ) {
           inner(el.textContent, el);
           continue;

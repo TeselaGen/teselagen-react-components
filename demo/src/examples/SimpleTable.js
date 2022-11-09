@@ -18,6 +18,7 @@ const schema = {
     },
     {
       path: "bool and i have a very long title header",
+      description: "I am the description for the long bool column",
       type: "boolean"
     },
     "type",
