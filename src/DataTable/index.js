@@ -2901,7 +2901,8 @@ class DataTable extends React.Component {
               <strong>${columnTitle}:</strong> <br>
               ${description}</div>`
             })}
-            style={{ display: "inline-block" }}
+            style={{ display: "flex" }}
+            // style={{ display: "inline-block" }}
           >
             {maybeCheckbox}
             {renderTitleInner ? renderTitleInner : columnTitle}{" "}
