@@ -13,6 +13,7 @@ let tippys = [];
       const id = "tippyEllipsizedEl";
       let innerRun = false;
       const inner = (content, el) => {
+        if (!content || content?.trim?.().length === 0) return;
         innerRun = true;
         document.querySelectorAll(`.${id}`).forEach(elem => {
           elem.classList.remove(id);
@@ -39,17 +40,23 @@ let tippys = [];
         const whiteSpace = style.getPropertyValue("white-space");
         const textOverflow = style.getPropertyValue("text-overflow");
         dataTip = el.getAttribute("data-tip");
+        const isEllipsized =
+          whiteSpace === "nowrap" && textOverflow === "ellipsis";
+
         if (dataTip) {
           inner(dataTip, el);
           continue;
         } else if (
-          whiteSpace === "nowrap" &&
-          textOverflow === "ellipsis" &&
+          isEllipsized &&
+          index === 0 &&
           el.offsetWidth < el.scrollWidth &&
+          el.textContent &&
           !el.classList.contains("no-data-tip")
         ) {
           inner(el.textContent, el);
           continue;
+        } else if (isEllipsized && el.offsetWidth >= el.scrollWidth) {
+          break;
         }
         el = el.parentElement;
       }

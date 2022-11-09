@@ -8,13 +8,17 @@ import { useToggle } from "../useToggle";
 const schema = {
   fields: [
     { path: "url", type: "markdown" },
-    { path: "name" },
+    { path: "name", description: "I am the description for the name column" },
     {
       path: "id",
       type: "action",
       render: () => {
         return <Button minimal icon="circle" />;
       }
+    },
+    {
+      path: "bool and i have a very long title header",
+      type: "boolean"
     },
     "type",
     "weather",
@@ -30,21 +34,24 @@ const entities = [
     name: "Thomas",
     id: "1",
     type: "new",
-    weather: "cloudy"
+    weather: "cloudy",
+    bool: false
   },
   {
     url: "https://froogle.com",
     name: "Taoh",
     id: "2",
     type: "old",
-    weather: "cloudy"
+    weather: "cloudy",
+    bool: true
   },
   {
     url: "https://google.com",
     name: "Chris",
     id: "3",
     type: "new",
-    weather: "rainy"
+    weather: "rainy",
+    bool: false
   },
   {
     url: `*I'm some markdown* 
@@ -52,28 +59,32 @@ const entities = [
     name: "Sam",
     id: "4",
     type: "old",
-    weather: "cloudy"
+    weather: "cloudy",
+    bool: true
   },
   {
     url: "**more markdown**",
-    name: "Adam",
+    name: "Adam with a really loooooonnnngggg last name",
     id: "5",
     type: "new",
-    weather: "cloudy"
+    weather: "cloudy",
+    bool: false
   },
   {
     url: "# https://google.com",
     name: "Kyle",
     id: "6",
     type: "old",
-    weather: "cloudy"
+    weather: "cloudy",
+    bool: true
   },
   {
     url: "https://google.com",
     name: "Tiff",
     id: "7",
     type: "new",
-    weather: "cloudy"
+    weather: "cloudy",
+    bool: false
   }
 ];
 

@@ -2204,7 +2204,14 @@ class DataTable extends React.Component {
           );
         };
       } else if (column.type === "boolean") {
-        tableColumn.Cell = props => (props.value ? "True" : "False");
+        tableColumn.Cell = props => (
+          <Icon
+            className={classNames({
+              [Classes.TEXT_MUTED]: !props.value
+            })}
+            icon={props.value ? "tick" : "cross"}
+          />
+        );
       } else if (column.type === "markdown") {
         tableColumn.Cell = props => (
           <ReactMarkdown>{props.value}</ReactMarkdown>
@@ -2744,6 +2751,7 @@ class DataTable extends React.Component {
     } = computePresets(this.props);
     const {
       displayName,
+      description,
       sortDisabled,
       filterDisabled,
       columnFilterDisabled,
@@ -2888,7 +2896,10 @@ class DataTable extends React.Component {
           <span
             title={columnTitle}
             className="tg-react-table-name"
-            style={{ display: "flex" }}
+            {...(description && {
+              "data-tip": description
+            })}
+            style={{ display: "inline-block" }}
           >
             {maybeCheckbox}
             {renderTitleInner ? renderTitleInner : columnTitle}{" "}

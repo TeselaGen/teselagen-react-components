@@ -11,6 +11,10 @@ interface schemaField {
   displayName?: string;
   path?: string;
   width?: number;
+  /**
+   * this will display as a tooltip on column header hover
+   */
+  description?: string;
   type?: "string" | "number" | "integer" | "boolean" | "timestamp" | "lookup" | "action" | "markdown" | "color";
   filterDisabled?: boolean;
   sortDisabled?: boolean;
