@@ -2871,7 +2871,7 @@ class DataTable extends React.Component {
       });
       maybeCheckbox = (
         <Checkbox
-          style={{ marginBottom: 0 }}
+          style={{ marginBottom: 0, marginLeft: 3 }}
           onChange={() => {
             this.updateEntitiesHelper(entities, ents => {
               ents.forEach(e => {
@@ -2893,20 +2893,21 @@ class DataTable extends React.Component {
         })}
       >
         {(displayName || startCase(path)) && !noTitle && (
-          <span
-            title={columnTitle}
-            className="tg-react-table-name"
-            {...(description && {
-              "data-tip": `<div>
-              <strong>${columnTitle}:</strong> <br>
-              ${description}</div>`
-            })}
-            style={{ display: "flex" }}
-            // style={{ display: "inline-block" }}
-          >
+          <React.Fragment>
             {maybeCheckbox}
-            {renderTitleInner ? renderTitleInner : columnTitle}{" "}
-          </span>
+            <span
+              title={columnTitle}
+              className="tg-react-table-name"
+              {...(description && {
+                "data-tip": `<div>
+                    <strong>${columnTitle}:</strong> <br>
+                    ${description}</div>`
+              })}
+              style={{ display: "inline-block" }}
+            >
+              {renderTitleInner ? renderTitleInner : columnTitle}{" "}
+            </span>
+          </React.Fragment>
         )}
         <div
           style={{ display: "flex", marginLeft: "auto", alignItems: "center" }}
