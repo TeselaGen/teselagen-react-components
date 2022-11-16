@@ -297,6 +297,15 @@ function Uploader({
                         userSchema,
                         searchResults
                       });
+                    } else {
+                      const newFile = new File(
+                        [papaparse.unparse(userSchema.userData)],
+                        file.name
+                      );
+                      const newFileName = removeExt(file.name) + `.csv`;
+                      file.name = newFileName;
+                      file.originFileObj = newFile;
+                      file.originalFileObj = newFile;
                     }
                   }
                 }

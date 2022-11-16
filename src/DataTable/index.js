@@ -3138,17 +3138,23 @@ const defaultFormatters = {
   boolean: newVal => {
     return isTruthy(newVal);
   },
-  // dropdown: (newVal, field) => {
-  //   return { newVal };
-  // },
+  dropdown: (newVal, field) => {
+    const valsMap = {};
+    field.values.forEach(v => {
+      valsMap[v.toLowerCase().trim()] = v;
+    });
+    return valsMap[newVal.toLowerCase().trim()] || newVal;
+  },
   numeric: newVal => {
     return toNumber(newVal);
   }
 };
 const defaultValidators = {
   dropdown: (newVal, field) => {
+    const err = "Please choose one of the accepted values";
+    if (!newVal) return err;
     if (!field.values.includes(newVal)) {
-      return "Please choose one of the accepted values";
+      return err;
     }
   },
   numeric: newVal => {

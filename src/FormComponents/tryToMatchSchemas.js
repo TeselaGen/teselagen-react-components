@@ -31,7 +31,7 @@ export default function tryToMatchSchemas({
   });
 
   if (!csvValidationIssue) {
-    return { csvValidationIssue };
+    return { userSchema, csvValidationIssue };
   }
 
   const incomingHeadersToScores = {};

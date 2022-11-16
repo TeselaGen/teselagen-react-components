@@ -56,7 +56,7 @@ let tippys = [];
           inner(el.textContent, el);
           continue;
         } else if (isEllipsized && el.offsetWidth >= el.scrollWidth) {
-          break;
+          // break; //tnr: i don't think we need this..
         }
         el = el.parentElement;
       }
