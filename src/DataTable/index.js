@@ -3143,7 +3143,7 @@ const defaultFormatters = {
     field.values.forEach(v => {
       valsMap[v.toLowerCase().trim()] = v;
     });
-    return valsMap[newVal.toLowerCase().trim()] || newVal;
+    return valsMap[newVal?.toLowerCase().trim()] || newVal;
   },
   numeric: newVal => {
     return toNumber(newVal);
