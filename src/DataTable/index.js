@@ -454,6 +454,12 @@ class DataTable extends React.Component {
     // re-index entities in redux form so that sorting will be correct in withSelectedEntities
     if (entitiesHaveChanged) {
       changeSelectedEntities({ idMap, entities, change });
+    } else if (
+      !isEmpty(idMap) &&
+      idMap[Object.keys(idMap)[0]].rowIndex === undefined
+    ) {
+      // if programmatically selected will still want the order to match the table sorting.
+      changeSelectedEntities({ idMap, entities, change });
     }
 
     // comment in to test what is causing re-render
