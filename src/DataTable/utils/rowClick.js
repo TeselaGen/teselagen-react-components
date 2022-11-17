@@ -101,10 +101,29 @@ export default function rowClick(e, rowInfo, entities, props) {
     }
   }
 
-  finalizeSelection({ idMap: newIdMap, props });
+  finalizeSelection({ idMap: newIdMap, entities, props });
 }
 
-export function finalizeSelection({ idMap, props }) {
+export function changeSelectedEntities({ idMap, entities = [], change }) {
+  const newIdMap = { ...idMap };
+  const entityIdToIndex = {};
+  entities.forEach((e, i) => {
+    entityIdToIndex[getIdOrCodeOrIndex(e, 0)] = i;
+  });
+  // we want to store the index of the entity so that it can be used to preserve order in selection
+  Object.keys(newIdMap).forEach(key => {
+    const rowIndex =
+      entityIdToIndex[getIdOrCodeOrIndex(newIdMap[key].entity, 0)];
+    newIdMap[key] = {
+      ...newIdMap[key],
+      rowIndex: rowIndex === undefined ? 10000000 : rowIndex
+    };
+  });
+
+  change("reduxFormSelectedEntityIdMap", newIdMap);
+}
+
+export function finalizeSelection({ idMap, entities, props }) {
   const {
     onDeselect,
     onSingleRowSelect,
@@ -123,7 +142,8 @@ export function finalizeSelection({ idMap, props }) {
   ) {
     return;
   }
-  change("reduxFormSelectedEntityIdMap", idMap);
+
+  changeSelectedEntities({ idMap, entities, change });
   const selectedRecords = getRecordsFromIdMap(idMap);
   onRowSelect(selectedRecords);
 

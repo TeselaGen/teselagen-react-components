@@ -50,11 +50,13 @@ export function getRecordsFromIdMap(idMap = {}) {
   return reduce(
     idMap,
     (acc, item) => {
-      if (item && item.entity) acc.push(item.entity);
+      if (item && item.entity) acc.push(item);
       return acc;
     },
     []
-  );
+  )
+    .sort((a, b) => a.rowIndex - b.rowIndex)
+    .map(item => item.entity);
 }
 
 export function getSelectedEntities(storeOrState, formName) {

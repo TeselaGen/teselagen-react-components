@@ -59,7 +59,10 @@ import { withHotkeys } from "../utils/hotkeyUtils";
 import InfoHelper from "../InfoHelper";
 import getTextFromEl from "../utils/getTextFromEl";
 import { getSelectedRowsFromEntities } from "./utils/selection";
-import rowClick, { finalizeSelection } from "./utils/rowClick";
+import rowClick, {
+  changeSelectedEntities,
+  finalizeSelection
+} from "./utils/rowClick";
 import PagingTool from "./PagingTool";
 import FilterAndSortMenu from "./FilterAndSortMenu";
 import getIdOrCodeOrIndex from "./utils/getIdOrCodeOrIndex";
@@ -319,7 +322,7 @@ class DataTable extends React.Component {
         return acc;
       }, {});
     change("reduxFormExpandedEntityIdMap", newIdMap);
-    finalizeSelection({ idMap: newIdMap, props: newProps });
+    finalizeSelection({ idMap: newIdMap, entities, props: newProps });
     const idToScrollTo = idArray[0];
     if (!idToScrollTo && idToScrollTo !== 0) return;
     const entityIndexToScrollTo = entities.findIndex(
@@ -431,18 +434,26 @@ class DataTable extends React.Component {
     //   }
     // }
 
+    const {
+      entities = [],
+      reduxFormSelectedEntityIdMap: idMap,
+      change
+    } = this.props;
+    const { entities: oldEntities = [] } = oldProps;
+    const reloaded = oldProps.isLoading && !this.props.isLoading;
+    const entitiesHaveChanged =
+      oldEntities.length !== entities.length ||
+      getIdOrCodeOrIndex(entities[0] || {}) !==
+        getIdOrCodeOrIndex(oldEntities[0] || {});
     // if switching pages or searching the table we want to reset the scrollbar
     if (tableScrollElement.scrollTop > 0 && !this.props.isCellEditable) {
-      const { entities = [] } = this.props;
-      const { entities: oldEntities = [] } = oldProps;
-      const reloaded = oldProps.isLoading && !this.props.isLoading;
-      const entitiesHaveChanged =
-        oldEntities.length !== entities.length ||
-        getIdOrCodeOrIndex(entities[0] || {}) !==
-          getIdOrCodeOrIndex(oldEntities[0] || {});
       if (reloaded || entitiesHaveChanged) {
         tableScrollElement.scrollTop = 0;
       }
+    }
+    // re-index entities in redux form so that sorting will be correct in withSelectedEntities
+    if (entitiesHaveChanged) {
+      changeSelectedEntities({ idMap, entities, change });
     }
 
     // comment in to test what is causing re-render
@@ -524,6 +535,7 @@ class DataTable extends React.Component {
 
     finalizeSelection({
       idMap: newIdMap,
+      entities,
       props
     });
   };
@@ -709,6 +721,7 @@ class DataTable extends React.Component {
       });
       finalizeSelection({
         idMap: newIdMap,
+        entities,
         props: computePresets(this.props)
       });
     }
@@ -1016,6 +1029,7 @@ class DataTable extends React.Component {
     });
     finalizeSelection({
       idMap: newIdMap,
+      entities,
       props: propPresets
     });
   };
@@ -1449,6 +1463,7 @@ class DataTable extends React.Component {
                 onClick={() => {
                   finalizeSelection({
                     idMap: {},
+                    entities,
                     props: computePresets(this.props)
                   });
                 }}
@@ -1647,6 +1662,7 @@ class DataTable extends React.Component {
 
           finalizeSelection({
             idMap: newIdMap,
+            entities,
             props: computePresets(this.props)
           });
         }
@@ -1897,6 +1913,7 @@ class DataTable extends React.Component {
 
           finalizeSelection({
             idMap: newIdMap,
+            entities,
             props: computePresets(this.props)
           });
         }}
