@@ -134,6 +134,24 @@ describe("dataTable.spec", () => {
       .eq(3) //get the third cell just for kicks
       .should("exist");
   });
+  it(`it can select all and then deselect all`, () => {
+    cy.visit("#/DataTable");
+    cy.get(
+      `[data-index="1"] .tg-react-table-checkbox-cell-container input`
+    ).should("not.be.checked");
+    cy.get(`.tg-react-table-checkbox-header-container input`).click({
+      force: true
+    });
+    cy.get(
+      `[data-index="1"] .tg-react-table-checkbox-cell-container input`
+    ).should("be.checked");
+    cy.get(`.tg-react-table-checkbox-header-container input`).click({
+      force: true
+    });
+    cy.get(
+      `[data-index="1"] .tg-react-table-checkbox-cell-container input`
+    ).should("not.be.checked");
+  });
 
   it("can use paging input to change pages", () => {
     cy.visit("#/DataTable");
