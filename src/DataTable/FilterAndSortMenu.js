@@ -15,6 +15,7 @@ import dayjs from "dayjs";
 import getDayjsFormatter from "../utils/getDayjsFormatter";
 import { onEnterHelper } from "../utils/handlerHelpers";
 import DialogFooter from "../DialogFooter";
+import "@teselagen/react-table/react-table.css";
 import "./style.css";
 import "../toastr";
 
