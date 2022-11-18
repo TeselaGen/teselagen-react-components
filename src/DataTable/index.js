@@ -461,6 +461,7 @@ class DataTable extends React.Component {
         changeSelectedEntities({ idMap, entities, change });
       } else if (
         !isEmpty(idMap) &&
+        idMap[Object.keys(idMap)[0]] &&
         idMap[Object.keys(idMap)[0]].rowIndex === undefined
       ) {
         // if programmatically selected will still want the order to match the table sorting.
@@ -1917,7 +1918,7 @@ class DataTable extends React.Component {
             if (isEntityDisabled(entity)) return;
             const entityId = getIdOrCodeOrIndex(entity, i);
             if (checkboxProps.checked) {
-              newIdMap[entityId] = false;
+              delete newIdMap[entityId];
             } else {
               newIdMap[entityId] = { entity };
             }

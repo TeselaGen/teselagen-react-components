@@ -112,6 +112,7 @@ export function changeSelectedEntities({ idMap, entities = [], change }) {
   });
   // we want to store the index of the entity so that it can be used to preserve order in selection
   Object.keys(newIdMap).forEach(key => {
+    if (!newIdMap[key]) return;
     const rowIndex =
       entityIdToIndex[getIdOrCodeOrIndex(newIdMap[key].entity, 0)];
     newIdMap[key] = {
