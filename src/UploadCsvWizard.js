@@ -285,6 +285,7 @@ const UploadCsvWizardDialog = compose(
 export default UploadCsvWizardDialog;
 
 export const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
+  formName,
   matchedHeaders,
   headerMessage,
   onlyShowRowsWErrors,
@@ -340,7 +341,7 @@ export const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
         maxHeight={500}
         initialEntities={initialEntities}
         destroyOnUnmount={false}
-        formName="editableCellTable"
+        formName={formName || "editableCellTable"}
         isSimple
         noAddMoreRowsButton={onlyShowRowsWErrors}
         onlyShowRowsWErrors={onlyShowRowsWErrors}
@@ -359,7 +360,7 @@ export const SimpleInsertDataDialog = compose(
     style: { width: "fit-content" }
   }),
   tgFormValueSelector(
-    "editableCellTable",
+    "simpleInsertEditableTable",
     "reduxFormEntities",
     "reduxFormCellValidation"
   )
@@ -373,7 +374,13 @@ export const SimpleInsertDataDialog = compose(
   return (
     <>
       <div className="bp3-dialog-body">
-        <PreviewCsvData {...{ ...r, validateAgainstSchema }}></PreviewCsvData>
+        <PreviewCsvData
+          {...{
+            ...r,
+            validateAgainstSchema,
+            formName: "simpleInsertEditableTable"
+          }}
+        ></PreviewCsvData>
       </div>
       <DialogFooter
         onClick={() => {

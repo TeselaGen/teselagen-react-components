@@ -6,3 +6,5 @@
 /demo/dist/
 npm-debug.log*
 .DS_Store
+/cypress/downloads
+/cypress/videos

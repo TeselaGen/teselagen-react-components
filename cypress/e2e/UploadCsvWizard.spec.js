@@ -8,6 +8,13 @@ describe("EditableCellTable.spec", () => {
   });
   it(`messed up headers should trigger the wizard`, () => {
     cy.visit("#/UploadCsvWizard");
+    cy.contains("or manually enter data").click();
+
+    cy.get(
+      `.hasCellError[data-tip="Please enter a value here"] [data-test="tgCell_name"]:first`
+    ).dblclick({ force: true });
+    cy.focused().type("a{enter}");
+    cy.contains(`.bp3-dialog button`, "Cancel").click();
     cy.uploadFile(
       ".tg-dropzone",
       "testUploadWizard_messedUpHeaders.csv",
@@ -47,6 +54,10 @@ describe("EditableCellTable.spec", () => {
 
   it(`going back and forth between the pages should not clear the data that has been changed unless the column was switched`, () => {
     cy.visit("#/UploadCsvWizard");
+    //first start manually updating data
+
+    cy.pause();
+    cy.contains(`Manually `);
     cy.uploadFile(
       ".tg-dropzone",
       "testUploadWizard_invalidData.csv",

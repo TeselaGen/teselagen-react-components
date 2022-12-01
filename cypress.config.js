@@ -4,8 +4,7 @@ module.exports = defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
       // console.log(config); // see everything in here!
-
-      config.specPattern = "cypress/integration/**/*.js";
+      config.specPattern = "cypress/e2e/**/*.js";
       config.baseUrl = "http://localhost:3333/";
       config.projectId = "gwixeq";
       return config;

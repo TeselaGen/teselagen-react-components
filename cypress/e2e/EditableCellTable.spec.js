@@ -1,4 +1,23 @@
 describe("EditableCellTable.spec", () => {
+  it(`cell checkboxes and the header checkbox should work`, () => {
+    cy.visit("#/DataTable/EditableCellTable");
+    cy.get(`[data-test="Is Protein"] input`).should("be.checked");
+    cy.get(`[data-test="tgCell_isProtein"]:first input`).should("be.checked");
+    cy.get(`[data-test="Is Protein"] input`).click({ force: true });
+    cy.get(`[data-test="Is Protein"] input`).should("not.be.checked");
+    cy.get(`[data-test="tgCell_isProtein"]:first input`).should(
+      "not.be.checked"
+    );
+    cy.get(`[data-test="tgCell_isProtein"]:first input`).click({ force: true });
+    cy.get(`[data-test="tgCell_isProtein"]:first input`).should("be.checked");
+    cy.get(`[data-test="tgCell_isProtein"]:last input`).should(
+      "not.be.checked"
+    );
+    cy.get(`[data-test="Is Protein"] input`).should("not.be.checked");
+    cy.get(`[data-test="Is Protein"] input`).click({ force: true });
+    cy.get(`[data-test="Is Protein"] input`).should("be.checked");
+    cy.get(`[data-test="tgCell_isProtein"]:last input`).should("be.checked");
+  });
   it(`should be able to edit text inputs correctly`, () => {
     cy.visit("#/DataTable/EditableCellTable");
     cy.get(

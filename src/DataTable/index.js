@@ -1341,6 +1341,7 @@ class DataTable extends React.Component {
     }
 
     return (
+      // eslint-disable-next-line no-undef
       <this.hotkeyEnabler>
         <div
           className={classNames(
@@ -2233,15 +2234,19 @@ class DataTable extends React.Component {
             ""
           );
         };
-      } else if (column.type === "boolean") {
-        tableColumn.Cell = props => (
-          <Icon
-            className={classNames({
-              [Classes.TEXT_MUTED]: !props.value
-            })}
-            icon={props.value ? "tick" : "cross"}
-          />
-        );
+      } else if (column.type === "boolean" && isCellEditable) {
+        if (isCellEditable) {
+          tableColumn.Cell = props => (props.value ? "True" : "False");
+        } else {
+          tableColumn.Cell = props => (
+            <Icon
+              className={classNames({
+                [Classes.TEXT_MUTED]: !props.value
+              })}
+              icon={props.value ? "tick" : "cross"}
+            />
+          );
+        }
       } else if (column.type === "markdown") {
         tableColumn.Cell = props => (
           <ReactMarkdown>{props.value}</ReactMarkdown>
