@@ -250,6 +250,9 @@ class DataTable extends React.Component {
       reduxFormExpandedEntityIdMap,
       change
     } = newProps;
+    const table = ReactDOM.findDOMNode(this.table);
+
+    const idMap = reduxFormSelectedEntityIdMap;
 
     //handle programatic filter adding
     if (!isEqual(newProps.additionalFilters, oldProps.additionalFilters)) {
@@ -309,42 +312,75 @@ class DataTable extends React.Component {
 
     // handle programmatic selection and scrolling
     const { selectedIds: oldSelectedIds } = oldProps;
-    if (isEqual(selectedIdsToUse, oldSelectedIds)) return;
-    const idArray = Array.isArray(selectedIdsToUse)
-      ? selectedIdsToUse
-      : [selectedIdsToUse];
-    const selectedEntities = entities.filter(
-      e => idArray.indexOf(getIdOrCodeOrIndex(e)) > -1 && !isEntityDisabled(e)
-    );
-    newIdMap =
-      newIdMap ||
-      selectedEntities.reduce((acc, entity) => {
-        acc[getIdOrCodeOrIndex(entity)] = { entity };
-        return acc;
-      }, {});
-    change("reduxFormExpandedEntityIdMap", newIdMap);
-    finalizeSelection({ idMap: newIdMap, entities, props: newProps });
-    const idToScrollTo = idArray[0];
-    if (!idToScrollTo && idToScrollTo !== 0) return;
-    const entityIndexToScrollTo = entities.findIndex(
-      e => e.id === idToScrollTo || e.code === idToScrollTo
-    );
-    const table = ReactDOM.findDOMNode(this.table);
-    if (entityIndexToScrollTo === -1 || !table) return;
-    const tableBody = table.querySelector(".rt-tbody");
-    if (!tableBody) return;
-    const rowEl = tableBody.getElementsByClassName("rt-tr-group")[
-      entityIndexToScrollTo
-    ];
-    if (!rowEl) return;
-    setTimeout(() => {
-      //we need to delay for a teeny bit to make sure the table has drawn
-      rowEl &&
-        tableBody &&
-        scrollIntoView(rowEl, tableBody, {
-          alignWithTop: true
-        });
-    }, 0);
+    if (isEqual(selectedIdsToUse, oldSelectedIds)) {
+      // if not changing selectedIds then we just want to make sure selected entities
+      // stored in redux are in proper format
+      // if selected ids have changed then it will handle redux selection
+      const tableScrollElement = table.getElementsByClassName("rt-table")[0];
+      const {
+        entities: oldEntities = [],
+        reduxFormSelectedEntityIdMap: oldIdMap
+      } = oldProps;
+      const reloaded = oldProps.isLoading && !this.props.isLoading;
+      const entitiesHaveChanged =
+        oldEntities.length !== entities.length ||
+        getIdOrCodeOrIndex(entities[0] || {}) !==
+          getIdOrCodeOrIndex(oldEntities[0] || {});
+      // if switching pages or searching the table we want to reset the scrollbar
+      if (tableScrollElement.scrollTop > 0 && !this.props.isCellEditable) {
+        if (reloaded || entitiesHaveChanged) {
+          tableScrollElement.scrollTop = 0;
+        }
+      }
+      // re-index entities in redux form so that sorting will be correct in withSelectedEntities
+      if (change) {
+        if (entitiesHaveChanged && (!isEmpty(oldIdMap) || !isEmpty(idMap))) {
+          changeSelectedEntities({ idMap, entities, change });
+        } else if (
+          !isEmpty(idMap) &&
+          idMap[Object.keys(idMap)[0]] &&
+          idMap[Object.keys(idMap)[0]].rowIndex === undefined
+        ) {
+          // if programmatically selected will still want the order to match the table sorting.
+          changeSelectedEntities({ idMap, entities, change });
+        }
+      }
+    } else {
+      const idArray = Array.isArray(selectedIdsToUse)
+        ? selectedIdsToUse
+        : [selectedIdsToUse];
+      const selectedEntities = entities.filter(
+        e => idArray.indexOf(getIdOrCodeOrIndex(e)) > -1 && !isEntityDisabled(e)
+      );
+      newIdMap =
+        newIdMap ||
+        selectedEntities.reduce((acc, entity) => {
+          acc[getIdOrCodeOrIndex(entity)] = { entity };
+          return acc;
+        }, {});
+      change("reduxFormExpandedEntityIdMap", newIdMap);
+      finalizeSelection({ idMap: newIdMap, entities, props: newProps });
+      const idToScrollTo = idArray[0];
+      if (!idToScrollTo && idToScrollTo !== 0) return;
+      const entityIndexToScrollTo = entities.findIndex(
+        e => e.id === idToScrollTo || e.code === idToScrollTo
+      );
+      if (entityIndexToScrollTo === -1 || !table) return;
+      const tableBody = table.querySelector(".rt-tbody");
+      if (!tableBody) return;
+      const rowEl = tableBody.getElementsByClassName("rt-tr-group")[
+        entityIndexToScrollTo
+      ];
+      if (!rowEl) return;
+      setTimeout(() => {
+        //we need to delay for a teeny bit to make sure the table has drawn
+        rowEl &&
+          tableBody &&
+          scrollIntoView(rowEl, tableBody, {
+            alignWithTop: true
+          });
+      }, 0);
+    }
   };
   formatAndValidateEntities = entities => {
     const { schema } = this.props;
@@ -408,7 +444,6 @@ class DataTable extends React.Component {
   }
 
   componentDidUpdate(oldProps) {
-    const table = ReactDOM.findDOMNode(this.table);
     // const tableBody = table.querySelector(".rt-tbody");
     // const headerNode = table.querySelector(".rt-thead.-header");
     // if (headerNode) headerNode.style.overflowY = "inherit";
@@ -420,54 +455,6 @@ class DataTable extends React.Component {
     // }
 
     this.updateFromProps(computePresets(oldProps), computePresets(this.props));
-
-    // let theads = table.getElementsByClassName("rt-thead");
-    // let tbody = table.getElementsByClassName("rt-tbody")[0];
-    const tableScrollElement = table.getElementsByClassName("rt-table")[0];
-
-    // if (tbody.scrollHeight > tbody.clientHeight) {
-    //   for (let i = 0; i < theads.length; i++) {
-    //     theads.item(i).classList.add("vertical-scrollbar-present");
-    //   }
-    // } else {
-    //   for (let i = 0; i < theads.length; i++) {
-    //     theads.item(i).classList.remove("vertical-scrollbar-present");
-    //   }
-    // }
-
-    const {
-      entities = [],
-      reduxFormSelectedEntityIdMap: idMap,
-      change
-    } = this.props;
-    const {
-      entities: oldEntities = [],
-      reduxFormSelectedEntityIdMap: oldIdMap
-    } = oldProps;
-    const reloaded = oldProps.isLoading && !this.props.isLoading;
-    const entitiesHaveChanged =
-      oldEntities.length !== entities.length ||
-      getIdOrCodeOrIndex(entities[0] || {}) !==
-        getIdOrCodeOrIndex(oldEntities[0] || {});
-    // if switching pages or searching the table we want to reset the scrollbar
-    if (tableScrollElement.scrollTop > 0 && !this.props.isCellEditable) {
-      if (reloaded || entitiesHaveChanged) {
-        tableScrollElement.scrollTop = 0;
-      }
-    }
-    // re-index entities in redux form so that sorting will be correct in withSelectedEntities
-    if (change) {
-      if (entitiesHaveChanged && (!isEmpty(oldIdMap) || !isEmpty(idMap))) {
-        changeSelectedEntities({ idMap, entities, change });
-      } else if (
-        !isEmpty(idMap) &&
-        idMap[Object.keys(idMap)[0]] &&
-        idMap[Object.keys(idMap)[0]].rowIndex === undefined
-      ) {
-        // if programmatically selected will still want the order to match the table sorting.
-        changeSelectedEntities({ idMap, entities, change });
-      }
-    }
 
     // comment in to test what is causing re-render
     // Object.entries(this.props).forEach(
