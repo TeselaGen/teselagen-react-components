@@ -134,6 +134,13 @@ describe("dataTable.spec", () => {
       .eq(3) //get the third cell just for kicks
       .should("exist");
   });
+  it(`changing the entities and the selected ids at the same time should work!`, () => {
+    cy.visit("#/DataTable");
+    cy.contains(`Update Selection and Entities Multiple times`).click();
+    cy.get(
+      `.rt-tr:contains(zoioiooonk) .tg-react-table-checkbox-cell-container input`
+    ).should("be.checked");
+  });
   it(`it can select all and then deselect all`, () => {
     cy.visit("#/DataTable");
     cy.get(

@@ -261,30 +261,31 @@ withQuery(
 }
 
 const generateFakeRows = num => {
-  return times(num).map(function(a, index) {
-    return {
-      id: index,
-      notDisplayedField: chance.name(),
-      name: chance.name(),
-      color: chance.color(),
-      hungerLevel: chance.integer(),
-      isShared: chance.pickone([true, false]),
-      user: {
-        age: chance.d100(),
-        lastName: chance.name(),
-        status: {
-          name: chance.pickone(["pending", "added", "confirmed"])
-        }
-      },
-      type: {
-        special: "row " + (index + 1)
-      },
-      addedBy: chance.name(),
-      updatedAt: chance.date(),
-      createdAt: chance.date()
-    };
-  });
+  return times(num).map((a, index) => generateFakeRow({ id: index }));
 };
+function generateFakeRow({ id, name }) {
+  return {
+    id: id,
+    notDisplayedField: chance.name(),
+    name: name || chance.name(),
+    color: chance.color(),
+    hungerLevel: chance.integer(),
+    isShared: chance.pickone([true, false]),
+    user: {
+      age: chance.d100(),
+      lastName: chance.name(),
+      status: {
+        name: chance.pickone(["pending", "added", "confirmed"])
+      }
+    },
+    type: {
+      special: "row " + (id + 1)
+    },
+    addedBy: chance.name(),
+    updatedAt: chance.date(),
+    createdAt: chance.date()
+  };
+}
 
 const defaultNumOfEntities = 60;
 
@@ -625,6 +626,41 @@ class DataTableInstance extends React.Component {
             type: "maxHeight",
             description:
               "By default every table has a max height of 800px. Setting this true changes it to 200px"
+          })}
+          {renderToggle({
+            that: this,
+            isButton: true,
+            label: "Update Selection and Entities Multiple times",
+            type: "updateSelectedAndChangeNumEnts",
+            hook: () => {
+
+              this.setState({
+                selectedIds: ["lala", "23r2", "asdf"],
+                isInfinite: true,
+                entities: [
+                  generateFakeRow({ id: "lala" }),
+                  generateFakeRow({ id: "23r2" }),
+                  generateFakeRow({ id: "asdf" }),
+                  generateFakeRow({ id: "2g2g" }),
+                  generateFakeRow({ id: "ahha" })
+                ]
+              });
+
+              setTimeout(() => {
+                this.setState({
+                  selectedIds: ["zoioiooonk", "23r2", "asdf"],
+                  isInfinite: true,
+                  entities: [
+                    generateFakeRow({ id: "zaza" }),
+                    generateFakeRow({ id: "23r2" }),
+                    generateFakeRow({ id: "asdf" }),
+                    generateFakeRow({ id: "2g2g" }),
+                    generateFakeRow({ id: "ahha" }),
+                    generateFakeRow({ id: "zoioiooonk", name: "zoioiooonk" }),
+                  ]
+                });
+              }, 1000);
+            }
           })}
         </OptionsSection>
         <br />
