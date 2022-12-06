@@ -2221,7 +2221,7 @@ class DataTable extends React.Component {
             ""
           );
         };
-      } else if (column.type === "boolean" && isCellEditable) {
+      } else if (column.type === "boolean") {
         if (isCellEditable) {
           tableColumn.Cell = props => (props.value ? "True" : "False");
         } else {
