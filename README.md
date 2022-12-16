@@ -21,7 +21,6 @@ Demo: https://teselagen.github.io/teselagen-react-components/
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
   - [Demo Development Server](#demo-development-server)
-  - [Developing linked to another folder: aka lims/hde](#developing-linked-to-another-folder-aka-limshde)
   - [Running Tests](#running-tests)
   - [Releasing](#releasing)
   - [Adding custom svg icons](#adding-custom-svg-icons)
@@ -31,11 +30,11 @@ Demo: https://teselagen.github.io/teselagen-react-components/
 
 # Using: 
 ```
-yarn add teselagen-react-components
+pnpm add teselagen-react-components
 ```
 Add peer-dependencies: 
 ```
-yarn add @blueprintjs/core @blueprintjs/datetime @blueprintjs/select react-addons-css-transition-group react-redux redux 
+pnpm add @blueprintjs/core @blueprintjs/datetime @blueprintjs/select react-addons-css-transition-group react-redux redux 
 ```
 
 ## Enhancers:
@@ -138,34 +137,6 @@ import {
 ## Demo Development Server
 
 - `npm start` will run a development server with the component's demo app at [http://localhost:3000](http://localhost:3000) with hot module reloading. You can check the /demo folder for the source code.
-
-## Developing linked to another folder: aka lims/hde
-```
-//link everything up:
-
-//LIMS EXAMPLE: 
-cd lims/node_modules/react        //this is so we don't have 2 copies of react being used on the front-end (react will throw errors if so)
-yarn link 
-cd teselagen-react-components
-yarn link
-yarn link react
-cd lims
-yarn link teselagen-react-components
-
-//HDE EXAMPLE: 
-cd hde/client/node_modules/react     //this is so we don't have 2 copies of react being used on the front-end (react will throw errors if so)
-yarn link 
-cd teselagen-react-components
-yarn link
-yarn link react
-cd hde/client
-yarn link teselagen-react-components
-
-//ALWAYS:
-//start the auto rebuild:
-cd teselagen-react-components
-yarn build-watch
-```
 
 ## Running Tests
 

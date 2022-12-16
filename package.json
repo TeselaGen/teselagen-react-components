@@ -13,12 +13,12 @@
   "scripts": {
     "build": "nwb build-react-component --copy-files --no-demo",
     "buildWithDemo": "nwb build-react-component --copy-files",
-    "//build-watch": "nodemon --watch src --exec \"rm .babelrc; yarn build\" ",
+    "//build-watch": "nodemon --watch src --exec \"rm .babelrc; pnpm build\" ",
     "clean": "nwb clean-module && npm clean-demo",
     "start": "nwb serve-react-demo --port 3333",
-    "analyze-build": "ANALYZE_BUNDLE=1 yarn buildWithDemo && webpack-bundle-analyzer demo/dist/stats.json build",
-    "c": "yarn cypress open --e2e --browser chrome",
-    "test": "yarn cypress run",
+    "analyze-build": "ANALYZE_BUNDLE=1 pnpm buildWithDemo && webpack-bundle-analyzer demo/dist/stats.json build",
+    "c": "pnpm cypress open --e2e --browser chrome",
+    "test": "pnpm cypress run",
     "changelog": "auto-changelog -p && git add CHANGELOG.md"
   },
   "dependencies": {
@@ -77,6 +77,7 @@
     "redux": "^4.1.2",
     "redux-thunk": "2.4.1",
     "stats-webpack-plugin": "^0.7.0",
+    "vite": "^4.0.1",
     "webpack-bundle-analyzer": "^3.7.0"
   },
   "resolutions": {

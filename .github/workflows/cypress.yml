@@ -18,7 +18,7 @@ jobs:
         with:
           record: true
           parallel: true
-          start: yarn start
+          start: pnpm start
           wait-on: http://localhost:3333
         env:
           WITH_COVERAGE: true
