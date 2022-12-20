@@ -54,10 +54,6 @@ describe("EditableCellTable.spec", () => {
 
   it(`going back and forth between the pages should not clear the data that has been changed unless the column was switched`, () => {
     cy.visit("#/UploadCsvWizard");
-    //first start manually updating data
-
-    cy.pause();
-    cy.contains(`Manually `);
     cy.uploadFile(
       ".tg-dropzone",
       "testUploadWizard_invalidData.csv",
