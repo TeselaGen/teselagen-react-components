@@ -340,7 +340,7 @@ export const renderBlueprintDateRangeInput = props => {
   );
 };
 
-export const renderBlueprintInput = props => {
+export const RenderBlueprintInput = props => {
   const {
     input,
     // meta = {},
@@ -349,34 +349,111 @@ export const renderBlueprintInput = props => {
     onKeyDown = noop,
     asyncValidating,
     rightElement,
+    clickToEdit,
     ...rest
   } = props;
-  return (
-    <InputGroup
-      rightElement={
-        asyncValidating ? (
-          <AsyncValidateFieldSpinner validating />
-        ) : (
-          rightElement
-        )
-      }
-      {...removeUnwantedProps(rest)}
-      intent={intent}
-      {...input}
-      onKeyDown={function(...args) {
-        onKeyDown(...args);
-        const e = args[0];
-        if (e.key === "Enter") {
-          onFieldSubmit(e.target.value, { enter: true }, e);
+  const [isOpen, setOpen] = useState(false);
+  const [value, setVal] = useState(null);
+  const toSpread = {};
+  if (clickToEdit) {
+    const isDisabled = clickToEdit && !isOpen;
+    toSpread.disabled = rest.disabled || isDisabled;
+  }
+  const stopEdit = () => {
+    setOpen(false);
+    setVal(null);
+  };
+
+  const inner =
+    clickToEdit && !isOpen ? (
+      <div>{input.value}</div>
+    ) : (
+      <InputGroup
+        rightElement={
+          asyncValidating ? (
+            <AsyncValidateFieldSpinner validating />
+          ) : (
+            rightElement
+          )
         }
-      }}
-      onBlur={function(e, val) {
-        if (rest.readOnly) return;
-        input.onBlur(e, val);
-        onFieldSubmit(e.target ? e.target.value : val, { blur: true }, e);
-      }}
-    />
-  );
+        {...removeUnwantedProps(rest)}
+        intent={intent}
+        {...input}
+        {...toSpread}
+        {...(clickToEdit
+          ? {
+              disabled: rest.disabled,
+              onChange: e => {
+                setVal(e.target.value);
+              },
+              ...(value === null ? {} : { value }),
+              onKeyDown: (...args) => {
+                onKeyDown(...args);
+                const e = args[0];
+                if (e.key === "Enter") {
+                  input.onChange(value === null ? input.value : value);
+                  onFieldSubmit(e.target.value, { enter: true }, e);
+                  stopEdit();
+                }
+                return true;
+              }
+            }
+          : {
+              onKeyDown: function(...args) {
+                onKeyDown(...args);
+                const e = args[0];
+                if (e.key === "Enter") {
+                  onFieldSubmit(e.target.value, { enter: true }, e);
+                }
+              },
+              onBlur: function(e, val) {
+                if (rest.readOnly) return;
+                input.onBlur(e, val);
+                onFieldSubmit(
+                  e.target ? e.target.value : val,
+                  { blur: true },
+                  e
+                );
+              }
+            })}
+      />
+    );
+  if (clickToEdit)
+    return (
+      <div style={{ display: "flex" }}>
+        {inner}
+        {clickToEdit &&
+          (isOpen ? (
+            <>
+              <Button
+                icon="small-cross"
+                onClick={stopEdit}
+                intent="danger"
+              ></Button>
+              <Button
+                icon="small-tick"
+                onClick={() => {
+                  input.onChange(value === null ? input.value : value);
+                  onFieldSubmit(value === null ? input.value : value, {
+                    cmdEnter: true
+                  });
+                  stopEdit();
+                }}
+                intent="success"
+              ></Button>{" "}
+            </>
+          ) : (
+            <Button
+              minimal
+              onClick={() => {
+                setOpen(true);
+              }}
+              icon="edit"
+            ></Button>
+          ))}
+      </div>
+    );
+  return inner;
 };
 
 export const renderBlueprintCheckbox = props => {
@@ -1259,7 +1336,7 @@ export const withAbstractWrapper = (ComponentToWrap, opts = {}) => {
   };
 };
 
-export const InputField = generateField(renderBlueprintInput);
+export const InputField = generateField(RenderBlueprintInput);
 export const FileUploadField = generateField(renderFileUpload);
 export const DateInputField = generateField(renderBlueprintDateInput);
 export const DateRangeInputField = generateField(renderBlueprintDateRangeInput);

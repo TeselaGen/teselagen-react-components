@@ -71,6 +71,14 @@ function FormComponentsDemo({ handleSubmit }) {
         <h3 className="form-component-title">
           Blueprint Redux Form Components
         </h3>
+        <InputField
+            clickToEdit
+            name={"inputFieldWithClickToEdit"}
+            inlineLabel={inlineLabels}
+            onFieldSubmit={onFieldSubmit}
+            label="InputField with clickToEdit=true"
+            placeholder="Enter note..."
+          />
         <OptionsSection>
           {inlineLabelsComp}
           {reactSelectFieldcreatableComp}
@@ -429,6 +437,7 @@ function FormComponentsDemo({ handleSubmit }) {
             label="TextareaField"
             placeholder="Enter notes..."
           />
+          
           <TextareaField
             clickToEdit
             name={"textAreaFieldWithClickToEdit"}
