@@ -1372,7 +1372,11 @@ function getOptions(options) {
 }
 
 function fakeWait() {
+  const fakeWaitNum = isNumber(window.Cypress.addFakeDefaultValueWait)
+    ? window.Cypress.addFakeDefaultValueWait
+    : 3000;
+
   return new Promise(resolve => {
-    setTimeout(() => resolve(), 3000);
+    setTimeout(() => resolve(), fakeWaitNum);
   });
 }

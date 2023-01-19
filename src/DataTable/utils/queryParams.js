@@ -299,7 +299,12 @@ function getSubFilter(
   const ccSelectedFilter = camelCase(selectedFilter);
   let stringFilterValue =
     filterValue && filterValue.toString ? filterValue.toString() : filterValue;
-  stringFilterValue = stringFilterValue || "";
+  if (stringFilterValue === false) {
+    // we still want to be able to search for the string "false" which will get parsed to false
+    stringFilterValue = "false";
+  } else {
+    stringFilterValue = stringFilterValue || "";
+  }
   const filterValLower =
     stringFilterValue.toLowerCase && stringFilterValue.toLowerCase();
   const arrayFilterValue = Array.isArray(filterValue)
