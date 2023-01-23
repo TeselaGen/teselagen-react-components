@@ -19,6 +19,7 @@ let tippys = [];
         });
 
         el.classList.add(id);
+
         const inst = tippy(`.${id}`, {
           content,
           delay: [0, 0],

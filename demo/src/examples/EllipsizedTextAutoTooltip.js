@@ -1,4 +1,4 @@
-import { Button, Classes } from "@blueprintjs/core";
+import { Button, Classes, Tooltip } from "@blueprintjs/core";
 import classNames from "classnames";
 import React, { useState } from "react";
 import { wrapDialog } from "../../../src";
@@ -14,6 +14,9 @@ export default function EllipsizedTextAutoTooltip() {
 
         <code>{`<Button data-tip="I'm a tooltip">`}</code>
         <Button data-tip="I'm a tooltip">Hover me!</Button>
+        <Tooltip content={"I'm a tooltip"}>
+          <Button>Hover me!</Button>
+        </Tooltip>
         <Button
           data-tip={`<strong>Bolded content</strong> <br></br><br></br><br></br> more content`}
         >
