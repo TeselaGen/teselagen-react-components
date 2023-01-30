@@ -195,3 +195,8 @@ code {
   bottom: -4px;
   right: -4px;
 }
+
+/* make AnchorButton match Button */
+.bp3-button {
+  font-family: Arial;
+}
