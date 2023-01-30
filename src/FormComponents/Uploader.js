@@ -93,7 +93,7 @@ function Uploader({
   const fileListToUse = fileList ? fileList : [];
 
   async function handleSecondHalfOfUpload({ acceptedFiles, cleanedFileList }) {
-    // onChange(cleanedFileList); //tnw: commenting this out because I don't think we should be triggering this before
+    onChange(cleanedFileList); //tnw: this line is necessary, if you want to clear the file list in the beforeUpload, call onChange([])
     // beforeUpload is called, otherwise beforeUpload will not be able to truly cancel the upload
     const keepGoing = beforeUpload
       ? await beforeUpload(cleanedFileList, onChange)
