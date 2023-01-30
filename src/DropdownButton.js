@@ -5,7 +5,14 @@ import { Button, Popover, Position } from "@blueprintjs/core";
 import classnames from "classnames";
 import popoverOverflowModifiers from "./utils/popoverOverflowModifiers";
 
-function DropdownButton({ disabled, menu, noRightIcon, className, ...rest }) {
+function DropdownButton({
+  disabled,
+  menu,
+  noRightIcon,
+  popoverProps,
+  className,
+  ...rest
+}) {
   return (
     <Popover
       minimal
@@ -14,6 +21,7 @@ function DropdownButton({ disabled, menu, noRightIcon, className, ...rest }) {
       autoFocus={false}
       content={menu}
       position={Position.BOTTOM_LEFT}
+      {...popoverProps}
     >
       <Button
         {...rest}
