@@ -2350,6 +2350,22 @@ class DataTable extends React.Component {
         );
       };
 
+      /**
+       * @teselagen/react-table is not properly obtaining the row's value
+       * because it treats applies some parsing login to the column's path where characters
+       * such as '.' and '[' are assumed to be part of a nested object path. Which is not true,
+       * for paths that simply contain those chars as part of the row key.
+       *
+       * So a new column prop is used to explicity specify the passed path is the row's key.
+       */
+      tableColumn.Cell = new Proxy(tableColumn.Cell, {apply: (originalFn, _this, _args) => {
+        if(column.pathIsKey) {
+          const [row] = _args
+          row.value = row.value || get(row.original, column.path)
+        }
+        return originalFn.apply(_this, _args)
+      }})
+
       columnsToRender.push(tableColumn);
     });
     return columnsToRender;
