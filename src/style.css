@@ -165,6 +165,7 @@ code {
   background-color: #394b59;
   color: #f5f8fa;
   padding: 4px 4px;
+  word-break: break-all;
 }
 [data-tippy-root] .tippy-arrow {
   color: #394b59;
