@@ -1132,6 +1132,7 @@ export function generateField(component, opts) {
     name,
     isRequired,
     onFieldSubmit = noop,
+    noRedux,
     // asyncValidate,
     ...rest
   }) {
@@ -1140,6 +1141,13 @@ export function generateField(component, opts) {
     const props = {
       onFieldSubmit,
       name,
+      ...(noRedux && {
+        input: {
+          onChange: rest.onChange || noop,
+          onBlur: rest.onBlur || noop,
+          value: rest.value
+        }
+      }),
       component,
       ...(isRequired && { validate: fieldRequired }),
       isRequired,
