@@ -1145,7 +1145,8 @@ export function generateField(component, opts) {
         input: {
           onChange: rest.onChange || noop,
           onBlur: rest.onBlur || noop,
-          value: rest.value
+          value: rest.value,
+          name
         }
       }),
       component,
