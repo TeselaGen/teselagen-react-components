@@ -8,7 +8,7 @@ export default function getDayjsFormatter(format) {
     formatDate: date => dayjs(date).format(format),
     parseDate: str => dayjs(str, format).toDate(),
     placeholder: format?.toLowerCase().includes("l")
-      ? dayjs.Ls.en.formats[format]
+      ? dayjs.Ls[dayjs.locale()]?.formats[format.toUpperCase()]
       : format
   };
 }
