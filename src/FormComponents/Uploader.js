@@ -6,7 +6,8 @@ import {
   Icon,
   Menu,
   Popover,
-  Position
+  Position,
+  Tooltip
 } from "@blueprintjs/core";
 import Dropzone from "react-dropzone";
 // import { first } from "lodash";
@@ -27,6 +28,9 @@ import {
   removeExt
 } from "../utils/parserUtils";
 import tryToMatchSchemas from "./tryToMatchSchemas";
+import { isArray, isFunction, isObject } from "lodash";
+import { flatMap } from "lodash";
+import urljoin from "url-join";
 
 function noop() {}
 // wink wink
@@ -88,8 +92,24 @@ function Uploader({
   if (contentOverride && typeof contentOverride === "function") {
     contentOverride = contentOverride({ loading });
   }
+  let simpleAccept;
+  let advancedAccept;
+  if (Array.isArray(accept)) {
+    if (accept.some(a => isObject(a))) {
+      //advanced accept
+      advancedAccept = accept;
+      simpleAccept = flatMap(accept, a => {
+        if (a.type) return a.type;
+        return a;
+      });
+      simpleAccept = simpleAccept.join(", ");
+    } else {
+      simpleAccept = accept.join(", ");
+    }
+  } else {
+    simpleAccept = accept;
+  }
 
-  const acceptToUse = Array.isArray(accept) ? accept.join(", ") : accept;
   const fileListToUse = fileList ? fileList : [];
 
   async function handleSecondHalfOfUpload({ acceptedFiles, cleanedFileList }) {
@@ -176,6 +196,8 @@ function Uploader({
     }
     setLoading(false);
   }
+  const baseUrl = window?.frontEndConfig?.serverBasePath || "";
+
   return (
     <div
       className="tg-uploader-outer"
@@ -191,19 +213,94 @@ function Uploader({
         className="tg-uploader-inner"
         style={{ width: "100%", height: "fit-content", minWidth: 0 }}
       >
-        {acceptToUse && (
+        {simpleAccept && (
           <div
             className={Classes.TEXT_MUTED}
             style={{ fontSize: 11, marginBottom: 5 }}
           >
-            Accepts {acceptToUse}
+            {advancedAccept ? (
+              <div style={{}}>
+                Accepts &nbsp;
+                <span style={{}}>
+                  {advancedAccept.map((a, i) => {
+                    return (
+                      <Tooltip
+                        key={i}
+                        content={
+                          <div>
+                            {a.description ? (
+                              <div
+                                style={{
+                                  marginBottom: 4,
+                                  fontStyle: "italic"
+                                }}
+                              >
+                                {a.description}
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                            {a.exampleFile && "Download Example File"}
+                          </div>
+                        }
+                      >
+                        <a
+                          className="tgFileTypeDescriptor"
+                          style={{ marginRight: 10, cursor: "pointer" }}
+                          {...(isFunction(a.exampleFile)
+                            ? { onClick: a.exampleFile }
+                            : a.exampleFile && {
+                                href: urljoin(
+                                  baseUrl,
+                                  "exampleFiles",
+                                  a.exampleFile
+                                )
+                              })}
+                        >
+                          {(a.type
+                            ? isArray(a.type)
+                              ? a.type
+                              : [a.type]
+                            : [a]
+                          )
+                            .map(t => {
+                              return t.startsWith(".") ? t : "." + t;
+                            })
+                            .join(", ")}
+
+                          {a.exampleFile && (
+                            <Icon
+                              style={{
+                                marginTop: 3,
+                                marginLeft: 3
+                              }}
+                              size={10}
+                              icon="download"
+                            ></Icon>
+                          )}
+                        </a>
+                      </Tooltip>
+                    );
+                  })}
+                </span>
+              </div>
+            ) : (
+              <>Accepts {simpleAccept}</>
+            )}
           </div>
         )}
         <Dropzone
           disabled={disabled}
           onClick={evt => evt.preventDefault()}
           multiple={fileLimit !== 1}
-          accept={acceptToUse}
+          accept={
+            simpleAccept
+              ? simpleAccept
+                  .split(", ")
+                  .map(a => (a.startsWith(".") ? a : "." + a))
+                  .join(", ")
+              : undefined
+          }
           {...{
             onDrop: async (acceptedFiles, rejectedFiles) => {
               cleanupFiles();
@@ -382,9 +479,9 @@ function Uploader({
                 {contentOverride || (
                   <div
                     title={
-                      acceptToUse
+                      simpleAccept
                         ? "Accepts only the following file types: " +
-                          acceptToUse
+                          simpleAccept
                         : "Accepts any file input"
                     }
                     className="tg-upload-inner"
