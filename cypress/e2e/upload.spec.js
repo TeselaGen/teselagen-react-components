@@ -1,7 +1,7 @@
 describe("upload", () => {
   it(`Uploader component should be able to upload (the file list won't get updated because there is no state backing that, redux or otherwise)`, () => {
     cy.visit("#/Uploader");
-
+    cy.tgToggle(`accept`);
     cy.uploadFile(
       ".tg-dropzone",
       "createReactionMapTest.csv",

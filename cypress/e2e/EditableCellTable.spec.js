@@ -185,7 +185,7 @@ describe("EditableCellTable.spec", () => {
 laura stevens	new	HOT	6	Yes
 lucas jensen	old	rainy	4	false
 todd ross	old	snowy	4	no`);
-    cy.get(`[data-test="tgCell_isProtein"]:last[data-copy-text="false"]`);
+    cy.get(`[data-test="tgCell_isProtein"]:last[data-copy-text="False"]`);
     cy.get(`[data-test="tgCell_weather"]:last`)
       .closest(`.hasCellError`)
       .should("exist");
