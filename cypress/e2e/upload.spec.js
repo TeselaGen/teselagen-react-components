@@ -2,6 +2,9 @@ describe("upload", () => {
   it(`Uploader component should be able to upload (the file list won't get updated because there is no state backing that, redux or otherwise)`, () => {
     cy.visit("#/Uploader");
     cy.tgToggle(`accept`);
+    cy.get(`span:contains(.ab1)`);
+    cy.get(`a:contains(.ab1)`).should("not.exist");
+    cy.get(`a:contains(.zip) .bp3-icon-download`);
     cy.uploadFile(
       ".tg-dropzone",
       "createReactionMapTest.csv",
@@ -9,7 +12,6 @@ describe("upload", () => {
       true
     );
     cy.contains("File uploaded!");
-    // cy.get(".tg-upload-file-list-item").should("exist");
   });
   it(`Uploader component should be able to be disabled`, () => {
     cy.visit("#/Uploader");

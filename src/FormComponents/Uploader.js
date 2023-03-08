@@ -223,9 +223,12 @@ function Uploader({
                 Accepts &nbsp;
                 <span style={{}}>
                   {advancedAccept.map((a, i) => {
+                    const disabled = !(a.description || a.exampleFile);
+                    const CustomTag = !a.exampleFile ? "span" : "a";
                     return (
                       <Tooltip
                         key={i}
+                        disabled={disabled}
                         content={
                           <div>
                             {a.description ? (
@@ -244,7 +247,7 @@ function Uploader({
                           </div>
                         }
                       >
-                        <a
+                        <CustomTag
                           className="tgFileTypeDescriptor"
                           style={{ marginRight: 10, cursor: "pointer" }}
                           {...(isFunction(a.exampleFile)
@@ -278,7 +281,7 @@ function Uploader({
                               icon="download"
                             ></Icon>
                           )}
-                        </a>
+                        </CustomTag>
                       </Tooltip>
                     );
                   })}
