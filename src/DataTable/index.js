@@ -85,7 +85,8 @@ enablePatches();
 const PRIMARY_SELECTED_VAL = "main_cell";
 
 dayjs.extend(localizedFormat);
-const IS_LINUX = window.navigator.platform.toLowerCase().search("linux") > -1;
+const IS_LINUX =
+  true || window.navigator.platform.toLowerCase().search("linux") > -1;
 
 class DataTable extends React.Component {
   constructor(props) {
