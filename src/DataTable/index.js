@@ -85,6 +85,7 @@ enablePatches();
 const PRIMARY_SELECTED_VAL = "main_cell";
 
 dayjs.extend(localizedFormat);
+const IS_LINUX = window.navigator.platform.toLowerCase().search("linux") > -1;
 
 class DataTable extends React.Component {
   constructor(props) {
@@ -124,7 +125,7 @@ class DataTable extends React.Component {
         },
         undo: {
           global: false,
-          combo: "mod+z",
+          combo: IS_LINUX ? "alt+z" : "mod+z",
           label: "Undo",
           onKeyDown: this.handleUndo
         },
