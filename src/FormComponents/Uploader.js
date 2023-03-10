@@ -65,7 +65,11 @@ function Uploader({
   onPreviewClick,
   axiosInstance = window.api || axios
 }) {
-  const accept = isObject(_accept) ? [_accept] : _accept;
+  const accept = isArray(_accept)
+    ? _accept
+    : isObject(_accept)
+    ? [_accept]
+    : _accept;
   const [loading, setLoading] = useState(false);
   const filesToClean = useRef([]);
 
