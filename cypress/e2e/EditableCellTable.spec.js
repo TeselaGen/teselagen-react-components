@@ -123,14 +123,17 @@ describe("EditableCellTable.spec", () => {
     ).should("not.exist");
   });
   it(`undo/redo should work`, () => {
+    const IS_LINUX =
+      window.navigator.platform.toLowerCase().search("linux") > -1;
+    const undoCmd = IS_LINUX ? `{alt}z` : "{meta}z";
     cy.visit("#/DataTable/EditableCellTable");
     cy.get(`.rt-td:contains(tom88)`).dblclick();
     cy.focused().type("{selectall}tasty55{enter}");
     cy.get(`.rt-td:contains(tasty55)`).dblclick();
     cy.focused().type("{selectall}delishhh{enter}");
     cy.get(`.rt-td:contains(delishhh)`);
-    cy.focused().type("{meta}z");
-    cy.focused().type("{meta}z");
+    cy.focused().type(undoCmd);
+    cy.focused().type(undoCmd);
     cy.get(`.rt-td:contains(tom88)`);
     cy.focused().type("{meta}{shift}z");
     cy.focused().type("{meta}{shift}z");
