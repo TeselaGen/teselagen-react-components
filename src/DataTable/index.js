@@ -131,7 +131,7 @@ class DataTable extends React.Component {
         },
         redo: {
           global: false,
-          combo: IS_LINUX ? "al+shiftt+z" : "mod+shift+z",
+          combo: IS_LINUX ? "alt+shiftt+z" : "mod+shift+z",
           label: "Redo",
           onKeyDown: this.handleRedo
         },
