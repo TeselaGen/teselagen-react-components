@@ -28,7 +28,7 @@ import {
   removeExt
 } from "../utils/parserUtils";
 import tryToMatchSchemas from "./tryToMatchSchemas";
-import { isArray, isFunction, isObject } from "lodash";
+import { isArray, isFunction, isPlainObject } from "lodash";
 import { flatMap } from "lodash";
 import urljoin from "url-join";
 
@@ -65,11 +65,7 @@ function Uploader({
   onPreviewClick,
   axiosInstance = window.api || axios
 }) {
-  const accept = isArray(_accept)
-    ? _accept
-    : isObject(_accept)
-    ? [_accept]
-    : _accept;
+  const accept = isPlainObject(_accept) ? [_accept] : _accept;
   const [loading, setLoading] = useState(false);
   const filesToClean = useRef([]);
 
@@ -100,7 +96,7 @@ function Uploader({
   let simpleAccept;
   let advancedAccept;
   if (Array.isArray(accept)) {
-    if (accept.some(a => isObject(a))) {
+    if (accept.some(a => isPlainObject(a))) {
       //advanced accept
       advancedAccept = accept;
       simpleAccept = flatMap(accept, a => {

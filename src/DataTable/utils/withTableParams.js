@@ -1,10 +1,9 @@
 import React, { useContext, useEffect } from "react";
 import { change, formValueSelector } from "redux-form";
 import { connect } from "react-redux";
-import compose from "lodash/fp/compose";
 import { isFunction } from "lodash";
 import { withRouter } from "react-router-dom";
-import { branch } from "recompose";
+import { branch, compose } from "recompose";
 
 import pureNoFunc from "../../utils/pureNoFunc";
 import TableFormTrackerContext from "../TableFormTrackerContext";
