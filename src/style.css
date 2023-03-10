@@ -201,3 +201,11 @@ code {
 .bp3-button {
   font-family: Arial;
 }
+
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+button:not(:disabled):active {
+  transform: translateY(1px);
+}

@@ -37,7 +37,7 @@ function noop() {}
 const emptyPromise = Promise.resolve.bind(Promise);
 
 function Uploader({
-  accept,
+  accept: _accept,
   contentOverride: maybeContentOverride,
   innerIcon,
   innerText,
@@ -65,6 +65,7 @@ function Uploader({
   onPreviewClick,
   axiosInstance = window.api || axios
 }) {
+  const accept = isObject(_accept) ? [_accept] : _accept;
   const [loading, setLoading] = useState(false);
   const filesToClean = useRef([]);
 
