@@ -126,6 +126,7 @@ describe("EditableCellTable.spec", () => {
     const IS_LINUX =
       window.navigator.platform.toLowerCase().search("linux") > -1;
     const undoCmd = IS_LINUX ? `{alt}z` : "{meta}z";
+    const redoCmd = IS_LINUX ? `{alt}{shift}z` : "{meta}{shift}z";
     cy.visit("#/DataTable/EditableCellTable");
     cy.get(`.rt-td:contains(tom88)`).dblclick();
     cy.focused().type("{selectall}tasty55{enter}");
@@ -135,8 +136,8 @@ describe("EditableCellTable.spec", () => {
     cy.focused().type(undoCmd);
     cy.focused().type(undoCmd);
     cy.get(`.rt-td:contains(tom88)`);
-    cy.focused().type("{meta}{shift}z");
-    cy.focused().type("{meta}{shift}z");
+    cy.focused().type(redoCmd);
+    cy.focused().type(redoCmd);
     cy.get(`.rt-td:contains(delishhh)`);
   });
   it(`deleting should work, default val should get reapplied`, () => {
