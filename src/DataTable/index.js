@@ -1099,6 +1099,7 @@ class DataTable extends React.Component {
       entitiesAcrossPages,
       children: maybeChildren,
       topLeftItems,
+      leftOfSearchBarItems,
       currentParams,
       hasOptionForForcedHidden,
       showForcedHiddenColumns,
@@ -1370,6 +1371,7 @@ class DataTable extends React.Component {
               {nonDisplayedFilterComp}
               {withSearch && (
                 <div className="data-table-search-and-clear-filter-container">
+                  {leftOfSearchBarItems}
                   {hasFilters ? (
                     <Tooltip content="Clear Filters">
                       <Button

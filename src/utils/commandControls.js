@@ -16,8 +16,8 @@ export const withCommand = mappings => WrappedComponent => ({
         : cmd[mappings[k]];
   });
 
-  let out = <WrappedComponent {...props} {...mappedProps} />;
-  let tooltip =
+  let out = <WrappedComponent {...mappedProps} {...props} />;
+  const tooltip =
     cmd.tooltip || (typeof cmd.isDisabled === "string" && cmd.isDisabled);
   if (tooltip && !cmdOptions.ignoreTooltip) {
     out = <Tooltip content={tooltip}>{out}</Tooltip>;

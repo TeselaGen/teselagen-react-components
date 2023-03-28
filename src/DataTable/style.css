@@ -31,7 +31,7 @@
 .data-table-header {
   display: flex;
   flex-wrap: wrap;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   justify-content: space-between;
   align-items: center;
 }

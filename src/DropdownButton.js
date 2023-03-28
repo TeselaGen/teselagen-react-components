@@ -24,10 +24,10 @@ function DropdownButton({
       {...popoverProps}
     >
       <Button
-        {...rest}
         disabled={disabled}
         className={classnames(className, "dropdown-button")}
         rightIcon={noRightIcon ? undefined : "caret-down"}
+        {...rest}
       />
     </Popover>
   );
