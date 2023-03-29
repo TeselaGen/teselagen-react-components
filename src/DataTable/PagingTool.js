@@ -32,55 +32,59 @@ function PagingInput({ disabled, onBlur, defaultPage }) {
   );
 }
 
-class PagingTool extends React.Component {
-  static defaultProps = {
-    onPageChange: noop
+// Define the functional component and its props
+const PagingTool = ({
+  onPageChange = noop,
+  onRefresh,
+  setPage,
+  setPageSize,
+  persistPageSize = noop,
+  paging: { pageSize, page, total },
+  hideTotalPages,
+  disabled,
+  controlled_hasNextPage,
+  disableSetPageSize,
+  hideSetPageSize
+}) => {
+  // Define local state
+  const [refetching, setRefetching] = useState(false);
+
+  // Initialize additional page sizes
+  useEffect(() => {
+    const additionalPageSize =
+      window.frontEndConfig && window.frontEndConfig.additionalPageSize
+        ? [toInteger(window.frontEndConfig.additionalPageSize)]
+        : [];
+    window.tgPageSizes = [...defaultPageSizes, ...additionalPageSize];
+  }, []);
+
+  // Define event handlers for the component
+  const onRefreshHandler = async () => {
+    setRefetching(true);
+    await onRefresh();
+    setRefetching(false);
   };
 
-  state = {
-    refetching: false
+  const setPageHandler = page => {
+    setPage(page);
+    onPageChange(page);
   };
 
-  onRefresh = async () => {
-    this.setState({
-      refetching: true
-    });
-    await this.props.onRefresh();
-    this.setState({
-      refetching: false
-    });
+  const setPageSizeHandler = e => {
+    const newPageSize = parseInt(e.target.value, 10);
+    setPageSize(newPageSize);
+    persistPageSize(newPageSize);
   };
 
-  setPage = page => {
-    this.props.setPage(page);
-    this.props.onPageChange(page);
+  const pageBackHandler = () => {
+    setPageHandler(parseInt(page, 10) - 1);
   };
 
-  setPageSize = e => {
-    const { setPageSize, persistPageSize = noop } = this.props;
-    const pageSize = parseInt(e.target.value, 10);
-    setPageSize(pageSize);
-    persistPageSize(pageSize);
+  const pageForwardHandler = () => {
+    setPageHandler(parseInt(page, 10) + 1);
   };
 
-  pageBack = () => {
-    const {
-      paging: { page }
-    } = this.props;
-    this.setPage(parseInt(page, 10) - 1);
-  };
-
-  pageForward = () => {
-    const {
-      paging: { page }
-    } = this.props;
-    this.setPage(parseInt(page, 10) + 1);
-  };
-
-  pageInputBlur = e => {
-    const {
-      paging: { pageSize, total }
-    } = this.props;
+  const pageInputBlurHandler = e => {
     const lastPage = Math.ceil(total / pageSize);
     const pageValue = parseInt(e.target.value, 10);
     const selectedPage =
@@ -89,117 +93,95 @@ class PagingTool extends React.Component {
         : pageValue < 1 || isNaN(pageValue)
         ? 1
         : pageValue;
-
-    this.setState({
-      selectedPage
-    });
-    this.setPage(selectedPage);
+    setPageHandler(selectedPage);
   };
-  componentDidMount() {
-    //set a
-    const additionalPageSize =
-      window.frontEndConfig && window.frontEndConfig.additionalPageSize
-        ? [toInteger(window.frontEndConfig.additionalPageSize)]
-        : [];
-    window.tgPageSizes = [...defaultPageSizes, ...additionalPageSize];
+
+  // Define rendering logic
+  const pageStart = (page - 1) * pageSize + 1;
+  if (pageStart < 0) throw new Error("We should never have page be <0");
+  const backEnabled = page - 1 > 0;
+  const forwardEnabled = page * pageSize < total;
+  const lastPage = Math.ceil(total / pageSize);
+  const options = [...(window.tgPageSizes || defaultPageSizes)];
+  if (!options.includes(pageSize)) {
+    options.push(pageSize);
   }
 
-  render() {
-    const { refetching } = this.state;
-    const {
-      paging: { pageSize, page, total },
-      onRefresh,
-      hideTotalPages,
-      disabled,
-      controlled_hasNextPage,
-      disableSetPageSize,
-      hideSetPageSize
-    } = this.props;
-    const pageStart = (page - 1) * pageSize + 1;
-    if (pageStart < 0) throw new Error("We should never have page be <0");
-    const backEnabled = page - 1 > 0;
-    const forwardEnabled = page * pageSize < total;
-    const lastPage = Math.ceil(total / pageSize);
-    const options = [...(window.tgPageSizes || defaultPageSizes)];
-    if (!options.includes(pageSize)) {
-      options.push(pageSize);
-    }
-    return (
-      <div className="paging-toolbar-container">
-        {onRefresh && (
-          <Button
-            minimal
-            loading={refetching}
-            icon="refresh"
-            disabled={disabled}
-            onClick={this.onRefresh}
-          />
-        )}
-        {!hideSetPageSize && (
-          <div
-            title="Set Page Size"
-            className={classNames(Classes.SELECT, Classes.MINIMAL)}
+  return (
+    <div className="paging-toolbar-container">
+      {onRefresh && (
+        <Button
+          minimal
+          loading={refetching}
+          icon="refresh"
+          disabled={disabled}
+          onClick={onRefreshHandler}
+        />
+      )}
+      {!hideSetPageSize && (
+        <div
+          title="Set Page Size"
+          className={classNames(Classes.SELECT, Classes.MINIMAL)}
+        >
+          <select
+            className="paging-page-size"
+            onChange={setPageSizeHandler}
+            disabled={disabled || disableSetPageSize}
+            value={pageSize}
           >
-            <select
-              className="paging-page-size"
-              onChange={this.setPageSize}
-              disabled={disabled || disableSetPageSize}
-              value={pageSize}
-            >
-              {[
-                <option key="page-size-placeholder" disabled value="fake">
-                  Size
-                </option>,
-                ...options.map(size => {
-                  return (
-                    <option key={size} value={size}>
-                      {size}
-                    </option>
-                  );
-                })
-              ]}
-            </select>
-          </div>
-        )}
-        <Button
-          onClick={this.pageBack}
-          disabled={!backEnabled || disabled}
-          minimal
-          className="paging-arrow-left"
-          icon="chevron-left"
-        />
-        <div>
-          {hideTotalPages ? (
-            page
-          ) : total ? (
-            <div>
-              <PagingInput
-                disabled={disabled}
-                onBlur={this.pageInputBlur}
-                defaultPage={page}
-              />
-              of {lastPage}
-            </div>
-          ) : (
-            "No Rows"
-          )}
+            {[
+              <option key="page-size-placeholder" disabled value="fake">
+                Size
+              </option>,
+              ...options.map(size => {
+                return (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                );
+              })
+            ]}
+          </select>
         </div>
-        <Button
-          style={{ marginLeft: 5 }}
-          disabled={
-            (controlled_hasNextPage === undefined
-              ? !forwardEnabled
-              : !controlled_hasNextPage) || disabled
-          }
-          icon="chevron-right"
-          minimal
-          className="paging-arrow-right"
-          onClick={this.pageForward}
-        />
+      )}
+      <Button
+        onClick={pageBackHandler}
+        disabled={!backEnabled || disabled}
+        minimal
+        className="paging-arrow-left"
+        icon="chevron-left"
+      />
+      <div>
+        {hideTotalPages ? (
+          page
+        ) : total ? (
+          <div>
+            <PagingInput
+              disabled={disabled}
+              onBlur={pageInputBlurHandler}
+              defaultPage={page}
+            />
+            of {lastPage}
+          </div>
+        ) : (
+          "No Rows"
+        )}
       </div>
-    );
-  }
-}
+      <Button
+        style={{ marginLeft: 5 }}
+        disabled={
+          (controlled_hasNextPage === undefined
+            ? !forwardEnabled
+            : !controlled_hasNextPage) || disabled
+        }
+        icon="chevron-right"
+        minimal
+        className="paging-arrow-right"
+        onClick={pageForwardHandler}
+      />
+    </div>
+  );
+};
 
 export default compose(
   withProps(props => {
