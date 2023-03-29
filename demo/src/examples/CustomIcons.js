@@ -3,6 +3,7 @@ import React from "react";
 import {
   flaskIcon,
   orfIcon,
+  removeDuplicatesIcon,
   featureIcon,
   dnaIcon,
   workqueueIcon,
@@ -36,6 +37,7 @@ export default function CustomIconsDemo() {
       </h4>
       <Button intent={"primary"} icon={flaskIcon} text="flaskIcon" />
       <Button icon={orfIcon} text="orfIcon" />
+      <Button icon={removeDuplicatesIcon} text="removeDuplicatesIcon" />
       <Button icon="add" text="orfIcon" />
       <Button icon={featureIcon} text="featureIcon" />
       <Button icon={reverseFeatureIcon} text="reverseFeatureIcon" />
