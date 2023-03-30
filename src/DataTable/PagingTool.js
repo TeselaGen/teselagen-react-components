@@ -7,7 +7,7 @@ import { onEnterOrBlurHelper } from "../utils/handlerHelpers";
 import { defaultPageSizes } from "./utils/queryParams";
 import getIdOrCodeOrIndex from "./utils/getIdOrCodeOrIndex";
 
-function PagingInput({ disabled, onBlur, defaultPage }) {
+function PagingInput({ disabled, onBlur, defaultPage, lastPage }) {
   const [page, setPage] = useState(defaultPage);
   const defaultValue = useRef(defaultPage);
 
@@ -20,7 +20,11 @@ function PagingInput({ disabled, onBlur, defaultPage }) {
 
   return (
     <input
-      style={{ marginLeft: 5, width: 35, marginRight: 8 }}
+      style={{
+        marginLeft: 5,
+        width: lastPage > 999 ? 65 : lastPage > 99 ? 45 : 35,
+        marginRight: 8
+      }}
       value={page}
       disabled={disabled}
       onChange={e => {
@@ -160,6 +164,7 @@ const PagingTool = ({
               disabled={disabled}
               onBlur={pageInputBlurHandler}
               defaultPage={page}
+              lastPage={lastPage}
             />
             of {lastPage}
           </div>
