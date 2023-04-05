@@ -14,7 +14,7 @@ if (userLocale) {
         dayjs.locale(newLocale);
       } catch (error) {
         // error
-        if (!skipCall && newLocale.contains("-")) {
+        if (!skipCall && newLocale.includes("-")) {
           requireLocale(newLocale.split("-")[0], true);
         }
       }
