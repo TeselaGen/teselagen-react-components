@@ -7,9 +7,21 @@ dayjs.extend(LocalizedFormat);
 const userLocale = Intl.DateTimeFormat().resolvedOptions().locale;
 
 if (userLocale) {
-  const localeToUse = userLocale.split("-")[0];
-  require(`dayjs/locale/${localeToUse}.js`);
-  dayjs.locale(localeToUse);
+  const requireLocale = (newLocale, skipCall) => {
+    if (dayjs.locale() !== newLocale) {
+      try {
+        require(`dayjs/locale/${newLocale}.js`);
+        dayjs.locale(newLocale);
+      } catch (error) {
+        // error
+        if (!skipCall && newLocale.contains("-")) {
+          requireLocale(newLocale.split("-")[0], true);
+        }
+      }
+    }
+  };
+  const localeToUse = userLocale.toLowerCase();
+  requireLocale(localeToUse);
 }
 
 export default function getDayjsFormatter(format) {
