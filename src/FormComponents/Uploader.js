@@ -31,6 +31,7 @@ import tryToMatchSchemas from "./tryToMatchSchemas";
 import { isArray, isFunction, isPlainObject } from "lodash";
 import { flatMap } from "lodash";
 import urljoin from "url-join";
+import popoverOverflowModifiers from "../utils/popoverOverflowModifiers";
 
 function noop() {}
 // wink wink
@@ -230,6 +231,7 @@ function Uploader({
                       <Tooltip
                         key={i}
                         disabled={disabled}
+                        modifiers={popoverOverflowModifiers}
                         content={
                           <div>
                             {a.description ? (
