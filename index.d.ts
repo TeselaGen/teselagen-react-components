@@ -617,12 +617,15 @@ export class FileUploadField extends React.Component<
   FileUploadFieldProps,
   any
 > { }
+type AcceptObj = {
+  type: string; exampleFile: string | (() => string); description: string; isTemplate: boolean
+}
 
 export interface FileUploadFieldProps extends GenericFormFieldProps {
   innerIcon: "string";
   innerText: "string";
   threeDotMenuItems: any;
-  accept: string | [string];
+  accept: string | [string] | AcceptObj | [AcceptObj];
   contentOverride: () => {};
   action: string;
   className: string;
@@ -677,7 +680,7 @@ export interface DateRangeInputFieldProps extends GenericFormFieldProps { }
  */
 export class CheckboxField extends React.Component<CheckboxFieldProps, any> { }
 
-export interface CheckboxFieldProps extends GenericFormFieldProps { 
+export interface CheckboxFieldProps extends GenericFormFieldProps {
   beforeOnChange: function
 }
 
@@ -709,7 +712,7 @@ export interface CheckboxFieldProps extends GenericFormFieldProps {
  */
 export class SwitchField extends React.Component<SwitchFieldProps, any> { }
 
-export interface SwitchFieldProps extends GenericFormFieldProps { 
+export interface SwitchFieldProps extends GenericFormFieldProps {
   beforeOnChange: function
 }
 /**
