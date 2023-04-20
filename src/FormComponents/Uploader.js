@@ -5,6 +5,7 @@ import {
   Classes,
   Icon,
   Menu,
+  MenuItem,
   Popover,
   Position,
   Tooltip
@@ -198,7 +199,6 @@ function Uploader({
     }
     setLoading(false);
   }
-  const baseUrl = window?.frontEndConfig?.serverBasePath || "";
 
   return (
     <div
@@ -225,43 +225,65 @@ function Uploader({
                 Accepts &nbsp;
                 <span style={{}}>
                   {advancedAccept.map((a, i) => {
-                    const disabled = !(a.description || a.exampleFile);
-                    const CustomTag = !a.exampleFile ? "span" : "a";
+                    const disabled = !(
+                      a.description ||
+                      a.exampleFile ||
+                      a.exampleFiles
+                    );
+                    const PopOrTooltip = a.exampleFiles ? Popover : Tooltip;
+                    const hasDownload = a.exampleFile || a.exampleFiles;
+                    const CustomTag = !hasDownload ? "span" : "a";
                     return (
-                      <Tooltip
+                      <PopOrTooltip
                         key={i}
+                        interactionKind="hover"
                         disabled={disabled}
                         modifiers={popoverOverflowModifiers}
                         content={
-                          <div>
-                            {a.description ? (
-                              <div
-                                style={{
-                                  marginBottom: 4,
-                                  fontStyle: "italic"
-                                }}
-                              >
-                                {a.description}
-                              </div>
-                            ) : (
-                              ""
-                            )}
-                            {a.exampleFile && "Download Example File"}
-                          </div>
+                          a.exampleFiles ? (
+                            <Menu>
+                              {a.exampleFiles.map(
+                                ({ description, exampleFile }, i) => {
+                                  return (
+                                    <MenuItem
+                                      icon="download"
+                                      intent="primary"
+                                      text={description}
+                                      {...getFileDownloadAttr(exampleFile)}
+                                      key={i}
+                                    ></MenuItem>
+                                  );
+                                }
+                              )}
+                            </Menu>
+                          ) : (
+                            <div
+                              style={{ maxWidth: 400, wordBreak: "break-all" }}
+                            >
+                              {a.description ? (
+                                <div
+                                  style={{
+                                    marginBottom: 4,
+                                    fontStyle: "italic"
+                                  }}
+                                >
+                                  {a.description}
+                                </div>
+                              ) : (
+                                ""
+                              )}
+                              {a.exampleFile &&
+                                (a.isTemplate
+                                  ? "Download Example Template"
+                                  : "Download Example File")}
+                            </div>
+                          )
                         }
                       >
                         <CustomTag
                           className="tgFileTypeDescriptor"
                           style={{ marginRight: 10, cursor: "pointer" }}
-                          {...(isFunction(a.exampleFile)
-                            ? { onClick: a.exampleFile }
-                            : a.exampleFile && {
-                                href: urljoin(
-                                  baseUrl,
-                                  "exampleFiles",
-                                  a.exampleFile
-                                )
-                              })}
+                          {...getFileDownloadAttr(a.exampleFile)}
                         >
                           {(a.type
                             ? isArray(a.type)
@@ -274,7 +296,7 @@ function Uploader({
                             })
                             .join(", ")}
 
-                          {a.exampleFile && (
+                          {hasDownload && (
                             <Icon
                               style={{
                                 marginTop: 3,
@@ -285,7 +307,7 @@ function Uploader({
                             ></Icon>
                           )}
                         </CustomTag>
-                      </Tooltip>
+                      </PopOrTooltip>
                     );
                   })}
                 </span>
@@ -666,3 +688,12 @@ function Uploader({
 }
 
 export default Uploader;
+
+function getFileDownloadAttr(exampleFile) {
+  const baseUrl = window?.frontEndConfig?.serverBasePath || "";
+  return isFunction(exampleFile)
+    ? { onClick: exampleFile }
+    : exampleFile && {
+        href: urljoin(baseUrl, "exampleFiles", exampleFile)
+      };
+}

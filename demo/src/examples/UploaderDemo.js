@@ -12,6 +12,10 @@ export default function UploaderDemo() {
     type: "accept",
     label: "Toggle Advance Accept"
   });
+  // const [advancedAccept, advancedAcceptToggleComp] = useToggle({
+  //   type: "accept",
+  //   label: "Toggle Advance Accept"
+  // });
   return (
     <div>
       <OptionsSection>
@@ -33,10 +37,20 @@ export default function UploaderDemo() {
                   {
                     type: "ab1",
                     description: "Sequence Trace Format",
+                    exampleFiles: [
+                      { description: "Download File 1", exampleFile: "google.com" },
+                      { description: "Download File 2", exampleFile: "google.com" }
+                    ]
                   },
                   {
                     type: "dna",
-                    description: "SnapGene DNA Format",
+                    description: "SnapGene DNA Format I'm a superrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrr long message",
+                    exampleFile: "google.com"
+                  },
+                  {
+                    type: "template",
+                    isTemplate: true,
+                    description: "I'm a template file",
                     exampleFile: "google.com"
                   },
                   {
