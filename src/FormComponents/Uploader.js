@@ -694,6 +694,9 @@ function getFileDownloadAttr(exampleFile) {
   return isFunction(exampleFile)
     ? { onClick: exampleFile }
     : exampleFile && {
+        target: "_blank",
+        // href: `/package.json`,
+        download: true,
         href: urljoin(baseUrl, "exampleFiles", exampleFile)
       };
 }
