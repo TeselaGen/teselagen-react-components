@@ -44,7 +44,7 @@ export default function UploaderDemo() {
                   },
                   {
                     type: "dna",
-                    description: "SnapGene DNA Format I'm a superrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrr long message",
+                    description: "SnapGene DNA Format I'm a superrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrrsuperrrrrrrrrrr long message",
                     exampleFile: "google.com"
                   },
                   {

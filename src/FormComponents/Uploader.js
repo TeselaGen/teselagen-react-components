@@ -258,7 +258,7 @@ function Uploader({
                             </Menu>
                           ) : (
                             <div
-                              style={{ maxWidth: 400, wordBreak: "break-all" }}
+                              style={{ maxWidth: 400, wordBreak: "break-word" }}
                             >
                               {a.description ? (
                                 <div
