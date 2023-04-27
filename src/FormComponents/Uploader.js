@@ -631,7 +631,9 @@ function Uploader({
                     />
                     <a
                       name={name || originalName}
-                      {...(url && !onFileClick ? { href: url } : {})}
+                      {...(url && !onFileClick
+                        ? { download: true, href: url }
+                        : {})}
                       /* eslint-disable react/jsx-no-bind*/
                       onClick={() => {
                         if (onFileClick) {
