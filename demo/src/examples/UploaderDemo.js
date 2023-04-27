@@ -39,7 +39,7 @@ export default function UploaderDemo() {
                     description: "Sequence Trace Format",
                     exampleFiles: [
                       { description: "Download File 1", exampleFile: "https://teselagen.github.io/json-schema-viewer/#/view/%23?url=.%2Fschemas%2Fdesign.json" },
-                      { description: "Download File 2", exampleFile: "https://teselagen.github.io/json-schema-viewer/#/view/%23?url=.%2Fschemas%2Fdesign.json" }
+                      { description: "View File 2", icon: 'link', exampleFile: "https://teselagen.github.io/json-schema-viewer/#/view/%23?url=.%2Fschemas%2Fdesign.json" }
                     ]
                   },
                   {

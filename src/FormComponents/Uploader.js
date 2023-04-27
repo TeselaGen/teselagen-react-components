@@ -243,10 +243,10 @@ function Uploader({
                           a.exampleFiles ? (
                             <Menu>
                               {a.exampleFiles.map(
-                                ({ description, exampleFile }, i) => {
+                                ({ description, exampleFile, icon }, i) => {
                                   return (
                                     <MenuItem
-                                      icon="download"
+                                      icon={icon || "download"}
                                       intent="primary"
                                       text={description}
                                       {...getFileDownloadAttr(exampleFile)}
