@@ -699,6 +699,9 @@ function getFileDownloadAttr(exampleFile) {
         target: "_blank",
         // href: `/package.json`,
         download: true,
-        href: urljoin(baseUrl, "exampleFiles", exampleFile)
+        href:
+          exampleFile.startsWith("https") || exampleFile.startsWith("www")
+            ? exampleFile
+            : urljoin(baseUrl, "exampleFiles", exampleFile)
       };
 }
