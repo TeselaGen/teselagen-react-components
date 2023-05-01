@@ -1332,264 +1332,287 @@ class DataTable extends React.Component {
     return (
       // eslint-disable-next-line no-undef
       <this.hotkeyEnabler>
-        <div
-          className={classNames(
-            "data-table-container",
-            extraClasses,
-            className,
-            compactClassName,
-            {
-              fullscreen,
-              in_cypress_test: window.Cypress, //tnr: this is a hack to make cypress be able to correctly click the table without the sticky header getting in the way. remove me once https://github.com/cypress-io/cypress/issues/871 is fixed
-              "dt-isViewable": isViewable,
-              "dt-minimalStyle": minimalStyle,
-              "no-padding": noPadding,
-              "hide-column-header": hideColumnHeader
-            }
-          )}
-        >
-          {showHeader && (
-            <div className="data-table-header">
-              <div className="data-table-title-and-buttons">
-                {tableName && withTitle && (
-                  <span className="data-table-title">{tableName}</span>
-                )}
-                {children}
-                {topLeftItems}
-              </div>
-              {errorParsingUrlString && (
-                <Callout
-                  icon="error"
-                  style={{
-                    width: "unset"
-                  }}
-                  intent={Intent.WARNING}
-                >
-                  Error parsing URL
-                </Callout>
-              )}
-              {nonDisplayedFilterComp}
-              {withSearch && (
-                <div className="data-table-search-and-clear-filter-container">
-                  {leftOfSearchBarItems}
-                  {hasFilters ? (
-                    <Tooltip content="Clear Filters">
-                      <Button
-                        minimal
-                        intent="danger"
-                        icon="filter-remove"
-                        disabled={disabled}
-                        className="data-table-clear-filters"
-                        onClick={() => {
-                          clearFilters(additionalFilterKeys);
-                        }}
-                      />
-                    </Tooltip>
-                  ) : (
-                    ""
-                  )}
-                  <SearchBar
-                    {...{
-                      reduxFormSearchInput,
-                      setSearchTerm,
-                      loading: isLoading,
-                      searchMenuButton,
-                      disabled,
-                      autoFocusSearch
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-          )}
-          {subHeader}
-          {showSelectAll && !isSingleSelect && (
-            <div
-              style={{
-                marginTop: 5,
-                marginBottom: 5,
-                display: "flex",
-                alignItems: "center"
-              }}
-            >
-              All items on this page are selected.{" "}
-              <Button
-                small
-                minimal
-                intent="primary"
-                text={`Select all ${entityCount ||
-                  entitiesAcrossPages.length} items`}
-                loading={this.state.selectingAll}
-                onClick={async () => {
-                  if (withSelectAll) {
-                    // this will be by querying for everything
-                    this.setState({
-                      selectingAll: true
-                    });
-                    try {
-                      const allEntities = await safeQuery(fragment, {
-                        variables: {
-                          filter: variables.filter,
-                          sort: variables.sort
-                        },
-                        canCancel: true
-                      });
-                      this.addEntitiesToSelection(allEntities);
-                    } catch (error) {
-                      console.error(`error:`, error);
-                      window.toastr.error("Error selecting all constructs");
-                    }
-                    this.setState({
-                      selectingAll: false
-                    });
-                  } else {
-                    this.addEntitiesToSelection(entitiesAcrossPages);
-                  }
-                }}
-              />
-            </div>
-          )}
-          {showClearAll > 0 && (
-            <div
-              style={{
-                marginTop: 5,
-                marginBottom: 5,
-                display: "flex",
-                alignItems: "center"
-              }}
-            >
-              All {showClearAll} items are selected.{" "}
-              <Button
-                small
-                minimal
-                intent="primary"
-                text="Clear Selection"
-                onClick={() => {
-                  finalizeSelection({
-                    idMap: {},
-                    entities,
-                    props: computePresets(this.props)
-                  });
-                }}
-              />
-            </div>
-          )}
-          <ReactTable
-            data={filteredEnts}
-            ref={n => {
-              if (n) this.table = n;
-            }}
-            additionalBodyEl={
-              isCellEditable &&
-              !noAddMoreRowsButton && (
-                <Button
-                  icon="add"
-                  style={{ marginTop: "auto" }}
-                  onClick={() => {
-                    this.insertRows({ numRows: 10, appendToBottom: true });
-                  }}
-                  minimal
-                >
-                  Add 10 Rows
-                </Button>
-              )
-            }
-            className={classNames({
-              isCellEditable,
-              "tg-table-loading": isLoading,
-              "tg-table-disabled": disabled
+        <div>
+          <div
+            {...(isCellEditable && {
+              tabIndex: -1,
+              onKeyDown: e => {
+                if (e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) return;
+                const cellId = this.getPrimarySelectedCellId();
+                if (!cellId) return;
+                const entityIdToEntity = getEntityIdToEntity(entities);
+                const [rowId] = cellId.split(":");
+                if (!rowId) return;
+                const entity = entityIdToEntity[rowId].e;
+                if (!entity) return;
+                const rowDisabled = isEntityDisabled(entity);
+                const isNum = e.keyCode >= 48 && e.keyCode <= 57;
+                const isLetter = e.keyCode >= 65 && e.keyCode <= 90;
+                if (!isNum && !isLetter) return;
+                if (rowDisabled) return;
+                this.startCellEdit(cellId);
+              }
             })}
-            itemSizeEstimator={
-              extraCompact
-                ? itemSizeEstimators.compact
-                : compact
-                ? itemSizeEstimators.normal
-                : itemSizeEstimators.comfortable
-            }
-            TfootComponent={() => {
-              return <button>hasdfasdf</button>;
-            }}
-            columns={this.renderColumns()}
-            pageSize={rowsToShow}
-            expanded={expandedRows}
-            showPagination={false}
-            sortable={false}
-            loading={isLoading || disabled}
-            defaultResized={resized}
-            onResizedChange={(newResized = []) => {
-              const resizedToUse = newResized.map(column => {
-                // have a min width of 50 so that columns don't disappear
-                if (column.value < 50) {
-                  return {
-                    ...column,
-                    value: 50
-                  };
-                } else {
-                  return column;
-                }
-              });
-              resizePersist(resizedToUse);
-            }}
-            TheadComponent={this.getTheadComponent}
-            ThComponent={this.getThComponent}
-            getTrGroupProps={this.getTableRowProps}
-            getTdProps={this.getTableCellProps}
-            NoDataComponent={({ children }) =>
-              isLoading ? null : (
-                <div className="rt-noData">
-                  {noRowsFoundMessage || children}
-                </div>
-              )
-            }
-            LoadingComponent={props => (
-              <DisabledLoadingComponent {...{ ...props, disabled }} />
+            className={classNames(
+              "data-table-container",
+              extraClasses,
+              className,
+              compactClassName,
+              {
+                fullscreen,
+                in_cypress_test: window.Cypress, //tnr: this is a hack to make cypress be able to correctly click the table without the sticky header getting in the way. remove me once https://github.com/cypress-io/cypress/issues/871 is fixed
+                "dt-isViewable": isViewable,
+                "dt-minimalStyle": minimalStyle,
+                "no-padding": noPadding,
+                "hide-column-header": hideColumnHeader
+              }
             )}
-            style={{
-              maxHeight,
-              minHeight: 150,
-              ...style
-            }}
-            SubComponent={SubComponentToUse}
-            {...ReactTableProps}
-          />
-
-          {!noFooter && (
-            <div
-              className="data-table-footer"
-              style={{
-                justifyContent:
-                  !showNumSelected && !showCount ? "flex-end" : "space-between"
-              }}
-            >
-              {selectedAndTotalMessage}
-              <div style={{ display: "flex", flexWrap: "wrap" }}>
-                {additionalFooterButtons}
-                {!noFullscreenButton && toggleFullscreenButton}
-                {withDisplayOptions && (
-                  <DisplayOptions
-                    compact={compact}
-                    extraCompact={extraCompact}
-                    disabled={disabled}
-                    hideDisplayOptionsIcon={hideDisplayOptionsIcon}
-                    resetDefaultVisibility={resetDefaultVisibilityToUse}
-                    updateColumnVisibility={updateColumnVisibilityToUse}
-                    updateTableDisplayDensity={updateTableDisplayDensityToUse}
-                    showForcedHiddenColumns={showForcedHiddenColumns}
-                    setShowForcedHidden={setShowForcedHidden}
-                    hasOptionForForcedHidden={hasOptionForForcedHidden}
-                    formName={formName}
-                    schema={schema}
-                  />
+          >
+            {showHeader && (
+              <div className="data-table-header">
+                <div className="data-table-title-and-buttons">
+                  {tableName && withTitle && (
+                    <span className="data-table-title">{tableName}</span>
+                  )}
+                  {children}
+                  {topLeftItems}
+                </div>
+                {errorParsingUrlString && (
+                  <Callout
+                    icon="error"
+                    style={{
+                      width: "unset"
+                    }}
+                    intent={Intent.WARNING}
+                  >
+                    Error parsing URL
+                  </Callout>
                 )}
-                {shouldShowPaging && (
-                  <PagingTool
-                    {...propPresets}
-                    persistPageSize={persistPageSizeToUse}
-                  />
+                {nonDisplayedFilterComp}
+                {withSearch && (
+                  <div className="data-table-search-and-clear-filter-container">
+                    {leftOfSearchBarItems}
+                    {hasFilters ? (
+                      <Tooltip content="Clear Filters">
+                        <Button
+                          minimal
+                          intent="danger"
+                          icon="filter-remove"
+                          disabled={disabled}
+                          className="data-table-clear-filters"
+                          onClick={() => {
+                            clearFilters(additionalFilterKeys);
+                          }}
+                        />
+                      </Tooltip>
+                    ) : (
+                      ""
+                    )}
+                    <SearchBar
+                      {...{
+                        reduxFormSearchInput,
+                        setSearchTerm,
+                        loading: isLoading,
+                        searchMenuButton,
+                        disabled,
+                        autoFocusSearch
+                      }}
+                    />
+                  </div>
                 )}
               </div>
-            </div>
-          )}
+            )}
+            {subHeader}
+            {showSelectAll && !isSingleSelect && (
+              <div
+                style={{
+                  marginTop: 5,
+                  marginBottom: 5,
+                  display: "flex",
+                  alignItems: "center"
+                }}
+              >
+                All items on this page are selected.{" "}
+                <Button
+                  small
+                  minimal
+                  intent="primary"
+                  text={`Select all ${entityCount ||
+                    entitiesAcrossPages.length} items`}
+                  loading={this.state.selectingAll}
+                  onClick={async () => {
+                    if (withSelectAll) {
+                      // this will be by querying for everything
+                      this.setState({
+                        selectingAll: true
+                      });
+                      try {
+                        const allEntities = await safeQuery(fragment, {
+                          variables: {
+                            filter: variables.filter,
+                            sort: variables.sort
+                          },
+                          canCancel: true
+                        });
+                        this.addEntitiesToSelection(allEntities);
+                      } catch (error) {
+                        console.error(`error:`, error);
+                        window.toastr.error("Error selecting all constructs");
+                      }
+                      this.setState({
+                        selectingAll: false
+                      });
+                    } else {
+                      this.addEntitiesToSelection(entitiesAcrossPages);
+                    }
+                  }}
+                />
+              </div>
+            )}
+            {showClearAll > 0 && (
+              <div
+                style={{
+                  marginTop: 5,
+                  marginBottom: 5,
+                  display: "flex",
+                  alignItems: "center"
+                }}
+              >
+                All {showClearAll} items are selected.{" "}
+                <Button
+                  small
+                  minimal
+                  intent="primary"
+                  text="Clear Selection"
+                  onClick={() => {
+                    finalizeSelection({
+                      idMap: {},
+                      entities,
+                      props: computePresets(this.props)
+                    });
+                  }}
+                />
+              </div>
+            )}
+            <ReactTable
+              data={filteredEnts}
+              ref={n => {
+                if (n) this.table = n;
+              }}
+              additionalBodyEl={
+                isCellEditable &&
+                !noAddMoreRowsButton && (
+                  <Button
+                    icon="add"
+                    style={{ marginTop: "auto" }}
+                    onClick={() => {
+                      this.insertRows({ numRows: 10, appendToBottom: true });
+                    }}
+                    minimal
+                  >
+                    Add 10 Rows
+                  </Button>
+                )
+              }
+              className={classNames({
+                isCellEditable,
+                "tg-table-loading": isLoading,
+                "tg-table-disabled": disabled
+              })}
+              itemSizeEstimator={
+                extraCompact
+                  ? itemSizeEstimators.compact
+                  : compact
+                  ? itemSizeEstimators.normal
+                  : itemSizeEstimators.comfortable
+              }
+              TfootComponent={() => {
+                return <button>hasdfasdf</button>;
+              }}
+              columns={this.renderColumns()}
+              pageSize={rowsToShow}
+              expanded={expandedRows}
+              showPagination={false}
+              sortable={false}
+              loading={isLoading || disabled}
+              defaultResized={resized}
+              onResizedChange={(newResized = []) => {
+                const resizedToUse = newResized.map(column => {
+                  // have a min width of 50 so that columns don't disappear
+                  if (column.value < 50) {
+                    return {
+                      ...column,
+                      value: 50
+                    };
+                  } else {
+                    return column;
+                  }
+                });
+                resizePersist(resizedToUse);
+              }}
+              TheadComponent={this.getTheadComponent}
+              ThComponent={this.getThComponent}
+              getTrGroupProps={this.getTableRowProps}
+              getTdProps={this.getTableCellProps}
+              NoDataComponent={({ children }) =>
+                isLoading ? null : (
+                  <div className="rt-noData">
+                    {noRowsFoundMessage || children}
+                  </div>
+                )
+              }
+              LoadingComponent={props => (
+                <DisabledLoadingComponent {...{ ...props, disabled }} />
+              )}
+              style={{
+                maxHeight,
+                minHeight: 150,
+                ...style
+              }}
+              SubComponent={SubComponentToUse}
+              {...ReactTableProps}
+            />
+
+            {!noFooter && (
+              <div
+                className="data-table-footer"
+                style={{
+                  justifyContent:
+                    !showNumSelected && !showCount
+                      ? "flex-end"
+                      : "space-between"
+                }}
+              >
+                {selectedAndTotalMessage}
+                <div style={{ display: "flex", flexWrap: "wrap" }}>
+                  {additionalFooterButtons}
+                  {!noFullscreenButton && toggleFullscreenButton}
+                  {withDisplayOptions && (
+                    <DisplayOptions
+                      compact={compact}
+                      extraCompact={extraCompact}
+                      disabled={disabled}
+                      hideDisplayOptionsIcon={hideDisplayOptionsIcon}
+                      resetDefaultVisibility={resetDefaultVisibilityToUse}
+                      updateColumnVisibility={updateColumnVisibilityToUse}
+                      updateTableDisplayDensity={updateTableDisplayDensityToUse}
+                      showForcedHiddenColumns={showForcedHiddenColumns}
+                      setShowForcedHidden={setShowForcedHidden}
+                      hasOptionForForcedHidden={hasOptionForForcedHidden}
+                      formName={formName}
+                      schema={schema}
+                    />
+                  )}
+                  {shouldShowPaging && (
+                    <PagingTool
+                      {...propPresets}
+                      persistPageSize={persistPageSizeToUse}
+                    />
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </this.hotkeyEnabler>
     );

@@ -33,6 +33,11 @@ describe("EditableCellTable.spec", () => {
     ).should("contain", "tom88_zonk");
     cy.get(".cellDragHandle").should("exist");
   });
+  it(`typing a letter should start edit`, () => {
+    cy.visit("#/DataTable/EditableCellTable");
+    cy.get(`[data-test="tgCell_name"]:first`).type("zonk{enter}");
+    cy.get(`[data-test="tgCell_name"]:first`).should("contain", "tom88zonk");
+  });
 
   it(`should be able to edit dropdown inputs correctly`, () => {
     cy.visit("#/DataTable/EditableCellTable");
