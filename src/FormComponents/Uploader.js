@@ -246,7 +246,7 @@ function Uploader({
           };
           // handleDownloadXlsxFile()
           a.exampleFiles = [
-            ...(a.exampleFile ? [a.exampleFile] : []),
+            // ...(a.exampleFile ? [a.exampleFile] : []),
             // {
             //   description: "Download Example CSV File",
             //   exampleFile: () => {}
