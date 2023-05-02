@@ -12,30 +12,17 @@ const validateAgainstSchema = {
   fields: [
     { isRequired: true, path: "name", description: "The Sequence Name", example: "pj5_0001" },
     { path: "description", example: "Example description of a sequence" },
-    { isRequired: true, path: "sequence", example: "gtgctttca" },
+    { isRequired: true, path: "sequence", example: "gtgctttca", description: "The dna sequence base pairs" },
     {
       path: "isRegex",
       type: "boolean",
-      defaultValue: false
-    },
-    {
-      path: "isRegex",
-      type: "boolean",
-      defaultValue: false
-    },
-    {
-      path: "isRegex",
-      type: "boolean",
-      defaultValue: false
-    },
-    {
-      path: "isRegex",
-      type: "boolean",
+      description: "Whether the sequence is a regex",
       defaultValue: false
     },
     {
       path: "matchType",
       type: "dropdown",
+      description: "Whether the sequence is a dna or protein sequence",
       values: ["dna", "protein"],
       defaultValue: "dna"
     },
