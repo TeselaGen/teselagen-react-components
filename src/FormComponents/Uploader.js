@@ -247,10 +247,10 @@ function Uploader({
           // handleDownloadXlsxFile()
           a.exampleFiles = [
             ...(a.exampleFile ? [a.exampleFile] : []),
-            {
-              description: "Download Example CSV File",
-              exampleFile: () => {}
-            },
+            // {
+            //   description: "Download Example CSV File",
+            //   exampleFile: () => {}
+            // },
             {
               description: "Download Example XLSX File",
               exampleFile: handleDownloadXlsxFile
