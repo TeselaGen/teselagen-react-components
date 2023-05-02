@@ -113,6 +113,30 @@ function matchSchemas({ userSchema, officialSchema }) {
       csvValidationIssue =
         "It looks like some of the headers in your uploaded file do not match the expected headers. Please look over and correct any issues with the mappings below.";
   });
+  if (officialSchema.allowAdditionalOnEnd) {
+    officialSchema.fields = officialSchema.fields.filter(
+      f => !f.isAdditionalOnEnd
+    );
+    userSchema.fields.forEach(f => {
+      if (f.path.startsWith(officialSchema.allowAdditionalOnEnd)) {
+        officialSchema.fields.push({
+          isAdditionalOnEnd: true,
+          path: f.path,
+          type: f.type || "string",
+          matches: [
+            {
+              item: {
+                path: f.path,
+                type: f.type
+              },
+              refIndex: f.refIndex,
+              score: 0
+            }
+          ]
+        });
+      }
+    });
+  }
 
   const editableFields = officialSchema.fields.filter(f => !f.isNotEditable);
   const hasErr =

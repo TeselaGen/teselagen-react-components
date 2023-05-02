@@ -232,7 +232,7 @@ const UploadCsvWizardDialog = compose(
   }
 
   return (
-    <div style={{ width: "fit-content" }}>
+    <div>
       <div style={{ display: "flex", justifyContent: "center" }}>
         <SimpleStepViz style={{ marginTop: 8 }} steps={steps}></SimpleStepViz>
       </div>
@@ -304,20 +304,22 @@ export const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
   const data =
     userSchema.userData &&
     userSchema.userData.length &&
-    userSchema.userData.map(row => {
+    userSchema.userData.map((row, i1) => {
       const toRet = {};
-      validateAgainstSchema.fields.forEach(({ path, defaultValue }, i) => {
-        const matchingKey = matchedHeaders?.[i];
+      validateAgainstSchema.fields.forEach(
+        ({ path, defaultValue, example }, i) => {
+          const matchingKey = matchedHeaders?.[i];
 
-        if (!matchingKey) {
-          toRet[path] = defaultValue === undefined ? defaultValue : "";
-        } else {
-          toRet[path] = row[matchingKey];
+          if (!matchingKey) {
+            toRet[path] = defaultValue === undefined ? defaultValue : "";
+          } else {
+            toRet[path] = row[matchingKey];
+          }
+          if (toRet[path] === undefined || toRet[path] === "") {
+            toRet[path] = defaultValue || (i1 === 0 && example) || "";
+          }
         }
-        if (toRet[path] === undefined || toRet[path] === "") {
-          toRet[path] = defaultValue || "";
-        }
-      });
+      );
       if (row.id === undefined) {
         toRet.id = nanoid();
       } else {
