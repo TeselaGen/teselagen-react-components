@@ -10,10 +10,10 @@ import { flatMap } from "lodash";
 import { compose } from "recompose";
 import SimpleStepViz from "./SimpleStepViz";
 import { nanoid } from "nanoid";
-import tgFormValues, { tgFormValueSelector } from "./utils/tgFormValues";
+import { tgFormValueSelector } from "./utils/tgFormValues";
 import { some } from "lodash";
 import { times } from "lodash";
-import { ReactSelectField, SwitchField } from "./FormComponents";
+import { ReactSelectField } from "./FormComponents";
 import DialogFooter from "./DialogFooter";
 import DataTable from "./DataTable";
 import wrapDialog from "./wrapDialog";
@@ -46,7 +46,7 @@ const UploadCsvWizardDialog = compose(
   csvValidationIssue,
   //fromRedux:
   handleSubmit,
-  onlyShowRowsWErrors,
+  // onlyShowRowsWErrors,
   reduxFormEntities,
   reduxFormCellValidation,
   changeForm
@@ -72,7 +72,7 @@ const UploadCsvWizardDialog = compose(
         {...{
           initialEntities: reduxFormEntities,
           matchedHeaders,
-          onlyShowRowsWErrors,
+          // onlyShowRowsWErrors,
           validateAgainstSchema,
           userSchema
         }}
@@ -285,11 +285,11 @@ const UploadCsvWizardDialog = compose(
 
 export default UploadCsvWizardDialog;
 
-export const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
+export const PreviewCsvData = function({
   formName,
   matchedHeaders,
   headerMessage,
-  onlyShowRowsWErrors,
+  // onlyShowRowsWErrors,
   validateAgainstSchema,
   userSchema = { userData: times(5) },
   initialEntities
@@ -346,11 +346,6 @@ export const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
           alignItems: "flex-start"
         }}
       >
-        <SwitchField
-          name="onlyShowRowsWErrors"
-          inlineLabel={true}
-          label="Only Show Rows With Errors"
-        />
         {validateAgainstSchema.allowAdditionalOnEnd && (
           <Button
             icon="plus"
@@ -389,15 +384,13 @@ export const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
         destroyOnUnmount={false}
         formName={formName || "editableCellTable"}
         isSimple
-        noAddMoreRowsButton={onlyShowRowsWErrors}
-        onlyShowRowsWErrors={onlyShowRowsWErrors}
         isCellEditable
         entities={data || []}
         schema={validateAgainstSchema}
       ></DataTable>
     </div>
   );
-});
+};
 
 export const SimpleInsertDataDialog = compose(
   wrapDialog({

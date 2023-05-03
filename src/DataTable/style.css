@@ -56,9 +56,6 @@
 .data-table-container {
   padding: 20px;
   position: relative;
-  /* height: 100%;  tnr: this rule messes up  */
-  /* jpc: restoring rule for now to see if it still causes
-   * problems, and if so, what are those */
   height: 100%;
   width: 100%;
   display: flex;
@@ -136,6 +133,7 @@
 
 /* tgreen: we don't want the border for rows that don't have any data */
 .ReactTable.ReactTable .rt-tbody .rt-tr-group.no-row-data {
+  min-height: 0px;
   border-bottom: none;
 }
 

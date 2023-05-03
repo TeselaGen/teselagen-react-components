@@ -260,6 +260,7 @@ export default compose(
     "localStorageForceUpdate",
     "reduxFormQueryParams",
     "reduxFormSearchInput",
+    "onlyShowRowsWErrors",
     "reduxFormSelectedEntityIdMap",
     "reduxFormExpandedEntityIdMap",
     "reduxFormSelectedCells",

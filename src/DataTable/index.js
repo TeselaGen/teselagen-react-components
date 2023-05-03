@@ -81,6 +81,7 @@ import { getRecordsFromIdMap } from "./utils/withSelectedEntities";
 import { CellDragHandle } from "./CellDragHandle";
 import { nanoid } from "nanoid";
 import { isString } from "lodash";
+import { SwitchField } from "../FormComponents";
 enablePatches();
 
 const PRIMARY_SELECTED_VAL = "main_cell";
@@ -1114,8 +1115,7 @@ class DataTable extends React.Component {
       variables,
       fragment,
       safeQuery,
-      isCellEditable,
-      noAddMoreRowsButton
+      isCellEditable
     } = propPresets;
 
     if (withSelectAll && !safeQuery) {
@@ -1369,6 +1369,13 @@ class DataTable extends React.Component {
               }
             )}
           >
+            {isCellEditable && entities.length > 50 && (
+              <SwitchField
+                name="onlyShowRowsWErrors"
+                inlineLabel={true}
+                label="Only Show Rows With Errors"
+              />
+            )}
             {showHeader && (
               <div className="data-table-header">
                 <div className="data-table-title-and-buttons">
@@ -1495,6 +1502,7 @@ class DataTable extends React.Component {
                 />
               </div>
             )}
+
             <ReactTable
               data={filteredEnts}
               ref={n => {
@@ -1502,7 +1510,7 @@ class DataTable extends React.Component {
               }}
               additionalBodyEl={
                 isCellEditable &&
-                !noAddMoreRowsButton && (
+                !onlyShowRowsWErrors && (
                   <Button
                     icon="add"
                     style={{ marginTop: "auto" }}
@@ -1573,7 +1581,6 @@ class DataTable extends React.Component {
               SubComponent={SubComponentToUse}
               {...ReactTableProps}
             />
-
             {!noFooter && (
               <div
                 className="data-table-footer"
