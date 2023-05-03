@@ -6,15 +6,31 @@ import { FileUploadField } from "../../../src";
 import DemoWrapper from "../DemoWrapper";
 import { parseCsvOrExcelFile } from "../../../src/utils/parserUtils";
 import { reduxForm } from "redux-form";
+import { useToggle } from "../useToggle";
 
+const simpleValidateAgainst = {
+  fields: [{ path: "name" }, { path: "description" }, { path: "sequence" }]
+};
 const validateAgainstSchema = {
-  helpInstructions: "This template file is used to add rows to the sequence table.",
+  helpInstructions:
+    "This template file is used to add rows to the sequence table.",
   allowAdditionalOnEnd: "ext-", // allow additional fields that start with "ext-" at the end of the csv
-  allowAdditionalOnEndDescription: "This will add extended properties to the uploaded sequence",
+  allowAdditionalOnEndDescription:
+    "This will add extended properties to the uploaded sequence",
   fields: [
-    { isRequired: true, path: "name", description: "The Sequence Name", example: "pj5_0001" },
+    {
+      isRequired: true,
+      path: "name",
+      description: "The Sequence Name",
+      example: "pj5_0001"
+    },
     { path: "description", example: "Example description of a sequence" },
-    { isRequired: true, path: "sequence", example: "gtgctttca", description: "The dna sequence base pairs" },
+    {
+      isRequired: true,
+      path: "sequence",
+      example: "gtgctttca",
+      description: "The dna sequence base pairs"
+    },
     {
       path: "isRegex",
       type: "boolean",
@@ -48,10 +64,15 @@ export default function UploadCsvWizardDemo() {
 }
 
 const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
+  const [simpleSchema, simpleSchemaComp] = useToggle({
+    type: "simpleSchemaButton",
+    label: "Simple Schema"
+  });
   return (
     <DemoWrapper>
       <h6>FileUploadField with file limit</h6>
-      <a href="/manual_data_entry (3).csv">FileUploadField with file limit</a>
+
+      {simpleSchemaComp}
       <FileUploadField
         label="CSV upload with wizard"
         onFieldSubmit={function(fileList) {
@@ -59,7 +80,15 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
         }}
         isRequired
         className={"fileUploadLimitAndType"}
-        accept={[{type: [".csv", ".xlsx"], validateAgainstSchema, exampleFile: "/manual_data_entry (3).csv"}]}
+        accept={[
+          {
+            type: [".csv", ".xlsx"],
+            validateAgainstSchema: simpleSchema
+              ? simpleValidateAgainst
+              : validateAgainstSchema,
+            exampleFile: "/manual_data_entry (3).csv"
+          }
+        ]}
         name={"exampleFile"}
         fileLimit={1}
       />

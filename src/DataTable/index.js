@@ -2017,10 +2017,10 @@ class DataTable extends React.Component {
   };
   refocusTable = () => {
     setTimeout(() => {
-      const table = ReactDOM.findDOMNode(this.table).closest(
+      const table = ReactDOM.findDOMNode(this.table)?.closest(
         ".data-table-container"
       );
-      table.focus();
+      table?.focus();
     }, 0);
   };
 
