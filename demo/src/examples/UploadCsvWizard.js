@@ -20,6 +20,7 @@ const validateAgainstSchema = {
   fields: [
     {
       isRequired: true,
+      isUnique: true, //tnw - we need to make sure this actually gets enforced
       path: "name",
       description: "The Sequence Name",
       example: "pj5_0001"

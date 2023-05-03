@@ -150,6 +150,7 @@
 /* Prevent rows from expanding vertically to fill available space */
 .ReactTable.ReactTable .rt-tbody .rt-tr-group,
 .ReactTable.ReactTable .rt-tbody .rt-tr-group .rt-tr {
+  min-height: 28px;
   flex: 0 0 auto;
 }
 
