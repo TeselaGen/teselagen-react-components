@@ -127,6 +127,12 @@
   border-right: 4px solid #d4d4d433;
   border-bottom: none;
 }
+.ReactTable.ReactTable.isCellEditable .rt-thead .rt-tr {
+  border-right: 4px solid #d4d4d433;
+}
+.ReactTable.ReactTable.isCellEditable .rt-thead .rt-th {
+  border: var(--cell-border-width) solid rgba(212, 212, 212, 0);
+}
 
 /* tgreen: we don't want the border for rows that don't have any data */
 .ReactTable.ReactTable .rt-tbody .rt-tr-group.no-row-data {
