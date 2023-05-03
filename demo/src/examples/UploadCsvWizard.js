@@ -8,7 +8,9 @@ import { parseCsvOrExcelFile } from "../../../src/utils/parserUtils";
 import { reduxForm } from "redux-form";
 
 const validateAgainstSchema = {
+  helpInstructions: "This template file is used to add rows to the sequence table.",
   allowAdditionalOnEnd: "ext-", // allow additional fields that start with "ext-" at the end of the csv
+  allowAdditionalOnEndDescription: "This will add extended properties to the uploaded sequence",
   fields: [
     { isRequired: true, path: "name", description: "The Sequence Name", example: "pj5_0001" },
     { path: "description", example: "Example description of a sequence" },
@@ -33,7 +35,6 @@ const validateAgainstSchema = {
       defaultValue: "misc_feature"
     }
   ]
-  // userData: []
 };
 
 export default function UploadCsvWizardDemo() {

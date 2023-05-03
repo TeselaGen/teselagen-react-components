@@ -34,6 +34,7 @@ import { flatMap } from "lodash";
 import urljoin from "url-join";
 import popoverOverflowModifiers from "../utils/popoverOverflowModifiers";
 import writeXlsxFile from "write-excel-file";
+import { startCase } from "lodash";
 
 const helperText = [
   `Tip: This template file is used to add rows to the database table from which it was downloaded. `,
@@ -227,10 +228,13 @@ function Uploader({
                 f.example || f.defaultValue;
               return {
                 column: f.displayName || f.path,
-                value: f => f[f.displayName || f.path]
+                value: v => {
+                  return v[f.displayName || f.path];
+                }
               };
             });
-
+            const nameToUse =
+              startCase(validateAgainstSchema.name) || "Example";
             const b = await writeXlsxFile(
               [[mainExampleData], a.validateAgainstSchema.fields, helperText],
               {
@@ -238,11 +242,11 @@ function Uploader({
                   fontWeight: "bold"
                 },
                 schema: [mainSchema, dataDictionarySchema, helperSchema],
-                sheets: ["Sheet 1", "Data Dictionary", "Help Notes"],
+                sheets: [nameToUse, "Data Dictionary", "Help Notes"],
                 filePath: "file.xlsx"
               }
             );
-            downloadjs(b, "file.xlsx", "xlsx");
+            downloadjs(b, `${nameToUse}.xlsx`, "xlsx");
           };
           // handleDownloadXlsxFile()
           a.exampleFiles = [
@@ -683,7 +687,7 @@ function Uploader({
                   </div>
                 )}
               </div>
-              {/* {validateAgainstSchema && (
+              {validateAgainstSchema && (
                 <div
                   style={{
                     textAlign: "center",
@@ -696,7 +700,7 @@ function Uploader({
                 >
                   .. or manually enter data
                 </div>
-              )} */}
+              )}
               {showFilesCount ? (
                 <div className="tg-upload-file-list-counter">
                   Files: {fileList ? fileList.length : 0}

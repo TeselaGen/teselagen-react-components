@@ -2951,7 +2951,10 @@ class DataTable extends React.Component {
                     <strong>${columnTitle}:</strong> <br>
                     ${description}</div>`
               })}
-              style={{ display: "inline-block" }}
+              style={{
+                ...(description && { fontStyle: "italic" }),
+                display: "inline-block"
+              }}
             >
               {renderTitleInner ? renderTitleInner : columnTitle}{" "}
             </span>

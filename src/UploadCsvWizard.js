@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { reduxForm, change } from "redux-form";
-import { Callout, Card, Intent } from "@blueprintjs/core";
+import { Button, Callout, Card, Intent } from "@blueprintjs/core";
 import immer from "immer";
 
 import "./UploadCsvWizard.css";
@@ -20,6 +20,7 @@ import wrapDialog from "./wrapDialog";
 import { omit } from "lodash";
 import showConfirmationDialog from "./showConfirmationDialog";
 import { connect } from "react-redux";
+import { isString } from "lodash";
 
 const UploadCsvWizardDialog = compose(
   reduxForm({
@@ -301,6 +302,8 @@ export const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
   //   }, 400);
   // }, []);
 
+  const forceUpdate = useForceUpdate();
+
   const data =
     userSchema.userData &&
     userSchema.userData.length &&
@@ -333,11 +336,52 @@ export const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
       <h5>
         {headerMessage || "Does this data look correct? Edit it as needed."}
       </h5>
-      <SwitchField
-        name="onlyShowRowsWErrors"
-        inlineLabel={true}
-        label="Only Show Rows With Errors"
-      />
+      {validateAgainstSchema.description && (
+        <Callout>{validateAgainstSchema.description}</Callout>
+      )}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start"
+        }}
+      >
+        <SwitchField
+          name="onlyShowRowsWErrors"
+          inlineLabel={true}
+          label="Only Show Rows With Errors"
+        />
+        {validateAgainstSchema.allowAdditionalOnEnd && (
+          <Button
+            icon="plus"
+            onClick={() => {
+              const path = prompt(
+                `Enter the name of the column you would like to add. ${validateAgainstSchema.allowAdditionalOnEndDescription ||
+                  ""}`
+              );
+              if (path) {
+                validateAgainstSchema.fields.push({
+                  description: "",
+                  path: `${
+                    isString(validateAgainstSchema.allowAdditionalOnEnd)
+                      ? validateAgainstSchema.allowAdditionalOnEnd
+                      : ""
+                  }${path}`,
+                  displayName: `${
+                    isString(validateAgainstSchema.allowAdditionalOnEnd)
+                      ? validateAgainstSchema.allowAdditionalOnEnd
+                      : ""
+                  }${path}`,
+                  type: "string"
+                });
+                forceUpdate();
+              }
+            }}
+          >
+            Add Column
+          </Button>
+        )}
+      </div>
       <DataTable
         maxWidth={800}
         maxHeight={500}
@@ -416,4 +460,12 @@ function maybeStripIdFromEntities(ents, validateAgainstSchema) {
     // we don't want to include it in the returned entities
     return ents?.map(e => omit(e, ["id"]));
   }
+}
+
+//create your forceUpdate hook
+function useForceUpdate() {
+  const [, setValue] = useState(0); // integer state
+  return () => setValue(value => value + 1); // update state to force render
+  // A function that increment 👆🏻 the previous state like here
+  // is better than directly setting `setValue(value + 1)`
 }
