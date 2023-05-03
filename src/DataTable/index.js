@@ -80,6 +80,7 @@ import "./style.css";
 import { getRecordsFromIdMap } from "./utils/withSelectedEntities";
 import { CellDragHandle } from "./CellDragHandle";
 import { nanoid } from "nanoid";
+import { isString } from "lodash";
 enablePatches();
 
 const PRIMARY_SELECTED_VAL = "main_cell";
@@ -3267,7 +3268,14 @@ const getCellVal = (ent, path, col) => {
   const isBool = col.type === "boolean";
   let selectedCellVal = get(ent, path, "");
   if (isBool) {
-    selectedCellVal = selectedCellVal === "True";
+    if (isString(selectedCellVal)) {
+      selectedCellVal = selectedCellVal.toLowerCase();
+    }
+    selectedCellVal =
+      selectedCellVal === "true" ||
+      selectedCellVal === true ||
+      selectedCellVal === 1 ||
+      selectedCellVal === "yes";
     selectedCellVal = isTruthy(selectedCellVal);
   }
   return selectedCellVal;
