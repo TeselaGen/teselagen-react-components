@@ -37,17 +37,12 @@ import writeXlsxFile from "write-excel-file";
 import { startCase } from "lodash";
 
 const helperText = [
-  `Tip: This template file is used to add rows to the database table from which it was downloaded. `,
-  "",
-  "",
   `How to Use This Template to Upload New Data`,
   `1. Go to the first tab and delete the example data.`,
-
   `2. Input your rows of data organized under the appropriate columns. If you're confused about a column name, go to the "Data Dictionary" tab for clarification.`,
-  `3. Save the completed template tab as a CSV file.`,
-
+  `3. Save the file.`,
   `4. Return to the interface from which you dowloaded this template.`,
-  `5. Upload the completed template CSV file.`
+  `5. Upload the completed file.`
 ];
 // const objects = [
 //   {

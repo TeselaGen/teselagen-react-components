@@ -29,6 +29,7 @@ const schema = {
       path: "weather",
       //should auto validate against list of accepted values, should auto format to try to coerce input values into accepted
       type: "dropdown",
+      description: "What it's like outside",
       defaultValue: "sunny",
       values: ["cloudy", "rainy", "sunny", "overcast"]
     },

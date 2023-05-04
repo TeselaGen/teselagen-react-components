@@ -265,6 +265,7 @@ export default compose(
     "reduxFormExpandedEntityIdMap",
     "reduxFormSelectedCells",
     "reduxFormEditingCell",
+    "reduxFormEditingCellSelectAll",
     "reduxFormCellIdToEditValue",
     "reduxFormEntities",
     "reduxFormCellValidation",

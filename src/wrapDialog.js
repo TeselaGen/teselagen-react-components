@@ -87,13 +87,19 @@ export default (topLevelDialogProps = {}) => Component => props => {
   const DialogToUse = extraDialogProps.isDraggable
     ? ResizableDraggableDialog
     : Dialog;
-
   return (
     <DialogToUse
       canOutsideClickClose={false}
       isOpen
-      onClose={hideModal}
+      onClose={e => {
+        e.stopPropagation();
+        if (e.key === "Escape" && !extraDialogProps.canEscKeyClose) {
+          return;
+        }
+        hideModal(e);
+      }}
       {...extraDialogProps}
+      canEscapeKeyClose={true}
       style={{ ...extraDialogProps.style }}
     >
       <div ref={r}></div>

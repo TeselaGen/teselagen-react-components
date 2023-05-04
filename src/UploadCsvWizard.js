@@ -332,10 +332,12 @@ export const PreviewCsvData = function({
     });
 
   return (
-    <div style={{}}>
-      <h5>
-        {headerMessage || "Does this data look correct? Edit it as needed."}
-      </h5>
+    <div style={{ minWidth: 400 }}>
+      <Callout style={{ marginBottom: 5 }} intent="primary">
+        {headerMessage ||
+          "Input your data here. Hover table headers for additional instructions" ||
+          "Does this data look correct? Edit it as needed."}
+      </Callout>
       {validateAgainstSchema.description && (
         <Callout>{validateAgainstSchema.description}</Callout>
       )}

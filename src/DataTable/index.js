@@ -1351,7 +1351,7 @@ class DataTable extends React.Component {
                 const isLetter = e.keyCode >= 65 && e.keyCode <= 90;
                 if (!isNum && !isLetter) return;
                 if (rowDisabled) return;
-                this.startCellEdit(cellId);
+                this.startCellEdit(cellId, { shouldSelectAll: true });
               }
             })}
             className={classNames(
@@ -1722,16 +1722,25 @@ class DataTable extends React.Component {
     };
   };
 
-  startCellEdit = cellId => {
+  startCellEdit = (cellId, { shouldSelectAll } = {}) => {
     const {
       change,
-
-      reduxFormSelectedCells = {}
+      reduxFormSelectedCells = {},
+      reduxFormEditingCell
     } = computePresets(this.props);
     const newSelectedCells = { ...reduxFormSelectedCells };
     newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
+    //check if the cell is already selected and editing and if so, don't change it
+    if (reduxFormEditingCell === cellId) return;
     change("reduxFormSelectedCells", newSelectedCells);
     change("reduxFormEditingCell", cellId);
+    if (shouldSelectAll) {
+      //we should select the text
+      change("reduxFormEditingCellSelectAll", true);
+      // console.log(`hiiii`);
+      // this.handleSelectAllText();
+      // this.handleDeleteCell({ noError: true });
+    }
   };
 
   getTableCellProps = (state, rowInfo, column) => {
@@ -2113,6 +2122,7 @@ class DataTable extends React.Component {
       SubComponent,
       shouldShowSubComponent,
       entities,
+      reduxFormEditingCellSelectAll,
       isEntityDisabled,
       getCellHoverText,
       withExpandAndCollapseAllButton,
@@ -2314,6 +2324,10 @@ class DataTable extends React.Component {
             } else {
               return (
                 <EditableCell
+                  stopSelectAll={() =>
+                    change("reduxFormEditingCellSelectAll", false)
+                  }
+                  shouldSelectAll={reduxFormEditingCellSelectAll}
                   cancelEdit={this.cancelCellEdit}
                   isNumeric={column.type === "numeric"}
                   initialValue={text}
@@ -2808,6 +2822,7 @@ class DataTable extends React.Component {
     const {
       displayName,
       description,
+      isUnique,
       sortDisabled,
       filterDisabled,
       columnFilterDisabled,
@@ -2942,6 +2957,11 @@ class DataTable extends React.Component {
     }
     return (
       <div
+        {...(description && {
+          "data-tip": `<div>
+            <strong>${columnTitle}:</strong> <br>
+            ${description} ${isUnique ? "<br>Must be unique" : ""}</div>`
+        })}
         data-test={displayName || startCase(path)}
         data-copy-text={displayName || startCase(path)}
         className={classNames("tg-react-table-column-header", {
@@ -2954,11 +2974,6 @@ class DataTable extends React.Component {
             <span
               title={columnTitle}
               className="tg-react-table-name"
-              {...(description && {
-                "data-tip": `<div>
-                    <strong>${columnTitle}:</strong> <br>
-                    ${description}</div>`
-              })}
               style={{
                 ...(description && { fontStyle: "italic" }),
                 display: "inline-block"
@@ -3084,7 +3099,14 @@ function getAllRows(e) {
   return allRowEls;
 }
 
-function EditableCell({ initialValue, finishEdit, cancelEdit, isNumeric }) {
+function EditableCell({
+  shouldSelectAll,
+  stopSelectAll,
+  initialValue,
+  finishEdit,
+  cancelEdit,
+  isNumeric
+}) {
   const [v, setV] = useState(initialValue);
   return (
     <input
@@ -3094,6 +3116,12 @@ function EditableCell({ initialValue, finishEdit, cancelEdit, isNumeric }) {
         fontSize: 12,
         background: "none"
       }}
+      ref={r => {
+        if (shouldSelectAll && r) {
+          r?.select();
+          stopSelectAll();
+        }
+      }}
       type={isNumeric ? "number" : undefined}
       value={v}
       autoFocus
@@ -3102,6 +3130,7 @@ function EditableCell({ initialValue, finishEdit, cancelEdit, isNumeric }) {
           finishEdit(v);
           e.stopPropagation();
         } else if (e.key === "Escape") {
+          e.stopPropagation();
           cancelEdit();
         }
       }}
@@ -3211,8 +3240,9 @@ const defaultFormatters = {
 const defaultValidators = {
   dropdown: (newVal, field) => {
     const err = "Please choose one of the accepted values";
-    if (!newVal) return err;
-    if (!field.values.includes(newVal)) {
+    if (!newVal) {
+      if (field.isRequired) return err;
+    } else if (!field.values.includes(newVal)) {
       return err;
     }
   },
