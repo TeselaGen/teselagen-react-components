@@ -93,9 +93,13 @@ export default (topLevelDialogProps = {}) => Component => props => {
       isOpen
       onClose={e => {
         e.stopPropagation();
-        if (e.key === "Escape" && !extraDialogProps.canEscKeyClose) {
-          hideModal(e);
+        if (
+          e.key === "Escape" &&
+          extraDialogProps.canEscapeKeyClose === false
+        ) {
+          return;
         }
+        hideModal(e);
       }}
       {...extraDialogProps}
       canEscapeKeyClose={true}
