@@ -49,7 +49,6 @@ const UploadCsvWizardDialog = compose(
   handleSubmit,
   // onlyShowRowsWErrors,
   reduxFormEntities,
-  reduxFormCleanRows,
   reduxFormCellValidation,
   changeForm
 }) {
@@ -234,17 +233,10 @@ const UploadCsvWizardDialog = compose(
       </div>
     );
   }
-
-  const entsToUse = (reduxFormEntities || []).filter(
-    e => !reduxFormCleanRows[getIdOrCodeOrIndex(e)]
+  const { entsToUse, validationToUse } = removeCleanRows(
+    reduxFormEntities,
+    reduxFormCellValidation
   );
-  const validationToUse = {};
-  forEach(reduxFormCellValidation, (v, k) => {
-    const [rowId] = k.split(":");
-    if (!reduxFormCleanRows[rowId]) {
-      validationToUse[k] = v;
-    }
-  });
 
   return (
     <div>
@@ -338,7 +330,7 @@ export const PreviewCsvData = function({
         }
       );
       if (i1 > 0) {
-        toRet.isCleanInitially = true;
+        toRet._isClean = true;
       }
       if (row.id === undefined) {
         toRet.id = nanoid();
@@ -422,27 +414,19 @@ export const SimpleInsertDataDialog = compose(
   tgFormValueSelector(
     "simpleInsertEditableTable",
     "reduxFormEntities",
-    "reduxFormCellValidation",
-    "reduxFormCleanRows"
+    "reduxFormCellValidation"
   )
 )(function SimpleInsertDataDialog({
   onSimpleInsertDialogFinish,
   reduxFormEntities,
   reduxFormCellValidation,
-  reduxFormCleanRows,
   validateAgainstSchema,
   ...r
 }) {
-  const entsToUse = (reduxFormEntities || []).filter(
-    e => !reduxFormCleanRows[getIdOrCodeOrIndex(e)]
+  const { entsToUse, validationToUse } = removeCleanRows(
+    reduxFormEntities,
+    reduxFormCellValidation
   );
-  const validationToUse = {};
-  forEach(reduxFormCellValidation, (v, k) => {
-    const [rowId] = k.split(":");
-    if (!reduxFormCleanRows[rowId]) {
-      validationToUse[k] = v;
-    }
-  });
 
   return (
     <>
@@ -477,6 +461,26 @@ const typeToCommonType = {
   boolean: "True/False",
   dropdown: "Select One"
 };
+function removeCleanRows(reduxFormEntities, reduxFormCellValidation) {
+  const toFilterOut = {};
+  const entsToUse = (reduxFormEntities || []).filter(e => {
+    if (!e._isClean) return true;
+    else {
+      toFilterOut[getIdOrCodeOrIndex(e)] = true;
+      return false;
+    }
+  });
+
+  const validationToUse = {};
+  forEach(reduxFormCellValidation, (v, k) => {
+    const [rowId] = k.split(":");
+    if (!toFilterOut[rowId]) {
+      validationToUse[k] = v;
+    }
+  });
+  return { entsToUse, validationToUse };
+}
+
 function maybeStripIdFromEntities(ents, validateAgainstSchema) {
   if (validateAgainstSchema?.fields?.some(({ path }) => path === "id")) {
     return ents;

@@ -261,7 +261,6 @@ export default compose(
     "reduxFormQueryParams",
     "reduxFormSearchInput",
     "onlyShowRowsWErrors",
-    "reduxFormCleanRows",
     "reduxFormSelectedEntityIdMap",
     "reduxFormExpandedEntityIdMap",
     "reduxFormSelectedCells",
