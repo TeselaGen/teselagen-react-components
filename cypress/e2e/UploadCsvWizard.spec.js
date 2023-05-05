@@ -123,7 +123,9 @@ describe("EditableCellTable.spec", () => {
   it(`manual entry should work`, () => {
     cy.visit("#/UploadCsvWizard");
     cy.contains("or manually enter data").click();
-    cy.contains(`Does this data look correct? Edit it as needed.`);
+    cy.contains(
+      `Input your data here. Hover table headers for additional instructions`
+    );
 
     //there should be a checkbox in the isRegex boolean column
     cy.get(`[data-test="Is Regex"] .bp3-checkbox`);

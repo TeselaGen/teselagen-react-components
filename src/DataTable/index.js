@@ -26,7 +26,8 @@ import {
   get,
   padStart,
   omitBy,
-  times
+  times,
+  isArray
 } from "lodash";
 import joinUrl from "url-join";
 
@@ -82,6 +83,7 @@ import { CellDragHandle } from "./CellDragHandle";
 import { nanoid } from "nanoid";
 import { isString } from "lodash";
 import { SwitchField } from "../FormComponents";
+import { isPlainObject } from "lodash";
 enablePatches();
 
 const PRIMARY_SELECTED_VAL = "main_cell";
@@ -416,6 +418,11 @@ class DataTable extends React.Component {
     const { newEnts, validationErrors } = this.formatAndValidateEntities(
       initialEntities || entities
     );
+    const cleanRows = {};
+    forEach(entities, e => {
+      cleanRows[getIdOrCodeOrIndex(e)] = e.isCleanInitially;
+    });
+    change("reduxFormCleanRows", cleanRows);
     change("reduxFormEntities", newEnts);
     change("reduxFormCellValidation", validationErrors);
   };
@@ -610,10 +617,12 @@ class DataTable extends React.Component {
           };
           // single paste value, fill all cells with value
           const newVal = pasteData[0][0];
+          const rowIds = [];
           this.updateEntitiesHelper(entities, entities => {
             const entityIdToEntity = getEntityIdToEntity(entities);
             Object.keys(reduxFormSelectedCells).forEach(cellId => {
               const [rowId, path] = cellId.split(":");
+              rowIds.push(rowId);
               const entity = entityIdToEntity[rowId].e;
               const { error } = editCellHelper({
                 entity,
@@ -628,6 +637,7 @@ class DataTable extends React.Component {
               }
             });
           });
+          this.markRowsAsDirty(rowIds);
           change("reduxFormCellValidation", newCellValidate);
         } else {
           // handle paste in same format
@@ -638,6 +648,8 @@ class DataTable extends React.Component {
             };
 
             const newSelectedCells = { ...reduxFormSelectedCells };
+            const rows = [];
+
             this.updateEntitiesHelper(entities, entities => {
               const entityIdToEntity = getEntityIdToEntity(entities);
               const [rowId, primaryCellPath] = primarySelectedCell.split(":");
@@ -668,6 +680,7 @@ class DataTable extends React.Component {
                           newVal: cell
                         });
                         const cellId = `${getIdOrCodeOrIndex(entity)}:${path}`;
+                        rows.push(getIdOrCodeOrIndex(entity));
                         if (!newSelectedCells[cellId]) {
                           newSelectedCells[cellId] = true;
                         }
@@ -682,6 +695,8 @@ class DataTable extends React.Component {
                 });
               });
             });
+            this.markRowsAsDirty(rows);
+
             change("reduxFormCellValidation", newCellValidate);
             change("reduxFormSelectedCells", newSelectedCells);
           }
@@ -742,10 +757,12 @@ class DataTable extends React.Component {
       ...reduxFormCellValidation
     };
     if (isEmpty(reduxFormSelectedCells)) return;
+    const rowIds = [];
     this.updateEntitiesHelper(entities, entities => {
       const entityIdToEntity = getEntityIdToEntity(entities);
       Object.keys(reduxFormSelectedCells).forEach(cellId => {
         const [rowId, path] = cellId.split(":");
+        rowIds.push(rowId);
         const entity = entityIdToEntity[rowId].e;
         const { error } = editCellHelper({
           entity,
@@ -760,6 +777,7 @@ class DataTable extends React.Component {
         }
       });
     });
+    this.markRowsAsDirty(rowIds);
     change("reduxFormCellValidation", newCellValidate);
   };
 
@@ -774,6 +792,8 @@ class DataTable extends React.Component {
     const toRet = text || cellWrapper.textContent || "";
     return toRet;
   };
+  // isRowEmpty = row => {};
+  // isCellEmptyOrDefault = cell => {};
 
   handleCopyRow = rowEl => {
     //takes in a row element
@@ -1747,6 +1767,8 @@ class DataTable extends React.Component {
     const {
       entities,
       schema,
+      reduxFormCleanRows,
+      doNotValidateUntouchedRows,
       reduxFormEditingCell,
       isCellEditable,
       reduxFormCellValidation,
@@ -1773,7 +1795,9 @@ class DataTable extends React.Component {
 
     const cellId = `${rowId}:${column.path}`;
     const rowDisabled = isEntityDisabled(entity);
-    const err = reduxFormCellValidation[cellId];
+    const isClean = reduxFormCleanRows[rowId] && doNotValidateUntouchedRows;
+
+    const err = !isClean && reduxFormCellValidation[cellId];
     let selectedTopBorder,
       selectedRightBorder,
       selectedBottomBorder,
@@ -1791,6 +1815,7 @@ class DataTable extends React.Component {
       isPrimarySelected,
       isSecondarySelected: reduxFormSelectedCells[cellId] === true,
       noSelectedTopBorder: !selectedTopBorder,
+      isCleanRow: isClean,
       noSelectedRightBorder: !selectedRightBorder,
       noSelectedBottomBorder: !selectedBottomBorder,
       noSelectedLeftBorder: !selectedLeftBorder,
@@ -2007,6 +2032,7 @@ class DataTable extends React.Component {
       reduxFormCellValidation
     } = computePresets(this.props);
     const [rowId, path] = cellId.split(":");
+    this.markRowsAsDirty(rowId);
     change("reduxFormEditingCell", null);
     this.updateEntitiesHelper(entities, entities => {
       const entity = entities.find((e, i) => {
@@ -2402,6 +2428,24 @@ class DataTable extends React.Component {
     });
     return columnsToRender;
   };
+  markRowsAs = (_rowIds, isClean) => {
+    const rowIds = isArray(_rowIds) ? _rowIds : [_rowIds];
+    const { reduxFormCleanRows, change } = this.props;
+    const r = {};
+    rowIds.forEach(rowId => {
+      r[isPlainObject(rowId) ? getIdOrCodeOrIndex(rowId) : rowId] = isClean;
+    });
+    change("reduxFormCleanRows", {
+      ...reduxFormCleanRows,
+      ...r
+    });
+  };
+  markRowsAsClean = _rowIds => {
+    this.markRowsAs(_rowIds, true);
+  };
+  markRowsAsDirty = _rowIds => {
+    this.markRowsAs(_rowIds, false);
+  };
 
   onDragEnd = cellsToSelect => {
     const {
@@ -2479,8 +2523,10 @@ class DataTable extends React.Component {
 
         const pathToIndex = getFieldPathToIndex(schema);
 
+        const rowIds = [];
         cellsToSelect.forEach(cellId => {
           const [rowId, cellPath] = cellId.split(":");
+          rowIds.push(rowId);
           if (cellPath !== selectedPath) return;
           newReduxFormSelectedCells[cellId] = true;
           const { e: entityToUpdate, i: rowIndex } = entityMap[rowId] || {};
@@ -2541,6 +2587,7 @@ class DataTable extends React.Component {
             newCellValidate[cellId] = error;
           }
         });
+        this.markRowsAsDirty(rowIds);
       });
 
       // select the new cells
@@ -2622,6 +2669,7 @@ class DataTable extends React.Component {
       const { newEnts, validationErrors } = this.formatAndValidateEntities(
         newEntities
       );
+      this.markRowsAsClean(newEnts);
       change("reduxFormCellValidation", {
         ...reduxFormCellValidation,
         ...validationErrors
@@ -2948,6 +2996,7 @@ class DataTable extends React.Component {
               ents.forEach(e => {
                 set(e, path, isIndeterminate ? true : !isChecked);
               });
+              this.markRowsAsDirty(entities);
             });
           }}
           indeterminate={isIndeterminate}
@@ -3196,8 +3245,11 @@ export const editCellHelper = ({
   path = path || colSchema.path;
   const { format, validate, type } = colSchema;
   let error;
-  if (nv === undefined && colSchema.defaultValue !== undefined)
+  // console.log(`entity:`, entity)
+  // console.log(`nv:`,nv)
+  if (nv === undefined && colSchema.defaultValue !== undefined) {
     nv = colSchema.defaultValue;
+  }
 
   if (format) {
     nv = format(nv, colSchema);
@@ -3219,6 +3271,7 @@ export const editCellHelper = ({
   }
 
   set(entity, path, nv);
+
   return { entity, error };
 };
 

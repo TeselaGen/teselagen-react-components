@@ -21,6 +21,7 @@ import { omit } from "lodash";
 import showConfirmationDialog from "./showConfirmationDialog";
 import { connect } from "react-redux";
 import { isString } from "lodash";
+import getIdOrCodeOrIndex from "./DataTable/utils/getIdOrCodeOrIndex";
 
 const UploadCsvWizardDialog = compose(
   reduxForm({
@@ -48,6 +49,7 @@ const UploadCsvWizardDialog = compose(
   handleSubmit,
   // onlyShowRowsWErrors,
   reduxFormEntities,
+  reduxFormCleanRows,
   reduxFormCellValidation,
   changeForm
 }) {
@@ -70,6 +72,7 @@ const UploadCsvWizardDialog = compose(
     inner = (
       <PreviewCsvData
         {...{
+          showDoesDataLookCorrectMsg: true,
           initialEntities: reduxFormEntities,
           matchedHeaders,
           // onlyShowRowsWErrors,
@@ -232,6 +235,17 @@ const UploadCsvWizardDialog = compose(
     );
   }
 
+  const entsToUse = (reduxFormEntities || []).filter(
+    e => !reduxFormCleanRows[getIdOrCodeOrIndex(e)]
+  );
+  const validationToUse = {};
+  forEach(reduxFormCellValidation, (v, k) => {
+    const [rowId] = k.split(":");
+    if (!reduxFormCleanRows[rowId]) {
+      validationToUse[k] = v;
+    }
+  });
+
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "center" }}>
@@ -241,8 +255,7 @@ const UploadCsvWizardDialog = compose(
       <DialogFooter
         text={!hasSubmitted ? "Review and Edit Data" : "Add File"}
         disabled={
-          hasSubmitted &&
-          (!reduxFormEntities?.length || some(reduxFormCellValidation, v => v))
+          hasSubmitted && (!entsToUse?.length || some(validationToUse, v => v))
         }
         {...(hasSubmitted && {
           onBackClick: () => {
@@ -271,7 +284,7 @@ const UploadCsvWizardDialog = compose(
             //step 2 submit
             onUploadWizardFinish({
               newEntities: maybeStripIdFromEntities(
-                reduxFormEntities,
+                entsToUse,
                 validateAgainstSchema
               )
             });
@@ -288,6 +301,7 @@ export default UploadCsvWizardDialog;
 export const PreviewCsvData = function({
   formName,
   matchedHeaders,
+  showDoesDataLookCorrectMsg,
   headerMessage,
   // onlyShowRowsWErrors,
   validateAgainstSchema,
@@ -323,6 +337,9 @@ export const PreviewCsvData = function({
           }
         }
       );
+      if (i1 > 0) {
+        toRet.isCleanInitially = true;
+      }
       if (row.id === undefined) {
         toRet.id = nanoid();
       } else {
@@ -335,8 +352,9 @@ export const PreviewCsvData = function({
     <div style={{ minWidth: 400 }}>
       <Callout style={{ marginBottom: 5 }} intent="primary">
         {headerMessage ||
-          "Input your data here. Hover table headers for additional instructions" ||
-          "Does this data look correct? Edit it as needed."}
+          (showDoesDataLookCorrectMsg
+            ? "Does this data look correct? Edit it as needed."
+            : "Input your data here. Hover table headers for additional instructions")}
       </Callout>
       {validateAgainstSchema.description && (
         <Callout>{validateAgainstSchema.description}</Callout>
@@ -384,6 +402,7 @@ export const PreviewCsvData = function({
         maxHeight={500}
         initialEntities={initialEntities}
         destroyOnUnmount={false}
+        doNotValidateUntouchedRows
         formName={formName || "editableCellTable"}
         isSimple
         isCellEditable
@@ -403,15 +422,28 @@ export const SimpleInsertDataDialog = compose(
   tgFormValueSelector(
     "simpleInsertEditableTable",
     "reduxFormEntities",
-    "reduxFormCellValidation"
+    "reduxFormCellValidation",
+    "reduxFormCleanRows"
   )
 )(function SimpleInsertDataDialog({
   onSimpleInsertDialogFinish,
   reduxFormEntities,
   reduxFormCellValidation,
+  reduxFormCleanRows,
   validateAgainstSchema,
   ...r
 }) {
+  const entsToUse = (reduxFormEntities || []).filter(
+    e => !reduxFormCleanRows[getIdOrCodeOrIndex(e)]
+  );
+  const validationToUse = {};
+  forEach(reduxFormCellValidation, (v, k) => {
+    const [rowId] = k.split(":");
+    if (!reduxFormCleanRows[rowId]) {
+      validationToUse[k] = v;
+    }
+  });
+
   return (
     <>
       <div className="bp3-dialog-body">
@@ -427,14 +459,12 @@ export const SimpleInsertDataDialog = compose(
         onClick={() => {
           onSimpleInsertDialogFinish({
             newEntities: maybeStripIdFromEntities(
-              reduxFormEntities,
+              entsToUse,
               validateAgainstSchema
             )
           });
         }}
-        disabled={
-          !reduxFormEntities?.length || some(reduxFormCellValidation, e => e)
-        }
+        disabled={!entsToUse?.length || some(validationToUse, e => e)}
         text="Add File"
       ></DialogFooter>
     </>

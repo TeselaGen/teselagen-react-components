@@ -23,7 +23,8 @@ const validateAgainstSchema = {
       isUnique: true, //tnw - we need to make sure this actually gets enforced
       path: "name",
       description: "The Sequence Name",
-      example: "pj5_0001"
+      example: "pj5_0001",
+      // defaultValue: "asdf"      
     },
     { path: "description", example: "Example description of a sequence" },
     {
@@ -41,15 +42,17 @@ const validateAgainstSchema = {
     {
       path: "matchType",
       type: "dropdown",
+      isRequired: true,
       description: "Whether the sequence is a dna or protein sequence",
       values: ["dna", "protein"],
-      defaultValue: "dna"
+      example: "dna"
     },
     {
       path: "type",
       type: "dropdown",
+      isRequired: true,
       values: ["misc_feature", "CDS", "rbs"],
-      defaultValue: "misc_feature"
+      example: "misc_feature"
     }
   ]
 };
