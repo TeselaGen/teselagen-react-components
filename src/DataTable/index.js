@@ -2639,12 +2639,13 @@ class DataTable extends React.Component {
         return getIdOrCodeOrIndex(e, i) === rowId;
       });
       const insertIndex = above ? indexToInsert : indexToInsert + 1;
-      const { newEnts, validationErrors } = this.formatAndValidateEntities(
+      let { newEnts, validationErrors } = this.formatAndValidateEntities(
         newEntities
       );
-      newEnts.forEach(e => {
-        e._isClean = true;
-      });
+      newEnts = newEnts.map(e => ({
+        ...e,
+        _isClean: true
+      }));
       change("reduxFormCellValidation", {
         ...reduxFormCellValidation,
         ...validationErrors
