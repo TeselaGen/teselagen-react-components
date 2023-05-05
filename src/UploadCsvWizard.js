@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { reduxForm, change } from "redux-form";
-import { Button, Callout, Card, Intent } from "@blueprintjs/core";
+import { Callout, Card, Intent } from "@blueprintjs/core";
 import immer from "immer";
 
 import "./UploadCsvWizard.css";
@@ -20,7 +20,6 @@ import wrapDialog from "./wrapDialog";
 import { omit } from "lodash";
 import showConfirmationDialog from "./showConfirmationDialog";
 import { connect } from "react-redux";
-import { isString } from "lodash";
 import getIdOrCodeOrIndex from "./DataTable/utils/getIdOrCodeOrIndex";
 
 const UploadCsvWizardDialog = compose(
@@ -308,7 +307,7 @@ export const PreviewCsvData = function({
   //   }, 400);
   // }, []);
 
-  const forceUpdate = useForceUpdate();
+  // const forceUpdate = useForceUpdate();
 
   const data =
     userSchema.userData &&
@@ -364,7 +363,7 @@ export const PreviewCsvData = function({
           alignItems: "flex-start"
         }}
       >
-        {validateAgainstSchema.allowAdditionalOnEnd && (
+        {/* {validateAgainstSchema.allowAdditionalOnEnd && (
           <Button
             icon="plus"
             onClick={() => {
@@ -393,7 +392,7 @@ export const PreviewCsvData = function({
           >
             Add Column
           </Button>
-        )}
+        )} */}
       </div>
       <DataTable
         maxWidth={800}
@@ -498,9 +497,9 @@ function maybeStripIdFromEntities(ents, validateAgainstSchema) {
 }
 
 //create your forceUpdate hook
-function useForceUpdate() {
-  const [, setValue] = useState(0); // integer state
-  return () => setValue(value => value + 1); // update state to force render
-  // A function that increment 👆🏻 the previous state like here
-  // is better than directly setting `setValue(value + 1)`
-}
+// function useForceUpdate() {
+//   const [, setValue] = useState(0); // integer state
+//   return () => setValue(value => value + 1); // update state to force render
+//   // A function that increment 👆🏻 the previous state like here
+//   // is better than directly setting `setValue(value + 1)`
+// }
