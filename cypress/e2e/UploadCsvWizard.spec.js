@@ -9,6 +9,10 @@ describe("EditableCellTable.spec", () => {
   it(`messed up headers should trigger the wizard`, () => {
     cy.visit("#/UploadCsvWizard");
     cy.contains("or manually enter data").click();
+    cy.get(`.rt-td [data-test="tgCell_description"]`)
+      .eq(1)
+      .click({ force: true });
+    cy.focused().type("description{enter}");
 
     cy.get(
       `.hasCellError[data-tip="Please enter a value here"] [data-test="tgCell_name"]:first`
@@ -126,6 +130,10 @@ describe("EditableCellTable.spec", () => {
     cy.contains(
       `Input your data here. Hover table headers for additional instructions`
     );
+    cy.get(`.rt-td [data-test="tgCell_description"]`)
+      .eq(1)
+      .click({ force: true });
+    cy.focused().type("description{enter}");
 
     //there should be a checkbox in the isRegex boolean column
     cy.get(`[data-test="Is Regex"] .bp3-checkbox`);
@@ -143,7 +151,13 @@ describe("EditableCellTable.spec", () => {
     cy.focused().type("g{enter}");
     cy.dragBetween(`.cellDragHandle`, `button:contains(Add 10 Rows)`);
 
-    cy.contains("Add File").click();
+    cy.contains(".bp3-disabled.bp3-button", "Add File");
+    cy.get(`[data-test="tgCell_matchType"]:contains(dna)`).click();
+    cy.dragBetween(`.cellDragHandle`, `button:contains(Add 10 Rows)`);
+    cy.get(`[data-test="tgCell_type"]:contains(misc_feature)`).click();
+    cy.dragBetween(`.cellDragHandle`, `button:contains(Add 10 Rows)`);
+
+    cy.contains(".bp3-button", "Add File").click();
     cy.contains("File Added");
     cy.contains(`manual_data_entry.csv`).click();
 

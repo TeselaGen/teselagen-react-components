@@ -280,9 +280,9 @@
   align-items: center;
   padding: 12px 12px;
 }
-.ReactTable .rt-tbody .rt-td.isCleanRow {
+/* .ReactTable .rt-tbody .rt-td.isCleanRow {
   opacity: 0.5;
-}
+} */
 
 /* fix padding in custom row expander cell */
 .ReactTable .rt-tbody .rt-expandable {

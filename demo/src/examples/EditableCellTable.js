@@ -23,6 +23,7 @@ const schema = {
     {
       path: "type",
       type: "dropdown",
+      isRequired: true,
       values: ["old", "new"]
     },
     {

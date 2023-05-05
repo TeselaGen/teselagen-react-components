@@ -639,8 +639,6 @@ class DataTable extends React.Component {
             };
 
             const newSelectedCells = { ...reduxFormSelectedCells };
-            const rows = [];
-
             this.updateEntitiesHelper(entities, entities => {
               const entityIdToEntity = getEntityIdToEntity(entities);
               const [rowId, primaryCellPath] = primarySelectedCell.split(":");
@@ -672,7 +670,6 @@ class DataTable extends React.Component {
                           newVal: cell
                         });
                         const cellId = `${getIdOrCodeOrIndex(entity)}:${path}`;
-                        rows.push(getIdOrCodeOrIndex(entity));
                         if (!newSelectedCells[cellId]) {
                           newSelectedCells[cellId] = true;
                         }
@@ -687,7 +684,6 @@ class DataTable extends React.Component {
                 });
               });
             });
-
             change("reduxFormCellValidation", newCellValidate);
             change("reduxFormSelectedCells", newSelectedCells);
           }
@@ -769,7 +765,6 @@ class DataTable extends React.Component {
         }
       });
     });
-
     change("reduxFormCellValidation", newCellValidate);
   };
 
@@ -784,8 +779,6 @@ class DataTable extends React.Component {
     const toRet = text || cellWrapper.textContent || "";
     return toRet;
   };
-  // isRowEmpty = row => {};
-  // isCellEmptyOrDefault = cell => {};
 
   handleCopyRow = rowEl => {
     //takes in a row element
@@ -1345,41 +1338,43 @@ class DataTable extends React.Component {
     return (
       // eslint-disable-next-line no-undef
       <this.hotkeyEnabler>
-        <div>
+        <div
+          className={classNames(
+            "data-table-container",
+            extraClasses,
+            className,
+            compactClassName,
+            {
+              fullscreen,
+              in_cypress_test: window.Cypress, //tnr: this is a hack to make cypress be able to correctly click the table without the sticky header getting in the way. remove me once https://github.com/cypress-io/cypress/issues/871 is fixed
+              "dt-isViewable": isViewable,
+              "dt-minimalStyle": minimalStyle,
+              "no-padding": noPadding,
+              "hide-column-header": hideColumnHeader
+            }
+          )}
+        >
           <div
             {...(isCellEditable && {
               tabIndex: -1,
               onKeyDown: e => {
-                if (e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) return;
+                if (e.shiftKey || e.metaKey || e.ctrlKey || e.altKey)
+                  return true;
                 const cellId = this.getPrimarySelectedCellId();
-                if (!cellId) return;
+                if (!cellId) return true;
                 const entityIdToEntity = getEntityIdToEntity(entities);
                 const [rowId] = cellId.split(":");
-                if (!rowId) return;
+                if (!rowId) return true;
                 const entity = entityIdToEntity[rowId].e;
-                if (!entity) return;
+                if (!entity) return true;
                 const rowDisabled = isEntityDisabled(entity);
                 const isNum = e.keyCode >= 48 && e.keyCode <= 57;
                 const isLetter = e.keyCode >= 65 && e.keyCode <= 90;
-                if (!isNum && !isLetter) return;
-                if (rowDisabled) return;
+                if (!isNum && !isLetter) return true;
+                if (rowDisabled) return true;
                 this.startCellEdit(cellId, { shouldSelectAll: true });
               }
             })}
-            className={classNames(
-              "data-table-container",
-              extraClasses,
-              className,
-              compactClassName,
-              {
-                fullscreen,
-                in_cypress_test: window.Cypress, //tnr: this is a hack to make cypress be able to correctly click the table without the sticky header getting in the way. remove me once https://github.com/cypress-io/cypress/issues/871 is fixed
-                "dt-isViewable": isViewable,
-                "dt-minimalStyle": minimalStyle,
-                "no-padding": noPadding,
-                "hide-column-header": hideColumnHeader
-              }
-            )}
           >
             {isCellEditable && entities.length > 50 && (
               <SwitchField
@@ -1514,7 +1509,6 @@ class DataTable extends React.Component {
                 />
               </div>
             )}
-
             <ReactTable
               data={filteredEnts}
               ref={n => {
@@ -1593,6 +1587,7 @@ class DataTable extends React.Component {
               SubComponent={SubComponentToUse}
               {...ReactTableProps}
             />
+
             {!noFooter && (
               <div
                 className="data-table-footer"
@@ -1749,9 +1744,6 @@ class DataTable extends React.Component {
     if (shouldSelectAll) {
       //we should select the text
       change("reduxFormEditingCellSelectAll", true);
-      // console.log(`hiiii`);
-      // this.handleSelectAllText();
-      // this.handleDeleteCell({ noError: true });
     }
   };
 
@@ -2023,7 +2015,6 @@ class DataTable extends React.Component {
       reduxFormCellValidation
     } = computePresets(this.props);
     const [rowId, path] = cellId.split(":");
-
     change("reduxFormEditingCell", null);
     this.updateEntitiesHelper(entities, entities => {
       const entity = entities.find((e, i) => {
@@ -2499,7 +2490,6 @@ class DataTable extends React.Component {
 
         cellsToSelect.forEach(cellId => {
           const [rowId, cellPath] = cellId.split(":");
-
           if (cellPath !== selectedPath) return;
           newReduxFormSelectedCells[cellId] = true;
           const { e: entityToUpdate, i: rowIndex } = entityMap[rowId] || {};
@@ -3115,9 +3105,11 @@ function getNewEntToSelect({
 }
 
 function getAllRows(e) {
-  const allRowEls = e.target
-    .closest(".data-table-container")
-    .querySelectorAll(".rt-tr");
+  const el = e.target.querySelector(".data-table-container")
+    ? e.target.querySelector(".data-table-container")
+    : e.target.closest(".data-table-container");
+
+  const allRowEls = el.querySelectorAll(".rt-tr");
   if (!allRowEls || !allRowEls.length) {
     return;
   }
@@ -3221,11 +3213,8 @@ export const editCellHelper = ({
   path = path || colSchema.path;
   const { format, validate, type } = colSchema;
   let error;
-  // console.log(`entity:`, entity)
-  // console.log(`nv:`,nv)
-  if (nv === undefined && colSchema.defaultValue !== undefined) {
+  if (nv === undefined && colSchema.defaultValue !== undefined)
     nv = colSchema.defaultValue;
-  }
 
   if (format) {
     nv = format(nv, colSchema);
@@ -3247,7 +3236,6 @@ export const editCellHelper = ({
   }
 
   set(entity, path, nv);
-
   return { entity, error };
 };
 

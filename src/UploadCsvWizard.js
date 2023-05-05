@@ -297,7 +297,7 @@ export const PreviewCsvData = function({
   headerMessage,
   // onlyShowRowsWErrors,
   validateAgainstSchema,
-  userSchema = { userData: times(5) },
+  userSchema = { userData: times(5).map(() => ({ _isClean: true })) },
   initialEntities
 }) {
   // const [loading, setLoading] = useState(true);
@@ -314,24 +314,30 @@ export const PreviewCsvData = function({
     userSchema.userData &&
     userSchema.userData.length &&
     userSchema.userData.map((row, i1) => {
-      const toRet = {};
+      const toRet = {
+        _isClean: row._isClean
+      };
       validateAgainstSchema.fields.forEach(
         ({ path, defaultValue, example }, i) => {
           const matchingKey = matchedHeaders?.[i];
-
           if (!matchingKey) {
             toRet[path] = defaultValue === undefined ? defaultValue : "";
           } else {
             toRet[path] = row[matchingKey];
           }
           if (toRet[path] === undefined || toRet[path] === "") {
-            toRet[path] = defaultValue || (i1 === 0 && example) || "";
+            if (defaultValue) {
+              toRet[path] = defaultValue;
+            } else if (i1 === 0 && example) {
+              toRet[path] = example;
+              delete toRet._isClean;
+            } else {
+              toRet[path] = "";
+            }
           }
         }
       );
-      if (i1 > 0) {
-        toRet._isClean = true;
-      }
+
       if (row.id === undefined) {
         toRet.id = nanoid();
       } else {
