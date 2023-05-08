@@ -1365,20 +1365,19 @@ class DataTable extends React.Component {
             {...(isCellEditable && {
               tabIndex: -1,
               onKeyDown: e => {
-                if (e.shiftKey || e.metaKey || e.ctrlKey || e.altKey)
-                  return true;
+                if (e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) return;
                 const cellId = this.getPrimarySelectedCellId();
-                if (!cellId) return true;
+                if (!cellId) return;
                 const entityIdToEntity = getEntityIdToEntity(entities);
                 const [rowId] = cellId.split(":");
-                if (!rowId) return true;
+                if (!rowId) return;
                 const entity = entityIdToEntity[rowId].e;
-                if (!entity) return true;
+                if (!entity) return;
                 const rowDisabled = isEntityDisabled(entity);
                 const isNum = e.keyCode >= 48 && e.keyCode <= 57;
                 const isLetter = e.keyCode >= 65 && e.keyCode <= 90;
-                if (!isNum && !isLetter) return true;
-                if (rowDisabled) return true;
+                if (!isNum && !isLetter) return;
+                if (rowDisabled) return;
                 this.startCellEdit(cellId, { shouldSelectAll: true });
               }
             })}
@@ -2051,7 +2050,7 @@ class DataTable extends React.Component {
   refocusTable = () => {
     setTimeout(() => {
       const table = ReactDOM.findDOMNode(this.table)?.closest(
-        ".data-table-container div"
+        ".data-table-container>div"
       );
       table?.focus();
     }, 0);
