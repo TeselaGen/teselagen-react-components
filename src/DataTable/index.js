@@ -82,6 +82,7 @@ import { CellDragHandle } from "./CellDragHandle";
 import { nanoid } from "nanoid";
 import { isString } from "lodash";
 import { SwitchField } from "../FormComponents";
+import { validateTableWideErrors } from "./validateTableWideErrors";
 enablePatches();
 
 const PRIMARY_SELECTED_VAL = "main_cell";
@@ -210,7 +211,7 @@ class DataTable extends React.Component {
         nextState
       );
       change("reduxFormEntities", newEnts);
-      change("reduxFormCellValidation", validationErrors);
+      this.updateValidation(newEnts, validationErrors);
       change("reduxFormEntitiesUndoRedoStack", {
         ...reduxFormEntitiesUndoRedoStack,
         currentVersion: reduxFormEntitiesUndoRedoStack.currentVersion - 1
@@ -235,7 +236,7 @@ class DataTable extends React.Component {
         nextState
       );
       change("reduxFormEntities", newEnts);
-      change("reduxFormCellValidation", validationErrors);
+      this.updateValidation(newEnts, validationErrors);
       change("reduxFormEntitiesUndoRedoStack", {
         ...reduxFormEntitiesUndoRedoStack,
         currentVersion: nextV
@@ -417,7 +418,7 @@ class DataTable extends React.Component {
       initialEntities || entities
     );
     change("reduxFormEntities", newEnts);
-    change("reduxFormCellValidation", validationErrors);
+    this.updateValidation(newEnts, validationErrors);
   };
 
   componentDidMount() {
@@ -628,8 +629,8 @@ class DataTable extends React.Component {
                 delete newCellValidate[cellId];
               }
             });
+            this.updateValidation(entities, newCellValidate);
           });
-          change("reduxFormCellValidation", newCellValidate);
         } else {
           // handle paste in same format
           const primarySelectedCell = this.getPrimarySelectedCellId();
@@ -683,8 +684,8 @@ class DataTable extends React.Component {
                   }
                 });
               });
+              this.updateValidation(entities, newCellValidate);
             });
-            change("reduxFormCellValidation", newCellValidate);
             change("reduxFormSelectedCells", newSelectedCells);
           }
         }
@@ -732,11 +733,17 @@ class DataTable extends React.Component {
     }
   };
 
+  updateValidation = (entities, newCellValidate) => {
+    const { change, schema } = computePresets(this.props);
+    change(
+      "reduxFormCellValidation",
+      validateTableWideErrors({ entities, schema, newCellValidate })
+    );
+  };
   handleDeleteCell = () => {
     const {
       reduxFormSelectedCells,
       reduxFormCellValidation,
-      change,
       schema,
       entities
     } = computePresets(this.props);
@@ -764,8 +771,8 @@ class DataTable extends React.Component {
           delete newCellValidate[cellId];
         }
       });
+      this.updateValidation(entities, newCellValidate);
     });
-    change("reduxFormCellValidation", newCellValidate);
   };
 
   handleCut = e => {
@@ -2027,7 +2034,7 @@ class DataTable extends React.Component {
         schema,
         newVal
       });
-      change("reduxFormCellValidation", {
+      this.updateValidation(entities, {
         ...reduxFormCellValidation,
         [cellId]: error
       });
@@ -2043,7 +2050,7 @@ class DataTable extends React.Component {
   refocusTable = () => {
     setTimeout(() => {
       const table = ReactDOM.findDOMNode(this.table)?.closest(
-        ".data-table-container"
+        ".data-table-container div"
       );
       table?.focus();
     }, 0);
@@ -2554,7 +2561,8 @@ class DataTable extends React.Component {
       });
 
       // select the new cells
-      change("reduxFormCellValidation", newCellValidate);
+      this.updateValidation(entities, newCellValidate);
+
       if (newPrimaryCellId) {
         newReduxFormSelectedCells[primaryCellId] = true;
         newReduxFormSelectedCells[newPrimaryCellId] = PRIMARY_SELECTED_VAL;
@@ -2616,7 +2624,7 @@ class DataTable extends React.Component {
   };
 
   insertRows = ({ above, numRows = 1, appendToBottom } = {}) => {
-    const { entities = [], reduxFormCellValidation, change } = computePresets(
+    const { entities = [], reduxFormCellValidation } = computePresets(
       this.props
     );
 
@@ -2636,7 +2644,7 @@ class DataTable extends React.Component {
         ...e,
         _isClean: true
       }));
-      change("reduxFormCellValidation", {
+      this.updateValidation(entities, {
         ...reduxFormCellValidation,
         ...validationErrors
       });
@@ -2786,7 +2794,6 @@ class DataTable extends React.Component {
                 const {
                   entities = [],
                   reduxFormCellValidation,
-                  change,
                   reduxFormSelectedCells = {}
                 } = computePresets(this.props);
                 const selectedRowIds = Object.keys(reduxFormSelectedCells).map(
@@ -2796,15 +2803,16 @@ class DataTable extends React.Component {
                   }
                 );
                 this.updateEntitiesHelper(entities, entities => {
-                  change(
-                    "reduxFormCellValidation",
+                  const ents = entities.filter(
+                    (e, i) => !selectedRowIds.includes(getIdOrCodeOrIndex(e, i))
+                  );
+                  this.updateValidation(
+                    ents,
                     omitBy(reduxFormCellValidation, (v, cellId) =>
                       selectedRowIds.includes(cellId.split(":")[0])
                     )
                   );
-                  return entities.filter(
-                    (e, i) => !selectedRowIds.includes(getIdOrCodeOrIndex(e, i))
-                  );
+                  return ents;
                 });
                 this.refocusTable();
               }}
@@ -3318,7 +3326,7 @@ function stripNumberAtEnd(str) {
   return str.replace(getNumberStrAtEnd(str), "");
 }
 
-const getCellVal = (ent, path, col) => {
+export const getCellVal = (ent, path, col) => {
   const isBool = col.type === "boolean";
   let selectedCellVal = get(ent, path, "");
   if (isBool) {

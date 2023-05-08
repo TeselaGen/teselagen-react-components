@@ -68,7 +68,6 @@ describe("MenuBar", () => {
 
     // it should only show the first 10 items by default
     cy.focused().type("c");
-    cy.focused().as("mainInput");
 
     cy.get(".tg-menu-search-suggestions .bp3-menu-item").should(
       "have.length",
@@ -81,13 +80,13 @@ describe("MenuBar", () => {
       .find("input")
       .type("ha");
 
-    cy.get("@mainInput").focus();
+    cy.get(`.tg-menu-bar-help-search input`).focus();
 
     //it should be able to click the
     cy.focused().type("{selectall}Don't Dismiss");
     cy.contains(".bp3-menu-item", "Don't Dismiss").click();
     cy.contains(".bp3-toast", "This menu's not going away any time soon");
-    cy.get("@mainInput").focus();
+    cy.get(`.tg-menu-bar-help-search input`).focus();
 
     cy.focused().type("{selectall}React");
     cy.contains(".bp3-menu-item", "ReactText 9").click();

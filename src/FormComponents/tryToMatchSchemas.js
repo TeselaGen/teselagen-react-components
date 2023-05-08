@@ -3,6 +3,7 @@ import { nanoid } from "nanoid";
 import Fuse from "fuse.js";
 import { max } from "lodash";
 import { editCellHelper } from "../DataTable";
+import { validateTableWideErrors } from "../DataTable/validateTableWideErrors";
 
 const getSchema = data => ({
   fields: map(data[0], (val, path) => {
@@ -141,20 +142,29 @@ function matchSchemas({ userSchema, officialSchema }) {
   const editableFields = officialSchema.fields.filter(f => !f.isNotEditable);
   const hasErr =
     !csvValidationIssue &&
-    userSchema.userData.some(e => {
-      return editableFields.some(columnSchema => {
-        //mutative
-        const { error } = editCellHelper({
-          entity: e,
-          columnSchema,
-          newVal: e[columnSchema.matches[0].item.path]
+    (
+      userSchema.userData.some(e => {
+        return editableFields.some(columnSchema => {
+          //mutative
+          const { error } = editCellHelper({
+            entity: e,
+            columnSchema,
+            newVal: e[columnSchema.matches[0].item.path]
+          });
+          if (error) {
+            return true;
+          }
+          return false;
         });
-        if (error) {
-          return true;
-        }
-        return false;
-      });
-    });
+      }) ||
+      Object.keys(
+        validateTableWideErrors({
+          entities: userSchema.userData,
+          schema: userSchema,
+          newCellValidate: {}
+        })
+      )
+    ).length;
 
   if (hasErr) {
     csvValidationIssue = `Some of the data doesn't look quite right. Do these header mappings look correct?`;

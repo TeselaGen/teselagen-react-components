@@ -14,6 +14,7 @@ import {
   getStringFromReactComponent,
   setCurrentParamsOnUrl
 } from "../../src";
+import { startCase } from "lodash";
 
 function HandleHotkeys({ combo, onKeyDown }) {
   const hotkeys = useMemo(
@@ -104,7 +105,7 @@ export function useToggle({
 
   if (hidden) comp = null;
   let toggleOrButton;
-  const labelOrText = label ? <span>{label}</span> : type;
+  const labelOrText = label ? <span>{label}</span> : startCase(type);
   const sharedProps = {
     style: { marginBottom: 0 },
     "data-test": type || label,

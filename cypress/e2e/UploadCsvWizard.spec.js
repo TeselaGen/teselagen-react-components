@@ -55,6 +55,12 @@ describe("EditableCellTable.spec", () => {
     cy.contains(`testUploadWizard_messedUpHeaders_updated.csv`);
     cy.contains(`Added Fixed Up File`);
   });
+  it(`isUnique should trigger validation error on file upload`, () => {
+    cy.get("asdfasdfasdfasdfasdf"); //fix me
+  });
+  it(`isUnique should work as a validation rule on the table for editing, pasting, undo/redo`, () => {
+    cy.get("asdfasdfasdfasdfasdf"); //fix me
+  });
 
   it(`going back and forth between the pages should not clear the data that has been changed unless the column was switched`, () => {
     cy.visit("#/UploadCsvWizard");
@@ -124,7 +130,7 @@ describe("EditableCellTable.spec", () => {
     cy.contains(`File Upload Aborted`);
     cy.get(`.bp3-dialog`).should("not.exist");
   });
-  it(`manual entry should work`, () => {
+  it(`manual entry should work, additional untouched (_isClean) rows should be omitted`, () => {
     cy.visit("#/UploadCsvWizard");
     cy.contains("or manually enter data").click();
     cy.contains(
@@ -143,19 +149,10 @@ describe("EditableCellTable.spec", () => {
       `.hasCellError[data-tip="Please enter a value here"] [data-test="tgCell_name"]:first`
     ).dblclick({ force: true });
     cy.focused().type("a{enter}");
-    cy.dragBetween(`.cellDragHandle`, `button:contains(Add 10 Rows)`);
-
     cy.get(
       `.hasCellError[data-tip="Please enter a value here"] [data-test="tgCell_sequence"]:first`
     ).dblclick({ force: true });
     cy.focused().type("g{enter}");
-    cy.dragBetween(`.cellDragHandle`, `button:contains(Add 10 Rows)`);
-
-    cy.contains(".bp3-disabled.bp3-button", "Add File");
-    cy.get(`[data-test="tgCell_matchType"]:contains(dna)`).click();
-    cy.dragBetween(`.cellDragHandle`, `button:contains(Add 10 Rows)`);
-    cy.get(`[data-test="tgCell_type"]:contains(misc_feature)`).click();
-    cy.dragBetween(`.cellDragHandle`, `button:contains(Add 10 Rows)`);
 
     cy.contains(".bp3-button", "Add File").click();
     cy.contains("File Added");
@@ -164,7 +161,7 @@ describe("EditableCellTable.spec", () => {
     const downloadsFolder = Cypress.config("downloadsFolder");
     cy.readFile(path.join(downloadsFolder, "manual_data_entry.csv")).should(
       "eq",
-      `name,description,sequence,isRegex,matchType,type\r\na,,g,false,dna,misc_feature\r\na,,g,false,dna,misc_feature\r\na,,g,false,dna,misc_feature\r\na,,g,false,dna,misc_feature\r\na,,g,false,dna,misc_feature`
+      `name,description,sequence,isRegex,matchType,type\r\npj5_0001,Example description of a sequence,gtgctttca,false,dna,misc_feature\r\na,description,g,false,,`
     );
   });
 });
