@@ -1859,6 +1859,7 @@ class DataTable extends React.Component {
             delete newSelectedCells[cellId];
           } else {
             newSelectedCells = {};
+            newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
           }
         } else {
           const primarySelectedCellId = this.getPrimarySelectedCellId();

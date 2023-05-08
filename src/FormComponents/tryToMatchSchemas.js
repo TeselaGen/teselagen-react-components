@@ -142,29 +142,28 @@ function matchSchemas({ userSchema, officialSchema }) {
   const editableFields = officialSchema.fields.filter(f => !f.isNotEditable);
   const hasErr =
     !csvValidationIssue &&
-    (
-      userSchema.userData.some(e => {
-        return editableFields.some(columnSchema => {
-          //mutative
-          const { error } = editCellHelper({
-            entity: e,
-            columnSchema,
-            newVal: e[columnSchema.matches[0].item.path]
-          });
-          if (error) {
-            return true;
-          }
-          return false;
+    (userSchema.userData.some(e => {
+      return editableFields.some(columnSchema => {
+        //mutative
+        const { error } = editCellHelper({
+          entity: e,
+          columnSchema,
+          newVal: e[columnSchema.matches[0].item.path]
         });
-      }) ||
+        if (error) {
+          return true;
+        }
+        return false;
+      });
+    }) ||
       Object.keys(
         validateTableWideErrors({
           entities: userSchema.userData,
-          schema: userSchema,
+          schema: officialSchema,
+          optionalUserSchema: userSchema,
           newCellValidate: {}
         })
-      )
-    ).length;
+      ).length);
 
   if (hasErr) {
     csvValidationIssue = `Some of the data doesn't look quite right. Do these header mappings look correct?`;

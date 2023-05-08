@@ -56,10 +56,51 @@ describe("EditableCellTable.spec", () => {
     cy.contains(`Added Fixed Up File`);
   });
   it(`isUnique should trigger validation error on file upload`, () => {
-    cy.get("asdfasdfasdfasdfasdf"); //fix me
+    cy.visit("#/UploadCsvWizard");
+    cy.tgToggle("enforceNameUnique");
+    cy.uploadFile(
+      ".tg-dropzone",
+      "testUploadWizard_invalidDataNonUnique.csv",
+      "text/csv",
+      true
+    );
+
+    cy.contains(
+      `Some of the data doesn't look quite right. Do these header mappings look correct?`
+    );
+    cy.contains("Review and Edit Data").click();
+    cy.get(`[data-tip="This value must be unique"]`);
+    cy.get(`.hasCellError:last [data-test="tgCell_name"]`);
+    cy.get(`button:contains(Add File).bp3-disabled`);
+    cy.contains(`Cancel`).click();
+    cy.contains(`File Upload Aborted`);
+    cy.get(`.bp3-dialog`).should("not.exist");
   });
   it(`isUnique should work as a validation rule on the table for editing, pasting, undo/redo`, () => {
-    cy.get("asdfasdfasdfasdfasdf"); //fix me
+    cy.visit("#/UploadCsvWizard");
+    cy.tgToggle("enforceNameUnique");
+    cy.contains("or manually enter data").click();
+    cy.get(`[data-test="tgCell_name"]`)
+      .eq(4)
+      .click({ force: true });
+    cy.focused().paste(`pj5_0002	new	cloudy	6	dna
+    pj5_0003	new	HOT	6	dna
+    pj5_0004	old	rainy	4	dna
+    pj5_0004	old	snowy	4	dna`);
+    cy.get(`[data-tip="This value must be unique"]`);
+    cy.get(`button:contains(Add File).bp3-disabled`);
+    cy.get(`.hasCellError:last [data-test="tgCell_name"]`)
+      .click({ force: true })
+      .type("haha{enter}");
+    cy.get(`button:contains(Add File).bp3-disabled`).should("not.exist");
+    const IS_LINUX =
+      window.navigator.platform.toLowerCase().search("linux") > -1;
+    const undoCmd = IS_LINUX ? `{alt}z` : "{meta}z";
+    const redoCmd = IS_LINUX ? `{alt}{shift}z` : "{meta}{shift}z";
+    cy.get(".data-table-container").type(undoCmd);
+    cy.get(`button:contains(Add File).bp3-disabled`);
+    cy.focused().type(redoCmd);
+    cy.get(`button:contains(Add File).bp3-disabled`).should("not.exist");
   });
 
   it(`going back and forth between the pages should not clear the data that has been changed unless the column was switched`, () => {
@@ -108,7 +149,7 @@ describe("EditableCellTable.spec", () => {
       `.hasCellError[data-tip="Please enter a value here"] [data-test="tgCell_name"]:first`
     ).should("exist");
   });
-  it(`invalid data should trigger the wizard`, () => {
+  it(`invalid data on upload should trigger the wizard`, () => {
     cy.visit("#/UploadCsvWizard");
     cy.uploadFile(
       ".tg-dropzone",

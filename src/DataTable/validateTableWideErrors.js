@@ -2,10 +2,18 @@ import getIdOrCodeOrIndex from "./utils/getIdOrCodeOrIndex";
 import { getCellVal } from ".";
 
 const uniqueMsg = "This value must be unique";
-export function validateTableWideErrors({ entities, schema, newCellValidate }) {
+export function validateTableWideErrors({
+  entities,
+  schema,
+  optionalUserSchema,
+  newCellValidate
+}) {
   schema.fields.forEach(col => {
-    const { path, isUnique } = col;
+    let { path, isUnique } = col;
     if (isUnique) {
+      if (optionalUserSchema) {
+        path = col.matches[0].item.path;
+      }
       const existingVals = {};
       entities.forEach(entity => {
         const val = getCellVal(entity, path, col);
