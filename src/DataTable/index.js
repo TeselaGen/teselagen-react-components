@@ -2180,7 +2180,9 @@ class DataTable extends React.Component {
         const [rowId, cellPath] = key.split(":");
         if (!selectedPaths.includes(cellPath)) selectedPaths.push(cellPath);
         const cellIndex = pathToIndex[cellPath];
-        const { i } = entityMap[rowId];
+        const ent = entityMap[rowId];
+        if (!ent) return;
+        const { i } = ent;
         if (firstRowIndex === undefined || i < firstRowIndex) {
           firstRowIndex = i;
         }
@@ -2549,7 +2551,9 @@ class DataTable extends React.Component {
       while (row[0] === undefined && row.length) row.shift();
     });
     const [rowId, cellPath] = cellId.split(":");
-    const { i } = entityMap[rowId];
+    const ent = entityMap[rowId];
+    if (!ent) return;
+    const { i } = ent;
     const cellIndex = pathToIndex[cellPath];
     const isBottomRight = i === lastRowIndex && cellIndex === lastCellIndex;
     return isBottomRight;
