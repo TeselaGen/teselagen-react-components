@@ -64,7 +64,7 @@ export default ({ demos }) => {
           placeholder="Filter..."
           leftElement={<Icon style={{ marginTop: 6 }} icon="search"></Icon>}
         ></InputGroup>
-        {Object.keys(demos).map(function(name, index) {
+        {Object.keys(demos).sort().map(function(name, index) {
           if (search && !name.toLowerCase().includes(search.toLowerCase()))
             return null;
           const childLinks = demos[name].childLinks || {};
