@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import isMobile from "is-mobile";
 import "./style.css";
-import { Button } from "@blueprintjs/core";
+import { Button, Icon, InputGroup } from "@blueprintjs/core";
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default ({ demos }) => {
   const [isOpen, setIsOpen] = useState(!isMobile());
+  const [search, setSearch] = useState("");
 
   let inner;
   if (!isOpen) {
@@ -27,20 +28,45 @@ export default ({ demos }) => {
         <div
           style={{
             display: "flex",
-            justifyContent: "flex-end",
+            justifyContent: "space-between",
+            alignItems: "baseline",
             width: "100%"
           }}
         >
+          <h4 style={{ marginTop: 10 }}>Components</h4>
           <Button
+            style={{ height: "fit-content" }}
             onClick={() => {
               setIsOpen(false);
             }}
             minimal
-            icon="cross"
+            icon="chevron-left"
           ></Button>
         </div>
-        <h4>Components</h4>
+
+        <InputGroup
+          rightElement={
+            search && (
+              <Button
+                minimal
+                style={{ marginRight: 10 }}
+                icon="small-cross"
+                onClick={() => {
+                  setSearch("");
+                }}
+              ></Button>
+            )
+          }
+          onChange={e => {
+            setSearch(e.target.value);
+          }}
+          style={{ marginBottom: 5 /* maxWidth: 200 */ }}
+          placeholder="Filter..."
+          leftElement={<Icon style={{ marginTop: 6 }} icon="search"></Icon>}
+        ></InputGroup>
         {Object.keys(demos).map(function(name, index) {
+          if (search && !name.toLowerCase().includes(search.toLowerCase()))
+            return null;
           const childLinks = demos[name].childLinks || {};
           return (
             <React.Fragment key={index}>
@@ -80,7 +106,8 @@ export default ({ demos }) => {
       className="demo-nav-container"
       style={{
         width: isOpen ? 350 : 50,
-        paddingLeft: isOpen ? 50 : undefined
+        paddingLeft: isOpen ? 20 : undefined,
+        paddingRight: isOpen ? 20 : undefined
       }}
     >
       {inner}
