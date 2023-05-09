@@ -64,36 +64,38 @@ export default ({ demos }) => {
           placeholder="Filter..."
           leftElement={<Icon style={{ marginTop: 6 }} icon="search"></Icon>}
         ></InputGroup>
-        {Object.keys(demos).sort().map(function(name, index) {
-          if (search && !name.toLowerCase().includes(search.toLowerCase()))
-            return null;
-          const childLinks = demos[name].childLinks || {};
-          return (
-            <React.Fragment key={index}>
-              <NavLink
-                exact
-                to={`/${name}`}
-                activeClassName="demo-nav-link-active"
-                className="demo-nav-link"
-              >
-                {name}
-              </NavLink>
-              {Object.keys(childLinks).map(childKey => {
-                return (
-                  <NavLink
-                    exact
-                    key={childKey}
-                    to={`/${name}/${childKey}`}
-                    activeClassName="demo-nav-link-active"
-                    className="demo-nav-link nested"
-                  >
-                    {childKey}
-                  </NavLink>
-                );
-              })}
-            </React.Fragment>
-          );
-        })}
+        {Object.keys(demos)
+          .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+          .map(function(name, index) {
+            if (search && !name.toLowerCase().includes(search.toLowerCase()))
+              return null;
+            const childLinks = demos[name].childLinks || {};
+            return (
+              <React.Fragment key={index}>
+                <NavLink
+                  exact
+                  to={`/${name}`}
+                  activeClassName="demo-nav-link-active"
+                  className="demo-nav-link"
+                >
+                  {name}
+                </NavLink>
+                {Object.keys(childLinks).map(childKey => {
+                  return (
+                    <NavLink
+                      exact
+                      key={childKey}
+                      to={`/${name}/${childKey}`}
+                      activeClassName="demo-nav-link-active"
+                      className="demo-nav-link nested"
+                    >
+                      {childKey}
+                    </NavLink>
+                  );
+                })}
+              </React.Fragment>
+            );
+          })}
         <br></br>
         <br></br>
         <br></br>
