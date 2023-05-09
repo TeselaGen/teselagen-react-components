@@ -1365,6 +1365,50 @@ class DataTable extends React.Component {
             {...(isCellEditable && {
               tabIndex: -1,
               onKeyDown: e => {
+                const isArrowKey = e.keyCode >= 37 && e.keyCode <= 40;
+                if (isArrowKey) {
+                  const { schema, entities } = computePresets(this.props);
+                  const left = e.keyCode === 37;
+                  const up = e.keyCode === 38;
+                  const down = e.keyCode === 40;
+                  const cellId = this.getPrimarySelectedCellId();
+                  const [rowId, columnPath] = cellId.split(":");
+                  const pathToIndex = getFieldPathToIndex(schema);
+                  const columnIndex = pathToIndex[columnPath];
+                  const entityMap = getEntityIdToEntity(entities);
+
+                  const { i: rowIndex } = entityMap[rowId];
+
+                  const {
+                    cellIdAbove,
+                    cellIdToRight,
+                    cellIdBelow,
+                    cellIdToLeft
+                  } = getCellInfo({
+                    columnIndex,
+                    columnPath,
+                    rowId,
+                    schema,
+                    entities,
+                    rowIndex,
+                    isEntityDisabled,
+                    entity: entityMap[rowId].e
+                  });
+                  const nextCellId = up
+                    ? cellIdAbove
+                    : down
+                    ? cellIdBelow
+                    : left
+                    ? cellIdToLeft
+                    : cellIdToRight;
+
+                  if (!nextCellId) return;
+
+                  this.handleCellClick({
+                    event: e,
+                    cellId: nextCellId
+                  });
+                }
                 if (e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) return;
                 const cellId = this.getPrimarySelectedCellId();
                 if (!cellId) return;
@@ -1770,20 +1814,24 @@ class DataTable extends React.Component {
     const entity = rowInfo.original;
     const rowIndex = rowInfo.index;
     const rowId = getIdOrCodeOrIndex(entity, rowIndex);
-    const columnIndex = column.columnIndex;
-    const cellIdToLeft = `${rowId}:${schema.fields[columnIndex - 1]?.path}`;
-    const cellIdToRight = `${rowId}:${schema.fields[columnIndex + 1]?.path}`;
-    const rowAboveId =
-      entities[rowInfo.index - 1] &&
-      getIdOrCodeOrIndex(entities[rowInfo.index - 1], rowInfo.index - 1);
-    const rowBelowId =
-      entities[rowInfo.index + 1] &&
-      getIdOrCodeOrIndex(entities[rowInfo.index + 1], rowInfo.index + 1);
-    const cellIdAbove = `${rowAboveId}:${column.path}`;
-    const cellIdBelow = `${rowBelowId}:${column.path}`;
-
-    const cellId = `${rowId}:${column.path}`;
-    const rowDisabled = isEntityDisabled(entity);
+    const {
+      cellId,
+      cellIdAbove,
+      cellIdToRight,
+      cellIdBelow,
+      cellIdToLeft,
+      rowDisabled,
+      columnIndex
+    } = getCellInfo({
+      columnIndex: column.index,
+      columnPath: column.path,
+      rowId,
+      schema,
+      entities,
+      rowIndex,
+      isEntityDisabled,
+      entity
+    });
     const _isClean = entity._isClean && doNotValidateUntouchedRows;
 
     const err = !_isClean && reduxFormCellValidation[cellId];
@@ -1838,93 +1886,112 @@ class DataTable extends React.Component {
           this.showContextMenu(e);
         }, 0);
       },
-      onClick: e => {
-        // cell click, cellclick
-        const {
-          change,
-          reduxFormEditingCell,
-          reduxFormSelectedCells = {}
-        } = computePresets(this.props);
-        const shift = e.shiftKey;
-        const meta = e.metaKey;
-        if (rowDisabled) return;
-        let newSelectedCells = {
-          ...reduxFormSelectedCells
-        };
-        if (newSelectedCells[cellId] && !shift) {
-          // don't deselect if editing
-          if (reduxFormEditingCell === cellId) return;
-          if (meta) {
-            delete newSelectedCells[cellId];
-          } else {
-            newSelectedCells = {};
-            newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
-          }
-        } else {
-          const primarySelectedCellId = this.getPrimarySelectedCellId();
-          if (meta) {
-            if (isEmpty(newSelectedCells)) {
-              newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
-            } else {
-              newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
-              if (primarySelectedCellId)
-                newSelectedCells[primarySelectedCellId] = true;
-            }
-          } else if (shift) {
-            if (primarySelectedCellId) {
-              const [rowId, colPath] = primarySelectedCellId.split(":");
-              const primaryRowIndex = entities.findIndex((e, i) => {
-                return getIdOrCodeOrIndex(e, i) === rowId;
-              });
-              const fieldToIndex = getFieldPathToIndex(schema);
-              const primaryColIndex = fieldToIndex[colPath];
-
-              if (primaryRowIndex === -1 || primaryColIndex === -1) {
-                newSelectedCells = {};
-                newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
-              } else {
-                const minRowIndex = min([primaryRowIndex, rowIndex]);
-                const minColIndex = min([primaryColIndex, columnIndex]);
-                const maxRowIndex = max([primaryRowIndex, rowIndex]);
-                const maxColIndex = max([primaryColIndex, columnIndex]);
-                const entitiesBetweenRows = entities.slice(
-                  minRowIndex,
-                  maxRowIndex + 1
-                );
-                const fieldsBetweenCols = schema.fields.slice(
-                  minColIndex,
-                  maxColIndex + 1
-                );
-                newSelectedCells = {
-                  [primarySelectedCellId]: PRIMARY_SELECTED_VAL
-                };
-                entitiesBetweenRows.forEach(e => {
-                  const rowId = getIdOrCodeOrIndex(e, entities.indexOf(e));
-                  fieldsBetweenCols.forEach(f => {
-                    const cellId = `${rowId}:${f.path}`;
-                    if (!newSelectedCells[cellId])
-                      newSelectedCells[cellId] = true;
-                  });
-                });
-                newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
-                newSelectedCells[primarySelectedCellId] = true;
-              }
-            } else {
-              newSelectedCells = {};
-              newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
-            }
-          } else {
-            newSelectedCells = {};
-            newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
-          }
-        }
-
-        change("reduxFormSelectedCells", newSelectedCells);
+      onClick: event => {
+        this.handleCellClick({
+          event,
+          cellId,
+          rowDisabled,
+          rowIndex,
+          columnIndex
+        });
       },
       className
     };
   };
 
+  handleCellClick = ({ event, cellId }) => {
+    if (!cellId) return;
+    // cell click, cellclick
+    const {
+      entities,
+      schema,
+      change,
+      reduxFormEditingCell,
+      reduxFormSelectedCells = {},
+      isEntityDisabled
+    } = computePresets(this.props);
+    const shift = event.shiftKey;
+    const meta = event.metaKey;
+    const [rowId, cellPath] = cellId.split(":");
+    const entityMap = getEntityIdToEntity(entities);
+    const { e: entity, i: rowIndex } = entityMap[rowId];
+    const pathToIndex = getFieldPathToIndex(schema);
+    const columnIndex = pathToIndex[cellPath];
+    const rowDisabled = isEntityDisabled(entity);
+
+    if (rowDisabled) return;
+    let newSelectedCells = {
+      ...reduxFormSelectedCells
+    };
+    if (newSelectedCells[cellId] && !shift) {
+      // don't deselect if editing
+      if (reduxFormEditingCell === cellId) return;
+      if (meta) {
+        delete newSelectedCells[cellId];
+      } else {
+        newSelectedCells = {};
+        newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
+      }
+    } else {
+      const primarySelectedCellId = this.getPrimarySelectedCellId();
+      if (meta) {
+        if (isEmpty(newSelectedCells)) {
+          newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
+        } else {
+          newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
+          if (primarySelectedCellId)
+            newSelectedCells[primarySelectedCellId] = true;
+        }
+      } else if (shift) {
+        if (primarySelectedCellId) {
+          const [rowId, colPath] = primarySelectedCellId.split(":");
+          const primaryRowIndex = entities.findIndex((e, i) => {
+            return getIdOrCodeOrIndex(e, i) === rowId;
+          });
+          const fieldToIndex = getFieldPathToIndex(schema);
+          const primaryColIndex = fieldToIndex[colPath];
+
+          if (primaryRowIndex === -1 || primaryColIndex === -1) {
+            newSelectedCells = {};
+            newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
+          } else {
+            const minRowIndex = min([primaryRowIndex, rowIndex]);
+            const minColIndex = min([primaryColIndex, columnIndex]);
+            const maxRowIndex = max([primaryRowIndex, rowIndex]);
+            const maxColIndex = max([primaryColIndex, columnIndex]);
+            const entitiesBetweenRows = entities.slice(
+              minRowIndex,
+              maxRowIndex + 1
+            );
+            const fieldsBetweenCols = schema.fields.slice(
+              minColIndex,
+              maxColIndex + 1
+            );
+            newSelectedCells = {
+              [primarySelectedCellId]: PRIMARY_SELECTED_VAL
+            };
+            entitiesBetweenRows.forEach(e => {
+              const rowId = getIdOrCodeOrIndex(e, entities.indexOf(e));
+              fieldsBetweenCols.forEach(f => {
+                const cellId = `${rowId}:${f.path}`;
+                if (!newSelectedCells[cellId]) newSelectedCells[cellId] = true;
+              });
+            });
+            newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
+            newSelectedCells[primarySelectedCellId] = true;
+          }
+        } else {
+          newSelectedCells = {};
+          newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
+        }
+      } else {
+        newSelectedCells = {};
+        newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
+      }
+    }
+
+    change("reduxFormSelectedCells", newSelectedCells);
+  };
   renderCheckboxHeader = () => {
     const {
       reduxFormSelectedEntityIdMap,
@@ -3031,6 +3098,39 @@ const itemSizeEstimators = {
   normal: () => 33.34,
   comfortable: () => 41.34
 };
+
+function getCellInfo({
+  columnIndex,
+  columnPath,
+  rowId,
+  schema,
+  entities,
+  rowIndex,
+  isEntityDisabled,
+  entity
+}) {
+  const cellIdToLeft = `${rowId}:${schema.fields[columnIndex - 1]?.path}`;
+  const cellIdToRight = `${rowId}:${schema.fields[columnIndex + 1]?.path}`;
+  const rowAboveId =
+    entities[rowIndex - 1] &&
+    getIdOrCodeOrIndex(entities[rowIndex - 1], rowIndex - 1);
+  const rowBelowId =
+    entities[rowIndex + 1] &&
+    getIdOrCodeOrIndex(entities[rowIndex + 1], rowIndex + 1);
+  const cellIdAbove = `${rowAboveId}:${columnPath}`;
+  const cellIdBelow = `${rowBelowId}:${columnPath}`;
+
+  const cellId = `${rowId}:${columnPath}`;
+  const rowDisabled = isEntityDisabled(entity);
+  return {
+    cellId,
+    cellIdAbove,
+    cellIdToRight,
+    cellIdBelow,
+    cellIdToLeft,
+    rowDisabled
+  };
+}
 
 function ColumnFilterMenu({
   FilterMenu,
