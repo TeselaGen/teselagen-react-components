@@ -10,16 +10,17 @@ import { flatMap } from "lodash";
 import { compose } from "recompose";
 import SimpleStepViz from "./SimpleStepViz";
 import { nanoid } from "nanoid";
-import tgFormValues, { tgFormValueSelector } from "./utils/tgFormValues";
+import { tgFormValueSelector } from "./utils/tgFormValues";
 import { some } from "lodash";
 import { times } from "lodash";
-import { ReactSelectField, SwitchField } from "./FormComponents";
+import { ReactSelectField } from "./FormComponents";
 import DialogFooter from "./DialogFooter";
 import DataTable from "./DataTable";
 import wrapDialog from "./wrapDialog";
 import { omit } from "lodash";
 import showConfirmationDialog from "./showConfirmationDialog";
 import { connect } from "react-redux";
+import getIdOrCodeOrIndex from "./DataTable/utils/getIdOrCodeOrIndex";
 
 const UploadCsvWizardDialog = compose(
   reduxForm({
@@ -45,7 +46,7 @@ const UploadCsvWizardDialog = compose(
   csvValidationIssue,
   //fromRedux:
   handleSubmit,
-  onlyShowRowsWErrors,
+  // onlyShowRowsWErrors,
   reduxFormEntities,
   reduxFormCellValidation,
   changeForm
@@ -69,9 +70,10 @@ const UploadCsvWizardDialog = compose(
     inner = (
       <PreviewCsvData
         {...{
+          showDoesDataLookCorrectMsg: true,
           initialEntities: reduxFormEntities,
           matchedHeaders,
-          onlyShowRowsWErrors,
+          // onlyShowRowsWErrors,
           validateAgainstSchema,
           userSchema
         }}
@@ -230,9 +232,13 @@ const UploadCsvWizardDialog = compose(
       </div>
     );
   }
+  const { entsToUse, validationToUse } = removeCleanRows(
+    reduxFormEntities,
+    reduxFormCellValidation
+  );
 
   return (
-    <div style={{ width: "fit-content" }}>
+    <div>
       <div style={{ display: "flex", justifyContent: "center" }}>
         <SimpleStepViz style={{ marginTop: 8 }} steps={steps}></SimpleStepViz>
       </div>
@@ -240,8 +246,7 @@ const UploadCsvWizardDialog = compose(
       <DialogFooter
         text={!hasSubmitted ? "Review and Edit Data" : "Add File"}
         disabled={
-          hasSubmitted &&
-          (!reduxFormEntities?.length || some(reduxFormCellValidation, v => v))
+          hasSubmitted && (!entsToUse?.length || some(validationToUse, v => v))
         }
         {...(hasSubmitted && {
           onBackClick: () => {
@@ -270,7 +275,7 @@ const UploadCsvWizardDialog = compose(
             //step 2 submit
             onUploadWizardFinish({
               newEntities: maybeStripIdFromEntities(
-                reduxFormEntities,
+                entsToUse,
                 validateAgainstSchema
               )
             });
@@ -284,13 +289,14 @@ const UploadCsvWizardDialog = compose(
 
 export default UploadCsvWizardDialog;
 
-export const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
+export const PreviewCsvData = function({
   formName,
   matchedHeaders,
+  showDoesDataLookCorrectMsg,
   headerMessage,
-  onlyShowRowsWErrors,
+  // onlyShowRowsWErrors,
   validateAgainstSchema,
-  userSchema = { userData: times(5) },
+  userSchema = { userData: times(5).map(() => ({ _isClean: true })) },
   initialEntities
 }) {
   // const [loading, setLoading] = useState(true);
@@ -301,23 +307,36 @@ export const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
   //   }, 400);
   // }, []);
 
+  // const forceUpdate = useForceUpdate();
+
   const data =
     userSchema.userData &&
     userSchema.userData.length &&
-    userSchema.userData.map(row => {
-      const toRet = {};
-      validateAgainstSchema.fields.forEach(({ path, defaultValue }, i) => {
-        const matchingKey = matchedHeaders?.[i];
+    userSchema.userData.map((row, i1) => {
+      const toRet = {
+        _isClean: row._isClean
+      };
+      validateAgainstSchema.fields.forEach(
+        ({ path, defaultValue, example }, i) => {
+          const matchingKey = matchedHeaders?.[i];
+          if (!matchingKey) {
+            toRet[path] = defaultValue === undefined ? defaultValue : "";
+          } else {
+            toRet[path] = row[matchingKey];
+          }
+          if (toRet[path] === undefined || toRet[path] === "") {
+            if (defaultValue) {
+              toRet[path] = defaultValue;
+            } else if (i1 === 0 && example) {
+              toRet[path] = example;
+              delete toRet._isClean;
+            } else {
+              toRet[path] = "";
+            }
+          }
+        }
+      );
 
-        if (!matchingKey) {
-          toRet[path] = defaultValue === undefined ? defaultValue : "";
-        } else {
-          toRet[path] = row[matchingKey];
-        }
-        if (toRet[path] === undefined || toRet[path] === "") {
-          toRet[path] = defaultValue || "";
-        }
-      });
       if (row.id === undefined) {
         toRet.id = nanoid();
       } else {
@@ -327,31 +346,69 @@ export const PreviewCsvData = tgFormValues("onlyShowRowsWErrors")(function({
     });
 
   return (
-    <div style={{}}>
-      <h5>
-        {headerMessage || "Does this data look correct? Edit it as needed."}
-      </h5>
-      <SwitchField
-        name="onlyShowRowsWErrors"
-        inlineLabel={true}
-        label="Only Show Rows With Errors"
-      />
+    <div style={{ minWidth: 400 }}>
+      <Callout style={{ marginBottom: 5 }} intent="primary">
+        {headerMessage ||
+          (showDoesDataLookCorrectMsg
+            ? "Does this data look correct? Edit it as needed."
+            : "Input your data here. Hover table headers for additional instructions")}
+      </Callout>
+      {validateAgainstSchema.description && (
+        <Callout>{validateAgainstSchema.description}</Callout>
+      )}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start"
+        }}
+      >
+        {/* {validateAgainstSchema.allowAdditionalOnEnd && (
+          <Button
+            icon="plus"
+            onClick={() => {
+              const path = prompt(
+                `Enter the name of the column you would like to add. ${validateAgainstSchema.allowAdditionalOnEndDescription ||
+                  ""}`
+              );
+              if (path) {
+                validateAgainstSchema.fields.push({
+                  description: "",
+                  path: `${
+                    isString(validateAgainstSchema.allowAdditionalOnEnd)
+                      ? validateAgainstSchema.allowAdditionalOnEnd
+                      : ""
+                  }${path}`,
+                  displayName: `${
+                    isString(validateAgainstSchema.allowAdditionalOnEnd)
+                      ? validateAgainstSchema.allowAdditionalOnEnd
+                      : ""
+                  }${path}`,
+                  type: "string"
+                });
+                forceUpdate();
+              }
+            }}
+          >
+            Add Column
+          </Button>
+        )} */}
+      </div>
       <DataTable
         maxWidth={800}
         maxHeight={500}
         initialEntities={initialEntities}
         destroyOnUnmount={false}
+        doNotValidateUntouchedRows
         formName={formName || "editableCellTable"}
         isSimple
-        noAddMoreRowsButton={onlyShowRowsWErrors}
-        onlyShowRowsWErrors={onlyShowRowsWErrors}
         isCellEditable
         entities={data || []}
         schema={validateAgainstSchema}
       ></DataTable>
     </div>
   );
-});
+};
 
 export const SimpleInsertDataDialog = compose(
   wrapDialog({
@@ -371,6 +428,11 @@ export const SimpleInsertDataDialog = compose(
   validateAgainstSchema,
   ...r
 }) {
+  const { entsToUse, validationToUse } = removeCleanRows(
+    reduxFormEntities,
+    reduxFormCellValidation
+  );
+
   return (
     <>
       <div className="bp3-dialog-body">
@@ -386,14 +448,12 @@ export const SimpleInsertDataDialog = compose(
         onClick={() => {
           onSimpleInsertDialogFinish({
             newEntities: maybeStripIdFromEntities(
-              reduxFormEntities,
+              entsToUse,
               validateAgainstSchema
             )
           });
         }}
-        disabled={
-          !reduxFormEntities?.length || some(reduxFormCellValidation, e => e)
-        }
+        disabled={!entsToUse?.length || some(validationToUse, e => e)}
         text="Add File"
       ></DialogFooter>
     </>
@@ -406,6 +466,26 @@ const typeToCommonType = {
   boolean: "True/False",
   dropdown: "Select One"
 };
+function removeCleanRows(reduxFormEntities, reduxFormCellValidation) {
+  const toFilterOut = {};
+  const entsToUse = (reduxFormEntities || []).filter(e => {
+    if (!e._isClean) return true;
+    else {
+      toFilterOut[getIdOrCodeOrIndex(e)] = true;
+      return false;
+    }
+  });
+
+  const validationToUse = {};
+  forEach(reduxFormCellValidation, (v, k) => {
+    const [rowId] = k.split(":");
+    if (!toFilterOut[rowId]) {
+      validationToUse[k] = v;
+    }
+  });
+  return { entsToUse, validationToUse };
+}
+
 function maybeStripIdFromEntities(ents, validateAgainstSchema) {
   if (validateAgainstSchema?.fields?.some(({ path }) => path === "id")) {
     return ents;
@@ -415,3 +495,11 @@ function maybeStripIdFromEntities(ents, validateAgainstSchema) {
     return ents?.map(e => omit(e, ["id"]));
   }
 }
+
+//create your forceUpdate hook
+// function useForceUpdate() {
+//   const [, setValue] = useState(0); // integer state
+//   return () => setValue(value => value + 1); // update state to force render
+//   // A function that increment 👆🏻 the previous state like here
+//   // is better than directly setting `setValue(value + 1)`
+// }

@@ -33,6 +33,55 @@ import { isArray, isFunction, isPlainObject } from "lodash";
 import { flatMap } from "lodash";
 import urljoin from "url-join";
 import popoverOverflowModifiers from "../utils/popoverOverflowModifiers";
+import writeXlsxFile from "write-excel-file";
+import { startCase } from "lodash";
+
+const helperText = [
+  `How to Use This Template to Upload New Data`,
+  `1. Go to the first tab and delete the example data.`,
+  `2. Input your rows of data organized under the appropriate columns. If you're confused about a column name, go to the "Data Dictionary" tab for clarification.`,
+  `3. Save the file.`,
+  `4. Return to the interface from which you dowloaded this template.`,
+  `5. Upload the completed file.`
+];
+// const objects = [
+//   {
+//     name: 'John Smith',
+//     age: 1800,
+//     dateOfBirth: new Date(),
+//     graduated: true
+//   },
+//   {
+//     name: 'Alice Brown',
+//     age: 2600.50,
+//     dateOfBirth: new Date(),
+//     graduated: false
+//   }
+// ]
+
+const helperSchema = [
+  {
+    column: undefined,
+    type: String,
+    value: student => student,
+    width: 200
+  }
+];
+
+// const a = async () => {
+//   console.log(`writin`);
+//   const b = await writeXlsxFile([helperText, helperText,helperText], {
+
+//     helperSchema: [helperSchema,helperSchema,helperSchema],
+//     sheets: ["Sheet 1", "Data Dictionary", "Help Notes"],
+//     filePath: "file.xlsx"
+//   });
+//   downloadjs(b, "file.xlsx", "xlsx");
+//   console.log(`b:`, b);
+// };
+// setTimeout(() => {
+//   a();
+// }, 0);
 
 function noop() {}
 // wink wink
@@ -46,7 +95,7 @@ function Uploader({
   action,
   className = "",
   minimal,
-  validateAgainstSchema,
+  validateAgainstSchema: _validateAgainstSchema,
   fileLimit,
   readBeforeUpload, //read the file using the browser's FileReader before passing it to onChange and/or uploading it
   uploadInBulk, //tnr: not yet implemented
@@ -67,6 +116,7 @@ function Uploader({
   onPreviewClick,
   axiosInstance = window.api || axios
 }) {
+  let validateAgainstSchema = _validateAgainstSchema;
   const accept = isPlainObject(_accept) ? [_accept] : _accept;
   const [loading, setLoading] = useState(false);
   const filesToClean = useRef([]);
@@ -96,12 +146,122 @@ function Uploader({
     contentOverride = contentOverride({ loading });
   }
   let simpleAccept;
+  let handleManuallyEnterData;
   let advancedAccept;
   if (Array.isArray(accept)) {
     if (accept.some(a => isPlainObject(a))) {
       //advanced accept
       advancedAccept = accept;
       simpleAccept = flatMap(accept, a => {
+        if (a.validateAgainstSchema) {
+          validateAgainstSchema = a.validateAgainstSchema;
+          handleManuallyEnterData = async e => {
+            e.stopPropagation();
+            const { newEntities } = await showSimpleInsertDataDialog(
+              "onSimpleInsertDialogFinish",
+              {
+                validateAgainstSchema
+              }
+            );
+            if (!newEntities) {
+              return;
+            } else {
+              const newFileName = `manual_data_entry.csv`;
+              const newFile = new File(
+                [papaparse.unparse(newEntities)],
+                newFileName
+              );
+              const file = {
+                ...newFile,
+                name: newFileName,
+                originFileObj: newFile,
+                originalFileObj: newFile,
+                id: nanoid()
+              };
+
+              const cleanedFileList = [file, ...fileListToUse].slice(
+                0,
+                fileLimit ? fileLimit : undefined
+              );
+              handleSecondHalfOfUpload({
+                acceptedFiles: cleanedFileList,
+                cleanedFileList
+              });
+              window.toastr.success(`File Added`);
+            }
+          };
+
+          const handleDownloadXlsxFile = async () => {
+            const dataDictionarySchema = [
+              { value: f => f.displayName || f.path, column: `Name` },
+              {
+                value: f => f.isUnique,
+                column: `Unique`
+              },
+              {
+                value: f => f.isRequired,
+                column: `Required`,
+                type: Boolean
+              },
+              {
+                value: f => f.type || "text",
+                column: `Data Type`
+              },
+              {
+                value: f => f.description,
+                column: `Notes`
+              },
+              {
+                value: f => f.example || f.defaultValue,
+                column: `Example Data`
+              }
+            ];
+
+            const mainExampleData = {};
+            const mainSchema = a.validateAgainstSchema.fields.map(f => {
+              mainExampleData[f.displayName || f.path] =
+                f.example || f.defaultValue;
+              return {
+                column: f.displayName || f.path,
+                value: v => {
+                  return v[f.displayName || f.path];
+                }
+              };
+            });
+            const nameToUse =
+              startCase(validateAgainstSchema.name) || "Example";
+            const b = await writeXlsxFile(
+              [[mainExampleData], a.validateAgainstSchema.fields, helperText],
+              {
+                headerStyle: {
+                  fontWeight: "bold"
+                },
+                schema: [mainSchema, dataDictionarySchema, helperSchema],
+                sheets: [nameToUse, "Data Dictionary", "Help Notes"],
+                filePath: "file.xlsx"
+              }
+            );
+            downloadjs(b, `${nameToUse}.xlsx`, "xlsx");
+          };
+          // handleDownloadXlsxFile()
+          a.exampleFiles = [
+            // ...(a.exampleFile ? [a.exampleFile] : []),
+            // {
+            //   description: "Download Example CSV File",
+            //   exampleFile: () => {}
+            // },
+            {
+              description: "Download Example XLSX File",
+              exampleFile: handleDownloadXlsxFile
+            },
+            {
+              description: "Manually Enter Data",
+              icon: "manually-entered-data",
+              exampleFile: handleManuallyEnterData
+            }
+          ];
+          delete a.exampleFile;
+        }
         if (a.type) return a.type;
         return a;
       });
@@ -530,41 +690,7 @@ function Uploader({
                     marginTop: 7,
                     marginBottom: 5
                   }}
-                  onClick={async e => {
-                    e.stopPropagation();
-                    const { newEntities } = await showSimpleInsertDataDialog(
-                      "onSimpleInsertDialogFinish",
-                      {
-                        validateAgainstSchema
-                      }
-                    );
-                    if (!newEntities) {
-                      return;
-                    } else {
-                      const newFileName = `manual_data_entry.csv`;
-                      const newFile = new File(
-                        [papaparse.unparse(newEntities)],
-                        newFileName
-                      );
-                      const file = {
-                        ...newFile,
-                        name: newFileName,
-                        originFileObj: newFile,
-                        originalFileObj: newFile,
-                        id: nanoid()
-                      };
-
-                      const cleanedFileList = [file, ...fileListToUse].slice(
-                        0,
-                        fileLimit ? fileLimit : undefined
-                      );
-                      handleSecondHalfOfUpload({
-                        acceptedFiles: cleanedFileList,
-                        cleanedFileList
-                      });
-                      window.toastr.success(`File Added`);
-                    }
-                  }}
+                  onClick={handleManuallyEnterData}
                   className="link-button"
                 >
                   .. or manually enter data
@@ -697,11 +823,12 @@ function getFileDownloadAttr(exampleFile) {
     ? { onClick: exampleFile }
     : exampleFile && {
         target: "_blank",
-        // href: `/package.json`,
         download: true,
         href:
           exampleFile.startsWith("https") || exampleFile.startsWith("www")
             ? exampleFile
-            : urljoin(baseUrl, "exampleFiles", exampleFile)
+            : baseUrl
+            ? urljoin(baseUrl, "exampleFiles", exampleFile)
+            : exampleFile
       };
 }

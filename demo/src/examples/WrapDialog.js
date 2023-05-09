@@ -125,6 +125,9 @@ export default function WrapDialogDemo() {
         <Button text="Open Dialog" onClick={() => setOpen(true)} />
         {isOpen && (
           <MyDialog
+            // dialogProps={
+            //   {canEscapeKeyClose: false,}
+            // }
             hideModal={() => {
               setOpen(false);
             }}

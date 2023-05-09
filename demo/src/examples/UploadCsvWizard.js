@@ -6,82 +6,56 @@ import { FileUploadField } from "../../../src";
 import DemoWrapper from "../DemoWrapper";
 import { parseCsvOrExcelFile } from "../../../src/utils/parserUtils";
 import { reduxForm } from "redux-form";
+import { useToggle } from "../useToggle";
 
-const validateAgainstSchema = {
+const simpleValidateAgainst = {
+  fields: [{ path: "name" }, { path: "description" }, { path: "sequence" }]
+};
+const validateAgainstSchema = ({enforceNameUnique}) => ({
+  helpInstructions:
+    "This template file is used to add rows to the sequence table.",
+  allowAdditionalOnEnd: "ext-", // allow additional fields that start with "ext-" at the end of the csv
+  allowAdditionalOnEndDescription:
+    "This will add extended properties to the uploaded sequence",
   fields: [
-    { isRequired: true, path: "name", description: "The Sequence Name" },
-    { path: "description" },
-    { isRequired: true, path: "sequence" },
+    {
+      isRequired: true,
+      isUnique: enforceNameUnique,
+      path: "name",
+      description: "The Sequence Name",
+      example: "pj5_0001",
+      // defaultValue: "asdf"      
+    },
+    { path: "description", example: "Example description of a sequence" },
+    {
+      isRequired: true,
+      path: "sequence",
+      example: "gtgctttca",
+      description: "The dna sequence base pairs"
+    },
     {
       path: "isRegex",
       type: "boolean",
+      description: "Whether the sequence is a regex",
       defaultValue: false
     },
     {
       path: "matchType",
       type: "dropdown",
+      // isRequired: true,
+      description: "Whether the sequence is a dna or protein sequence",
       values: ["dna", "protein"],
-      defaultValue: "dna"
+      example: "dna"
     },
     {
       path: "type",
       type: "dropdown",
+      // isRequired: true,
       values: ["misc_feature", "CDS", "rbs"],
-      defaultValue: "misc_feature"
+      example: "misc_feature"
     }
   ]
-  // userData: []
-};
-const csvStr = `Name,Sequence,Type,Color,Match type
-15 long linker based on the one I designed,APGSGTGGGSGSAPG,,#85DAE9,protein
-20 aa linker based on the one I designed,APGGSGGGTGGGSGGGSAPG,,#C7B0E3,protein
-22 aa linker,GPGSGGGGSGGGGSGGGGSGPG,misc_protein,#f58a5e,protein
-38 aa lkong linker,APGGSGGGSGGGSGGGSGGGSGGGTGGGSGGGSAGSPG,,#75C6A9,protein
-3d6 variable domain LC,YVVMTQTPLTLSVTIGQPASISCKSSQSLLDSDGKTYLNWLLQRPGQSPKRLIYLVSKLDSGVPDRFTGSGSGTDFTLKISRIEAEDLGLYYCWQGTHFPRTFGGGTKLEIK,,#ff9ccd,protein
-3d6 variable HC,EVKLVESGGGLVKPGASLKLSCAASGFTFSNYGMSWVRQNSDKRLEWVASIRSGGGRTYYSDNVKGRFTISRENAKNTLYLQMSSLKSEDTALYYCVRYDHYSGSSDYWGQGTTVTVS,,#f58a5e,protein
-15 long linker based on the one I designed,APGSGTGGGSGSAPG,,#85DAE9,protein
-20 aa linker based on the one I designed,APGGSGGGTGGGSGGGSAPG,,#C7B0E3,protein
-22 aa linker,GPGSGGGGSGGGGSGGGGSGPG,misc_feat1,#f58a5e,protein
-38 aa lkong linker,APGGSGGGSGGGSGGGSGGGSGGGTGGGSGGGSAGSPG,,#75C6A9,protein
-3d6 variable domain LC,YVVMTQTPLTLSVTIGQPASISCKSSQSLLDSDGKTYLNWLLQRPGQSPKRLIYLVSKLDSGVPDRFTGSGSGTDFTLKISRIEAEDLGLYYCWQGTHFPRTFGGGTKLEIK,,#ff9ccd,protein
-3d6 variable HC,EVKLVESGGGLVKPGASLKLSCAASGFTFSNYGMSWVRQNSDKRLEWVASIRSGGGRTYYSDNVKGRFTISRENAKNTLYLQMSSLKSEDTALYYCVRYDHYSGSSDYWGQGTTVTVS,,#f58a5e,protein
-15 long linker based on the one I designed,APGSGTGGGSGSAPG,,#85DAE9,protein
-20 aa linker based on the one I designed,APGGSGGGTGGGSGGGSAPG,,#C7B0E3,protein
-22 aa linker,GPGSGGGGSGGGGSGGGGSGPG,,#f58a5e,protein
-38 aa lkong linker,APGGSGGGSGGGSGGGSGGGSGGGTGGGSGGGSAGSPG,,#75C6A9,protein
-3d6 variable domain LC,YVVMTQTPLTLSVTIGQPASISCKSSQSLLDSDGKTYLNWLLQRPGQSPKRLIYLVSKLDSGVPDRFTGSGSGTDFTLKISRIEAEDLGLYYCWQGTHFPRTFGGGTKLEIK,,#ff9ccd,protein
-3d6 variable HC,EVKLVESGGGLVKPGASLKLSCAASGFTFSNYGMSWVRQNSDKRLEWVASIRSGGGRTYYSDNVKGRFTISRENAKNTLYLQMSSLKSEDTALYYCVRYDHYSGSSDYWGQGTTVTVS,,#f58a5e,protein
-15 long linker based on the one I designed,APGSGTGGGSGSAPG,,#85DAE9,protein
-20 aa linker based on the one I designed,APGGSGGGTGGGSGGGSAPG,,#C7B0E3,protein
-22 aa linker,GPGSGGGGSGGGGSGGGGSGPG,,#f58a5e,protein
-38 aa lkong linker,APGGSGGGSGGGSGGGSGGGSGGGTGGGSGGGSAGSPG,,#75C6A9,protein
-3d6 variable domain LC,YVVMTQTPLTLSVTIGQPASISCKSSQSLLDSDGKTYLNWLLQRPGQSPKRLIYLVSKLDSGVPDRFTGSGSGTDFTLKISRIEAEDLGLYYCWQGTHFPRTFGGGTKLEIK,,#ff9ccd,protein
-3d6 variable HC,EVKLVESGGGLVKPGASLKLSCAASGFTFSNYGMSWVRQNSDKRLEWVASIRSGGGRTYYSDNVKGRFTISRENAKNTLYLQMSSLKSEDTALYYCVRYDHYSGSSDYWGQGTTVTVS,,#f58a5e,protein
-15 long linker based on the one I designed,APGSGTGGGSGSAPG,,#85DAE9,protein
-20 aa linker based on the one I designed,APGGSGGGTGGGSGGGSAPG,,#C7B0E3,protein
-22 aa linker,GPGSGGGGSGGGGSGGGGSGPG,,#f58a5e,protein
-38 aa lkong linker,APGGSGGGSGGGSGGGSGGGSGGGTGGGSGGGSAGSPG,,#75C6A9,protein
-3d6 variable domain LC,YVVMTQTPLTLSVTIGQPASISCKSSQSLLDSDGKTYLNWLLQRPGQSPKRLIYLVSKLDSGVPDRFTGSGSGTDFTLKISRIEAEDLGLYYCWQGTHFPRTFGGGTKLEIK,,#ff9ccd,protein
-3d6 variable HC,EVKLVESGGGLVKPGASLKLSCAASGFTFSNYGMSWVRQNSDKRLEWVASIRSGGGRTYYSDNVKGRFTISRENAKNTLYLQMSSLKSEDTALYYCVRYDHYSGSSDYWGQGTTVTVS,,#f58a5e,protein
-15 long linker based on the one I designed,APGSGTGGGSGSAPG,,#85DAE9,protein
-20 aa linker based on the one I designed,APGGSGGGTGGGSGGGSAPG,,#C7B0E3,protein
-22 aa linker,GPGSGGGGSGGGGSGGGGSGPG,,#f58a5e,protein
-38 aa lkong linker,APGGSGGGSGGGSGGGSGGGSGGGTGGGSGGGSAGSPG,,#75C6A9,protein
-3d6 variable domain LC,YVVMTQTPLTLSVTIGQPASISCKSSQSLLDSDGKTYLNWLLQRPGQSPKRLIYLVSKLDSGVPDRFTGSGSGTDFTLKISRIEAEDLGLYYCWQGTHFPRTFGGGTKLEIK,,#ff9ccd,protein
-3d6 variable HC,EVKLVESGGGLVKPGASLKLSCAASGFTFSNYGMSWVRQNSDKRLEWVASIRSGGGRTYYSDNVKGRFTISRENAKNTLYLQMSSLKSEDTALYYCVRYDHYSGSSDYWGQGTTVTVS,,#f58a5e,protein
-15 long linker based on the one I designed,APGSGTGGGSGSAPG,,#85DAE9,protein
-20 aa linker based on the one I designed,APGGSGGGTGGGSGGGSAPG,,#C7B0E3,protein
-22 aa linker,GPGSGGGGSGGGGSGGGGSGPG,,#f58a5e,protein
-38 aa lkong linker,APGGSGGGSGGGSGGGSGGGSGGGTGGGSGGGSAGSPG,,#75C6A9,protein
-3d6 variable domain LC,YVVMTQTPLTLSVTIGQPASISCKSSQSLLDSDGKTYLNWLLQRPGQSPKRLIYLVSKLDSGVPDRFTGSGSGTDFTLKISRIEAEDLGLYYCWQGTHFPRTFGGGTKLEIK,,#ff9ccd,protein
-3d6 variable HC,EVKLVESGGGLVKPGASLKLSCAASGFTFSNYGMSWVRQNSDKRLEWVASIRSGGGRTYYSDNVKGRFTISRENAKNTLYLQMSSLKSEDTALYYCVRYDHYSGSSDYWGQGTTVTVS,,#f58a5e,protein
-15 long linker based on the one I designed,APGSGTGGGSGSAPG,,#85DAE9,protein
-20 aa linker based on the one I designed,APGGSGGGTGGGSGGGSAPG,,#C7B0E3,protein
-22 aa linker,GPGSGGGGSGGGGSGGGGSGPG,,#f58a5e,protein
-38 aa lkong linker,APGGSGGGSGGGSGGGSGGGSGGGTGGGSGGGSAGSPG,,#75C6A9,protein
-3d6 variable domain LC,YVVMTQTPLTLSVTIGQPASISCKSSQSLLDSDGKTYLNWLLQRPGQSPKRLIYLVSKLDSGVPDRFTGSGSGTDFTLKISRIEAEDLGLYYCWQGTHFPRTFGGGTKLEIK,,#ff9ccd,protein
-3d6 variable HC,EVKLVESGGGLVKPGASLKLSCAASGFTFSNYGMSWVRQNSDKRLEWVASIRSGGGRTYYSDNVKGRFTISRENAKNTLYLQMSSLKSEDTALYYCVRYDHYSGSSDYWGQGTTVTVS,,#f58a5e,protein
-`;
+});
 
 export default function UploadCsvWizardDemo() {
   return (
@@ -94,18 +68,37 @@ export default function UploadCsvWizardDemo() {
 }
 
 const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
+  const [simpleSchema, simpleSchemaComp] = useToggle({
+    type: "simpleSchema",
+    label: "Simple Schema"
+  });
+  const [enforceNameUnique, enforceNameUniqueComp] = useToggle({
+    type: "enforceNameUnique",
+  });
   return (
     <DemoWrapper>
-      <h6>FileUploadField with file limit</h6>
+      <h6>Options</h6>
+      {simpleSchemaComp}
+      {enforceNameUniqueComp}
+      <br></br>
+      <br></br>
+      <br></br>
       <FileUploadField
-        validateAgainstSchema={validateAgainstSchema}
         label="CSV upload with wizard"
         onFieldSubmit={function(fileList) {
           console.info("do something with the finished file list:", fileList);
         }}
         isRequired
         className={"fileUploadLimitAndType"}
-        accept={[".csv", ".xlsx"]}
+        accept={[
+          {
+            type: [".csv", ".xlsx"],
+            validateAgainstSchema: simpleSchema
+              ? simpleValidateAgainst
+              : validateAgainstSchema({enforceNameUnique}),
+            exampleFile: "/manual_data_entry (3).csv"
+          }
+        ]}
         name={"exampleFile"}
         fileLimit={1}
       />

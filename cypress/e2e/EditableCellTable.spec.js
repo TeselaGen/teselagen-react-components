@@ -36,7 +36,7 @@ describe("EditableCellTable.spec", () => {
   it(`typing a letter should start edit`, () => {
     cy.visit("#/DataTable/EditableCellTable");
     cy.get(`[data-test="tgCell_name"]:first`).type("zonk{enter}");
-    cy.get(`[data-test="tgCell_name"]:first`).should("contain", "tom88zonk");
+    cy.get(`[data-test="tgCell_name"]:first`).should("contain", "zonk");
   });
 
   it(`should be able to edit dropdown inputs correctly`, () => {
@@ -126,6 +126,81 @@ describe("EditableCellTable.spec", () => {
     cy.get(
       `[data-tip="Must be a number"] [data-test="tgCell_howMany"]:first`
     ).should("not.exist");
+  });
+  it(`arrow keys should work together with shift and dragging should work`, () => {
+    cy.visit("#/DataTable/EditableCellTable");
+    cy.get(`[data-test="tgCell_howMany"]`)
+      .eq(3)
+      .click({ force: true });
+    cy.focused().type(`{leftArrow}`);
+    cy.get(
+      `.rt-td.isSelectedCell.isPrimarySelected [data-test="tgCell_weather"]`
+    );
+    cy.focused().type(`{shift}{leftArrow}`);
+    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_type"]`);
+    cy.focused().type(`{shift}{downArrow}`);
+    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_type"]`).eq(1);
+    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_type"]`)
+      .eq(2)
+      .should("not.exist");
+    cy.focused().type(`{shift}{downArrow}`);
+    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_type"]`).eq(2);
+    cy.focused().type(`{shift}{leftArrow}`);
+    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_name"]`).eq(2);
+    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_type"]`).eq(2);
+    cy.get(
+      `.rt-td.isSecondarySelected [data-test="tgCell_name"]:contains(tom93)`
+    )
+      .eq(1)
+      .should("not.exist");
+    cy.dragBetween(`.cellDragHandle`, `.rt-td:contains(tom96)`);
+    cy.get(
+      `.rt-td.isSecondarySelected [data-test="tgCell_name"]:contains(tom93)`
+    ).eq(1);
+    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_type"]`).eq(5);
+    cy.focused().type(`{shift}{upArrow}`);
+    cy.focused().type(`{shift}{upArrow}`);
+    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_type"]`)
+      .eq(4)
+      .should("not.exist");
+    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_type"]`).eq(3);
+  });
+  it(`arrow keys should work for simple cases`, () => {
+    cy.visit("#/DataTable/EditableCellTable");
+    cy.get(`[data-test="tgCell_name"]`)
+      .eq(0)
+      .click({ force: true });
+    cy.get(
+      `.rt-td.isSelectedCell.isPrimarySelected [data-test="tgCell_name"]:contains(tom88)`
+    );
+    cy.focused().type(`{upArrow}`);
+    cy.get(
+      `.rt-td.isSelectedCell.isPrimarySelected [data-test="tgCell_name"]:contains(tom88)`
+    );
+    cy.focused().type(`{leftArrow}`);
+    cy.get(
+      `.rt-td.isSelectedCell.isPrimarySelected [data-test="tgCell_name"]:contains(tom88)`
+    );
+    cy.focused().type(`{rightArrow}`);
+    cy.get(`.rt-td.isSelectedCell.isPrimarySelected [data-test="tgCell_type"]`);
+    cy.focused().type(`{downArrow}`);
+    cy.get(
+      `[data-index="1"] .rt-td.isSelectedCell.isPrimarySelected [data-test="tgCell_type"]`
+    );
+    cy.get(`[data-index="49"] [data-test="tgCell_isProtein"]`).click({
+      force: true
+    });
+    cy.get(
+      `[data-index="49"] .rt-td.isSelectedCell.isPrimarySelected [data-test="tgCell_isProtein"]`
+    );
+    cy.focused().type(`{rightArrow}`);
+    cy.get(
+      `[data-index="49"] .rt-td.isSelectedCell.isPrimarySelected [data-test="tgCell_isProtein"]`
+    );
+    cy.focused().type(`{downArrow}`);
+    cy.get(
+      `[data-index="49"] .rt-td.isSelectedCell.isPrimarySelected [data-test="tgCell_isProtein"]`
+    );
   });
   it(`undo/redo should work`, () => {
     const IS_LINUX =

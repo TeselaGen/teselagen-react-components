@@ -56,9 +56,6 @@
 .data-table-container {
   padding: 20px;
   position: relative;
-  /* height: 100%;  tnr: this rule messes up  */
-  /* jpc: restoring rule for now to see if it still causes
-   * problems, and if so, what are those */
   height: 100%;
   width: 100%;
   display: flex;
@@ -124,14 +121,19 @@
   border-bottom: 1px solid rgb(233, 233, 233);
 }
 .ReactTable.ReactTable.isCellEditable .rt-tbody .rt-tr-group {
+  border-right: 4px solid #d4d4d433;
   border-bottom: none;
 }
-.ReactTable.ReactTable.isCellEditable .rt-tbody {
-  border-right: 4px solid var(--base1);
+.ReactTable.ReactTable.isCellEditable .rt-thead .rt-tr {
+  border-right: 4px solid #d4d4d433;
+}
+.ReactTable.ReactTable.isCellEditable .rt-thead .rt-th {
+  border: var(--cell-border-width) solid rgba(212, 212, 212, 0);
 }
 
 /* tgreen: we don't want the border for rows that don't have any data */
 .ReactTable.ReactTable .rt-tbody .rt-tr-group.no-row-data {
+  min-height: 0px;
   border-bottom: none;
 }
 
@@ -150,6 +152,7 @@
 /* Prevent rows from expanding vertically to fill available space */
 .ReactTable.ReactTable .rt-tbody .rt-tr-group,
 .ReactTable.ReactTable .rt-tbody .rt-tr-group .rt-tr {
+  min-height: 28px;
   flex: 0 0 auto;
 }
 
@@ -277,6 +280,9 @@
   align-items: center;
   padding: 12px 12px;
 }
+/* .ReactTable .rt-tbody .rt-td.isCleanRow {
+  opacity: 0.5;
+} */
 
 /* fix padding in custom row expander cell */
 .ReactTable .rt-tbody .rt-expandable {

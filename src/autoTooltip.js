@@ -11,6 +11,18 @@ let tippys = [];
       lastMouseOverElement = element;
 
       const id = "tippyEllipsizedEl";
+      // eslint-disable-next-line no-inner-declarations
+      function clearOldTippys(maybeInst) {
+        //clear old tippys
+        tippys = tippys.filter(t => {
+          const areeq = maybeInst?.reference?.isEqualNode(t.reference);
+          if (!areeq) {
+            t.destroy();
+            return false;
+          }
+          return true;
+        });
+      }
       let innerRun = false;
       const inner = (content, el) => {
         innerRun = true;
@@ -25,9 +37,11 @@ let tippys = [];
           delay: [0, 0],
           allowHTML: true
         });
+        clearOldTippys(...inst);
         inst.forEach(i => {
           i.show();
         });
+
         tippys = [...tippys, ...inst];
         if (content === el.getAttribute("title")) {
           el.removeAttribute("title");
@@ -35,9 +49,11 @@ let tippys = [];
       };
       const levels = 6;
       let dataTip;
+      let dataTipStop;
       let el = element;
       for (let index = 0; index < levels; index++) {
         if (!el) continue;
+
         const style = window.getComputedStyle(el);
         const whiteSpace = style.getPropertyValue("white-space");
         const textOverflow = style.getPropertyValue("text-overflow");
@@ -46,8 +62,10 @@ let tippys = [];
           whiteSpace === "nowrap" && textOverflow === "ellipsis";
 
         if (dataTip) {
+          if (dataTipStop) break;
+
           inner(dataTip, el);
-          continue;
+          break;
         } else if (
           isEllipsized &&
           el.offsetWidth < el.scrollWidth - 4 && //the -4 is adding a teeny bit of tolerance to fix issues with the column headers getting tooltips even when fully visible
@@ -56,7 +74,7 @@ let tippys = [];
           el.textContent?.trim?.().length !== 0
         ) {
           inner(el.textContent, el);
-          continue;
+          break;
         } else if (isEllipsized && el.offsetWidth >= el.scrollWidth) {
           // break; //tnr: i don't think we need this..
         }
@@ -64,11 +82,7 @@ let tippys = [];
       }
 
       if (!innerRun) {
-        //clear old tippys
-        tippys.forEach(t => {
-          t.destroy();
-        });
-        tippys = [];
+        clearOldTippys();
       }
     }
   });
