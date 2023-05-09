@@ -7,7 +7,7 @@ export function CellDragHandle({
   thisTable,
   onDragEnd,
   cellId,
-  isSelectionARectangleWithPrimaryInCorner
+  isSelectionARectangle
 }) {
   const xStart = useRef(0);
   const timeoutkey = useRef();
@@ -117,9 +117,9 @@ export function CellDragHandle({
       onMouseDown={e => {
         rowsToSelect.current = [];
         xStart.current = e.clientX;
-        const isRect = isSelectionARectangleWithPrimaryInCorner();
+        const { isRect, selectedPaths } = isSelectionARectangle();
         if (isRect) {
-          rectangleCellPaths.current = isRect.selectedPaths;
+          rectangleCellPaths.current = selectedPaths;
         }
         document.addEventListener("mousemove", handleDrag.current, false);
         document.addEventListener("mouseup", mouseup.current, false);

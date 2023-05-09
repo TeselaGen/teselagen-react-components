@@ -1371,11 +1371,46 @@ class DataTable extends React.Component {
                   const left = e.keyCode === 37;
                   const up = e.keyCode === 38;
                   const down = e.keyCode === 40;
-                  const cellId = this.getPrimarySelectedCellId();
-                  const [rowId, columnPath] = cellId.split(":");
+                  let cellIdToUse = this.getPrimarySelectedCellId();
                   const pathToIndex = getFieldPathToIndex(schema);
-                  const columnIndex = pathToIndex[columnPath];
                   const entityMap = getEntityIdToEntity(entities);
+                  if (!cellIdToUse) return;
+                  const {
+                    isRect,
+                    firstCellIndex,
+                    lastCellIndex,
+                    lastRowIndex,
+                    firstRowIndex
+                  } = this.isSelectionARectangle();
+
+                  if (isRect) {
+                    const [rowId, columnPath] = cellIdToUse.split(":");
+
+                    const columnIndex = pathToIndex[columnPath];
+                    const indexToPath = invert(pathToIndex);
+                    // we want to grab the cell opposite to the primary selected cell
+                    if (
+                      firstCellIndex === columnIndex &&
+                      firstRowIndex === entityMap[rowId]?.i
+                    ) {
+                      cellIdToUse = `${entities[lastRowIndex].id}:${indexToPath[lastCellIndex]}`;
+                    } else if (
+                      firstCellIndex === columnIndex &&
+                      lastRowIndex === entityMap[rowId]?.i
+                    ) {
+                      cellIdToUse = `${entities[firstRowIndex].id}:${indexToPath[lastCellIndex]}`;
+                    } else if (
+                      lastCellIndex === columnIndex &&
+                      firstRowIndex === entityMap[rowId]?.i
+                    ) {
+                      cellIdToUse = `${entities[lastRowIndex].id}:${indexToPath[firstCellIndex]}`;
+                    } else {
+                      cellIdToUse = `${entities[firstRowIndex].id}:${indexToPath[firstCellIndex]}`;
+                    }
+                  }
+                  if (!cellIdToUse) return;
+                  const [rowId, columnPath] = cellIdToUse.split(":");
+                  const columnIndex = pathToIndex[columnPath];
 
                   const { i: rowIndex } = entityMap[rowId];
 
@@ -1910,8 +1945,6 @@ class DataTable extends React.Component {
       reduxFormSelectedCells = {},
       isEntityDisabled
     } = computePresets(this.props);
-    const shift = event.shiftKey;
-    const meta = event.metaKey;
     const [rowId, cellPath] = cellId.split(":");
     const entityMap = getEntityIdToEntity(entities);
     const { e: entity, i: rowIndex } = entityMap[rowId];
@@ -1923,10 +1956,10 @@ class DataTable extends React.Component {
     let newSelectedCells = {
       ...reduxFormSelectedCells
     };
-    if (newSelectedCells[cellId] && !shift) {
+    if (newSelectedCells[cellId] && !event.shiftKey) {
       // don't deselect if editing
       if (reduxFormEditingCell === cellId) return;
-      if (meta) {
+      if (event.metaKey) {
         delete newSelectedCells[cellId];
       } else {
         newSelectedCells = {};
@@ -1934,7 +1967,7 @@ class DataTable extends React.Component {
       }
     } else {
       const primarySelectedCellId = this.getPrimarySelectedCellId();
-      if (meta) {
+      if (event.metaKey) {
         if (isEmpty(newSelectedCells)) {
           newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
         } else {
@@ -1942,7 +1975,7 @@ class DataTable extends React.Component {
           if (primarySelectedCellId)
             newSelectedCells[primarySelectedCellId] = true;
         }
-      } else if (shift) {
+      } else if (event.shiftKey) {
         if (primarySelectedCellId) {
           const [rowId, colPath] = primarySelectedCellId.split(":");
           const primaryRowIndex = entities.findIndex((e, i) => {
@@ -1977,8 +2010,8 @@ class DataTable extends React.Component {
                 if (!newSelectedCells[cellId]) newSelectedCells[cellId] = true;
               });
             });
-            newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
-            newSelectedCells[primarySelectedCellId] = true;
+            // newSelectedCells[cellId] = PRIMARY_SELECTED_VAL;
+            // newSelectedCells[primarySelectedCellId] = true;
           }
         } else {
           newSelectedCells = {};
@@ -2123,14 +2156,17 @@ class DataTable extends React.Component {
     }, 0);
   };
 
-  isSelectionARectangleWithPrimaryInCorner = () => {
+  isSelectionARectangle = () => {
     const { entities, reduxFormSelectedCells, schema } = computePresets(
       this.props
     );
-    if (Object.keys(reduxFormSelectedCells).length > 1) {
+    if (
+      reduxFormSelectedCells &&
+      Object.keys(reduxFormSelectedCells).length > 1
+    ) {
       const pathToIndex = getFieldPathToIndex(schema);
       const entityMap = getEntityIdToEntity(entities);
-      let primaryCellId;
+      // let primaryCellId;
       let selectionGrid = [];
       let firstCellIndex;
       let lastCellIndex;
@@ -2138,9 +2174,9 @@ class DataTable extends React.Component {
       let firstRowIndex;
       const selectedPaths = [];
       Object.keys(reduxFormSelectedCells).forEach(key => {
-        if (reduxFormSelectedCells[key] === PRIMARY_SELECTED_VAL) {
-          primaryCellId = key;
-        }
+        // if (reduxFormSelectedCells[key] === PRIMARY_SELECTED_VAL) {
+        //   primaryCellId = key;
+        // }
         const [rowId, cellPath] = key.split(":");
         if (!selectedPaths.includes(cellPath)) selectedPaths.push(cellPath);
         const cellIndex = pathToIndex[cellPath];
@@ -2176,25 +2212,24 @@ class DataTable extends React.Component {
           }
         }
       }
+
       if (isRectangle) {
-        selectionGrid.forEach(row => {
-          // remove undefineds from start of row
-          while (row[0] === undefined && row.length) row.shift();
-        });
-        // primary cell must be in a corner for this to happen
-        const [rowId, cellPath] = primaryCellId.split(":");
-        const { i } = entityMap[rowId];
-        const cellIndex = pathToIndex[cellPath];
-        const isTopLeft = i === firstRowIndex && cellIndex === firstCellIndex;
-        const isTopRight = i === firstRowIndex && cellIndex === lastCellIndex;
-        const isBottomLeft = i === lastRowIndex && cellIndex === firstCellIndex;
-        const isBottomRight = i === lastRowIndex && cellIndex === lastCellIndex;
-        if (isTopLeft || isTopRight || isBottomLeft || isBottomRight) {
-          return { selectedPaths, selectionGrid };
-        }
+        return {
+          isRect: true,
+          selectedPaths,
+          selectionGrid,
+          lastRowIndex,
+          lastCellIndex,
+          firstCellIndex,
+          firstRowIndex,
+          entityMap,
+          pathToIndex
+        };
+      } else {
+        return {};
       }
     }
-    return false;
+    return {};
   };
 
   renderColumns = () => {
@@ -2435,6 +2470,14 @@ class DataTable extends React.Component {
         //   });
         // }
 
+        const {
+          isRect,
+          selectionGrid,
+          lastRowIndex,
+          lastCellIndex,
+          entityMap,
+          pathToIndex
+        } = this.isSelectionARectangle();
         return (
           <>
             <div
@@ -2466,17 +2509,25 @@ class DataTable extends React.Component {
               />
             )}
 
-            {isSelectedCell && isSelectedCell === PRIMARY_SELECTED_VAL && (
-              <CellDragHandle
-                key={cellId}
-                thisTable={this.table}
-                cellId={cellId}
-                isSelectionARectangleWithPrimaryInCorner={
-                  this.isSelectionARectangleWithPrimaryInCorner
-                }
-                onDragEnd={this.onDragEnd}
-              ></CellDragHandle>
-            )}
+            {isSelectedCell &&
+              (isRect
+                ? this.isBottomRightCornerOfRectangle({
+                    cellId,
+                    selectionGrid,
+                    lastRowIndex,
+                    lastCellIndex,
+                    entityMap,
+                    pathToIndex
+                  })
+                : isSelectedCell === PRIMARY_SELECTED_VAL) && (
+                <CellDragHandle
+                  key={cellId}
+                  thisTable={this.table}
+                  cellId={cellId}
+                  isSelectionARectangle={this.isSelectionARectangle}
+                  onDragEnd={this.onDragEnd}
+                ></CellDragHandle>
+              )}
           </>
         );
       };
@@ -2484,6 +2535,24 @@ class DataTable extends React.Component {
       columnsToRender.push(tableColumn);
     });
     return columnsToRender;
+  };
+  isBottomRightCornerOfRectangle = ({
+    cellId,
+    selectionGrid,
+    lastRowIndex,
+    lastCellIndex,
+    entityMap,
+    pathToIndex
+  }) => {
+    selectionGrid.forEach(row => {
+      // remove undefineds from start of row
+      while (row[0] === undefined && row.length) row.shift();
+    });
+    const [rowId, cellPath] = cellId.split(":");
+    const { i } = entityMap[rowId];
+    const cellIndex = pathToIndex[cellPath];
+    const isBottomRight = i === lastRowIndex && cellIndex === lastCellIndex;
+    return isBottomRight;
   };
 
   onDragEnd = cellsToSelect => {
@@ -2497,8 +2566,7 @@ class DataTable extends React.Component {
     const primaryCellId = this.getPrimarySelectedCellId();
     const [primaryRowId, primaryCellPath] = primaryCellId.split(":");
     const pathToField = getFieldPathToField(schema);
-    const { selectedPaths, selectionGrid } =
-      this.isSelectionARectangleWithPrimaryInCorner() || {};
+    const { selectedPaths, selectionGrid } = this.isSelectionARectangle();
     let allSelectedPaths = selectedPaths;
     if (!allSelectedPaths) {
       allSelectedPaths = [primaryCellPath];
@@ -2520,9 +2588,7 @@ class DataTable extends React.Component {
         ...reduxFormCellValidation
       };
       const entityMap = getEntityIdToEntity(entities);
-      const { e: selectedEnt, i: primaryRowIndex } = entityMap[primaryRowId];
-      let newPrimaryRowIndex = primaryRowIndex;
-      let newPrimaryCellId;
+      const { e: selectedEnt } = entityMap[primaryRowId];
 
       allSelectedPaths.forEach(selectedPath => {
         const column = pathToField[selectedPath];
@@ -2569,16 +2635,6 @@ class DataTable extends React.Component {
           const { e: entityToUpdate, i: rowIndex } = entityMap[rowId] || {};
           if (entityToUpdate) {
             entityToUpdate._isClean = false;
-            // if this is the entity at the new bottom/top of the drag in the primary column it should now
-            // be primary. This ensures primary is always at the corner of the rectangle
-            const isNewBottom =
-              rowIndex > primaryRowIndex && rowIndex > newPrimaryRowIndex;
-            const isNewTop =
-              rowIndex < primaryRowIndex && rowIndex < newPrimaryRowIndex;
-            if (cellPath === primaryCellPath && (isNewBottom || isNewTop)) {
-              newPrimaryRowIndex = rowIndex;
-              newPrimaryCellId = cellId;
-            }
             let newVal;
             if (incrementStart !== undefined) {
               const num = incrementStart++;
@@ -2629,11 +2685,6 @@ class DataTable extends React.Component {
 
       // select the new cells
       this.updateValidation(entities, newCellValidate);
-
-      if (newPrimaryCellId) {
-        newReduxFormSelectedCells[primaryCellId] = true;
-        newReduxFormSelectedCells[newPrimaryCellId] = PRIMARY_SELECTED_VAL;
-      }
       change("reduxFormSelectedCells", newReduxFormSelectedCells);
     });
   };
@@ -3109,16 +3160,18 @@ function getCellInfo({
   isEntityDisabled,
   entity
 }) {
-  const cellIdToLeft = `${rowId}:${schema.fields[columnIndex - 1]?.path}`;
-  const cellIdToRight = `${rowId}:${schema.fields[columnIndex + 1]?.path}`;
+  const leftpath = schema.fields[columnIndex - 1]?.path;
+  const rightpath = schema.fields[columnIndex + 1]?.path;
+  const cellIdToLeft = leftpath && `${rowId}:${leftpath}`;
+  const cellIdToRight = rightpath && `${rowId}:${rightpath}`;
   const rowAboveId =
     entities[rowIndex - 1] &&
     getIdOrCodeOrIndex(entities[rowIndex - 1], rowIndex - 1);
   const rowBelowId =
     entities[rowIndex + 1] &&
     getIdOrCodeOrIndex(entities[rowIndex + 1], rowIndex + 1);
-  const cellIdAbove = `${rowAboveId}:${columnPath}`;
-  const cellIdBelow = `${rowBelowId}:${columnPath}`;
+  const cellIdAbove = rowAboveId && `${rowAboveId}:${columnPath}`;
+  const cellIdBelow = rowBelowId && `${rowBelowId}:${columnPath}`;
 
   const cellId = `${rowId}:${columnPath}`;
   const rowDisabled = isEntityDisabled(entity);
