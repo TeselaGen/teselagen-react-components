@@ -43,15 +43,14 @@ FocusStyleManager.onlyShowFocusOnTabs();
 const demos = {
   DataTable: {
     demo: DataTableExample,
-    childLinks: {
-      SimpleTable: {
-        demo: SimpleTable
-      },
-      EditableCellTable: {
-        demo: EditableCellTable
-      }
-    },
+    childLinks: {},
     noLiveCode: true
+  },
+  "DataTable - EditableCellTable": {
+    demo: EditableCellTable
+  },
+  "DataTable - SimpleTable": {
+    demo: SimpleTable
   },
   InfoHelper: {
     demo: InfoHelper,

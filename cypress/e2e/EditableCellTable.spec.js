@@ -1,6 +1,6 @@
 describe("EditableCellTable.spec", () => {
   it(`cell checkboxes and the header checkbox should work`, () => {
-    cy.visit("#/DataTable/EditableCellTable");
+    cy.visit("#/DataTable%20-%20EditableCellTable");
     cy.get(`[data-test="Is Protein"] input`).should("be.checked");
     cy.get(`[data-test="tgCell_isProtein"]:first input`).should("be.checked");
     cy.get(`[data-test="Is Protein"] input`).click({ force: true });
@@ -19,7 +19,7 @@ describe("EditableCellTable.spec", () => {
     cy.get(`[data-test="tgCell_isProtein"]:last input`).should("be.checked");
   });
   it(`should be able to edit text inputs correctly`, () => {
-    cy.visit("#/DataTable/EditableCellTable");
+    cy.visit("#/DataTable%20-%20EditableCellTable");
     cy.get(
       `[data-tip="Must include the letter 'a'"] [data-test="tgCell_name"]:first`
     ).should("contain", "tom88"); //should lowercase "Tom88"
@@ -34,13 +34,13 @@ describe("EditableCellTable.spec", () => {
     cy.get(".cellDragHandle").should("exist");
   });
   it(`typing a letter should start edit`, () => {
-    cy.visit("#/DataTable/EditableCellTable");
+    cy.visit("#/DataTable%20-%20EditableCellTable");
     cy.get(`[data-test="tgCell_name"]:first`).type("zonk{enter}");
     cy.get(`[data-test="tgCell_name"]:first`).should("contain", "zonk");
   });
 
   it(`should be able to edit dropdown inputs correctly`, () => {
-    cy.visit("#/DataTable/EditableCellTable");
+    cy.visit("#/DataTable%20-%20EditableCellTable");
     cy.get(
       `[data-tip="Please choose one of the accepted values"] [data-test="tgCell_type"]:first`
     ).should("contain", "fail"); //should lowercase "Tom"
@@ -49,13 +49,13 @@ describe("EditableCellTable.spec", () => {
     cy.get(`[data-test="tgCell_type"]:first`).should("contain", "old");
   });
   it(`smart increment should work`, () => {
-    cy.visit("#/DataTable/EditableCellTable");
+    cy.visit("#/DataTable%20-%20EditableCellTable");
     cy.get(`.rt-td:contains(nancy110)`).click();
     cy.dragBetween(`.cellDragHandle`, `button:contains(Add 10 Rows)`);
     cy.contains("nancy137");
   });
   it(`smart increment + multi column drag should work`, () => {
-    cy.visit("#/DataTable/EditableCellTable");
+    cy.visit("#/DataTable%20-%20EditableCellTable");
     cy.get(`.rt-td:contains(nancy110)`).click();
     cy.get(`.rt-tr:contains(nancy110) .rt-td:contains(too old)`).click({
       shiftKey: true
@@ -66,7 +66,7 @@ describe("EditableCellTable.spec", () => {
   });
 
   it(`drag should be repeating down`, () => {
-    cy.visit("#/DataTable/EditableCellTable");
+    cy.visit("#/DataTable%20-%20EditableCellTable");
     const makeSureInitialRowsAreCorrect = () => {
       cy.get(".rt-tr-group")
         .eq(5)
@@ -89,7 +89,7 @@ describe("EditableCellTable.spec", () => {
   });
 
   it(`drag should be repeating up`, () => {
-    cy.visit("#/DataTable/EditableCellTable");
+    cy.visit("#/DataTable%20-%20EditableCellTable");
     const makeSureInitialRowsAreCorrect = () => {
       cy.get(".rt-tr-group")
         .eq(15)
@@ -116,7 +116,7 @@ describe("EditableCellTable.spec", () => {
   });
 
   it(`should be able to edit numeric inputs correctly`, () => {
-    cy.visit("#/DataTable/EditableCellTable");
+    cy.visit("#/DataTable%20-%20EditableCellTable");
     cy.get(
       `[data-tip="Must be a number"] [data-test="tgCell_howMany"]:first`
     ).should("contain", "NaN"); //should lowercase "Tom"
@@ -128,7 +128,7 @@ describe("EditableCellTable.spec", () => {
     ).should("not.exist");
   });
   it(`arrow keys should work together with shift and dragging should work`, () => {
-    cy.visit("#/DataTable/EditableCellTable");
+    cy.visit("#/DataTable%20-%20EditableCellTable");
     cy.get(`[data-test="tgCell_howMany"]`)
       .eq(3)
       .click({ force: true });
@@ -166,7 +166,7 @@ describe("EditableCellTable.spec", () => {
     cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_type"]`).eq(3);
   });
   it(`arrow keys should work for simple cases`, () => {
-    cy.visit("#/DataTable/EditableCellTable");
+    cy.visit("#/DataTable%20-%20EditableCellTable");
     cy.get(`[data-test="tgCell_name"]`)
       .eq(0)
       .click({ force: true });
@@ -207,7 +207,7 @@ describe("EditableCellTable.spec", () => {
       window.navigator.platform.toLowerCase().search("linux") > -1;
     const undoCmd = IS_LINUX ? `{alt}z` : "{meta}z";
     const redoCmd = IS_LINUX ? `{alt}{shift}z` : "{meta}{shift}z";
-    cy.visit("#/DataTable/EditableCellTable");
+    cy.visit("#/DataTable%20-%20EditableCellTable");
     cy.get(`.rt-td:contains(tom88)`).dblclick();
     cy.focused().type("{selectall}tasty55{enter}");
     cy.get(`.rt-td:contains(tasty55)`).dblclick();
@@ -221,7 +221,7 @@ describe("EditableCellTable.spec", () => {
     cy.get(`.rt-td:contains(delishhh)`);
   });
   it(`deleting should work, default val should get reapplied`, () => {
-    cy.visit("#/DataTable/EditableCellTable");
+    cy.visit("#/DataTable%20-%20EditableCellTable");
     cy.get(`.rt-td:contains(tom88)`).click();
     cy.focused().type("{backspace}");
     cy.get(`.rt-td:contains(tom88)`).should("not.exist");
@@ -234,7 +234,7 @@ describe("EditableCellTable.spec", () => {
     );
   });
   it(`adding 10 rows should work`, () => {
-    cy.visit("#/DataTable/EditableCellTable");
+    cy.visit("#/DataTable%20-%20EditableCellTable");
     cy.get(`[data-index="59"]`).should("not.exist");
     cy.contains(`Add 10 Rows`).click();
     cy.get(`[data-index="59"]`).should("exist");
@@ -246,13 +246,13 @@ describe("EditableCellTable.spec", () => {
     cy.get(`[data-test="tgCell_weather"]:last`).contains("sunny");
   });
   it(`single row delete should work`, () => {
-    cy.visit("#/DataTable/EditableCellTable");
+    cy.visit("#/DataTable%20-%20EditableCellTable");
     cy.get(`.rt-td:contains(tom88)`).rightclick();
     cy.contains("Remove Row").click();
     cy.get(`.rt-td:contains(tom88)`).should("not.exist");
   });
   it(`multi row delete should work`, () => {
-    cy.visit("#/DataTable/EditableCellTable");
+    cy.visit("#/DataTable%20-%20EditableCellTable");
     cy.get(`.rt-td:contains(tom88)`).click();
     cy.get(`[data-index="6"]`).click({ shiftKey: true });
     cy.get(`[data-index="6"]`).rightclick();
@@ -262,7 +262,7 @@ describe("EditableCellTable.spec", () => {
     cy.get(`.rt-td:contains(tom88)`).should("not.exist");
   });
   it(`paste should overflow and create new rows`, () => {
-    cy.visit("#/DataTable/EditableCellTable");
+    cy.visit("#/DataTable%20-%20EditableCellTable");
     cy.get(`[data-test="tgCell_name"]:last`).click();
     cy.get(`[data-index="52"]`).should("not.exist");
     cy.focused().paste(`hettie mclaughlin	new	cloudy	6	True

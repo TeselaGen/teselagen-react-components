@@ -173,7 +173,7 @@ describe("dataTable.spec", () => {
   });
 
   it("Can drag columns to reorder", () => {
-    cy.visit("#/DataTable/SimpleTable");
+    cy.visit("#/DataTable%20-%20SimpleTable");
     const checkIndices = type => {
       cy.get(".rt-th:contains(Name)")
         .invoke("index")

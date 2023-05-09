@@ -1,6 +1,6 @@
 describe("simpleTableRowSelection.spec", () => {
   it("can handle shift clicking correctly!", () => {
-    cy.visit("#/DataTable/SimpleTable");
+    cy.visit("#/DataTable%20-%20SimpleTable");
     cy.contains(".rt-tr", "Thomas").click();
     cy.contains(".rt-tr-group.selected", "Adam").should("not.exist");
     cy.contains(".rt-tr", "Adam").click({ shiftKey: true });
@@ -11,7 +11,7 @@ describe("simpleTableRowSelection.spec", () => {
     cy.contains(".rt-tr-group.selected", "Adam");
   });
   it("can handle disabled entities when shift clicking", () => {
-    cy.visit("#/DataTable/SimpleTable");
+    cy.visit("#/DataTable%20-%20SimpleTable");
     cy.tgToggle("isEntityDisabled");
     cy.contains(".rt-tr", "Thomas").click();
     cy.contains(".rt-tr-group.selected", "Adam").should("not.exist");
@@ -23,7 +23,7 @@ describe("simpleTableRowSelection.spec", () => {
     cy.contains(".rt-tr-group.selected", "Adam");
   });
   it("can handle moving via the down arrows and when holding shift", () => {
-    cy.visit("#/DataTable/SimpleTable");
+    cy.visit("#/DataTable%20-%20SimpleTable");
     cy.contains(".rt-tr", "Taoh").type("{downarrow}");
     cy.contains(".rt-tr-group.selected", "Chris");
     cy.contains(".rt-tr", "Taoh").type("{downarrow}{downarrow}");
@@ -35,7 +35,7 @@ describe("simpleTableRowSelection.spec", () => {
     cy.contains(".rt-tr-group.selected", "Sam");
   });
   it("can handle moving via the up  arrows", () => {
-    cy.visit("#/DataTable/SimpleTable");
+    cy.visit("#/DataTable%20-%20SimpleTable");
     cy.contains(".rt-tr", "Taoh").type("{uparrow}");
     cy.contains(".rt-tr-group.selected", "Sam").should("not.exist");
     cy.contains(".rt-tr-group.selected", "Thomas");
@@ -48,7 +48,7 @@ describe("simpleTableRowSelection.spec", () => {
   });
 
   it("can handle disabled entities when moving via the up and down arrows and when holding shift", () => {
-    cy.visit("#/DataTable/SimpleTable");
+    cy.visit("#/DataTable%20-%20SimpleTable");
     cy.tgToggle("isEntityDisabled");
     cy.contains(".rt-tr", "Taoh").type("{downarrow}{downarrow}");
     cy.contains(".rt-tr-group.selected", "Kyle");
