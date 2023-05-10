@@ -3118,7 +3118,10 @@ class DataTable extends React.Component {
             {maybeCheckbox}
             <span
               title={columnTitle}
-              className="tg-react-table-name"
+              className={classNames({
+                "tg-react-table-name": true,
+                "no-data-tip": !!description
+              })}
               style={{
                 ...(description && { fontStyle: "italic" }),
                 display: "inline-block"
