@@ -28,13 +28,6 @@ export default function UploaderDemo() {
             advancedAccept
               ? [
                   {
-                    type: "zip",
-                    description: "Any of the following types, just compressed",
-                    exampleFile: () => {
-                      window.toastr.success(`I've been clicked!`);
-                    }
-                  },
-                  {
                     type: "ab1",
                     description: "Sequence Trace Format",
                     exampleFiles: [

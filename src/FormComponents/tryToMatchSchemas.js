@@ -31,10 +31,6 @@ export default function tryToMatchSchemas({
     officialSchema: validateAgainstSchema
   });
 
-  if (!csvValidationIssue) {
-    return { userSchema, csvValidationIssue };
-  }
-
   const incomingHeadersToScores = {};
 
   searchResults.forEach(r => {
@@ -61,16 +57,16 @@ export default function tryToMatchSchemas({
       }
     }
   });
-  const initialMatchedHeaders = {};
-  searchResults.forEach((r, i) => {
+  const matchedHeaders = {};
+  searchResults.forEach((r) => {
     if (r.topMatch) {
-      initialMatchedHeaders[i] = r.topMatch;
+      matchedHeaders[r.path] = r.topMatch;
     }
   });
 
   return {
     csvValidationIssue,
-    initialMatchedHeaders,
+    matchedHeaders,
     userSchema,
     searchResults
   };
@@ -91,9 +87,12 @@ function matchSchemas({ userSchema, officialSchema }) {
 
     //if there are any exact matches, push them onto the results array
     userSchema.fields.forEach((uh, i) => {
+      const pathMatch = uh.path.toLowerCase().replace(/ /g, "") ===
+      h.path.toLowerCase().replace(/ /g, "")
+      const displayNameMatch = h.displayName && uh.path.toLowerCase().replace(/ /g, "") ===
+      h.displayName.toLowerCase().replace(/ /g, "")
       if (
-        uh.path.toLowerCase().replace(/ /g, "") ===
-        h.path.toLowerCase().replace(/ /g, "")
+        pathMatch || displayNameMatch
       ) {
         result = result.filter(({ path }) => path === uh.path);
         //add a fake perfect match result to make sure we get the match
@@ -110,7 +109,7 @@ function matchSchemas({ userSchema, officialSchema }) {
     });
     h.matches = result;
 
-    if (!hasMatch)
+    if (!hasMatch && h.isRequired) 
       csvValidationIssue =
         "It looks like some of the headers in your uploaded file do not match the expected headers. Please look over and correct any issues with the mappings below.";
   });
@@ -148,7 +147,7 @@ function matchSchemas({ userSchema, officialSchema }) {
         const { error } = editCellHelper({
           entity: e,
           columnSchema,
-          newVal: e[columnSchema.matches[0].item.path]
+          newVal: e[columnSchema.matches[0]?.item?.path]
         });
         if (error) {
           return true;
@@ -168,10 +167,10 @@ function matchSchemas({ userSchema, officialSchema }) {
   if (hasErr) {
     csvValidationIssue = `Some of the data doesn't look quite right. Do these header mappings look correct?`;
   }
-  if (!csvValidationIssue) {
-    //all the headers match up as does the actual data
-    return { csvValidationIssue };
-  }
+  // if (!csvValidationIssue) {
+  //   //all the headers match up as does the actual data
+  //   return { csvValidationIssue };
+  // }
 
   return {
     searchResults: officialSchema.fields,

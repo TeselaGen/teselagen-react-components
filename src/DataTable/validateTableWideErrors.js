@@ -1,5 +1,6 @@
 import getIdOrCodeOrIndex from "./utils/getIdOrCodeOrIndex";
 import { getCellVal } from ".";
+import { forEach } from "lodash";
 
 const uniqueMsg = "This value must be unique";
 export function validateTableWideErrors({
@@ -8,6 +9,22 @@ export function validateTableWideErrors({
   optionalUserSchema,
   newCellValidate
 }) {
+  forEach(newCellValidate, (err, cellId) => {
+    if (err && err._isTableWideError) {
+      delete newCellValidate[cellId];
+    }
+  });
+  if (schema.tableWideValidation) {
+    const newErrs = schema.tableWideValidation({
+      entities,
+    });
+    forEach(newErrs, (err, cellId) => {
+      newCellValidate[cellId] = {
+        message: err,
+        _isTableWideError: true
+      };
+    })
+  }
   schema.fields.forEach(col => {
     let { path, isUnique } = col;
     if (isUnique) {
@@ -20,8 +37,14 @@ export function validateTableWideErrors({
         if (!val) return;
         const cellId = `${getIdOrCodeOrIndex(entity)}:${path}`;
         if (existingVals[val]) {
-          newCellValidate[cellId] = uniqueMsg;
-          newCellValidate[existingVals[val]] = uniqueMsg;
+          newCellValidate[cellId] = {
+            message: uniqueMsg,
+            _isTableWideError: true
+          };
+          newCellValidate[existingVals[val]] = {
+            message: uniqueMsg,
+            _isTableWideError: true
+          };
         } else {
           if (newCellValidate[cellId] === uniqueMsg) {
             delete newCellValidate[cellId];
