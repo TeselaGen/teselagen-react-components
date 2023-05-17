@@ -63,7 +63,6 @@ const UploadCsvWizardDialog = compose(
     onUploadWizardFinish,
     doAllFilesHaveSameHeaders
   } = p;
-  console.log(`doAllFilesHaveSameHeaders:`, doAllFilesHaveSameHeaders);
   const [hasSubmitted, setSubmitted] = useState();
   const [steps, setSteps] = useState(getInitialSteps(true));
 

@@ -663,7 +663,6 @@ function Uploader({
                     }
                     return false;
                   });
-                  console.log(`doAllFilesHaveSameHeaders:`, doAllFilesHaveSameHeaders)
                   const multipleFiles = allFiles.length > 1;
                   const { res } = await showUploadCsvWizardDialog(
                     "onUploadWizardFinish",
