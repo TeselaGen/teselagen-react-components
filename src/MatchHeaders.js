@@ -1,15 +1,33 @@
 import React from "react";
 import { Callout, Card, Intent } from "@blueprintjs/core";
 import immer from "immer";
-import { flatMap } from "lodash";
+import { flatMap, forEach } from "lodash";
 import { ReactSelectField } from "./FormComponents";
 import showConfirmationDialog from "./showConfirmationDialog";
 import { startCase } from "lodash";
 import { typeToCommonType } from "./UploadCsvWizard";
 
 export function MatchHeaders({
-  onMultiFileUploadSubmit, csvValidationIssue, searchResults, matchedHeaders, userSchema, flippedMatchedHeaders, reduxFormEntities, changeForm, datatableFormName, setFilesWIssues, filesWIssues, fileIndex
+  onMultiFileUploadSubmit,
+  doAllFilesHaveSameHeaders,
+  csvValidationIssue,
+  searchResults,
+  matchedHeaders,
+  userSchema,
+  reduxFormEntitiesArray,
+  changeForm,
+  datatableFormName,
+  datatableFormNames: _datatableFormNames,
+  setFilesWIssues,
+  filesWIssues,
+  fileIndex
 }) {
+  const datatableFormNames = _datatableFormNames || [datatableFormName];
+  const flippedMatchedHeaders = {};
+
+  forEach(matchedHeaders, (v, k) => {
+    if (v) flippedMatchedHeaders[v] = k;
+  });
   return (
     <div style={{ maxWidth: 500 }}>
       {!onMultiFileUploadSubmit && (
@@ -22,8 +40,10 @@ export function MatchHeaders({
       {searchResults.map(({ path, displayName, type }, i) => {
         const userMatchedHeader = matchedHeaders[path];
         const opts = flatMap(userSchema.fields, ({ path: pathInner }) => {
-          if (pathInner !== userMatchedHeader &&
-            flippedMatchedHeaders[pathInner]) {
+          if (
+            pathInner !== userMatchedHeader &&
+            flippedMatchedHeaders[pathInner]
+          ) {
             return [];
           }
           return {
@@ -37,10 +57,8 @@ export function MatchHeaders({
           const rb = searchResults[i].matches
             .map(m => m.item.path)
             .indexOf(b.value);
-          if (!ra)
-            return -1;
-          if (!rb)
-            return 1;
+          if (!ra) return -1;
+          if (!rb) return 1;
           return rb - ra;
         });
         return (
@@ -69,7 +87,9 @@ export function MatchHeaders({
                       }}
                     >
                       <span
-                        data-tip={`Column Type: ${typeToCommonType[type || "string"] || type}`}
+                        data-tip={`Column Type: ${typeToCommonType[
+                          type || "string"
+                        ] || type}`}
                       >
                         {displayName || startCase(path)}
                       </span>
@@ -80,55 +100,37 @@ export function MatchHeaders({
                       noMarginBottom
                       tooltipError
                       beforeOnChange={async () => {
-                        if (reduxFormEntities && reduxFormEntities.isDirty) {
+                        const clearEntities = () => {
+                          datatableFormNames.forEach(name => {
+                            changeForm(name, "reduxFormEntities", null);
+                          });
+                        };
+                        if (reduxFormEntitiesArray.some(r => r?.isDirty)) {
                           //when the column mapping changes, update the column in reduxFormEntities (if reduxFormEntities exists)
                           const doAction = await showConfirmationDialog({
-                            text: "Are you sure you want to edit the columm mapping? This will clear any changes you've already made to the table data",
+                            text:
+                              "Are you sure you want to edit the columm mapping? This will clear any changes you've already made to the table data",
                             intent: Intent.DANGER,
                             confirmButtonText: "Yes",
                             cancelButtonText: "No"
                             // canEscapeKeyCancel: true //this is false by default
                           });
                           if (doAction) {
-                            changeForm(
-                              datatableFormName,
-                              "reduxFormEntities",
-                              null
-                            );
+                            clearEntities();
                           } else {
                             return { stopEarly: true };
                           }
-                        } else if (reduxFormEntities) {
-                          changeForm(
-                            datatableFormName,
-                            "reduxFormEntities",
-                            null
-                          );
+                        } else {
+                          clearEntities();
+                          return { stopEarly: false };
                         }
                       }}
-                      onChange={async (val) => {
+                      onChange={val => {
                         setFilesWIssues(
                           immer(filesWIssues, files => {
                             files.forEach((f, i) => {
                               const isCurrentFile = fileIndex === i;
-                              // const isValAlreadyBeingUsed = some(
-                              //   f.matchedHeaders,
-                              //   (v, k) => {
-                              //     //if any of the matched headers are already using that val, don't change this one
-                              //     return val && v === val && k !== path;
-                              //   }
-                              // );
-                              // const valForCurrentFile =
-                              //   files[fileIndex].matchedHeaders[path];
-                              // const v = f.matchedHeaders[path]; // the current value of the matched header for the file
-                              if (
-                                // !isValAlreadyBeingUsed && //this should never be the case for the current file
-                                isCurrentFile
-                                //   || //if this is the current file, set the file to the new value
-                                // !v //if the current value is empty, set the file to the new value
-                                // ||
-                                // v === valForCurrentFile //if the file in question has the same value as the current file being changed, set the file to the new value
-                              ) {
+                              if (isCurrentFile || doAllFilesHaveSameHeaders) {
                                 f.matchedHeaders[path] = val;
                               }
                             });

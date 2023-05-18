@@ -587,32 +587,32 @@ function Uploader({
                   })
                 );
               }
-
+              const cleanedAccepted = acceptedFiles.map(file => {
+                return {
+                  originFileObj: file,
+                  originalFileObj: file,
+                  id: file.id,
+                  lastModified: file.lastModified,
+                  lastModifiedDate: file.lastModifiedDate,
+                  loading: file.loading,
+                  name: file.name,
+                  preview: file.preview,
+                  size: file.size,
+                  type: file.type,
+                  ...(file.parsedString
+                    ? { parsedString: file.parsedString }
+                    : {})
+                };
+              });
               const cleanedFileList = [
-                ...acceptedFiles.map(file => {
-                  return {
-                    originFileObj: file,
-                    originalFileObj: file,
-                    id: file.id,
-                    lastModified: file.lastModified,
-                    lastModifiedDate: file.lastModifiedDate,
-                    loading: file.loading,
-                    name: file.name,
-                    preview: file.preview,
-                    size: file.size,
-                    type: file.type,
-                    ...(file.parsedString
-                      ? { parsedString: file.parsedString }
-                      : {})
-                  };
-                }),
+                ...cleanedAccepted,
                 ...fileListToUse
               ].slice(0, fileLimit ? fileLimit : undefined);
 
               if (validateAgainstSchema) {
                 const filesWIssues = [];
                 const filesWOIssues = [];
-                for (const file of cleanedFileList) {
+                for (const file of cleanedAccepted) {
                   if (isCsvOrExcelFile(file)) {
                     const parsedF = await parseCsvOrExcelFile(file);
                     const {
@@ -695,12 +695,14 @@ function Uploader({
                       file.originFileObj = newFile;
                       file.originalFileObj = newFile;
                     });
-
-                    window.toastr.success(
-                      `Added Fixed Up File${
-                        allFiles.length > 1 ? "s" : ""
-                      } ${allFiles.map(({ file }) => file.name).join(", ")}`
-                    );
+                    setTimeout(() => {
+                      //inside a timeout for cypress purposes
+                      window.toastr.success(
+                        `Added Fixed Up File${
+                          allFiles.length > 1 ? "s" : ""
+                        } ${allFiles.map(({ file }) => file.name).join(", ")}`
+                      );
+                    }, 200);
                   }
                 }
               }

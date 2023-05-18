@@ -44,7 +44,7 @@ describe("EditableCellTable.spec", () => {
       true
     );
     cy.contains(
-      `It looks like some of the headers in your uploaded file do not match the expected headers. Please look over and correct any issues with the mappings below.`
+      `It looks like some of the headers in your uploaded file(s) do not match the expected headers. Please look over and correct any issues with the mappings below.`
     );
 
     cy.contains(".bp3-dialog", `zonk`).should("not.exist"); //the data from the file should be previewed
@@ -192,7 +192,7 @@ describe("EditableCellTable.spec", () => {
       `.hasCellError[data-tip="Please enter a value here"] [data-test="tgCell_name"]:first`
     ).should("exist");
   });
-  it(`multiple csv files packed a zip should bring up a wizard with a tab for every file`, () => {
+  it(`multiple csv files packed into a zip should bring up a wizard with a tab for every file`, () => {
     cy.visit("#/UploadCsvWizard");
     cy.tgToggle("allowMultipleFiles");
     cy.uploadFile(
@@ -202,7 +202,7 @@ describe("EditableCellTable.spec", () => {
       true
     );
     cy.contains(
-      `It looks like some of the headers/data in your uploaded files have issues.`
+      `Please look over each of the following files and correct any issues.`
     );
     cy.get(
       `.bp3-dialog .bp3-tab[aria-selected="true"]:contains(testUploadWizard_invalidData.csv) .bp3-icon-warning-sign`
@@ -239,6 +239,7 @@ describe("EditableCellTable.spec", () => {
       ".bp3-dialog tr:contains(Sequence BPs) .bp3-multi-select-tag-input-input"
     ).click();
     cy.get(".bp3-menu-item:contains(lolz)").click();
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(200);
     cy.get(
       ".bp3-dialog tr:contains(Name) .bp3-multi-select-tag-input-input"
@@ -253,7 +254,7 @@ describe("EditableCellTable.spec", () => {
       .eq(1)
       .click();
   });
-  it(`multiple csv files should bring up a wizard with a tab for every file`, () => {
+  it(`multiple csv files with the same headers should bring up a wizard with single header selection and a tab for every file. Going back and editing headers should give a warning if the tables have been touched. Uploading more files shouldn't get leftover state`, () => {
     cy.visit("#/UploadCsvWizard");
     cy.tgToggle("allowMultipleFiles");
     cy.uploadBlobFiles(
@@ -273,7 +274,7 @@ a,,g,false,dna,misc_feature
         {
           name: "test2.csv",
           contents: `name,description,sequence,isRegex,matchType,type
-a,,g,false,dna,
+,,g,false,dna,
 a,,g,false,dna,misc_feature
 a,,g,false,dna,misc_feature
 a,,g,false,dna,misc_feature
@@ -295,61 +296,116 @@ a,,g,false,dna,misc_feature`,
     );
 
     cy.contains(
-      `It looks like some of the headers/data in your uploaded files have issues.`
+      `Some of the data doesn't look quite right. Do these header mappings look correct?`
     );
+    cy.get(`.bp3-dialog tr:contains(Name) .tg-select-clear-all`).click();
+    cy.contains("Review and Edit Data").click();
+    cy.get(
+      `.bp3-dialog .bp3-tab[aria-selected="true"]:contains(test.csv) .bp3-icon-warning-sign`
+    );
+    cy.get(`.bp3-dialog .bp3-tab:contains(test2.csv) .bp3-icon-warning-sign`);
+    cy.get(`.bp3-dialog .bp3-tab:contains(test3.csv) .bp3-icon-warning-sign`);
+    cy.get(`.hasCellError:first [data-test="tgCell_name"]`).click({
+      force: true
+    });
+    cy.focused().type("haha{enter}");
+
+    cy.contains("Back").click();
+
+    cy.get(
+      ".bp3-dialog tr:contains(Name) .bp3-multi-select-tag-input-input"
+    ).click();
+    cy.get(".bp3-menu-item:contains(name)").click();
+    cy.contains(
+      `Are you sure you want to edit the columm mapping? This will clear any changes you've already made to the table data`
+    );
+    cy.get(`.bp3-button:contains(Yes)`).click();
+
+    cy.contains("Review and Edit Data").click();
+
     cy.get(
       `.bp3-dialog .bp3-tab[aria-selected="true"]:contains(test.csv) .bp3-icon-warning-sign`
     );
     cy.get(`.bp3-dialog .bp3-tab:contains(test2.csv) .bp3-icon-warning-sign`);
     cy.get(`.bp3-dialog .bp3-tab:contains(test3.csv) .bp3-icon-tick-circle`);
-    cy.get(
-      ".bp3-dialog tr:contains(Sequence BPs) .bp3-multi-select-tag-input-input"
-    )
-      .first()
-      .click();
 
-    cy.get(".bp3-menu-item:contains(bonk)").click();
-    cy.get(`.tg-select-value:contains(bonk)`);
-
-    // cy.get(
-    //   `.bp3-dialog .bp3-tab:contains(test2.csv) .bp3-icon-warning-sign`
-    // ).click()
-
-    // cy.get(
-    //   ".bp3-dialog .bp3-tab:contains(test2.csv) .bp3-icon-tick-circle"
-    // );
-    cy.contains("Review and Edit Data").click();
     cy.get(`[data-tip="Please enter a value here"]`);
-    cy.get(`.hasCellError:last [data-test="tgCell_name"]`);
+    cy.get(`.hasCellError:first [data-test="tgCell_name"]`);
     cy.get(`button:contains(Next File).bp3-disabled`);
-    cy.get(`.hasCellError:last [data-test="tgCell_name"]`).click({
+    cy.get(`.hasCellError:first [data-test="tgCell_name"]`).click({
       force: true
     });
     cy.focused().type("haha{enter}");
     // cy.get(`.hasCellError:last [data-test="tgCell_name"]`).type("haha{enter}", {force: true});
     cy.get(`button:contains(Next File):first`).click();
-    cy.get(`.tg-select-value:contains(bonk)`);
 
-    cy.get(
-      `.bp3-dialog .bp3-tab[aria-selected="true"]:contains(testUploadWizard_messedUpHeaders.csv) .bp3-icon-warning-sign`
-    );
-    cy.get(
-      ".bp3-dialog tr:contains(Sequence BPs) .bp3-multi-select-tag-input-input"
-    ).click();
-    cy.get(".bp3-menu-item:contains(lolz)").click();
-    cy.wait(200);
-    cy.get(
-      ".bp3-dialog tr:contains(Name) .bp3-multi-select-tag-input-input"
-    ).click();
-    cy.get(".bp3-menu-item:contains(typo)").click();
+    cy.get(`.hasCellError:first [data-test="tgCell_name"]`).click({
+      force: true
+    });
+    cy.focused().type("haha{enter}");
 
-    cy.contains("Review and Edit Data").click();
-    cy.get(".bp3-button:contains(Add 10 Rows)")
-      .eq(1)
-      .click();
     cy.get(`.bp3-button:contains(Finalize Files)`)
       .eq(1)
       .click();
+    cy.contains(`Added Fixed Up Files test.csv, test2.csv, test3.csv`);
+
+    cy.uploadBlobFiles(
+      ".tg-dropzone",
+      [
+        {
+          name: "test4.csv",
+          contents: `lalala,description,zonk,isRegex,matchType,type
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature
+  `,
+          type: "text/csv"
+        },
+        {
+          name: "test5.csv",
+          contents: `lalala,description,zonk,isRegex,matchType,type
+a,,g,false,dna,
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature`,
+          type: "text/csv"
+        },
+        {
+          name: "test6.csv",
+          contents: `lalala,description,zonk,isRegex,matchType,type
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature`,
+          type: "text/csv"
+        }
+      ],
+      true
+    );
+    cy.contains(
+      `It looks like some of the headers in your uploaded file(s) do not match the expected headers. Please look over and correct any issues with the mappings below.`
+    );
+
+    cy.get(
+      ".bp3-dialog tr:contains(Name) .bp3-multi-select-tag-input-input"
+    ).click();
+    cy.get(".bp3-menu-item:contains(lalala)").click();
+    cy.get(".bp3-dialog tr:contains(Name):contains(lalala)").click();
+    cy.get(
+      ".bp3-dialog tr:contains(Sequence BPs) .bp3-multi-select-tag-input-input"
+    ).click();
+    cy.get(".bp3-menu-item:contains(zonk)")
+      .first()
+      .click();
+    cy.contains("Review and Edit Data").click();
+    cy.contains("Finalize Files")
+      .first()
+      .click();
+    cy.contains(`Added Fixed Up Files test4.csv, test5.csv, test6.csv`);
   });
   it(`multiple manual entries should get unique names`, () => {
     cy.visit("#/UploadCsvWizard");
@@ -453,7 +509,6 @@ a,,g,false,dna,misc_feature`,
     cy.contains("Finish Upload").click();
     cy.contains("Upload Successful").then(() => {
       cy.window().then(win => {
-        console.log(`win.parsedData:`, JSON.stringify(win.parsedData, null, 4));
         expect(win.parsedData).to.deep.equal([
           {
             name: "pj5_0001",
