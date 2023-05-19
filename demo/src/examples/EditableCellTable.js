@@ -27,6 +27,12 @@ const schema = {
       values: ["old", "new"]
     },
     {
+      path: "tags",
+      type: "dropdownMulti",
+      isRequired: true,
+      values: ["tag1", "tag2", "color:blue", "color:red", "color:green"]
+    },
+    {
       path: "weather",
       //should auto validate against list of accepted values, should auto format to try to coerce input values into accepted
       type: "dropdown",

@@ -15,7 +15,7 @@ import Dropzone from "react-dropzone";
 import classnames from "classnames";
 import { nanoid } from "nanoid";
 
-import papaparse from "papaparse";
+import papaparse, { unparse } from "papaparse";
 
 import downloadjs from "downloadjs";
 
@@ -24,7 +24,9 @@ import UploadCsvWizardDialog, {
 } from "../UploadCsvWizard";
 import { useDialog } from "../useDialog";
 import {
+  filterFilesInZip,
   isCsvOrExcelFile,
+  isZipFile,
   parseCsvOrExcelFile,
   removeExt
 } from "../utils/parserUtils";
@@ -35,6 +37,7 @@ import urljoin from "url-join";
 import popoverOverflowModifiers from "../utils/popoverOverflowModifiers";
 import writeXlsxFile from "write-excel-file";
 import { startCase } from "lodash";
+import { getNewName } from "./getNewName";
 
 const helperText = [
   `How to Use This Template to Upload New Data`,
@@ -117,7 +120,19 @@ function Uploader({
   axiosInstance = window.api || axios
 }) {
   let validateAgainstSchema = _validateAgainstSchema;
-  const accept = isPlainObject(_accept) ? [_accept] : _accept;
+  const accept = !_accept
+    ? undefined
+    : isPlainObject(_accept)
+    ? [_accept]
+    : isArray(_accept)
+    ? _accept
+    : _accept.split(",").map(a => ({ type: a }));
+  if (accept && !accept.some(a => a.type === "zip")) {
+    accept?.unshift({
+      type: "zip",
+      description: "Any of the following types, just compressed"
+    });
+  }
   const [loading, setLoading] = useState(false);
   const filesToClean = useRef([]);
 
@@ -166,13 +181,17 @@ function Uploader({
             if (!newEntities) {
               return;
             } else {
-              const newFileName = `manual_data_entry.csv`;
+              //check existing files to make sure the new file name gets incremented if necessary
+              // fileList
+
+              const newFileName = getNewName(fileList, `manual_data_entry.csv`);
               const newFile = new File(
                 [papaparse.unparse(newEntities)],
                 newFileName
               );
               const file = {
                 ...newFile,
+                parsedData: newEntities,
                 name: newFileName,
                 originFileObj: newFile,
                 originalFileObj: newFile,
@@ -190,6 +209,8 @@ function Uploader({
               window.toastr.success(`File Added`);
             }
           };
+
+          const nameToUse = startCase(validateAgainstSchema.name) || "Example";
 
           const handleDownloadXlsxFile = async () => {
             const dataDictionarySchema = [
@@ -212,7 +233,7 @@ function Uploader({
                 column: `Notes`
               },
               {
-                value: f => f.example || f.defaultValue,
+                value: f => f.example || f.defaultValue || "",
                 column: `Example Data`
               }
             ];
@@ -228,8 +249,6 @@ function Uploader({
                 }
               };
             });
-            const nameToUse =
-              startCase(validateAgainstSchema.name) || "Example";
             const b = await writeXlsxFile(
               [[mainExampleData], a.validateAgainstSchema.fields, helperText],
               {
@@ -246,10 +265,26 @@ function Uploader({
           // handleDownloadXlsxFile()
           a.exampleFiles = [
             // ...(a.exampleFile ? [a.exampleFile] : []),
-            // {
-            //   description: "Download Example CSV File",
-            //   exampleFile: () => {}
-            // },
+            {
+              description: "Download Example CSV File",
+              exampleFile: () => {
+                const rows = [];
+                rows.push(
+                  a.validateAgainstSchema.fields.map(f => {
+                    return `${f.displayName || f.path}`;
+                  })
+                );
+                rows.push(
+                  a.validateAgainstSchema.fields.map(f => {
+                    return `${f.example || f.defaultValue || ""}`;
+                  })
+                );
+
+                const csv = unparse(rows);
+
+                downloadjs(csv, `${nameToUse}.csv`, "csv");
+              }
+            },
             {
               description: "Download Example XLSX File",
               exampleFile: handleDownloadXlsxFile
@@ -490,7 +525,21 @@ function Uploader({
               : undefined
           }
           {...{
-            onDrop: async (acceptedFiles, rejectedFiles) => {
+            onDrop: async (_acceptedFiles, rejectedFiles) => {
+              let acceptedFiles = [];
+              for (const file of _acceptedFiles) {
+                if (isZipFile(file)) {
+                  const files = await filterFilesInZip(
+                    file,
+                    simpleAccept
+                      ?.split(", ")
+                      ?.map(a => (a.startsWith(".") ? a : "." + a)) || []
+                  );
+                  acceptedFiles.push(...files.map(f => f.originFileObj));
+                } else {
+                  acceptedFiles.push(file);
+                }
+              }
               cleanupFiles();
               if (rejectedFiles.length) {
                 let msg = "";
@@ -538,36 +587,37 @@ function Uploader({
                   })
                 );
               }
-
+              const cleanedAccepted = acceptedFiles.map(file => {
+                return {
+                  originFileObj: file,
+                  originalFileObj: file,
+                  id: file.id,
+                  lastModified: file.lastModified,
+                  lastModifiedDate: file.lastModifiedDate,
+                  loading: file.loading,
+                  name: file.name,
+                  preview: file.preview,
+                  size: file.size,
+                  type: file.type,
+                  ...(file.parsedString
+                    ? { parsedString: file.parsedString }
+                    : {})
+                };
+              });
               const cleanedFileList = [
-                ...acceptedFiles.map(file => {
-                  return {
-                    originFileObj: file,
-                    originalFileObj: file,
-                    id: file.id,
-                    lastModified: file.lastModified,
-                    lastModifiedDate: file.lastModifiedDate,
-                    loading: file.loading,
-                    name: file.name,
-                    preview: file.preview,
-                    size: file.size,
-                    type: file.type,
-                    ...(file.parsedString
-                      ? { parsedString: file.parsedString }
-                      : {})
-                  };
-                }),
+                ...cleanedAccepted,
                 ...fileListToUse
               ].slice(0, fileLimit ? fileLimit : undefined);
 
               if (validateAgainstSchema) {
                 const filesWIssues = [];
-                for (const file of cleanedFileList) {
+                const filesWOIssues = [];
+                for (const file of cleanedAccepted) {
                   if (isCsvOrExcelFile(file)) {
                     const parsedF = await parseCsvOrExcelFile(file);
                     const {
                       csvValidationIssue,
-                      initialMatchedHeaders,
+                      matchedHeaders,
                       userSchema,
                       searchResults
                     } = tryToMatchSchemas({
@@ -578,15 +628,23 @@ function Uploader({
                       filesWIssues.push({
                         file,
                         csvValidationIssue,
-                        initialMatchedHeaders,
+                        matchedHeaders,
                         userSchema,
                         searchResults
                       });
                     } else {
+                      filesWOIssues.push({
+                        file,
+                        csvValidationIssue,
+                        matchedHeaders,
+                        userSchema,
+                        searchResults
+                      });
                       const newFile = new File(
                         [papaparse.unparse(userSchema.userData)],
                         file.name
                       );
+                      file.parsedData = userSchema.userData;
                       const newFileName = removeExt(file.name) + `.csv`;
                       file.name = newFileName;
                       file.originFileObj = newFile;
@@ -595,44 +653,56 @@ function Uploader({
                   }
                 }
                 if (filesWIssues.length) {
-                  const {
-                    file,
-                    name,
-                    csvValidationIssue,
-                    ...rest
-                  } = filesWIssues[0];
-
-                  //just handle the 1st file for now
-                  const { newEntities } = await showUploadCsvWizardDialog(
+                  const { file } = filesWIssues[0];
+                  const allFiles = [...filesWIssues, ...filesWOIssues];
+                  const doAllFilesHaveSameHeaders = allFiles.every(f => {
+                    if (f.userSchema.fields && f.userSchema.fields.length) {
+                      return f.userSchema.fields.every((h, i) => {
+                        return h.path === allFiles[0].userSchema.fields[i].path;
+                      });
+                    }
+                    return false;
+                  });
+                  const multipleFiles = allFiles.length > 1;
+                  const { res } = await showUploadCsvWizardDialog(
                     "onUploadWizardFinish",
                     {
-                      ...rest,
                       dialogProps: {
-                        title: `Fix Up File ${
-                          file.name ? `"${file.name}"` : ""
+                        title: `Fix Up File${multipleFiles ? "s" : ""} ${
+                          multipleFiles ? "" : file.name ? `"${file.name}"` : ""
                         }`
                       },
-                      csvValidationIssue,
+                      doAllFilesHaveSameHeaders,
+                      filesWIssues: allFiles,
                       validateAgainstSchema
                     }
                   );
 
-                  if (!newEntities) {
+                  if (!res) {
                     window.toastr.warning(`File Upload Aborted`);
                     return;
                   } else {
-                    const newFileName = removeExt(file.name) + `_updated.csv`;
-                    //swap out file with a new csv file
-                    const newFile = new File(
-                      [papaparse.unparse(newEntities)],
-                      newFileName
-                    );
-
-                    file.name = newFileName;
-                    file.originFileObj = newFile;
-                    file.originalFileObj = newFile;
-
-                    window.toastr.success(`Added Fixed Up File ${newFileName}`);
+                    allFiles.forEach(({ file }, i) => {
+                      const newEntities = res[i];
+                      // const newFileName = removeExt(file.name) + `_updated.csv`;
+                      //swap out file with a new csv file
+                      const newFile = new File(
+                        [papaparse.unparse(newEntities)],
+                        file.name
+                      );
+                      file.parsedData = newEntities;
+                      // file.name = newFileName;
+                      file.originFileObj = newFile;
+                      file.originalFileObj = newFile;
+                    });
+                    setTimeout(() => {
+                      //inside a timeout for cypress purposes
+                      window.toastr.success(
+                        `Added Fixed Up File${
+                          allFiles.length > 1 ? "s" : ""
+                        } ${allFiles.map(({ file }) => file.name).join(", ")}`
+                      );
+                    }, 200);
                   }
                 }
               }

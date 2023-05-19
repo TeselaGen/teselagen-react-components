@@ -209,3 +209,6 @@ button {
 button:not(:disabled):active {
   transform: translateY(1px);
 }
+.bp3-tabs.bp3-vertical > .bp3-tab-panel {
+  min-width: 0px;
+}

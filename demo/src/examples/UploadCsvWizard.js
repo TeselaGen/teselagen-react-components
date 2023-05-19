@@ -4,31 +4,72 @@ import { Button } from "@blueprintjs/core";
 import store from "../store";
 import { FileUploadField } from "../../../src";
 import DemoWrapper from "../DemoWrapper";
-import { parseCsvOrExcelFile } from "../../../src/utils/parserUtils";
 import { reduxForm } from "redux-form";
 import { useToggle } from "../useToggle";
+import getIdOrCodeOrIndex from "../../../src/DataTable/utils/getIdOrCodeOrIndex";
 
 const simpleValidateAgainst = {
   fields: [{ path: "name" }, { path: "description" }, { path: "sequence" }]
 };
-const validateAgainstSchema = ({enforceNameUnique}) => ({
+const validateAgainstSchema = ({
+  multipleExamples,
+  enforceNameUnique,
+  allowEitherNameOrId
+}) => ({
   helpInstructions:
     "This template file is used to add rows to the sequence table.",
   allowAdditionalOnEnd: "ext-", // allow additional fields that start with "ext-" at the end of the csv
   allowAdditionalOnEndDescription:
     "This will add extended properties to the uploaded sequence",
+  tableWideValidation: allowEitherNameOrId
+    ? ({ entities }) => {
+        const toRet = {};
+        entities.forEach(entity => {
+          if (!entity.name && !entity.ID) {
+            toRet[`${getIdOrCodeOrIndex(entity)}:name`] =
+              "Must have a Name or an ID";
+            toRet[`${getIdOrCodeOrIndex(entity)}:ID`] =
+              "Must have a Name or an ID";
+          } else if (entity.name && entity.ID) {
+            toRet[`${getIdOrCodeOrIndex(entity)}:name`] =
+              "Cannot have both a Name and an ID";
+            toRet[`${getIdOrCodeOrIndex(entity)}:ID`] =
+              "Cannot have both a Name and an ID";
+          }
+        });
+        return toRet;
+      }
+    : undefined,
   fields: [
     {
-      isRequired: true,
+      isRequired: !allowEitherNameOrId,
       isUnique: enforceNameUnique,
       path: "name",
-      description: "The Sequence Name",
-      example: "pj5_0001",
-      // defaultValue: "asdf"      
+      backupPath: "id",
+      description: allowEitherNameOrId
+        ? `The ID of the model to be tagged. Used if a Name is NOT provided`
+        : "The Sequence Name",
+      example: multipleExamples ? ["pj5_0001", "someOtherSeq"] : "pj5_0001"
+
+      // defaultValue: "asdf"
     },
-    { path: "description", example: "Example description of a sequence" },
+    ...(allowEitherNameOrId
+      ? [
+          {
+            path: "ID",
+            description: `The ID of the model to be tagged. Used if a Name is NOT provided`
+          }
+        ]
+      : []),
+    {
+      path: "description",
+      example: multipleExamples
+        ? ["Example description of a sequence", "A 2nd description"]
+        : "Example description of a sequence"
+    },
     {
       isRequired: true,
+      displayName: "Sequence BPs",
       path: "sequence",
       example: "gtgctttca",
       description: "The dna sequence base pairs"
@@ -45,14 +86,14 @@ const validateAgainstSchema = ({enforceNameUnique}) => ({
       // isRequired: true,
       description: "Whether the sequence is a dna or protein sequence",
       values: ["dna", "protein"],
-      example: "dna"
+      example: multipleExamples ? ["dna", "protein"] : "dna"
     },
     {
       path: "type",
       type: "dropdown",
       // isRequired: true,
       values: ["misc_feature", "CDS", "rbs"],
-      example: "misc_feature"
+      example: multipleExamples ? ["misc_feature", "CDS"] : "misc_feature"
     }
   ]
 });
@@ -73,13 +114,29 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
     label: "Simple Schema"
   });
   const [enforceNameUnique, enforceNameUniqueComp] = useToggle({
-    type: "enforceNameUnique",
+    type: "enforceNameUnique"
+  });
+  const [allowEitherNameOrId, allowEitherNameOrIdComp] = useToggle({
+    type: "allowEitherNameOrId"
+  });
+  // const [allowZip, allowZipComp] = useToggle({
+  //   type: "allowZip"
+  // });
+  const [multipleExamples, multipleExamplesComp] = useToggle({
+    type: "multipleExamples"
+  });
+  const [allowMultipleFiles, allowMultipleFilesComp] = useToggle({
+    type: "allowMultipleFiles"
   });
   return (
     <DemoWrapper>
       <h6>Options</h6>
       {simpleSchemaComp}
       {enforceNameUniqueComp}
+      {allowMultipleFilesComp}
+      {multipleExamplesComp}
+      {/* {allowZipComp} */}
+      {allowEitherNameOrIdComp}
       <br></br>
       <br></br>
       <br></br>
@@ -95,23 +152,27 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
             type: [".csv", ".xlsx"],
             validateAgainstSchema: simpleSchema
               ? simpleValidateAgainst
-              : validateAgainstSchema({enforceNameUnique}),
+              : validateAgainstSchema({
+                  enforceNameUnique,
+                  allowEitherNameOrId,
+                  multipleExamples
+                }),
             exampleFile: "/manual_data_entry (3).csv"
           }
         ]}
         name={"exampleFile"}
-        fileLimit={1}
+        fileLimit={allowMultipleFiles ? undefined : 1}
       />
       <Button
         intent="success"
-        text="Submit Form"
+        text="Finish Upload"
         onClick={handleSubmit(async function(values) {
-          const { data } = await parseCsvOrExcelFile(values.exampleFile, {
-            validateAgainstSchema,
-            csvParserOptions: {
-              lowerCaseHeaders: true
-            }
-          });
+          window.parsedData = values.exampleFile[0].parsedData;
+          window.toastr.success("Upload Successful");
+          console.info(
+            `values.exampleFile.parsedData:`,
+            values.exampleFile[0].parsedData
+          );
         })}
       />
     </DemoWrapper>

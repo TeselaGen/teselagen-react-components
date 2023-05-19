@@ -19,6 +19,8 @@ export {
   default as DataTable,
   ConnectedPagingTool as PagingTool
 } from "./DataTable";
+
+export { default as getIdOrCodeOrIndex } from "./DataTable/utils/getIdOrCodeOrIndex";
 export { default as Loading } from "./Loading";
 export { default as AdvancedOptions } from "./AdvancedOptions";
 export { default as TgSelect } from "./TgSelect";

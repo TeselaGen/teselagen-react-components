@@ -616,7 +616,7 @@ class DataTable extends React.Component {
             Object.keys(reduxFormSelectedCells).forEach(cellId => {
               const [rowId, path] = cellId.split(":");
               const entity = entityIdToEntity[rowId].e;
-              entity._isClean = false;
+              delete entity._isClean;
               const { error } = editCellHelper({
                 entity,
                 path,
@@ -661,7 +661,7 @@ class DataTable extends React.Component {
                     const cellIndexToChange = startCellIndex + j;
                     const entity = entitiesToManipulate[i];
                     if (entity) {
-                      entity._isClean = false;
+                      delete entity._isClean;
                       const path = indexToPath[cellIndexToChange];
                       if (path) {
                         const { error } = editCellHelper({
@@ -758,7 +758,7 @@ class DataTable extends React.Component {
         const [rowId, path] = cellId.split(":");
         rowIds.push(rowId);
         const entity = entityIdToEntity[rowId].e;
-        entity._isClean = false;
+        delete entity._isClean;
         const { error } = editCellHelper({
           entity,
           path,
@@ -1904,7 +1904,7 @@ class DataTable extends React.Component {
       },
 
       ...(err && {
-        "data-tip": err
+        "data-tip": err?.message || err
       }),
       onContextMenu: e => {
         if (!isPrimarySelected) {
@@ -2114,7 +2114,7 @@ class DataTable extends React.Component {
     );
   };
 
-  finishCellEdit = (cellId, newVal) => {
+  finishCellEdit = (cellId, newVal, doNotStopEditing) => {
     const {
       entities = [],
       change,
@@ -2122,12 +2122,12 @@ class DataTable extends React.Component {
       reduxFormCellValidation
     } = computePresets(this.props);
     const [rowId, path] = cellId.split(":");
-    change("reduxFormEditingCell", null);
+    !doNotStopEditing && change("reduxFormEditingCell", null);
     this.updateEntitiesHelper(entities, entities => {
       const entity = entities.find((e, i) => {
         return getIdOrCodeOrIndex(e, i) === rowId;
       });
-      entity._isClean = false;
+      delete entity._isClean;
       const { error } = editCellHelper({
         entity,
         path,
@@ -2139,7 +2139,7 @@ class DataTable extends React.Component {
         [cellId]: error
       });
     });
-    this.refocusTable();
+    !doNotStopEditing && this.refocusTable();
   };
 
   cancelCellEdit = () => {
@@ -2430,13 +2430,14 @@ class DataTable extends React.Component {
           noEllipsis = true;
         } else {
           if (reduxFormEditingCell === cellId) {
-            if (column.type === "dropdown") {
+            if (column.type === "dropdown" || column.type === "dropdownMulti") {
               return (
                 <DropdownCell
+                  isMulti={column.type === "dropdownMulti"}
                   initialValue={text}
                   options={column.values}
-                  finishEdit={newVal => {
-                    this.finishCellEdit(cellId, newVal);
+                  finishEdit={(newVal, doNotStopEditing) => {
+                    this.finishCellEdit(cellId, newVal, doNotStopEditing);
                   }}
                   cancelEdit={this.cancelCellEdit}
                 ></DropdownCell>
@@ -2496,20 +2497,22 @@ class DataTable extends React.Component {
             >
               {val}
             </div>
-            {isCellEditable && column.type === "dropdown" && (
-              <Icon
-                icon="caret-down"
-                style={{
-                  position: "absolute",
-                  right: 5,
-                  opacity: 0.3
-                }}
-                className="cell-edit-dropdown"
-                onClick={() => {
-                  this.startCellEdit(cellId);
-                }}
-              />
-            )}
+            {isCellEditable &&
+              (column.type === "dropdown" ||
+                column.type === "dropdownMulti") && (
+                <Icon
+                  icon="caret-down"
+                  style={{
+                    position: "absolute",
+                    right: 5,
+                    opacity: 0.3
+                  }}
+                  className="cell-edit-dropdown"
+                  onClick={() => {
+                    this.startCellEdit(cellId);
+                  }}
+                />
+              )}
 
             {isSelectedCell &&
               (isRect
@@ -2638,7 +2641,7 @@ class DataTable extends React.Component {
           newReduxFormSelectedCells[cellId] = true;
           const { e: entityToUpdate, i: rowIndex } = entityMap[rowId] || {};
           if (entityToUpdate) {
-            entityToUpdate._isClean = false;
+            delete entityToUpdate._isClean;
             let newVal;
             if (incrementStart !== undefined) {
               const num = incrementStart++;
@@ -3090,7 +3093,7 @@ class DataTable extends React.Component {
           onChange={() => {
             this.updateEntitiesHelper(entities, ents => {
               ents.forEach(e => {
-                e._isClean = false;
+                delete e._isClean;
                 set(e, path, isIndeterminate ? true : !isChecked);
               });
             });
@@ -3329,23 +3332,55 @@ function EditableCell({
   );
 }
 
-function DropdownCell({ options, initialValue, finishEdit, cancelEdit }) {
+function DropdownCell({
+  options,
+  isMulti,
+  initialValue,
+  finishEdit,
+  cancelEdit
+}) {
+  const [v, setV] = useState(
+    isMulti
+      ? initialValue.split(",").map(v => ({ value: v, label: v }))
+      : initialValue
+  );
   return (
-    <div className="tg-dropdown-cell-edit-container">
+    <div
+      className={classNames("tg-dropdown-cell-edit-container", {
+        "tg-dropdown-cell-edit-container-multi": isMulti
+      })}
+    >
       <TgSelect
         small
-        // onKeyDown={e => {
-        //   if (e.key === "Esc") {
-        //     cancelEdit();
-        //   }
-        // }}
+        multi={isMulti}
         autoOpen
-        value={initialValue}
+        value={v}
         onChange={val => {
+          if (isMulti) {
+            setV(val);
+            return;
+          }
           finishEdit(val ? val.value : null);
         }}
         popoverProps={{
-          onClose: cancelEdit
+          onClose: e => {
+            if (isMulti) {
+              if (e && e.key === "Escape") {
+                cancelEdit();
+              } else {
+                finishEdit(
+                  v && v.map
+                    ? v
+                        .map(v => v.value)
+                        .filter(v => v)
+                        .join(",")
+                    : v
+                );
+              }
+            } else {
+              cancelEdit();
+            }
+          }
         }}
         options={options.map(value => ({ label: value, value }))}
       ></TgSelect>
@@ -3391,7 +3426,7 @@ export const editCellHelper = ({
     nv = defaultFormatters[type](nv, colSchema);
   }
   if (validate) {
-    error = validate(nv, colSchema);
+    error = validate(nv, colSchema, entity);
   }
   if (!error) {
     const validator =
@@ -3418,6 +3453,17 @@ const defaultFormatters = {
     });
     return valsMap[newVal?.toLowerCase().trim()] || newVal;
   },
+  dropdownMulti: (newVal, field) => {
+    const valsMap = {};
+    field.values.forEach(v => {
+      valsMap[v.toLowerCase().trim()] = v;
+    });
+    if (!newVal) return;
+    return newVal
+      .split(",")
+      .map(v => valsMap[v.toLowerCase().trim()] || v)
+      .join(",");
+  },
   numeric: newVal => {
     return toNumber(newVal);
   }
@@ -3428,6 +3474,22 @@ const defaultValidators = {
     if (!newVal) {
       if (field.isRequired) return err;
     } else if (!field.values.includes(newVal)) {
+      return err;
+    }
+  },
+  dropdownMulti: (newVal, field) => {
+    const err = "Please choose one of the accepted values";
+    if (!newVal) {
+      if (field.isRequired) return err;
+    } else {
+      let err;
+      newVal.split(",").some(v => {
+        if (!field.values.includes(v)) {
+          err = `${v} is not an accepted value`;
+          return true;
+        }
+        return false;
+      });
       return err;
     }
   },

@@ -137,17 +137,18 @@ describe("EditableCellTable.spec", () => {
       `.rt-td.isSelectedCell.isPrimarySelected [data-test="tgCell_weather"]`
     );
     cy.focused().type(`{shift}{leftArrow}`);
-    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_type"]`);
+    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_tags"]`);
     cy.focused().type(`{shift}{downArrow}`);
-    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_type"]`).eq(1);
-    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_type"]`)
+    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_tags"]`).eq(1);
+    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_tags"]`)
       .eq(2)
       .should("not.exist");
     cy.focused().type(`{shift}{downArrow}`);
-    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_type"]`).eq(2);
+    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_tags"]`).eq(2);
+    cy.focused().type(`{shift}{leftArrow}`);
     cy.focused().type(`{shift}{leftArrow}`);
     cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_name"]`).eq(2);
-    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_type"]`).eq(2);
+    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_tags"]`).eq(2);
     cy.get(
       `.rt-td.isSecondarySelected [data-test="tgCell_name"]:contains(tom93)`
     )
@@ -239,7 +240,7 @@ describe("EditableCellTable.spec", () => {
     cy.contains(`Add 10 Rows`).click();
     cy.get(`[data-index="59"]`).should("exist");
     //the last error should now be in the type column
-    cy.get(`.rt-td.hasCellError:last [data-test="tgCell_type"]`).should(
+    cy.get(`.rt-td.hasCellError:last [data-test="tgCell_tags"]`).should(
       "exist"
     );
     //the last row should be auto populate with default values
