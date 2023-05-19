@@ -18,6 +18,7 @@ import DialogFooter from "../DialogFooter";
 import "@teselagen/react-table/react-table.css";
 import "./style.css";
 import "../toastr";
+import TgSelect from "../TgSelect";
 
 const isInvalidFilterValue = value => {
   if (Array.isArray(value)) {
@@ -52,6 +53,17 @@ export default class FilterAndSortMenu extends React.Component {
     } else if (ccSelectedFilter === "notEmpty") {
       // manually set filter value (nothing is selected by user)
       filterValToUse = true;
+    } else if (ccSelectedFilter === "isEmpty") {
+      // manually set filter value (nothing is selected by user)
+      filterValToUse = false;
+    } else if (
+      ccSelectedFilter === "inList" ||
+      ccSelectedFilter === "notInList"
+    ) {
+      filterValToUse =
+        typeof filterValue === "string"
+          ? filterValue.split(".")
+          : filterValue.filter(op => op.value !== "").map(op => op.value);
     }
     const { filterOn, addFilters, removeSingleFilter } = this.props;
     if (isInvalidFilterValue(filterValToUse)) {
@@ -84,19 +96,25 @@ export default class FilterAndSortMenu extends React.Component {
       startsWith: "text",
       endsWith: "text",
       contains: "text",
+      notContains: "text",
       isExactly: "text",
+      isEmpty: "text",
       notEmpty: "text",
-      inList: "text",
+      inList: "list",
+      notInList: "list",
       true: "boolean",
       false: "boolean",
       dateIs: "date",
+      notBetween: "dateRange",
       isBetween: "dateRange",
       isBefore: "date",
       isAfter: "date",
       greaterThan: "number",
       lessThan: "number",
       inRange: "numberRange",
-      equalTo: "number"
+      outsideRange: "numberRange",
+      equalTo: "number",
+      regex: "text"
     };
     const filterMenuItems = getFilterMenuItems(dataType);
     const ccSelectedFilter = camelCase(selectedFilter);
@@ -162,6 +180,28 @@ const dateMinMaxHelpers = {
 };
 
 class FilterInput extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedOptions: props.filterValue
+        ? props.filterValue.split(".").map(val => ({
+            userCreated: true,
+            label: val,
+            value: val
+          }))
+        : []
+    };
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(selectedOptions) {
+    this.setState({ selectedOptions });
+    this.props.handleFilterValueChange(selectedOptions);
+    if (selectedOptions.some(op => op.value === "")) {
+      this.props.handleFilterSubmit();
+    }
+  }
+
   render() {
     const {
       handleFilterValueChange,
@@ -170,13 +210,14 @@ class FilterInput extends React.Component {
       filterSubType,
       filterType
     } = this.props;
+    const { selectedOptions } = this.state;
     //Options: Text, Single number (before, after, equals), 2 numbers (range),
     //Single Date (before, after, on), 2 dates (range)
     let inputGroup = <div />;
     switch (filterType) {
       case "text":
         inputGroup =
-          filterSubType === "notEmpty" ? (
+          filterSubType === "notEmpty" || filterSubType === "isEmpty" ? (
             <div />
           ) : (
             <div className="custom-menu-item">
@@ -191,6 +232,19 @@ class FilterInput extends React.Component {
               />
             </div>
           );
+        break;
+      case "list":
+        inputGroup = (
+          <div className="custom-menu-item">
+            <TgSelect
+              multi={true}
+              creatable={true}
+              value={selectedOptions}
+              onChange={this.handleChange}
+              options={[]}
+            />
+          </div>
+        );
         break;
       case "number":
         inputGroup = (
@@ -299,14 +353,25 @@ function getFilterMenuItems(dataType) {
   if (dataType === "string") {
     filterMenuItems = [
       "Contains",
-      "Starts with",
-      "Ends with",
-      "Is exactly",
+      "Not Contains",
+      "Starts With",
+      "Ends With",
+      "Is Exactly",
+      "Regex",
       "In List",
-      "Not empty"
+      "Not In List",
+      "Is Empty",
+      "Not Empty"
     ];
   } else if (dataType === "lookup") {
-    filterMenuItems = ["Contains", "Starts with", "Ends with", "Is exactly"];
+    filterMenuItems = [
+      "Contains",
+      "Not Contains",
+      "Starts With",
+      "Ends With",
+      "Is Exactly",
+      "Regex"
+    ];
   } else if (dataType === "boolean") {
     filterMenuItems = ["True", "False"];
   } else if (dataType === "number" || dataType === "integer") {
@@ -314,14 +379,16 @@ function getFilterMenuItems(dataType) {
     //   filterMenuItems = ["None"];
     // }
     filterMenuItems = [
-      "Greater than",
-      "Less than",
-      "In range",
-      "Equal to",
-      "In List"
+      "Greater Than",
+      "Less Than",
+      "In Range",
+      "Outside Range",
+      "Equal To",
+      "In List",
+      "Not In List"
     ];
   } else if (dataType === "timestamp") {
-    filterMenuItems = ["Is between", "Is before", "Is after"];
+    filterMenuItems = ["Is Between", "Not Between", "Is Before", "Is After"];
   }
   return filterMenuItems;
 }

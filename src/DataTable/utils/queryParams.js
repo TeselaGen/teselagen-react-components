@@ -337,6 +337,17 @@ function getSubFilter(
             fieldVal.toLowerCase()
           );
         };
+  } else if (ccSelectedFilter === "notContains") {
+    return qb
+      ? qb.notContains(stringFilterValue.replace(/_/g, "\\_")) //filter using qb (aka we're backend connected)
+      : fieldVal => {
+          //filter using plain old javascript (aka we've got a local table that isn't backend connected)
+          if (!fieldVal || !fieldVal.toLowerCase) return false;
+          return (
+            fieldVal.toLowerCase().replace(filterValLower, "") ===
+            fieldVal.toLowerCase()
+          );
+        };
   } else if (ccSelectedFilter === "inList") {
     return qb
       ? qb.inList(arrayFilterValue) //filter using qb (aka we're backend connected)
@@ -348,6 +359,24 @@ function getSubFilter(
               .map(val => val && val.toLowerCase())
               .indexOf(fieldVal.toString().toLowerCase()) > -1
           );
+        };
+  } else if (ccSelectedFilter === "notInList") {
+    return qb
+      ? qb.notInList(arrayFilterValue) //filter using qb (aka we're backend connected)
+      : fieldVal => {
+          //filter using plain old javascript (aka we've got a local table that isn't backend connected)
+          if (!fieldVal?.toString) return false;
+          return (
+            arrayFilterValue
+              .map(val => val && val.toLowerCase())
+              .indexOf(fieldVal.toString().toLowerCase()) === -1
+          );
+        };
+  } else if (ccSelectedFilter === "isEmpty") {
+    return qb
+      ? qb.isEmpty()
+      : fieldVal => {
+          return !fieldVal;
         };
   } else if (ccSelectedFilter === "notEmpty") {
     return qb
@@ -377,10 +406,26 @@ function getSubFilter(
         };
   } else if (ccSelectedFilter === "isBetween") {
     return qb
-      ? qb.between(new Date(arrayFilterValue[0]), new Date(arrayFilterValue[1]))
+      ? qb.between(
+          new Date(arrayFilterValue[0]),
+          new Date(new Date(arrayFilterValue[1]).setHours(23, 59)) // set end of day for more accurate filtering
+        )
       : fieldVal => {
           return (
             dayjs(arrayFilterValue[0]).valueOf() <= dayjs(fieldVal).valueOf() &&
+            dayjs(fieldVal).valueOf() <= dayjs(arrayFilterValue[1]).valueOf()
+          );
+        };
+  } else if (ccSelectedFilter === "notBetween") {
+    const dates = [
+      new Date(arrayFilterValue[0]),
+      new Date(new Date(arrayFilterValue[1]).setHours(23, 59)) // set end of day for more accurate filtering
+    ];
+    return qb
+      ? qb.notBetween(...dates)
+      : fieldVal => {
+          return (
+            dayjs(arrayFilterValue[0]).valueOf() <= dayjs(fieldVal).valueOf() ||
             dayjs(fieldVal).valueOf() <= dayjs(arrayFilterValue[1]).valueOf()
           );
         };
@@ -392,7 +437,7 @@ function getSubFilter(
         };
   } else if (ccSelectedFilter === "isAfter") {
     return qb
-      ? qb.greaterThan(new Date(filterValue))
+      ? qb.greaterThan(new Date(new Date(filterValue).setHours(23, 59))) // set end of day for more accurate filtering
       : fieldVal => {
           return dayjs(fieldVal).valueOf() > dayjs(filterValue).valueOf();
         };
@@ -410,15 +455,28 @@ function getSubFilter(
         };
   } else if (ccSelectedFilter === "inRange") {
     return qb
-      ? qb.between([filterValue[0], filterValue[1]])
+      ? qb.between(filterValue[0], filterValue[1])
       : fieldVal => {
           return filterValue[0] <= fieldVal && fieldVal <= filterValue[1];
+        };
+  } else if (ccSelectedFilter === "outsideRange") {
+    return qb
+      ? qb.notBetween(filterValue[0], filterValue[1])
+      : fieldVal => {
+          return filterValue[0] > fieldVal || fieldVal > filterValue[1];
         };
   } else if (ccSelectedFilter === "equalTo") {
     return qb
       ? filterValue
       : fieldVal => {
           return fieldVal === filterValue;
+        };
+  } else if (ccSelectedFilter === "regex") {
+    return qb
+      ? qb.matchesRegex(filterValue)
+      : fieldVal => {
+          new RegExp(filterValue).test(fieldVal);
+          return fieldVal;
         };
   }
 
@@ -485,13 +543,18 @@ function parseFilters(newParams) {
       newParams.filters.split("::").map(filter => {
         const splitFilter = filter.split("__");
         const [filterOn, selectedFilter, filterValue] = splitFilter;
+        const parseFilterValue = filterValue => {
+          // for inList filters safeParse will convert two id values to a single number.
+          // ex. "9.10" will become 9.1 which would completely mess up our filter
+          if (selectedFilter === "inList") return filterValue;
+          if (selectedFilter === "inRange" || selectedFilter === "outsideRange")
+            return filterValue.split(".").map(Number);
+          return safeParse(filterValue);
+        };
         return {
           filterOn,
           selectedFilter,
-          filterValue:
-            // for inList filters safeParse will convert two id values to a single number.
-            // ex. "9.10" will become 9.1 which would completely mess up our filter
-            selectedFilter === "inList" ? filterValue : safeParse(filterValue)
+          filterValue: parseFilterValue(filterValue)
         };
       })
   };
