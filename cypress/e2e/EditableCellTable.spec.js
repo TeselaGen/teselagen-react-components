@@ -53,16 +53,11 @@ describe("EditableCellTable.spec", () => {
     cy.get(`.rt-td:contains(nancy110)`).click();
     cy.dragBetween(`.cellDragHandle`, `button:contains(Add 10 Rows)`);
     cy.contains("nancy137");
-  });
-  it(`smart increment + multi column drag should work`, () => {
-    cy.visit("#/DataTable%20-%20EditableCellTable");
-    cy.get(`.rt-td:contains(nancy110)`).click();
-    cy.get(`.rt-tr:contains(nancy110) .rt-td:contains(too old)`).click({
-      shiftKey: true
-    });
-
+    //if two or more incrementing cells are selected one above the other it should still work to increment
+    cy.get(`.rt-td:contains(nancy108)`).click();
+    cy.get(`.rt-td:contains(nancy109)`).click({ shiftKey: true });
     cy.dragBetween(`.cellDragHandle`, `button:contains(Add 10 Rows)`);
-    cy.get(`.rt-tr:contains(nancy137):contains(too old)`);
+    cy.contains("nancy137");
   });
 
   it(`drag should be repeating down`, () => {

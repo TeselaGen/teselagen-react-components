@@ -628,6 +628,9 @@ type ValidateAgainstSchemaObj = {
   tableWideValidation: ({ entities }) => {
     cellId: string;
   };
+  tableWideAsyncValidation: ({ entities }) => {
+    cellId: string;
+  };
   fields: SchemaField[];
 }
 

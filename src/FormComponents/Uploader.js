@@ -38,6 +38,9 @@ import popoverOverflowModifiers from "../utils/popoverOverflowModifiers";
 import writeXlsxFile from "write-excel-file";
 import { startCase } from "lodash";
 import { getNewName } from "./getNewName";
+import { isObject } from "lodash";
+import { connect } from "react-redux";
+import { initialize } from "redux-form";
 
 const helperText = [
   `How to Use This Template to Upload New Data`,
@@ -114,6 +117,7 @@ function Uploader({
   dropzoneProps = {},
   overflowList,
   disabled,
+  initializeForm,
   showFilesCount,
   threeDotMenuItems,
   onPreviewClick,
@@ -210,7 +214,12 @@ function Uploader({
             }
           };
 
-          const nameToUse = startCase(validateAgainstSchema.name) || "Example";
+          const nameToUse =
+            startCase(
+              removeExt(
+                validateAgainstSchema.fileName || validateAgainstSchema.name
+              )
+            ) || "Example";
 
           const handleDownloadXlsxFile = async () => {
             const dataDictionarySchema = [
@@ -279,7 +288,6 @@ function Uploader({
                     return `${f.example || f.defaultValue || ""}`;
                   })
                 );
-
                 const csv = unparse(rows);
 
                 downloadjs(csv, `${nameToUse}.csv`, "csv");
@@ -612,19 +620,38 @@ function Uploader({
               if (validateAgainstSchema) {
                 const filesWIssues = [];
                 const filesWOIssues = [];
-                for (const file of cleanedAccepted) {
+                for (const [i, file] of cleanedAccepted.entries()) {
                   if (isCsvOrExcelFile(file)) {
                     const parsedF = await parseCsvOrExcelFile(file);
                     const {
-                      csvValidationIssue,
+                      csvValidationIssue: _csvValidationIssue,
                       matchedHeaders,
                       userSchema,
                       searchResults
-                    } = tryToMatchSchemas({
+                    } = await tryToMatchSchemas({
                       incomingData: parsedF.data,
                       validateAgainstSchema
                     });
+                    let csvValidationIssue = _csvValidationIssue;
                     if (csvValidationIssue) {
+                      if (isObject(csvValidationIssue)) {
+                        initializeForm(
+                          `editableCellTable${
+                            cleanedAccepted.length > 1 ? `-${i}` : ""
+                          }`,
+                          {
+                            reduxFormCellValidation: csvValidationIssue
+                          },
+                          {
+                            keepDirty: true,
+                            keepValues: true,
+                            updateUnregisteredFields: true
+                          }
+                        );
+                        csvValidationIssue = `It looks like there was an error with your data - ${
+                          Object.values(csvValidationIssue)[0]
+                        }`; //pass just the first error as a string
+                      }
                       filesWIssues.push({
                         file,
                         csvValidationIssue,
@@ -885,7 +912,7 @@ function Uploader({
   );
 }
 
-export default Uploader;
+export default connect(() => {}, { initializeForm: initialize })(Uploader);
 
 function getFileDownloadAttr(exampleFile) {
   const baseUrl = window?.frontEndConfig?.serverBasePath || "";

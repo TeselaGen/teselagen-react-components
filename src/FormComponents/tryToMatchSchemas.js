@@ -4,6 +4,7 @@ import Fuse from "fuse.js";
 import { max } from "lodash";
 import { editCellHelper } from "../DataTable";
 import { validateTableWideErrors } from "../DataTable/validateTableWideErrors";
+import { isEmpty } from "lodash";
 
 const getSchema = data => ({
   fields: map(data[0], (val, path) => {
@@ -20,13 +21,13 @@ const getSchema = data => ({
   })
 });
 
-export default function tryToMatchSchemas({
+export default async function tryToMatchSchemas({
   incomingData,
   validateAgainstSchema
 }) {
   const userSchema = getSchema(incomingData);
 
-  const { searchResults, csvValidationIssue } = matchSchemas({
+  const { searchResults, csvValidationIssue } = await matchSchemas({
     userSchema,
     officialSchema: validateAgainstSchema
   });
@@ -72,7 +73,7 @@ export default function tryToMatchSchemas({
   };
 }
 
-function matchSchemas({ userSchema, officialSchema }) {
+async function matchSchemas({ userSchema, officialSchema }) {
   const options = {
     includeScore: true,
     keys: ["path", "displayName"]
@@ -164,6 +165,16 @@ function matchSchemas({ userSchema, officialSchema }) {
           newCellValidate: {}
         })
       ).length);
+  if (officialSchema.tableWideAsyncValidation) {
+    //do the table wide validation
+    const res = await officialSchema.tableWideAsyncValidation({
+      entities: userSchema.userData
+    });
+    if (!isEmpty(res)) {
+      csvValidationIssue = res;
+    }
+    //return errors on the tables
+  }
 
   if (hasErr) {
     csvValidationIssue = `Some of the data doesn't look quite right. Do these header mappings look correct?`;

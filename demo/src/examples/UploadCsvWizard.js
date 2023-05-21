@@ -12,6 +12,7 @@ const simpleValidateAgainst = {
   fields: [{ path: "name" }, { path: "description" }, { path: "sequence" }]
 };
 const validateAgainstSchema = ({
+  asyncNameValidation,
   multipleExamples,
   enforceNameUnique,
   allowEitherNameOrId
@@ -21,6 +22,18 @@ const validateAgainstSchema = ({
   allowAdditionalOnEnd: "ext-", // allow additional fields that start with "ext-" at the end of the csv
   allowAdditionalOnEndDescription:
     "This will add extended properties to the uploaded sequence",
+  ...(asyncNameValidation && {
+    tableWideAsyncValidation: async ({ entities }) => {
+      await new Promise(resolve => setTimeout(resolve, 400));
+      const toRet = {};
+      entities.forEach(entity => {
+        if (entity.name.toLowerCase() === "thomas") {
+          toRet[`${getIdOrCodeOrIndex(entity)}:name`] = "Cannot be Thomas";
+        }
+      });
+      return toRet;
+    }
+  }),
   tableWideValidation: allowEitherNameOrId
     ? ({ entities }) => {
         const toRet = {};
@@ -116,6 +129,11 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
   const [enforceNameUnique, enforceNameUniqueComp] = useToggle({
     type: "enforceNameUnique"
   });
+  const [asyncNameValidation, asyncNameValidationComp] = useToggle({
+    type: "asyncNameValidation",
+    description:
+      "If checked, will validate asynchronously that the names do not equal Thomas"
+  });
   const [allowEitherNameOrId, allowEitherNameOrIdComp] = useToggle({
     type: "allowEitherNameOrId"
   });
@@ -133,6 +151,7 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
       <h6>Options</h6>
       {simpleSchemaComp}
       {enforceNameUniqueComp}
+      {asyncNameValidationComp}
       {allowMultipleFilesComp}
       {multipleExamplesComp}
       {/* {allowZipComp} */}
@@ -153,6 +172,7 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
             validateAgainstSchema: simpleSchema
               ? simpleValidateAgainst
               : validateAgainstSchema({
+                  asyncNameValidation,
                   enforceNameUnique,
                   allowEitherNameOrId,
                   multipleExamples

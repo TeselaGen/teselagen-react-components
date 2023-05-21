@@ -168,7 +168,7 @@ export function MatchHeaders({
                             }}
                             key={i}
                           >
-                            {row?.[userMatchedHeader]}
+                            {row?.[userMatchedHeader] || ""}
                           </div>
                         );
                       })}

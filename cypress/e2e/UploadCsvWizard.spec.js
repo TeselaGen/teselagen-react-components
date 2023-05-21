@@ -254,16 +254,17 @@ describe("EditableCellTable.spec", () => {
       .eq(1)
       .click();
   });
-  it(`multiple csv files with the same headers should bring up a wizard with single header selection and a tab for every file. Going back and editing headers should give a warning if the tables have been touched. Uploading more files shouldn't get leftover state`, () => {
+  it(`multiple csv files with the same headers should bring up a wizard with single header selection and a tab for every file. Async validation should work. Going back and editing headers should give a warning if the tables have been touched. Uploading more files shouldn't get leftover state`, () => {
     cy.visit("#/UploadCsvWizard");
     cy.tgToggle("allowMultipleFiles");
+    cy.tgToggle("asyncNameValidation");
     cy.uploadBlobFiles(
       ".tg-dropzone",
       [
         {
           name: "test.csv",
           contents: `name,description,sequence,isRegex,matchType,type
-a,,g,false,dna,misc_feature
+thomas,,g,false,dna,misc_feature
 ,,g,false,dna,misc_feature
 a,,g,false,dna,misc_feature
 a,,g,false,dna,misc_feature
@@ -338,10 +339,19 @@ a,,g,false,dna,misc_feature`,
     cy.focused().type("haha{enter}");
     // cy.get(`.hasCellError:last [data-test="tgCell_name"]`).type("haha{enter}", {force: true});
     cy.get(`button:contains(Next File):first`).click();
-
+    cy.get(`.bp3-spinner`);
+    cy.get(`[data-tip="Cannot be Thomas"]`);
     cy.get(`.hasCellError:first [data-test="tgCell_name"]`).click({
       force: true
     });
+    cy.focused().type("ba{enter}");
+    cy.get(`button:contains(Next File):first`).click();
+    cy.get(`.bp3-spinner`);
+    cy.get(`.bp3-spinner`).should("not.exist");
+    cy.get(`.hasCellError:first [data-test="tgCell_name"]`).click({
+      force: true
+    });
+
     cy.focused().type("haha{enter}");
 
     cy.get(`.bp3-button:contains(Finalize Files)`)
@@ -406,6 +416,77 @@ a,,g,false,dna,misc_feature`,
       .first()
       .click();
     cy.contains(`Added Fixed Up Files test4.csv, test5.csv, test6.csv`);
+  });
+  it(`multiple "perfect" csv files (but with async errors) should trigger async validation if applicable`, () => {
+    cy.visit("#/UploadCsvWizard");
+    cy.tgToggle("allowMultipleFiles");
+    cy.tgToggle("asyncNameValidation");
+    cy.uploadBlobFiles(
+      ".tg-dropzone",
+      [
+        {
+          name: "test.csv",
+          contents: `name,description,sequence,isRegex,matchType,type
+thomas,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature
+`,
+          type: "text/csv"
+        },
+        {
+          name: "test2.csv",
+          contents: `name,description,sequence,isRegex,matchType,type
+a,,g,false,dna,
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature
+thomas,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature`,
+          type: "text/csv"
+        },
+        {
+          name: "test3.csv",
+          contents: `name,description,sequence,isRegex,matchType,type
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature
+a,,g,false,dna,misc_feature
+thomas,,g,false,dna,misc_feature`,
+          type: "text/csv"
+        }
+      ],
+      true
+    );
+
+    cy.contains(
+      `It looks like there was an error with your data - Cannot be Thomas`
+    );
+    cy.contains("Review and Edit Data").click();
+    cy.get(`.bp3-button.bp3-disabled:contains(Next File)`);
+    cy.get(`[data-tip="Cannot be Thomas"]`);
+    cy.get(`.hasCellError:first [data-test="tgCell_name"]`).click({
+      force: true
+    });
+    cy.focused().type("ba{enter}");
+    cy.get(`button:contains(Next File):first`).click();
+    cy.get(`.bp3-spinner`);
+    cy.get(`.bp3-spinner`).should("not.exist");
+    cy.get(`[data-tip="Cannot be Thomas"]`);
+    cy.get(`.hasCellError:first [data-test="tgCell_name"]`).click({
+      force: true
+    });
+    cy.focused().type("ba{enter}");
+    cy.get(`button:contains(Next File):first`).click({ force: true });
+    cy.get(`.bp3-spinner`);
+    cy.get(`.bp3-spinner`).should("not.exist");
+    cy.get(`.bp3-button.bp3-disabled:contains(Finalize Files)`);
+    cy.get(`[data-tip="Cannot be Thomas"]`);
+    cy.get(`.hasCellError:first [data-test="tgCell_name"]`).click({
+      force: true
+    });
+    cy.focused().type("ba{enter}");
+    cy.get(`.bp3-button:contains(Finalize Files):last`).click();
   });
   it(`multiple manual entries should get unique names`, () => {
     cy.visit("#/UploadCsvWizard");

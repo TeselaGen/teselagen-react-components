@@ -413,12 +413,20 @@ class DataTable extends React.Component {
     };
   };
   formatAndValidateTableInitial = () => {
-    const { _origEntities: entities, initialEntities, change } = this.props;
+    const {
+      _origEntities: entities,
+      initialEntities,
+      change,
+      reduxFormCellValidation
+    } = this.props;
     const { newEnts, validationErrors } = this.formatAndValidateEntities(
       initialEntities || entities
     );
     change("reduxFormEntities", newEnts);
-    this.updateValidation(newEnts, validationErrors);
+    this.updateValidation(newEnts, {
+      ...validationErrors,
+      ...reduxFormCellValidation
+    });
   };
 
   componentDidMount() {
