@@ -326,27 +326,21 @@ function getSubFilter(
           if (!fieldVal || !fieldVal.toLowerCase) return false;
           return endsWith(fieldVal.toLowerCase(), filterValLower);
         };
-  } else if (ccSelectedFilter === "contains") {
+  } else if (
+    ccSelectedFilter === "contains" ||
+    ccSelectedFilter === "notContains"
+  ) {
     return qb
-      ? qb.contains(stringFilterValue.replace(/_/g, "\\_")) //filter using qb (aka we're backend connected)
+      ? ccSelectedFilter === "contains"
+        ? qb.contains(stringFilterValue.replace(/_/g, "\\_"))
+        : qb.notContains(stringFilterValue.replace(/_/g, "\\_"))
       : fieldVal => {
-          //filter using plain old javascript (aka we've got a local table that isn't backend connected)
           if (!fieldVal || !fieldVal.toLowerCase) return false;
-          return (
-            fieldVal.toLowerCase().replace(filterValLower, "") !==
-            fieldVal.toLowerCase()
-          );
-        };
-  } else if (ccSelectedFilter === "notContains") {
-    return qb
-      ? qb.notContains(stringFilterValue.replace(/_/g, "\\_")) //filter using qb (aka we're backend connected)
-      : fieldVal => {
-          //filter using plain old javascript (aka we've got a local table that isn't backend connected)
-          if (!fieldVal || !fieldVal.toLowerCase) return false;
-          return (
-            fieldVal.toLowerCase().replace(filterValLower, "") ===
-            fieldVal.toLowerCase()
-          );
+          return ccSelectedFilter === "contains"
+            ? fieldVal.toLowerCase().replace(filterValLower, "") !==
+                fieldVal.toLowerCase()
+            : fieldVal.toLowerCase().replace(filterValLower, "") ===
+                fieldVal.toLowerCase();
         };
   } else if (ccSelectedFilter === "inList") {
     return qb
@@ -417,16 +411,15 @@ function getSubFilter(
           );
         };
   } else if (ccSelectedFilter === "notBetween") {
-    const dates = [
-      new Date(arrayFilterValue[0]),
-      new Date(new Date(arrayFilterValue[1]).setHours(23, 59)) // set end of day for more accurate filtering
-    ];
     return qb
-      ? qb.notBetween(...dates)
+      ? qb.notBetween(
+          new Date(arrayFilterValue[0]),
+          new Date(new Date(arrayFilterValue[1]).setHours(23, 59)) // set end of day for more accurate filtering
+        )
       : fieldVal => {
           return (
-            dayjs(arrayFilterValue[0]).valueOf() <= dayjs(fieldVal).valueOf() ||
-            dayjs(fieldVal).valueOf() <= dayjs(arrayFilterValue[1]).valueOf()
+            dayjs(arrayFilterValue[0]).valueOf() > dayjs(fieldVal).valueOf() ||
+            dayjs(fieldVal).valueOf() > dayjs(arrayFilterValue[1]).valueOf()
           );
         };
   } else if (ccSelectedFilter === "isBefore") {
