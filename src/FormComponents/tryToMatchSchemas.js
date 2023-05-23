@@ -1,4 +1,4 @@
-import { map } from "lodash";
+import { forEach, map } from "lodash";
 import { nanoid } from "nanoid";
 import Fuse from "fuse.js";
 import { max } from "lodash";
@@ -171,7 +171,7 @@ async function matchSchemas({ userSchema, officialSchema }) {
       entities: userSchema.userData
     });
     if (!isEmpty(res)) {
-      csvValidationIssue = res;
+      csvValidationIssue = addSpecialPropToErrs(res);
     }
     //return errors on the tables
   }
@@ -189,3 +189,13 @@ async function matchSchemas({ userSchema, officialSchema }) {
     csvValidationIssue
   };
 }
+
+export const addSpecialPropToErrs = res => {
+  forEach(res, (v, k) => {
+    res[k] = {
+      message: v,
+      _isTableAsyncWideError: true
+    };
+  });
+  return res;
+};

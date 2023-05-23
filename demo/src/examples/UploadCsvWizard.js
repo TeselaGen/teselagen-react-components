@@ -27,7 +27,7 @@ const validateAgainstSchema = ({
       await new Promise(resolve => setTimeout(resolve, 400));
       const toRet = {};
       entities.forEach(entity => {
-        if (entity.name.toLowerCase() === "thomas") {
+        if (entity.name?.toLowerCase() === "thomas") {
           toRet[`${getIdOrCodeOrIndex(entity)}:name`] = "Cannot be Thomas";
         }
       });

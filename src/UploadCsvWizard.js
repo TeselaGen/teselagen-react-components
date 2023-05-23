@@ -20,6 +20,7 @@ import { connect } from "react-redux";
 import getIdOrCodeOrIndex from "./DataTable/utils/getIdOrCodeOrIndex";
 import { MatchHeaders } from "./MatchHeaders";
 import { isEmpty } from "lodash";
+import { addSpecialPropToErrs } from "./FormComponents/tryToMatchSchemas";
 
 const getInitialSteps = csvValidationIssue => [
   { text: "Set Headers", active: csvValidationIssue },
@@ -172,43 +173,36 @@ const UploadCsvWizardDialog = compose(
 
                         if (nextUnfinishedFile !== undefined) {
                           //do async validation here if needed
-                          if (validateAgainstSchema.tableWideAsyncValidation) {
-                            const currentEnts =
-                              reduxFormEntitiesArray[focusedTab];
-                            const res = await validateAgainstSchema.tableWideAsyncValidation(
-                              { entities: currentEnts }
-                            );
-                            if (!isEmpty(res)) {
-                              changeForm(
-                                `editableCellTable-${focusedTab}`,
-                                "reduxFormCellValidation",
-                                {
-                                  ...res
-                                }
-                              );
-                              return;
-                            }
-                          }
+
+                          const currentEnts =
+                            reduxFormEntitiesArray[focusedTab];
+
+                          if (
+                            await asyncValidateHelper(
+                              validateAgainstSchema,
+                              currentEnts,
+                              changeForm,
+                              `editableCellTable-${focusedTab}`
+                            )
+                          )
+                            return;
+
                           setFocusedTab(nextUnfinishedFile);
                         } else {
                           //do async validation here if needed
-                          if (validateAgainstSchema.tableWideAsyncValidation) {
-                            for (const [i, ents] of finishedFiles.entries()) {
-                              const res = await validateAgainstSchema.tableWideAsyncValidation(
-                                { entities: ents }
-                              );
-                              if (!isEmpty(res)) {
-                                changeForm(
-                                  `editableCellTable-${i}`,
-                                  "reduxFormCellValidation",
-                                  {
-                                    ...res
-                                  }
-                                );
-                                return;
-                              }
-                            }
+
+                          for (const [i, ents] of finishedFiles.entries()) {
+                            if (
+                              await asyncValidateHelper(
+                                validateAgainstSchema,
+                                ents,
+                                changeForm,
+                                `editableCellTable-${i}`
+                              )
+                            )
+                              return;
                           }
+
                           //we are done
                           onUploadWizardFinish({
                             res: finishedFiles.map(ents => {
@@ -462,17 +456,15 @@ const UploadCsvWizardDialogInner = compose(
           } else {
             if (!onMultiFileUploadSubmit) {
               //do async validation here if needed
-              if (validateAgainstSchema.tableWideAsyncValidation) {
-                const res = await validateAgainstSchema.tableWideAsyncValidation(
-                  { entities: entsToUse }
-                );
-                if (!isEmpty(res)) {
-                  changeForm(datatableFormName, "reduxFormCellValidation", {
-                    ...res
-                  });
-                  return;
-                }
-              }
+              if (
+                await asyncValidateHelper(
+                  validateAgainstSchema,
+                  entsToUse,
+                  changeForm,
+                  `editableCellTable`
+                )
+              )
+                return;
             }
             //step 2 submit
             const payload = maybeStripIdFromEntities(
@@ -673,22 +665,15 @@ export const SimpleInsertDataDialog = compose(
         onClick={handleSubmit(async () => {
           if (some(validationToUse, e => e)) return;
           //do async validation here if needed
-          if (validateAgainstSchema.tableWideAsyncValidation) {
-            const res = await validateAgainstSchema.tableWideAsyncValidation({
-              entities: entsToUse
-            });
-            if (!isEmpty(res)) {
-              changeForm(
-                "simpleInsertEditableTable",
-                "reduxFormCellValidation",
-                {
-                  ...reduxFormCellValidation,
-                  ...res
-                }
-              );
-              return;
-            }
-          }
+          if (
+            await asyncValidateHelper(
+              validateAgainstSchema,
+              entsToUse,
+              changeForm,
+              "simpleInsertEditableTable"
+            )
+          )
+            return;
           onSimpleInsertDialogFinish({
             newEntities: maybeStripIdFromEntities(
               entsToUse,
@@ -709,6 +694,24 @@ export const typeToCommonType = {
   boolean: "True/False",
   dropdown: "Select One"
 };
+
+async function asyncValidateHelper(
+  validateAgainstSchema,
+  currentEnts,
+  changeForm,
+  tableName
+) {
+  if (!validateAgainstSchema.tableWideAsyncValidation) return;
+  const res = await validateAgainstSchema.tableWideAsyncValidation({
+    entities: currentEnts
+  });
+  if (!isEmpty(res)) {
+    changeForm(tableName, "reduxFormCellValidation", {
+      ...addSpecialPropToErrs(res)
+    });
+    return true;
+  }
+}
 
 function removeCleanRows(reduxFormEntities, reduxFormCellValidation) {
   const toFilterOut = {};

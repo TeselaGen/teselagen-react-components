@@ -648,8 +648,9 @@ function Uploader({
                             updateUnregisteredFields: true
                           }
                         );
+                        const err = Object.values(csvValidationIssue)[0];
                         csvValidationIssue = `It looks like there was an error with your data - ${
-                          Object.values(csvValidationIssue)[0]
+                          err && err.message ? err.message : err
                         }`; //pass just the first error as a string
                       }
                       filesWIssues.push({

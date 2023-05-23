@@ -4,7 +4,7 @@ describe("upload", () => {
     cy.tgToggle(`accept`);
     cy.get(`a:contains(.ab1)`).click();
     cy.get(`.bp3-menu-item:contains(Download File 1)`);
-    cy.get(`a:contains(.zip) .bp3-icon-download`);
+    cy.get(`.tgFileTypeDescriptor:contains(.zip)`);
     cy.uploadFile(
       ".tg-dropzone",
       "createReactionMapTest.csv",
@@ -58,7 +58,7 @@ describe("upload", () => {
       true
     );
 
-    cy.contains("type must be .json");
+    cy.contains("type must be .zip, .json");
     cy.uploadBlobFiles(
       ".fileUploadLimitAndType.tg-dropzone",
       [

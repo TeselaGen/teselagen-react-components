@@ -423,9 +423,16 @@ class DataTable extends React.Component {
       initialEntities || entities
     );
     change("reduxFormEntities", newEnts);
+    const toKeep = {};
+    //on the initial load we want to keep any async table wide errors
+    forEach(reduxFormCellValidation, (v, k) => {
+      if (v && v._isTableAsyncWideError) {
+        toKeep[k] = v;
+      }
+    });
     this.updateValidation(newEnts, {
-      ...validationErrors,
-      ...reduxFormCellValidation
+      ...toKeep,
+      ...validationErrors
     });
   };
 
