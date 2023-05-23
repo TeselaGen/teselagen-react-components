@@ -58,6 +58,11 @@ describe("EditableCellTable.spec", () => {
     cy.get(`.rt-td:contains(nancy109)`).click({ shiftKey: true });
     cy.dragBetween(`.cellDragHandle`, `button:contains(Add 10 Rows)`);
     cy.contains("nancy137");
+    cy.get(`.rt-td:contains(nancy110)`).click();
+    cy.get(`.rt-td:contains(nancy111)`).click({ shiftKey: true });
+    cy.dragBetween(`.cellDragHandle`, `.rt-td:contains(nancy113)`);
+    // make sure simple case still works
+    cy.get(`.rt-td:contains(nancy113)`);
   });
 
   it(`drag should be repeating down`, () => {

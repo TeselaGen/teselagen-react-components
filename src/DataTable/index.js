@@ -2611,12 +2611,15 @@ class DataTable extends React.Component {
       };
       const entityMap = getEntityIdToEntity(entities);
       const { e: selectedEnt } = entityMap[primaryRowId];
+      const firstCellToSelectRowIndex =
+        entityMap[cellsToSelect[0]?.split(":")[0]]?.i;
+      const pathToIndex = getFieldPathToIndex(schema);
 
       allSelectedPaths.forEach(selectedPath => {
         const column = pathToField[selectedPath];
 
         const selectedCellVal = getCellVal(selectedEnt, selectedPath, column);
-
+        const cellIndexOfSelectedPath = pathToIndex[selectedPath];
         let incrementStart;
         let incrementPrefix;
         let incrementPad = 0;
@@ -2625,30 +2628,97 @@ class DataTable extends React.Component {
           const cellNum = Number(cellNumStr);
           const entityAbovePrimaryCell =
             entities[entityMap[primaryRowId].i - 1];
-
-          if (entityAbovePrimaryCell && !isNaN(cellNum)) {
-            const cellAboveVal = get(entityAbovePrimaryCell, selectedPath, "");
-            const cellAboveNumStr = getNumberStrAtEnd(cellAboveVal);
-            const cellAboveNum = Number(cellAboveNumStr);
-            if (!isNaN(cellAboveNum)) {
-              const isIncremental = cellNum - cellAboveNum === 1;
-              if (isIncremental) {
-                const cellTextNoNum = stripNumberAtEnd(selectedCellVal);
-                const sameText =
-                  stripNumberAtEnd(cellAboveVal) === cellTextNoNum;
-                if (sameText) {
-                  incrementStart = cellNum + 1;
-                  incrementPrefix = cellTextNoNum || "";
-                  if (cellNumStr.startsWith("0")) {
-                    incrementPad = cellNumStr.length;
+          if (!isNaN(cellNum)) {
+            if (
+              entityAbovePrimaryCell &&
+              (!selectionGrid || selectionGrid.length <= 1)
+            ) {
+              const cellAboveVal = get(
+                entityAbovePrimaryCell,
+                selectedPath,
+                ""
+              );
+              const cellAboveNumStr = getNumberStrAtEnd(cellAboveVal);
+              const cellAboveNum = Number(cellAboveNumStr);
+              if (!isNaN(cellAboveNum)) {
+                const isIncremental = cellNum - cellAboveNum === 1;
+                if (isIncremental) {
+                  const cellTextNoNum = stripNumberAtEnd(selectedCellVal);
+                  const sameText =
+                    stripNumberAtEnd(cellAboveVal) === cellTextNoNum;
+                  if (sameText) {
+                    incrementStart = cellNum + 1;
+                    incrementPrefix = cellTextNoNum || "";
+                    if (cellNumStr.startsWith("0")) {
+                      incrementPad = cellNumStr.length;
+                    }
                   }
+                }
+              }
+            }
+            if (incrementStart === undefined) {
+              const draggingDown =
+                firstCellToSelectRowIndex > selectionGrid?.[0][0].rowIndex;
+              if (selectedPaths && draggingDown) {
+                let checkIncrement;
+                let prefix;
+                let maybePad;
+                // determine if all the cells in this column of the selectionGrid are incrementing
+                const allAreIncrementing = selectionGrid.every(row => {
+                  // see if cell is selected
+                  const cellInfo = row[cellIndexOfSelectedPath];
+                  if (!cellInfo) return false;
+                  const { cellId } = cellInfo;
+                  const [rowId] = cellId.split(":");
+                  const cellVal = getCellVal(
+                    entityMap[rowId].e,
+                    selectedPath,
+                    pathToField[selectedPath]
+                  );
+                  const cellNumStr = getNumberStrAtEnd(cellVal);
+                  const cellNum = Number(cellNumStr);
+                  const cellTextNoNum = stripNumberAtEnd(cellVal);
+                  if (cellNumStr.startsWith("0")) {
+                    maybePad = cellNumStr.length;
+                  }
+                  if (cellTextNoNum && !prefix) {
+                    prefix = cellTextNoNum;
+                  }
+                  if (cellTextNoNum && prefix !== cellTextNoNum) {
+                    return false;
+                  }
+                  if (!isNaN(cellNum)) {
+                    if (!checkIncrement) {
+                      checkIncrement = cellNum;
+                      return true;
+                    } else {
+                      return ++checkIncrement === cellNum;
+                    }
+                  } else {
+                    return false;
+                  }
+                });
+
+                if (allAreIncrementing) {
+                  incrementStart = checkIncrement + 1;
+                  incrementPrefix = prefix || "";
+                  incrementPad = maybePad;
                 }
               }
             }
           }
         }
 
-        const pathToIndex = getFieldPathToIndex(schema);
+        let firstSelectedCellRowIndex;
+        if (selectionGrid) {
+          selectionGrid[0].some(cell => {
+            if (cell) {
+              firstSelectedCellRowIndex = cell.rowIndex;
+              return true;
+            }
+            return false;
+          });
+        }
 
         cellsToSelect.forEach(cellId => {
           const [rowId, cellPath] = cellId.split(":");
@@ -2666,14 +2736,14 @@ class DataTable extends React.Component {
                 // if there are multiple cells selected then we want to copy them repeating
                 // ex: if we have 1,2,3 selected and we drag for 5 more rows we want it to
                 // be 1,2,3,1,2 for the new row cells in this column
-                const draggingDown = rowIndex > selectionGrid[0][0].rowIndex;
+                const draggingDown = rowIndex > firstSelectedCellRowIndex;
                 const cellIndex = pathToIndex[cellPath];
                 let cellIdToCopy;
                 if (draggingDown) {
-                  const firstIndexInGrid = selectionGrid[0][0].rowIndex;
                   const { cellId } = selectionGrid[
-                    (rowIndex - firstIndexInGrid) % selectionGrid.length
-                  ].find(g => g.cellIndex === cellIndex);
+                    (rowIndex - firstSelectedCellRowIndex) %
+                      selectionGrid.length
+                  ].find(g => g && g.cellIndex === cellIndex);
                   cellIdToCopy = cellId;
                 } else {
                   const lastIndexInGrid =
