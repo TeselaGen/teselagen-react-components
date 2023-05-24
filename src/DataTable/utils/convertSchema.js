@@ -1,3 +1,4 @@
+import { camelCase } from "lodash";
 import { startCase, keyBy, map } from "lodash";
 
 function convertSchema(schema) {
@@ -14,7 +15,7 @@ function convertSchema(schema) {
     let fieldToUse = field;
     if (typeof field === "string") {
       fieldToUse = {
-        displayName: startCase(field),
+        displayName: startCase(camelCase(field)),
         path: field,
         type: "string"
       };
@@ -27,7 +28,7 @@ function convertSchema(schema) {
     if (!fieldToUse.displayName) {
       fieldToUse = {
         ...fieldToUse,
-        displayName: startCase(fieldToUse.path)
+        displayName: startCase(camelCase(fieldToUse.path))
       };
     }
     // paths are needed for column resizing

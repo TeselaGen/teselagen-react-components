@@ -21,6 +21,7 @@ import getIdOrCodeOrIndex from "./DataTable/utils/getIdOrCodeOrIndex";
 import { MatchHeaders } from "./MatchHeaders";
 import { isEmpty } from "lodash";
 import { addSpecialPropToErrs } from "./FormComponents/tryToMatchSchemas";
+import { cloneDeep } from "lodash";
 
 const getInitialSteps = csvValidationIssue => [
   { text: "Set Headers", active: csvValidationIssue },
@@ -98,7 +99,7 @@ const UploadCsvWizardDialog = compose(
 
   const [focusedTab, setFocusedTab] = useState(0);
   const [filesWIssues, setFilesWIssues] = useState(
-    _filesWIssues.map(f => ({ ...f, file: { ...f.file } })) //do this little trick to stop immer from preventing the file from being modified
+    _filesWIssues.map(cloneDeep) //do this little trick to stop immer from preventing the file from being modified
   );
   if (filesWIssues.length > 1) {
     const tabs = (
@@ -487,6 +488,7 @@ export default UploadCsvWizardDialog;
 const exampleData = { userData: times(5).map(() => ({ _isClean: true })) };
 export const PreviewCsvData = function({
   matchedHeaders,
+  isEditingExistingFile,
   showDoesDataLookCorrectMsg,
   headerMessage,
   datatableFormName,
@@ -553,7 +555,9 @@ export const PreviewCsvData = function({
         {headerMessage ||
           (showDoesDataLookCorrectMsg
             ? "Does this data look correct? Edit it as needed."
-            : "Input your data here. Hover table headers for additional instructions")}
+            : `${
+                isEditingExistingFile ? "Edit" : "Input"
+              } your data here. Hover table headers for additional instructions`)}
       </Callout>
       {validateAgainstSchema.description && (
         <Callout>{validateAgainstSchema.description}</Callout>
@@ -624,7 +628,7 @@ export const SimpleInsertDataDialog = compose(
     "reduxFormEntities",
     "reduxFormCellValidation"
   ),
-  connect(() => {}, { changeForm: change })
+  connect(undefined, { changeForm: change })
 )(function SimpleInsertDataDialog({
   onSimpleInsertDialogFinish,
   reduxFormEntities,
@@ -632,6 +636,7 @@ export const SimpleInsertDataDialog = compose(
   validateAgainstSchema,
   changeForm,
   submitting,
+  isEditingExistingFile,
   matchedHeaders,
   showDoesDataLookCorrectMsg,
   headerMessage,
@@ -650,6 +655,7 @@ export const SimpleInsertDataDialog = compose(
         <PreviewCsvData
           {...{
             matchedHeaders,
+            isEditingExistingFile,
             showDoesDataLookCorrectMsg,
             headerMessage,
             // onlyShowRowsWErrors,
@@ -682,7 +688,7 @@ export const SimpleInsertDataDialog = compose(
           });
         })}
         disabled={!entsToUse?.length || some(validationToUse, e => e)}
-        text="Add File"
+        text={isEditingExistingFile ? "Edit Data" : "Add File"}
       ></DialogFooter>
     </>
   );

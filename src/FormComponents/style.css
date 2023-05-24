@@ -75,12 +75,10 @@
 .tg-upload-file-list-item:hover {
   background: rgb(215, 238, 255);
 }
-.tg-upload-file-list-item-close,
-.tg-upload-file-list-item-preview {
+.clickableIcon {
   cursor: pointer;
 }
-.tg-upload-file-list-item-close:hover,
-.tg-upload-file-list-item-preview:hover {
+.clickableIcon:hover {
   opacity: 0.7;
 }
 

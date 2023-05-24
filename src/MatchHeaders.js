@@ -6,6 +6,7 @@ import { ReactSelectField } from "./FormComponents";
 import showConfirmationDialog from "./showConfirmationDialog";
 import { startCase } from "lodash";
 import { typeToCommonType } from "./UploadCsvWizard";
+import { camelCase } from "lodash";
 
 export function MatchHeaders({
   onMultiFileUploadSubmit,
@@ -91,7 +92,7 @@ export function MatchHeaders({
                           type || "string"
                         ] || type}`}
                       >
-                        {displayName || startCase(path)}
+                        {displayName || startCase(camelCase(path))}
                       </span>
                     </div>
                   </td>

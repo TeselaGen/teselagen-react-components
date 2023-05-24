@@ -1316,11 +1316,11 @@ class DataTable extends React.Component {
           }
           return (
             <div
-              key={displayName || startCase(path)}
+              key={displayName || startCase(camelCase(path))}
               className="tg-filter-on-non-displayed-field"
             >
-              {displayName || startCase(path)} {lowerCase(selectedFilter)}{" "}
-              {filterValToDisplay}
+              {displayName || startCase(camelCase(path))}{" "}
+              {lowerCase(selectedFilter)} {filterValToDisplay}
             </div>
           );
         }
@@ -2628,7 +2628,7 @@ class DataTable extends React.Component {
           const cellNum = Number(cellNumStr);
           const entityAbovePrimaryCell =
             entities[entityMap[primaryRowId].i - 1];
-          if (!isNaN(cellNum)) {
+          if (cellNumStr !== null && !isNaN(cellNum)) {
             if (
               entityAbovePrimaryCell &&
               (!selectionGrid || selectionGrid.length <= 1)
@@ -2649,7 +2649,7 @@ class DataTable extends React.Component {
                   if (sameText) {
                     incrementStart = cellNum + 1;
                     incrementPrefix = cellTextNoNum || "";
-                    if (cellNumStr.startsWith("0")) {
+                    if (cellNumStr && cellNumStr.startsWith("0")) {
                       incrementPad = cellNumStr.length;
                     }
                   }
@@ -3078,7 +3078,7 @@ class DataTable extends React.Component {
       isActionColumn ||
       columnFilterDisabled;
     const ccDisplayName = camelCase(displayName || path);
-    let columnTitle = displayName || startCase(path);
+    let columnTitle = displayName || startCase(camelCase(path));
     if (isActionColumn) columnTitle = "";
 
     const currentFilter =
@@ -3195,13 +3195,13 @@ class DataTable extends React.Component {
             <strong>${columnTitle}:</strong> <br>
             ${description} ${isUnique ? "<br>Must be unique" : ""}</div>`
         })}
-        data-test={displayName || startCase(path)}
-        data-copy-text={displayName || startCase(path)}
+        data-test={displayName || startCase(camelCase(path))}
+        data-copy-text={displayName || startCase(camelCase(path))}
         className={classNames("tg-react-table-column-header", {
           "sort-active": sortUp || sortDown
         })}
       >
-        {(displayName || startCase(path)) && !noTitle && (
+        {(displayName || startCase(camelCase(path))) && !noTitle && (
           <React.Fragment>
             {maybeCheckbox}
             <span
@@ -3634,7 +3634,7 @@ function stripNumberAtEnd(str) {
 }
 
 export const getCellVal = (ent, path, col) => {
-  const isBool = col.type === "boolean";
+  const isBool = col?.type === "boolean";
   let selectedCellVal = get(ent, path, "");
   if (isBool) {
     if (isString(selectedCellVal)) {

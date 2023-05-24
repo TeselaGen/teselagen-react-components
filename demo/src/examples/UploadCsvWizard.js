@@ -14,8 +14,10 @@ const simpleValidateAgainst = {
 const validateAgainstSchema = ({
   asyncNameValidation,
   multipleExamples,
-  enforceNameUnique,
-  allowEitherNameOrId
+  requireExactlyOneOf,
+  requireAllOrNone,
+  requireAtLeastOneOf,
+  enforceNameUnique
 }) => ({
   helpInstructions:
     "This template file is used to add rows to the sequence table.",
@@ -34,39 +36,49 @@ const validateAgainstSchema = ({
       return toRet;
     }
   }),
-  tableWideValidation: allowEitherNameOrId
-    ? ({ entities }) => {
-        const toRet = {};
-        entities.forEach(entity => {
-          if (!entity.name && !entity.ID) {
-            toRet[`${getIdOrCodeOrIndex(entity)}:name`] =
-              "Must have a Name or an ID";
-            toRet[`${getIdOrCodeOrIndex(entity)}:ID`] =
-              "Must have a Name or an ID";
-          } else if (entity.name && entity.ID) {
-            toRet[`${getIdOrCodeOrIndex(entity)}:name`] =
-              "Cannot have both a Name and an ID";
-            toRet[`${getIdOrCodeOrIndex(entity)}:ID`] =
-              "Cannot have both a Name and an ID";
-          }
-        });
-        return toRet;
-      }
-    : undefined,
+  requireAllOrNone: requireAllOrNone && [
+    ["description", "type"],
+  ],
+  requireExactlyOneOf: requireExactlyOneOf && [
+    ["name", "ID"],
+    ["description", "sequence"]
+  ],
+  requireAtLeastOneOf: requireAtLeastOneOf && [
+    ["name", "ID"],
+    ["description", "sequence"]
+  ],
+  // tableWideValidation: allowEitherNameOrId
+  //   ? ({ entities }) => {
+  //       const toRet = {};
+  //       entities.forEach(entity => {
+  //         if (!entity.name && !entity.ID) {
+  //           toRet[`${getIdOrCodeOrIndex(entity)}:name`] =
+  //             "Must have a Name or an ID";
+  //           toRet[`${getIdOrCodeOrIndex(entity)}:ID`] =
+  //             "Must have a Name or an ID";
+  //         } else if (entity.name && entity.ID) {
+  //           toRet[`${getIdOrCodeOrIndex(entity)}:name`] =
+  //             "Cannot have both a Name and an ID";
+  //           toRet[`${getIdOrCodeOrIndex(entity)}:ID`] =
+  //             "Cannot have both a Name and an ID";
+  //         }
+  //       });
+  //       return toRet;
+  //     }
+  //   : undefined,
   fields: [
     {
-      isRequired: !allowEitherNameOrId,
+      isRequired: !requireExactlyOneOf && !requireAtLeastOneOf,
       isUnique: enforceNameUnique,
       path: "name",
-      backupPath: "id",
-      description: allowEitherNameOrId
+      description: requireExactlyOneOf
         ? `The ID of the model to be tagged. Used if a Name is NOT provided`
         : "The Sequence Name",
       example: multipleExamples ? ["pj5_0001", "someOtherSeq"] : "pj5_0001"
 
       // defaultValue: "asdf"
     },
-    ...(allowEitherNameOrId
+    ...(requireExactlyOneOf || requireAtLeastOneOf
       ? [
           {
             path: "ID",
@@ -81,7 +93,7 @@ const validateAgainstSchema = ({
         : "Example description of a sequence"
     },
     {
-      isRequired: true,
+      isRequired: !requireExactlyOneOf && !requireAtLeastOneOf,
       displayName: "Sequence BPs",
       path: "sequence",
       example: "gtgctttca",
@@ -134,9 +146,24 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
     description:
       "If checked, will validate asynchronously that the names do not equal Thomas"
   });
-  const [allowEitherNameOrId, allowEitherNameOrIdComp] = useToggle({
-    type: "allowEitherNameOrId"
+  const [requireExactlyOneOf, requireExactlyOneOfComp] = useToggle({
+    type: "requireExactlyOneOf",
+    description:
+      "If checked, will require that either the name or id or the description or sequence be provided, not both"
   });
+  const [requireAllOrNone, requireAllOrNoneComp] = useToggle({
+    type: "requireAllOrNone",
+    description:
+      "If checked, will require that either the type and description are both provided or that neither are provided"
+  });
+  const [requireAtLeastOneOf, atLeastOneComp] = useToggle({
+    type: "requireAtLeastOneOf",
+    description:
+      "If checked, will require that either the name or id or the description or sequence or both be provided"
+  });
+  // const [allowEitherNameOrId, allowEitherNameOrIdComp] = useToggle({
+  //   type: "allowEitherNameOrId"
+  // });
   // const [allowZip, allowZipComp] = useToggle({
   //   type: "allowZip"
   // });
@@ -152,10 +179,12 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
       {simpleSchemaComp}
       {enforceNameUniqueComp}
       {asyncNameValidationComp}
+      {atLeastOneComp}
+      {requireAllOrNoneComp}
+      {requireExactlyOneOfComp}
       {allowMultipleFilesComp}
       {multipleExamplesComp}
       {/* {allowZipComp} */}
-      {allowEitherNameOrIdComp}
       <br></br>
       <br></br>
       <br></br>
@@ -172,9 +201,12 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
             validateAgainstSchema: simpleSchema
               ? simpleValidateAgainst
               : validateAgainstSchema({
+                  requireAllOrNone,
+                  requireAtLeastOneOf,
+                  requireExactlyOneOf,
                   asyncNameValidation,
                   enforceNameUnique,
-                  allowEitherNameOrId,
+                  // allowEitherNameOrId,
                   multipleExamples
                 }),
             exampleFile: "/manual_data_entry (3).csv"
