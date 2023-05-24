@@ -41,6 +41,7 @@ import { getNewName } from "./getNewName";
 import { isObject } from "lodash";
 import { connect } from "react-redux";
 import { initialize } from "redux-form";
+import classNames from "classnames";
 
 const helperText = [
   `How to Use This Template to Upload New Data`,
@@ -178,7 +179,7 @@ function Uploader({
     : isArray(_accept)
     ? _accept
     : _accept.split(",").map(a => ({ type: a }));
-  if (accept && !accept.some(a => a.type === "zip")) {
+  if (validateAgainstSchema && accept && !accept.some(a => a.type === "zip")) {
     accept?.unshift({
       type: "zip",
       description: "Any of the following types, just compressed"
@@ -594,7 +595,7 @@ function Uploader({
             onDrop: async (_acceptedFiles, rejectedFiles) => {
               let acceptedFiles = [];
               for (const file of _acceptedFiles) {
-                if (isZipFile(file)) {
+                if (validateAgainstSchema && isZipFile(file)) {
                   const files = await filterFilesInZip(
                     file,
                     simpleAccept
@@ -888,9 +889,10 @@ function Uploader({
 
         {fileList && showUploadList && !minimal && !!fileList.length && (
           <div
-            className={
+            className={classNames(
+              "tg-upload-file-list-holder",
               overflowList ? "tg-upload-file-list-item-overflow" : null
-            }
+            )}
           >
             {fileList.map((file, index) => {
               const {

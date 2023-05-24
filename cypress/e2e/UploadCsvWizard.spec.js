@@ -784,7 +784,7 @@ thomas,,g,false,dna,misc_feature`,
     cy.focused().type("ba{enter}");
     cy.get(`.bp3-button:contains(Finalize Files):last`).click();
   });
-  it(`multiple manual entries should get unique names`, () => {
+  it(`multiple manual entries should get unique names. They should be able to be edited after`, () => {
     cy.visit("#/UploadCsvWizard");
     cy.tgToggle("allowMultipleFiles");
     cy.contains("or manually enter data").click();
@@ -792,6 +792,63 @@ thomas,,g,false,dna,misc_feature`,
     cy.contains("manual_data_entry.csv");
     cy.contains("or manually enter data").click();
     cy.contains(".bp3-button", "Add File").click();
+    cy.contains("manual_data_entry(1).csv");
+    cy.get(
+      `.tg-upload-file-list-item:contains(manual_data_entry.csv) .tg-upload-file-list-item-edit`
+    ).click();
+    cy.contains(`Edit your data here.`);
+    cy.contains(`Add 10 Rows`).click();
+    cy.get(`[data-index="4"] [data-test="tgCell_sequence"]`).click({
+      force: true
+    });
+    cy.focused().type(`{backspace}`);
+    cy.get(`.bp3-disabled:contains(Edit Data)`);
+    cy.focused().type(`tom{enter}`);
+    cy.get(`[data-index="4"] [data-test="tgCell_name"]`).click({ force: true });
+    cy.focused().type(`taoh{enter}`);
+    cy.get(`.bp3-button:contains(Edit Data)`).click();
+    cy.contains(`File Updated`);
+
+    cy.contains("Finish Upload").click();
+    cy.contains("Upload Successful").then(() => {
+      cy.window().then(win => {
+        expect(win.parsedData).to.deep.equal([
+          {
+            name: "pj5_0001",
+            description: "Example description of a sequence",
+            sequence: "gtgctttca",
+            isRegex: false,
+            matchType: "dna",
+            type: "misc_feature"
+          },
+          {
+            name: "taoh",
+            description: "",
+            sequence: "tom",
+            isRegex: false,
+            matchType: "",
+            type: ""
+          }
+        ]);
+      });
+    });
+    cy.contains("manual_data_entry(1).csv");
+
+    cy.contains("manual_data_entry.csv").click();
+    cy.readFile(
+      path.join(Cypress.config("downloadsFolder"), "manual_data_entry.csv")
+    ).should(
+      "eq",
+      `name,description,sequence,isRegex,matchType,type\r\npj5_0001,Example description of a sequence,gtgctttca,false,dna,misc_feature\r\ntaoh,,tom,false,,`
+    );
+
+    cy.get(
+      `.tg-upload-file-list-item:contains(manual_data_entry.csv) .tg-upload-file-list-item-edit`
+    ).click();
+    cy.get(
+      `[data-index="1"] [data-test="tgCell_sequence"]:contains(tom)`
+    ).click();
+    cy.get(`.bp3-button:contains(Cancel)`).click();
     cy.contains("manual_data_entry(1).csv");
   });
   it(`zip data that contains one or more perfect CSV/XLSX should NOT trigger the wizard but should be unzipped`, () => {
