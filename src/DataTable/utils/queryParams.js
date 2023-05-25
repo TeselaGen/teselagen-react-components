@@ -507,7 +507,7 @@ function stringifyFilters(newParams) {
         acc +=
           (index > 0 ? "::" : "") +
           `${filterOn}__${camelCase(selectedFilter)}__${safeStringify(
-            Array.isArray(filterValue) ? filterValue.join(".") : filterValue
+            Array.isArray(filterValue) ? filterValue.join(";") : filterValue
           )}`;
         return acc;
       },
@@ -537,11 +537,15 @@ function parseFilters(newParams) {
         const splitFilter = filter.split("__");
         const [filterOn, selectedFilter, filterValue] = splitFilter;
         const parseFilterValue = filterValue => {
-          // for inList filters safeParse will convert two id values to a single number.
-          // ex. "9.10" will become 9.1 which would completely mess up our filter
-          if (selectedFilter === "inList") return filterValue;
-          if (selectedFilter === "inRange" || selectedFilter === "outsideRange")
-            return filterValue.split(".").map(Number);
+          if (selectedFilter === "inList" || selectedFilter === "notInList") {
+            return filterValue.match(/(\d+\.\d+)/g) || filterValue.split(";");
+          }
+          if (
+            selectedFilter === "inRange" ||
+            selectedFilter === "outsideRange"
+          ) {
+            return filterValue.split(";").map(Number);
+          }
           return safeParse(filterValue);
         };
         return {
@@ -691,12 +695,6 @@ function cleanupFilter(filter) {
     filterToUse = {
       ...filterToUse,
       filterValue: filterToUse.filterValue.toString()
-    };
-  }
-  if (filterToUse.selectedFilter === "inList") {
-    filterToUse = {
-      ...filterToUse,
-      filterValue: filterToUse.filterValue.replace(/, |,/g, ".")
     };
   }
   return filterToUse;

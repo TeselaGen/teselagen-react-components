@@ -21,10 +21,10 @@ import "../toastr";
 import TgSelect from "../TgSelect";
 
 const isInvalidFilterValue = value => {
-  if (Array.isArray(value)) {
+  if (Array.isArray(value) && value.length) {
     return value.some(item => isInvalidFilterValue(item));
   }
-  return value === "" || value === undefined;
+  return value === "" || value === undefined || value.length === 0;
 };
 export default class FilterAndSortMenu extends React.Component {
   constructor(props) {
@@ -60,13 +60,13 @@ export default class FilterAndSortMenu extends React.Component {
       ccSelectedFilter === "inList" ||
       ccSelectedFilter === "notInList"
     ) {
-      filterValToUse =
-        typeof filterValue === "string"
-          ? filterValue.split(".")
-          : filterValue.filter(op => op.value !== "").map(op => op.value);
+      filterValToUse = filterValue
+        .filter(v => v.value !== "")
+        .map(val => val.value || val);
     }
     const { filterOn, addFilters, removeSingleFilter } = this.props;
     if (isInvalidFilterValue(filterValToUse)) {
+      togglePopover();
       return removeSingleFilter(filterOn);
     }
     addFilters([
@@ -183,8 +183,8 @@ class FilterInput extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedOptions: props.filterValue
-        ? props.filterValue.split(".").map(val => ({
+      selectedOptions: Array.isArray(props.filterValue)
+        ? props.filterValue.map(val => ({
             userCreated: true,
             label: val,
             value: val
@@ -195,10 +195,16 @@ class FilterInput extends React.Component {
   }
 
   handleChange(selectedOptions) {
-    this.setState({ selectedOptions });
-    this.props.handleFilterValueChange(selectedOptions);
-    if (selectedOptions.some(op => op.value === "")) {
-      this.props.handleFilterSubmit();
+    const { handleFilterSubmit, handleFilterValueChange } = this.props;
+    const isStateEmpty = !this.state.selectedOptions.length;
+    const isLocalEmpty = selectedOptions.some(op => op.value.trim() === "");
+
+    if (isStateEmpty && isLocalEmpty) return;
+    if (!isStateEmpty && isLocalEmpty) handleFilterSubmit();
+    if (!isLocalEmpty) {
+      selectedOptions = selectedOptions.filter(op => op.value.trim() !== "");
+      this.setState({ selectedOptions });
+      handleFilterValueChange(selectedOptions);
     }
   }
 
