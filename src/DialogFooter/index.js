@@ -10,6 +10,7 @@ function DialogFooter({
   loading,
   submitting,
   onBackClick,
+  style,
   onClick = noop,
   secondaryAction,
   intent = Intent.PRIMARY,
@@ -27,13 +28,13 @@ function DialogFooter({
   const r = useRef();
   return (
     <div
+      style={style}
       ref={r}
       className={classNames(Classes.DIALOG_FOOTER, containerClassname)}
     >
       <div className={Classes.DIALOG_FOOTER_ACTIONS}>
         {onBackClick && (
           <Button
-            // intent={secondaryIntent}
             className={Classes.MINIMAL + " " + secondaryClassName}
             text={backText}
             onClick={onBackClick}

@@ -53,16 +53,16 @@ describe("EditableCellTable.spec", () => {
     cy.get(`.rt-td:contains(nancy110)`).click();
     cy.dragBetween(`.cellDragHandle`, `button:contains(Add 10 Rows)`);
     cy.contains("nancy137");
-  });
-  it(`smart increment + multi column drag should work`, () => {
-    cy.visit("#/DataTable%20-%20EditableCellTable");
-    cy.get(`.rt-td:contains(nancy110)`).click();
-    cy.get(`.rt-tr:contains(nancy110) .rt-td:contains(too old)`).click({
-      shiftKey: true
-    });
-
+    //if two or more incrementing cells are selected one above the other it should still work to increment
+    cy.get(`.rt-td:contains(nancy108)`).click();
+    cy.get(`.rt-td:contains(nancy109)`).click({ shiftKey: true });
     cy.dragBetween(`.cellDragHandle`, `button:contains(Add 10 Rows)`);
-    cy.get(`.rt-tr:contains(nancy137):contains(too old)`);
+    cy.contains("nancy137");
+    cy.get(`.rt-td:contains(nancy110)`).click();
+    cy.get(`.rt-td:contains(nancy111)`).click({ shiftKey: true });
+    cy.dragBetween(`.cellDragHandle`, `.rt-td:contains(nancy113)`);
+    // make sure simple case still works
+    cy.get(`.rt-td:contains(nancy113)`);
   });
 
   it(`drag should be repeating down`, () => {
@@ -137,17 +137,18 @@ describe("EditableCellTable.spec", () => {
       `.rt-td.isSelectedCell.isPrimarySelected [data-test="tgCell_weather"]`
     );
     cy.focused().type(`{shift}{leftArrow}`);
-    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_type"]`);
+    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_tags"]`);
     cy.focused().type(`{shift}{downArrow}`);
-    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_type"]`).eq(1);
-    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_type"]`)
+    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_tags"]`).eq(1);
+    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_tags"]`)
       .eq(2)
       .should("not.exist");
     cy.focused().type(`{shift}{downArrow}`);
-    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_type"]`).eq(2);
+    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_tags"]`).eq(2);
+    cy.focused().type(`{shift}{leftArrow}`);
     cy.focused().type(`{shift}{leftArrow}`);
     cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_name"]`).eq(2);
-    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_type"]`).eq(2);
+    cy.get(`.rt-td.isSecondarySelected [data-test="tgCell_tags"]`).eq(2);
     cy.get(
       `.rt-td.isSecondarySelected [data-test="tgCell_name"]:contains(tom93)`
     )
@@ -239,7 +240,7 @@ describe("EditableCellTable.spec", () => {
     cy.contains(`Add 10 Rows`).click();
     cy.get(`[data-index="59"]`).should("exist");
     //the last error should now be in the type column
-    cy.get(`.rt-td.hasCellError:last [data-test="tgCell_type"]`).should(
+    cy.get(`.rt-td.hasCellError:last [data-test="tgCell_tags"]`).should(
       "exist"
     );
     //the last row should be auto populate with default values

@@ -7,7 +7,7 @@ import { Intent, Button, Classes, IMenuItemProps, MenuItem, IAnchorButtonProps }
 /*~ If this module has methods, export them as functions like so.
  */
 
-interface schemaField {
+interface SchemaField {
   displayName?: string;
   path?: string;
   width?: number;
@@ -29,10 +29,10 @@ interface schemaField {
 
 interface objectSchema {
   model: string;
-  fields: schemaField[]
+  fields: SchemaField[]
 }
 
-export type dataTableSchema = schemaField[] | objectSchema
+export type dataTableSchema = SchemaField[] | objectSchema
 
 interface showDialogOnDocBodyOptions {
   /**
@@ -593,7 +593,7 @@ export interface InputFieldProps extends GenericFormFieldProps { }
  * <FileUploadField
           name="alignmentToolSequenceUpload"
           innerText="Upload Sequences to Align (.ab1, .fasta, .gb)"
-          accept={[".ab1", ".fasta", ".fa", ".gb", ".zip"]}
+          accept={[".ab1", ".fasta", ".fa", ".gb"]}
           style={{ maxWidth: 400 }}
           readBeforeUpload //if passed file.parsedString will show up if the read is successful
           beforeUpload={async (files, onChange) => {
@@ -607,7 +607,7 @@ export interface InputFieldProps extends GenericFormFieldProps { }
         />
  * <FileUploadField accept={[".csv", ".xlsx"]} name="oligoFiles" />
  * <FileUploadField
-          accept={[".csv", ".json", ".xlsx", ".zip"]}
+          accept={[".csv", ".json", ".xlsx"]}
           label="Upload Existing Design Template File Here"
           name="inputFiles"
           fileLimit={1}
@@ -618,7 +618,20 @@ export class FileUploadField extends React.Component<
   any
 > { }
 type AcceptObj = {
-  type: string; exampleFile: string | (() => string); description: string; isTemplate: boolean
+  validateAgainstSchema: ValidateAgainstSchemaObj;
+  type: string; 
+  exampleFile: string | (() => string); 
+  description: string; 
+  isTemplate: boolean
+}
+type ValidateAgainstSchemaObj = {
+  tableWideValidation: ({ entities }) => {
+    cellId: string;
+  };
+  tableWideAsyncValidation: ({ entities }) => {
+    cellId: string;
+  };
+  fields: SchemaField[];
 }
 
 export interface FileUploadFieldProps extends GenericFormFieldProps {

@@ -15,7 +15,7 @@ import Dropzone from "react-dropzone";
 import classnames from "classnames";
 import { nanoid } from "nanoid";
 
-import papaparse from "papaparse";
+import papaparse, { unparse } from "papaparse";
 
 import downloadjs from "downloadjs";
 
@@ -24,7 +24,9 @@ import UploadCsvWizardDialog, {
 } from "../UploadCsvWizard";
 import { useDialog } from "../useDialog";
 import {
+  filterFilesInZip,
   isCsvOrExcelFile,
+  isZipFile,
   parseCsvOrExcelFile,
   removeExt
 } from "../utils/parserUtils";
@@ -35,6 +37,11 @@ import urljoin from "url-join";
 import popoverOverflowModifiers from "../utils/popoverOverflowModifiers";
 import writeXlsxFile from "write-excel-file";
 import { startCase } from "lodash";
+import { getNewName } from "./getNewName";
+import { isObject } from "lodash";
+import { connect } from "react-redux";
+import { initialize } from "redux-form";
+import classNames from "classnames";
 
 const helperText = [
   `How to Use This Template to Upload New Data`,
@@ -83,6 +90,53 @@ const helperSchema = [
 //   a();
 // }, 0);
 
+const onEditClick = ({
+  file,
+  validateAgainstSchema,
+  showSimpleInsertDataDialog,
+  newFileName,
+  finishUp
+}) => async () => {
+  const {
+    // csvValidationIssue: _csvValidationIssue,
+    matchedHeaders,
+    userSchema,
+    searchResults
+  } = await tryToMatchSchemas({
+    incomingData: file.parsedData,
+    validateAgainstSchema
+  });
+
+  const { newEntities } = await showSimpleInsertDataDialog(
+    "onSimpleInsertDialogFinish",
+    {
+      dialogProps: {
+        title: "Edit Data"
+      },
+      validateAgainstSchema,
+      isEditingExistingFile: true,
+      searchResults,
+      matchedHeaders,
+      userSchema
+    }
+  );
+
+  if (!newEntities) {
+    return;
+  } else {
+    const newFile = getNewCsvFile(newEntities, newFileName);
+    // file.parsedData = newEntities;
+    Object.assign(file, {
+      ...newFile,
+      originFileObj: newFile,
+      originalFileObj: newFile,
+      parsedData: newEntities
+    });
+    finishUp(file);
+    window.toastr.success(`File Updated`);
+  }
+};
+
 function noop() {}
 // wink wink
 const emptyPromise = Promise.resolve.bind(Promise);
@@ -111,13 +165,26 @@ function Uploader({
   dropzoneProps = {},
   overflowList,
   disabled,
+  initializeForm,
   showFilesCount,
   threeDotMenuItems,
   onPreviewClick,
   axiosInstance = window.api || axios
 }) {
   let validateAgainstSchema = _validateAgainstSchema;
-  const accept = isPlainObject(_accept) ? [_accept] : _accept;
+  const accept = !_accept
+    ? undefined
+    : isPlainObject(_accept)
+    ? [_accept]
+    : isArray(_accept)
+    ? _accept
+    : _accept.split(",").map(a => ({ type: a }));
+  if (validateAgainstSchema && accept && !accept.some(a => a.type === "zip")) {
+    accept?.unshift({
+      type: "zip",
+      description: "Any of the following types, just compressed"
+    });
+  }
   const [loading, setLoading] = useState(false);
   const filesToClean = useRef([]);
 
@@ -166,30 +233,52 @@ function Uploader({
             if (!newEntities) {
               return;
             } else {
-              const newFileName = `manual_data_entry.csv`;
-              const newFile = new File(
-                [papaparse.unparse(newEntities)],
-                newFileName
-              );
+              //check existing files to make sure the new file name gets incremented if necessary
+              // fileList
+
+              const newFileName = getNewName(fileList, `manual_data_entry.csv`);
+              const newFile = getNewCsvFile(newEntities, newFileName);
+              const finishUp = file => {
+                const cleanedFileList = [file, ...fileListToUse].slice(
+                  0,
+                  fileLimit ? fileLimit : undefined
+                );
+                handleSecondHalfOfUpload({
+                  acceptedFiles: cleanedFileList,
+                  cleanedFileList
+                });
+              };
               const file = {
                 ...newFile,
+                parsedData: newEntities,
+                meta: {
+                  fields: validateAgainstSchema.fields.map(({ path }) => path)
+                },
                 name: newFileName,
                 originFileObj: newFile,
                 originalFileObj: newFile,
                 id: nanoid()
               };
-
-              const cleanedFileList = [file, ...fileListToUse].slice(
-                0,
-                fileLimit ? fileLimit : undefined
-              );
-              handleSecondHalfOfUpload({
-                acceptedFiles: cleanedFileList,
-                cleanedFileList
+              file.onEditClick = onEditClick({
+                file,
+                validateAgainstSchema,
+                showSimpleInsertDataDialog,
+                newFileName,
+                finishUp
               });
+
+              finishUp(file);
+
               window.toastr.success(`File Added`);
             }
           };
+
+          const nameToUse =
+            startCase(
+              removeExt(
+                validateAgainstSchema.fileName || validateAgainstSchema.name
+              )
+            ) || "Example";
 
           const handleDownloadXlsxFile = async () => {
             const dataDictionarySchema = [
@@ -212,7 +301,7 @@ function Uploader({
                 column: `Notes`
               },
               {
-                value: f => f.example || f.defaultValue,
+                value: f => f.example || f.defaultValue || "",
                 column: `Example Data`
               }
             ];
@@ -228,8 +317,6 @@ function Uploader({
                 }
               };
             });
-            const nameToUse =
-              startCase(validateAgainstSchema.name) || "Example";
             const b = await writeXlsxFile(
               [[mainExampleData], a.validateAgainstSchema.fields, helperText],
               {
@@ -246,10 +333,25 @@ function Uploader({
           // handleDownloadXlsxFile()
           a.exampleFiles = [
             // ...(a.exampleFile ? [a.exampleFile] : []),
-            // {
-            //   description: "Download Example CSV File",
-            //   exampleFile: () => {}
-            // },
+            {
+              description: "Download Example CSV File",
+              exampleFile: () => {
+                const rows = [];
+                rows.push(
+                  a.validateAgainstSchema.fields.map(f => {
+                    return `${f.displayName || f.path}`;
+                  })
+                );
+                rows.push(
+                  a.validateAgainstSchema.fields.map(f => {
+                    return `${f.example || f.defaultValue || ""}`;
+                  })
+                );
+                const csv = unparse(rows);
+
+                downloadjs(csv, `${nameToUse}.csv`, "csv");
+              }
+            },
             {
               description: "Download Example XLSX File",
               exampleFile: handleDownloadXlsxFile
@@ -490,7 +592,21 @@ function Uploader({
               : undefined
           }
           {...{
-            onDrop: async (acceptedFiles, rejectedFiles) => {
+            onDrop: async (_acceptedFiles, rejectedFiles) => {
+              let acceptedFiles = [];
+              for (const file of _acceptedFiles) {
+                if (validateAgainstSchema && isZipFile(file)) {
+                  const files = await filterFilesInZip(
+                    file,
+                    simpleAccept
+                      ?.split(", ")
+                      ?.map(a => (a.startsWith(".") ? a : "." + a)) || []
+                  );
+                  acceptedFiles.push(...files.map(f => f.originFileObj));
+                } else {
+                  acceptedFiles.push(file);
+                }
+              }
               cleanupFiles();
               if (rejectedFiles.length) {
                 let msg = "";
@@ -538,56 +654,99 @@ function Uploader({
                   })
                 );
               }
-
+              const cleanedAccepted = acceptedFiles.map(file => {
+                return {
+                  originFileObj: file,
+                  originalFileObj: file,
+                  id: file.id,
+                  lastModified: file.lastModified,
+                  lastModifiedDate: file.lastModifiedDate,
+                  loading: file.loading,
+                  name: file.name,
+                  preview: file.preview,
+                  size: file.size,
+                  type: file.type,
+                  ...(file.parsedString
+                    ? { parsedString: file.parsedString }
+                    : {})
+                };
+              });
               const cleanedFileList = [
-                ...acceptedFiles.map(file => {
-                  return {
-                    originFileObj: file,
-                    originalFileObj: file,
-                    id: file.id,
-                    lastModified: file.lastModified,
-                    lastModifiedDate: file.lastModifiedDate,
-                    loading: file.loading,
-                    name: file.name,
-                    preview: file.preview,
-                    size: file.size,
-                    type: file.type,
-                    ...(file.parsedString
-                      ? { parsedString: file.parsedString }
-                      : {})
-                  };
-                }),
+                ...cleanedAccepted,
                 ...fileListToUse
               ].slice(0, fileLimit ? fileLimit : undefined);
 
               if (validateAgainstSchema) {
                 const filesWIssues = [];
-                for (const file of cleanedFileList) {
+                const filesWOIssues = [];
+                for (const [i, file] of cleanedAccepted.entries()) {
                   if (isCsvOrExcelFile(file)) {
                     const parsedF = await parseCsvOrExcelFile(file);
                     const {
-                      csvValidationIssue,
-                      initialMatchedHeaders,
+                      csvValidationIssue: _csvValidationIssue,
+                      matchedHeaders,
                       userSchema,
                       searchResults
-                    } = tryToMatchSchemas({
+                    } = await tryToMatchSchemas({
                       incomingData: parsedF.data,
                       validateAgainstSchema
                     });
+                    let csvValidationIssue = _csvValidationIssue;
                     if (csvValidationIssue) {
+                      if (isObject(csvValidationIssue)) {
+                        initializeForm(
+                          `editableCellTable${
+                            cleanedAccepted.length > 1 ? `-${i}` : ""
+                          }`,
+                          {
+                            reduxFormCellValidation: csvValidationIssue
+                          },
+                          {
+                            keepDirty: true,
+                            keepValues: true,
+                            updateUnregisteredFields: true
+                          }
+                        );
+                        const err = Object.values(csvValidationIssue)[0];
+                        csvValidationIssue = `It looks like there was an error with your data - ${
+                          err && err.message ? err.message : err
+                        }`; //pass just the first error as a string
+                      }
                       filesWIssues.push({
                         file,
                         csvValidationIssue,
-                        initialMatchedHeaders,
+                        matchedHeaders,
                         userSchema,
                         searchResults
                       });
                     } else {
-                      const newFile = new File(
-                        [papaparse.unparse(userSchema.userData)],
-                        file.name
-                      );
+                      filesWOIssues.push({
+                        file,
+                        csvValidationIssue,
+                        matchedHeaders,
+                        userSchema,
+                        searchResults
+                      });
                       const newFileName = removeExt(file.name) + `.csv`;
+                      const newFile = getNewCsvFile(
+                        userSchema.userData,
+                        newFileName
+                      );
+
+                      file.meta = parsedF.meta;
+                      file.onEditClick = onEditClick({
+                        file,
+                        validateAgainstSchema,
+                        showSimpleInsertDataDialog,
+                        newFileName,
+                        finishUp: () => {
+                          handleSecondHalfOfUpload({
+                            acceptedFiles,
+                            cleanedFileList
+                          });
+                        }
+                      });
+                      file.parsedData = userSchema.userData;
                       file.name = newFileName;
                       file.originFileObj = newFile;
                       file.originalFileObj = newFile;
@@ -595,44 +754,66 @@ function Uploader({
                   }
                 }
                 if (filesWIssues.length) {
-                  const {
-                    file,
-                    name,
-                    csvValidationIssue,
-                    ...rest
-                  } = filesWIssues[0];
-
-                  //just handle the 1st file for now
-                  const { newEntities } = await showUploadCsvWizardDialog(
+                  const { file } = filesWIssues[0];
+                  const allFiles = [...filesWIssues, ...filesWOIssues];
+                  const doAllFilesHaveSameHeaders = allFiles.every(f => {
+                    if (f.userSchema.fields && f.userSchema.fields.length) {
+                      return f.userSchema.fields.every((h, i) => {
+                        return h.path === allFiles[0].userSchema.fields[i].path;
+                      });
+                    }
+                    return false;
+                  });
+                  const multipleFiles = allFiles.length > 1;
+                  const { res } = await showUploadCsvWizardDialog(
                     "onUploadWizardFinish",
                     {
-                      ...rest,
                       dialogProps: {
-                        title: `Fix Up File ${
-                          file.name ? `"${file.name}"` : ""
+                        title: `Fix Up File${multipleFiles ? "s" : ""} ${
+                          multipleFiles ? "" : file.name ? `"${file.name}"` : ""
                         }`
                       },
-                      csvValidationIssue,
+                      doAllFilesHaveSameHeaders,
+                      filesWIssues: allFiles,
                       validateAgainstSchema
                     }
                   );
 
-                  if (!newEntities) {
+                  if (!res) {
                     window.toastr.warning(`File Upload Aborted`);
                     return;
                   } else {
-                    const newFileName = removeExt(file.name) + `_updated.csv`;
-                    //swap out file with a new csv file
-                    const newFile = new File(
-                      [papaparse.unparse(newEntities)],
-                      newFileName
-                    );
+                    allFiles.forEach(({ file }, i) => {
+                      const newEntities = res[i];
+                      // const newFileName = removeExt(file.name) + `_updated.csv`;
+                      //swap out file with a new csv file
+                      const newFile = getNewCsvFile(newEntities, file.name);
 
-                    file.name = newFileName;
-                    file.originFileObj = newFile;
-                    file.originalFileObj = newFile;
-
-                    window.toastr.success(`Added Fixed Up File ${newFileName}`);
+                      file.onEditClick = onEditClick({
+                        file,
+                        validateAgainstSchema,
+                        showSimpleInsertDataDialog,
+                        newFileName: file.name,
+                        finishUp: () => {
+                          handleSecondHalfOfUpload({
+                            acceptedFiles,
+                            cleanedFileList
+                          });
+                        }
+                      });
+                      file.parsedData = newEntities;
+                      // file.name = newFileName;
+                      file.originFileObj = newFile;
+                      file.originalFileObj = newFile;
+                    });
+                    setTimeout(() => {
+                      //inside a timeout for cypress purposes
+                      window.toastr.success(
+                        `Added Fixed Up File${
+                          allFiles.length > 1 ? "s" : ""
+                        } ${allFiles.map(({ file }) => file.name).join(", ")}`
+                      );
+                    }, 200);
                   }
                 }
               }
@@ -708,12 +889,14 @@ function Uploader({
 
         {fileList && showUploadList && !minimal && !!fileList.length && (
           <div
-            className={
+            className={classNames(
+              "tg-upload-file-list-holder",
               overflowList ? "tg-upload-file-list-item-overflow" : null
-            }
+            )}
           >
             {fileList.map((file, index) => {
               const {
+                onEditClick,
                 loading,
                 error,
                 name,
@@ -722,15 +905,15 @@ function Uploader({
                 downloadName
               } = file;
               let icon;
-              let isPreviewable = false;
               if (loading) {
                 icon = "repeat";
               } else if (error) {
                 icon = "error";
               } else {
                 if (onPreviewClick) {
-                  isPreviewable = true;
                   icon = "eye-open";
+                } else if (onEditClick) {
+                  icon = "edit";
                 } else {
                   icon = "saved";
                 }
@@ -741,42 +924,62 @@ function Uploader({
                   className="tg-upload-file-list-item"
                   style={{ display: "flex", width: "100%" }}
                 >
-                  <div style={{ display: "flex", width: "100%" }}>
-                    <Icon
-                      className={classnames({
-                        "tg-spin": loading,
-                        "tg-upload-file-list-item-preview": isPreviewable
-                      })}
-                      style={{ marginRight: 5 }}
-                      icon={icon}
-                      onClick={() => {
-                        if (isPreviewable) {
-                          onPreviewClick(file, index, fileList);
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      width: "100%"
+                    }}
+                  >
+                    <span style={{ display: "flex" }}>
+                      <Icon
+                        className={classnames({
+                          "tg-spin": loading,
+                          "tg-upload-file-list-item-preview": onPreviewClick,
+                          "tg-upload-file-list-item-edit": onEditClick,
+                          clickableIcon: onPreviewClick || onEditClick
+                        })}
+                        data-tip={
+                          onEditClick
+                            ? "Edit"
+                            : onPreviewClick
+                            ? "Preview"
+                            : undefined
                         }
-                      }}
-                    />
-                    <a
-                      name={name || originalName}
-                      {...(url && !onFileClick
-                        ? { download: true, href: url }
-                        : {})}
-                      /* eslint-disable react/jsx-no-bind*/
-                      onClick={() => {
-                        if (onFileClick) {
-                          onFileClick(file);
-                        } else {
-                          //handle default download
-                          if (file.originFileObj) {
-                            downloadjs(file.originFileObj, file.name);
+                        style={{ marginRight: 5 }}
+                        icon={icon}
+                        onClick={() => {
+                          if (onEditClick) {
+                            onEditClick(file, index, fileList);
                           }
-                        }
-                      }}
-                      /* eslint-enable react/jsx-no-bind*/
-                      {...(downloadName ? { download: downloadName } : {})}
-                    >
-                      {" "}
-                      {name || originalName}{" "}
-                    </a>
+                          if (onPreviewClick) {
+                            onPreviewClick(file, index, fileList);
+                          }
+                        }}
+                      />
+                      <a
+                        name={name || originalName}
+                        {...(url && !onFileClick
+                          ? { download: true, href: url }
+                          : {})}
+                        /* eslint-disable react/jsx-no-bind*/
+                        onClick={() => {
+                          if (onFileClick) {
+                            onFileClick(file);
+                          } else {
+                            //handle default download
+                            if (file.originFileObj) {
+                              downloadjs(file.originFileObj, file.name);
+                            }
+                          }
+                        }}
+                        /* eslint-enable react/jsx-no-bind*/
+                        {...(downloadName ? { download: downloadName } : {})}
+                      >
+                        {" "}
+                        {name || originalName}{" "}
+                      </a>
+                    </span>
                     {!loading && (
                       <Icon
                         onClick={() => {
@@ -789,7 +992,7 @@ function Uploader({
                         }}
                         iconSize={16}
                         icon="cross"
-                        className="tg-upload-file-list-item-close"
+                        className="tg-upload-file-list-item-close clickableIcon"
                       />
                     )}
                   </div>
@@ -815,7 +1018,7 @@ function Uploader({
   );
 }
 
-export default Uploader;
+export default connect(undefined, { initializeForm: initialize })(Uploader);
 
 function getFileDownloadAttr(exampleFile) {
   const baseUrl = window?.frontEndConfig?.serverBasePath || "";
@@ -831,4 +1034,14 @@ function getFileDownloadAttr(exampleFile) {
             ? urljoin(baseUrl, "exampleFiles", exampleFile)
             : exampleFile
       };
+}
+
+function getNewCsvFile(ents, fileName) {
+  return new File([papaparse.unparse(stripId(ents))], fileName);
+}
+function stripId(ents = []) {
+  return ents.map(ent => {
+    const { id, ...rest } = ent;
+    return rest;
+  });
 }
