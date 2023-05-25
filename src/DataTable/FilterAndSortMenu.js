@@ -60,9 +60,9 @@ export default class FilterAndSortMenu extends React.Component {
       ccSelectedFilter === "inList" ||
       ccSelectedFilter === "notInList"
     ) {
-      filterValToUse = filterValue
-        .filter(v => v.value !== "")
-        .map(val => val.value || val);
+      filterValToUse =
+        filterValue &&
+        filterValue.filter(v => v.value !== "").map(val => val.value || val);
     }
     const { filterOn, addFilters, removeSingleFilter } = this.props;
     if (isInvalidFilterValue(filterValToUse)) {
