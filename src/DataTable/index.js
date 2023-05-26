@@ -2780,13 +2780,12 @@ class DataTable extends React.Component {
       change("reduxFormSelectedCells", newReduxFormSelectedCells);
     });
   };
-  getCopyTextForCell = (val, row, column) => {
+  getCopyTextForCell = (val, row = {}, column = {}) => {
     const { cellRenderer } = computePresets(this.props);
     // TODOCOPY we need a way to potentially omit certain columns from being added as a \t element (talk to taoh about this)
     let text = typeof val !== "string" ? row.value : val;
 
     const record = row.original;
-
     if (column.getClipboardData) {
       text = column.getClipboardData(row.value, record, row, this.props);
     } else if (column.getValueToFilterOn) {
@@ -2801,7 +2800,7 @@ class DataTable extends React.Component {
         this.props
       );
     } else if (text) {
-      text = String(text);
+      text = React.isValidElement(text) ? text : String(text);
     }
     const getTextFromElementOrLink = text => {
       if (React.isValidElement(text)) {
@@ -3188,6 +3187,9 @@ class DataTable extends React.Component {
         ></Checkbox>
       );
     }
+
+    const columnTitleTextified = getTextFromEl(columnTitle);
+
     return (
       <div
         {...(description && {
@@ -3195,17 +3197,17 @@ class DataTable extends React.Component {
             <strong>${columnTitle}:</strong> <br>
             ${description} ${isUnique ? "<br>Must be unique" : ""}</div>`
         })}
-        data-test={displayName || startCase(camelCase(path))}
-        data-copy-text={displayName || startCase(camelCase(path))}
+        data-test={columnTitleTextified}
+        data-copy-text={columnTitleTextified}
         className={classNames("tg-react-table-column-header", {
           "sort-active": sortUp || sortDown
         })}
       >
-        {(displayName || startCase(camelCase(path))) && !noTitle && (
+        {columnTitleTextified && !noTitle && (
           <React.Fragment>
             {maybeCheckbox}
             <span
-              title={columnTitle}
+              title={columnTitleTextified}
               className={classNames({
                 "tg-react-table-name": true,
                 "no-data-tip": !!description

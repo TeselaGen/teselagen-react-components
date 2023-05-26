@@ -51,6 +51,7 @@ export { default as tg_modalState } from "./enhancers/withDialog/tg_modalState";
 export { default as Timeline, TimelineEvent } from "./Timeline";
 export * from "./FormComponents";
 export * from "./utils/parserUtils";
+export * from "./useDialog";
 
 export * from "./toastr";
 export * from "./utils/handlerHelpers";
