@@ -8,17 +8,18 @@ import {
   MenuDivider,
   InputGroup,
   Classes,
-  NumericInput
+  NumericInput,
+  MenuItem
 } from "@blueprintjs/core";
 import dayjs from "dayjs";
 
 import getDayjsFormatter from "../utils/getDayjsFormatter";
 import { onEnterHelper } from "../utils/handlerHelpers";
 import DialogFooter from "../DialogFooter";
+import TgSelect from "../TgSelect";
 import "@teselagen/react-table/react-table.css";
 import "./style.css";
 import "../toastr";
-import TgSelect from "../TgSelect";
 
 const isInvalidFilterValue = value => {
   if (Array.isArray(value) && value.length) {
@@ -26,6 +27,21 @@ const isInvalidFilterValue = value => {
   }
   return value === "" || value === undefined || value.length === 0;
 };
+
+const cleanNumber = val => {
+  if (Array.isArray(val)) {
+    return val.map(v => cleanNumber(v));
+  }
+
+  const newValue = Number(
+    val
+      .toString()
+      .match(/(\d*(?:,\d{3})*(?:\.\d+)?|\d+(?:\.\d+)?)/g)[0]
+      .replace(",", "")
+  );
+  if (newValue !== 0) return newValue;
+};
+
 export default class FilterAndSortMenu extends React.Component {
   constructor(props) {
     super(props);
@@ -44,7 +60,7 @@ export default class FilterAndSortMenu extends React.Component {
   };
   handleFilterSubmit = () => {
     const { filterValue, selectedFilter } = this.state;
-    const { togglePopover } = this.props;
+    const { togglePopover, dataType } = this.props;
     const ccSelectedFilter = camelCase(selectedFilter);
     let filterValToUse = filterValue;
     if (ccSelectedFilter === "true" || ccSelectedFilter === "false") {
@@ -56,13 +72,13 @@ export default class FilterAndSortMenu extends React.Component {
     } else if (ccSelectedFilter === "isEmpty") {
       // manually set filter value (nothing is selected by user)
       filterValToUse = false;
-    } else if (
-      ccSelectedFilter === "inList" ||
-      ccSelectedFilter === "notInList"
-    ) {
-      filterValToUse =
-        filterValue &&
-        filterValue.filter(v => v.value !== "").map(val => val.value || val);
+    } else if (dataType === "integer") {
+      filterValToUse = filterValue
+        .toString()
+        .match(/\d*(?:,\d{3})*/g)[0]
+        .replace(",", "");
+    } else if (dataType === "number") {
+      filterValToUse = cleanNumber(filterValue);
     }
     const { filterOn, addFilters, removeSingleFilter } = this.props;
     if (isInvalidFilterValue(filterValToUse)) {
@@ -178,36 +194,16 @@ const dateMinMaxHelpers = {
     .add(25, "years")
     .toDate()
 };
-
+const renderCreateNewOption = (query, active, handleClick) => (
+  <MenuItem
+    icon="add"
+    text={query}
+    active={active}
+    onClick={handleClick}
+    shouldDismissPopover={false}
+  />
+);
 class FilterInput extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedOptions: Array.isArray(props.filterValue)
-        ? props.filterValue.map(val => ({
-            userCreated: true,
-            label: val,
-            value: val
-          }))
-        : []
-    };
-    this.handleChange = this.handleChange.bind(this);
-  }
-
-  handleChange(selectedOptions) {
-    const { handleFilterSubmit, handleFilterValueChange } = this.props;
-    const isStateEmpty = !this.state.selectedOptions.length;
-    const isLocalEmpty = selectedOptions.some(op => op.value.trim() === "");
-
-    if (isStateEmpty && isLocalEmpty) return;
-    if (!isStateEmpty && isLocalEmpty) handleFilterSubmit();
-    if (!isLocalEmpty) {
-      selectedOptions = selectedOptions.filter(op => op.value.trim() !== "");
-      this.setState({ selectedOptions });
-      handleFilterValueChange(selectedOptions);
-    }
-  }
-
   render() {
     const {
       handleFilterValueChange,
@@ -216,7 +212,6 @@ class FilterInput extends React.Component {
       filterSubType,
       filterType
     } = this.props;
-    const { selectedOptions } = this.state;
     //Options: Text, Single number (before, after, equals), 2 numbers (range),
     //Single Date (before, after, on), 2 dates (range)
     let inputGroup = <div />;
@@ -243,10 +238,26 @@ class FilterInput extends React.Component {
         inputGroup = (
           <div className="custom-menu-item">
             <TgSelect
+              placeholder="Add item"
+              renderCreateNewOption={renderCreateNewOption}
+              noResults={null}
               multi={true}
               creatable={true}
-              value={selectedOptions}
-              onChange={this.handleChange}
+              value={
+                Array.isArray(filterValue)
+                  ? filterValue.map(val => ({
+                      label: val,
+                      value: val
+                    }))
+                  : []
+              }
+              onChange={selectedOptions => {
+                selectedOptions.some(opt => opt.value === "")
+                  ? handleFilterSubmit()
+                  : handleFilterValueChange(
+                      selectedOptions.map(opt => opt.value)
+                    );
+              }}
               options={[]}
             />
           </div>

@@ -538,7 +538,7 @@ function parseFilters(newParams) {
         const [filterOn, selectedFilter, filterValue] = splitFilter;
         const parseFilterValue = filterValue => {
           if (selectedFilter === "inList" || selectedFilter === "notInList") {
-            return filterValue.match(/(\d+\.\d+)/g) || filterValue.split(";");
+            return filterValue.split(";");
           }
           if (
             selectedFilter === "inRange" ||

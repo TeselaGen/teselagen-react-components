@@ -223,7 +223,7 @@ class TgSelect extends React.Component {
       autoFocus,
       autoOpen,
       noResultsText,
-      noResults = noResultsDefault,
+      noResults: _noResults,
       inputProps,
       placeholder,
       isLoading,
@@ -233,9 +233,13 @@ class TgSelect extends React.Component {
       popoverProps,
       additionalRightEl,
       resetOnSelect = true,
+      renderCreateNewOption: _renderCreateNewOption = renderCreateNewOption,
       ...rest
     } = this.props;
+    let noResults = _noResults;
 
+    // Null is also a valid value for a React Component, noResultsDefault should only be appplied when noResults is undefined
+    if (noResults === undefined) noResults = noResultsDefault;
     const hasValue = Array.isArray(value)
       ? value.length > 0
       : !!value || value === 0;
@@ -253,26 +257,28 @@ class TgSelect extends React.Component {
             onClick={this.handleClear}
           />
         )}
-        <Button
-          onClick={e => {
-            if (this.state.isOpen) {
-              e.stopPropagation();
+        {_noResults === undefined && (
+          <Button
+            onClick={e => {
+              if (this.state.isOpen) {
+                e.stopPropagation();
 
-              this.setState({ isOpen: false });
-            }
-          }}
-          disabled={disabled}
-          className="tg-select-toggle"
-          minimal
-          icon={this.state.isOpen ? "caret-up" : "caret-down"}
-        />
+                this.setState({ isOpen: false });
+              }
+            }}
+            disabled={disabled}
+            className="tg-select-toggle"
+            minimal
+            icon={this.state.isOpen ? "caret-up" : "caret-down"}
+          />
+        )}
       </span>
     );
 
     const maybeCreateNewItemFromQuery = creatable ? createNewOption : undefined;
     const maybeCreateNewItemRenderer =
       creatable && !this.queryHasExactOptionMatch()
-        ? renderCreateNewOption
+        ? _renderCreateNewOption
         : null;
     const selectedItems = getValueArray(value).map(value => {
       if (value && value.label) return value; //if the value has a label, just use that
