@@ -28,20 +28,6 @@ const isInvalidFilterValue = value => {
   return value === "" || value === undefined || value.length === 0;
 };
 
-const cleanNumber = val => {
-  if (Array.isArray(val)) {
-    return val.map(v => cleanNumber(v));
-  }
-
-  const newValue = Number(
-    val
-      .toString()
-      .match(/(\d*(?:,\d{3})*(?:\.\d+)?|\d+(?:\.\d+)?)/g)[0]
-      .replace(",", "")
-  );
-  if (newValue !== 0) return newValue;
-};
-
 export default class FilterAndSortMenu extends React.Component {
   constructor(props) {
     super(props);
@@ -72,14 +58,21 @@ export default class FilterAndSortMenu extends React.Component {
     } else if (ccSelectedFilter === "isEmpty") {
       // manually set filter value (nothing is selected by user)
       filterValToUse = false;
-    } else if (dataType === "integer") {
-      filterValToUse = filterValue
-        .toString()
-        .match(/\d*(?:,\d{3})*/g)[0]
-        .replace(",", "");
-    } else if (dataType === "number") {
-      filterValToUse = cleanNumber(filterValue);
+    } else if (
+      ccSelectedFilter === "inList" ||
+      ccSelectedFilter === "notInList"
+    ) {
+      if (dataType === "number") {
+        filterValToUse =
+          Array.isArray(filterValue) &&
+          filterValue.map(val =>
+            val.includes(",")
+              ? parseFloat(val.replaceAll(",", "")) || ""
+              : parseFloat(val)
+          );
+      }
     }
+
     const { filterOn, addFilters, removeSingleFilter } = this.props;
     if (isInvalidFilterValue(filterValToUse)) {
       togglePopover();
