@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { reduxForm, change, formValueSelector, destroy } from "redux-form";
 import { Callout, Icon, Intent, Tab, Tabs } from "@blueprintjs/core";
 import immer from "immer";
+import { observer } from "mobx-react";
 
 import "./UploadCsvWizard.css";
 
@@ -68,7 +69,8 @@ const UploadCsvWizardDialog = compose(
       }
     },
     { changeForm: change, destroyForms: destroy }
-  )
+  ),
+  observer
 )(function UploadCsvWizardDialogOuter({
   validateAgainstSchema,
   reduxFormEntitiesArray,
@@ -486,17 +488,18 @@ const UploadCsvWizardDialogInner = compose(
 export default UploadCsvWizardDialog;
 
 const exampleData = { userData: times(5).map(() => ({ _isClean: true })) };
-export const PreviewCsvData = function({
-  matchedHeaders,
-  isEditingExistingFile,
-  showDoesDataLookCorrectMsg,
-  headerMessage,
-  datatableFormName,
-  // onlyShowRowsWErrors,
-  validateAgainstSchema,
-  userSchema = exampleData,
-  initialEntities
-}) {
+export const PreviewCsvData = observer(function(props) {
+  const {
+    matchedHeaders,
+    isEditingExistingFile,
+    showDoesDataLookCorrectMsg,
+    headerMessage,
+    datatableFormName,
+    // onlyShowRowsWErrors,
+    validateAgainstSchema,
+    userSchema = exampleData,
+    initialEntities
+  } = props;
   const useExampleData = userSchema === exampleData;
   // const [loading, setLoading] = useState(true);
   // useEffect(() => {
@@ -506,7 +509,7 @@ export const PreviewCsvData = function({
   //   }, 400);
   // }, []);
 
-  // const forceUpdate = useForceUpdate();
+  // const [val, forceUpdate] = useForceUpdate();
 
   const data =
     userSchema.userData &&
@@ -548,7 +551,6 @@ export const PreviewCsvData = function({
       }
       return toRet;
     });
-
   return (
     <div style={{ minWidth: 400 }}>
       <Callout style={{ marginBottom: 5 }} intent="primary">
@@ -569,40 +571,17 @@ export const PreviewCsvData = function({
           alignItems: "flex-start"
         }}
       >
-        {/* {validateAgainstSchema.allowAdditionalOnEnd && (
-          <Button
-            icon="plus"
-            onClick={() => {
-              const path = prompt(
-                `Enter the name of the column you would like to add. ${validateAgainstSchema.allowAdditionalOnEndDescription ||
-                  ""}`
-              );
-              if (path) {
-                validateAgainstSchema.fields.push({
-                  description: "",
-                  path: `${
-                    isString(validateAgainstSchema.allowAdditionalOnEnd)
-                      ? validateAgainstSchema.allowAdditionalOnEnd
-                      : ""
-                  }${path}`,
-                  displayName: `${
-                    isString(validateAgainstSchema.allowAdditionalOnEnd)
-                      ? validateAgainstSchema.allowAdditionalOnEnd
-                      : ""
-                  }${path}`,
-                  type: "string"
-                });
-                forceUpdate();
-              }
-            }}
-          >
-            Add Column
-          </Button>
-        )} */}
+        {validateAgainstSchema.HeaderComp && (
+          <validateAgainstSchema.HeaderComp
+            {...props}
+            // {...{ forceUpdate }}
+          ></validateAgainstSchema.HeaderComp>
+        )}
       </div>
       <DataTable
         maxWidth={800}
         maxHeight={500}
+        // val={val}
         destroyOnUnmount={false}
         doNotValidateUntouchedRows
         formName={datatableFormName || "editableCellTable"}
@@ -614,7 +593,7 @@ export const PreviewCsvData = function({
       ></DataTable>
     </div>
   );
-};
+});
 
 export const SimpleInsertDataDialog = compose(
   wrapDialog({
@@ -628,7 +607,8 @@ export const SimpleInsertDataDialog = compose(
     "reduxFormEntities",
     "reduxFormCellValidation"
   ),
-  connect(undefined, { changeForm: change })
+  connect(undefined, { changeForm: change }),
+  observer
 )(function SimpleInsertDataDialog({
   onSimpleInsertDialogFinish,
   reduxFormEntities,
@@ -753,8 +733,8 @@ function maybeStripIdFromEntities(ents, validateAgainstSchema) {
 
 //create your forceUpdate hook
 // function useForceUpdate() {
-//   const [, setValue] = useState(0); // integer state
-//   return () => setValue(value => value + 1); // update state to force render
+//   const [val, setValue] = useState(0); // integer state
+//   return [val, () => setValue(value => value + 1)]; // update state to force render
 //   // A function that increment 👆🏻 the previous state like here
 //   // is better than directly setting `setValue(value + 1)`
 // }

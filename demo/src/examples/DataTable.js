@@ -39,7 +39,9 @@ const schema = {
         return <Checkbox />;
       }
     },
-    { path: "isShared", type: "boolean", displayName: "Is Shared?" },
+    { path: "isShared", type: "boolean", displayName: <div>
+      <Icon icon="hand"></Icon> Is Shared?
+    </div> },
     {
       path: "name",
       type: "string",

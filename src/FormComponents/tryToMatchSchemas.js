@@ -5,6 +5,7 @@ import { max } from "lodash";
 import { editCellHelper } from "../DataTable";
 import { validateTableWideErrors } from "../DataTable/validateTableWideErrors";
 import { isEmpty } from "lodash";
+import getTextFromEl from "../utils/getTextFromEl";
 
 const getSchema = data => ({
   fields: map(data[0], (val, path) => {
@@ -94,7 +95,9 @@ async function matchSchemas({ userSchema, officialSchema }) {
       const displayNameMatch =
         h.displayName &&
         uh.path.toLowerCase().replace(/ /g, "") ===
-          h.displayName.toLowerCase().replace(/ /g, "");
+          getTextFromEl(h.displayName)
+            .toLowerCase()
+            .replace(/ /g, "");
       if (pathMatch || displayNameMatch) {
         result = result.filter(({ path }) => path === uh.path);
         //add a fake perfect match result to make sure we get the match
@@ -115,29 +118,8 @@ async function matchSchemas({ userSchema, officialSchema }) {
       csvValidationIssue =
         "It looks like some of the headers in your uploaded file(s) do not match the expected headers. Please look over and correct any issues with the mappings below.";
   });
-  if (officialSchema.allowAdditionalOnEnd) {
-    officialSchema.fields = officialSchema.fields.filter(
-      f => !f.isAdditionalOnEnd
-    );
-    userSchema.fields.forEach(f => {
-      if (f.path.startsWith(officialSchema.allowAdditionalOnEnd)) {
-        officialSchema.fields.push({
-          isAdditionalOnEnd: true,
-          path: f.path,
-          type: f.type || "string",
-          matches: [
-            {
-              item: {
-                path: f.path,
-                type: f.type
-              },
-              refIndex: f.refIndex,
-              score: 0
-            }
-          ]
-        });
-      }
-    });
+  if (officialSchema.coerceUserSchema) {
+    officialSchema.coerceUserSchema({ userSchema, officialSchema });
   }
 
   const editableFields = officialSchema.fields.filter(f => !f.isNotEditable);

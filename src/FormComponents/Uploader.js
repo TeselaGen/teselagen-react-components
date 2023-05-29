@@ -19,6 +19,9 @@ import papaparse, { unparse } from "papaparse";
 
 import downloadjs from "downloadjs";
 
+import { configure, makeObservable, observable } from "mobx";
+import { observer } from "mobx-react";
+
 import UploadCsvWizardDialog, {
   SimpleInsertDataDialog
 } from "../UploadCsvWizard";
@@ -31,7 +34,7 @@ import {
   removeExt
 } from "../utils/parserUtils";
 import tryToMatchSchemas from "./tryToMatchSchemas";
-import { isArray, isFunction, isPlainObject } from "lodash";
+import { forEach, isArray, isFunction, isPlainObject } from "lodash";
 import { flatMap } from "lodash";
 import urljoin from "url-join";
 import popoverOverflowModifiers from "../utils/popoverOverflowModifiers";
@@ -42,7 +45,9 @@ import { isObject } from "lodash";
 import { connect } from "react-redux";
 import { initialize } from "redux-form";
 import classNames from "classnames";
+import { compose } from "recompose";
 
+configure({ isolateGlobalState: true });
 const helperText = [
   `How to Use This Template to Upload New Data`,
   `1. Go to the first tab and delete the example data.`,
@@ -51,20 +56,6 @@ const helperText = [
   `4. Return to the interface from which you dowloaded this template.`,
   `5. Upload the completed file.`
 ];
-// const objects = [
-//   {
-//     name: 'John Smith',
-//     age: 1800,
-//     dateOfBirth: new Date(),
-//     graduated: true
-//   },
-//   {
-//     name: 'Alice Brown',
-//     age: 2600.50,
-//     dateOfBirth: new Date(),
-//     graduated: false
-//   }
-// ]
 
 const helperSchema = [
   {
@@ -75,20 +66,50 @@ const helperSchema = [
   }
 ];
 
-// const a = async () => {
-//   console.log(`writin`);
-//   const b = await writeXlsxFile([helperText, helperText,helperText], {
+// class SchemaStore {
+//   validateAgainstSchema = {};
 
-//     helperSchema: [helperSchema,helperSchema,helperSchema],
-//     sheets: ["Sheet 1", "Data Dictionary", "Help Notes"],
-//     filePath: "file.xlsx"
-//   });
-//   downloadjs(b, "file.xlsx", "xlsx");
-//   console.log(`b:`, b);
-// };
-// setTimeout(() => {
-//   a();
-// }, 0);
+//   constructor() {
+//     makeObservable(this, {
+//       validateAgainstSchema: observable.shallow
+//     });
+//   }
+
+//   setValidateAgainstSchema(newValidateAgainstSchema) {
+//     this.validateAgainstSchema = new newValidateAgainstSchema();
+//   }
+// }
+class ValidateAgainstSchema {
+  fields = [];
+
+  constructor() {
+    makeObservable(this, {
+      fields: observable.shallow
+    });
+  }
+
+  setValidateAgainstSchema(newValidateAgainstSchema) {
+    forEach(newValidateAgainstSchema, (v, k) => {
+      this[k] = v;
+    });
+  }
+}
+
+const validateAgainstSchemaStore = new ValidateAgainstSchema();
+// autorun(() => {
+//   console.log(
+//     `validateAgainstSchemaStore?.fields:`,
+//     JSON.stringify(validateAgainstSchemaStore?.fields, null, 4)
+//   );
+// });
+// validateAgainstSchemaStore.fields = ["hahah"];
+// validateAgainstSchemaStore.fields.push("yaa");
+
+// const validateAgainstSchema = observable.shallow({
+//   fields: []
+// })
+
+// validateAgainstSchema.fields = ["hahah"];
 
 const onEditClick = ({
   file,
@@ -171,7 +192,22 @@ function Uploader({
   onPreviewClick,
   axiosInstance = window.api || axios
 }) {
-  let validateAgainstSchema = _validateAgainstSchema;
+  //on component did mount
+  const validateAgainstSchemaToUse =
+    _validateAgainstSchema ||
+    (isArray(_accept) ? _accept : [_accept]).find?.(
+      a => a.validateAgainstSchema
+    ).validateAgainstSchema;
+
+  useEffect(() => {
+    // validateAgainstSchema
+    validateAgainstSchemaStore.setValidateAgainstSchema(
+      validateAgainstSchemaToUse
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const validateAgainstSchema = validateAgainstSchemaStore;
   const accept = !_accept
     ? undefined
     : isPlainObject(_accept)
@@ -179,7 +215,11 @@ function Uploader({
     : isArray(_accept)
     ? _accept
     : _accept.split(",").map(a => ({ type: a }));
-  if (validateAgainstSchema && accept && !accept.some(a => a.type === "zip")) {
+  if (
+    validateAgainstSchemaStore &&
+    accept &&
+    !accept.some(a => a.type === "zip")
+  ) {
     accept?.unshift({
       type: "zip",
       description: "Any of the following types, just compressed"
@@ -221,7 +261,6 @@ function Uploader({
       advancedAccept = accept;
       simpleAccept = flatMap(accept, a => {
         if (a.validateAgainstSchema) {
-          validateAgainstSchema = a.validateAgainstSchema;
           handleManuallyEnterData = async e => {
             e.stopPropagation();
             const { newEntities } = await showSimpleInsertDataDialog(
@@ -1018,7 +1057,10 @@ function Uploader({
   );
 }
 
-export default connect(undefined, { initializeForm: initialize })(Uploader);
+export default compose(
+  connect(undefined, { initializeForm: initialize }),
+  observer
+)(Uploader);
 
 function getFileDownloadAttr(exampleFile) {
   const baseUrl = window?.frontEndConfig?.serverBasePath || "";

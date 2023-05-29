@@ -21,6 +21,9 @@ export const useDialog = ({ ModalComponent, ...rest }) => {
       hideModal={() => {
         setOpen(false);
       }}
+      hideDialog={() => {
+        setOpen(false);
+      }}
       {...rest}
       {...additionalProps}
       dialogProps={{
@@ -38,6 +41,11 @@ export const useDialog = ({ ModalComponent, ...rest }) => {
       //return a promise that can be awaited
       setAdditionalProps({
         hideModal: () => {
+          //override hideModal to resolve also
+          setOpen(false);
+          resolve({});
+        },
+        hideDialog: () => {
           //override hideModal to resolve also
           setOpen(false);
           resolve({});

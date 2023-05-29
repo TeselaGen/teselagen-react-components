@@ -17,13 +17,34 @@ const validateAgainstSchema = ({
   requireExactlyOneOf,
   requireAllOrNone,
   requireAtLeastOneOf,
+  allowExtendedProps,
   enforceNameUnique
 }) => ({
   helpInstructions:
     "This template file is used to add rows to the sequence table.",
-  allowAdditionalOnEnd: "ext-", // allow additional fields that start with "ext-" at the end of the csv
-  allowAdditionalOnEndDescription:
-    "This will add extended properties to the uploaded sequence",
+  coerceUserSchema: ({ userSchema, officialSchema }) => {
+    const field = {
+      addedViaCoerce: true,
+      path: "fakePath",
+      matches: [
+        {
+          item: {
+            path: "fakePath"
+          },
+        }
+      ]
+    };
+    if (!officialSchema.fields.some(f => f.addedViaCoerce)) {
+      //officialSchema doesn't already have a fake path
+      officialSchema.fields.push(field);
+    }
+
+    //in most cases you won't have to do this because userSchema will come in with the data you want to add:
+    if (!userSchema.fields.some(f => f.addedViaCoerce)) { 
+      //userSchema doesn't already have a fake path
+      userSchema.fields.push(field);
+    }
+  },
   ...(asyncNameValidation && {
     tableWideAsyncValidation: async ({ entities }) => {
       await new Promise(resolve => setTimeout(resolve, 400));
@@ -36,9 +57,8 @@ const validateAgainstSchema = ({
       return toRet;
     }
   }),
-  requireAllOrNone: requireAllOrNone && [
-    ["description", "type"],
-  ],
+  allowExtendedProps: allowExtendedProps && ["sequence", "aliquot"],
+  requireAllOrNone: requireAllOrNone && [["description", "type"]],
   requireExactlyOneOf: requireExactlyOneOf && [
     ["name", "ID"],
     ["description", "sequence"]
@@ -136,10 +156,13 @@ export default function UploadCsvWizardDemo() {
 const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
   const [simpleSchema, simpleSchemaComp] = useToggle({
     type: "simpleSchema",
-    label: "Simple Schema"
+    label: "Simple Schema",
+    description:
+      "If checked, will use a simple schema with no bells or whistles"
   });
   const [enforceNameUnique, enforceNameUniqueComp] = useToggle({
-    type: "enforceNameUnique"
+    type: "enforceNameUnique",
+    description: "If checked, will require that the names be unique"
   });
   const [asyncNameValidation, asyncNameValidationComp] = useToggle({
     type: "asyncNameValidation",
@@ -156,6 +179,11 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
     description:
       "If checked, will require that either the type and description are both provided or that neither are provided"
   });
+  const [allowExtendedProps, allowExtendedPropsComp] = useToggle({
+    type: "allowExtendedProps",
+    description:
+      "If checked, will require that either the type and description are both provided or that neither are provided"
+  });
   const [requireAtLeastOneOf, atLeastOneComp] = useToggle({
     type: "requireAtLeastOneOf",
     description:
@@ -168,10 +196,12 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
   //   type: "allowZip"
   // });
   const [multipleExamples, multipleExamplesComp] = useToggle({
-    type: "multipleExamples"
+    type: "multipleExamples",
+    description: "If checked, will add multiple examples for each column"
   });
   const [allowMultipleFiles, allowMultipleFilesComp] = useToggle({
-    type: "allowMultipleFiles"
+    type: "allowMultipleFiles",
+    description: "If checked, will allow multiple files to be uploaded"
   });
   return (
     <DemoWrapper>
@@ -181,6 +211,7 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
       {asyncNameValidationComp}
       {atLeastOneComp}
       {requireAllOrNoneComp}
+      {allowExtendedPropsComp}
       {requireExactlyOneOfComp}
       {allowMultipleFilesComp}
       {multipleExamplesComp}
@@ -202,6 +233,7 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
               ? simpleValidateAgainst
               : validateAgainstSchema({
                   requireAllOrNone,
+                  allowExtendedProps,
                   requireAtLeastOneOf,
                   requireExactlyOneOf,
                   asyncNameValidation,
