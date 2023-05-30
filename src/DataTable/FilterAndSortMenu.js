@@ -63,9 +63,8 @@ export default class FilterAndSortMenu extends React.Component {
       ccSelectedFilter === "notInList"
     ) {
       if (dataType === "number") {
-        filterValToUse =
-          Array.isArray(filterValue) &&
-          filterValue.map(val =>
+        if (Array.isArray(filterValue))
+          filterValToUse = filterValue.map(val =>
             val.includes(",")
               ? parseFloat(val.replaceAll(",", "")) || ""
               : parseFloat(val)
