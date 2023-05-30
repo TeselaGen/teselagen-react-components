@@ -66,19 +66,6 @@ const helperSchema = [
   }
 ];
 
-// class SchemaStore {
-//   validateAgainstSchema = {};
-
-//   constructor() {
-//     makeObservable(this, {
-//       validateAgainstSchema: observable.shallow
-//     });
-//   }
-
-//   setValidateAgainstSchema(newValidateAgainstSchema) {
-//     this.validateAgainstSchema = new newValidateAgainstSchema();
-//   }
-// }
 class ValidateAgainstSchema {
   fields = [];
 
@@ -197,7 +184,7 @@ function Uploader({
     _validateAgainstSchema ||
     (isArray(_accept) ? _accept : [_accept]).find?.(
       a => a.validateAgainstSchema
-    ).validateAgainstSchema;
+    )?.validateAgainstSchema;
 
   useEffect(() => {
     // validateAgainstSchema
