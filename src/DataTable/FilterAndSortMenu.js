@@ -63,12 +63,9 @@ export default class FilterAndSortMenu extends React.Component {
       ccSelectedFilter === "notInList"
     ) {
       if (dataType === "number") {
-        if (Array.isArray(filterValue))
-          filterValToUse = filterValue.map(val =>
-            val.includes(",")
-              ? parseFloat(val.replaceAll(",", "")) || ""
-              : parseFloat(val)
-          );
+        filterValToUse = filterValue.map(val =>
+          parseFloat(val.replaceAll(",", ""))
+        );
       }
     }
 
@@ -235,14 +232,10 @@ class FilterInput extends React.Component {
               noResults={null}
               multi={true}
               creatable={true}
-              value={
-                Array.isArray(filterValue)
-                  ? filterValue.map(val => ({
-                      label: val,
-                      value: val
-                    }))
-                  : []
-              }
+              value={(filterValue || []).map(val => ({
+                label: val,
+                value: val
+              }))}
               onChange={selectedOptions => {
                 selectedOptions.some(opt => opt.value === "")
                   ? handleFilterSubmit()
