@@ -193,8 +193,10 @@ function Uploader({
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const validateAgainstSchema = validateAgainstSchemaStore;
+  let validateAgainstSchema;
+  if (validateAgainstSchemaToUse) {
+    validateAgainstSchema = validateAgainstSchemaStore;
+  }
   const accept = !_accept
     ? undefined
     : isPlainObject(_accept)
