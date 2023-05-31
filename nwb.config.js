@@ -1,6 +1,6 @@
 const path = require("path");
 const StatsPlugin = require("stats-webpack-plugin");
-let plugins = [];
+const plugins = [];
 if (process.env.ANALYZE_BUNDLE) {
   plugins.push(new StatsPlugin("stats.json", { chunkModules: true }));
 }
@@ -38,9 +38,6 @@ module.exports = {
       // "teselagen-react-components":
       //   console.log("comment me back out!") ||
       //   path.resolve("../../teselagen-react-components/src/"),
-      // "@teselagen/platform-ux":
-      //   console.log("comment me back out!") ||
-      //   path.resolve("../../teselagen-platform-ux/src/"),
 
       //don't comment this out!
       react: path.resolve(__dirname, "node_modules/react")
