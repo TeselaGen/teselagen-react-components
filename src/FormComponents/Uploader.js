@@ -183,7 +183,7 @@ function Uploader({
   const validateAgainstSchemaToUse =
     _validateAgainstSchema ||
     (isArray(_accept) ? _accept : [_accept]).find?.(
-      a => a.validateAgainstSchema
+      a => a?.validateAgainstSchema
     )?.validateAgainstSchema;
 
   useEffect(() => {
