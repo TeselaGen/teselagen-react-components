@@ -18,33 +18,36 @@ const validateAgainstSchema = ({
   requireAllOrNone,
   requireAtLeastOneOf,
   allowExtendedProps,
-  enforceNameUnique
+  enforceNameUnique,
+  coerceUserSchema
 }) => ({
   helpInstructions:
     "This template file is used to add rows to the sequence table.",
-  coerceUserSchema: ({ userSchema, officialSchema }) => {
-    const field = {
-      addedViaCoerce: true,
-      path: "fakePath",
-      matches: [
-        {
-          item: {
-            path: "fakePath"
-          },
-        }
-      ]
-    };
-    if (!officialSchema.fields.some(f => f.addedViaCoerce)) {
-      //officialSchema doesn't already have a fake path
-      officialSchema.fields.push(field);
-    }
+  ...(coerceUserSchema && {
+    coerceUserSchema: ({ userSchema, officialSchema }) => {
+      const field = {
+        addedViaCoerce: true,
+        path: "fakePath",
+        matches: [
+          {
+            item: {
+              path: "fakePath"
+            }
+          }
+        ]
+      };
+      if (!officialSchema.fields.some(f => f.addedViaCoerce)) {
+        //officialSchema doesn't already have a fake path
+        officialSchema.fields.push(field);
+      }
 
-    //in most cases you won't have to do this because userSchema will come in with the data you want to add:
-    if (!userSchema.fields.some(f => f.addedViaCoerce)) { 
-      //userSchema doesn't already have a fake path
-      userSchema.fields.push(field);
+      //in most cases you won't have to do this because userSchema will come in with the data you want to add:
+      if (!userSchema.fields.some(f => f.addedViaCoerce)) {
+        //userSchema doesn't already have a fake path
+        userSchema.fields.push(field);
+      }
     }
-  },
+  }),
   ...(asyncNameValidation && {
     tableWideAsyncValidation: async ({ entities }) => {
       await new Promise(resolve => setTimeout(resolve, 400));
@@ -102,6 +105,7 @@ const validateAgainstSchema = ({
       ? [
           {
             path: "ID",
+            displayName: "ID",
             description: `The ID of the model to be tagged. Used if a Name is NOT provided`
           }
         ]
@@ -179,6 +183,11 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
     description:
       "If checked, will require that either the type and description are both provided or that neither are provided"
   });
+  const [coerceUserSchema, coerceUserSchemaComp] = useToggle({
+    type: "coerceUserSchema",
+    description:
+      "If checked, will coerce the user schema to include a fakePath column"
+  });
   const [allowExtendedProps, allowExtendedPropsComp] = useToggle({
     type: "allowExtendedProps",
     description:
@@ -211,6 +220,7 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
       {asyncNameValidationComp}
       {atLeastOneComp}
       {requireAllOrNoneComp}
+      {coerceUserSchemaComp}
       {allowExtendedPropsComp}
       {requireExactlyOneOfComp}
       {allowMultipleFilesComp}
@@ -232,6 +242,7 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
             validateAgainstSchema: simpleSchema
               ? simpleValidateAgainst
               : validateAgainstSchema({
+                  coerceUserSchema,
                   requireAllOrNone,
                   allowExtendedProps,
                   requireAtLeastOneOf,
@@ -252,6 +263,7 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
         text="Finish Upload"
         onClick={handleSubmit(async function(values) {
           window.parsedData = values.exampleFile[0].parsedData;
+          window.exampleFile = values.exampleFile
           window.toastr.success("Upload Successful");
           console.info(
             `values.exampleFile.parsedData:`,

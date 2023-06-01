@@ -98,53 +98,6 @@ const validateAgainstSchemaStore = new ValidateAgainstSchema();
 
 // validateAgainstSchema.fields = ["hahah"];
 
-const onEditClick = ({
-  file,
-  validateAgainstSchema,
-  showSimpleInsertDataDialog,
-  newFileName,
-  finishUp
-}) => async () => {
-  const {
-    // csvValidationIssue: _csvValidationIssue,
-    matchedHeaders,
-    userSchema,
-    searchResults
-  } = await tryToMatchSchemas({
-    incomingData: file.parsedData,
-    validateAgainstSchema
-  });
-
-  const { newEntities } = await showSimpleInsertDataDialog(
-    "onSimpleInsertDialogFinish",
-    {
-      dialogProps: {
-        title: "Edit Data"
-      },
-      validateAgainstSchema,
-      isEditingExistingFile: true,
-      searchResults,
-      matchedHeaders,
-      userSchema
-    }
-  );
-
-  if (!newEntities) {
-    return;
-  } else {
-    const newFile = getNewCsvFile(newEntities, newFileName);
-    // file.parsedData = newEntities;
-    Object.assign(file, {
-      ...newFile,
-      originFileObj: newFile,
-      originalFileObj: newFile,
-      parsedData: newEntities
-    });
-    finishUp(file);
-    window.toastr.success(`File Updated`);
-  }
-};
-
 function noop() {}
 // wink wink
 const emptyPromise = Promise.resolve.bind(Promise);
@@ -191,8 +144,7 @@ function Uploader({
     validateAgainstSchemaStore.setValidateAgainstSchema(
       validateAgainstSchemaToUse
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [validateAgainstSchemaToUse]);
   let validateAgainstSchema;
   if (validateAgainstSchemaToUse) {
     validateAgainstSchema = validateAgainstSchemaStore;
@@ -244,6 +196,7 @@ function Uploader({
   let simpleAccept;
   let handleManuallyEnterData;
   let advancedAccept;
+
   if (Array.isArray(accept)) {
     if (accept.some(a => isPlainObject(a))) {
       //advanced accept
@@ -263,19 +216,12 @@ function Uploader({
             } else {
               //check existing files to make sure the new file name gets incremented if necessary
               // fileList
-
-              const newFileName = getNewName(fileList, `manual_data_entry.csv`);
+              const newFileName = getNewName(
+                fileListToUse,
+                `manual_data_entry.csv`
+              );
               const newFile = getNewCsvFile(newEntities, newFileName);
-              const finishUp = file => {
-                const cleanedFileList = [file, ...fileListToUse].slice(
-                  0,
-                  fileLimit ? fileLimit : undefined
-                );
-                handleSecondHalfOfUpload({
-                  acceptedFiles: cleanedFileList,
-                  cleanedFileList
-                });
-              };
+
               const file = {
                 ...newFile,
                 parsedData: newEntities,
@@ -285,17 +231,18 @@ function Uploader({
                 name: newFileName,
                 originFileObj: newFile,
                 originalFileObj: newFile,
-                id: nanoid()
+                id: nanoid(),
+                hasEditClick: true
               };
-              file.onEditClick = onEditClick({
-                file,
-                validateAgainstSchema,
-                showSimpleInsertDataDialog,
-                newFileName,
-                finishUp
-              });
 
-              finishUp(file);
+              const cleanedFileList = [file, ...fileListToUse].slice(
+                0,
+                fileLimit ? fileLimit : undefined
+              );
+              handleSecondHalfOfUpload({
+                acceptedFiles: cleanedFileList,
+                cleanedFileList
+              });
 
               window.toastr.success(`File Added`);
             }
@@ -762,18 +709,7 @@ function Uploader({
                       );
 
                       file.meta = parsedF.meta;
-                      file.onEditClick = onEditClick({
-                        file,
-                        validateAgainstSchema,
-                        showSimpleInsertDataDialog,
-                        newFileName,
-                        finishUp: () => {
-                          handleSecondHalfOfUpload({
-                            acceptedFiles,
-                            cleanedFileList
-                          });
-                        }
-                      });
+                      file.hasEditClick = true;
                       file.parsedData = userSchema.userData;
                       file.name = newFileName;
                       file.originFileObj = newFile;
@@ -817,18 +753,7 @@ function Uploader({
                       //swap out file with a new csv file
                       const newFile = getNewCsvFile(newEntities, file.name);
 
-                      file.onEditClick = onEditClick({
-                        file,
-                        validateAgainstSchema,
-                        showSimpleInsertDataDialog,
-                        newFileName: file.name,
-                        finishUp: () => {
-                          handleSecondHalfOfUpload({
-                            acceptedFiles,
-                            cleanedFileList
-                          });
-                        }
-                      });
+                      file.hasEditClick = true;
                       file.parsedData = newEntities;
                       // file.name = newFileName;
                       file.originFileObj = newFile;
@@ -924,13 +849,13 @@ function Uploader({
           >
             {fileList.map((file, index) => {
               const {
-                onEditClick,
                 loading,
                 error,
                 name,
                 originalName,
                 url,
-                downloadName
+                downloadName,
+                hasEditClick
               } = file;
               let icon;
               if (loading) {
@@ -940,7 +865,7 @@ function Uploader({
               } else {
                 if (onPreviewClick) {
                   icon = "eye-open";
-                } else if (onEditClick) {
+                } else if (hasEditClick) {
                   icon = "edit";
                 } else {
                   icon = "saved";
@@ -964,11 +889,11 @@ function Uploader({
                         className={classnames({
                           "tg-spin": loading,
                           "tg-upload-file-list-item-preview": onPreviewClick,
-                          "tg-upload-file-list-item-edit": onEditClick,
-                          clickableIcon: onPreviewClick || onEditClick
+                          "tg-upload-file-list-item-edit": hasEditClick,
+                          clickableIcon: onPreviewClick || hasEditClick
                         })}
                         data-tip={
-                          onEditClick
+                          hasEditClick
                             ? "Edit"
                             : onPreviewClick
                             ? "Preview"
@@ -976,9 +901,54 @@ function Uploader({
                         }
                         style={{ marginRight: 5 }}
                         icon={icon}
-                        onClick={() => {
-                          if (onEditClick) {
-                            onEditClick(file, index, fileList);
+                        onClick={async () => {
+                          if (hasEditClick) {
+                            const {
+                              // csvValidationIssue: _csvValidationIssue,
+                              matchedHeaders,
+                              userSchema,
+                              searchResults
+                            } = await tryToMatchSchemas({
+                              incomingData: file.parsedData,
+                              validateAgainstSchema
+                            });
+
+                            const {
+                              newEntities
+                            } = await showSimpleInsertDataDialog(
+                              "onSimpleInsertDialogFinish",
+                              {
+                                dialogProps: {
+                                  title: "Edit Data"
+                                },
+                                validateAgainstSchema,
+                                isEditingExistingFile: true,
+                                searchResults,
+                                matchedHeaders,
+                                userSchema
+                              }
+                            );
+
+                            if (!newEntities) {
+                              return;
+                            } else {
+                              const newFile = getNewCsvFile(
+                                newEntities,
+                                file.name
+                              );
+                              // file.parsedData = newEntities;
+                              Object.assign(file, {
+                                ...newFile,
+                                originFileObj: newFile,
+                                originalFileObj: newFile,
+                                parsedData: newEntities
+                              });
+                              handleSecondHalfOfUpload({
+                                acceptedFiles: fileList,
+                                cleanedFileList: fileList
+                              });
+                              window.toastr.success(`File Updated`);
+                            }
                           }
                           if (onPreviewClick) {
                             onPreviewClick(file, index, fileList);

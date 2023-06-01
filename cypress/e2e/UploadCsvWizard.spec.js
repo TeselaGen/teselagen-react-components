@@ -225,6 +225,7 @@ describe("EditableCellTable.spec", () => {
   it(`requireExactlyOneOf should trigger validation error on file upload`, () => {
     cy.visit("#/UploadCsvWizard");
     cy.tgToggle("requireExactlyOneOf");
+    // cy.wait(1000);
     cy.uploadBlobFiles(
       ".tg-dropzone",
       [
@@ -337,7 +338,7 @@ abby,0,wee,g,false,dna,misc_feature
 josh,3,,g,false,dna,
 a,6,,g,false,dna,misc_feature
 ,,lol,,false,dna,misc_feature
-a,,,,false,dna,misc_feature
+a,,desc,,false,dna,misc_feature
   `,
           type: "text/csv"
         }
@@ -350,24 +351,22 @@ a,,,,false,dna,misc_feature
     );
     cy.contains("Review and Edit Data").click();
     cy.get(
-      `[data-tip="At least one of these fields must be present - Name, ID"]`
-    );
-    cy.get(
-      `[data-tip="At least one of these fields must be present - Name, ID"] [data-test="tgCell_ID"]`
-    );
-    cy.get(
-      `[data-tip="At least one of these fields must be present - Description, Sequence BPs"]`
-    );
-    // cy.focused().type(`{backspace}{enter}`)
-    cy.get(
-      `[data-tip="At least one of these fields must be present - Description, Sequence BPs"]`
+      `[data-tip="Please specify either ALL of the following fields or NONE of them - Description, Type"]`
     )
-      .last()
+      .first()
+
       .click();
     cy.focused().type(`wee{enter}`);
     cy.get(
-      `[data-tip="At least one of these fields must be present - Description, Sequence BPs"]`
+      `[data-tip="Please specify either ALL of the following fields or NONE of them - Description, Type"]`
     ).should("not.exist");
+    cy.get(`[data-index="1"] [data-test="tgCell_description"]`).click({
+      force: true
+    });
+    cy.focused().type(`ha{enter}`);
+    cy.get(
+      `[data-tip="Please specify either ALL of the following fields or NONE of them - Description, Type"]`
+    );
   });
 
   it(`isUnique should trigger validation error on file upload`, () => {
@@ -488,7 +487,7 @@ a,,,,false,dna,misc_feature
       `.hasCellError[data-tip="Please enter a value here"] [data-test="tgCell_name"]:first`
     ).should("exist");
   });
-  it(`multiple csv files packed into a zip should bring up a wizard with a tab for every file`, () => {
+  it(`multiple csv files packed into a zip should bring up a wizard with a tab for every file. They should be able to be edited after`, () => {
     cy.visit("#/UploadCsvWizard");
     cy.tgToggle("allowMultipleFiles");
     cy.uploadFile(
@@ -549,6 +548,118 @@ a,,,,false,dna,misc_feature
     cy.get(`.bp3-button:contains(Finalize Files)`)
       .eq(1)
       .click();
+
+    cy.get(
+      `.tg-upload-file-list-item:contains(testUploadWizard_invalidDataNonUnique.csv) .tg-upload-file-list-item-edit`
+    ).click();
+    cy.get(`[data-index="0"] [data-test="tgCell_sequence"]`).click({
+      force: true
+    });
+    cy.focused().type(`tom{enter}`);
+    cy.get(`.bp3-button:contains(Edit Data)`).click();
+    cy.contains(`File Updated`);
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(200);
+    cy.get(
+      `.tg-upload-file-list-item:contains(testUploadWizard_invalidData.csv) .tg-upload-file-list-item-edit`
+    ).click();
+    cy.get(`[data-index="0"] [data-test="tgCell_sequence"]`).click({
+      force: true
+    });
+    cy.focused().type(`robbin{enter}`);
+    cy.get(`.bp3-button:contains(Edit Data)`).click();
+    cy.contains(`File Updated`);
+
+    cy.contains("Finish Upload").click();
+    cy.contains("Upload Successful").then(() => {
+      cy.window().then(win => {
+        expect(win.exampleFile[0].parsedData).to.deep.equal([
+          {
+            name: "a",
+            description: "",
+            sequence: "tom",
+            isRegex: false,
+            matchType: "dna",
+            type: "misc_feature"
+          },
+          {
+            name: "a",
+            description: "",
+            sequence: "g",
+            isRegex: false,
+            matchType: "dna",
+            type: "misc_feature"
+          },
+          {
+            name: "a",
+            description: "",
+            sequence: "g",
+            isRegex: false,
+            matchType: "dna",
+            type: "misc_feature"
+          },
+          {
+            name: "b",
+            description: "",
+            sequence: "g",
+            isRegex: false,
+            matchType: "dna",
+            type: "misc_feature"
+          },
+          {
+            name: "b",
+            description: "",
+            sequence: "g",
+            isRegex: false,
+            matchType: "dna",
+            type: "misc_feature"
+          }
+        ]);
+        expect(win.exampleFile[1].parsedData).to.deep.equal([
+          {
+            name: "a",
+            description: "",
+            sequence: "robbin",
+            isRegex: false,
+            matchType: "dna",
+            type: "misc_feature"
+          },
+          {
+            name: "haha",
+            description: "",
+            sequence: "g",
+            isRegex: true,
+            matchType: "dna",
+            type: "misc_feature"
+          },
+          {
+            name: "a",
+            description: "",
+            sequence: "g",
+            isRegex: false,
+            matchType: "dna",
+            type: "misc_feature"
+          },
+          {
+            name: "a",
+            description: "",
+            sequence: "g",
+            isRegex: false,
+            matchType: "dna",
+            type: "misc_feature"
+          },
+          {
+            name: "a",
+            description: "",
+            sequence: "g",
+            isRegex: false,
+            matchType: "dna",
+            type: "misc_feature"
+          }
+        ]);
+      });
+    });
+    cy.contains("testUploadWizard_invalidData.csv");
   });
   it(`multiple csv files with the same headers should bring up a wizard with single header selection and a tab for every file. Async validation should work. Going back and editing headers should give a warning if the tables have been touched. Uploading more files shouldn't get leftover state`, () => {
     cy.visit("#/UploadCsvWizard");
@@ -808,11 +919,32 @@ thomas,,g,false,dna,misc_feature`,
     cy.focused().type(`taoh{enter}`);
     cy.get(`.bp3-button:contains(Edit Data)`).click();
     cy.contains(`File Updated`);
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(200);
+    cy.get(
+      `.tg-upload-file-list-item:contains(manual_data_entry(1).csv) .tg-upload-file-list-item-edit`
+    ).click();
+    cy.get(`[data-index="0"] [data-test="tgCell_sequence"]`).click({
+      force: true
+    });
+    cy.focused().type(`tom{enter}`);
+    cy.get(`.bp3-button:contains(Edit Data)`).click();
+    cy.contains(`File Updated`);
 
     cy.contains("Finish Upload").click();
     cy.contains("Upload Successful").then(() => {
       cy.window().then(win => {
-        expect(win.parsedData).to.deep.equal([
+        expect(win.exampleFile[0].parsedData).to.deep.equal([
+          {
+            name: "pj5_0001",
+            description: "Example description of a sequence",
+            sequence: "tom",
+            isRegex: false,
+            matchType: "dna",
+            type: "misc_feature"
+          }
+        ]);
+        expect(win.exampleFile[1].parsedData).to.deep.equal([
           {
             name: "pj5_0001",
             description: "Example description of a sequence",
