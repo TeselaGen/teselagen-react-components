@@ -189,10 +189,9 @@ function Uploader({
   }
   useEffect(() => {
     return () => {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
       cleanupFiles();
     };
-  });
+  }, []);
 
   let contentOverride = maybeContentOverride;
   if (contentOverride && typeof contentOverride === "function") {
@@ -225,11 +224,14 @@ function Uploader({
                 fileListToUse,
                 `manual_data_entry.csv`
               );
-              const newFile = getNewCsvFile(newEntities, newFileName);
+              const { newFile, cleanedEntities } = getNewCsvFile(
+                newEntities,
+                newFileName
+              );
 
               const file = {
                 ...newFile,
-                parsedData: newEntities,
+                parsedData: cleanedEntities,
                 meta: {
                   fields: validateAgainstSchema.fields.map(({ path }) => path)
                 },
@@ -329,7 +331,8 @@ function Uploader({
                 );
                 const csv = unparse(rows);
 
-                downloadjs(csv, `${nameToUse}.csv`, "csv");
+                const downloadFn = window.Cypress?.downloadTest || downloadjs;
+                downloadFn(csv, `${nameToUse}.csv`, "csv");
               }
             },
             {
@@ -717,14 +720,15 @@ function Uploader({
                           searchResults
                         });
                         const newFileName = removeExt(file.name) + `.csv`;
-                        const newFile = getNewCsvFile(
+
+                        const { newFile, cleanedEntities } = getNewCsvFile(
                           userSchema.userData,
                           newFileName
                         );
 
                         file.meta = parsedF.meta;
                         file.hasEditClick = true;
-                        file.parsedData = userSchema.userData;
+                        file.parsedData = cleanedEntities;
                         file.name = newFileName;
                         file.originFileObj = newFile;
                         file.originalFileObj = newFile;
@@ -771,10 +775,13 @@ function Uploader({
                         const newEntities = res[i];
                         // const newFileName = removeExt(file.name) + `_updated.csv`;
                         //swap out file with a new csv file
-                        const newFile = getNewCsvFile(newEntities, file.name);
+                        const { newFile, cleanedEntities } = getNewCsvFile(
+                          newEntities,
+                          file.name
+                        );
 
                         file.hasEditClick = true;
-                        file.parsedData = newEntities;
+                        file.parsedData = cleanedEntities;
                         // file.name = newFileName;
                         file.originFileObj = newFile;
                         file.originalFileObj = newFile;
@@ -952,16 +959,16 @@ function Uploader({
                               if (!newEntities) {
                                 return;
                               } else {
-                                const newFile = getNewCsvFile(
-                                  newEntities,
-                                  file.name
-                                );
+                                const {
+                                  newFile,
+                                  cleanedEntities
+                                } = getNewCsvFile(newEntities, file.name);
                                 // file.parsedData = newEntities;
                                 Object.assign(file, {
                                   ...newFile,
                                   originFileObj: newFile,
                                   originalFileObj: newFile,
-                                  parsedData: newEntities
+                                  parsedData: cleanedEntities
                                 });
                                 handleSecondHalfOfUpload({
                                   acceptedFiles: fileList,
@@ -1059,8 +1066,14 @@ function getFileDownloadAttr(exampleFile) {
 }
 
 function getNewCsvFile(ents, fileName) {
-  return new File([papaparse.unparse(stripId(ents))], fileName);
+  const strippedEnts = stripId(ents);
+
+  return {
+    newFile: new File([papaparse.unparse(strippedEnts)], fileName),
+    cleanedEntities: strippedEnts
+  };
 }
+
 function stripId(ents = []) {
   return ents.map(ent => {
     const { id, ...rest } = ent;

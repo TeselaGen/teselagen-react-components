@@ -11,15 +11,7 @@ const getSchema = data => ({
   fields: map(data[0], (val, path) => {
     return { path, type: "string" };
   }),
-  userData: map(data, d => {
-    if (!d.id) {
-      return {
-        ...d,
-        id: nanoid()
-      };
-    }
-    return d;
-  })
+  userData: data
 });
 
 export default async function tryToMatchSchemas({
@@ -122,6 +114,15 @@ async function matchSchemas({ userSchema, officialSchema }) {
     officialSchema.coerceUserSchema({ userSchema, officialSchema });
   }
 
+  userSchema.userData = map(userSchema.userData, e => {
+    if (!e.id) {
+      return {
+        ...e,
+        id: "__generated__" + nanoid()
+      };
+    }
+    return e;
+  });
   const editableFields = officialSchema.fields.filter(f => !f.isNotEditable);
   const hasErr =
     !csvValidationIssue &&
