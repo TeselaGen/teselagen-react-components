@@ -713,7 +713,6 @@ export const renderReactSelect = props => {
   } else {
     valueToUse = value;
   }
-
   const propsToUse = {
     ...removeUnwantedProps(rest),
     intent,

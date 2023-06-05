@@ -1,11 +1,11 @@
 import { forEach, map } from "lodash";
 import { nanoid } from "nanoid";
 import Fuse from "fuse.js";
-import { max } from "lodash";
 import { editCellHelper } from "../DataTable";
 import { validateTableWideErrors } from "../DataTable/validateTableWideErrors";
 import { isEmpty } from "lodash";
 import getTextFromEl from "../utils/getTextFromEl";
+import { min } from "lodash";
 
 const getSchema = data => ({
   fields: map(data[0], (val, path) => {
@@ -46,8 +46,8 @@ export default async function tryToMatchSchemas({
   searchResults.forEach(r => {
     for (const match of r.matches) {
       if (!incomingHeadersToScores[match.item.path]) continue;
-      const maxScore = max(incomingHeadersToScores[match.item.path]);
-      if (maxScore === match.score) {
+      const minScore = min(incomingHeadersToScores[match.item.path]);
+      if (minScore === match.score) {
         r.topMatch = match.item.path;
         r.matches.forEach(match => {
           if (!incomingHeadersToScores[match.item.path]) return;
@@ -153,12 +153,12 @@ async function matchSchemas({ userSchema, officialSchema }) {
       entities: userSchema.userData
     });
     if (!isEmpty(res)) {
-      csvValidationIssue = addSpecialPropToErrs(res);
+      csvValidationIssue = addSpecialPropToAsyncErrs(res);
     }
     //return errors on the tables
   }
 
-  if (hasErr) {
+  if (hasErr && !csvValidationIssue) {
     csvValidationIssue = `Some of the data doesn't look quite right. Do these header mappings look correct?`;
   }
   // if (!csvValidationIssue) {
@@ -172,7 +172,7 @@ async function matchSchemas({ userSchema, officialSchema }) {
   };
 }
 
-export const addSpecialPropToErrs = res => {
+export const addSpecialPropToAsyncErrs = res => {
   forEach(res, (v, k) => {
     res[k] = {
       message: v,

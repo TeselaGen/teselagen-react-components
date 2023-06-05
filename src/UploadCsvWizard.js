@@ -21,7 +21,7 @@ import { connect } from "react-redux";
 import getIdOrCodeOrIndex from "./DataTable/utils/getIdOrCodeOrIndex";
 import { MatchHeaders } from "./MatchHeaders";
 import { isEmpty } from "lodash";
-import { addSpecialPropToErrs } from "./FormComponents/tryToMatchSchemas";
+import { addSpecialPropToAsyncErrs } from "./FormComponents/tryToMatchSchemas";
 import { cloneDeep } from "lodash";
 
 const getInitialSteps = csvValidationIssue => [
@@ -693,7 +693,7 @@ async function asyncValidateHelper(
   });
   if (!isEmpty(res)) {
     changeForm(tableName, "reduxFormCellValidation", {
-      ...addSpecialPropToErrs(res)
+      ...addSpecialPropToAsyncErrs(res)
     });
     return true;
   }

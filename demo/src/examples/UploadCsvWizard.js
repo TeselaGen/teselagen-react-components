@@ -19,7 +19,8 @@ const validateAgainstSchema = ({
   requireAtLeastOneOf,
   allowExtendedProps,
   enforceNameUnique,
-  coerceUserSchema
+  coerceUserSchema,
+  alternateHeaders
 }) => ({
   helpInstructions:
     "This template file is used to add rows to the sequence table.",
@@ -89,7 +90,31 @@ const validateAgainstSchema = ({
   //       return toRet;
   //     }
   //   : undefined,
-  fields: [
+  fields: alternateHeaders ? [
+    {
+      path: "description", 
+    },
+    {
+      path: "catalog number",
+      isRequired: true
+    },
+    {
+      path: "isColumn", 
+      isRequired: true
+    },
+    {
+      path: "plateWellDescription", 
+    },
+    {
+      path: "maxVolume", 
+      isRequired: true
+    },
+    {
+      path: "zoinkkk", 
+      isRequired: true
+    },
+
+  ] : [
     {
       isRequired: !requireExactlyOneOf && !requireAtLeastOneOf,
       isUnique: enforceNameUnique,
@@ -188,6 +213,11 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
     description:
       "If checked, will coerce the user schema to include a fakePath column"
   });
+  const [alternateHeaders, alternateHeadersComp] = useToggle({
+    type: "alternateHeaders",
+    description:
+      "If checked, will use alternate headers for the columns"
+  });
   const [allowExtendedProps, allowExtendedPropsComp] = useToggle({
     type: "allowExtendedProps",
     description:
@@ -221,6 +251,7 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
       {atLeastOneComp}
       {requireAllOrNoneComp}
       {coerceUserSchemaComp}
+      {alternateHeadersComp}
       {allowExtendedPropsComp}
       {requireExactlyOneOfComp}
       {allowMultipleFilesComp}
@@ -242,6 +273,7 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
             validateAgainstSchema: simpleSchema
               ? simpleValidateAgainst
               : validateAgainstSchema({
+                alternateHeaders,
                   coerceUserSchema,
                   requireAllOrNone,
                   allowExtendedProps,

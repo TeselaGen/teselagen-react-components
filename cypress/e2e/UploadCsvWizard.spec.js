@@ -824,6 +824,33 @@ a,,g,false,dna,misc_feature`,
       .click();
     cy.contains(`Added Fixed Up Files test4.csv, test5.csv, test6.csv`);
   });
+  it(`csv file headers should be matched up correctly`, () => {
+    cy.visit("#/UploadCsvWizard");
+    cy.tgToggle("alternateHeaders");
+    cy.uploadBlobFiles(
+      ".tg-dropzone",
+      [
+        {
+          name: "test.csv",
+          contents: `max volume,catalog number,description,sequence,isColumn,matchType,type
+thomas,3,,g,false,dna,misc_feature
+`,
+          type: "text/csv"
+        }
+      ],
+      true
+    );
+    cy.get(`.tg-select-value:contains(isColumn)`);
+    cy.get(`.tg-select-value:contains(max volume)`);
+    cy.get(`.tg-select-value:contains(catalog number)`);
+    cy.contains(`.bp3-dialog .bp3-button`, "Review and Edit Data").click();
+    cy.get(`[data-tip="Please enter a value here"]`).click();
+    cy.focused().type("haha{enter}");
+    cy.contains(`.bp3-dialog .bp3-button`, "Add File").click();
+    cy.contains("test.csv");
+    cy.get(`.tg-upload-file-list-item-edit`).click();
+    cy.get(`[data-test="tgCell_catalog number"]:contains(3)`);
+  });
   it(`multiple "perfect" csv files (but with async errors) should trigger async validation if applicable`, () => {
     cy.visit("#/UploadCsvWizard");
     cy.tgToggle("allowMultipleFiles");

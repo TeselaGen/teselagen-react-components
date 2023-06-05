@@ -83,6 +83,7 @@ import { nanoid } from "nanoid";
 import { isString } from "lodash";
 import { SwitchField } from "../FormComponents";
 import { validateTableWideErrors } from "./validateTableWideErrors";
+import { isFunction } from "lodash";
 enablePatches();
 
 const PRIMARY_SELECTED_VAL = "main_cell";
@@ -2450,7 +2451,7 @@ class DataTable extends React.Component {
                 <DropdownCell
                   isMulti={column.type === "dropdownMulti"}
                   initialValue={text}
-                  options={column.values}
+                  options={getVals(column.values)}
                   finishEdit={(newVal, doNotStopEditing) => {
                     this.finishCellEdit(cellId, newVal, doNotStopEditing);
                   }}
@@ -2465,7 +2466,7 @@ class DataTable extends React.Component {
                   }
                   shouldSelectAll={reduxFormEditingCellSelectAll}
                   cancelEdit={this.cancelCellEdit}
-                  isNumeric={column.type === "numeric"}
+                  isNumeric={column.type === "number"}
                   initialValue={text}
                   finishEdit={newVal => {
                     this.finishCellEdit(cellId, newVal);
@@ -3535,14 +3536,14 @@ const defaultFormatters = {
   },
   dropdown: (newVal, field) => {
     const valsMap = {};
-    field.values.forEach(v => {
+    getVals(field.values).forEach(v => {
       valsMap[v.toLowerCase().trim()] = v;
     });
     return valsMap[newVal?.toLowerCase().trim()] || newVal;
   },
   dropdownMulti: (newVal, field) => {
     const valsMap = {};
-    field.values.forEach(v => {
+    getVals(field.values).forEach(v => {
       valsMap[v.toLowerCase().trim()] = v;
     });
     if (!newVal) return;
@@ -3551,7 +3552,7 @@ const defaultFormatters = {
       .map(v => valsMap[v.toLowerCase().trim()] || v)
       .join(",");
   },
-  numeric: newVal => {
+  number: newVal => {
     return toNumber(newVal);
   }
 };
@@ -3560,7 +3561,7 @@ const defaultValidators = {
     const err = "Please choose one of the accepted values";
     if (!newVal) {
       if (field.isRequired) return err;
-    } else if (!field.values.includes(newVal)) {
+    } else if (!getVals(field.values).includes(newVal)) {
       return err;
     }
   },
@@ -3571,7 +3572,7 @@ const defaultValidators = {
     } else {
       let err;
       newVal.split(",").some(v => {
-        if (!field.values.includes(v)) {
+        if (!getVals(field.values).includes(v)) {
           err = `${v} is not an accepted value`;
           return true;
         }
@@ -3580,7 +3581,7 @@ const defaultValidators = {
       return err;
     }
   },
-  numeric: newVal => {
+  number: newVal => {
     if (isNaN(newVal) || !isNumber(newVal)) {
       return "Must be a number";
     }
@@ -3651,3 +3652,10 @@ export const getCellVal = (ent, path, col) => {
   }
   return selectedCellVal;
 };
+
+function getVals(values) {
+  if (isFunction(values)) {
+    return values();
+  }
+  return values;
+}

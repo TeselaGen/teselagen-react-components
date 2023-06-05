@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import {
   Button,
+  Callout,
   Classes,
   Icon,
   Menu,
@@ -111,6 +112,7 @@ function Uploader({
   className = "",
   minimal,
   validateAgainstSchema: _validateAgainstSchema,
+  validateAgainstSchema: _callout,
   fileLimit,
   readBeforeUpload, //read the file using the browser's FileReader before passing it to onChange and/or uploading it
   uploadInBulk, //tnr: not yet implemented
@@ -133,6 +135,9 @@ function Uploader({
   axiosInstance = window.api || axios
 }) {
   //on component did mount
+  const callout =
+    _callout ||
+    (isArray(_accept) ? _accept : [_accept]).find?.(a => a?.callout)?.callout;
   const validateAgainstSchemaToUse =
     _validateAgainstSchema ||
     (isArray(_accept) ? _accept : [_accept]).find?.(
@@ -438,581 +443,597 @@ function Uploader({
   }
 
   return (
-    <div
-      className="tg-uploader-outer"
-      style={{
-        width: minimal ? undefined : "100%",
-        display: "flex",
-        height: "fit-content"
-      }}
-    >
-      {comp}
-      {comp2}
+    <>
+      {callout && (
+        <Callout style={{ marginBottom: 5 }} intent="primary">
+          {callout}
+        </Callout>
+      )}
       <div
-        className="tg-uploader-inner"
-        style={{ width: "100%", height: "fit-content", minWidth: 0 }}
+        className="tg-uploader-outer"
+        style={{
+          width: minimal ? undefined : "100%",
+          display: "flex",
+          height: "fit-content"
+        }}
       >
-        {simpleAccept && (
-          <div
-            className={Classes.TEXT_MUTED}
-            style={{ fontSize: 11, marginBottom: 5 }}
-          >
-            {advancedAccept ? (
-              <div style={{}}>
-                Accepts &nbsp;
-                <span style={{}}>
-                  {advancedAccept.map((a, i) => {
-                    const disabled = !(
-                      a.description ||
-                      a.exampleFile ||
-                      a.exampleFiles
-                    );
-                    const PopOrTooltip = a.exampleFiles ? Popover : Tooltip;
-                    const hasDownload = a.exampleFile || a.exampleFiles;
-                    const CustomTag = !hasDownload ? "span" : "a";
-                    return (
-                      <PopOrTooltip
-                        key={i}
-                        interactionKind="hover"
-                        disabled={disabled}
-                        modifiers={popoverOverflowModifiers}
-                        content={
-                          a.exampleFiles ? (
-                            <Menu>
-                              {a.exampleFiles.map(
-                                ({ description, exampleFile, icon }, i) => {
-                                  return (
-                                    <MenuItem
-                                      icon={icon || "download"}
-                                      intent="primary"
-                                      text={description}
-                                      {...getFileDownloadAttr(exampleFile)}
-                                      key={i}
-                                    ></MenuItem>
-                                  );
-                                }
-                              )}
-                            </Menu>
-                          ) : (
-                            <div
-                              style={{ maxWidth: 400, wordBreak: "break-word" }}
-                            >
-                              {a.description ? (
-                                <div
-                                  style={{
-                                    marginBottom: 4,
-                                    fontStyle: "italic"
-                                  }}
-                                >
-                                  {a.description}
-                                </div>
-                              ) : (
-                                ""
-                              )}
-                              {a.exampleFile &&
-                                (a.isTemplate
-                                  ? "Download Example Template"
-                                  : "Download Example File")}
-                            </div>
-                          )
-                        }
-                      >
-                        <CustomTag
-                          className="tgFileTypeDescriptor"
-                          style={{ marginRight: 10, cursor: "pointer" }}
-                          {...getFileDownloadAttr(a.exampleFile)}
-                        >
-                          {(a.type
-                            ? isArray(a.type)
-                              ? a.type
-                              : [a.type]
-                            : [a]
-                          )
-                            .map(t => {
-                              return t.startsWith(".") ? t : "." + t;
-                            })
-                            .join(", ")}
-
-                          {hasDownload && (
-                            <Icon
-                              style={{
-                                marginTop: 3,
-                                marginLeft: 3
-                              }}
-                              size={10}
-                              icon="download"
-                            ></Icon>
-                          )}
-                        </CustomTag>
-                      </PopOrTooltip>
-                    );
-                  })}
-                </span>
-              </div>
-            ) : (
-              <>Accepts {simpleAccept}</>
-            )}
-          </div>
-        )}
-        <Dropzone
-          disabled={disabled}
-          onClick={evt => evt.preventDefault()}
-          multiple={fileLimit !== 1}
-          accept={
-            simpleAccept
-              ? simpleAccept
-                  .split(", ")
-                  .map(a => (a.startsWith(".") ? a : "." + a))
-                  .join(", ")
-              : undefined
-          }
-          {...{
-            onDrop: async (_acceptedFiles, rejectedFiles) => {
-              let acceptedFiles = [];
-              for (const file of _acceptedFiles) {
-                if (validateAgainstSchema && isZipFile(file)) {
-                  const files = await filterFilesInZip(
-                    file,
-                    simpleAccept
-                      ?.split(", ")
-                      ?.map(a => (a.startsWith(".") ? a : "." + a)) || []
-                  );
-                  acceptedFiles.push(...files.map(f => f.originFileObj));
-                } else {
-                  acceptedFiles.push(file);
-                }
-              }
-              cleanupFiles();
-              if (rejectedFiles.length) {
-                let msg = "";
-                rejectedFiles.forEach(file => {
-                  if (msg) msg += "\n";
-                  msg +=
-                    `${file.file.name}: ` +
-                    file.errors.map(err => err.message).join(", ");
-                });
-                window.toastr &&
-                  window.toastr.warning(
-                    <div className="preserve-newline">{msg}</div>
-                  );
-              }
-              if (!acceptedFiles.length) return;
-              setLoading(true);
-              if (fileLimit) {
-                acceptedFiles = acceptedFiles.slice(0, fileLimit);
-              }
-
-              acceptedFiles.forEach(file => {
-                file.preview = URL.createObjectURL(file);
-                file.loading = true;
-                if (!file.id) {
-                  file.id = nanoid();
-                }
-                filesToClean.current.push(file);
-              });
-
-              if (readBeforeUpload) {
-                acceptedFiles = await Promise.all(
-                  acceptedFiles.map(file => {
-                    return new Promise((resolve, reject) => {
-                      const reader = new FileReader();
-                      reader.readAsText(file, "UTF-8");
-                      reader.onload = evt => {
-                        file.parsedString = evt.target.result;
-                        resolve(file);
-                      };
-                      reader.onerror = err => {
-                        console.error("err:", err);
-                        reject(err);
-                      };
-                    });
-                  })
-                );
-              }
-              const cleanedAccepted = acceptedFiles.map(file => {
-                return {
-                  originFileObj: file,
-                  originalFileObj: file,
-                  id: file.id,
-                  lastModified: file.lastModified,
-                  lastModifiedDate: file.lastModifiedDate,
-                  loading: file.loading,
-                  name: file.name,
-                  preview: file.preview,
-                  size: file.size,
-                  type: file.type,
-                  ...(file.parsedString
-                    ? { parsedString: file.parsedString }
-                    : {})
-                };
-              });
-              const cleanedFileList = [
-                ...cleanedAccepted,
-                ...fileListToUse
-              ].slice(0, fileLimit ? fileLimit : undefined);
-
-              if (validateAgainstSchema) {
-                const filesWIssues = [];
-                const filesWOIssues = [];
-                for (const [i, file] of cleanedAccepted.entries()) {
-                  if (isCsvOrExcelFile(file)) {
-                    const parsedF = await parseCsvOrExcelFile(file);
-                    const {
-                      csvValidationIssue: _csvValidationIssue,
-                      matchedHeaders,
-                      userSchema,
-                      searchResults
-                    } = await tryToMatchSchemas({
-                      incomingData: parsedF.data,
-                      validateAgainstSchema
-                    });
-                    let csvValidationIssue = _csvValidationIssue;
-                    if (csvValidationIssue) {
-                      if (isObject(csvValidationIssue)) {
-                        initializeForm(
-                          `editableCellTable${
-                            cleanedAccepted.length > 1 ? `-${i}` : ""
-                          }`,
-                          {
-                            reduxFormCellValidation: csvValidationIssue
-                          },
-                          {
-                            keepDirty: true,
-                            keepValues: true,
-                            updateUnregisteredFields: true
-                          }
-                        );
-                        const err = Object.values(csvValidationIssue)[0];
-                        csvValidationIssue = `It looks like there was an error with your data - ${
-                          err && err.message ? err.message : err
-                        }`; //pass just the first error as a string
-                      }
-                      filesWIssues.push({
-                        file,
-                        csvValidationIssue,
-                        matchedHeaders,
-                        userSchema,
-                        searchResults
-                      });
-                    } else {
-                      filesWOIssues.push({
-                        file,
-                        csvValidationIssue,
-                        matchedHeaders,
-                        userSchema,
-                        searchResults
-                      });
-                      const newFileName = removeExt(file.name) + `.csv`;
-                      const newFile = getNewCsvFile(
-                        userSchema.userData,
-                        newFileName
-                      );
-
-                      file.meta = parsedF.meta;
-                      file.hasEditClick = true;
-                      file.parsedData = userSchema.userData;
-                      file.name = newFileName;
-                      file.originFileObj = newFile;
-                      file.originalFileObj = newFile;
-                    }
-                  }
-                }
-                if (filesWIssues.length) {
-                  const { file } = filesWIssues[0];
-                  const allFiles = [...filesWIssues, ...filesWOIssues];
-                  const doAllFilesHaveSameHeaders = allFiles.every(f => {
-                    if (f.userSchema.fields && f.userSchema.fields.length) {
-                      return f.userSchema.fields.every((h, i) => {
-                        return h.path === allFiles[0].userSchema.fields[i].path;
-                      });
-                    }
-                    return false;
-                  });
-                  const multipleFiles = allFiles.length > 1;
-                  const { res } = await showUploadCsvWizardDialog(
-                    "onUploadWizardFinish",
-                    {
-                      dialogProps: {
-                        title: `Fix Up File${multipleFiles ? "s" : ""} ${
-                          multipleFiles ? "" : file.name ? `"${file.name}"` : ""
-                        }`
-                      },
-                      doAllFilesHaveSameHeaders,
-                      filesWIssues: allFiles,
-                      validateAgainstSchema
-                    }
-                  );
-
-                  if (!res) {
-                    window.toastr.warning(`File Upload Aborted`);
-                    return;
-                  } else {
-                    allFiles.forEach(({ file }, i) => {
-                      const newEntities = res[i];
-                      // const newFileName = removeExt(file.name) + `_updated.csv`;
-                      //swap out file with a new csv file
-                      const newFile = getNewCsvFile(newEntities, file.name);
-
-                      file.hasEditClick = true;
-                      file.parsedData = newEntities;
-                      // file.name = newFileName;
-                      file.originFileObj = newFile;
-                      file.originalFileObj = newFile;
-                    });
-                    setTimeout(() => {
-                      //inside a timeout for cypress purposes
-                      window.toastr.success(
-                        `Added Fixed Up File${
-                          allFiles.length > 1 ? "s" : ""
-                        } ${allFiles.map(({ file }) => file.name).join(", ")}`
-                      );
-                    }, 200);
-                  }
-                }
-              }
-
-              handleSecondHalfOfUpload({ acceptedFiles, cleanedFileList });
-            }
-          }}
-          {...dropzoneProps}
+        {comp}
+        {comp2}
+        <div
+          className="tg-uploader-inner"
+          style={{ width: "100%", height: "fit-content", minWidth: 0 }}
         >
-          {({
-            getRootProps,
-            getInputProps,
-            isDragAccept,
-            isDragReject,
-            isDragActive
-            // isDragActive
-            // isDragReject
-            // isDragAccept
-          }) => (
-            <section>
-              <div
-                {...getRootProps()}
-                className={classnames("tg-dropzone", className, {
-                  "tg-dropzone-minimal": minimal,
-                  "tg-dropzone-active": isDragActive,
-                  "tg-dropzone-reject": isDragReject, // tnr: the acceptClassName/rejectClassName doesn't work with file extensions (only mimetypes are supported when dragging). Thus we'll just always turn the drop area blue when dragging and let the filtering occur on drop. See https://github.com/react-dropzone/react-dropzone/issues/888#issuecomment-773938074
-                  "tg-dropzone-accept": isDragAccept,
-                  "tg-dropzone-disabled": disabled
-                })}
-              >
-                <input {...getInputProps()} />
-                {contentOverride || (
-                  <div
-                    title={
-                      simpleAccept
-                        ? "Accepts only the following file types: " +
-                          simpleAccept
-                        : "Accepts any file input"
-                    }
-                    className="tg-upload-inner"
-                  >
-                    {innerIcon || (
-                      <Icon icon="upload" iconSize={minimal ? 15 : 30} />
-                    )}
-                    {innerText ||
-                      (minimal ? "Upload" : "Click or drag to upload")}
-                  </div>
-                )}
-              </div>
-              {validateAgainstSchema && (
-                <div
-                  style={{
-                    textAlign: "center",
-                    fontSize: 18,
-                    marginTop: 7,
-                    marginBottom: 5
-                  }}
-                  onClick={handleManuallyEnterData}
-                  className="link-button"
-                >
-                  .. or manually enter data
-                </div>
-              )}
-              {showFilesCount ? (
-                <div className="tg-upload-file-list-counter">
-                  Files: {fileList ? fileList.length : 0}
-                </div>
-              ) : null}
-            </section>
-          )}
-        </Dropzone>
-        {/* {validateAgainstSchema && <CsvWizardHelper bindToggle={{}} validateAgainstSchema={validateAgainstSchema}></CsvWizardHelper>} */}
+          {simpleAccept && (
+            <div
+              className={Classes.TEXT_MUTED}
+              style={{ fontSize: 11, marginBottom: 5 }}
+            >
+              {advancedAccept ? (
+                <div style={{}}>
+                  Accepts &nbsp;
+                  <span style={{}}>
+                    {advancedAccept.map((a, i) => {
+                      const disabled = !(
+                        a.description ||
+                        a.exampleFile ||
+                        a.exampleFiles
+                      );
+                      const PopOrTooltip = a.exampleFiles ? Popover : Tooltip;
+                      const hasDownload = a.exampleFile || a.exampleFiles;
+                      const CustomTag = !hasDownload ? "span" : "a";
+                      return (
+                        <PopOrTooltip
+                          key={i}
+                          interactionKind="hover"
+                          disabled={disabled}
+                          modifiers={popoverOverflowModifiers}
+                          content={
+                            a.exampleFiles ? (
+                              <Menu>
+                                {a.exampleFiles.map(
+                                  ({ description, exampleFile, icon }, i) => {
+                                    return (
+                                      <MenuItem
+                                        icon={icon || "download"}
+                                        intent="primary"
+                                        text={description}
+                                        {...getFileDownloadAttr(exampleFile)}
+                                        key={i}
+                                      ></MenuItem>
+                                    );
+                                  }
+                                )}
+                              </Menu>
+                            ) : (
+                              <div
+                                style={{
+                                  maxWidth: 400,
+                                  wordBreak: "break-word"
+                                }}
+                              >
+                                {a.description ? (
+                                  <div
+                                    style={{
+                                      marginBottom: 4,
+                                      fontStyle: "italic"
+                                    }}
+                                  >
+                                    {a.description}
+                                  </div>
+                                ) : (
+                                  ""
+                                )}
+                                {a.exampleFile &&
+                                  (a.isTemplate
+                                    ? "Download Example Template"
+                                    : "Download Example File")}
+                              </div>
+                            )
+                          }
+                        >
+                          <CustomTag
+                            className="tgFileTypeDescriptor"
+                            style={{ marginRight: 10, cursor: "pointer" }}
+                            {...getFileDownloadAttr(a.exampleFile)}
+                          >
+                            {(a.type
+                              ? isArray(a.type)
+                                ? a.type
+                                : [a.type]
+                              : [a]
+                            )
+                              .map(t => {
+                                return t.startsWith(".") ? t : "." + t;
+                              })
+                              .join(", ")}
 
-        {fileList && showUploadList && !minimal && !!fileList.length && (
-          <div
-            className={classNames(
-              "tg-upload-file-list-holder",
-              overflowList ? "tg-upload-file-list-item-overflow" : null
-            )}
-          >
-            {fileList.map((file, index) => {
-              const {
-                loading,
-                error,
-                name,
-                originalName,
-                url,
-                downloadName,
-                hasEditClick
-              } = file;
-              let icon;
-              if (loading) {
-                icon = "repeat";
-              } else if (error) {
-                icon = "error";
-              } else {
-                if (onPreviewClick) {
-                  icon = "eye-open";
-                } else if (hasEditClick) {
-                  icon = "edit";
-                } else {
-                  icon = "saved";
+                            {hasDownload && (
+                              <Icon
+                                style={{
+                                  marginTop: 3,
+                                  marginLeft: 3
+                                }}
+                                size={10}
+                                icon="download"
+                              ></Icon>
+                            )}
+                          </CustomTag>
+                        </PopOrTooltip>
+                      );
+                    })}
+                  </span>
+                </div>
+              ) : (
+                <>Accepts {simpleAccept}</>
+              )}
+            </div>
+          )}
+          <Dropzone
+            disabled={disabled}
+            onClick={evt => evt.preventDefault()}
+            multiple={fileLimit !== 1}
+            accept={
+              simpleAccept
+                ? simpleAccept
+                    .split(", ")
+                    .map(a => (a.startsWith(".") ? a : "." + a))
+                    .join(", ")
+                : undefined
+            }
+            {...{
+              onDrop: async (_acceptedFiles, rejectedFiles) => {
+                let acceptedFiles = [];
+                for (const file of _acceptedFiles) {
+                  if (validateAgainstSchema && isZipFile(file)) {
+                    const files = await filterFilesInZip(
+                      file,
+                      simpleAccept
+                        ?.split(", ")
+                        ?.map(a => (a.startsWith(".") ? a : "." + a)) || []
+                    );
+                    acceptedFiles.push(...files.map(f => f.originFileObj));
+                  } else {
+                    acceptedFiles.push(file);
+                  }
                 }
+                cleanupFiles();
+                if (rejectedFiles.length) {
+                  let msg = "";
+                  rejectedFiles.forEach(file => {
+                    if (msg) msg += "\n";
+                    msg +=
+                      `${file.file.name}: ` +
+                      file.errors.map(err => err.message).join(", ");
+                  });
+                  window.toastr &&
+                    window.toastr.warning(
+                      <div className="preserve-newline">{msg}</div>
+                    );
+                }
+                if (!acceptedFiles.length) return;
+                setLoading(true);
+                if (fileLimit) {
+                  acceptedFiles = acceptedFiles.slice(0, fileLimit);
+                }
+
+                acceptedFiles.forEach(file => {
+                  file.preview = URL.createObjectURL(file);
+                  file.loading = true;
+                  if (!file.id) {
+                    file.id = nanoid();
+                  }
+                  filesToClean.current.push(file);
+                });
+
+                if (readBeforeUpload) {
+                  acceptedFiles = await Promise.all(
+                    acceptedFiles.map(file => {
+                      return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.readAsText(file, "UTF-8");
+                        reader.onload = evt => {
+                          file.parsedString = evt.target.result;
+                          resolve(file);
+                        };
+                        reader.onerror = err => {
+                          console.error("err:", err);
+                          reject(err);
+                        };
+                      });
+                    })
+                  );
+                }
+                const cleanedAccepted = acceptedFiles.map(file => {
+                  return {
+                    originFileObj: file,
+                    originalFileObj: file,
+                    id: file.id,
+                    lastModified: file.lastModified,
+                    lastModifiedDate: file.lastModifiedDate,
+                    loading: file.loading,
+                    name: file.name,
+                    preview: file.preview,
+                    size: file.size,
+                    type: file.type,
+                    ...(file.parsedString
+                      ? { parsedString: file.parsedString }
+                      : {})
+                  };
+                });
+                const cleanedFileList = [
+                  ...cleanedAccepted,
+                  ...fileListToUse
+                ].slice(0, fileLimit ? fileLimit : undefined);
+
+                if (validateAgainstSchema) {
+                  const filesWIssues = [];
+                  const filesWOIssues = [];
+                  for (const [i, file] of cleanedAccepted.entries()) {
+                    if (isCsvOrExcelFile(file)) {
+                      const parsedF = await parseCsvOrExcelFile(file);
+                      const {
+                        csvValidationIssue: _csvValidationIssue,
+                        matchedHeaders,
+                        userSchema,
+                        searchResults
+                      } = await tryToMatchSchemas({
+                        incomingData: parsedF.data,
+                        validateAgainstSchema
+                      });
+                      let csvValidationIssue = _csvValidationIssue;
+                      if (csvValidationIssue) {
+                        if (isObject(csvValidationIssue)) {
+                          initializeForm(
+                            `editableCellTable${
+                              cleanedAccepted.length > 1 ? `-${i}` : ""
+                            }`,
+                            {
+                              reduxFormCellValidation: csvValidationIssue
+                            },
+                            {
+                              keepDirty: true,
+                              keepValues: true,
+                              updateUnregisteredFields: true
+                            }
+                          );
+                          const err = Object.values(csvValidationIssue)[0];
+                          csvValidationIssue = `It looks like there was an error with your data - ${
+                            err && err.message ? err.message : err
+                          }. Please review your headers and then correct any errors with your data on the next page.`; //pass just the first error as a string
+                        }
+                        filesWIssues.push({
+                          file,
+                          csvValidationIssue,
+                          matchedHeaders,
+                          userSchema,
+                          searchResults
+                        });
+                      } else {
+                        filesWOIssues.push({
+                          file,
+                          csvValidationIssue,
+                          matchedHeaders,
+                          userSchema,
+                          searchResults
+                        });
+                        const newFileName = removeExt(file.name) + `.csv`;
+                        const newFile = getNewCsvFile(
+                          userSchema.userData,
+                          newFileName
+                        );
+
+                        file.meta = parsedF.meta;
+                        file.hasEditClick = true;
+                        file.parsedData = userSchema.userData;
+                        file.name = newFileName;
+                        file.originFileObj = newFile;
+                        file.originalFileObj = newFile;
+                      }
+                    }
+                  }
+                  if (filesWIssues.length) {
+                    const { file } = filesWIssues[0];
+                    const allFiles = [...filesWIssues, ...filesWOIssues];
+                    const doAllFilesHaveSameHeaders = allFiles.every(f => {
+                      if (f.userSchema.fields && f.userSchema.fields.length) {
+                        return f.userSchema.fields.every((h, i) => {
+                          return (
+                            h.path === allFiles[0].userSchema.fields[i].path
+                          );
+                        });
+                      }
+                      return false;
+                    });
+                    const multipleFiles = allFiles.length > 1;
+                    const { res } = await showUploadCsvWizardDialog(
+                      "onUploadWizardFinish",
+                      {
+                        dialogProps: {
+                          title: `Fix Up File${multipleFiles ? "s" : ""} ${
+                            multipleFiles
+                              ? ""
+                              : file.name
+                              ? `"${file.name}"`
+                              : ""
+                          }`
+                        },
+                        doAllFilesHaveSameHeaders,
+                        filesWIssues: allFiles,
+                        validateAgainstSchema
+                      }
+                    );
+
+                    if (!res) {
+                      window.toastr.warning(`File Upload Aborted`);
+                      return;
+                    } else {
+                      allFiles.forEach(({ file }, i) => {
+                        const newEntities = res[i];
+                        // const newFileName = removeExt(file.name) + `_updated.csv`;
+                        //swap out file with a new csv file
+                        const newFile = getNewCsvFile(newEntities, file.name);
+
+                        file.hasEditClick = true;
+                        file.parsedData = newEntities;
+                        // file.name = newFileName;
+                        file.originFileObj = newFile;
+                        file.originalFileObj = newFile;
+                      });
+                      setTimeout(() => {
+                        //inside a timeout for cypress purposes
+                        window.toastr.success(
+                          `Added Fixed Up File${
+                            allFiles.length > 1 ? "s" : ""
+                          } ${allFiles.map(({ file }) => file.name).join(", ")}`
+                        );
+                      }, 200);
+                    }
+                  }
+                }
+
+                handleSecondHalfOfUpload({ acceptedFiles, cleanedFileList });
               }
-              return (
+            }}
+            {...dropzoneProps}
+          >
+            {({
+              getRootProps,
+              getInputProps,
+              isDragAccept,
+              isDragReject,
+              isDragActive
+              // isDragActive
+              // isDragReject
+              // isDragAccept
+            }) => (
+              <section>
                 <div
-                  key={index}
-                  className="tg-upload-file-list-item"
-                  style={{ display: "flex", width: "100%" }}
+                  {...getRootProps()}
+                  className={classnames("tg-dropzone", className, {
+                    "tg-dropzone-minimal": minimal,
+                    "tg-dropzone-active": isDragActive,
+                    "tg-dropzone-reject": isDragReject, // tnr: the acceptClassName/rejectClassName doesn't work with file extensions (only mimetypes are supported when dragging). Thus we'll just always turn the drop area blue when dragging and let the filtering occur on drop. See https://github.com/react-dropzone/react-dropzone/issues/888#issuecomment-773938074
+                    "tg-dropzone-accept": isDragAccept,
+                    "tg-dropzone-disabled": disabled
+                  })}
                 >
+                  <input {...getInputProps()} />
+                  {contentOverride || (
+                    <div
+                      title={
+                        simpleAccept
+                          ? "Accepts only the following file types: " +
+                            simpleAccept
+                          : "Accepts any file input"
+                      }
+                      className="tg-upload-inner"
+                    >
+                      {innerIcon || (
+                        <Icon icon="upload" iconSize={minimal ? 15 : 30} />
+                      )}
+                      {innerText ||
+                        (minimal ? "Upload" : "Click or drag to upload")}
+                    </div>
+                  )}
+                </div>
+                {validateAgainstSchema && (
                   <div
                     style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      width: "100%"
+                      textAlign: "center",
+                      fontSize: 18,
+                      marginTop: 7,
+                      marginBottom: 5
                     }}
+                    onClick={handleManuallyEnterData}
+                    className="link-button"
                   >
-                    <span style={{ display: "flex" }}>
-                      <Icon
-                        className={classnames({
-                          "tg-spin": loading,
-                          "tg-upload-file-list-item-preview": onPreviewClick,
-                          "tg-upload-file-list-item-edit": hasEditClick,
-                          clickableIcon: onPreviewClick || hasEditClick
-                        })}
-                        data-tip={
-                          hasEditClick
-                            ? "Edit"
-                            : onPreviewClick
-                            ? "Preview"
-                            : undefined
-                        }
-                        style={{ marginRight: 5 }}
-                        icon={icon}
-                        onClick={async () => {
-                          if (hasEditClick) {
-                            const {
-                              // csvValidationIssue: _csvValidationIssue,
-                              matchedHeaders,
-                              userSchema,
-                              searchResults
-                            } = await tryToMatchSchemas({
-                              incomingData: file.parsedData,
-                              validateAgainstSchema
-                            });
-
-                            const {
-                              newEntities
-                            } = await showSimpleInsertDataDialog(
-                              "onSimpleInsertDialogFinish",
-                              {
-                                dialogProps: {
-                                  title: "Edit Data"
-                                },
-                                validateAgainstSchema,
-                                isEditingExistingFile: true,
-                                searchResults,
-                                matchedHeaders,
-                                userSchema
-                              }
-                            );
-
-                            if (!newEntities) {
-                              return;
-                            } else {
-                              const newFile = getNewCsvFile(
-                                newEntities,
-                                file.name
-                              );
-                              // file.parsedData = newEntities;
-                              Object.assign(file, {
-                                ...newFile,
-                                originFileObj: newFile,
-                                originalFileObj: newFile,
-                                parsedData: newEntities
-                              });
-                              handleSecondHalfOfUpload({
-                                acceptedFiles: fileList,
-                                cleanedFileList: fileList
-                              });
-                              window.toastr.success(`File Updated`);
-                            }
-                          }
-                          if (onPreviewClick) {
-                            onPreviewClick(file, index, fileList);
-                          }
-                        }}
-                      />
-                      <a
-                        name={name || originalName}
-                        {...(url && !onFileClick
-                          ? { download: true, href: url }
-                          : {})}
-                        /* eslint-disable react/jsx-no-bind*/
-                        onClick={() => {
-                          if (onFileClick) {
-                            onFileClick(file);
-                          } else {
-                            //handle default download
-                            if (file.originFileObj) {
-                              downloadjs(file.originFileObj, file.name);
-                            }
-                          }
-                        }}
-                        /* eslint-enable react/jsx-no-bind*/
-                        {...(downloadName ? { download: downloadName } : {})}
-                      >
-                        {" "}
-                        {name || originalName}{" "}
-                      </a>
-                    </span>
-                    {!loading && (
-                      <Icon
-                        onClick={() => {
-                          onRemove(file, index, fileList);
-                          onChange(
-                            fileList.filter((file, index2) => {
-                              return index2 !== index;
-                            })
-                          );
-                        }}
-                        iconSize={16}
-                        icon="cross"
-                        className="tg-upload-file-list-item-close clickableIcon"
-                      />
-                    )}
+                    .. or manually enter data
                   </div>
-                </div>
-              );
-            })}
+                )}
+                {showFilesCount ? (
+                  <div className="tg-upload-file-list-counter">
+                    Files: {fileList ? fileList.length : 0}
+                  </div>
+                ) : null}
+              </section>
+            )}
+          </Dropzone>
+          {/* {validateAgainstSchema && <CsvWizardHelper bindToggle={{}} validateAgainstSchema={validateAgainstSchema}></CsvWizardHelper>} */}
+
+          {fileList && showUploadList && !minimal && !!fileList.length && (
+            <div
+              className={classNames(
+                "tg-upload-file-list-holder",
+                overflowList ? "tg-upload-file-list-item-overflow" : null
+              )}
+            >
+              {fileList.map((file, index) => {
+                const {
+                  loading,
+                  error,
+                  name,
+                  originalName,
+                  url,
+                  downloadName,
+                  hasEditClick
+                } = file;
+                let icon;
+                if (loading) {
+                  icon = "repeat";
+                } else if (error) {
+                  icon = "error";
+                } else {
+                  if (onPreviewClick) {
+                    icon = "eye-open";
+                  } else if (hasEditClick) {
+                    icon = "edit";
+                  } else {
+                    icon = "saved";
+                  }
+                }
+                return (
+                  <div
+                    key={index}
+                    className="tg-upload-file-list-item"
+                    style={{ display: "flex", width: "100%" }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        width: "100%"
+                      }}
+                    >
+                      <span style={{ display: "flex" }}>
+                        <Icon
+                          className={classnames({
+                            "tg-spin": loading,
+                            "tg-upload-file-list-item-preview": onPreviewClick,
+                            "tg-upload-file-list-item-edit": hasEditClick,
+                            clickableIcon: onPreviewClick || hasEditClick
+                          })}
+                          data-tip={
+                            hasEditClick
+                              ? "Edit"
+                              : onPreviewClick
+                              ? "Preview"
+                              : undefined
+                          }
+                          style={{ marginRight: 5 }}
+                          icon={icon}
+                          onClick={async () => {
+                            if (hasEditClick) {
+                              const {
+                                // csvValidationIssue: _csvValidationIssue,
+                                matchedHeaders,
+                                userSchema,
+                                searchResults
+                              } = await tryToMatchSchemas({
+                                incomingData: file.parsedData,
+                                validateAgainstSchema
+                              });
+
+                              const {
+                                newEntities
+                              } = await showSimpleInsertDataDialog(
+                                "onSimpleInsertDialogFinish",
+                                {
+                                  dialogProps: {
+                                    title: "Edit Data"
+                                  },
+                                  validateAgainstSchema,
+                                  isEditingExistingFile: true,
+                                  searchResults,
+                                  matchedHeaders,
+                                  userSchema
+                                }
+                              );
+
+                              if (!newEntities) {
+                                return;
+                              } else {
+                                const newFile = getNewCsvFile(
+                                  newEntities,
+                                  file.name
+                                );
+                                // file.parsedData = newEntities;
+                                Object.assign(file, {
+                                  ...newFile,
+                                  originFileObj: newFile,
+                                  originalFileObj: newFile,
+                                  parsedData: newEntities
+                                });
+                                handleSecondHalfOfUpload({
+                                  acceptedFiles: fileList,
+                                  cleanedFileList: fileList
+                                });
+                                window.toastr.success(`File Updated`);
+                              }
+                            }
+                            if (onPreviewClick) {
+                              onPreviewClick(file, index, fileList);
+                            }
+                          }}
+                        />
+                        <a
+                          name={name || originalName}
+                          {...(url && !onFileClick
+                            ? { download: true, href: url }
+                            : {})}
+                          /* eslint-disable react/jsx-no-bind*/
+                          onClick={() => {
+                            if (onFileClick) {
+                              onFileClick(file);
+                            } else {
+                              //handle default download
+                              if (file.originFileObj) {
+                                downloadjs(file.originFileObj, file.name);
+                              }
+                            }
+                          }}
+                          /* eslint-enable react/jsx-no-bind*/
+                          {...(downloadName ? { download: downloadName } : {})}
+                        >
+                          {" "}
+                          {name || originalName}{" "}
+                        </a>
+                      </span>
+                      {!loading && (
+                        <Icon
+                          onClick={() => {
+                            onRemove(file, index, fileList);
+                            onChange(
+                              fileList.filter((file, index2) => {
+                                return index2 !== index;
+                              })
+                            );
+                          }}
+                          iconSize={16}
+                          icon="cross"
+                          className="tg-upload-file-list-item-close clickableIcon"
+                        />
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+        {threeDotMenuItems && (
+          <div className="tg-dropzone-extra-options">
+            <Popover
+              autoFocus={false}
+              minimal
+              content={<Menu>{threeDotMenuItems}</Menu>}
+              position={Position.BOTTOM_RIGHT}
+            >
+              <Button minimal icon="more" />
+            </Popover>
           </div>
         )}
       </div>
-      {threeDotMenuItems && (
-        <div className="tg-dropzone-extra-options">
-          <Popover
-            autoFocus={false}
-            minimal
-            content={<Menu>{threeDotMenuItems}</Menu>}
-            position={Position.BOTTOM_RIGHT}
-          >
-            <Button minimal icon="more" />
-          </Popover>
-        </div>
-      )}
-    </div>
+    </>
   );
 }
 
