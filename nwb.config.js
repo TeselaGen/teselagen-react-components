@@ -23,21 +23,9 @@ module.exports = {
     aliases: {
       // **** You can comment one or more of these in to override an npm module with a local module. *****
       // **** Just be sure to comment them back out before committing! *****
-      // "ve-sequence-utils":
-      //   console.log("comment me back out!") ||
-      //   path.resolve("../../ve-sequence-utils/src/"),
       // "@teselagen/react-table":
       //   console.log("comment me back out!") ||
       //   path.resolve("../react-table/src/"),
-      // "bio-parsers":
-      //   console.log("comment me back out!") ||
-      //   path.resolve("../../ve-sequence-parsers/src/parsers/"),
-      // "open-vector-editor":
-      //   console.log("comment me back out!") ||
-      //   path.resolve("../../openVectorEditor/src/"),
-      // "teselagen-react-components":
-      //   console.log("comment me back out!") ||
-      //   path.resolve("../../teselagen-react-components/src/"),
 
       //don't comment this out!
       react: path.resolve(__dirname, "node_modules/react")

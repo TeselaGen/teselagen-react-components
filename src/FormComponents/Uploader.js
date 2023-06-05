@@ -33,7 +33,7 @@ import {
   isZipFile,
   parseCsvOrExcelFile,
   removeExt
-} from "../utils/parserUtils";
+} from "@teselagen/file-utils";
 import tryToMatchSchemas from "./tryToMatchSchemas";
 import { forEach, isArray, isFunction, isPlainObject } from "lodash";
 import { flatMap } from "lodash";
