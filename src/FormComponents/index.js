@@ -187,6 +187,7 @@ class AbstractInput extends React.Component {
       rightEl,
       labelStyle,
       noOuterLabel,
+      fileLimit,
       noMarginBottom,
       assignDefaultButton,
       showGenerateDefaultDot,
@@ -242,8 +243,15 @@ class AbstractInput extends React.Component {
     let labelInfo = secondaryLabel;
 
     const hasOuterLabel = !noOuterLabel && !isLabelTooltip;
+    function getFileLimitInfo() {
+      if (!fileLimit) return "";
+      return `max ${fileLimit} file${fileLimit === 1 ? "" : "s"}`;
+    }
+
     if (isRequired && hasOuterLabel && label && !labelInfo) {
-      labelInfo = "(required)";
+      labelInfo = `(required${fileLimit ? `, ${getFileLimitInfo()}` : ""})`;
+    } else if (!labelInfo && fileLimit) {
+      labelInfo = `(${getFileLimitInfo()})`;
     }
 
     return (

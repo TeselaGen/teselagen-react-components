@@ -699,7 +699,7 @@ function Uploader({
                           const err = Object.values(csvValidationIssue)[0];
                           csvValidationIssue = `It looks like there was an error with your data - ${
                             err && err.message ? err.message : err
-                          }. Please review your headers and then correct any errors with your data on the next page.`; //pass just the first error as a string
+                          }. Please review your headers and then correct any errors on the next page.`; //pass just the first error as a string
                         }
                         filesWIssues.push({
                           file,

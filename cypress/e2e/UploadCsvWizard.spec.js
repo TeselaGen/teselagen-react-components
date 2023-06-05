@@ -704,7 +704,7 @@ a,,g,false,dna,misc_feature`,
     );
 
     cy.contains(
-      `Some of the data doesn't look quite right. Do these header mappings look correct?`
+      `It looks like there was an error with your data - Cannot be Thomas. Please review your headers and then correct any errors on the next page.`
     );
     cy.get(`.bp3-dialog tr:contains(Name) .tg-select-clear-all`).click();
     cy.contains("Review and Edit Data").click();
