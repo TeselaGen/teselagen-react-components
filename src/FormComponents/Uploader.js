@@ -78,6 +78,10 @@ class ValidateAgainstSchema {
   }
 
   setValidateAgainstSchema(newValidateAgainstSchema) {
+    if (!newValidateAgainstSchema) {
+      this.fields = [];
+      return;
+    }
     const schema = convertSchema(newValidateAgainstSchema);
     if (
       schema.fields.some(f => {
