@@ -110,6 +110,7 @@ async function matchSchemas({ userSchema, officialSchema }) {
         hasMatch = true;
       }
     });
+    h.hasMatch = hasMatch;
     h.matches = result;
 
     if (!hasMatch && h.isRequired)
@@ -138,7 +139,9 @@ async function matchSchemas({ userSchema, officialSchema }) {
         const { error } = editCellHelper({
           entity: e,
           columnSchema,
-          newVal: e[columnSchema.matches[0]?.item?.path]
+          newVal: columnSchema.hasMatch
+            ? e[columnSchema.matches[0]?.item?.path]
+            : undefined
         });
         if (error) {
           return true;
