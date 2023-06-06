@@ -8,23 +8,26 @@ import {
   MenuDivider,
   InputGroup,
   Classes,
-  NumericInput
+  NumericInput,
+  MenuItem
 } from "@blueprintjs/core";
 import dayjs from "dayjs";
 
 import getDayjsFormatter from "../utils/getDayjsFormatter";
 import { onEnterHelper } from "../utils/handlerHelpers";
 import DialogFooter from "../DialogFooter";
+import TgSelect from "../TgSelect";
 import "@teselagen/react-table/react-table.css";
 import "./style.css";
 import "../toastr";
 
 const isInvalidFilterValue = value => {
-  if (Array.isArray(value)) {
+  if (Array.isArray(value) && value.length) {
     return value.some(item => isInvalidFilterValue(item));
   }
-  return value === "" || value === undefined;
+  return value === "" || value === undefined || value.length === 0;
 };
+
 export default class FilterAndSortMenu extends React.Component {
   constructor(props) {
     super(props);
@@ -43,7 +46,7 @@ export default class FilterAndSortMenu extends React.Component {
   };
   handleFilterSubmit = () => {
     const { filterValue, selectedFilter } = this.state;
-    const { togglePopover } = this.props;
+    const { togglePopover, dataType } = this.props;
     const ccSelectedFilter = camelCase(selectedFilter);
     let filterValToUse = filterValue;
     if (ccSelectedFilter === "true" || ccSelectedFilter === "false") {
@@ -52,9 +55,23 @@ export default class FilterAndSortMenu extends React.Component {
     } else if (ccSelectedFilter === "notEmpty") {
       // manually set filter value (nothing is selected by user)
       filterValToUse = true;
+    } else if (ccSelectedFilter === "isEmpty") {
+      // manually set filter value (nothing is selected by user)
+      filterValToUse = false;
+    } else if (
+      ccSelectedFilter === "inList" ||
+      ccSelectedFilter === "notInList"
+    ) {
+      if (dataType === "number") {
+        filterValToUse =
+          filterValue &&
+          filterValue.map(val => parseFloat(val.replaceAll(",", "")));
+      }
     }
+
     const { filterOn, addFilters, removeSingleFilter } = this.props;
     if (isInvalidFilterValue(filterValToUse)) {
+      togglePopover();
       return removeSingleFilter(filterOn);
     }
     addFilters([
@@ -84,19 +101,25 @@ export default class FilterAndSortMenu extends React.Component {
       startsWith: "text",
       endsWith: "text",
       contains: "text",
+      notContains: "text",
       isExactly: "text",
+      isEmpty: "text",
       notEmpty: "text",
-      inList: "text",
+      inList: "list",
+      notInList: "list",
       true: "boolean",
       false: "boolean",
       dateIs: "date",
+      notBetween: "dateRange",
       isBetween: "dateRange",
       isBefore: "date",
       isAfter: "date",
       greaterThan: "number",
       lessThan: "number",
       inRange: "numberRange",
-      equalTo: "number"
+      outsideRange: "numberRange",
+      equalTo: "number",
+      regex: "text"
     };
     const filterMenuItems = getFilterMenuItems(dataType);
     const ccSelectedFilter = camelCase(selectedFilter);
@@ -160,7 +183,15 @@ const dateMinMaxHelpers = {
     .add(25, "years")
     .toDate()
 };
-
+const renderCreateNewOption = (query, active, handleClick) => (
+  <MenuItem
+    icon="add"
+    text={query}
+    active={active}
+    onClick={handleClick}
+    shouldDismissPopover={false}
+  />
+);
 class FilterInput extends React.Component {
   render() {
     const {
@@ -176,7 +207,7 @@ class FilterInput extends React.Component {
     switch (filterType) {
       case "text":
         inputGroup =
-          filterSubType === "notEmpty" ? (
+          filterSubType === "notEmpty" || filterSubType === "isEmpty" ? (
             <div />
           ) : (
             <div className="custom-menu-item">
@@ -191,6 +222,31 @@ class FilterInput extends React.Component {
               />
             </div>
           );
+        break;
+      case "list":
+        inputGroup = (
+          <div className="custom-menu-item">
+            <TgSelect
+              placeholder="Add item"
+              renderCreateNewOption={renderCreateNewOption}
+              noResults={null}
+              multi={true}
+              creatable={true}
+              value={(filterValue || []).map(val => ({
+                label: val,
+                value: val
+              }))}
+              onChange={selectedOptions => {
+                selectedOptions.some(opt => opt.value === "")
+                  ? handleFilterSubmit()
+                  : handleFilterValueChange(
+                      selectedOptions.map(opt => opt.value)
+                    );
+              }}
+              options={[]}
+            />
+          </div>
+        );
         break;
       case "number":
         inputGroup = (
@@ -299,14 +355,25 @@ function getFilterMenuItems(dataType) {
   if (dataType === "string") {
     filterMenuItems = [
       "Contains",
-      "Starts with",
-      "Ends with",
-      "Is exactly",
+      "Not Contains",
+      "Starts With",
+      "Ends With",
+      "Is Exactly",
+      "Regex",
       "In List",
-      "Not empty"
+      "Not In List",
+      "Is Empty",
+      "Not Empty"
     ];
   } else if (dataType === "lookup") {
-    filterMenuItems = ["Contains", "Starts with", "Ends with", "Is exactly"];
+    filterMenuItems = [
+      "Contains",
+      "Not Contains",
+      "Starts With",
+      "Ends With",
+      "Is Exactly",
+      "Regex"
+    ];
   } else if (dataType === "boolean") {
     filterMenuItems = ["True", "False"];
   } else if (dataType === "number" || dataType === "integer") {
@@ -314,14 +381,16 @@ function getFilterMenuItems(dataType) {
     //   filterMenuItems = ["None"];
     // }
     filterMenuItems = [
-      "Greater than",
-      "Less than",
-      "In range",
-      "Equal to",
-      "In List"
+      "Greater Than",
+      "Less Than",
+      "In Range",
+      "Outside Range",
+      "Equal To",
+      "In List",
+      "Not In List"
     ];
   } else if (dataType === "timestamp") {
-    filterMenuItems = ["Is between", "Is before", "Is after"];
+    filterMenuItems = ["Is Between", "Not Between", "Is Before", "Is After"];
   }
   return filterMenuItems;
 }
