@@ -354,22 +354,22 @@ josh,,g,false,dna,misc_feature
       cy.window().then(win => {
         expect(win.parsedData).to.deep.equal([
           {
+            ID: undefined,
             name: "abby",
             description: "",
             sequence: "g",
             isRegex: false,
             matchType: "dna",
-            type: "misc_feature",
-            ID: ""
+            type: "misc_feature"
           },
           {
+            ID: undefined,
             name: "josh",
             description: "",
             sequence: "g",
             isRegex: false,
             matchType: "dna",
-            type: "misc_feature",
-            ID: ""
+            type: "misc_feature"
           }
         ]);
       });
