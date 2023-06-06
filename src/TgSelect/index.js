@@ -256,7 +256,7 @@ class TgSelect extends React.Component {
             onClick={this.handleClear}
           />
         )}
-        {noResults && (
+        {noResults !== null && (
           <Button
             onClick={e => {
               if (this.state.isOpen) {
