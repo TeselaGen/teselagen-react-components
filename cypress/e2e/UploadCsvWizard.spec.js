@@ -324,6 +324,77 @@ a,,,,false,dna,misc_feature
     cy.get(
       `[data-tip="At least one of these fields must be present - Description, Sequence BPs"]`
     ).should("not.exist");
+    // file data should NOT include generated lowercase id
+  });
+  it(`requireExactlyOneOf should pass a perfect file`, () => {
+    cy.visit("#/UploadCsvWizard");
+    cy.tgToggle("requireExactlyOneOf");
+    cy.uploadBlobFiles(
+      ".tg-dropzone",
+      [
+        {
+          name: "nameOrId.csv",
+          contents: `name,description,sequence,isRegex,matchType,type
+abby,,g,false,dna,misc_feature
+josh,,g,false,dna,misc_feature
+  `,
+          type: "text/csv"
+        }
+      ],
+      true
+    );
+
+    cy.get(`.tg-upload-file-list-item-edit`).click();
+
+    cy.get(`[data-test="tgCell_ID"]`).should("be.empty");
+    cy.contains("Cancel").click();
+
+    cy.contains("Finish Upload").click();
+    cy.contains("Upload Successful").then(() => {
+      cy.window().then(win => {
+        expect(win.parsedData).to.deep.equal([
+          {
+            name: "abby",
+            description: "",
+            sequence: "g",
+            isRegex: false,
+            matchType: "dna",
+            type: "misc_feature",
+            ID: ""
+          },
+          {
+            name: "josh",
+            description: "",
+            sequence: "g",
+            isRegex: false,
+            matchType: "dna",
+            type: "misc_feature",
+            ID: ""
+          }
+        ]);
+      });
+    });
+    cy.contains("nameOrId.csv").click();
+    cy.readFile(
+      path.join(Cypress.config("downloadsFolder"), "nameOrId.csv")
+    ).should(
+      "eq",
+      `name,description,sequence,isRegex,matchType,type,ID\r\nabby,,g,false,dna,misc_feature,\r\njosh,,g,false,dna,misc_feature,`
+    );
+  });
+  it(`error if "id" passed as path in validateAgainstSchema`, done => {
+    cy.visit("#/UploadCsvWizard");
+
+    cy.on("uncaught:exception", err => {
+      assert(
+        err.message.includes(
+          `Uploader was passed a validateAgainstSchema with a fields array that contains a field with a path of "id". This is not allowed.`
+        )
+      );
+      done();
+      return false;
+    });
+    cy.tgToggle("idAsPathShouldError");
   });
   it(`requireAllOrNone should trigger validation error on file upload`, () => {
     cy.visit("#/UploadCsvWizard");

@@ -15,6 +15,7 @@ const validateAgainstSchema = ({
   asyncNameValidation,
   multipleExamples,
   requireExactlyOneOf,
+  idAsPathShouldError,
   requireAllOrNone,
   requireAtLeastOneOf,
   allowExtendedProps,
@@ -90,86 +91,95 @@ const validateAgainstSchema = ({
   //       return toRet;
   //     }
   //   : undefined,
-  fields: alternateHeaders ? [
-    {
-      path: "description", 
-    },
-    {
-      path: "catalog number",
-      isRequired: true
-    },
-    {
-      path: "isColumn", 
-      isRequired: true
-    },
-    {
-      path: "plateWellDescription", 
-    },
-    {
-      path: "maxVolume", 
-      isRequired: true
-    },
-    {
-      path: "zoinkkk", 
-      isRequired: true
-    },
+  fields: alternateHeaders
+    ? [
+        {
+          path: "description"
+        },
+        {
+          path: "catalog number",
+          isRequired: true
+        },
+        {
+          path: "isColumn",
+          isRequired: true
+        },
+        {
+          path: "plateWellDescription"
+        },
+        {
+          path: "maxVolume",
+          isRequired: true
+        },
+        {
+          path: "zoinkkk",
+          isRequired: true
+        }
+      ]
+    : [
+        {
+          isRequired: !requireExactlyOneOf && !requireAtLeastOneOf,
+          isUnique: enforceNameUnique,
+          path: "name",
+          description: requireExactlyOneOf
+            ? `The ID of the model to be tagged. Used if a Name is NOT provided`
+            : "The Sequence Name",
+          example: multipleExamples ? ["pj5_0001", "someOtherSeq"] : "pj5_0001"
 
-  ] : [
-    {
-      isRequired: !requireExactlyOneOf && !requireAtLeastOneOf,
-      isUnique: enforceNameUnique,
-      path: "name",
-      description: requireExactlyOneOf
-        ? `The ID of the model to be tagged. Used if a Name is NOT provided`
-        : "The Sequence Name",
-      example: multipleExamples ? ["pj5_0001", "someOtherSeq"] : "pj5_0001"
-
-      // defaultValue: "asdf"
-    },
-    ...(requireExactlyOneOf || requireAtLeastOneOf
-      ? [
-          {
-            path: "ID",
-            displayName: "ID",
-            description: `The ID of the model to be tagged. Used if a Name is NOT provided`
-          }
-        ]
-      : []),
-    {
-      path: "description",
-      example: multipleExamples
-        ? ["Example description of a sequence", "A 2nd description"]
-        : "Example description of a sequence"
-    },
-    {
-      isRequired: !requireExactlyOneOf && !requireAtLeastOneOf,
-      displayName: "Sequence BPs",
-      path: "sequence",
-      example: "gtgctttca",
-      description: "The dna sequence base pairs"
-    },
-    {
-      path: "isRegex",
-      type: "boolean",
-      description: "Whether the sequence is a regex",
-      defaultValue: false
-    },
-    {
-      path: "matchType",
-      type: "dropdown",
-      // isRequired: true,
-      description: "Whether the sequence is a dna or protein sequence",
-      values: ["dna", "protein"],
-      example: multipleExamples ? ["dna", "protein"] : "dna"
-    },
-    {
-      path: "type",
-      type: "dropdown",
-      // isRequired: true,
-      values: ["misc_feature", "CDS", "rbs"],
-      example: multipleExamples ? ["misc_feature", "CDS"] : "misc_feature"
-    }
-  ]
+          // defaultValue: "asdf"
+        },
+        ...(requireExactlyOneOf || requireAtLeastOneOf
+          ? [
+              {
+                path: "ID",
+                displayName: "ID",
+                description: `The ID of the model to be tagged. Used if a Name is NOT provided`
+              }
+            ]
+          : []),
+        ...(idAsPathShouldError
+          ? [
+              {
+                path: "id",
+                description: `Passing an "id" as the path should throw an informative error`
+              }
+            ]
+          : []),
+        {
+          path: "description",
+          example: multipleExamples
+            ? ["Example description of a sequence", "A 2nd description"]
+            : "Example description of a sequence"
+        },
+        {
+          isRequired: !requireExactlyOneOf && !requireAtLeastOneOf,
+          displayName: "Sequence BPs",
+          path: "sequence",
+          example: "gtgctttca",
+          description: "The dna sequence base pairs"
+        },
+        {
+          path: "isRegex",
+          type: "boolean",
+          description: "Whether the sequence is a regex",
+          defaultValue: false
+        },
+        {
+          path: "matchType",
+          type: "dropdown",
+          // isRequired: true,
+          description: "Whether the sequence is a dna or protein sequence",
+          values: ["dna", "protein"],
+          example: multipleExamples ? ["dna", "protein"] : "dna"
+        },
+        {
+          path: "type",
+          type: "dropdown",
+          // isRequired: true,
+          values: ["misc_feature", "CDS", "rbs"],
+          example: multipleExamples ? ["misc_feature", "CDS"] : "misc_feature"
+        }
+      ]
 });
 
 export default function UploadCsvWizardDemo() {
@@ -203,6 +213,10 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
     description:
       "If checked, will require that either the name or id or the description or sequence be provided, not both"
   });
+  const [idAsPathShouldError, idAsPathShouldErrorComp] = useToggle({
+    type: "idAsPathShouldError",
+    description: "Passing an id as the path should throw an informative error"
+  });
   const [requireAllOrNone, requireAllOrNoneComp] = useToggle({
     type: "requireAllOrNone",
     description:
@@ -215,8 +229,7 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
   });
   const [alternateHeaders, alternateHeadersComp] = useToggle({
     type: "alternateHeaders",
-    description:
-      "If checked, will use alternate headers for the columns"
+    description: "If checked, will use alternate headers for the columns"
   });
   const [allowExtendedProps, allowExtendedPropsComp] = useToggle({
     type: "allowExtendedProps",
@@ -254,6 +267,7 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
       {alternateHeadersComp}
       {allowExtendedPropsComp}
       {requireExactlyOneOfComp}
+      {idAsPathShouldErrorComp}
       {allowMultipleFilesComp}
       {multipleExamplesComp}
       {/* {allowZipComp} */}
@@ -273,12 +287,13 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
             validateAgainstSchema: simpleSchema
               ? simpleValidateAgainst
               : validateAgainstSchema({
-                alternateHeaders,
+                  alternateHeaders,
                   coerceUserSchema,
                   requireAllOrNone,
                   allowExtendedProps,
                   requireAtLeastOneOf,
                   requireExactlyOneOf,
+                  idAsPathShouldError,
                   asyncNameValidation,
                   enforceNameUnique,
                   // allowEitherNameOrId,
@@ -295,7 +310,7 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
         text="Finish Upload"
         onClick={handleSubmit(async function(values) {
           window.parsedData = values.exampleFile[0].parsedData;
-          window.exampleFile = values.exampleFile
+          window.exampleFile = values.exampleFile;
           window.toastr.success("Upload Successful");
           console.info(
             `values.exampleFile.parsedData:`,

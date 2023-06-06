@@ -47,6 +47,7 @@ import { connect } from "react-redux";
 import { initialize } from "redux-form";
 import classNames from "classnames";
 import { compose } from "recompose";
+import convertSchema from "../DataTable/utils/convertSchema";
 
 configure({ isolateGlobalState: true });
 const helperText = [
@@ -77,7 +78,20 @@ class ValidateAgainstSchema {
   }
 
   setValidateAgainstSchema(newValidateAgainstSchema) {
-    forEach(newValidateAgainstSchema, (v, k) => {
+    const schema = convertSchema(newValidateAgainstSchema);
+    if (
+      schema.fields.some(f => {
+        if (f.path === "id") {
+          return true;
+        }
+        return false;
+      })
+    ) {
+      throw new Error(
+        `Uploader was passed a validateAgainstSchema with a fields array that contains a field with a path of "id". This is not allowed.`
+      );
+    }
+    forEach(schema, (v, k) => {
       this[k] = v;
     });
   }
