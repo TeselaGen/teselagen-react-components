@@ -1378,6 +1378,7 @@ class DataTable extends React.Component {
           )}
         >
           <div
+            className="data-table-container-inner"
             {...(isCellEditable && {
               tabIndex: -1,
               onKeyDown: e => {
