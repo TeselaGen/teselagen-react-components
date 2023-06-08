@@ -130,7 +130,7 @@ function Uploader({
   className = "",
   minimal,
   validateAgainstSchema: _validateAgainstSchema,
-  validateAgainstSchema: _callout,
+  callout: _callout,
   fileLimit,
   readBeforeUpload, //read the file using the browser's FileReader before passing it to onChange and/or uploading it
   uploadInBulk, //tnr: not yet implemented
