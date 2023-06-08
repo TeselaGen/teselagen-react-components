@@ -1178,14 +1178,15 @@
   dependencies:
     any-observable "^0.3.0"
 
-"@teselagen/file-utils@^0.2.2":
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/@teselagen/file-utils/-/file-utils-0.2.2.tgz#cd1977c93e17261802965458ef7cf90583f60314"
-  integrity sha512-5wkuYp+Xy+ZNCWe3EkTkV1aHC/fIkpvWvAn3y1OWKgh5vvXz3AuosEy2Az2gx4zKzXrbY48GBMso4U6b5aFQ7A==
+"@teselagen/file-utils@^0.2.10":
+  version "0.2.10"
+  resolved "https://registry.yarnpkg.com/@teselagen/file-utils/-/file-utils-0.2.10.tgz#155b22839d611868387c52ff2572a633a195fb53"
+  integrity sha512-8qtX5TWWTjIMIv7sUqbMOXkOQK1nAUb7W2Jbkn1UKfdHdSImsQCZpjqmOxTncesPaCGVVKIIxjltHS2u9TtrYA==
   dependencies:
     bluebird "^3.7.2"
     jszip "^3.10.1"
     lodash "^4.17.21"
+    mock-fs "5.2.0"
     papaparse "^5.4.1"
 
 "@teselagen/react-list@0.8.18", "@teselagen/react-list@^0.8.18":
@@ -7089,6 +7090,11 @@ mocha@7.1.2:
     yargs "13.3.2"
     yargs-parser "13.1.2"
     yargs-unparser "1.6.0"
+
+mock-fs@5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/mock-fs/-/mock-fs-5.2.0.tgz#3502a9499c84c0a1218ee4bf92ae5bf2ea9b2b5e"
+  integrity sha512-2dF2R6YMSZbpip1V1WHKGLNjr/k48uQClqMVb5H3MOvwc9qhYis3/IWbj02qIg/Y8MDXKFF4c5v0rxx2o6xTZw==
 
 move-concurrently@^1.0.1:
   version "1.0.1"
