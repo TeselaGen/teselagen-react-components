@@ -70,4 +70,4 @@ const sortify = (value, replacer, space) => {
   return jsonStringify(sortKeys(cleanObj), null, space);
 };
 
-module.exports = sortify;
+export default sortify;

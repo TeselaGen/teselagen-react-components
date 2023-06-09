@@ -301,6 +301,7 @@ class TgSelect extends React.Component {
         itemDisabled={itemDisabled}
         query={this.state.query}
         popoverProps={{
+          captureDismiss: true,
           minimal: true,
           className: classNames("tg-select", "tg-stop-dialog-form-enter", {
             "tg-single-select": !multi

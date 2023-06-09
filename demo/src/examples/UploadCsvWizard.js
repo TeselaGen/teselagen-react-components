@@ -27,27 +27,29 @@ const validateAgainstSchema = ({
     "This template file is used to add rows to the sequence table.",
   ...(coerceUserSchema && {
     coerceUserSchema: ({ userSchema, officialSchema }) => {
-      const field = {
-        addedViaCoerce: true,
-        path: "fakePath",
-        matches: [
-          {
-            item: {
-              path: "fakePath"
-            }
-          }
-        ]
-      };
-      if (!officialSchema.fields.some(f => f.addedViaCoerce)) {
-        //officialSchema doesn't already have a fake path
-        officialSchema.fields.push(field);
-      }
-
-      //in most cases you won't have to do this because userSchema will come in with the data you want to add:
-      if (!userSchema.fields.some(f => f.addedViaCoerce)) {
-        //userSchema doesn't already have a fake path
-        userSchema.fields.push(field);
-      }
+      //if userSchema comes in with extended properties, we need to add them to the officialSchema
+      userSchema.fields.forEach(f => {
+        if (
+          f.path.startsWith("ext-") &&
+          !officialSchema.fields.some(({ path }) => {
+            return path === f.path;
+          })
+        ) {
+          officialSchema.fields.push({
+            path: f.path,
+            displayName: f.path,
+            hasMatch: true,
+            matches: [
+              {
+                item: {
+                  displayName: f.path,
+                  path: f.path
+                }
+              }
+            ]
+          });
+        }
+      });
     }
   }),
   ...(asyncNameValidation && {
@@ -225,7 +227,7 @@ const Inner = reduxForm({ form: "UploadCsvWizardDemo" })(({ handleSubmit }) => {
   const [coerceUserSchema, coerceUserSchemaComp] = useToggle({
     type: "coerceUserSchema",
     description:
-      "If checked, will coerce the user schema to include a fakePath column"
+      "If checked, will coerce the user schema to allow user columns starting with ext-"
   });
   const [alternateHeaders, alternateHeadersComp] = useToggle({
     type: "alternateHeaders",

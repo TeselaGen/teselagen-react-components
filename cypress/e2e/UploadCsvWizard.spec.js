@@ -80,6 +80,17 @@ describe("EditableCellTable.spec", () => {
       `name,description,sequence,isRegex,matchType,type\r\na,,g,false,dna,misc_feature\r\na,,g,false,dna,misc_feature\r\na,,g,false,dna,misc_feature\r\na,,g,false,dna,misc_feature\r\na,,tom,false,dna,misc_feature`
     );
   });
+  it(`custom coerceUserSchema should allow ext- columns`, () => {
+    cy.visit("#/UploadCsvWizard");
+    cy.tgToggle(`coerceUserSchema`);
+    cy.uploadFile(
+      ".tg-dropzone",
+      "testUploadWizard_extColumns.csv",
+      "text/csv"
+    );
+    cy.get(`.tg-upload-file-list-item-edit`).click();
+    cy.get(`[data-test="tgCell_ext-weee"]:contains(yewww)`);
+  });
   it(`wizard should let a "perfect" file that uses a display name through without any additional steps`, () => {
     cy.visit("#/UploadCsvWizard");
     cy.uploadFile(
