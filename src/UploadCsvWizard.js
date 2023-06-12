@@ -281,7 +281,7 @@ const UploadCsvWizardDialog = compose(
                 fileIndex: 0,
                 ...filesWIssues[0]
               }}
-            ></MatchHeaders>
+            />
           )}
           {hasSubmittedOuter && tabs}
           {!hasSubmittedOuter && (

@@ -1,6 +1,6 @@
 import React from "react";
 import { Callout, Card, Intent } from "@blueprintjs/core";
-import immer from "immer";
+import immer, { setAutoFreeze } from "immer";
 import { flatMap, forEach } from "lodash";
 import { ReactSelectField } from "./FormComponents";
 import showConfirmationDialog from "./showConfirmationDialog";
@@ -8,6 +8,7 @@ import { startCase } from "lodash";
 import { typeToCommonType } from "./UploadCsvWizard";
 import { camelCase } from "lodash";
 
+setAutoFreeze(false);
 export function MatchHeaders({
   onMultiFileUploadSubmit,
   doAllFilesHaveSameHeaders,

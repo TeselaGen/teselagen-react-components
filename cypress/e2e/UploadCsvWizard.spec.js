@@ -773,9 +773,12 @@ a,,g,false,dna,misc_feature`,
       true
     );
 
+    cy.contains(`It looks like there was an error with your data:`);
+    cy.contains(`Cannot be Thomas`);
     cy.contains(
-      `It looks like there was an error with your data - Cannot be Thomas. Please review your headers and then correct any errors on the next page.`
+      `Please review your headers and then correct any errors on the next page.`
     );
+
     cy.get(`.bp3-dialog tr:contains(Name) .tg-select-clear-all`).click();
     cy.contains("Review and Edit Data").click();
     cy.get(
@@ -963,9 +966,7 @@ thomas,,g,false,dna,misc_feature`,
       true
     );
 
-    cy.contains(
-      `It looks like there was an error with your data - Cannot be Thomas`
-    );
+    cy.contains(`Cannot be Thomas`);
     cy.contains("Review and Edit Data").click();
     cy.get(`.bp3-button.bp3-disabled:contains(Next File)`);
     cy.get(`[data-tip="Cannot be Thomas"]`);

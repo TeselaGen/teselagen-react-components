@@ -741,6 +741,8 @@ function Uploader({
                               )}`
                             );
                           }
+                          // csvValidationIssue = `It looks like there was an error with your data: ${errMsg}  Please review your headers and then correct any errors on the next page.`;
+
                           csvValidationIssue = (
                             <div>
                               <div>
