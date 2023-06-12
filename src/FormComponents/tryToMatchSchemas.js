@@ -1,4 +1,4 @@
-import { forEach, map } from "lodash";
+import { forEach, isArray, map } from "lodash";
 import { nanoid } from "nanoid";
 import Fuse from "fuse.js";
 import { editCellHelper } from "../DataTable";
@@ -97,7 +97,19 @@ async function matchSchemas({ userSchema, officialSchema }) {
           getTextFromEl(h.displayName)
             .toLowerCase()
             .replace(/ /g, "");
-      if (pathMatch || displayNameMatch) {
+      const hasAlternatePathMatch =
+        h.alternatePathMatch &&
+        (isArray(h.alternatePathMatch)
+          ? h.alternatePathMatch.some(alternatePathMatch => {
+              return (
+                uh.path.toLowerCase().replace(/ /g, "") ===
+                alternatePathMatch.toLowerCase().replace(/ /g, "")
+              );
+            })
+          : uh.path.toLowerCase().replace(/ /g, "") ===
+            h.alternatePathMatch.toLowerCase().replace(/ /g, ""));
+
+      if (pathMatch || displayNameMatch || hasAlternatePathMatch) {
         result = result.filter(({ path }) => path === uh.path);
         //add a fake perfect match result to make sure we get the match
         result.unshift({

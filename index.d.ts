@@ -2,13 +2,14 @@
 
 import * as React from "react";
 
-import { Intent, Button, Classes, IMenuItemProps, MenuItem, IAnchorButtonProps } from "@blueprintjs/core";
+import { Intent,  IMenuItemProps, IAnchorButtonProps } from "@blueprintjs/core";
 
 /*~ If this module has methods, export them as functions like so.
  */
 
 interface SchemaField {
   displayName?: string;
+  alternatePathMatch?: string | string[];
   path?: string;
   width?: number;
   /**
@@ -619,9 +620,9 @@ export class FileUploadField extends React.Component<
 > { }
 type AcceptObj = {
   validateAgainstSchema: ValidateAgainstSchemaObj;
-  type: string; 
-  exampleFile: string | (() => string); 
-  description: string; 
+  type: string;
+  exampleFile: string | (() => string);
+  description: string;
   isTemplate: boolean
 }
 type ValidateAgainstSchemaObj = {
