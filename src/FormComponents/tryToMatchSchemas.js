@@ -6,6 +6,8 @@ import { validateTableWideErrors } from "../DataTable/validateTableWideErrors";
 import { isEmpty } from "lodash";
 import getTextFromEl from "../utils/getTextFromEl";
 import { min } from "lodash";
+import { camelCase } from "lodash";
+import { startCase } from "lodash";
 
 const getSchema = data => ({
   fields: map(data[0], (val, path) => {
@@ -19,7 +21,6 @@ const getSchema = data => ({
   //   return d
   // })
 });
-
 export default async function tryToMatchSchemas({
   incomingData,
   validateAgainstSchema
@@ -113,9 +114,10 @@ async function matchSchemas({ userSchema, officialSchema }) {
     h.hasMatch = hasMatch;
     h.matches = result;
 
-    if (!hasMatch && h.isRequired)
+    if (!hasMatch && h.isRequired) {
       csvValidationIssue =
         "It looks like some of the headers in your uploaded file(s) do not match the expected headers. Please look over and correct any issues with the mappings below.";
+    }
   });
   if (officialSchema.coerceUserSchema) {
     officialSchema.coerceUserSchema({ userSchema, officialSchema });
@@ -131,9 +133,9 @@ async function matchSchemas({ userSchema, officialSchema }) {
     return e;
   });
   const editableFields = officialSchema.fields.filter(f => !f.isNotEditable);
-  const hasErr =
-    !csvValidationIssue &&
-    (userSchema.userData.some(e => {
+  let hasErr;
+  if (!csvValidationIssue) {
+    userSchema.userData.some(e => {
       return editableFields.some(columnSchema => {
         //mutative
         const { error } = editCellHelper({
@@ -144,19 +146,26 @@ async function matchSchemas({ userSchema, officialSchema }) {
             : undefined
         });
         if (error) {
+          hasErr = `${columnSchema.displayName ||
+            startCase(camelCase(columnSchema.path))}: ${error}`;
           return true;
         }
+
         return false;
       });
-    }) ||
-      Object.keys(
+    });
+    if (!hasErr) {
+      hasErr = Object.values(
         validateTableWideErrors({
           entities: userSchema.userData,
           schema: officialSchema,
           optionalUserSchema: userSchema,
           newCellValidate: {}
         })
-      ).length);
+      )[0];
+    }
+  }
+
   if (officialSchema.tableWideAsyncValidation) {
     //do the table wide validation
     const res = await officialSchema.tableWideAsyncValidation({
@@ -169,7 +178,15 @@ async function matchSchemas({ userSchema, officialSchema }) {
   }
 
   if (hasErr && !csvValidationIssue) {
-    csvValidationIssue = `Some of the data doesn't look quite right. Do these header mappings look correct?`;
+    if (hasErr.message) {
+      csvValidationIssue = hasErr;
+    } else {
+      csvValidationIssue = {
+        message: hasErr
+      };
+      // csvValidationIssue = ` Some of the data doesn't look quite right. Do these header mappings look correct?`;
+    }
+    // csvValidationIssue = `Some of the data doesn't look quite right. Do these header mappings look correct?`;
   }
   // if (!csvValidationIssue) {
   //   //all the headers match up as does the actual data

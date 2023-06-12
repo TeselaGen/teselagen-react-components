@@ -3526,7 +3526,6 @@ export const editCellHelper = ({
       error = validator(nv, colSchema);
     }
   }
-
   set(entity, path, nv);
   return { entity, error };
 };

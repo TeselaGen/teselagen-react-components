@@ -564,6 +564,16 @@ function Uploader({
                               : [a]
                             )
                               .map(t => {
+                                if (!t.startsWith) {
+                                  console.error(`Missing type here:`, a);
+                                  throw new Error(
+                                    `Missing "type" here: ${JSON.stringify(
+                                      a,
+                                      null,
+                                      4
+                                    )}`
+                                  );
+                                }
                                 return t.startsWith(".") ? t : "." + t;
                               })
                               .join(", ")}
@@ -718,9 +728,31 @@ function Uploader({
                             }
                           );
                           const err = Object.values(csvValidationIssue)[0];
-                          csvValidationIssue = `It looks like there was an error with your data - ${
-                            err && err.message ? err.message : err
-                          }. Please review your headers and then correct any errors on the next page.`; //pass just the first error as a string
+                          // csvValidationIssue = `It looks like there was an error with your data - \n\n${
+                          //   err && err.message ? err.message : err
+                          // }.\n\nPlease review your headers and then correct any errors on the next page.`; //pass just the first error as a string
+                          const errMsg = err && err.message ? err.message : err;
+                          if (isPlainObject(errMsg)) {
+                            throw new Error(
+                              `errMsg is an object ${JSON.stringify(
+                                errMsg,
+                                null,
+                                4
+                              )}`
+                            );
+                          }
+                          csvValidationIssue = (
+                            <div>
+                              <div>
+                                It looks like there was an error with your data:
+                              </div>
+                              <div style={{ color: "red" }}>{errMsg}</div>
+                              <div>
+                                Please review your headers and then correct any
+                                errors on the next page.
+                              </div>
+                            </div>
+                          );
                         }
                         filesWIssues.push({
                           file,
