@@ -12,6 +12,8 @@ import { times } from "lodash";
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import { withRouter } from "react-router-dom";
+import remarkGfm from "remark-gfm";
+
 import { DataTable, PagingTool, withTableParams } from "../../../src";
 import DemoWrapper from "../DemoWrapper";
 import OptionsSection from "../OptionsSection";
@@ -167,7 +169,7 @@ export default class DataTableDemo extends React.Component {
                 withTableParams(){" "}
               </summary>
               <ReactMarkdown
-                source={`
+                children={`
 \`\`\`
 withQuery(["stage", "id name"], {
   isPlural: true,

@@ -53,6 +53,7 @@ import localizedFormat from "dayjs/plugin/localizedFormat";
 import ReactMarkdown from "react-markdown";
 import immer, { produceWithPatches, enablePatches, applyPatches } from "immer";
 import papaparse from "papaparse";
+import remarkGfm from "remark-gfm";
 
 import TgSelect from "../TgSelect";
 import { withHotkeys } from "../utils/hotkeyUtils";
@@ -2417,7 +2418,9 @@ class DataTable extends React.Component {
         }
       } else if (column.type === "markdown") {
         tableColumn.Cell = props => (
-          <ReactMarkdown>{props.value}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {props.value}
+          </ReactMarkdown>
         );
       } else {
         tableColumn.Cell = props => props.value;
