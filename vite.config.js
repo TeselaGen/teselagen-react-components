@@ -20,7 +20,6 @@ export default defineConfig({
   plugins: [react()],
   define: {
     "process.platform": {},
-    "process.cwd": () => {},
   },
   build: {
     target: "es2015",

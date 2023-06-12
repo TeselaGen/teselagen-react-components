@@ -8,6 +8,8 @@ import {
   KeyCombo
 } from "@blueprintjs/core";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
 import {
   doesSearchValMatchText,
   getCurrentParamsFromUrl,
@@ -46,7 +48,7 @@ function ShowInfo({ description, info, type }) {
           style={{ maxWidth: 600, overflow: "auto" }}
           className="bp3-dialog-body"
         >
-          <ReactMarkdown source={description || info} />
+          <ReactMarkdown remarkPlugins={[remarkGfm]} children={description || info} />
         </div>
       </Dialog>
 

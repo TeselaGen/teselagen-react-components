@@ -10,6 +10,8 @@ import {
 import { lifecycle, mapProps } from "recompose";
 import { omit } from "lodash";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
 import { doesSearchValMatchText, getCurrentParamsFromUrl, getStringFromReactComponent } from "../../src";
 
 const omitProps = keys => mapProps(props => omit(props, keys));
@@ -175,7 +177,7 @@ function ShowInfo({ description, info, type }) {
           style={{ maxWidth: 600, overflow: "auto" }}
           className="bp3-dialog-body"
         >
-          <ReactMarkdown source={description || info} />
+          <ReactMarkdown remarkPlugins={[remarkGfm]} children={description || info} />
         </div>
       </Dialog>
 
