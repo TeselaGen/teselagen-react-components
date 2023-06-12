@@ -1178,10 +1178,10 @@
   dependencies:
     any-observable "^0.3.0"
 
-"@teselagen/file-utils@^0.2.10":
-  version "0.2.10"
-  resolved "https://registry.yarnpkg.com/@teselagen/file-utils/-/file-utils-0.2.10.tgz#155b22839d611868387c52ff2572a633a195fb53"
-  integrity sha512-8qtX5TWWTjIMIv7sUqbMOXkOQK1nAUb7W2Jbkn1UKfdHdSImsQCZpjqmOxTncesPaCGVVKIIxjltHS2u9TtrYA==
+"@teselagen/file-utils@^0.2.11":
+  version "0.2.11"
+  resolved "https://registry.yarnpkg.com/@teselagen/file-utils/-/file-utils-0.2.11.tgz#4eb300b4504c27d631a893f7fdb7e3046c8d76ff"
+  integrity sha512-pXq96E7uq/nLoT41FH+d+sqHTvG//f9hHDUCGxABCwJkdGZKLCZb5/blMjQ8TqERm5Tu/7RW6hmGBGPAJ2JrOg==
   dependencies:
     bluebird "^3.7.2"
     jszip "^3.10.1"
