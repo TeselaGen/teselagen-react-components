@@ -15,11 +15,14 @@
     "index.d.ts"
   ],
   "scripts": {
-    "build": "nwb build-react-component --copy-files --no-demo",
-    "buildWithDemo": "nwb build-react-component --copy-files",
+    "start": "vite --port 3333",
+    "build": "vite build",
+    "buildWithDemo": "vite build -c vite.config.demo.js",
+    "NWB_start": "nwb serve-react-demo --port 3333",
+    "NWB_build": "nwb build-react-component --copy-files --no-demo",
+    "NWB_buildWithDemo": "nwb build-react-component --copy-files",
     "//build-watch": "nodemon --watch src --exec \"rm .babelrc; yarn build\" ",
     "clean": "nwb clean-module && npm clean-demo",
-    "start": "nwb serve-react-demo --port 3333",
     "analyze-build": "ANALYZE_BUNDLE=1 yarn buildWithDemo && webpack-bundle-analyzer demo/dist/stats.json build",
     "c": "yarn cypress open --e2e --browser chrome",
     "test": "yarn cypress run",
@@ -32,6 +35,7 @@
     "@teselagen/file-utils": "^0.2.15",
     "@teselagen/react-list": "^0.8.18",
     "@teselagen/react-table": "^6.10.11",
+    "@vitejs/plugin-react": "^4.0.0",
     "axios": "^0.21.1",
     "browser-or-node": "^2.0.0",
     "classnames": "^2.2.6",
@@ -65,6 +69,7 @@
     "tippy.js": "^6.3.7",
     "url-join": "^4.0.1",
     "use-deep-compare-effect": "^1.6.1",
+    "vite": "^4.3.9",
     "write-excel-file": "^1.4.25"
   },
   "devDependencies": {
