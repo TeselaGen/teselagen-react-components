@@ -701,7 +701,19 @@ function Uploader({
                   const filesWOIssues = [];
                   for (const [i, file] of cleanedAccepted.entries()) {
                     if (isCsvOrExcelFile(file)) {
-                      const parsedF = await parseCsvOrExcelFile(file);
+                      let parsedF;
+                      try {
+                        parsedF = await parseCsvOrExcelFile(file);
+                      } catch (error) {
+                        console.error("error:", error);
+                        window.toastr &&
+                          window.toastr.error(
+                            `There was an error parsing your file. Please try again. ${error.message ||
+                              error}`
+                          );
+                        return;
+                      }
+
                       const {
                         csvValidationIssue: _csvValidationIssue,
                         matchedHeaders,
@@ -711,6 +723,18 @@ function Uploader({
                         incomingData: parsedF.data,
                         validateAgainstSchema
                       });
+                      if (userSchema?.userData?.length === 0) {
+                        console.error(
+                          `userSchema, parsedF.data:`,
+                          userSchema,
+                          parsedF.data
+                        );
+                        window.toastr &&
+                          window.toastr.error(
+                            `It looks like there wasn't any data in your file. Please add some data and try again`
+                          );
+                        return;
+                      }
                       let csvValidationIssue = _csvValidationIssue;
                       if (csvValidationIssue) {
                         if (isObject(csvValidationIssue)) {
