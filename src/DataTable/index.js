@@ -3556,6 +3556,7 @@ const defaultFormatters = {
       .join(",");
   },
   number: newVal => {
+    if (isValueEmpty(newVal)) return newVal;
     return toNumber(newVal);
   }
 };
@@ -3584,7 +3585,8 @@ const defaultValidators = {
       return err;
     }
   },
-  number: newVal => {
+  number: (newVal, field) => {
+    if (isValueEmpty(newVal) && !field.isRequired) return;
     if (isNaN(newVal) || !isNumber(newVal)) {
       return "Must be a number";
     }
@@ -3633,6 +3635,10 @@ function getNumberStrAtEnd(str) {
   }
 
   return null;
+}
+
+function isValueEmpty(val) {
+  return val === undefined || val === null || val === "";
 }
 
 function stripNumberAtEnd(str) {
