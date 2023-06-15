@@ -91,6 +91,29 @@ describe("EditableCellTable.spec", () => {
     cy.get(`.tg-upload-file-list-item-edit`).click();
     cy.get(`[data-test="tgCell_ext-weee"]:contains(yewww)`);
   });
+  it(`uploading a completely empty file should fail`, () => {
+    cy.visit("#/UploadCsvWizard");
+    cy.uploadFile(
+      ".tg-dropzone",
+      "testUploadWizard_emptyFile.csv",
+      "text/csv",
+      true
+    );
+    cy.contains(`There was an error parsing your file. Please try again.`);
+  });
+  it(`uploading an empty file with headers should fail`, () => {
+    cy.visit("#/UploadCsvWizard");
+    cy.uploadFile(
+      ".tg-dropzone",
+      "testUploadWizard_emptyWithHeadersFile.csv",
+      "text/csv",
+      true
+    );
+
+    cy.contains(
+      `It looks like there wasn't any data in your file. Please add some data and try again`
+    );
+  });
   it(`wizard should let a "perfect" file that uses a display name through without any additional steps`, () => {
     cy.visit("#/UploadCsvWizard");
     cy.uploadFile(
