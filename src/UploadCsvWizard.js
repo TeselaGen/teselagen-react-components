@@ -559,7 +559,7 @@ export const PreviewCsvData = observer(function(props) {
             ? "Does this data look correct? Edit it as needed."
             : `${
                 isEditingExistingFile ? "Edit" : "Input"
-              } your data here.zoink Hover table headers for additional instructions.`)}
+              } your data here. Hover table headers for additional instructions.`)}
       </Callout>
       {validateAgainstSchema.description && (
         <Callout>{validateAgainstSchema.description}</Callout>
