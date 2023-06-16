@@ -1,6 +1,6 @@
 {
   "name": "teselagen-react-components",
-  "version": "30.15.2",
+  "version": "30.15.3",
   "description": "Teselagen React Component Library",
   "main": "lib/index.js",
   "types": "./index.d.ts",
@@ -15,12 +15,12 @@
     "index.d.ts"
   ],
   "scripts": {
-    "start": "vite --open --port 3333",
-    "build": "vite build",
-    "buildWithDemo": "vite build -c vite.config.demo.js",
-    "NWB_start": "nwb serve-react-demo --port 3333",
-    "NWB_build": "nwb build-react-component --copy-files --no-demo",
-    "NWB_buildWithDemo": "nwb build-react-component --copy-files",
+    "VITE_start": "vite --open --port 3333",
+    "VITE_build": "vite build",
+    "VITE_buildWithDemo": "vite build -c vite.config.demo.js",
+    "start": "nwb serve-react-demo --port 3333",
+    "build": "nwb build-react-component --copy-files --no-demo",
+    "buildWithDemo": "nwb build-react-component --copy-files",
     "//build-watch": "nodemon --watch src --exec \"rm .babelrc; yarn build\" ",
     "clean": "nwb clean-module && npm clean-demo",
     "analyze-build": "ANALYZE_BUNDLE=1 yarn buildWithDemo && webpack-bundle-analyzer demo/dist/stats.json build",
