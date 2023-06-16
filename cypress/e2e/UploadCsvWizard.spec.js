@@ -278,7 +278,7 @@ a,,,,false,dna,misc_feature
       true
     );
 
-    cy.contains(`It looks like there was an error with your data:`);
+    cy.contains(`It looks like there was an error with your data`);
     cy.contains("Review and Edit Data").click();
     cy.get(`[data-tip="Cannot have more than one of these fields - Name, ID"]`);
     cy.get(`[data-tip="One of these fields is required - Name, ID"]`);
@@ -333,7 +333,7 @@ a,,,,false,dna,misc_feature
       true
     );
 
-    cy.contains(`It looks like there was an error with your data:`);
+    cy.contains(`It looks like there was an error with your data`);
     cy.contains("Review and Edit Data").click();
     cy.get(
       `[data-tip="At least one of these fields must be present - Name, ID"]`
@@ -447,7 +447,7 @@ a,,desc,,false,dna,misc_feature
       true
     );
 
-    cy.contains(`It looks like there was an error with your data:`);
+    cy.contains(`It looks like there was an error with your data`);
     cy.contains("Review and Edit Data").click();
     cy.get(
       `[data-tip="Please specify either ALL of the following fields or NONE of them - Description, Type"]`
@@ -478,7 +478,7 @@ a,,desc,,false,dna,misc_feature
       true
     );
 
-    cy.contains(`It looks like there was an error with your data:`);
+    cy.contains(`It looks like there was an error with your data`);
     cy.contains("Review and Edit Data").click();
     cy.get(`[data-tip="This value must be unique"]`);
     cy.get(`.hasCellError:last [data-test="tgCell_name"]`);
@@ -497,7 +497,7 @@ a,,desc,,false,dna,misc_feature
       true
     );
 
-    cy.contains(`It looks like there was an error with your data:`);
+    cy.contains(`It looks like there was an error with your data`);
     cy.contains("Review and Edit Data").click();
     cy.get(`[data-tip="Please enter a value here"]`);
   });
@@ -544,7 +544,7 @@ a,,desc,,false,dna,misc_feature
       "text/csv",
       true
     );
-    cy.contains(`It looks like there was an error with your data:`);
+    cy.contains(`It looks like there was an error with your data`);
     cy.contains("Review and Edit Data").click();
     cy.contains("Back").click();
     cy.get(`.tg-test-sequence .bp3-icon-cross`).click();
@@ -796,7 +796,7 @@ a,,g,false,dna,misc_feature`,
       true
     );
 
-    cy.contains(`It looks like there was an error with your data:`);
+    cy.contains(`It looks like there was an error with your data`);
     cy.contains(`Cannot be Thomas`);
     cy.contains(
       `Please review your headers and then correct any errors on the next page.`
@@ -1124,7 +1124,7 @@ thomas,,g,false,dna,misc_feature`,
       "application/zip",
       true
     );
-    cy.contains(`It looks like there was an error with your data:`);
+    cy.contains(`It looks like there was an error with your data`);
     cy.contains(".bp3-dialog", `zonk`); //the data from the file should be previewed
     cy.contains(".bp3-dialog", `DEscription`); //the matched headers should show up
     cy.contains(".bp3-dialog", `Description`); //the expected headers should show up
@@ -1144,7 +1144,7 @@ thomas,,g,false,dna,misc_feature`,
       "text/csv",
       true
     );
-    cy.contains(`It looks like there was an error with your data:`);
+    cy.contains(`It looks like there was an error with your data`);
     cy.contains(".bp3-dialog", `zonk`); //the data from the file should be previewed
     cy.contains(".bp3-dialog", `DEscription`); //the matched headers should show up
     cy.contains(".bp3-dialog", `Description`); //the expected headers should show up
