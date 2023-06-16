@@ -32,7 +32,7 @@ export function validateTableWideErrors({
     displayNameMap[f.path] = f.displayName || startCase(camelCase(f.path));
   });
   function getDisplayName(path) {
-    return displayNameMap[path] || path;
+    return displayNameMap[path] || startCase(camelCase(path));
   }
 
   if (schema.requireAtLeastOneOf) {

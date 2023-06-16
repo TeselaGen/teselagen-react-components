@@ -121,7 +121,7 @@ function noop() {}
 // wink wink
 const emptyPromise = Promise.resolve.bind(Promise);
 
-function Uploader({
+function UploaderInner({
   accept: _accept,
   contentOverride: maybeContentOverride,
   innerIcon,
@@ -358,7 +358,7 @@ function Uploader({
               exampleFile: handleDownloadXlsxFile
             },
             {
-              description: "Manually Enter Data",
+              description: "Build CSV File",
               icon: "manually-entered-data",
               exampleFile: handleManuallyEnterData
             }
@@ -768,7 +768,8 @@ function Uploader({
                           csvValidationIssue = (
                             <div>
                               <div>
-                                It looks like there was an error with your data:
+                                It looks like there was an error with your data
+                                (Correct on the Review Data page):
                               </div>
                               <div style={{ color: "red" }}>{errMsg}</div>
                               <div>
@@ -928,7 +929,7 @@ function Uploader({
                     onClick={handleManuallyEnterData}
                     className="link-button"
                   >
-                    .. or manually enter data
+                    Build CSV File
                   </div>
                 )}
                 {showFilesCount ? (
@@ -1118,10 +1119,12 @@ function Uploader({
   );
 }
 
-export default compose(
+const Uploader = compose(
   connect(undefined, { initializeForm: initialize }),
   observer
-)(Uploader);
+)(UploaderInner);
+
+export default Uploader;
 
 function getFileDownloadAttr(exampleFile) {
   const baseUrl = window?.frontEndConfig?.serverBasePath || "";

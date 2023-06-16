@@ -5,7 +5,7 @@ import { flatMap, forEach } from "lodash";
 import { ReactSelectField } from "./FormComponents";
 import showConfirmationDialog from "./showConfirmationDialog";
 import { startCase } from "lodash";
-import { typeToCommonType } from "./UploadCsvWizard";
+import { typeToCommonType } from "./typeToCommonType";
 import { camelCase } from "lodash";
 
 setAutoFreeze(false);
@@ -38,7 +38,43 @@ export function MatchHeaders({
         </Callout>
       )}
       <br></br>
-
+      <tr
+        style={{
+          display: "flex",
+          minHeight: 50,
+          alignItems: "center",
+          justifyContent: "space-between"
+        }}
+      >
+        <td
+          style={{
+            width: 200,
+            marginLeft: 20,
+            display: "flex",
+            fontWeight: "bold"
+          }}
+        >
+          Accepted Headers
+        </td>
+        <td
+          style={{
+            width: 200,
+            marginLeft: 20,
+            display: "flex",
+            fontWeight: "bold"
+          }}
+        >
+          Your Headers
+        </td>
+        <td
+          style={{
+            fontWeight: "bold",
+            marginLeft: 30
+          }}
+        >
+          Data Preview
+        </td>
+      </tr>
       {searchResults.map(({ path, displayName, type }, i) => {
         const userMatchedHeader = matchedHeaders[path];
         const opts = flatMap(userSchema.fields, ({ path: pathInner }) => {
@@ -155,14 +191,13 @@ export function MatchHeaders({
                   >
                     {userMatchedHeader &&
                       [
-                        { [userMatchedHeader]: "Preview:" },
+                        // { [userMatchedHeader]: "Preview:" },
                         ...userSchema.userData?.slice(0, 3)
                         // { [userMatchedHeader]: "..." }
                       ].map((row, i) => {
                         return (
                           <div
                             style={{
-                              ...(i === 0 && { fontWeight: "bold" }),
                               maxWidth: 70,
                               overflow: "hidden",
                               textOverflow: "ellipsis",

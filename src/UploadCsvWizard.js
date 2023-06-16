@@ -25,7 +25,7 @@ import { addSpecialPropToAsyncErrs } from "./FormComponents/tryToMatchSchemas";
 import { cloneDeep } from "lodash";
 
 const getInitialSteps = csvValidationIssue => [
-  { text: "Set Headers", active: csvValidationIssue },
+  { text: "Review Headers", active: csvValidationIssue },
   { text: "Review Data", active: !csvValidationIssue }
 ];
 
@@ -559,7 +559,7 @@ export const PreviewCsvData = observer(function(props) {
             ? "Does this data look correct? Edit it as needed."
             : `${
                 isEditingExistingFile ? "Edit" : "Input"
-              } your data here. Hover table headers for additional instructions`)}
+              } your data here.zoink Hover table headers for additional instructions.`)}
       </Callout>
       {validateAgainstSchema.description && (
         <Callout>{validateAgainstSchema.description}</Callout>
@@ -673,13 +673,6 @@ export const SimpleInsertDataDialog = compose(
     </>
   );
 });
-
-export const typeToCommonType = {
-  string: "Text",
-  number: "Number",
-  boolean: "True/False",
-  dropdown: "Select One"
-};
 
 async function asyncValidateHelper(
   validateAgainstSchema,

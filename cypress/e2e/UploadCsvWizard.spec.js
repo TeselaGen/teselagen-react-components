@@ -134,7 +134,7 @@ describe("EditableCellTable.spec", () => {
   });
   it(`messed up headers should trigger the wizard. editing the added file should work`, () => {
     cy.visit("#/UploadCsvWizard");
-    // cy.contains("or manually enter data").click();
+    // cy.contains("Build CSV File").click();
     // cy.get(`.rt-td [data-test="tgCell_description"]`)
     //   .eq(1)
     //   .click({ force: true });
@@ -504,7 +504,7 @@ a,,desc,,false,dna,misc_feature
   it(`an array of example data should work`, () => {
     cy.visit("#/UploadCsvWizard");
     cy.tgToggle("multipleExamples");
-    cy.contains("or manually enter data").click();
+    cy.contains("Build CSV File").click();
     cy.get(`[data-test="tgCell_name"]:contains(someOtherSeq)`);
     cy.get(`[data-test="tgCell_description"]:contains(A 2nd description)`);
     cy.get(`[data-test="tgCell_type"]:contains(CDS)`);
@@ -512,7 +512,7 @@ a,,desc,,false,dna,misc_feature
   it(`isUnique should work as a validation rule on the table for editing, pasting, undo/redo`, () => {
     cy.visit("#/UploadCsvWizard");
     cy.tgToggle("enforceNameUnique");
-    cy.contains("or manually enter data").click();
+    cy.contains("Build CSV File").click();
     cy.get(`[data-test="tgCell_name"]`)
       .eq(4)
       .click({ force: true });
@@ -1019,10 +1019,10 @@ thomas,,g,false,dna,misc_feature`,
   it(`multiple manual entries should get unique names. They should be able to be edited after`, () => {
     cy.visit("#/UploadCsvWizard");
     cy.tgToggle("allowMultipleFiles");
-    cy.contains("or manually enter data").click();
+    cy.contains("Build CSV File").click();
     cy.contains(".bp3-button", "Add File").click();
     cy.contains("manual_data_entry.csv");
-    cy.contains("or manually enter data").click();
+    cy.contains("Build CSV File").click();
     cy.contains(".bp3-button", "Add File").click();
     cy.contains("manual_data_entry(1).csv");
     cy.get(
@@ -1158,7 +1158,7 @@ thomas,,g,false,dna,misc_feature`,
   });
   it(`manual entry should work, additional untouched (_isClean) rows should be omitted`, () => {
     cy.visit("#/UploadCsvWizard");
-    cy.contains("or manually enter data").click();
+    cy.contains("Build CSV File").click();
     cy.contains(
       `Input your data here. Hover table headers for additional instructions`
     );
