@@ -4,6 +4,7 @@ import {
   Button,
   Callout,
   Classes,
+  Colors,
   Icon,
   Menu,
   MenuItem,
@@ -53,7 +54,7 @@ configure({ isolateGlobalState: true });
 const helperText = [
   `How to Use This Template to Upload New Data`,
   `1. Go to the first tab and delete the example data.`,
-  `2. Input your rows of data organized under the appropriate columns. If you're confused about a column name, go to the "Data Dictionary" tab for clarification.`,
+  `2. Input your rows of data organized under the appropriate columns. If you're confused about a column name, go to the "Column Info" tab for clarification.`,
   `3. Save the file.`,
   `4. Return to the interface from which you dowloaded this template.`,
   `5. Upload the completed file.`
@@ -282,7 +283,7 @@ function UploaderInner({
 
           const handleDownloadXlsxFile = async () => {
             const dataDictionarySchema = [
-              { value: f => f.displayName || f.path, column: `Name` },
+              { value: f => f.displayName || f.path, column: `Column Name` },
               {
                 value: f => f.isUnique,
                 column: `Unique`
@@ -324,7 +325,7 @@ function UploaderInner({
                   fontWeight: "bold"
                 },
                 schema: [mainSchema, dataDictionarySchema, helperSchema],
-                sheets: [nameToUse, "Data Dictionary", "Help Notes"],
+                sheets: [nameToUse, "Column Info", "Upload Instructions"],
                 filePath: "file.xlsx"
               }
             );
@@ -355,10 +356,12 @@ function UploaderInner({
             },
             {
               description: "Download Example XLSX File",
+              subtext: "Includes Upload Instructions and Column Info",
               exampleFile: handleDownloadXlsxFile
             },
             {
-              description: "Build CSV File",
+              description: manualEnterMessage,
+              subtext: manualEnterSubMessage,
               icon: "manually-entered-data",
               exampleFile: handleManuallyEnterData
             }
@@ -512,12 +515,32 @@ function UploaderInner({
                             a.exampleFiles ? (
                               <Menu>
                                 {a.exampleFiles.map(
-                                  ({ description, exampleFile, icon }, i) => {
+                                  (
+                                    { description, subtext, exampleFile, icon },
+                                    i
+                                  ) => {
                                     return (
                                       <MenuItem
                                         icon={icon || "download"}
                                         intent="primary"
-                                        text={description}
+                                        text={
+                                          subtext ? (
+                                            <div>
+                                              <div>{description}</div>
+                                              <div
+                                                style={{
+                                                  fontSize: 11,
+                                                  fontStyle: "italic",
+                                                  color: Colors.GRAY3
+                                                }}
+                                              >
+                                                {subtext}
+                                              </div>{" "}
+                                            </div>
+                                          ) : (
+                                            description
+                                          )
+                                        }
                                         {...getFileDownloadAttr(exampleFile)}
                                         key={i}
                                       ></MenuItem>
@@ -929,7 +952,16 @@ function UploaderInner({
                     onClick={handleManuallyEnterData}
                     className="link-button"
                   >
-                    Build CSV File
+                    {manualEnterMessage}
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: Colors.GRAY3,
+                        fontStyle: "italic"
+                      }}
+                    >
+                      {manualEnterSubMessage}
+                    </div>
                   </div>
                 )}
                 {showFilesCount ? (
@@ -1157,3 +1189,6 @@ function stripId(ents = []) {
     return rest;
   });
 }
+
+const manualEnterMessage = "Build CSV File";
+const manualEnterSubMessage = "Paste or type data to build a CSV file";
