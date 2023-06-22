@@ -226,6 +226,9 @@ function UploaderInner({
       advancedAccept = accept;
       simpleAccept = flatMap(accept, a => {
         if (a.validateAgainstSchema) {
+          if (!a.type) {
+            a.type = [".csv", ".xlsx"];
+          }
           handleManuallyEnterData = async e => {
             e.stopPropagation();
             const { newEntities } = await showSimpleInsertDataDialog(
