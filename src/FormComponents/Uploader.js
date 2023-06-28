@@ -102,7 +102,6 @@ class ValidateAgainstSchema {
   }
 }
 
-const validateAgainstSchemaStore = new ValidateAgainstSchema();
 // autorun(() => {
 //   console.log(
 //     `validateAgainstSchemaStore?.fields:`,
@@ -154,6 +153,7 @@ function UploaderInner({
   axiosInstance = window.api || axios
 }) {
   //on component did mount
+  const validateAgainstSchemaStore = useRef(new ValidateAgainstSchema());
   const callout =
     _callout ||
     (isArray(_accept) ? _accept : [_accept]).find?.(a => a?.callout)?.callout;
@@ -165,13 +165,13 @@ function UploaderInner({
 
   useEffect(() => {
     // validateAgainstSchema
-    validateAgainstSchemaStore.setValidateAgainstSchema(
+    validateAgainstSchemaStore.current.setValidateAgainstSchema(
       validateAgainstSchemaToUse
     );
   }, [validateAgainstSchemaToUse]);
   let validateAgainstSchema;
   if (validateAgainstSchemaToUse) {
-    validateAgainstSchema = validateAgainstSchemaStore;
+    validateAgainstSchema = validateAgainstSchemaStore.current;
   }
   const accept = !_accept
     ? undefined
@@ -181,7 +181,7 @@ function UploaderInner({
     ? _accept
     : _accept.split(",").map(a => ({ type: a }));
   if (
-    validateAgainstSchemaStore &&
+    validateAgainstSchemaStore.current &&
     accept &&
     !accept.some(a => a.type === "zip")
   ) {
