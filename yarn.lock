@@ -1533,6 +1533,11 @@
   dependencies:
     any-observable "^0.3.0"
 
+"@teselagen/bounce-loader@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@teselagen/bounce-loader/-/bounce-loader-0.0.6.tgz#ace027cc51bd1b4ff2f7fab18743b81be8993e86"
+  integrity sha512-29C1yOGWMyw+THdd/zzVlR/il5pXlAHw6XUWw9x6t8WS0TQay8gEE8YSFwjIFHdbmLRtAU36EKtwnl+Yi2vHKA==
+
 "@teselagen/file-utils@^0.2.15":
   version "0.2.15"
   resolved "https://registry.yarnpkg.com/@teselagen/file-utils/-/file-utils-0.2.15.tgz#d2f25839ea51c453a7b9e16051933be9f6573e2f"

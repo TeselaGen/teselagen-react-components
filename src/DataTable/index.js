@@ -5,7 +5,6 @@ import { arrayMove } from "react-sortable-hoc";
 import copy from "copy-to-clipboard";
 import {
   invert,
-  isNumber,
   toNumber,
   isEmpty,
   min,
@@ -81,17 +80,17 @@ import "./style.css";
 import { getRecordsFromIdMap } from "./utils/withSelectedEntities";
 import { CellDragHandle } from "./CellDragHandle";
 import { nanoid } from "nanoid";
-import { isString } from "lodash";
 import { SwitchField } from "../FormComponents";
 import { validateTableWideErrors } from "./validateTableWideErrors";
-import { isFunction } from "lodash";
+import { editCellHelper } from "./editCellHelper";
+import { getCellVal } from "./getCellVal";
+import { getVals } from "./getVals";
 enablePatches();
 
 const PRIMARY_SELECTED_VAL = "main_cell";
 
 dayjs.extend(localizedFormat);
 const IS_LINUX = window.navigator.platform.toLowerCase().search("linux") > -1;
-
 class DataTable extends React.Component {
   constructor(props) {
     super(props);
@@ -1383,7 +1382,8 @@ class DataTable extends React.Component {
             {...(isCellEditable && {
               tabIndex: -1,
               onKeyDown: e => {
-                const isArrowKey = e.keyCode >= 37 && e.keyCode <= 40;
+                const isArrowKey =
+                  (e.keyCode >= 37 && e.keyCode <= 40) || e.keyCode === 9;
                 if (isArrowKey) {
                   const { schema, entities } = computePresets(this.props);
                   const left = e.keyCode === 37;
@@ -1455,14 +1455,24 @@ class DataTable extends React.Component {
                     ? cellIdToLeft
                     : cellIdToRight;
 
+                  e.stopPropagation();
+                  e.preventDefault();
                   if (!nextCellId) return;
-
+                  // this.handleCellBlur();
+                  // this.finishCellEdit
+                  if (
+                    document.activeElement?.parentElement?.classList.contains(
+                      "rt-td"
+                    )
+                  ) {
+                    document.activeElement.blur();
+                  }
                   this.handleCellClick({
                     event: e,
                     cellId: nextCellId
                   });
                 }
-                if (e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) return;
+                if (e.metaKey || e.ctrlKey || e.altKey) return;
                 const cellId = this.getPrimarySelectedCellId();
                 if (!cellId) return;
                 const entityIdToEntity = getEntityIdToEntity(entities);
@@ -1476,6 +1486,8 @@ class DataTable extends React.Component {
                 if (!isNum && !isLetter) return;
                 if (rowDisabled) return;
                 this.startCellEdit(cellId, { shouldSelectAll: true });
+                e.stopPropagation();
+                // e.preventDefault();
               }
             })}
           >
@@ -1920,7 +1932,6 @@ class DataTable extends React.Component {
         if (rowDisabled) return;
         this.startCellEdit(cellId);
       },
-
       ...(err && {
         "data-tip": err?.message || err
       }),
@@ -3242,7 +3253,8 @@ class DataTable extends React.Component {
 // //   return change(form, "reduxFormSelectedEntityIdMap", value)
 // // }
 // export default CompToExport
-export default dataTableEnhancer(DataTable);
+const WrappedDT = dataTableEnhancer(DataTable);
+export default WrappedDT;
 const ConnectedPagingTool = dataTableEnhancer(PagingTool);
 export { ConnectedPagingTool };
 
@@ -3480,123 +3492,6 @@ function DropdownCell({
   );
 }
 
-function isTruthy(v) {
-  if (!v) return false;
-  if (typeof v === "string") {
-    if (v.toLowerCase() === "false") {
-      return false;
-    }
-    if (v.toLowerCase() === "no") {
-      return false;
-    }
-  }
-  return true;
-}
-
-//(mutative) responsible for formatting and then validating the
-export const editCellHelper = ({
-  entity,
-  path,
-  schema,
-  columnSchema,
-  newVal
-}) => {
-  let nv = newVal;
-
-  const colSchema =
-    columnSchema || schema?.fields?.find(({ path: p }) => p === path) || {};
-  path = path || colSchema.path;
-  const { format, validate, type } = colSchema;
-  let error;
-  if (nv === undefined && colSchema.defaultValue !== undefined)
-    nv = colSchema.defaultValue;
-
-  if (format) {
-    nv = format(nv, colSchema);
-  }
-  if (defaultFormatters[type]) {
-    nv = defaultFormatters[type](nv, colSchema);
-  }
-  if (validate) {
-    error = validate(nv, colSchema, entity);
-  }
-  if (!error) {
-    const validator =
-      defaultValidators[type] ||
-      type === "string" ||
-      (type === undefined && defaultValidators.string);
-    if (validator) {
-      error = validator(nv, colSchema);
-    }
-  }
-  set(entity, path, nv);
-  return { entity, error };
-};
-
-const defaultFormatters = {
-  boolean: newVal => {
-    return isTruthy(newVal);
-  },
-  dropdown: (newVal, field) => {
-    const valsMap = {};
-    getVals(field.values).forEach(v => {
-      valsMap[v.toLowerCase().trim()] = v;
-    });
-    return valsMap[newVal?.toLowerCase().trim()] || newVal;
-  },
-  dropdownMulti: (newVal, field) => {
-    const valsMap = {};
-    getVals(field.values).forEach(v => {
-      valsMap[v.toLowerCase().trim()] = v;
-    });
-    if (!newVal) return;
-    return newVal
-      .split(",")
-      .map(v => valsMap[v.toLowerCase().trim()] || v)
-      .join(",");
-  },
-  number: newVal => {
-    if (isValueEmpty(newVal)) return newVal;
-    return toNumber(newVal);
-  }
-};
-const defaultValidators = {
-  dropdown: (newVal, field) => {
-    const err = "Please choose one of the accepted values";
-    if (!newVal) {
-      if (field.isRequired) return err;
-    } else if (!getVals(field.values).includes(newVal)) {
-      return err;
-    }
-  },
-  dropdownMulti: (newVal, field) => {
-    const err = "Please choose one of the accepted values";
-    if (!newVal) {
-      if (field.isRequired) return err;
-    } else {
-      let err;
-      newVal.split(",").some(v => {
-        if (!getVals(field.values).includes(v)) {
-          err = `${v} is not an accepted value`;
-          return true;
-        }
-        return false;
-      });
-      return err;
-    }
-  },
-  number: (newVal, field) => {
-    if (isValueEmpty(newVal) && !field.isRequired) return;
-    if (isNaN(newVal) || !isNumber(newVal)) {
-      return "Must be a number";
-    }
-  },
-  string: (newVal, field) => {
-    if (!field.isRequired) return false;
-    if (!newVal) return "Please enter a value here";
-  }
-};
-
 function getFieldPathToIndex(schema) {
   const fieldToIndex = {};
   schema.fields.forEach((f, i) => {
@@ -3637,34 +3532,6 @@ function getNumberStrAtEnd(str) {
   return null;
 }
 
-function isValueEmpty(val) {
-  return val === undefined || val === null || val === "";
-}
-
 function stripNumberAtEnd(str) {
   return str.replace(getNumberStrAtEnd(str), "");
-}
-
-export const getCellVal = (ent, path, col) => {
-  const isBool = col?.type === "boolean";
-  let selectedCellVal = get(ent, path, "");
-  if (isBool) {
-    if (isString(selectedCellVal)) {
-      selectedCellVal = selectedCellVal.toLowerCase();
-    }
-    selectedCellVal =
-      selectedCellVal === "true" ||
-      selectedCellVal === true ||
-      selectedCellVal === 1 ||
-      selectedCellVal === "yes";
-    selectedCellVal = isTruthy(selectedCellVal);
-  }
-  return selectedCellVal;
-};
-
-function getVals(values) {
-  if (isFunction(values)) {
-    return values();
-  }
-  return values;
 }

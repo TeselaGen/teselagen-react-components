@@ -1,5 +1,5 @@
 import getIdOrCodeOrIndex from "./utils/getIdOrCodeOrIndex";
-import { getCellVal } from ".";
+import { getCellVal } from "./getCellVal";
 import { forEach, isArray } from "lodash";
 import { startCase } from "lodash";
 import { camelCase } from "lodash";

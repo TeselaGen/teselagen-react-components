@@ -1,7 +1,7 @@
 import React from "react";
 import DNALoader from "../DNALoader";
-import BounceLoader from "../BounceLoader";
 import "./style.css";
+import { BounceLoader } from "@teselagen/bounce-loader";
 
 export default class Loading extends React.Component {
   state = {

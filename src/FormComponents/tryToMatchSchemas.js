@@ -1,7 +1,7 @@
 import { forEach, isArray, map } from "lodash";
 import { nanoid } from "nanoid";
 import Fuse from "fuse.js";
-import { editCellHelper } from "../DataTable";
+import { editCellHelper } from "../DataTable/editCellHelper";
 import { validateTableWideErrors } from "../DataTable/validateTableWideErrors";
 import { isEmpty } from "lodash";
 import getTextFromEl from "../utils/getTextFromEl";

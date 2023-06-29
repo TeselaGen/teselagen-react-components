@@ -6,7 +6,7 @@ import { observer } from "mobx-react";
 
 import "./UploadCsvWizard.css";
 
-import { forEach, isArray } from "lodash";
+import { forEach } from "lodash";
 import { compose } from "recompose";
 import SimpleStepViz from "./SimpleStepViz";
 import { nanoid } from "nanoid";
@@ -500,7 +500,7 @@ export const PreviewCsvData = observer(function(props) {
     userSchema = exampleData,
     initialEntities
   } = props;
-  const useExampleData = userSchema === exampleData;
+  // const useExampleData = userSchema === exampleData;
   // const [loading, setLoading] = useState(true);
   // useEffect(() => {
   //   // simulate layout change outside of React lifecycle
@@ -514,35 +514,33 @@ export const PreviewCsvData = observer(function(props) {
   const data =
     userSchema.userData &&
     userSchema.userData.length &&
-    userSchema.userData.map((row, i1) => {
+    userSchema.userData.map(row => {
       const toRet = {
         _isClean: row._isClean
       };
-      validateAgainstSchema.fields.forEach(
-        ({ path, defaultValue, example }) => {
-          const matchingKey = matchedHeaders?.[path];
-          if (!matchingKey) {
-            toRet[path] = defaultValue === undefined ? defaultValue : "";
+      validateAgainstSchema.fields.forEach(({ path, defaultValue }) => {
+        const matchingKey = matchedHeaders?.[path];
+        if (!matchingKey) {
+          toRet[path] = defaultValue === undefined ? defaultValue : "";
+        } else {
+          toRet[path] = row[matchingKey];
+        }
+        if (toRet[path] === undefined || toRet[path] === "") {
+          if (defaultValue) {
+            toRet[path] = defaultValue;
           } else {
-            toRet[path] = row[matchingKey];
-          }
-          if (toRet[path] === undefined || toRet[path] === "") {
-            if (defaultValue) {
-              toRet[path] = defaultValue;
-            } else {
-              const exampleToUse = isArray(example) //this means that the row was not added by a user
-                ? example[i1]
-                : i1 === 0 && example;
-              if (useExampleData && exampleToUse) {
-                toRet[path] = exampleToUse;
-                delete toRet._isClean;
-              } else {
-                toRet[path] = "";
-              }
-            }
+            // const exampleToUse = isArray(example) //this means that the row was not added by a user
+            //   ? example[i1]
+            //   : i1 === 0 && example;
+            toRet[path] = "";
+            // if (useExampleData && exampleToUse) {
+            //   toRet[path] = exampleToUse;
+            //   delete toRet._isClean;
+            // } else {
+            // }
           }
         }
-      );
+      });
 
       if (row.id === undefined) {
         toRet.id = nanoid();

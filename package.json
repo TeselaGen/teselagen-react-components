@@ -1,6 +1,6 @@
 {
   "name": "teselagen-react-components",
-  "version": "30.15.7",
+  "version": "30.15.8",
   "description": "Teselagen React Component Library",
   "main": "lib/index.js",
   "types": "./index.d.ts",
@@ -32,6 +32,7 @@
     "@blueprintjs/core": "3.52.0",
     "@blueprintjs/datetime": "3.23.19",
     "@blueprintjs/select": "3.18.11",
+    "@teselagen/bounce-loader": "^0.0.6",
     "@teselagen/file-utils": "^0.2.15",
     "@teselagen/react-list": "^0.8.18",
     "@teselagen/react-table": "^6.10.11",
