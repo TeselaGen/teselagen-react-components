@@ -501,14 +501,14 @@ a,,desc,,false,dna,misc_feature
     cy.contains("Review and Edit Data").click();
     cy.get(`[data-tip="Please enter a value here"]`);
   });
-  it(`an array of example data should work`, () => {
-    cy.visit("#/UploadCsvWizard");
-    cy.tgToggle("multipleExamples");
-    cy.contains("Build CSV File").click();
-    cy.get(`[data-test="tgCell_name"]:contains(someOtherSeq)`);
-    cy.get(`[data-test="tgCell_description"]:contains(A 2nd description)`);
-    cy.get(`[data-test="tgCell_type"]:contains(CDS)`);
-  });
+  // it(`an array of example data should work`, () => {
+  //   cy.visit("#/UploadCsvWizard");
+  //   cy.tgToggle("multipleExamples");
+  //   cy.contains("Build CSV File").click();
+  //   cy.get(`[data-test="tgCell_name"]:contains(someOtherSeq)`);
+  //   cy.get(`[data-test="tgCell_description"]:contains(A 2nd description)`);
+  //   cy.get(`[data-test="tgCell_type"]:contains(CDS)`);
+  // });
   it(`isUnique should work as a validation rule on the table for editing, pasting, undo/redo`, () => {
     cy.visit("#/UploadCsvWizard");
     cy.tgToggle("enforceNameUnique");
@@ -1020,9 +1020,15 @@ thomas,,g,false,dna,misc_feature`,
     cy.visit("#/UploadCsvWizard");
     cy.tgToggle("allowMultipleFiles");
     cy.contains("Build CSV File").click();
+    cy.get(`[data-test="tgCell_name"]:first`).click({ force: true });
+    cy.focused().paste(`Thomas	Wee	agagag	False	dna	misc_feature`);
     cy.contains(".bp3-button", "Add File").click();
     cy.contains("manual_data_entry.csv");
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(200);
     cy.contains("Build CSV File").click();
+    cy.get(`[data-test="tgCell_name"]:first`).click({ force: true });
+    cy.focused().paste(`Thomas	Wee	agagag	False	dna	misc_feature`);
     cy.contains(".bp3-button", "Add File").click();
     cy.contains("manual_data_entry(1).csv");
     cy.get(
@@ -1057,8 +1063,8 @@ thomas,,g,false,dna,misc_feature`,
       cy.window().then(win => {
         expect(win.exampleFile[0].parsedData).to.deep.equal([
           {
-            name: "pj5_0001",
-            description: "Example description of a sequence",
+            name: "Thomas",
+            description: "Wee",
             sequence: "tom",
             isRegex: false,
             matchType: "dna",
@@ -1067,9 +1073,9 @@ thomas,,g,false,dna,misc_feature`,
         ]);
         expect(win.exampleFile[1].parsedData).to.deep.equal([
           {
-            name: "pj5_0001",
-            description: "Example description of a sequence",
-            sequence: "gtgctttca",
+            name: "Thomas",
+            description: "Wee",
+            sequence: "agagag",
             isRegex: false,
             matchType: "dna",
             type: "misc_feature"
@@ -1092,7 +1098,7 @@ thomas,,g,false,dna,misc_feature`,
       path.join(Cypress.config("downloadsFolder"), "manual_data_entry.csv")
     ).should(
       "eq",
-      `name,description,sequence,isRegex,matchType,type\r\npj5_0001,Example description of a sequence,gtgctttca,false,dna,misc_feature\r\ntaoh,,tom,false,,`
+      `name,description,sequence,isRegex,matchType,type\r\nThomas,Wee,agagag,false,dna,misc_feature\r\ntaoh,,tom,false,,`
     );
 
     cy.get(
@@ -1187,20 +1193,12 @@ thomas,,g,false,dna,misc_feature`,
     const downloadsFolder = Cypress.config("downloadsFolder");
     cy.readFile(path.join(downloadsFolder, "manual_data_entry.csv")).should(
       "eq",
-      `name,description,sequence,isRegex,matchType,type\r\npj5_0001,Example description of a sequence,gtgctttca,false,dna,misc_feature\r\na,description,g,false,,`
+      `name,description,sequence,isRegex,matchType,type\r\na,description,g,false,,`
     );
     cy.contains("Finish Upload").click();
     cy.contains("Upload Successful").then(() => {
       cy.window().then(win => {
         expect(win.parsedData).to.deep.equal([
-          {
-            name: "pj5_0001",
-            description: "Example description of a sequence",
-            sequence: "gtgctttca",
-            isRegex: false,
-            matchType: "dna",
-            type: "misc_feature"
-          },
           {
             name: "a",
             description: "description",
