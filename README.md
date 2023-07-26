@@ -1,3 +1,13 @@
+# THIS REPO HAS MOVED! 
+
+https://github.com/TeselaGen/tg-oss/tree/main/packages/ui
+
+🙏🙏 PLEASE MAKE ALL ISSUES/PRs there! 🙏🙏
+
+
+# THIS REPO HAS MOVED! 
+
+
 
 # TeselaGen-React-Components
 
@@ -192,4 +202,14 @@ See the demo page for live examples!
 open `src/customIcons.js` and add a new exported svg with a name of xxxxIcon (you can find the svgs from iconmonstr or flaticon or wherever)
 
 be sure to add it to the `demo/src/examples/CustomIcons.js` page to TEST THAT IT WORKS and so that people know it exists!
+
+
+# THIS REPO HAS MOVED! 
+
+https://github.com/TeselaGen/tg-oss/tree/main/packages/ui
+
+🙏🙏 PLEASE MAKE ALL ISSUES/PRs there! 🙏🙏
+
+
+# THIS REPO HAS MOVED! 
 
